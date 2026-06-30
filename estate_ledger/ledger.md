@@ -660,7 +660,7 @@ Summary:
 Added durable Alfred job artifacts and result retrieval. Completed jobs now write result.json, events.json, and summary.txt under runtime job artifact directories. Added alfred-result and Audit validation for job result artifacts.
 
 
-## EC-000059 - Added Alfred job artifacts and results
+## Retired duplicate entry for Alfred job artifacts and results
 
 Timestamp: 2026-06-30 08:42:51
 Location: A:\theestate
@@ -867,3 +867,24 @@ Classification: Estate Internal
 
 Summary:
 Added a capability help command to explain Alfred-routable capabilities, their services, residents, readiness, and intended use.
+
+## EC-000078 - Added Estate governance onboarding runway
+
+Timestamp: 2026-06-30 16:55:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added the Estate governance onboarding runway, including AI_HINTS.md, AI_START_HERE.md, lean governance documents, visual onboarding specification, worker packages, archived origin memory, and concept art assets.
+
+
+## EC-000079 - Repaired Estate ledger and devlog continuity
+
+Timestamp: 2026-06-30 17:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Repaired Estate history continuity after EC-000078 by adding missing ledger and devlog entries and retiring the duplicate EC-000059 entry heading without deleting historical text.
