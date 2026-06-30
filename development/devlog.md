@@ -329,3 +329,10 @@ Repaired the Discovery report latest-observation path and cleaned duplicate-reco
 EC-000046 - Hardened Discovery report runtime fallback
 
 Added a runtime latest fallback for Discovery report generation so discovery-report renders from runtime state after the latest observation migration.
+
+
+## 2026-06-30 00:12:46
+
+EC-000047 - Added Audit runtime report artifacts
+
+Added audit --save support and a runtime Audit report helper so Audit can persist latest machine-readable results under runtime/audit without mutating versioned Estate state.

@@ -138,6 +138,7 @@ def _syntax_checks():
         "src/estate/core/provider_sync.py",
         "src/estate/core/discovery_catalog.py",
         "src/estate/core/discovery_cycle.py",
+        "src/estate/core/audit_runtime.py",
     ]
 
     for file in py_files:

@@ -515,3 +515,14 @@ Classification: Estate Internal
 
 Summary:
 Hardened Discovery report generation after runtime migration by adding a runtime latest fallback when the legacy report reader cannot find a versioned latest observation. The report now renders from runtime Discovery state and preserves the human-readable Discovery contract.
+
+
+## EC-000047 - Added Audit runtime report artifacts
+
+Timestamp: 2026-06-30 00:12:46
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added runtime Audit report persistence using the audit --save option. Audit can now emit human-readable output, JSON output, and a saved runtime artifact at runtime/audit/latest.json without dirtying the versioned repository.

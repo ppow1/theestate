@@ -8,6 +8,7 @@ from estate.core.provider_sync import sync_ollama_providers
 from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery_catalog_from_latest, format_discovery_catalog_report
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.audit import print_audit_report
+from estate.core.audit_runtime import save_audit_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -140,6 +141,11 @@ def cmd_audit(args):
     else:
         report = print_audit_report()
 
+    if getattr(args, "save", False):
+        path = save_audit_report(report)
+        if not getattr(args, "json", False):
+            print(f"Saved audit report: {path}")
+
     if report["failed"] > 0:
         raise SystemExit(1)
 
@@ -211,6 +217,7 @@ def main():
 
     p = sub.add_parser("audit")
     p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
+    p.add_argument("--save", action="store_true", help="Save latest audit report to runtime/audit/latest.json")
     p.set_defaults(func=cmd_audit)
 
     args = parser.parse_args()
