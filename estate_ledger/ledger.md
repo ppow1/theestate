@@ -899,3 +899,13 @@ Classification: Estate Internal
 
 Summary:
 Cleaned duplicated history repair blocks, removed temporary backup files, and restored ledger/devlog continuity after the governance onboarding runway commit.
+
+## EC-000081 - Repaired Alfred code review audit contract
+
+Timestamp: 2026-06-30 17:30:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Updated the Alfred code review audit validator to match the current Alfred task JSON contract. The validator now reads the results array, locates the code.review capability result, and validates the Estate Code Review Report summary without changing Alfred runtime behavior.

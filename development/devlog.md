@@ -659,3 +659,9 @@ Added missing EC-000078 history entries and repaired the duplicate EC-000059 ent
 EC-000080 - Cleaned duplicate history repair entries
 
 Cleaned duplicated history repair blocks, removed temporary backup files, and restored ledger/devlog continuity after the governance onboarding runway commit.
+
+## 2026-06-30 17:30:00
+
+EC-000081 - Repaired Alfred code review audit contract
+
+Updated the Alfred code review audit validator to read the current results-array contract and validate the code.review Estate Code Review Report without changing Alfred runtime behavior.

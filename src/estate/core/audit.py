@@ -879,14 +879,25 @@ def _alfred_code_review_executor_check():
     except Exception as e:
         return {"name": "runtime:alfred_code_review_json", "ok": False, "detail": str(e)}
 
-    text = data.get("result", {}).get("summary") or ""
+    review_result = None
+    for item in data.get("results", []):
+        if item.get("capability") == "code.review":
+            review_result = item
+            break
+
+    if review_result is None:
+        return {
+            "name": "runtime:alfred_code_review_json",
+            "ok": False,
+            "detail": "missing code.review result",
+        }
+
+    text = review_result.get("result", {}).get("summary") or ""
     return {
         "name": "runtime:alfred_code_review_json",
-        "ok": data.get("ok") is True and "Safe Code Review Result" in text,
+        "ok": data.get("ok") is True and review_result.get("ok") is True and "Estate Code Review Report" in text,
         "detail": data.get("job_id", "code review valid"),
     }
-
-
 
 def _alfred_artifacts_command_check():
     task = _run('.\\estate.bat alfred-task "summarize artifacts" --json')
@@ -1634,3 +1645,4 @@ def print_audit_report():
             print(f"     {check['detail']}")
 
     return report
+
