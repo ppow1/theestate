@@ -455,3 +455,10 @@ Added alfred-request, alfred-requests, and alfred-promote with Audit validation.
 EC-000063 - Added Alfred operator briefing
 
 Added alfred-briefing with human-readable and JSON output plus Audit validation.
+
+
+## 2026-06-30 08:55:26
+
+EC-000064 - Added Estate operator manual and service catalog
+
+Added docs/operator_manual.md and docs/service_catalog.md to document current Estate operation and service capabilities.

@@ -713,3 +713,14 @@ Classification: Estate Internal
 
 Summary:
 Added Alfred operator briefing to summarize readiness, available services, capabilities, queued requests, and latest jobs in one Steward-facing command.
+
+
+## EC-000064 - Added Estate operator manual and service catalog
+
+Timestamp: 2026-06-30 08:55:26
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added operator-facing documentation for the Estate, including the layer model, command surface, standard workflows, runtime artifact guidance, recovery notes, and current Alfred-facing service catalog.
