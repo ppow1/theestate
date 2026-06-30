@@ -211,6 +211,7 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_alfred_artifacts_command_check())
     checks.append(_alfred_cleanup_command_check())
     checks.append(_alfred_briefing_command_check())
     checks.append(_alfred_request_queue_command_check())
@@ -252,6 +253,7 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "alfred-artifacts",
         "alfred-cleanup",
         "alfred-briefing",
         "alfred-request",
@@ -872,6 +874,28 @@ def _alfred_code_review_executor_check():
         "name": "runtime:alfred_code_review_json",
         "ok": data.get("ok") is True and "Safe Code Review Result" in text,
         "detail": data.get("job_id", "code review valid"),
+    }
+
+
+
+def _alfred_artifacts_command_check():
+    task = _run('.\\estate.bat alfred-task "summarize artifacts" --json')
+    if not task["ok"]:
+        return {"name": "runtime:alfred_artifacts_json", "ok": False, "detail": task["stderr"] or task["stdout"]}
+
+    result = _run(".\\estate.bat alfred-artifacts --json")
+    if not result["ok"]:
+        return {"name": "runtime:alfred_artifacts_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_artifacts_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:alfred_artifacts_json",
+        "ok": isinstance(data.get("artifacts"), list),
+        "detail": f"{data.get('count')} artifacts",
     }
 
 

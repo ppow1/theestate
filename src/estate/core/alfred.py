@@ -896,3 +896,43 @@ def _safe_code_review_text(goal):
         "Safety boundary:",
         "No project files were modified by this executor.",
     ])
+
+
+
+def artifact_index():
+    jobs = list_jobs().get("jobs", [])
+    artifacts = []
+
+    for job in jobs:
+        item = job.get("artifacts") or {}
+        if item:
+            artifacts.append({
+                "job_id": job.get("id"),
+                "goal": job.get("goal"),
+                "status": job.get("status"),
+                "artifacts": item,
+            })
+
+    return {
+        "version": 1,
+        "count": len(artifacts),
+        "artifacts": artifacts,
+    }
+
+
+def format_artifact_index(payload=None):
+    payload = payload or artifact_index()
+    lines = [
+        "=========================================",
+        "Alfred Artifact Index",
+        "=========================================",
+        f"Artifacts: {payload.get('count')}",
+        "",
+    ]
+
+    for item in payload.get("artifacts", [])[-30:]:
+        lines.append(f"{item.get('job_id')} | {item.get('status')} | {item.get('goal')}")
+        for key, value in sorted((item.get("artifacts") or {}).items()):
+            lines.append(f"  {key}: {value}")
+
+    return "\n".join(lines)

@@ -790,3 +790,14 @@ Classification: Estate Internal
 
 Summary:
 Added a safe non-destructive code review executor for Alfred code assistance tasks. The executor produces review guidance and preserves the no-write safety boundary.
+
+
+## EC-000071 - Added Alfred artifact index
+
+Timestamp: 2026-06-30 09:04:38
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added an Alfred artifact index command to list runtime job artifacts and make completed job outputs easier to find from the command surface.

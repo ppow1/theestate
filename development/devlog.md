@@ -504,3 +504,10 @@ Added local reasoning execution output and Audit validation for Alfred local rea
 EC-000070 - Added Alfred code review dry-run executor
 
 Added safe code review execution output and Audit validation.
+
+
+## 2026-06-30 09:04:38
+
+EC-000071 - Added Alfred artifact index
+
+Added alfred-artifacts with human-readable and JSON output plus Audit validation.
