@@ -119,3 +119,14 @@ Classification: Estate Internal
 
 Summary:
 Added .gitignore rules for Python cache files and removed committed __pycache__ artifacts from Git tracking.
+
+
+## EC-000012 - Created Service and Capability Registries
+
+Timestamp: 2026-06-29 20:39:17
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added initial Estate Service Registry and Capability Registry to track callable services and local AI resources including RTX 4090 CUDA, Kokoro TTS, F5-TTS, ComfyUI, FFmpeg, and pending Whisper.

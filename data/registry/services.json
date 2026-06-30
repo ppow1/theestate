@@ -1,0 +1,26 @@
+[
+  {
+    "id": "SVC-000001",
+    "name": "Ledger Service",
+    "status": "Active",
+    "owner": "Archives",
+    "resident": "Eleanor",
+    "purpose": "Create and maintain Estate Change records, ledger entries, and institutional continuity."
+  },
+  {
+    "id": "SVC-000002",
+    "name": "Registry Service",
+    "status": "Active",
+    "owner": "Archives",
+    "resident": "Eleanor",
+    "purpose": "Maintain object registries for residents, workers, departments, capabilities, and future institutional objects."
+  },
+  {
+    "id": "SVC-000003",
+    "name": "Capability Service",
+    "status": "Draft",
+    "owner": "Administration",
+    "resident": "Alfred",
+    "purpose": "Track available local and cloud capabilities usable by the Estate."
+  }
+]

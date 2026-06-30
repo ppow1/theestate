@@ -1,0 +1,51 @@
+[
+  {
+    "id": "CAP-000001",
+    "name": "RTX 4090 CUDA",
+    "category": "Compute",
+    "status": "Operational",
+    "location": "Local AI Workstation",
+    "root": "A:\\AI",
+    "notes": "Primary local GPU acceleration resource."
+  },
+  {
+    "id": "CAP-000002",
+    "name": "Kokoro TTS",
+    "category": "Speech Synthesis",
+    "status": "Operational",
+    "location": "A:\\AI\\TTS",
+    "notes": "Local text-to-speech capability."
+  },
+  {
+    "id": "CAP-000003",
+    "name": "F5-TTS",
+    "category": "Speech Synthesis",
+    "status": "Operational",
+    "location": "A:\\AI\\TTS\\F5-TTS",
+    "notes": "Local voice/TTS capability."
+  },
+  {
+    "id": "CAP-000004",
+    "name": "ComfyUI",
+    "category": "Image Generation",
+    "status": "Installed",
+    "location": "A:\\AI\\ComfyUI",
+    "notes": "Local image generation workflow environment."
+  },
+  {
+    "id": "CAP-000005",
+    "name": "FFmpeg / FFplay",
+    "category": "Media Processing",
+    "status": "Operational",
+    "location": "A:\\AI\\Tools\\FFmpeg",
+    "notes": "Local audio/video processing dependency."
+  },
+  {
+    "id": "CAP-000006",
+    "name": "Whisper",
+    "category": "Speech Recognition",
+    "status": "Pending Install",
+    "location": "A:\\AI",
+    "notes": "Planned local speech-to-text capability."
+  }
+]

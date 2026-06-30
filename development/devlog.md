@@ -77,3 +77,10 @@ Created resident record RES-000006 for Judy, serving as General Counsel in Legal
 EC-000011 - Added Python cache ignore rules
 
 Added .gitignore rules for Python cache files and removed committed __pycache__ artifacts from Git tracking.
+
+
+## 2026-06-29 20:39:17
+
+EC-000012 - Created Service and Capability Registries
+
+Added initial Estate Service Registry and Capability Registry to track callable services and local AI resources including RTX 4090 CUDA, Kokoro TTS, F5-TTS, ComfyUI, FFmpeg, and pending Whisper.
