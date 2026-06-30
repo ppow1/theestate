@@ -216,6 +216,7 @@ def _runtime_checks():
     checks.append(_alfred_request_queue_command_check())
     checks.append(_alfred_status_command_check())
     checks.append(_alfred_task_command_check())
+    checks.append(_alfred_local_reasoning_executor_check())
     checks.append(_alfred_plan_command_check())
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
@@ -832,6 +833,25 @@ def _service_readiness_command_check():
         "name": "runtime:service_readiness_json",
         "ok": "ready_count" in data and "blocked_count" in data,
         "detail": f"ready={data.get('ready_count')} blocked={data.get('blocked_count')}",
+    }
+
+
+
+def _alfred_local_reasoning_executor_check():
+    result = _run('.\\estate.bat alfred-task "reason about the current Estate readiness" --json')
+    if not result["ok"]:
+        return {"name": "runtime:alfred_local_reasoning_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_local_reasoning_json", "ok": False, "detail": str(e)}
+
+    text = data.get("result", {}).get("summary") or ""
+    return {
+        "name": "runtime:alfred_local_reasoning_json",
+        "ok": data.get("ok") is True and "Local Reasoning Result" in text,
+        "detail": data.get("job_id", "local reasoning valid"),
     }
 
 

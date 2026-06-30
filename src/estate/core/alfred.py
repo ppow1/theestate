@@ -26,6 +26,11 @@ EXECUTION_POLICIES = {
         "uses_network": False,
         "requires_confirmation": False,
     },
+    "local_reasoning_executor": {
+        "writes_files": False,
+        "uses_network": False,
+        "requires_confirmation": False,
+    },
 }
 
 
@@ -285,25 +290,14 @@ def _safe_execute_step(step, goal):
     capability = step.get("capability")
 
     if capability in ["plan", "reason", "summarize"]:
-        text = [
-            f"Goal: {goal}",
-            "",
-            "Alfred Assessment:",
-            "The Estate can route this request through the local reasoning service.",
-            "This safe executor produces a structured text artifact without modifying project files.",
-            "",
-            "Recommended next steps:",
-            "1. Confirm the intended output.",
-            "2. Use available Estate services if a specialized tool is needed.",
-            "3. Preserve results under the runtime job artifact directory.",
-        ]
+        text = _local_reasoning_text(goal)
 
         return {
             "ok": True,
             "capability": capability,
-            "mode": "safe_text_executor",
+            "mode": "local_reasoning_executor",
             "result": {
-                "summary": "\n".join(text),
+                "summary": text,
                 "next_action": "Review the generated runtime artifact and decide whether to promote the task to a more specific service.",
             },
         }
@@ -854,4 +848,26 @@ def format_cleanup_result(result):
     ]
     for job_id in result.get("removed", []):
         lines.append(f"- {job_id}")
+    return "\n".join(lines)
+
+
+
+def _local_reasoning_text(goal):
+    status = alfred_status()
+    lines = [
+        f"Goal: {goal}",
+        "",
+        "Local Reasoning Result:",
+        "Alfred reviewed the goal against the current Estate capability surface.",
+        "",
+        "Estate readiness:",
+        f"- Services available: {status.get('services', {}).get('available')}",
+        f"- Capabilities available: {status.get('services', {}).get('capabilities')}",
+        f"- Runtime jobs recorded: {status.get('jobs', {}).get('count')}",
+        "",
+        "Recommended operator response:",
+        "1. Use Alfred planning for routing.",
+        "2. Use safe execution for non-destructive work.",
+        "3. Promote to a specialized service only when the task requires it.",
+    ]
     return "\n".join(lines)
