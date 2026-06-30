@@ -207,6 +207,7 @@ def _runtime_checks():
     checks.append(_cli_inventory_check())
     checks.append(_audit_runtime_artifact_check())
     checks.append(_audit_summary_command_check())
+    checks.append(_service_readiness_command_check())
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
@@ -245,6 +246,7 @@ def _cli_inventory_check():
         "sync-ollama",
         "audit",
         "audit-summary",
+        "service-readiness",
         "service-status",
         "service-route",
         "alfred-capabilities",
@@ -812,6 +814,24 @@ def _alfred_cleanup_command_check():
         "name": "runtime:alfred_cleanup_json",
         "ok": data.get("ok") is True and "removed_count" in data,
         "detail": f"removed={data.get('removed_count')}",
+    }
+
+
+
+def _service_readiness_command_check():
+    result = _run(".\\estate.bat service-readiness --json")
+    if not result["ok"]:
+        return {"name": "runtime:service_readiness_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:service_readiness_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:service_readiness_json",
+        "ok": "ready_count" in data and "blocked_count" in data,
+        "detail": f"ready={data.get('ready_count')} blocked={data.get('blocked_count')}",
     }
 
 

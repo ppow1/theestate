@@ -746,3 +746,14 @@ Classification: Estate Internal
 
 Summary:
 Added Alfred runtime job cleanup with retention control so runtime job artifacts can be managed without touching versioned Estate state.
+
+
+## EC-000067 - Added service readiness gates
+
+Timestamp: 2026-06-30 08:56:58
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added service readiness reporting so Alfred and the Steward can distinguish ready services from blocked services and see missing requirements clearly.

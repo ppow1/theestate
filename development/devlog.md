@@ -476,3 +476,10 @@ Updated Alfred safe text executor to produce structured runtime text output for 
 EC-000066 - Added Alfred job cleanup and retention
 
 Added alfred-cleanup with retention control and Audit validation.
+
+
+## 2026-06-30 08:56:58
+
+EC-000067 - Added service readiness gates
+
+Added service-readiness with JSON and human-readable output plus Audit validation.

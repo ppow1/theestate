@@ -207,3 +207,56 @@ def format_alfred_capabilities(payload=None):
         lines.append(f"     {item['alfred_use']}")
 
     return "\n".join(lines)
+
+
+
+def service_readiness():
+    status = service_status()
+    blocked = []
+    ready = []
+
+    for service in status.get("services", []):
+        if service.get("available"):
+            ready.append(service["id"])
+        else:
+            blocked.append({
+                "id": service["id"],
+                "missing": [
+                    requirement["requirement"]
+                    for requirement in service.get("requirements", [])
+                    if not requirement.get("ok")
+                ],
+            })
+
+    return {
+        "version": 1,
+        "ready": ready,
+        "blocked": blocked,
+        "ready_count": len(ready),
+        "blocked_count": len(blocked),
+    }
+
+
+def format_service_readiness(payload=None):
+    payload = payload or service_readiness()
+    lines = [
+        "=========================================",
+        "Estate Service Readiness",
+        "=========================================",
+        f"Ready: {payload.get('ready_count')}",
+        f"Blocked: {payload.get('blocked_count')}",
+        "",
+        "Ready Services:",
+    ]
+
+    for service_id in payload.get("ready", []):
+        lines.append(f"- {service_id}")
+
+    lines.append("")
+    lines.append("Blocked Services:")
+    for service in payload.get("blocked", []):
+        lines.append(f"- {service.get('id')}")
+        for missing in service.get("missing", []):
+            lines.append(f"  missing: {missing}")
+
+    return "\n".join(lines)
