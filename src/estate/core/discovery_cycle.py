@@ -26,7 +26,16 @@ def run_discovery_cycle():
     failures = []
 
     try:
-        observation = observe_ai_environment()
+        observed = observe_ai_environment()
+
+        if isinstance(observed, tuple):
+            observation = observed[0]
+        else:
+            observation = observed
+
+        if not isinstance(observation, dict):
+            raise TypeError(f"observation root is {type(observation).__name__}, expected dict")
+
         steps.append({"name": "observe", "ok": True, "detail": "observation written"})
     except Exception as exc:
         observation = {}

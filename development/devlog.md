@@ -252,3 +252,10 @@ Added persistent Discovery Catalog support, automatic catalog updates from obser
 EC-000036 - Added Discovery lifecycle command and metrics
 
 Added the discover lifecycle command, persisted Discovery cycle metrics, and extended Audit coverage for the lifecycle command, metrics file, CLI inventory, and new Discovery modules.
+
+
+## 2026-06-29 23:30:37
+
+EC-000037 - Repaired Discovery lifecycle observation handling
+
+Repaired Discovery lifecycle metrics generation by normalizing tuple-shaped observe_ai_environment results before metric extraction.

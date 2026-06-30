@@ -4,16 +4,16 @@
   "catalog_inactive": 0,
   "changed_since_previous": null,
   "consecutive_successful_runs": 0,
-  "duration_seconds": 0.08,
+  "duration_seconds": 0.084,
   "failures": [
     "'tuple' object has no attribute 'get'"
   ],
-  "finished_at": "2026-06-29T23:29:50",
+  "finished_at": "2026-06-29T23:30:41",
   "ok": false,
   "ollama_models": 0,
   "ollama_running": null,
   "report_lines": 26,
-  "started_at": "2026-06-29T23:29:50",
+  "started_at": "2026-06-29T23:30:41",
   "steps": [
     {
       "detail": "'tuple' object has no attribute 'get'",
