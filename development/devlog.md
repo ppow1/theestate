@@ -161,3 +161,10 @@ Defined the need for Estate Audit to detect numbering drift and validation failu
 EC-000023 - Added Discovery human-readable report
 
 Added a Discovery report command that summarizes latest AI environment observations, changes, tools, TTS items, Python environments, and Ollama models in human-readable form.
+
+
+## 2026-06-29 22:27:18
+
+EC-000024 - Added Estate Audit command
+
+Implemented Estate Audit command to validate Python syntax, selected CLI runtime commands, JSON registries, Git cleanliness, and latest EC alignment between Git and the ledger.

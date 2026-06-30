@@ -251,3 +251,14 @@ Classification: Estate Internal
 
 Summary:
 Added a Discovery report command that summarizes latest AI environment observations, changes, tools, TTS items, Python environments, and Ollama models in human-readable form.
+
+
+## EC-000024 - Added Estate Audit command
+
+Timestamp: 2026-06-29 22:27:18
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented Estate Audit command to validate Python syntax, selected CLI runtime commands, JSON registries, Git cleanliness, and latest EC alignment between Git and the ledger.

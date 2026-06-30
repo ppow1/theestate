@@ -5,6 +5,7 @@ from estate.core.registry import load_registry
 from estate.core.services import list_services, list_capabilities, list_providers
 from estate.core.discovery import observe_ai_environment, generate_discovery_report
 from estate.core.provider_sync import sync_ollama_providers
+from estate.core.audit import print_audit_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -67,6 +68,11 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+def cmd_audit(args):
+    report = print_audit_report()
+    if report["failed"] > 0:
+        raise SystemExit(1)
+
 def cmd_sync_ollama(args):
     created, ec_id = sync_ollama_providers()
     print(f"Logged {ec_id}")
@@ -119,6 +125,9 @@ def main():
     p = sub.add_parser("sync-ollama")
     p.set_defaults(func=cmd_sync_ollama)
 
+    p = sub.add_parser("audit")
+    p.set_defaults(func=cmd_audit)
+
     args = parser.parse_args()
     if not hasattr(args, "func"):
         parser.print_help()
@@ -127,4 +136,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
