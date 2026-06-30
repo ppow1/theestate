@@ -217,3 +217,10 @@ Added ledger structure validation to Estate Audit, including sequential EC numbe
 EC-000031 - Added Estate Audit devlog structure validation
 
 Added devlog structure validation to Estate Audit, including EC entry presence, duplicate EC detection, and latest devlog-to-ledger alignment.
+
+
+## 2026-06-29 23:06:15
+
+EC-000032 - Added Discovery operational validation bundle
+
+Added a bundled set of Discovery-focused Audit checks covering latest observation shape, historical observation JSON validity, observation history presence, and Discovery report contract validation.

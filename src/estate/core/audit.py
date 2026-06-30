@@ -231,6 +231,9 @@ def _registry_checks():
 def _observation_checks():
     return [
         _observation_history_check(),
+        _observation_latest_shape_check(),
+        _observation_history_json_check(),
+        _discovery_report_contract_check(),
     ]
 
 
@@ -331,6 +334,108 @@ def _ledger_structure_check():
         "name": "history:ledger_structure",
         "ok": True,
         "detail": f"{len(entries)} sequential entries",
+    }
+
+
+
+def _observation_latest_shape_check():
+    path = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {
+            "name": "observations:latest_shape",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    if not isinstance(data, dict):
+        return {
+            "name": "observations:latest_shape",
+            "ok": False,
+            "detail": "latest observation root is not an object",
+        }
+
+    if not data:
+        return {
+            "name": "observations:latest_shape",
+            "ok": False,
+            "detail": "latest observation is empty",
+        }
+
+    keys = sorted(data.keys())
+    return {
+        "name": "observations:latest_shape",
+        "ok": True,
+        "detail": "keys=" + ", ".join(keys[:8]),
+    }
+
+
+def _observation_history_json_check():
+    observations = ESTATE_ROOT / "observations"
+    history = [
+        path for path in sorted(observations.glob("ai_environment_*.json"))
+        if not path.name.endswith("_latest.json")
+    ]
+
+    if not history:
+        return {
+            "name": "observations:history_json",
+            "ok": False,
+            "detail": "no timestamped observation files found",
+        }
+
+    invalid = []
+    for path in history:
+        try:
+            json.loads(path.read_text(encoding="utf-8"))
+        except Exception as e:
+            invalid.append(f"{path.name}: {e}")
+
+    return {
+        "name": "observations:history_json",
+        "ok": not invalid,
+        "detail": f"{len(history)} valid historical observations" if not invalid else "; ".join(invalid[:3]),
+    }
+
+
+def _discovery_report_contract_check():
+    result = _run(".\\estate.bat discovery-report")
+
+    if not result["ok"]:
+        return {
+            "name": "observations:discovery_report_contract",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    output = result["stdout"]
+    required_terms = [
+        "Discovery",
+        "AI",
+        "Ollama",
+    ]
+    missing = [term for term in required_terms if term.lower() not in output.lower()]
+    lines = [line for line in output.splitlines() if line.strip()]
+
+    if missing:
+        return {
+            "name": "observations:discovery_report_contract",
+            "ok": False,
+            "detail": "missing report terms: " + ", ".join(missing),
+        }
+
+    if len(lines) < 5:
+        return {
+            "name": "observations:discovery_report_contract",
+            "ok": False,
+            "detail": f"report too short: {len(lines)} lines",
+        }
+
+    return {
+        "name": "observations:discovery_report_contract",
+        "ok": True,
+        "detail": f"{len(lines)} non-empty lines",
     }
 
 

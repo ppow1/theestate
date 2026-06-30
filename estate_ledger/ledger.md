@@ -339,3 +339,14 @@ Classification: Estate Internal
 
 Summary:
 Expanded Estate Audit history validation to check development devlog structure. Audit now validates devlog EC entry presence, duplicate devlog EC detection, and latest devlog EC alignment with the ledger.
+
+
+## EC-000032 - Added Discovery operational validation bundle
+
+Timestamp: 2026-06-29 23:06:15
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Expanded Estate Audit with a bundled Discovery validation increment. Audit now validates latest observation shape, timestamped observation JSON readability, observation history presence, and the operational contract of the human-readable Discovery report.
