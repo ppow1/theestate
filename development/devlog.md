@@ -266,3 +266,10 @@ Repaired Discovery lifecycle metrics generation by normalizing tuple-shaped obse
 EC-000038 - Repaired Discovery catalog wrapper contract
 
 Repaired the Discovery catalog wrapper to normalize tuple-shaped observation results before catalog synchronization, fixing the Discovery lifecycle observe step failure.
+
+
+## 2026-06-29 23:34:45
+
+EC-000039 - Separated Discovery runtime state from versioned state
+
+Moved mutable Discovery catalog, metrics, and latest observation state to runtime/discovery and ignored runtime state in Git. Audit now validates runtime Discovery state instead of treating normal runtime mutation as versioned institutional change.

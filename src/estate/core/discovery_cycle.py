@@ -6,7 +6,7 @@ from estate.core.paths import ESTATE_ROOT
 from estate.core.discovery import observe_ai_environment, generate_discovery_report
 from estate.core.discovery_catalog import load_discovery_catalog, summarize_discovery_catalog
 
-METRICS_PATH = ESTATE_ROOT / "data" / "discovery" / "metrics.json"
+METRICS_PATH = ESTATE_ROOT / "runtime" / "discovery" / "metrics.json"
 
 
 def _now():

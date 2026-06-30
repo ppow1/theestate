@@ -4,8 +4,8 @@ from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
 
-CATALOG_PATH = ESTATE_ROOT / "data" / "discovery" / "catalog.json"
-LATEST_OBSERVATION_PATH = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+CATALOG_PATH = ESTATE_ROOT / "runtime" / "discovery" / "catalog.json"
+LATEST_OBSERVATION_PATH = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
 
 
 def _now():

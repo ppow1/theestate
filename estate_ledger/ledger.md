@@ -416,3 +416,14 @@ Classification: Estate Internal
 
 Summary:
 Repaired the Discovery catalog integration wrapper so tuple-shaped observation results are normalized before catalog synchronization. This fixes the lifecycle observe step failure and establishes that the wrapped Discovery observation interface returns a dictionary to downstream consumers.
+
+
+## EC-000039 - Separated Discovery runtime state from versioned state
+
+Timestamp: 2026-06-29 23:34:45
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Separated mutable Discovery runtime state from versioned institutional records. Discovery catalog, metrics, and latest observation now use runtime/discovery, which is ignored by Git, so normal Discovery and Audit operations no longer dirty the repository merely by running.

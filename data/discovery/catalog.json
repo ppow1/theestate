@@ -10,9 +10,9 @@
       "first_seen": "2026-06-29T23:26:36",
       "id": "model:llama3.2:3b",
       "kind": "model",
-      "last_seen": "2026-06-29T23:26:36",
+      "last_seen": "2026-06-29T23:32:24",
       "name": "llama3.2:3b",
-      "observations": 1,
+      "observations": 6,
       "status": "active"
     },
     {
@@ -25,9 +25,9 @@
       "first_seen": "2026-06-29T23:26:36",
       "id": "model:qwen2.5-coder:7b",
       "kind": "model",
-      "last_seen": "2026-06-29T23:26:36",
+      "last_seen": "2026-06-29T23:32:24",
       "name": "qwen2.5-coder:7b",
-      "observations": 1,
+      "observations": 6,
       "status": "active"
     },
     {
@@ -37,9 +37,9 @@
       "first_seen": "2026-06-29T23:26:36",
       "id": "provider:ollama",
       "kind": "provider",
-      "last_seen": "2026-06-29T23:26:36",
+      "last_seen": "2026-06-29T23:32:24",
       "name": "ollama",
-      "observations": 1,
+      "observations": 6,
       "status": "active"
     },
     {
@@ -47,9 +47,9 @@
       "first_seen": "2026-06-29T23:26:36",
       "id": "python_env:aider_py311",
       "kind": "python_env",
-      "last_seen": "2026-06-29T23:26:36",
+      "last_seen": "2026-06-29T23:32:24",
       "name": "aider_py311",
-      "observations": 1,
+      "observations": 6,
       "status": "active"
     },
     {
@@ -57,9 +57,9 @@
       "first_seen": "2026-06-29T23:26:36",
       "id": "python_env:comfyui_server_py311",
       "kind": "python_env",
-      "last_seen": "2026-06-29T23:26:36",
+      "last_seen": "2026-06-29T23:32:24",
       "name": "comfyui_server_py311",
-      "observations": 1,
+      "observations": 6,
       "status": "active"
     },
     {
@@ -67,12 +67,12 @@
       "first_seen": "2026-06-29T23:26:36",
       "id": "python_env:whisper_py311",
       "kind": "python_env",
-      "last_seen": "2026-06-29T23:26:36",
+      "last_seen": "2026-06-29T23:32:24",
       "name": "whisper_py311",
-      "observations": 1,
+      "observations": 6,
       "status": "active"
     }
   ],
-  "updated_at": "2026-06-29T23:26:36",
+  "updated_at": "2026-06-29T23:32:24",
   "version": 1
 }

@@ -49,7 +49,6 @@ def _required_paths_check():
         "data/registry/services.json",
         "data/registry/capabilities.json",
         "data/registry/providers.json",
-        "observations/ai_environment_latest.json",
         "estate_ledger/ledger.md",
         "development/devlog.md",
         "estate.bat",
@@ -207,7 +206,6 @@ def _json_checks():
         "data/registry/services.json",
         "data/registry/capabilities.json",
         "data/registry/providers.json",
-        "observations/ai_environment_latest.json",
     ]:
         ok, detail = _json_ok(ESTATE_ROOT / path)
         checks.append({
@@ -523,12 +521,12 @@ def _discovery_status_command_check():
 
 
 def _discovery_catalog_schema_check():
-    path = ESTATE_ROOT / "data" / "discovery" / "catalog.json"
+    path = ESTATE_ROOT / "runtime" / "discovery" / "catalog.json"
     if not path.exists():
         return {
             "name": "observations:discovery_catalog_schema",
             "ok": False,
-            "detail": "missing data/discovery/catalog.json",
+            "detail": "missing runtime/discovery/catalog.json",
         }
 
     try:
@@ -621,8 +619,8 @@ def _discovery_catalog_command_check():
 
 
 def _discovery_catalog_latest_coverage_check():
-    latest_path = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
-    catalog_path = ESTATE_ROOT / "data" / "discovery" / "catalog.json"
+    latest_path = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
+    catalog_path = ESTATE_ROOT / "runtime" / "discovery" / "catalog.json"
 
     try:
         latest = json.loads(latest_path.read_text(encoding="utf-8"))
@@ -695,12 +693,12 @@ def _discovery_cycle_command_check():
 
 
 def _discovery_metrics_file_check():
-    path = ESTATE_ROOT / "data" / "discovery" / "metrics.json"
+    path = ESTATE_ROOT / "runtime" / "discovery" / "metrics.json"
     if not path.exists():
         return {
             "name": "observations:discovery_metrics_file",
             "ok": False,
-            "detail": "missing data/discovery/metrics.json",
+            "detail": "missing runtime/discovery/metrics.json",
         }
 
     try:

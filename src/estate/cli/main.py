@@ -70,7 +70,7 @@ def cmd_discovery_status(args):
     import json
     from estate.core.paths import ESTATE_ROOT
 
-    latest = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+    latest = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
     data = json.loads(latest.read_text(encoding="utf-8"))
 
     models = data.get("ollama", {}).get("models", [])
@@ -101,7 +101,7 @@ def cmd_discovery_report(args):
     if getattr(args, "json", False):
         import json
         from estate.core.paths import ESTATE_ROOT
-        latest = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+        latest = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
         print(json.dumps(json.loads(latest.read_text(encoding="utf-8")), indent=2))
     else:
         print(generate_discovery_report())

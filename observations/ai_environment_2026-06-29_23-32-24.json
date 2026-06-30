@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-06-29 23:32:24",
+  "ai_home": "A:\\AI",
+  "paths": {
+    "envs": "A:\\AI\\envs",
+    "tts": "A:\\AI\\TTS",
+    "tools": "A:\\AI\\Tools",
+    "models": "A:\\AI\\Models"
+  },
+  "exists": {
+    "ai_home": true,
+    "envs": true,
+    "tts": true,
+    "tools": true,
+    "models": true
+  },
+  "python_envs": [
+    "aider_py311",
+    "comfyui_server_py311",
+    "whisper_py311"
+  ],
+  "tts_items": [
+    "F5-TTS",
+    "kokoro_auditions",
+    "kokoro_py311"
+  ],
+  "tool_items": [
+    "FFmpeg",
+    "llama.cpp"
+  ],
+  "model_categories": [
+    ".desktop2-downloads",
+    "CLIP",
+    "Checkpoints",
+    "ControlNet",
+    "Embeddings",
+    "FLUX",
+    "GGUF",
+    "IPAdapter",
+    "LLM",
+    "LoRA",
+    "Ollama",
+    "SDXL",
+    "Upscalers",
+    "VAE",
+    "audio_encoders",
+    "background_removal",
+    "clip_vision",
+    "configs",
+    "detection",
+    "diffusers",
+    "diffusion_models",
+    "frame_interpolation",
+    "geometry_estimation",
+    "gligen",
+    "hypernetworks",
+    "latent_upscale_models",
+    "loras",
+    "model_patches",
+    "optical_flow",
+    "photomaker",
+    "style_models",
+    "text_encoders",
+    "unet",
+    "upscale_models",
+    "vae_approx"
+  ],
+  "ollama": {
+    "installed": true,
+    "running": true,
+    "version": "ollama version is 0.30.11",
+    "models_raw": "NAME                ID              SIZE      MODIFIED     \nqwen2.5-coder:7b    dae161e27b0e    4.7 GB    34 hours ago    \nllama3.2:3b         a80c4f17acd5    2.0 GB    34 hours ago",
+    "models": [
+      {
+        "name": "qwen2.5-coder:7b",
+        "id": "dae161e27b0e",
+        "size": "4.7 GB",
+        "modified": "34 hours ago"
+      },
+      {
+        "name": "llama3.2:3b",
+        "id": "a80c4f17acd5",
+        "size": "2.0 GB",
+        "modified": "34 hours ago"
+      }
+    ]
+  },
+  "change_report": {
+    "first_observation": false,
+    "changes": {
+      "python_envs": {
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          "aider_py311",
+          "comfyui_server_py311",
+          "whisper_py311"
+        ]
+      },
+      "tts_items": {
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          "F5-TTS",
+          "kokoro_auditions",
+          "kokoro_py311"
+        ]
+      },
+      "tool_items": {
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          "FFmpeg",
+          "llama.cpp"
+        ]
+      },
+      "model_categories": {
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          ".desktop2-downloads",
+          "CLIP",
+          "Checkpoints",
+          "ControlNet",
+          "Embeddings",
+          "FLUX",
+          "GGUF",
+          "IPAdapter",
+          "LLM",
+          "LoRA",
+          "Ollama",
+          "SDXL",
+          "Upscalers",
+          "VAE",
+          "audio_encoders",
+          "background_removal",
+          "clip_vision",
+          "configs",
+          "detection",
+          "diffusers",
+          "diffusion_models",
+          "frame_interpolation",
+          "geometry_estimation",
+          "gligen",
+          "hypernetworks",
+          "latent_upscale_models",
+          "loras",
+          "model_patches",
+          "optical_flow",
+          "photomaker",
+          "style_models",
+          "text_encoders",
+          "unet",
+          "upscale_models",
+          "vae_approx"
+        ]
+      },
+      "ollama_models": {
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          "llama3.2:3b",
+          "qwen2.5-coder:7b"
+        ]
+      }
+    }
+  },
+  "changed_since_previous": false
+}

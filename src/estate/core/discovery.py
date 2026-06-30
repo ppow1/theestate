@@ -2,6 +2,8 @@ import json
 import subprocess
 from pathlib import Path
 from estate.core.paths import ESTATE_ROOT
+
+RUNTIME_DISCOVERY_DIR = ESTATE_ROOT / "runtime" / "discovery"
 from estate.core.time import now
 
 AI_HOME = Path(r"A:\AI")
@@ -217,6 +219,7 @@ from estate.core.discovery_catalog import update_discovery_catalog as _estate_up
 _estate_catalog_observe_ai_environment = observe_ai_environment
 
 def observe_ai_environment():
+    RUNTIME_DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
     observed = _estate_catalog_observe_ai_environment()
 
     if isinstance(observed, tuple):
