@@ -179,6 +179,7 @@ def _syntax_checks():
         "src/estate/core/discovery_runtime.py",
         "src/estate/core/audit_runtime.py",
         "src/estate/core/service_layer.py",
+        "src/estate/core/alfred.py",
     ]
 
     for file in py_files:
@@ -209,6 +210,9 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_alfred_plan_command_check())
+    checks.append(_alfred_run_command_check())
+    checks.append(_alfred_jobs_command_check())
 
     return checks
 
@@ -234,6 +238,9 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "alfred-plan",
+        "alfred-run",
+        "alfred-jobs",
     ]
 
     if not result["ok"]:
@@ -410,6 +417,88 @@ def _alfred_capabilities_command_check():
         "name": "runtime:alfred_capabilities_json",
         "ok": isinstance(capabilities, list) and len(capabilities) > 0,
         "detail": f"{len(capabilities)} capabilities",
+    }
+
+
+
+def _alfred_plan_command_check():
+    result = _run('.\\estate.bat alfred-plan "generate an image of the estate" --json')
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_plan_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_plan_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = ["goal", "intents", "required_capabilities", "steps", "ready"]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "runtime:alfred_plan_json",
+        "ok": not missing and data.get("ready") is True,
+        "detail": "plan valid" if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+def _alfred_run_command_check():
+    result = _run('.\\estate.bat alfred-run "summarize and plan work" --json')
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_run_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_run_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = ["id", "goal", "status", "plan", "events"]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "runtime:alfred_run_json",
+        "ok": not missing and data.get("status") == "ready",
+        "detail": data.get("id", "job valid") if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+def _alfred_jobs_command_check():
+    result = _run(".\\estate.bat alfred-jobs --json")
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_jobs_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_jobs_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    return {
+        "name": "runtime:alfred_jobs_json",
+        "ok": isinstance(data.get("jobs"), list),
+        "detail": f"{len(data.get('jobs', []))} jobs",
     }
 
 

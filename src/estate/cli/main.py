@@ -9,6 +9,7 @@ from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
 from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities
+from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -128,6 +129,36 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+
+
+def cmd_alfred_plan(args):
+    plan = plan_goal(args.goal)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(plan, indent=2, sort_keys=True))
+    else:
+        print(format_plan(plan))
+
+
+def cmd_alfred_run(args):
+    job = create_job(args.goal)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(job, indent=2, sort_keys=True))
+    else:
+        print(format_job(job))
+
+    if job.get("status") == "blocked":
+        raise SystemExit(1)
+
+
+def cmd_alfred_jobs(args):
+    payload = list_jobs()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_jobs(payload))
 
 def cmd_service_status(args):
     payload = service_status()
@@ -263,6 +294,21 @@ def main():
     p.add_argument("--save", action="store_true", help="Save latest audit report to runtime/audit/latest.json")
     p.set_defaults(func=cmd_audit)
 
+
+
+    p = sub.add_parser("alfred-plan")
+    p.add_argument("goal", help="Goal for Alfred to plan")
+    p.add_argument("--json", action="store_true", help="Print Alfred plan JSON")
+    p.set_defaults(func=cmd_alfred_plan)
+
+    p = sub.add_parser("alfred-run")
+    p.add_argument("goal", help="Goal for Alfred to prepare as a runtime job")
+    p.add_argument("--json", action="store_true", help="Print Alfred job JSON")
+    p.set_defaults(func=cmd_alfred_run)
+
+    p = sub.add_parser("alfred-jobs")
+    p.add_argument("--json", action="store_true", help="Print Alfred runtime jobs JSON")
+    p.set_defaults(func=cmd_alfred_jobs)
 
     p = sub.add_parser("service-status")
     p.add_argument("--json", action="store_true", help="Print Estate service status JSON")
