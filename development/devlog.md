@@ -128,3 +128,10 @@ EC-000018 - Synced observed Ollama model providers
 Synced observed Ollama models into provider registry:
 - PRV-000005 Ollama qwen2.5-coder:7b
 - PRV-000006 Ollama llama3.2:3b
+
+
+## 2026-06-29 21:35:49
+
+EC-000019 - Added Estate Change Validation Standard
+
+Codified that no Estate Change is complete until syntax validation, runtime validation, Git validation, and ledger validation pass before commit.
