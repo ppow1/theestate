@@ -546,3 +546,10 @@ Added estate-health with human-readable and JSON output plus Audit validation.
 EC-000076 - Added Alfred request inbox triage
 
 Added alfred-triage with human-readable and JSON output plus Audit validation.
+
+
+## 2026-06-30 09:11:53
+
+EC-000077 - Added capability help surface
+
+Added capability-help with human-readable and JSON output plus Audit validation.

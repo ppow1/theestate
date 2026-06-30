@@ -8,7 +8,7 @@ from estate.core.provider_sync import sync_ollama_providers
 from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery_catalog_from_latest, format_discovery_catalog_report
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
-from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities, service_readiness, format_service_readiness
+from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities, service_readiness, format_service_readiness, capability_help, format_capability_help
 from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, triage_requests, format_request_triage, alfred_briefing, format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, triage_requests, format_request_triage, alfred_briefing, format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
@@ -328,6 +328,15 @@ def cmd_alfred_jobs(args):
     else:
         print(format_jobs(payload))
 
+def cmd_capability_help(args):
+    payload = capability_help()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_capability_help(payload))
+
+
 def cmd_service_readiness(args):
     payload = service_readiness()
     if getattr(args, "json", False):
@@ -369,7 +378,7 @@ def cmd_alfred_capabilities(args):
         import json
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
-        print(format_alfred_capabilities, service_readiness, format_service_readiness(payload))
+        print(format_alfred_capabilities, service_readiness, format_service_readiness, capability_help, format_capability_help(payload))
 
 def cmd_audit_summary(args):
     summary = summarize_audit_artifact()
@@ -571,6 +580,10 @@ def main():
     p = sub.add_parser("alfred-jobs")
     p.add_argument("--json", action="store_true", help="Print Alfred runtime jobs JSON")
     p.set_defaults(func=cmd_alfred_jobs)
+
+    p = sub.add_parser("capability-help")
+    p.add_argument("--json", action="store_true", help="Print Estate capability help JSON")
+    p.set_defaults(func=cmd_capability_help)
 
     p = sub.add_parser("service-readiness")
     p.add_argument("--json", action="store_true", help="Print Estate service readiness JSON")

@@ -856,3 +856,14 @@ Classification: Estate Internal
 
 Summary:
 Added Alfred request triage to summarize queued, promoted, and other request states for Steward-facing request management.
+
+
+## EC-000077 - Added capability help surface
+
+Timestamp: 2026-06-30 09:11:53
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added a capability help command to explain Alfred-routable capabilities, their services, residents, readiness, and intended use.

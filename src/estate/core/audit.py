@@ -207,6 +207,7 @@ def _runtime_checks():
     checks.append(_cli_inventory_check())
     checks.append(_audit_runtime_artifact_check())
     checks.append(_audit_summary_command_check())
+    checks.append(_capability_help_command_check())
     checks.append(_service_readiness_command_check())
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
@@ -253,6 +254,7 @@ def _cli_inventory_check():
         "sync-ollama",
         "audit",
         "audit-summary",
+        "capability-help",
         "service-readiness",
         "service-status",
         "service-route",
@@ -983,6 +985,25 @@ def _alfred_triage_command_check():
         "name": "runtime:alfred_triage_json",
         "ok": "summary" in data and "queued" in data,
         "detail": f"queued={data.get('summary', {}).get('queued')}",
+    }
+
+
+
+def _capability_help_command_check():
+    result = _run(".\\estate.bat capability-help --json")
+    if not result["ok"]:
+        return {"name": "runtime:capability_help_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:capability_help_json", "ok": False, "detail": str(e)}
+
+    capabilities = data.get("capabilities", {})
+    return {
+        "name": "runtime:capability_help_json",
+        "ok": isinstance(capabilities, dict) and "image.generate" in capabilities,
+        "detail": f"{data.get('count')} capabilities",
     }
 
 

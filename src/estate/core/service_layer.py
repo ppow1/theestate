@@ -260,3 +260,45 @@ def format_service_readiness(payload=None):
             lines.append(f"  missing: {missing}")
 
     return "\n".join(lines)
+
+
+
+def capability_help():
+    payload = alfred_capabilities()
+    by_capability = {}
+
+    for item in payload.get("capabilities", []):
+        by_capability[item["capability"]] = {
+            "service": item["service"],
+            "service_name": item["service_name"],
+            "available": item["available"],
+            "resident": item["resident"],
+            "use": item["alfred_use"],
+        }
+
+    return {
+        "version": 1,
+        "count": len(by_capability),
+        "capabilities": by_capability,
+    }
+
+
+def format_capability_help(payload=None):
+    payload = payload or capability_help()
+    lines = [
+        "=========================================",
+        "Estate Capability Help",
+        "=========================================",
+        f"Capabilities: {payload.get('count')}",
+        "",
+    ]
+
+    for capability, info in sorted(payload.get("capabilities", {}).items()):
+        mark = "READY" if info.get("available") else "BLOCKED"
+        lines.append(f"{mark} | {capability}")
+        lines.append(f"  Service: {info.get('service')}")
+        lines.append(f"  Resident: {info.get('resident')}")
+        lines.append(f"  Use: {info.get('use')}")
+        lines.append("")
+
+    return "\n".join(lines)
