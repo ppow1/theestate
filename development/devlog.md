@@ -142,3 +142,15 @@ Codified that no Estate Change is complete until syntax validation, runtime vali
 EC-000020 - Added Discovery change detection
 
 Enhanced AI environment discovery to compare current observations against the previous snapshot, report additions and removals, and preserve timestamped observation history.
+
+## 2026-06-29 21:55:00
+
+EC-000021 - Reconciled Discovery change detection commit identity
+
+Preserved the fact that Discovery change detection committed as EC-000021 while the CLI-generated ledger entry used EC-000020.
+
+## 2026-06-29 21:56:00
+
+EC-000022 - Added Estate audit concept
+
+Defined the need for Estate Audit to detect numbering drift and validation failures before future commits.

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 21:47:49",
+  "timestamp": "2026-06-29 21:55:25",
   "ai_home": "A:\\AI",
   "paths": {
     "envs": "A:\\AI\\envs",
@@ -46,13 +46,13 @@
     "installed": true,
     "running": true,
     "version": "ollama version is 0.30.11",
-    "models_raw": "NAME                ID              SIZE      MODIFIED     \nqwen2.5-coder:7b    dae161e27b0e    4.7 GB    32 hours ago    \nllama3.2:3b         a80c4f17acd5    2.0 GB    33 hours ago",
+    "models_raw": "NAME                ID              SIZE      MODIFIED     \nqwen2.5-coder:7b    dae161e27b0e    4.7 GB    33 hours ago    \nllama3.2:3b         a80c4f17acd5    2.0 GB    33 hours ago",
     "models": [
       {
         "name": "qwen2.5-coder:7b",
         "id": "dae161e27b0e",
         "size": "4.7 GB",
-        "modified": "32 hours ago"
+        "modified": "33 hours ago"
       },
       {
         "name": "llama3.2:3b",

@@ -220,3 +220,23 @@ Classification: Estate Internal
 
 Summary:
 Enhanced AI environment discovery to compare current observations against the previous snapshot, report additions and removals, and preserve timestamped observation history.
+
+## EC-000021 - Reconciled Discovery change detection commit identity
+
+Timestamp: 2026-06-29 21:55:00
+Location: A:\theestate
+Status: Ratified
+Classification: Estate Internal
+
+Summary:
+Reconciled ledger identity for the Discovery change detection work committed as EC-000021. The CLI-generated Estate Change entry was EC-000020 due to prior numbering drift. This entry preserves history without rewriting prior records.
+
+## EC-000022 - Added Estate audit concept
+
+Timestamp: 2026-06-29 21:56:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added the next operating requirement: Estate Audit must detect EC drift, syntax failures, runtime failures, registry issues, and commit/ledger mismatch before changes are considered complete.
