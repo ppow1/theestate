@@ -273,3 +273,14 @@ Classification: Estate Internal
 
 Summary:
 Expanded Estate Audit beyond basic syntax, runtime, JSON, Git, and EC drift checks. Added required path validation, registry shape validation, duplicate registry ID detection, observation history validation, and ledger-to-devlog EC consistency validation.
+
+
+## EC-000026 - Refactored Estate Audit check groups
+
+Timestamp: 2026-06-29 22:54:11
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Refactored Estate Audit internally into grouped check functions for syntax, runtime, JSON, registry, observation, history, and Git validation. Preserved existing audit behavior while making the subsystem easier to extend and maintain.

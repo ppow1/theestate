@@ -130,13 +130,12 @@ def _latest_ledger_ec_in_devlog_check():
     }
 
 
-def run_audit():
+def _syntax_checks():
     checks = []
-
     py_files = [
         "src/estate/cli/main.py",
         "src/estate/core/discovery.py",
-        "src/estate/core/provider_sync.py"
+        "src/estate/core/provider_sync.py",
     ]
 
     for file in py_files:
@@ -144,33 +143,47 @@ def run_audit():
         checks.append({
             "name": f"syntax:{file}",
             "ok": result["ok"],
-            "detail": result["stderr"] or result["stdout"]
+            "detail": result["stderr"] or result["stdout"],
         })
 
+    return checks
+
+
+def _runtime_checks():
+    checks = []
     for command in [".\\estate.bat status", ".\\estate.bat discovery-report"]:
         result = _run(command)
+        detail = result["stderr"] or result["stdout"].splitlines()[0] if result["stdout"] else ""
         checks.append({
             "name": f"runtime:{command}",
             "ok": result["ok"],
-            "detail": result["stderr"] or result["stdout"].splitlines()[0] if result["stdout"] else ""
+            "detail": detail,
         })
 
+    return checks
+
+
+def _json_checks():
+    checks = []
     for path in [
         "data/registry/residents.json",
         "data/registry/services.json",
         "data/registry/capabilities.json",
         "data/registry/providers.json",
-        "observations/ai_environment_latest.json"
+        "observations/ai_environment_latest.json",
     ]:
         ok, detail = _json_ok(ESTATE_ROOT / path)
         checks.append({
             "name": f"json:{path}",
             "ok": ok,
-            "detail": detail
+            "detail": detail,
         })
 
+    return checks
 
-    checks.append(_required_paths_check())
+
+def _registry_checks():
+    checks = [_required_paths_check()]
 
     for path, collection_key in [
         ("data/registry/residents.json", "residents"),
@@ -180,23 +193,49 @@ def run_audit():
     ]:
         checks.append(_registry_shape_check(path, collection_key))
 
-    checks.append(_observation_history_check())
-    checks.append(_latest_ledger_ec_in_devlog_check())
+    return checks
 
-    git_status = _run("git status --porcelain")
-    checks.append({
-        "name": "git:working_tree_clean",
-        "ok": git_status["ok"] and git_status["stdout"] == "",
-        "detail": git_status["stdout"]
-    })
 
+def _observation_checks():
+    return [
+        _observation_history_check(),
+    ]
+
+
+def _history_checks():
     git_ec, git_result = _latest_git_ec()
     ledger_ec = _latest_ledger_ec()
-    checks.append({
-        "name": "history:latest_git_ec_matches_latest_ledger_ec",
-        "ok": git_ec == ledger_ec,
-        "detail": f"git={git_ec} ledger={ledger_ec}"
-    })
+
+    return [
+        _latest_ledger_ec_in_devlog_check(),
+        {
+            "name": "history:latest_git_ec_matches_latest_ledger_ec",
+            "ok": git_ec == ledger_ec,
+            "detail": f"git={git_ec} ledger={ledger_ec}",
+        },
+    ]
+
+
+def _git_checks():
+    git_status = _run("git status --porcelain")
+    return [
+        {
+            "name": "git:working_tree_clean",
+            "ok": git_status["ok"] and git_status["stdout"] == "",
+            "detail": git_status["stdout"],
+        }
+    ]
+
+
+def run_audit():
+    checks = []
+    checks.extend(_syntax_checks())
+    checks.extend(_runtime_checks())
+    checks.extend(_json_checks())
+    checks.extend(_registry_checks())
+    checks.extend(_observation_checks())
+    checks.extend(_history_checks())
+    checks.extend(_git_checks())
 
     passed = sum(1 for check in checks if check["ok"])
     failed = len(checks) - passed
@@ -204,7 +243,7 @@ def run_audit():
     return {
         "passed": passed,
         "failed": failed,
-        "checks": checks
+        "checks": checks,
     }
 
 def print_audit_report():

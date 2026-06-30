@@ -175,3 +175,10 @@ Implemented Estate Audit command to validate Python syntax, selected CLI runtime
 EC-000025 - Matured Estate Audit integrity checks
 
 Expanded Estate Audit to validate required Estate paths, registry record shape, duplicate registry IDs, observation history presence, and latest ledger EC presence in the development devlog.
+
+
+## 2026-06-29 22:54:11
+
+EC-000026 - Refactored Estate Audit check groups
+
+Grouped Estate Audit checks into focused internal functions without changing audit behavior. This prepares Audit for continued maturation without turning run_audit into an oversized procedural block.
