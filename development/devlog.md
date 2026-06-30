@@ -189,3 +189,10 @@ Grouped Estate Audit checks into focused internal functions without changing aud
 EC-000027 - Improved Estate Audit report grouping
 
 Grouped Estate Audit report output by check domain without changing validation behavior. This makes Audit results easier to scan during development and repair sessions.
+
+
+## 2026-06-29 22:58:01
+
+EC-000028 - Added Estate Audit JSON output
+
+Added --json support to the Estate Audit command so audit results can be emitted as structured machine-readable data while preserving the existing human-readable report.

@@ -69,7 +69,14 @@ def cmd_discover_ai(args):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
 def cmd_audit(args):
-    report = print_audit_report()
+    if getattr(args, "json", False):
+        import json
+        from estate.core.audit import run_audit
+        report = run_audit()
+        print(json.dumps(report, indent=2))
+    else:
+        report = print_audit_report()
+
     if report["failed"] > 0:
         raise SystemExit(1)
 
@@ -126,6 +133,7 @@ def main():
     p.set_defaults(func=cmd_sync_ollama)
 
     p = sub.add_parser("audit")
+    p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
     p.set_defaults(func=cmd_audit)
 
     args = parser.parse_args()

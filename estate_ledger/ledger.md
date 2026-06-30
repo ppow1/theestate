@@ -295,3 +295,14 @@ Classification: Estate Internal
 
 Summary:
 Improved Estate Audit human-readable output by grouping checks by audit domain while preserving existing validation behavior. Audit reports now separate syntax, runtime, JSON, Estate path, registry, observation, history, and Git checks for faster operational review.
+
+
+## EC-000028 - Added Estate Audit JSON output
+
+Timestamp: 2026-06-29 22:58:01
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added machine-readable JSON output to the Estate Audit command using the --json option. This preserves the human-readable grouped report while allowing Audit results to be consumed by scripts and future operational tooling.
