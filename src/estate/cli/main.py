@@ -8,6 +8,7 @@ from estate.core.provider_sync import sync_ollama_providers
 from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery_catalog_from_latest, format_discovery_catalog_report
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
+from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -127,6 +128,41 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+
+def cmd_service_status(args):
+    payload = service_status()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_service_status(payload))
+
+
+def cmd_service_route(args):
+    payload = route_capability(args.capability)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print("=========================================")
+        print("Estate Service Route")
+        print("=========================================")
+        print(f"Capability: {payload['capability']}")
+        print(f"Matches: {len(payload['matches'])}")
+        print(f"Available: {len(payload['available'])}")
+        for service in payload["matches"]:
+            mark = "AVAILABLE" if service.get("available") else "UNAVAILABLE"
+            print(f"{mark} | {service['id']} | {service['name']}")
+
+
+def cmd_alfred_capabilities(args):
+    payload = alfred_capabilities()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_alfred_capabilities(payload))
+
 def cmd_audit_summary(args):
     summary = summarize_audit_artifact()
     if getattr(args, "json", False):
@@ -226,6 +262,20 @@ def main():
     p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
     p.add_argument("--save", action="store_true", help="Save latest audit report to runtime/audit/latest.json")
     p.set_defaults(func=cmd_audit)
+
+
+    p = sub.add_parser("service-status")
+    p.add_argument("--json", action="store_true", help="Print Estate service status JSON")
+    p.set_defaults(func=cmd_service_status)
+
+    p = sub.add_parser("service-route")
+    p.add_argument("capability", help="Capability to route, such as image.generate or code.write")
+    p.add_argument("--json", action="store_true", help="Print service route JSON")
+    p.set_defaults(func=cmd_service_route)
+
+    p = sub.add_parser("alfred-capabilities")
+    p.add_argument("--json", action="store_true", help="Print Alfred capability surface JSON")
+    p.set_defaults(func=cmd_alfred_capabilities)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

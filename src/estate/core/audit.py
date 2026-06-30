@@ -178,6 +178,7 @@ def _syntax_checks():
         "src/estate/core/discovery_service.py",
         "src/estate/core/discovery_runtime.py",
         "src/estate/core/audit_runtime.py",
+        "src/estate/core/service_layer.py",
     ]
 
     for file in py_files:
@@ -205,6 +206,9 @@ def _runtime_checks():
     checks.append(_cli_inventory_check())
     checks.append(_audit_runtime_artifact_check())
     checks.append(_audit_summary_command_check())
+    checks.append(_service_status_command_check())
+    checks.append(_service_route_command_check())
+    checks.append(_alfred_capabilities_command_check())
 
     return checks
 
@@ -227,6 +231,9 @@ def _cli_inventory_check():
         "sync-ollama",
         "audit",
         "audit-summary",
+        "service-status",
+        "service-route",
+        "alfred-capabilities",
     ]
 
     if not result["ok"]:
@@ -312,6 +319,97 @@ def _audit_summary_command_check():
         "name": "runtime:audit_summary_json",
         "ok": not missing and data.get("exists") is True,
         "detail": "summary valid" if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+
+def _service_status_command_check():
+    result = _run(".\\estate.bat service-status --json")
+    if not result["ok"]:
+        return {
+            "name": "runtime:service_status_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:service_status_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    services = data.get("services", [])
+    if not isinstance(services, list) or not services:
+        return {
+            "name": "runtime:service_status_json",
+            "ok": False,
+            "detail": "no services",
+        }
+
+    missing = []
+    for index, service in enumerate(services):
+        for field in ["id", "name", "resident", "capabilities", "providers", "requirements", "available", "alfred_use"]:
+            if field not in service:
+                missing.append(f"services[{index}].{field}")
+
+    return {
+        "name": "runtime:service_status_json",
+        "ok": not missing,
+        "detail": f"{len(services)} services" if not missing else "missing: " + ", ".join(missing[:5]),
+    }
+
+
+def _service_route_command_check():
+    result = _run(".\\estate.bat service-route image.generate --json")
+    if not result["ok"]:
+        return {
+            "name": "runtime:service_route_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:service_route_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    return {
+        "name": "runtime:service_route_json",
+        "ok": data.get("capability") == "image.generate" and isinstance(data.get("matches"), list),
+        "detail": f"{len(data.get('matches', []))} matches",
+    }
+
+
+def _alfred_capabilities_command_check():
+    result = _run(".\\estate.bat alfred-capabilities --json")
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_capabilities_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_capabilities_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    capabilities = data.get("capabilities", [])
+    return {
+        "name": "runtime:alfred_capabilities_json",
+        "ok": isinstance(capabilities, list) and len(capabilities) > 0,
+        "detail": f"{len(capabilities)} capabilities",
     }
 
 
