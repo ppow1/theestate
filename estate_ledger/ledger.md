@@ -361,3 +361,14 @@ Classification: Estate Internal
 
 Summary:
 Added machine-readable JSON output to the Discovery report command using the --json option. Expanded Estate Audit to validate the Discovery JSON command output as parseable structured observation data.
+
+
+## EC-000034 - Added Discovery status command
+
+Timestamp: 2026-06-29 23:21:37
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added a concise Discovery status command with human-readable and JSON output. Expanded Estate Audit to validate the Discovery status JSON contract and updated CLI inventory expectations.

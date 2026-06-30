@@ -176,6 +176,7 @@ def _cli_inventory_check():
         "providers",
         "discover-ai",
         "discovery-report",
+        "discovery-status",
         "sync-ollama",
         "audit",
     ]
@@ -235,6 +236,7 @@ def _observation_checks():
         _observation_history_json_check(),
         _discovery_report_contract_check(),
         _discovery_json_command_check(),
+        _discovery_status_command_check(),
     ]
 
 
@@ -470,6 +472,43 @@ def _discovery_json_command_check():
         "name": "observations:discovery_report_json",
         "ok": True,
         "detail": f"{len(data.keys())} top-level keys",
+    }
+
+
+
+def _discovery_status_command_check():
+    result = _run(".\\estate.bat discovery-status --json")
+    if not result["ok"]:
+        return {
+            "name": "observations:discovery_status_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "observations:discovery_status_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = [
+        "exists",
+        "changed_since_previous",
+        "ollama_running",
+        "ollama_models",
+        "tools",
+        "tts",
+        "python_envs",
+    ]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "observations:discovery_status_json",
+        "ok": not missing,
+        "detail": "status keys present" if not missing else "missing: " + ", ".join(missing),
     }
 
 

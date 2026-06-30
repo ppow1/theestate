@@ -231,3 +231,10 @@ Added a bundled set of Discovery-focused Audit checks covering latest observatio
 EC-000033 - Added Discovery JSON report command
 
 Added --json support to discovery-report and extended Audit to validate the machine-readable Discovery report command.
+
+
+## 2026-06-29 23:21:37
+
+EC-000034 - Added Discovery status command
+
+Added discovery-status with JSON support and extended Audit to validate its machine-readable status contract.

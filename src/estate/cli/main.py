@@ -52,6 +52,37 @@ def cmd_capabilities(args):
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
 
+def cmd_discovery_status(args):
+    import json
+    from estate.core.paths import ESTATE_ROOT
+
+    latest = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+    data = json.loads(latest.read_text(encoding="utf-8"))
+
+    models = data.get("ollama", {}).get("models", [])
+    tools = data.get("tools", [])
+    tts = data.get("tts", [])
+    python_envs = data.get("python_envs", [])
+
+    status = {
+        "exists": data.get("exists"),
+        "changed_since_previous": data.get("changed_since_previous"),
+        "ollama_running": data.get("ollama", {}).get("running"),
+        "ollama_models": len(models),
+        "tools": len(tools),
+        "tts": len(tts),
+        "python_envs": len(python_envs),
+    }
+
+    if getattr(args, "json", False):
+        print(json.dumps(status, indent=2))
+    else:
+        print("=========================================")
+        print("Estate Discovery Status")
+        print("=========================================")
+        for key, value in status.items():
+            print(f"{key}: {value}")
+
 def cmd_discovery_report(args):
     if getattr(args, "json", False):
         import json
@@ -135,6 +166,10 @@ def main():
     p = sub.add_parser("discovery-report")
     p.add_argument("--json", action="store_true", help="Print latest Discovery observation JSON")
     p.set_defaults(func=cmd_discovery_report)
+
+    p = sub.add_parser("discovery-status")
+    p.add_argument("--json", action="store_true", help="Print concise Discovery status JSON")
+    p.set_defaults(func=cmd_discovery_status)
 
     p = sub.add_parser("sync-ollama")
     p.set_defaults(func=cmd_sync_ollama)
