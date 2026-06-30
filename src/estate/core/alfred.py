@@ -285,13 +285,26 @@ def _safe_execute_step(step, goal):
     capability = step.get("capability")
 
     if capability in ["plan", "reason", "summarize"]:
+        text = [
+            f"Goal: {goal}",
+            "",
+            "Alfred Assessment:",
+            "The Estate can route this request through the local reasoning service.",
+            "This safe executor produces a structured text artifact without modifying project files.",
+            "",
+            "Recommended next steps:",
+            "1. Confirm the intended output.",
+            "2. Use available Estate services if a specialized tool is needed.",
+            "3. Preserve results under the runtime job artifact directory.",
+        ]
+
         return {
             "ok": True,
             "capability": capability,
             "mode": "safe_text_executor",
             "result": {
-                "summary": f"Prepared reasoning output for goal: {goal}",
-                "next_action": "Use service routing to select an executable provider when full execution is enabled.",
+                "summary": "\n".join(text),
+                "next_action": "Review the generated runtime artifact and decide whether to promote the task to a more specific service.",
             },
         }
 
