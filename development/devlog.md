@@ -154,3 +154,10 @@ Preserved the fact that Discovery change detection committed as EC-000021 while 
 EC-000022 - Added Estate audit concept
 
 Defined the need for Estate Audit to detect numbering drift and validation failures before future commits.
+
+
+## 2026-06-29 22:18:47
+
+EC-000023 - Added Discovery human-readable report
+
+Added a Discovery report command that summarizes latest AI environment observations, changes, tools, TTS items, Python environments, and Ollama models in human-readable form.

@@ -3,7 +3,7 @@ from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
 from estate.core.services import list_services, list_capabilities, list_providers
-from estate.core.discovery import observe_ai_environment
+from estate.core.discovery import observe_ai_environment, generate_discovery_report
 from estate.core.provider_sync import sync_ollama_providers
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -50,6 +50,9 @@ def cmd_capabilities(args):
 
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
+
+def cmd_discovery_report(args):
+    print(generate_discovery_report())
 
 def cmd_discover_ai(args):
     observations, out = observe_ai_environment()
@@ -110,6 +113,9 @@ def main():
     p = sub.add_parser("discover-ai")
     p.set_defaults(func=cmd_discover_ai)
 
+    p = sub.add_parser("discovery-report")
+    p.set_defaults(func=cmd_discovery_report)
+
     p = sub.add_parser("sync-ollama")
     p.set_defaults(func=cmd_sync_ollama)
 
@@ -121,3 +127,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -134,3 +134,77 @@ def observe_ai_environment():
     history.write_text(json.dumps(observations, indent=2), encoding="utf-8")
 
     return observations, latest
+from pathlib import Path
+import json
+
+def generate_discovery_report():
+    latest = OBS_DIR / "ai_environment_latest.json"
+    if not latest.exists():
+        return "No discovery observation found. Run: estate discover-ai"
+
+    data = json.loads(latest.read_text(encoding="utf-8"))
+    report = []
+
+    report.append("=" * 41)
+    report.append("Estate Discovery Report")
+    report.append("=" * 41)
+    report.append("")
+    report.append(f"Observation: {data.get('timestamp', '')}")
+    report.append(f"AI_HOME: {data.get('ai_home', '')}")
+    report.append("")
+    report.append("Overall:")
+    report.append("Healthy" if data.get("exists", {}).get("ai_home") else "Warning")
+    report.append("")
+    report.append("Changes since previous observation:")
+
+    changes = data.get("change_report", {}).get("changes", {})
+    any_change = False
+    labels = {
+        "python_envs": "Python Environment",
+        "tts_items": "TTS Item",
+        "tool_items": "Tool",
+        "model_categories": "Model Category",
+        "ollama_models": "Ollama Model"
+    }
+
+    for key, label in labels.items():
+        section = changes.get(key, {})
+        for item in section.get("added", []):
+            report.append(f"  + {label}: {item}")
+            any_change = True
+        for item in section.get("removed", []):
+            report.append(f"  - {label}: {item}")
+            any_change = True
+
+    if not any_change:
+        report.append("  No changes detected.")
+
+    report.append("")
+    report.append("Python Environments:")
+    for item in data.get("python_envs", []):
+        report.append(f"  - {item}")
+
+    report.append("")
+    report.append("TTS Items:")
+    for item in data.get("tts_items", []):
+        report.append(f"  - {item}")
+
+    report.append("")
+    report.append("Tools:")
+    for item in data.get("tool_items", []):
+        report.append(f"  - {item}")
+
+    report.append("")
+    report.append("Ollama:")
+    ollama = data.get("ollama", {})
+    report.append("  Running" if ollama.get("running") else "  Not running")
+
+    report.append("")
+    report.append("Ollama Models:")
+    for model in ollama.get("models", []):
+        report.append(f"  - {model.get('name')} | {model.get('size')} | {model.get('modified')}")
+
+    report.append("")
+    report.append(f"Observation written to: {latest}")
+
+    return "\n".join(report)

@@ -240,3 +240,14 @@ Classification: Estate Internal
 
 Summary:
 Added the next operating requirement: Estate Audit must detect EC drift, syntax failures, runtime failures, registry issues, and commit/ledger mismatch before changes are considered complete.
+
+
+## EC-000023 - Added Discovery human-readable report
+
+Timestamp: 2026-06-29 22:18:47
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added a Discovery report command that summarizes latest AI environment observations, changes, tools, TTS items, Python environments, and Ollama models in human-readable form.
