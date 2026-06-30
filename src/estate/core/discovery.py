@@ -269,3 +269,63 @@ def observe_ai_environment():
     _estate_contain_legacy_observation_writes(before_files)
     _estate_update_discovery_catalog(observation)
     return observation
+
+
+# Runtime report fallback.
+# Ensures discovery-report reads runtime latest state after runtime migration.
+if "_estate_runtime_generate_discovery_report" not in globals():
+    _estate_runtime_generate_discovery_report = generate_discovery_report
+
+    def generate_discovery_report():
+        import json
+
+        report = _estate_runtime_generate_discovery_report()
+        if "No discovery observation found" not in report:
+            return report
+
+        latest = RUNTIME_DISCOVERY_DIR / "ai_environment_latest.json"
+        if not latest.exists():
+            return report
+
+        data = json.loads(latest.read_text(encoding="utf-8"))
+        ollama = data.get("ollama", {}) or {}
+
+        lines = [
+            "=========================================",
+            "Estate Discovery Report",
+            "=========================================",
+            f"Timestamp: {data.get('timestamp')}",
+            f"AI Home: {data.get('ai_home')}",
+            f"Changed Since Previous: {data.get('changed_since_previous')}",
+            "",
+            "Ollama:",
+            f"  Running: {ollama.get('running')}",
+            f"  Installed: {ollama.get('installed')}",
+            f"  Version: {ollama.get('version')}",
+            "",
+            "Ollama Models:",
+        ]
+
+        for model in ollama.get("models", []) or []:
+            if isinstance(model, dict):
+                lines.append(f"  - {model.get('name')} | {model.get('size')} | {model.get('modified')}")
+            else:
+                lines.append(f"  - {model}")
+
+        lines.extend([
+            "",
+            "Python Environments:",
+        ])
+
+        for env in data.get("python_envs", []) or []:
+            lines.append(f"  - {env}")
+
+        lines.extend([
+            "",
+            "AI Model Categories:",
+        ])
+
+        for category in data.get("model_categories", []) or []:
+            lines.append(f"  - {category}")
+
+        return "\n".join(lines)

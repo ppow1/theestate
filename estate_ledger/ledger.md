@@ -504,3 +504,14 @@ Classification: Estate Internal
 
 Summary:
 Repaired the remaining Discovery report path after runtime migration and removed ambiguous prior-change tokens from duplicate-record notes so the latest Estate Change parser resolves the current formal entry correctly.
+
+
+## EC-000046 - Hardened Discovery report runtime fallback
+
+Timestamp: 2026-06-30 00:03:26
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Hardened Discovery report generation after runtime migration by adding a runtime latest fallback when the legacy report reader cannot find a versioned latest observation. The report now renders from runtime Discovery state and preserves the human-readable Discovery contract.

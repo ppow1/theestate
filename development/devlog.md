@@ -322,3 +322,10 @@ Repaired the remaining Discovery report runtime reader path and corrected the du
 EC-000045 - Repaired Discovery report latest path and EC parser ambiguity
 
 Repaired the Discovery report latest-observation path and cleaned duplicate-record wording so latest Estate Change detection remains unambiguous.
+
+
+## 2026-06-30 00:03:26
+
+EC-000046 - Hardened Discovery report runtime fallback
+
+Added a runtime latest fallback for Discovery report generation so discovery-report renders from runtime state after the latest observation migration.
