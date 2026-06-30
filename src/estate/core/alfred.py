@@ -352,11 +352,13 @@ def execute_job(job_id):
     job["status"] = "completed" if ok else "failed"
     append_job_event(job, "job_completed" if ok else "job_failed", job["status"])
     save_job(job)
+    write_job_artifacts(job)
 
     return {
         "ok": ok,
         "job": job,
         "results": results,
+        "artifacts": job.get("artifacts", {}),
     }
 
 
@@ -499,3 +501,101 @@ def format_execution_policy(policy=None):
             lines.append(f"  {key}: {value}")
 
     return "\n".join(lines)
+
+
+
+def _job_artifact_dir(job_id):
+    return RUNTIME_JOBS_DIR / job_id
+
+
+def write_job_artifacts(job):
+    artifact_dir = _job_artifact_dir(job["id"])
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+
+    result_path = artifact_dir / "result.json"
+    events_path = artifact_dir / "events.json"
+    summary_path = artifact_dir / "summary.txt"
+
+    result_payload = {
+        "job_id": job.get("id"),
+        "status": job.get("status"),
+        "goal": job.get("goal"),
+        "results": job.get("results", []),
+    }
+
+    result_path.write_text(json.dumps(result_payload, indent=2, sort_keys=True), encoding="utf-8")
+    events_path.write_text(json.dumps(job.get("events", []), indent=2, sort_keys=True), encoding="utf-8")
+
+    lines = [
+        "Alfred Job Result",
+        "=================",
+        f"Job: {job.get('id')}",
+        f"Status: {job.get('status')}",
+        f"Goal: {job.get('goal')}",
+        "",
+        "Results:",
+    ]
+
+    for item in job.get("results", []):
+        lines.append(f"- {item.get('capability')} via {item.get('mode')}: ok={item.get('ok')}")
+        summary = item.get("result", {}).get("summary")
+        if summary:
+            lines.append(f"  {summary}")
+
+    summary_path.write_text("\n".join(lines), encoding="utf-8")
+
+    job["artifacts"] = {
+        "dir": str(artifact_dir),
+        "result": str(result_path),
+        "events": str(events_path),
+        "summary": str(summary_path),
+    }
+
+    save_job(job)
+    return job["artifacts"]
+
+
+def get_job_result(job_id):
+    job = load_job(job_id)
+    if not job:
+        return {
+            "ok": False,
+            "error": "job not found",
+            "job_id": job_id,
+        }
+
+    artifacts = job.get("artifacts") or {}
+    summary = None
+    summary_path = artifacts.get("summary")
+    if summary_path and Path(summary_path).exists():
+        summary = Path(summary_path).read_text(encoding="utf-8")
+
+    return {
+        "ok": True,
+        "job_id": job_id,
+        "status": job.get("status"),
+        "goal": job.get("goal"),
+        "artifacts": artifacts,
+        "summary": summary,
+        "results": job.get("results", []),
+    }
+
+
+def format_job_result(result):
+    if not result.get("ok"):
+        return f"Alfred job result failed: {result.get('error')}"
+
+    if result.get("summary"):
+        return result["summary"]
+
+    return format_job_inspection({
+        "ok": True,
+        "job": {
+            "id": result.get("job_id"),
+            "status": result.get("status"),
+            "goal": result.get("goal"),
+            "results": result.get("results", []),
+        },
+        "events": [],
+        "results": result.get("results", []),
+    })

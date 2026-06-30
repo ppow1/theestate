@@ -214,6 +214,7 @@ def _runtime_checks():
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
     checks.append(_alfred_execute_command_check())
+    checks.append(_alfred_result_command_check())
     checks.append(_alfred_policy_command_check())
     checks.append(_alfred_job_control_command_check())
 
@@ -245,6 +246,7 @@ def _cli_inventory_check():
         "alfred-run",
         "alfred-jobs",
         "alfred-execute",
+        "alfred-result",
         "alfred-inspect",
         "alfred-cancel",
         "alfred-retry",
@@ -638,6 +640,59 @@ def _alfred_job_control_command_check():
         "name": "runtime:alfred_job_control_json",
         "ok": inspected.get("ok") is True and retry.get("ok") is True,
         "detail": f"inspected={job_id}",
+    }
+
+
+
+def _alfred_result_command_check():
+    create_result = _run('.\\estate.bat alfred-run "summarize and plan work" --json')
+    if not create_result["ok"]:
+        return {
+            "name": "runtime:alfred_result_json",
+            "ok": False,
+            "detail": create_result["stderr"] or create_result["stdout"],
+        }
+
+    try:
+        created = json.loads(create_result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_result_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    job_id = created.get("id")
+    execute_result = _run(f'.\\estate.bat alfred-execute {job_id} --json')
+    if not execute_result["ok"]:
+        return {
+            "name": "runtime:alfred_result_json",
+            "ok": False,
+            "detail": execute_result["stderr"] or execute_result["stdout"],
+        }
+
+    result = _run(f'.\\estate.bat alfred-result {job_id} --json')
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_result_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_result_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    artifacts = data.get("artifacts", {})
+    return {
+        "name": "runtime:alfred_result_json",
+        "ok": data.get("ok") is True and bool(artifacts.get("summary")),
+        "detail": artifacts.get("summary", "result valid"),
     }
 
 
