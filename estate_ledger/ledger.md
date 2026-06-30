@@ -372,3 +372,14 @@ Classification: Estate Internal
 
 Summary:
 Added a concise Discovery status command with human-readable and JSON output. Expanded Estate Audit to validate the Discovery status JSON contract and updated CLI inventory expectations.
+
+
+## EC-000035 - Added Discovery persistent catalog
+
+Timestamp: 2026-06-29 23:26:35
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added a persistent Discovery Catalog at data/discovery/catalog.json. Discovery observations now update durable institutional inventory memory with first seen, last seen, observation counts, active/inactive status, and evidence. Added discovery-catalog CLI output with human-readable and JSON modes, and expanded Estate Audit to validate catalog schema, command output, and latest observation coverage.

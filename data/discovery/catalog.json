@@ -1,0 +1,78 @@
+{
+  "entities": [
+    {
+      "evidence": {
+        "id": "a80c4f17acd5",
+        "modified": "34 hours ago",
+        "name": "llama3.2:3b",
+        "size": "2.0 GB"
+      },
+      "first_seen": "2026-06-29T23:26:36",
+      "id": "model:llama3.2:3b",
+      "kind": "model",
+      "last_seen": "2026-06-29T23:26:36",
+      "name": "llama3.2:3b",
+      "observations": 1,
+      "status": "active"
+    },
+    {
+      "evidence": {
+        "id": "dae161e27b0e",
+        "modified": "34 hours ago",
+        "name": "qwen2.5-coder:7b",
+        "size": "4.7 GB"
+      },
+      "first_seen": "2026-06-29T23:26:36",
+      "id": "model:qwen2.5-coder:7b",
+      "kind": "model",
+      "last_seen": "2026-06-29T23:26:36",
+      "name": "qwen2.5-coder:7b",
+      "observations": 1,
+      "status": "active"
+    },
+    {
+      "evidence": {
+        "running": true
+      },
+      "first_seen": "2026-06-29T23:26:36",
+      "id": "provider:ollama",
+      "kind": "provider",
+      "last_seen": "2026-06-29T23:26:36",
+      "name": "ollama",
+      "observations": 1,
+      "status": "active"
+    },
+    {
+      "evidence": {},
+      "first_seen": "2026-06-29T23:26:36",
+      "id": "python_env:aider_py311",
+      "kind": "python_env",
+      "last_seen": "2026-06-29T23:26:36",
+      "name": "aider_py311",
+      "observations": 1,
+      "status": "active"
+    },
+    {
+      "evidence": {},
+      "first_seen": "2026-06-29T23:26:36",
+      "id": "python_env:comfyui_server_py311",
+      "kind": "python_env",
+      "last_seen": "2026-06-29T23:26:36",
+      "name": "comfyui_server_py311",
+      "observations": 1,
+      "status": "active"
+    },
+    {
+      "evidence": {},
+      "first_seen": "2026-06-29T23:26:36",
+      "id": "python_env:whisper_py311",
+      "kind": "python_env",
+      "last_seen": "2026-06-29T23:26:36",
+      "name": "whisper_py311",
+      "observations": 1,
+      "status": "active"
+    }
+  ],
+  "updated_at": "2026-06-29T23:26:36",
+  "version": 1
+}

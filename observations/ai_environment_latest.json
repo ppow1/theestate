@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 22:18:46",
+  "timestamp": "2026-06-29 23:26:35",
   "ai_home": "A:\\AI",
   "paths": {
     "envs": "A:\\AI\\envs",
@@ -16,6 +16,7 @@
   },
   "python_envs": [
     "aider_py311",
+    "comfyui_server_py311",
     "whisper_py311"
   ],
   "tts_items": [
@@ -40,25 +41,46 @@
     "Ollama",
     "SDXL",
     "Upscalers",
-    "VAE"
+    "VAE",
+    "audio_encoders",
+    "background_removal",
+    "clip_vision",
+    "configs",
+    "detection",
+    "diffusers",
+    "diffusion_models",
+    "frame_interpolation",
+    "geometry_estimation",
+    "gligen",
+    "hypernetworks",
+    "latent_upscale_models",
+    "loras",
+    "model_patches",
+    "optical_flow",
+    "photomaker",
+    "style_models",
+    "text_encoders",
+    "unet",
+    "upscale_models",
+    "vae_approx"
   ],
   "ollama": {
     "installed": true,
     "running": true,
     "version": "ollama version is 0.30.11",
-    "models_raw": "NAME                ID              SIZE      MODIFIED     \nqwen2.5-coder:7b    dae161e27b0e    4.7 GB    33 hours ago    \nllama3.2:3b         a80c4f17acd5    2.0 GB    33 hours ago",
+    "models_raw": "NAME                ID              SIZE      MODIFIED     \nqwen2.5-coder:7b    dae161e27b0e    4.7 GB    34 hours ago    \nllama3.2:3b         a80c4f17acd5    2.0 GB    34 hours ago",
     "models": [
       {
         "name": "qwen2.5-coder:7b",
         "id": "dae161e27b0e",
         "size": "4.7 GB",
-        "modified": "33 hours ago"
+        "modified": "34 hours ago"
       },
       {
         "name": "llama3.2:3b",
         "id": "a80c4f17acd5",
         "size": "2.0 GB",
-        "modified": "33 hours ago"
+        "modified": "34 hours ago"
       }
     ]
   },
@@ -66,7 +88,9 @@
     "first_observation": false,
     "changes": {
       "python_envs": {
-        "added": [],
+        "added": [
+          "comfyui_server_py311"
+        ],
         "removed": [],
         "unchanged": [
           "aider_py311",
@@ -91,7 +115,29 @@
         ]
       },
       "model_categories": {
-        "added": [],
+        "added": [
+          "audio_encoders",
+          "background_removal",
+          "clip_vision",
+          "configs",
+          "detection",
+          "diffusers",
+          "diffusion_models",
+          "frame_interpolation",
+          "geometry_estimation",
+          "gligen",
+          "hypernetworks",
+          "latent_upscale_models",
+          "loras",
+          "model_patches",
+          "optical_flow",
+          "photomaker",
+          "style_models",
+          "text_encoders",
+          "unet",
+          "upscale_models",
+          "vae_approx"
+        ],
         "removed": [],
         "unchanged": [
           "CLIP",
@@ -119,5 +165,5 @@
       }
     }
   },
-  "changed_since_previous": false
+  "changed_since_previous": true
 }

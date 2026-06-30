@@ -177,6 +177,7 @@ def _cli_inventory_check():
         "discover-ai",
         "discovery-report",
         "discovery-status",
+        "discovery-catalog",
         "sync-ollama",
         "audit",
     ]
@@ -237,6 +238,9 @@ def _observation_checks():
         _discovery_report_contract_check(),
         _discovery_json_command_check(),
         _discovery_status_command_check(),
+        _discovery_catalog_schema_check(),
+        _discovery_catalog_command_check(),
+        _discovery_catalog_latest_coverage_check(),
     ]
 
 
@@ -509,6 +513,143 @@ def _discovery_status_command_check():
         "name": "observations:discovery_status_json",
         "ok": not missing,
         "detail": "status keys present" if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+
+def _discovery_catalog_schema_check():
+    path = ESTATE_ROOT / "data" / "discovery" / "catalog.json"
+    if not path.exists():
+        return {
+            "name": "observations:discovery_catalog_schema",
+            "ok": False,
+            "detail": "missing data/discovery/catalog.json",
+        }
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {
+            "name": "observations:discovery_catalog_schema",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    if not isinstance(data, dict):
+        return {
+            "name": "observations:discovery_catalog_schema",
+            "ok": False,
+            "detail": "catalog root is not an object",
+        }
+
+    if data.get("version") != 1:
+        return {
+            "name": "observations:discovery_catalog_schema",
+            "ok": False,
+            "detail": "catalog version is not 1",
+        }
+
+    entities = data.get("entities")
+    if not isinstance(entities, list):
+        return {
+            "name": "observations:discovery_catalog_schema",
+            "ok": False,
+            "detail": "entities is not a list",
+        }
+
+    ids = set()
+    for index, entity in enumerate(entities):
+        if not isinstance(entity, dict):
+            return {
+                "name": "observations:discovery_catalog_schema",
+                "ok": False,
+                "detail": f"entities[{index}] is not an object",
+            }
+
+        for field in ["id", "kind", "name", "first_seen", "last_seen", "observations", "status"]:
+            if field not in entity:
+                return {
+                    "name": "observations:discovery_catalog_schema",
+                    "ok": False,
+                    "detail": f"entities[{index}] missing {field}",
+                }
+
+        if entity["id"] in ids:
+            return {
+                "name": "observations:discovery_catalog_schema",
+                "ok": False,
+                "detail": f"duplicate id: {entity['id']}",
+            }
+
+        ids.add(entity["id"])
+
+    return {
+        "name": "observations:discovery_catalog_schema",
+        "ok": True,
+        "detail": f"{len(entities)} catalog entities",
+    }
+
+
+def _discovery_catalog_command_check():
+    result = _run(".\\estate.bat discovery-catalog --json")
+    if not result["ok"]:
+        return {
+            "name": "observations:discovery_catalog_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "observations:discovery_catalog_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    return {
+        "name": "observations:discovery_catalog_json",
+        "ok": isinstance(data, dict) and "entities" in data,
+        "detail": f"{len(data.get('entities', []))} entities" if isinstance(data, dict) else "catalog JSON root is not object",
+    }
+
+
+def _discovery_catalog_latest_coverage_check():
+    latest_path = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+    catalog_path = ESTATE_ROOT / "data" / "discovery" / "catalog.json"
+
+    try:
+        latest = json.loads(latest_path.read_text(encoding="utf-8"))
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {
+            "name": "observations:discovery_catalog_latest_coverage",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    entities = catalog.get("entities", [])
+    active_ids = {entity.get("id") for entity in entities if entity.get("status") == "active"}
+
+    missing = []
+    ollama = latest.get("ollama", {}) or {}
+    if ollama.get("running") is not None and "provider:ollama" not in active_ids:
+        missing.append("provider:ollama")
+
+    for model in ollama.get("models", []) or []:
+        if isinstance(model, dict):
+            name = model.get("name") or model.get("model") or model.get("id")
+        else:
+            name = model
+        expected = "model:" + str(name).strip().lower().replace("\\", "/")
+        if expected not in active_ids:
+            missing.append(expected)
+
+    return {
+        "name": "observations:discovery_catalog_latest_coverage",
+        "ok": not missing,
+        "detail": "latest Ollama entities represented" if not missing else "missing: " + ", ".join(missing[:5]),
     }
 
 

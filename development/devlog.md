@@ -238,3 +238,10 @@ Added --json support to discovery-report and extended Audit to validate the mach
 EC-000034 - Added Discovery status command
 
 Added discovery-status with JSON support and extended Audit to validate its machine-readable status contract.
+
+
+## 2026-06-29 23:26:35
+
+EC-000035 - Added Discovery persistent catalog
+
+Added persistent Discovery Catalog support, automatic catalog updates from observations, discovery-catalog CLI output, and Audit validation for catalog schema, command JSON, and latest observation coverage.

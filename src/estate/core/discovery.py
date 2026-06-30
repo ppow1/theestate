@@ -208,3 +208,15 @@ def generate_discovery_report():
     report.append(f"Observation written to: {latest}")
 
     return "\n".join(report)
+
+
+# Discovery Catalog integration.
+# Wrapped here so every normal Discovery observation updates persistent catalog memory.
+from estate.core.discovery_catalog import update_discovery_catalog as _estate_update_discovery_catalog
+
+_estate_catalog_observe_ai_environment = observe_ai_environment
+
+def observe_ai_environment():
+    observation = _estate_catalog_observe_ai_environment()
+    _estate_update_discovery_catalog(observation)
+    return observation

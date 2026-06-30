@@ -5,6 +5,7 @@ from estate.core.registry import load_registry
 from estate.core.services import list_services, list_capabilities, list_providers
 from estate.core.discovery import observe_ai_environment, generate_discovery_report
 from estate.core.provider_sync import sync_ollama_providers
+from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery_catalog_from_latest, format_discovery_catalog_report
 from estate.core.audit import print_audit_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -51,6 +52,18 @@ def cmd_capabilities(args):
 
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
+
+def cmd_discovery_catalog(args):
+    if getattr(args, "refresh", False):
+        catalog = sync_discovery_catalog_from_latest()
+    else:
+        catalog = load_discovery_catalog()
+
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(catalog, indent=2, sort_keys=True))
+    else:
+        print(format_discovery_catalog_report(catalog))
 
 def cmd_discovery_status(args):
     import json
@@ -170,6 +183,11 @@ def main():
     p = sub.add_parser("discovery-status")
     p.add_argument("--json", action="store_true", help="Print concise Discovery status JSON")
     p.set_defaults(func=cmd_discovery_status)
+
+    p = sub.add_parser("discovery-catalog")
+    p.add_argument("--json", action="store_true", help="Print Discovery catalog JSON")
+    p.add_argument("--refresh", action="store_true", help="Refresh catalog from latest observation before printing")
+    p.set_defaults(func=cmd_discovery_catalog)
 
     p = sub.add_parser("sync-ollama")
     p.set_defaults(func=cmd_sync_ollama)
