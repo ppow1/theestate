@@ -105,3 +105,10 @@ Added provider registry to separate stable service needs from interchangeable AI
 EC-000015 - Added AI Environment Discovery Service
 
 Added discovery support for observing A:\AI paths, Python environments, TTS installations, tools, and model categories without manually declaring them first.
+
+
+## 2026-06-29 21:19:14
+
+EC-000016 - Enhanced discovery with Ollama observation
+
+Updated AI environment discovery to observe Ollama version, runtime availability, and installed Ollama models.

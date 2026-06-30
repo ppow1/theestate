@@ -163,3 +163,14 @@ Classification: Estate Internal
 
 Summary:
 Added discovery support for observing A:\AI paths, Python environments, TTS installations, tools, and model categories without manually declaring them first.
+
+
+## EC-000016 - Enhanced discovery with Ollama observation
+
+Timestamp: 2026-06-29 21:19:14
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Updated AI environment discovery to observe Ollama version, runtime availability, and installed Ollama models.

@@ -1,10 +1,28 @@
-from pathlib import Path
 import json
+import subprocess
+from pathlib import Path
 from estate.core.paths import ESTATE_ROOT
 from estate.core.time import now
 
 AI_HOME = Path(r"A:\AI")
 OBS_DIR = ESTATE_ROOT / "observations"
+
+def observe_ollama():
+    try:
+        version = subprocess.check_output(["ollama", "--version"], text=True, stderr=subprocess.STDOUT).strip()
+        models_raw = subprocess.check_output(["ollama", "list"], text=True, stderr=subprocess.STDOUT).strip()
+        return {
+            "installed": True,
+            "running": True,
+            "version": version,
+            "models_raw": models_raw
+        }
+    except Exception as e:
+        return {
+            "installed": False,
+            "running": False,
+            "error": str(e)
+        }
 
 def observe_ai_environment():
     OBS_DIR.mkdir(parents=True, exist_ok=True)
@@ -33,7 +51,8 @@ def observe_ai_environment():
         "python_envs": sorted([p.name for p in envs_dir.iterdir() if p.is_dir()]) if envs_dir.exists() else [],
         "tts_items": sorted([p.name for p in tts_dir.iterdir() if p.is_dir()]) if tts_dir.exists() else [],
         "tool_items": sorted([p.name for p in tools_dir.iterdir() if p.is_dir()]) if tools_dir.exists() else [],
-        "model_categories": sorted([p.name for p in models_dir.iterdir() if p.is_dir()]) if models_dir.exists() else []
+        "model_categories": sorted([p.name for p in models_dir.iterdir() if p.is_dir()]) if models_dir.exists() else [],
+        "ollama": observe_ollama()
     }
 
     out = OBS_DIR / "ai_environment_latest.json"

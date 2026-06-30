@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 20:58:11",
+  "timestamp": "2026-06-29 21:19:15",
   "ai_home": "A:\\AI",
   "paths": {
     "envs": "A:\\AI\\envs",
@@ -35,8 +35,15 @@
     "IPAdapter",
     "LLM",
     "LoRA",
+    "Ollama",
     "SDXL",
     "Upscalers",
     "VAE"
-  ]
+  ],
+  "ollama": {
+    "installed": true,
+    "running": true,
+    "version": "ollama version is 0.30.11",
+    "models_raw": "NAME                ID              SIZE      MODIFIED     \nqwen2.5-coder:7b    dae161e27b0e    4.7 GB    32 hours ago    \nllama3.2:3b         a80c4f17acd5    2.0 GB    32 hours ago"
+  }
 }
