@@ -112,3 +112,10 @@ Added discovery support for observing A:\AI paths, Python environments, TTS inst
 EC-000016 - Enhanced discovery with Ollama observation
 
 Updated AI environment discovery to observe Ollama version, runtime availability, and installed Ollama models.
+
+
+## 2026-06-29 21:21:43
+
+EC-000017 - Parsed Ollama models into structured observations
+
+Updated Ollama discovery to parse installed models into structured name, id, size, and modified fields for future routing and provider selection.

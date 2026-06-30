@@ -174,3 +174,14 @@ Classification: Estate Internal
 
 Summary:
 Updated AI environment discovery to observe Ollama version, runtime availability, and installed Ollama models.
+
+
+## EC-000017 - Parsed Ollama models into structured observations
+
+Timestamp: 2026-06-29 21:21:43
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Updated Ollama discovery to parse installed models into structured name, id, size, and modified fields for future routing and provider selection.

@@ -7,6 +7,23 @@ from estate.core.time import now
 AI_HOME = Path(r"A:\AI")
 OBS_DIR = ESTATE_ROOT / "observations"
 
+def parse_ollama_models(models_raw):
+    lines = [line.rstrip() for line in models_raw.splitlines() if line.strip()]
+    if len(lines) <= 1:
+        return []
+
+    models = []
+    for line in lines[1:]:
+        parts = line.split()
+        if len(parts) >= 4:
+            models.append({
+                "name": parts[0],
+                "id": parts[1],
+                "size": " ".join(parts[2:4]),
+                "modified": " ".join(parts[4:]) if len(parts) > 4 else ""
+            })
+    return models
+
 def observe_ollama():
     try:
         version = subprocess.check_output(["ollama", "--version"], text=True, stderr=subprocess.STDOUT).strip()
@@ -15,13 +32,15 @@ def observe_ollama():
             "installed": True,
             "running": True,
             "version": version,
-            "models_raw": models_raw
+            "models_raw": models_raw,
+            "models": parse_ollama_models(models_raw)
         }
     except Exception as e:
         return {
             "installed": False,
             "running": False,
-            "error": str(e)
+            "error": str(e),
+            "models": []
         }
 
 def observe_ai_environment():
