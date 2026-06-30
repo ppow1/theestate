@@ -213,6 +213,7 @@ def _runtime_checks():
     checks.append(_alfred_plan_command_check())
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
+    checks.append(_alfred_execute_command_check())
 
     return checks
 
@@ -241,6 +242,7 @@ def _cli_inventory_check():
         "alfred-plan",
         "alfred-run",
         "alfred-jobs",
+        "alfred-execute",
     ]
 
     if not result["ok"]:
@@ -499,6 +501,58 @@ def _alfred_jobs_command_check():
         "name": "runtime:alfred_jobs_json",
         "ok": isinstance(data.get("jobs"), list),
         "detail": f"{len(data.get('jobs', []))} jobs",
+    }
+
+
+
+def _alfred_execute_command_check():
+    create_result = _run('.\\estate.bat alfred-run "summarize and plan work" --json')
+    if not create_result["ok"]:
+        return {
+            "name": "runtime:alfred_execute_json",
+            "ok": False,
+            "detail": create_result["stderr"] or create_result["stdout"],
+        }
+
+    try:
+        created = json.loads(create_result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_execute_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    job_id = created.get("id")
+    if not job_id:
+        return {
+            "name": "runtime:alfred_execute_json",
+            "ok": False,
+            "detail": "created job missing id",
+        }
+
+    result = _run(f'.\\estate.bat alfred-execute {job_id} --json')
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_execute_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_execute_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    job = data.get("job", {})
+    return {
+        "name": "runtime:alfred_execute_json",
+        "ok": data.get("ok") is True and job.get("status") == "completed",
+        "detail": job.get("id", "execution valid"),
     }
 
 

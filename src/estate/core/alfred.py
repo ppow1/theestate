@@ -231,3 +231,136 @@ def format_jobs(payload=None):
         lines.append(f"{job.get('id')} | {job.get('status')} | {job.get('goal')}")
 
     return "\n".join(lines)
+
+
+
+def _job_path(job_id):
+    return RUNTIME_JOBS_DIR / f"{job_id}.json"
+
+
+def load_job(job_id):
+    path = _job_path(job_id)
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def save_job(job):
+    RUNTIME_JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    path = _job_path(job["id"])
+    path.write_text(json.dumps(job, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def append_job_event(job, event, detail):
+    job.setdefault("events", [])
+    job["events"].append({
+        "timestamp": _now(),
+        "event": event,
+        "detail": detail,
+    })
+
+
+def _safe_execute_step(step, goal):
+    capability = step.get("capability")
+
+    if capability in ["plan", "reason", "summarize"]:
+        return {
+            "ok": True,
+            "capability": capability,
+            "mode": "safe_text_executor",
+            "result": {
+                "summary": f"Prepared reasoning output for goal: {goal}",
+                "next_action": "Use service routing to select an executable provider when full execution is enabled.",
+            },
+        }
+
+    if capability.startswith("code."):
+        return {
+            "ok": True,
+            "capability": capability,
+            "mode": "safe_code_executor",
+            "result": {
+                "summary": f"Prepared code-assistance execution plan for goal: {goal}",
+                "safety": "No filesystem writes performed by this executor.",
+            },
+        }
+
+    return {
+        "ok": True,
+        "capability": capability,
+        "mode": "dry_run",
+        "result": {
+            "summary": f"Execution for {capability} is not yet enabled; dry-run completed.",
+        },
+    }
+
+
+def execute_job(job_id):
+    job = load_job(job_id)
+    if not job:
+        return {
+            "ok": False,
+            "error": "job not found",
+            "job_id": job_id,
+        }
+
+    if job.get("status") not in ["ready", "planned"]:
+        return {
+            "ok": False,
+            "error": f"job status is {job.get('status')}",
+            "job": job,
+        }
+
+    append_job_event(job, "job_started", "Alfred job execution started")
+    job["status"] = "running"
+    save_job(job)
+
+    results = []
+    ok = True
+
+    for step in job.get("plan", {}).get("steps", []):
+        append_job_event(job, "step_started", step.get("capability"))
+        result = _safe_execute_step(step, job.get("goal", ""))
+        results.append(result)
+        if result.get("ok"):
+            append_job_event(job, "step_completed", step.get("capability"))
+        else:
+            ok = False
+            append_job_event(job, "step_failed", step.get("capability"))
+
+    job["results"] = results
+    job["status"] = "completed" if ok else "failed"
+    append_job_event(job, "job_completed" if ok else "job_failed", job["status"])
+    save_job(job)
+
+    return {
+        "ok": ok,
+        "job": job,
+        "results": results,
+    }
+
+
+def format_execution_result(result):
+    if not result.get("ok"):
+        return f"Alfred execution failed: {result.get('error')}"
+
+    job = result.get("job", {})
+    lines = [
+        "=========================================",
+        "Alfred Execution Result",
+        "=========================================",
+        f"Job: {job.get('id')}",
+        f"Status: {job.get('status')}",
+        f"Goal: {job.get('goal')}",
+        "",
+        "Results:",
+    ]
+
+    for item in result.get("results", []):
+        lines.append(f"- {item.get('mode')} | {item.get('capability')} | ok={item.get('ok')}")
+        summary = item.get("result", {}).get("summary")
+        if summary:
+            lines.append(f"     {summary}")
+
+    return "\n".join(lines)
