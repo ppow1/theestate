@@ -345,6 +345,13 @@ EC-000048 - Added Audit check metadata envelope
 Added structured metadata to Audit checks and validation for the saved runtime audit artifact schema.
 
 
+## 2026-06-30 00:36:55
+
+EC-000049 - Reserved historical gap repair
+
+Reserved EC-000049 to preserve sequential Estate Change numbering after Git history advanced from EC-000048 to EC-000050.
+
+
 ## 2026-06-30 00:27:57
 
 EC-000050 - Added Discovery service facade
@@ -357,3 +364,10 @@ Introduced DiscoveryService as the canonical Discovery service boundary, added d
 EC-000051 - Repaired Discovery service runtime import
 
 Added missing discovery_runtime.py module required by the DiscoveryService facade introduced in EC-000050.
+
+
+## 2026-06-30 00:36:55
+
+EC-000052 - Stabilized Discovery service refresh and history alignment
+
+Repaired DiscoveryService refresh provider synchronization handling and aligned ledger/devlog history with existing Git commits.

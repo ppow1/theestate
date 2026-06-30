@@ -539,6 +539,17 @@ Summary:
 Added an Audit check metadata envelope with group, severity, duration, and group duration fields. Audit reports now include structured metadata suitable for future dashboards, CI, and regression tracking, and Audit validates the saved runtime artifact schema.
 
 
+## EC-000049 - Reserved historical gap repair
+
+Timestamp: 2026-06-30 00:36:55
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Reserved EC-000049 as a historical numbering repair after Git history advanced from EC-000048 to EC-000050. This entry preserves sequential Estate Change numbering without rewriting existing commit history.
+
+
 ## EC-000050 - Added Discovery service facade
 
 Timestamp: 2026-06-30 00:27:57
@@ -559,3 +570,14 @@ Classification: Estate Internal
 
 Summary:
 Repaired EC-000050 by adding the missing Discovery runtime module required by DiscoveryService. The repair preserves the committed service facade history and restores CLI importability.
+
+
+## EC-000052 - Stabilized Discovery service refresh and history alignment
+
+Timestamp: 2026-06-30 00:36:55
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Stabilized the DiscoveryService refresh command by handling provider synchronization return values defensively. Also repaired institutional history alignment by recording the reserved gap repair and the missing runtime import repair in ledger and devlog without rewriting Git history.

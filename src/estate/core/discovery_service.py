@@ -55,10 +55,24 @@ class DiscoveryService:
         }
 
         try:
-            created, ec_id = sync_ollama_providers()
+            sync_result = sync_ollama_providers()
+
+            if isinstance(sync_result, tuple):
+                created = sync_result[0] if len(sync_result) > 0 else []
+                ec_id = sync_result[1] if len(sync_result) > 1 else None
+            elif isinstance(sync_result, dict):
+                created = sync_result.get("created", [])
+                ec_id = sync_result.get("ec_id") or sync_result.get("estate_change")
+            elif isinstance(sync_result, list):
+                created = sync_result
+                ec_id = None
+            else:
+                created = []
+                ec_id = None
+
             provider_result = {
                 "ok": True,
-                "detail": f"{len(created)} providers created",
+                "detail": f"{len(created)} provider records returned",
                 "created": created,
                 "ec_id": ec_id,
             }
