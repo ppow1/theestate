@@ -1013,3 +1013,52 @@ def format_estate_health_report(payload=None):
         lines.append(f"  {status}: {count}")
 
     return "\n".join(lines)
+
+
+
+def triage_requests():
+    payload = list_requests()
+    queued = []
+    promoted = []
+    other = []
+
+    for request in payload.get("requests", []):
+        status = request.get("status")
+        if status == "queued":
+            queued.append(request)
+        elif status == "promoted":
+            promoted.append(request)
+        else:
+            other.append(request)
+
+    return {
+        "version": 1,
+        "count": payload.get("count", 0),
+        "queued": queued,
+        "promoted": promoted,
+        "other": other,
+        "summary": {
+            "queued": len(queued),
+            "promoted": len(promoted),
+            "other": len(other),
+        },
+    }
+
+
+def format_request_triage(payload=None):
+    payload = payload or triage_requests()
+    lines = [
+        "=========================================",
+        "Alfred Request Triage",
+        "=========================================",
+        f"Queued: {payload.get('summary', {}).get('queued')}",
+        f"Promoted: {payload.get('summary', {}).get('promoted')}",
+        f"Other: {payload.get('summary', {}).get('other')}",
+        "",
+        "Queued Requests:",
+    ]
+
+    for request in payload.get("queued", [])[-20:]:
+        lines.append(f"- {request.get('id')} | {request.get('goal')}")
+
+    return "\n".join(lines)

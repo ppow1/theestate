@@ -845,3 +845,14 @@ Classification: Estate Internal
 
 Summary:
 Added estate-health as a concise operator health report over Alfred readiness, service availability, capabilities, and runtime jobs.
+
+
+## EC-000076 - Added Alfred request inbox triage
+
+Timestamp: 2026-06-30 09:11:17
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added Alfred request triage to summarize queued, promoted, and other request states for Steward-facing request management.

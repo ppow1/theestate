@@ -539,3 +539,10 @@ Added Estate code structure reporting to Alfred safe code review execution and A
 EC-000075 - Added Estate health report command
 
 Added estate-health with human-readable and JSON output plus Audit validation.
+
+
+## 2026-06-30 09:11:17
+
+EC-000076 - Added Alfred request inbox triage
+
+Added alfred-triage with human-readable and JSON output plus Audit validation.

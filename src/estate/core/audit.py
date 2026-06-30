@@ -215,6 +215,7 @@ def _runtime_checks():
     checks.append(_alfred_artifacts_command_check())
     checks.append(_alfred_cleanup_command_check())
     checks.append(_alfred_briefing_command_check())
+    checks.append(_alfred_triage_command_check())
     checks.append(_alfred_request_queue_command_check())
     checks.append(_alfred_status_command_check())
     checks.append(_alfred_alias_command_check())
@@ -260,6 +261,7 @@ def _cli_inventory_check():
         "alfred-artifacts",
         "alfred-cleanup",
         "alfred-briefing",
+        "alfred-triage",
         "alfred-request",
         "alfred-requests",
         "alfred-promote",
@@ -962,6 +964,25 @@ def _estate_health_command_check():
         "name": "runtime:estate_health_json",
         "ok": data.get("ready") is True and "services" in data and "jobs" in data,
         "detail": f"services={data.get('services', {}).get('available')} jobs={data.get('jobs', {}).get('count')}",
+    }
+
+
+
+def _alfred_triage_command_check():
+    _run('.\\estate.bat alfred-request "triage validation request" --json')
+    result = _run(".\\estate.bat alfred-triage --json")
+    if not result["ok"]:
+        return {"name": "runtime:alfred_triage_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_triage_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:alfred_triage_json",
+        "ok": "summary" in data and "queued" in data,
+        "detail": f"queued={data.get('summary', {}).get('queued')}",
     }
 
 
