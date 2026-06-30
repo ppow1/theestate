@@ -53,7 +53,13 @@ def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
 
 def cmd_discovery_report(args):
-    print(generate_discovery_report())
+    if getattr(args, "json", False):
+        import json
+        from estate.core.paths import ESTATE_ROOT
+        latest = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+        print(json.dumps(json.loads(latest.read_text(encoding="utf-8")), indent=2))
+    else:
+        print(generate_discovery_report())
 
 def cmd_discover_ai(args):
     observations, out = observe_ai_environment()
@@ -127,6 +133,7 @@ def main():
     p.set_defaults(func=cmd_discover_ai)
 
     p = sub.add_parser("discovery-report")
+    p.add_argument("--json", action="store_true", help="Print latest Discovery observation JSON")
     p.set_defaults(func=cmd_discovery_report)
 
     p = sub.add_parser("sync-ollama")

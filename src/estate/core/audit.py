@@ -234,6 +234,7 @@ def _observation_checks():
         _observation_latest_shape_check(),
         _observation_history_json_check(),
         _discovery_report_contract_check(),
+        _discovery_json_command_check(),
     ]
 
 
@@ -436,6 +437,39 @@ def _discovery_report_contract_check():
         "name": "observations:discovery_report_contract",
         "ok": True,
         "detail": f"{len(lines)} non-empty lines",
+    }
+
+
+
+def _discovery_json_command_check():
+    result = _run(".\\estate.bat discovery-report --json")
+    if not result["ok"]:
+        return {
+            "name": "observations:discovery_report_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "observations:discovery_report_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    if not isinstance(data, dict):
+        return {
+            "name": "observations:discovery_report_json",
+            "ok": False,
+            "detail": "JSON report root is not an object",
+        }
+
+    return {
+        "name": "observations:discovery_report_json",
+        "ok": True,
+        "detail": f"{len(data.keys())} top-level keys",
     }
 
 

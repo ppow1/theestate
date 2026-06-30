@@ -350,3 +350,14 @@ Classification: Estate Internal
 
 Summary:
 Expanded Estate Audit with a bundled Discovery validation increment. Audit now validates latest observation shape, timestamped observation JSON readability, observation history presence, and the operational contract of the human-readable Discovery report.
+
+
+## EC-000033 - Added Discovery JSON report command
+
+Timestamp: 2026-06-29 23:07:30
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added machine-readable JSON output to the Discovery report command using the --json option. Expanded Estate Audit to validate the Discovery JSON command output as parseable structured observation data.

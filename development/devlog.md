@@ -224,3 +224,10 @@ Added devlog structure validation to Estate Audit, including EC entry presence, 
 EC-000032 - Added Discovery operational validation bundle
 
 Added a bundled set of Discovery-focused Audit checks covering latest observation shape, historical observation JSON validity, observation history presence, and Discovery report contract validation.
+
+
+## 2026-06-29 23:07:30
+
+EC-000033 - Added Discovery JSON report command
+
+Added --json support to discovery-report and extended Audit to validate the machine-readable Discovery report command.
