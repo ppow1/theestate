@@ -70,3 +70,10 @@ Created resident record RES-000005 for Marie, serving as Manager of Research in 
 EC-000010 - Registered Resident Judy
 
 Created resident record RES-000006 for Judy, serving as General Counsel in Legal.
+
+
+## 2026-06-29 20:29:23
+
+EC-000011 - Added Python cache ignore rules
+
+Added .gitignore rules for Python cache files and removed committed __pycache__ artifacts from Git tracking.

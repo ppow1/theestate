@@ -108,3 +108,14 @@ Classification: Estate Internal
 
 Summary:
 Created resident record RES-000006 for Judy, serving as General Counsel in Legal.
+
+
+## EC-000011 - Added Python cache ignore rules
+
+Timestamp: 2026-06-29 20:29:23
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added .gitignore rules for Python cache files and removed committed __pycache__ artifacts from Git tracking.
