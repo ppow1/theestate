@@ -537,3 +537,14 @@ Classification: Estate Internal
 
 Summary:
 Added an Audit check metadata envelope with group, severity, duration, and group duration fields. Audit reports now include structured metadata suitable for future dashboards, CI, and regression tracking, and Audit validates the saved runtime artifact schema.
+
+
+## EC-000050 - Added Discovery service facade
+
+Timestamp: 2026-06-30 00:27:57
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added a DiscoveryService facade to consolidate Discovery observation, report, status, catalog, lifecycle, and provider synchronization behavior behind one service boundary. Added discovery-refresh as the service-level refresh command and extended Audit to validate the new service command and module.

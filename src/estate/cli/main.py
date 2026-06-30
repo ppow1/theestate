@@ -7,6 +7,7 @@ from estate.core.discovery import observe_ai_environment, generate_discovery_rep
 from estate.core.provider_sync import sync_ollama_providers
 from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery_catalog_from_latest, format_discovery_catalog_report
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
+from estate.core.discovery_service import get_discovery_service
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -55,42 +56,36 @@ def cmd_capabilities(args):
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
 
-def cmd_discovery_catalog(args):
-    if getattr(args, "refresh", False):
-        catalog = sync_discovery_catalog_from_latest()
+def cmd_discovery_refresh(args):
+    service = get_discovery_service()
+    result = service.refresh()
+
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
     else:
-        catalog = load_discovery_catalog()
+        print(service.format_refresh_report(result))
+
+    if not result.get("ok"):
+        raise SystemExit(1)
+
+def cmd_discovery_catalog(args):
+    service = get_discovery_service()
+    catalog = service.catalog(refresh=getattr(args, "refresh", False))
 
     if getattr(args, "json", False):
         import json
         print(json.dumps(catalog, indent=2, sort_keys=True))
     else:
-        print(format_discovery_catalog_report(catalog))
+        print(service.catalog_report(refresh=False))
 
 def cmd_discovery_status(args):
-    import json
-    from estate.core.paths import ESTATE_ROOT
-
-    latest = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
-    data = json.loads(latest.read_text(encoding="utf-8"))
-
-    models = data.get("ollama", {}).get("models", [])
-    tools = data.get("tools", [])
-    tts = data.get("tts", [])
-    python_envs = data.get("python_envs", [])
-
-    status = {
-        "exists": data.get("exists"),
-        "changed_since_previous": data.get("changed_since_previous"),
-        "ollama_running": data.get("ollama", {}).get("running"),
-        "ollama_models": len(models),
-        "tools": len(tools),
-        "tts": len(tts),
-        "python_envs": len(python_envs),
-    }
+    service = get_discovery_service()
+    status = service.status()
 
     if getattr(args, "json", False):
-        print(json.dumps(status, indent=2))
+        import json
+        print(json.dumps(status, indent=2, sort_keys=True))
     else:
         print("=========================================")
         print("Estate Discovery Status")
@@ -211,6 +206,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print Discovery catalog JSON")
     p.add_argument("--refresh", action="store_true", help="Refresh catalog from latest observation before printing")
     p.set_defaults(func=cmd_discovery_catalog)
+
+    p = sub.add_parser("discovery-refresh")
+    p.add_argument("--json", action="store_true", help="Run Discovery service refresh and print JSON")
+    p.set_defaults(func=cmd_discovery_refresh)
 
     p = sub.add_parser("sync-ollama")
     p.set_defaults(func=cmd_sync_ollama)

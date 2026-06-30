@@ -175,6 +175,7 @@ def _syntax_checks():
         "src/estate/core/provider_sync.py",
         "src/estate/core/discovery_catalog.py",
         "src/estate/core/discovery_cycle.py",
+        "src/estate/core/discovery_service.py",
         "src/estate/core/audit_runtime.py",
     ]
 
@@ -220,6 +221,7 @@ def _cli_inventory_check():
         "discovery-report",
         "discovery-status",
         "discovery-catalog",
+        "discovery-refresh",
         "sync-ollama",
         "audit",
     ]
@@ -326,6 +328,7 @@ def _observation_checks():
         _discovery_catalog_latest_coverage_check(),
         _discovery_cycle_command_check(),
         _discovery_metrics_file_check(),
+        _discovery_refresh_command_check(),
     ]
 
 
@@ -799,6 +802,35 @@ def _discovery_metrics_file_check():
         "name": "observations:discovery_metrics_file",
         "ok": not missing and data.get("ok") is True,
         "detail": f"{len(data.get('steps', []))} cycle steps" if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+
+def _discovery_refresh_command_check():
+    result = _run(".\\estate.bat discovery-refresh --json")
+    if not result["ok"]:
+        return {
+            "name": "observations:discovery_refresh_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "observations:discovery_refresh_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = ["ok", "cycle", "provider_sync", "status", "catalog_summary"]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "observations:discovery_refresh_json",
+        "ok": not missing and data.get("ok") is True,
+        "detail": "refresh valid" if not missing else "missing: " + ", ".join(missing),
     }
 
 

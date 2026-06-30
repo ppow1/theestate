@@ -343,3 +343,10 @@ Added audit --save support and a runtime Audit report helper so Audit can persis
 EC-000048 - Added Audit check metadata envelope
 
 Added structured metadata to Audit checks and validation for the saved runtime audit artifact schema.
+
+
+## 2026-06-30 00:27:57
+
+EC-000050 - Added Discovery service facade
+
+Introduced DiscoveryService as the canonical Discovery service boundary, added discovery-refresh, and updated CLI/Audit integration around the new service facade.
