@@ -473,7 +473,7 @@ Summary:
 Repaired Discovery report reads after runtime state separation by pointing report generation and latest-observation validation at runtime/discovery/ai_environment_latest.json instead of the removed versioned latest observation file.
 
 
-## Duplicate EC-000043 note - Pointed Discovery reports at runtime latest
+## Duplicate entry note for prior report repair - Pointed Discovery reports at runtime latest
 
 Timestamp: 2026-06-29 23:56:22
 Location: A:\theestate
@@ -492,4 +492,15 @@ Status: Draft
 Classification: Estate Internal
 
 Summary:
-Repaired the remaining Discovery report reader path after runtime migration and corrected the institutional record after EC-000043 was accidentally recorded twice. The duplicate EC-000043 ledger/devlog entry was preserved as a duplicate note rather than a formal Estate Change, and this repair records the correction without rewriting Git history.
+Repaired the remaining Discovery report reader path after runtime migration and corrected the institutional record after the prior report-repair change was accidentally recorded twice. The duplicate prior report-repair ledger/devlog entry was preserved as a duplicate note rather than a formal Estate Change, and this repair records the correction without rewriting Git history.
+
+
+## EC-000045 - Repaired Discovery report latest path and EC parser ambiguity
+
+Timestamp: 2026-06-30 00:01:48
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Repaired the remaining Discovery report path after runtime migration and removed ambiguous prior-change tokens from duplicate-record notes so the latest Estate Change parser resolves the current formal entry correctly.

@@ -305,7 +305,7 @@ Updated Discovery report and latest-observation validation to read runtime/disco
 
 ## 2026-06-29 23:56:22
 
-Duplicate EC-000043 note - Pointed Discovery reports at runtime latest
+Duplicate entry note for prior report repair - Pointed Discovery reports at runtime latest
 
 Updated Discovery report and latest-observation validation to read runtime/discovery/ai_environment_latest.json after removal of the versioned latest observation file.
 
@@ -314,4 +314,11 @@ Updated Discovery report and latest-observation validation to read runtime/disco
 
 EC-000044 - Repaired Discovery report runtime reader and duplicate EC record
 
-Repaired the remaining Discovery report runtime reader path and corrected the duplicate formal EC-000043 ledger/devlog record by preserving it as a duplicate note while recording this formal repair.
+Repaired the remaining Discovery report runtime reader path and corrected the duplicate formal prior report-repair ledger/devlog record by preserving it as a duplicate note while recording this formal repair.
+
+
+## 2026-06-30 00:01:48
+
+EC-000045 - Repaired Discovery report latest path and EC parser ambiguity
+
+Repaired the Discovery report latest-observation path and cleaned duplicate-record wording so latest Estate Change detection remains unambiguous.
