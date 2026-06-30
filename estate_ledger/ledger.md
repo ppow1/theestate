@@ -929,3 +929,13 @@ Classification: Estate Internal
 
 Summary:
 Corrected the Alfred code review audit validator to read the current alfred-task JSON wrapper. The validator now reads result.results, validates the safe_code_review_executor Estate Code Review Report, and preserves Alfred runtime behavior unchanged.
+
+EC-000084 - Expanded Estate canonical governance documents
+
+Timestamp: 2026-06-30 17:50:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Expanded the Estate Orientation Handbook, Estate Vision and Architecture document, and Estate Manual from skeleton scaffolds into fuller first-pass canonical documents. The update preserves the lean governance structure while adding substantive onboarding, architecture, operations, Discovery, Audit, Alfred, archive, memory, local-first, and worker guidance.

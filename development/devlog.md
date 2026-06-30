@@ -677,3 +677,9 @@ Updated the Alfred code review audit validator to accept the safe_code_review_ex
 EC-000083 - Corrected Alfred code review audit payload path
 
 Corrected the Alfred code review audit validator to read result.results from the current alfred-task JSON wrapper and validate the safe_code_review_executor Estate Code Review Report.
+
+2026-06-30 17:50:00
+
+EC-000084 - Expanded Estate canonical governance documents
+
+Expanded the three core governance documents from skeleton scaffolds into fuller first-pass canon covering onboarding, architecture, operations, Discovery, Audit, Alfred, archive, memory, local-first infrastructure, and worker guidance.
