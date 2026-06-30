@@ -215,6 +215,7 @@ def _runtime_checks():
     checks.append(_alfred_jobs_command_check())
     checks.append(_alfred_execute_command_check())
     checks.append(_alfred_result_command_check())
+    checks.append(_alfred_result_command_check())
     checks.append(_alfred_policy_command_check())
     checks.append(_alfred_job_control_command_check())
 
@@ -246,6 +247,7 @@ def _cli_inventory_check():
         "alfred-run",
         "alfred-jobs",
         "alfred-execute",
+        "alfred-result",
         "alfred-result",
         "alfred-inspect",
         "alfred-cancel",

@@ -9,7 +9,7 @@ from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
 from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities
-from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result
+from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, get_job_result, format_job_result
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
