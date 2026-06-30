@@ -1,0 +1,38 @@
+[
+  {
+    "id": "PRV-000001",
+    "name": "Kokoro Provider",
+    "service": "Speech Service",
+    "capability": "CAP-000002",
+    "status": "Operational",
+    "location": "A:\\AI\\TTS\\kokoro_py311",
+    "policy": "Preferred for lightweight local TTS."
+  },
+  {
+    "id": "PRV-000002",
+    "name": "F5-TTS Provider",
+    "service": "Speech Service",
+    "capability": "CAP-000003",
+    "status": "Operational",
+    "location": "A:\\AI\\TTS\\F5-TTS",
+    "policy": "Use when voice quality or voice cloning is preferred over speed."
+  },
+  {
+    "id": "PRV-000003",
+    "name": "ComfyUI Provider",
+    "service": "Image Generation Service",
+    "capability": "CAP-000004",
+    "status": "Installed",
+    "location": "A:\\AI\\ComfyUI",
+    "policy": "Use for local image generation workflows."
+  },
+  {
+    "id": "PRV-000004",
+    "name": "Whisper Provider",
+    "service": "Speech Recognition Service",
+    "capability": "CAP-000006",
+    "status": "Pending Install",
+    "location": "A:\\AI",
+    "policy": "Use for local speech-to-text once installed."
+  }
+]

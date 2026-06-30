@@ -2,7 +2,7 @@ import argparse
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
-from estate.core.services import list_services, list_capabilities
+from estate.core.services import list_services, list_capabilities, list_providers
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -35,6 +35,7 @@ def cmd_status(args):
     print(f"Registered residents: {len(load_registry('residents'))}")
     print(f"Registered services: {len(load_registry('services'))}")
     print(f"Registered capabilities: {len(load_registry('capabilities'))}")
+    print(f"Registered providers: {len(load_registry('providers'))}")
 
 def cmd_list_residents(args):
     print_table(load_registry("residents"), ["id", "name", "department", "office"])
@@ -44,6 +45,9 @@ def cmd_services(args):
 
 def cmd_capabilities(args):
     print_table(list_capabilities(), ["id", "name", "category", "status", "location"])
+
+def cmd_providers(args):
+    print_table(list_providers(), ["id", "name", "service", "status", "location"])
 
 def main():
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
@@ -75,6 +79,9 @@ def main():
 
     p = sub.add_parser("capabilities")
     p.set_defaults(func=cmd_capabilities)
+
+    p = sub.add_parser("providers")
+    p.set_defaults(func=cmd_providers)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):

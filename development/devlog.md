@@ -91,3 +91,10 @@ Added initial Estate Service Registry and Capability Registry to track callable 
 EC-000013 - Added service and capability CLI views
 
 Updated Estate Core CLI to list registered services and capabilities and expanded status output to include service and capability counts.
+
+
+## 2026-06-29 20:51:45
+
+EC-000014 - Added Provider Registry
+
+Added provider registry to separate stable service needs from interchangeable AI resources such as Kokoro, F5-TTS, ComfyUI, and pending Whisper.

@@ -141,3 +141,14 @@ Classification: Estate Internal
 
 Summary:
 Updated Estate Core CLI to list registered services and capabilities and expanded status output to include service and capability counts.
+
+
+## EC-000014 - Added Provider Registry
+
+Timestamp: 2026-06-29 20:51:45
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added provider registry to separate stable service needs from interchangeable AI resources such as Kokoro, F5-TTS, ComfyUI, and pending Whisper.
