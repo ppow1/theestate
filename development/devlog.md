@@ -336,3 +336,10 @@ Added a runtime latest fallback for Discovery report generation so discovery-rep
 EC-000047 - Added Audit runtime report artifacts
 
 Added audit --save support and a runtime Audit report helper so Audit can persist latest machine-readable results under runtime/audit without mutating versioned Estate state.
+
+
+## 2026-06-30 00:16:22
+
+EC-000048 - Added Audit check metadata envelope
+
+Added structured metadata to Audit checks and validation for the saved runtime audit artifact schema.

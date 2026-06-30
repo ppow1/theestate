@@ -526,3 +526,14 @@ Classification: Estate Internal
 
 Summary:
 Added runtime Audit report persistence using the audit --save option. Audit can now emit human-readable output, JSON output, and a saved runtime artifact at runtime/audit/latest.json without dirtying the versioned repository.
+
+
+## EC-000048 - Added Audit check metadata envelope
+
+Timestamp: 2026-06-30 00:16:22
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added an Audit check metadata envelope with group, severity, duration, and group duration fields. Audit reports now include structured metadata suitable for future dashboards, CI, and regression tracking, and Audit validates the saved runtime artifact schema.

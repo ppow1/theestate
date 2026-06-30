@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import time
 from pathlib import Path
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -130,6 +131,42 @@ def _latest_ledger_ec_in_devlog_check():
     }
 
 
+
+def _audit_check_severity(name):
+    if name.startswith("git:"):
+        return "error"
+    if name.startswith("history:"):
+        return "error"
+    if name.startswith("syntax:"):
+        return "error"
+    if name.startswith("runtime:"):
+        return "error"
+    if name.startswith("json:"):
+        return "error"
+    return "error"
+
+
+def _enrich_checks(checks, group_name):
+    enriched = []
+    for check in checks:
+        item = dict(check)
+        item.setdefault("group", group_name)
+        item.setdefault("severity", _audit_check_severity(item.get("name", "")))
+        item.setdefault("duration_ms", 0)
+        enriched.append(item)
+    return enriched
+
+
+def _run_check_group(group_name, func):
+    start = time.perf_counter()
+    checks = func()
+    duration_ms = round((time.perf_counter() - start) * 1000, 3)
+    enriched = _enrich_checks(checks, group_name)
+    for check in enriched:
+        check["group_duration_ms"] = duration_ms
+    return enriched
+
+
 def _syntax_checks():
     checks = []
     py_files = [
@@ -164,6 +201,7 @@ def _runtime_checks():
         })
 
     checks.append(_cli_inventory_check())
+    checks.append(_audit_runtime_artifact_check())
 
     return checks
 
@@ -198,6 +236,48 @@ def _cli_inventory_check():
         "name": "runtime:cli_inventory",
         "ok": not missing,
         "detail": f"{len(required)} commands present" if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+
+def _audit_runtime_artifact_check():
+    path = ESTATE_ROOT / "runtime" / "audit" / "latest.json"
+    if not path.exists():
+        return {
+            "name": "runtime:audit_latest_artifact",
+            "ok": False,
+            "detail": "missing runtime/audit/latest.json",
+        }
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {
+            "name": "runtime:audit_latest_artifact",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    report = data.get("report", {})
+    checks = report.get("checks", [])
+
+    if not isinstance(checks, list):
+        return {
+            "name": "runtime:audit_latest_artifact",
+            "ok": False,
+            "detail": "report checks is not a list",
+        }
+
+    missing = []
+    for index, check in enumerate(checks):
+        for field in ["name", "ok", "detail", "group", "severity", "duration_ms", "group_duration_ms"]:
+            if field not in check:
+                missing.append(f"checks[{index}].{field}")
+
+    return {
+        "name": "runtime:audit_latest_artifact",
+        "ok": not missing,
+        "detail": f"{len(checks)} enriched checks" if not missing else "missing: " + ", ".join(missing[:5]),
     }
 
 
@@ -751,18 +831,19 @@ def _git_checks():
 
 def run_audit():
     checks = []
-    checks.extend(_syntax_checks())
-    checks.extend(_runtime_checks())
-    checks.extend(_json_checks())
-    checks.extend(_registry_checks())
-    checks.extend(_observation_checks())
-    checks.extend(_history_checks())
-    checks.extend(_git_checks())
+    checks.extend(_run_check_group("syntax", _syntax_checks))
+    checks.extend(_run_check_group("runtime", _runtime_checks))
+    checks.extend(_run_check_group("json", _json_checks))
+    checks.extend(_run_check_group("registry", _registry_checks))
+    checks.extend(_run_check_group("observations", _observation_checks))
+    checks.extend(_run_check_group("history", _history_checks))
+    checks.extend(_run_check_group("git", _git_checks))
 
     passed = sum(1 for check in checks if check["ok"])
     failed = len(checks) - passed
 
     return {
+        "version": 1,
         "passed": passed,
         "failed": failed,
         "checks": checks,
