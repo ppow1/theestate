@@ -680,3 +680,14 @@ Classification: Estate Internal
 
 Summary:
 Added alfred-task as the first end-to-end Alfred command. Alfred can now create a job, execute it, write artifacts, and return the final result in one operation.
+
+
+## EC-000061 - Added Alfred operator status surface
+
+Timestamp: 2026-06-30 08:45:27
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added Alfred operator status to summarize services, capabilities, runtime jobs, and Alfred readiness in one command.

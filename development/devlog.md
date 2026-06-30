@@ -434,3 +434,10 @@ Added job artifact writing, alfred-result, and Audit validation for completed Al
 EC-000060 - Added Alfred end-to-end task command
 
 Added alfred-task with full create, execute, artifact, and result retrieval flow plus Audit validation.
+
+
+## 2026-06-30 08:45:27
+
+EC-000061 - Added Alfred operator status surface
+
+Added alfred-status with human-readable and JSON output plus Audit validation.

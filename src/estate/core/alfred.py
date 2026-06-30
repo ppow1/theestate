@@ -627,3 +627,61 @@ def format_task_result(task):
         return summary
 
     return format_execution_result(task.get("execution", {}))
+
+
+
+def alfred_status():
+    jobs = list_jobs().get("jobs", [])
+    service_surface = alfred_capabilities()
+
+    by_status = {}
+    for job in jobs:
+        status = job.get("status", "unknown")
+        by_status[status] = by_status.get(status, 0) + 1
+
+    ready_services = [
+        service for service in service_surface.get("services", [])
+        if service.get("available")
+    ]
+
+    return {
+        "version": 1,
+        "jobs": {
+            "count": len(jobs),
+            "by_status": by_status,
+            "latest": jobs[-5:],
+        },
+        "services": {
+            "count": len(service_surface.get("services", [])),
+            "available": len(ready_services),
+            "capabilities": len(service_surface.get("capabilities", [])),
+        },
+        "operator_summary": {
+            "ready": True,
+            "message": "Alfred can plan, create jobs, safely execute jobs, and return runtime artifacts.",
+        },
+    }
+
+
+def format_alfred_status(payload=None):
+    payload = payload or alfred_status()
+    lines = [
+        "=========================================",
+        "Alfred Operator Status",
+        "=========================================",
+        f"Ready: {payload.get('operator_summary', {}).get('ready')}",
+        f"Message: {payload.get('operator_summary', {}).get('message')}",
+        "",
+        "Services:",
+        f"  Count: {payload.get('services', {}).get('count')}",
+        f"  Available: {payload.get('services', {}).get('available')}",
+        f"  Capabilities: {payload.get('services', {}).get('capabilities')}",
+        "",
+        "Jobs:",
+        f"  Count: {payload.get('jobs', {}).get('count')}",
+    ]
+
+    for status, count in sorted(payload.get("jobs", {}).get("by_status", {}).items()):
+        lines.append(f"  {status}: {count}")
+
+    return "\n".join(lines)
