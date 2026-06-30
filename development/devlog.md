@@ -665,3 +665,9 @@ Cleaned duplicated history repair blocks, removed temporary backup files, and re
 EC-000081 - Repaired Alfred code review audit contract
 
 Updated the Alfred code review audit validator to read the current results-array contract and validate the code.review Estate Code Review Report without changing Alfred runtime behavior.
+
+## 2026-06-30 17:40:00
+
+EC-000082 - Relaxed Alfred code review audit routing check
+
+Updated the Alfred code review audit validator to accept the safe_code_review_executor Estate Code Review Report regardless of routing capability label.

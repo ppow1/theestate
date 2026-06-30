@@ -881,7 +881,8 @@ def _alfred_code_review_executor_check():
 
     review_result = None
     for item in data.get("results", []):
-        if item.get("capability") == "code.review":
+        text = item.get("result", {}).get("summary") or ""
+        if item.get("mode") == "safe_code_review_executor" and "Estate Code Review Report" in text:
             review_result = item
             break
 
@@ -889,7 +890,7 @@ def _alfred_code_review_executor_check():
         return {
             "name": "runtime:alfred_code_review_json",
             "ok": False,
-            "detail": "missing code.review result",
+            "detail": "missing safe code review executor result",
         }
 
     text = review_result.get("result", {}).get("summary") or ""
@@ -1645,4 +1646,5 @@ def print_audit_report():
             print(f"     {check['detail']}")
 
     return report
+
 
