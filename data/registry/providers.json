@@ -34,5 +34,37 @@
     "status": "Pending Install",
     "location": "A:\\AI",
     "policy": "Use for local speech-to-text once installed."
+  },
+  {
+    "id": "PRV-000005",
+    "name": "Ollama qwen2.5-coder:7b",
+    "service": "Reasoning Service",
+    "capability": "CAP-000007",
+    "status": "Observed",
+    "location": "Ollama local runtime",
+    "policy": "Observed local Ollama model. Pending formal routing policy.",
+    "observed_from": "A:\\theestate\\observations\\ai_environment_latest.json",
+    "model": {
+      "name": "qwen2.5-coder:7b",
+      "id": "dae161e27b0e",
+      "size": "4.7 GB",
+      "modified": "32 hours ago"
+    }
+  },
+  {
+    "id": "PRV-000006",
+    "name": "Ollama llama3.2:3b",
+    "service": "Reasoning Service",
+    "capability": "CAP-000007",
+    "status": "Observed",
+    "location": "Ollama local runtime",
+    "policy": "Observed local Ollama model. Pending formal routing policy.",
+    "observed_from": "A:\\theestate\\observations\\ai_environment_latest.json",
+    "model": {
+      "name": "llama3.2:3b",
+      "id": "a80c4f17acd5",
+      "size": "2.0 GB",
+      "modified": "32 hours ago"
+    }
   }
 ]

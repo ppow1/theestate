@@ -46,12 +46,8 @@ def sync_ollama_providers():
 
     summary = "No new Ollama model providers were found during sync."
     if created:
-        summary = "Synced observed Ollama models into provider registry:
-" + "
-".join(
-            f"- {p['id']} {p['name']}" for p in created
-        )
-
+        lines = [f"- {p['id']} {p['name']}" for p in created]
+        summary = "Synced observed Ollama models into provider registry:\n" + "\n".join(lines)
     ec_id = create_change(
         title="Synced observed Ollama model providers",
         summary=summary

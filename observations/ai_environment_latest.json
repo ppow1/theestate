@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 21:21:43",
+  "timestamp": "2026-06-29 21:34:01",
   "ai_home": "A:\\AI",
   "paths": {
     "envs": "A:\\AI\\envs",
@@ -24,7 +24,8 @@
     "kokoro_py311"
   ],
   "tool_items": [
-    "FFmpeg"
+    "FFmpeg",
+    "llama.cpp"
   ],
   "model_categories": [
     "CLIP",
@@ -32,6 +33,7 @@
     "ControlNet",
     "Embeddings",
     "FLUX",
+    "GGUF",
     "IPAdapter",
     "LLM",
     "LoRA",
