@@ -939,3 +939,13 @@ Classification: Estate Internal
 
 Summary:
 Expanded the Estate Orientation Handbook, Estate Vision and Architecture document, and Estate Manual from skeleton scaffolds into fuller first-pass canonical documents. The update preserves the lean governance structure while adding substantive onboarding, architecture, operations, Discovery, Audit, Alfred, archive, memory, local-first, and worker guidance.
+
+EC-000085 - Added Estate Collaboration Layer v1 infrastructure
+
+Timestamp: 2026-06-30 18:15:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added the Estate Collaboration Layer v1 infrastructure and implementation plan. This introduced repository collaboration queues, message/work package/promotion/status folders, canonical templates, GitHub and local filesystem transport adapter documentation, worker collaboration protocol, promotion workflow, and integration pointers in AI_START_HERE, the Estate Manual, the Orientation Handbook, and the Vision and Architecture document.

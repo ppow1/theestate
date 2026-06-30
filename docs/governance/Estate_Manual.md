@@ -462,3 +462,25 @@ Latest git EC matches latest ledger EC.
 Latest ledger EC appears in devlog.
 
 This is the clean handoff checkpoint.
+
+Collaboration Layer v1
+
+The Collaboration Layer enables multiple intelligences to work together without increasing Steward workload.
+
+Primary documentation:
+
+docs\collaboration\Estate_Collaboration_Layer_v1.md
+
+Initial shared state:
+
+collaboration\
+
+Local-only state:
+
+runtime\collaboration\
+
+GitHub is the first transport adapter. It is not the Communication Bus.
+
+Alfred owns operational routing and coordination.
+
+The Privacy and Boundary Office owns classification, promotion, and outbound permission.

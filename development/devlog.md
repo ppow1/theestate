@@ -683,3 +683,9 @@ Corrected the Alfred code review audit validator to read result.results from the
 EC-000084 - Expanded Estate canonical governance documents
 
 Expanded the three core governance documents from skeleton scaffolds into fuller first-pass canon covering onboarding, architecture, operations, Discovery, Audit, Alfred, archive, memory, local-first infrastructure, and worker guidance.
+
+2026-06-30 18:15:00
+
+EC-000085 - Added Estate Collaboration Layer v1 infrastructure
+
+Added Collaboration Layer v1 infrastructure for multi-worker coordination, including collaboration folders, message templates, transport adapter docs, promotion workflow, worker protocol, and governance integration pointers.

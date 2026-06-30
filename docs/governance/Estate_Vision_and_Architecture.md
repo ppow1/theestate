@@ -600,3 +600,28 @@ If yes, extend the existing subsystem.
 If no, document why a new capability, workflow, registry, or office is justified.
 
 Expansion happens by need, not novelty.
+
+Estate Collaboration Layer v1
+
+The Estate Collaboration Layer is the infrastructure that enables many intelligences to work together.
+
+It includes:
+
+Communication Bus operational flow.
+Canonical message envelopes.
+Work package lifecycle.
+Worker collaboration protocol.
+Promotion workflow.
+GitHub transport adapter.
+Local filesystem transport adapter.
+Privacy and Boundary Office integration.
+
+The Collaboration Layer strengthens existing Offices rather than creating a new Collaboration Office.
+
+Alfred owns coordination and routing.
+
+The Privacy and Boundary Office owns classification, promotion, and outbound permission.
+
+Discovery observes collaboration infrastructure.
+
+Audit validates collaboration structure and lifecycle state.

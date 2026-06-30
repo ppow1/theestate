@@ -475,3 +475,19 @@ The Estate succeeds when:
 - Marie enriches meaning.
 - Ingrid protects boundaries.
 - The Steward remains final authority without becoming the help desk.
+
+Collaboration Layer v1
+
+The Collaboration Layer is the Estate infrastructure for multi-worker coordination.
+
+It allows ChatGPT workers, local 4090 workers, Alfred, and future services to use a common work package and message lifecycle.
+
+GitHub is the first shared transport adapter.
+
+The local filesystem is the first local transport adapter.
+
+The Communication Bus is not GitHub. GitHub is replaceable.
+
+Alfred coordinates operational routing.
+
+The Privacy and Boundary Office controls classification, promotion, and outbound permission.

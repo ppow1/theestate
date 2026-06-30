@@ -1,0 +1,15 @@
+{
+"promotion_id": "promote_YYYYMMDD_HHMMSS_slug",
+"version": 1,
+"source_path": "",
+"target_path": "",
+"classification": "Estate Internal",
+"requested_by": "",
+"approved_by": "",
+"approved_at": "",
+"reason": "",
+"risks": [],
+"redactions": [],
+"audit_reference": null,
+"decision": "pending"
+}

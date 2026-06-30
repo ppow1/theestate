@@ -23,3 +23,11 @@ When uncertain:
 Pat is the court of last resort, not the first stop.
 
 PowerShell standard: give complete executable blocks beginning with Clear-Host.
+
+Collaboration Layer
+
+For multi-worker collaboration, read:
+
+docs/collaboration/Estate_Collaboration_Layer_v1.md
+
+The Collaboration Layer is infrastructure for worker coordination, GitHub transport, local filesystem transport, promotion workflow, and privacy boundary enforcement.
