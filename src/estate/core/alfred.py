@@ -967,3 +967,49 @@ def _estate_code_review_report(goal):
     ])
 
     return "\n".join(lines)
+
+
+
+def estate_health_report():
+    status = alfred_status()
+    services = status.get("services", {})
+    jobs = status.get("jobs", {})
+
+    return {
+        "version": 1,
+        "created_at": _now(),
+        "ready": status.get("operator_summary", {}).get("ready"),
+        "services": services,
+        "jobs": jobs,
+        "summary": [
+            "Estate Health Report",
+            f"Ready: {status.get('operator_summary', {}).get('ready')}",
+            f"Services available: {services.get('available')}",
+            f"Capabilities: {services.get('capabilities')}",
+            f"Jobs recorded: {jobs.get('count')}",
+        ],
+    }
+
+
+def format_estate_health_report(payload=None):
+    payload = payload or estate_health_report()
+    lines = [
+        "=========================================",
+        "Estate Health Report",
+        "=========================================",
+        f"Created: {payload.get('created_at')}",
+        f"Ready: {payload.get('ready')}",
+        "",
+        "Services:",
+        f"  Count: {payload.get('services', {}).get('count')}",
+        f"  Available: {payload.get('services', {}).get('available')}",
+        f"  Capabilities: {payload.get('services', {}).get('capabilities')}",
+        "",
+        "Jobs:",
+        f"  Count: {payload.get('jobs', {}).get('count')}",
+    ]
+
+    for status, count in sorted(payload.get("jobs", {}).get("by_status", {}).items()):
+        lines.append(f"  {status}: {count}")
+
+    return "\n".join(lines)

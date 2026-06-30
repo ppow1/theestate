@@ -834,3 +834,14 @@ Classification: Estate Internal
 
 Summary:
 Expanded Alfred safe code review execution into a local code structure report. Alfred can now produce a non-destructive report of Estate Python modules and review guidance as a runtime artifact.
+
+
+## EC-000075 - Added Estate health report command
+
+Timestamp: 2026-06-30 09:10:41
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added estate-health as a concise operator health report over Alfred readiness, service availability, capabilities, and runtime jobs.

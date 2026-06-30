@@ -532,3 +532,10 @@ Added docs/alfred_v1_operator_completion.md documenting Alfred v1 completion sta
 EC-000074 - Added Alfred local code review report executor
 
 Added Estate code structure reporting to Alfred safe code review execution and Audit validation.
+
+
+## 2026-06-30 09:10:41
+
+EC-000075 - Added Estate health report command
+
+Added estate-health with human-readable and JSON output plus Audit validation.

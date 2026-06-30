@@ -211,6 +211,7 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_estate_health_command_check())
     checks.append(_alfred_artifacts_command_check())
     checks.append(_alfred_cleanup_command_check())
     checks.append(_alfred_briefing_command_check())
@@ -255,6 +256,7 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "estate-health",
         "alfred-artifacts",
         "alfred-cleanup",
         "alfred-briefing",
@@ -942,6 +944,24 @@ def _alfred_code_report_executor_check():
         "name": "runtime:alfred_code_report_json",
         "ok": data.get("ok") is True and "Estate Code Review Report" in text,
         "detail": data.get("job_id", "code report valid"),
+    }
+
+
+
+def _estate_health_command_check():
+    result = _run(".\\estate.bat estate-health --json")
+    if not result["ok"]:
+        return {"name": "runtime:estate_health_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:estate_health_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:estate_health_json",
+        "ok": data.get("ready") is True and "services" in data and "jobs" in data,
+        "detail": f"services={data.get('services', {}).get('available')} jobs={data.get('jobs', {}).get('count')}",
     }
 
 
