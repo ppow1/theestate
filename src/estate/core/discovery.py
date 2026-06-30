@@ -217,6 +217,15 @@ from estate.core.discovery_catalog import update_discovery_catalog as _estate_up
 _estate_catalog_observe_ai_environment = observe_ai_environment
 
 def observe_ai_environment():
-    observation = _estate_catalog_observe_ai_environment()
+    observed = _estate_catalog_observe_ai_environment()
+
+    if isinstance(observed, tuple):
+        observation = observed[0]
+    else:
+        observation = observed
+
+    if not isinstance(observation, dict):
+        raise TypeError(f"observation root is {type(observation).__name__}, expected dict")
+
     _estate_update_discovery_catalog(observation)
     return observation

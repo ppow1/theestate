@@ -404,4 +404,15 @@ Status: Draft
 Classification: Estate Internal
 
 Summary:
-Repaired the Discovery lifecycle command after Audit revealed that observe_ai_environment can return a tuple-shaped result. The lifecycle command now normalizes tuple observations before calculating metrics, preserving the historical EC-000036 defect as a recorded repair rather than rewriting history.
+Repaired the Discovery lifecycle command after Audit revealed that observe_ai_environment can return a tuple-shaped result. The lifecycle command now normalizes tuple observations before calculating metrics, preserving the historical lifecycle defect as a recorded repair rather than rewriting history.
+
+
+## EC-000038 - Repaired Discovery catalog wrapper contract
+
+Timestamp: 2026-06-29 23:32:19
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Repaired the Discovery catalog integration wrapper so tuple-shaped observation results are normalized before catalog synchronization. This fixes the lifecycle observe step failure and establishes that the wrapped Discovery observation interface returns a dictionary to downstream consumers.

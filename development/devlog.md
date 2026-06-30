@@ -259,3 +259,10 @@ Added the discover lifecycle command, persisted Discovery cycle metrics, and ext
 EC-000037 - Repaired Discovery lifecycle observation handling
 
 Repaired Discovery lifecycle metrics generation by normalizing tuple-shaped observe_ai_environment results before metric extraction.
+
+
+## 2026-06-29 23:32:19
+
+EC-000038 - Repaired Discovery catalog wrapper contract
+
+Repaired the Discovery catalog wrapper to normalize tuple-shaped observation results before catalog synchronization, fixing the Discovery lifecycle observe step failure.

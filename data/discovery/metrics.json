@@ -2,23 +2,21 @@
   "catalog_active": 6,
   "catalog_entities": 6,
   "catalog_inactive": 0,
-  "changed_since_previous": null,
-  "consecutive_successful_runs": 0,
-  "duration_seconds": 0.084,
-  "failures": [
-    "'tuple' object has no attribute 'get'"
-  ],
-  "finished_at": "2026-06-29T23:30:41",
-  "ok": false,
-  "ollama_models": 0,
-  "ollama_running": null,
+  "changed_since_previous": false,
+  "consecutive_successful_runs": 4,
+  "duration_seconds": 0.097,
+  "failures": [],
+  "finished_at": "2026-06-29T23:32:22",
+  "ok": true,
+  "ollama_models": 2,
+  "ollama_running": true,
   "report_lines": 26,
-  "started_at": "2026-06-29T23:30:41",
+  "started_at": "2026-06-29T23:32:22",
   "steps": [
     {
-      "detail": "'tuple' object has no attribute 'get'",
+      "detail": "observation written",
       "name": "observe",
-      "ok": false
+      "ok": true
     },
     {
       "detail": "6 entities",
