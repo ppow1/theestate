@@ -217,6 +217,7 @@ def _runtime_checks():
     checks.append(_alfred_status_command_check())
     checks.append(_alfred_task_command_check())
     checks.append(_alfred_local_reasoning_executor_check())
+    checks.append(_alfred_code_review_executor_check())
     checks.append(_alfred_plan_command_check())
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
@@ -852,6 +853,25 @@ def _alfred_local_reasoning_executor_check():
         "name": "runtime:alfred_local_reasoning_json",
         "ok": data.get("ok") is True and "Local Reasoning Result" in text,
         "detail": data.get("job_id", "local reasoning valid"),
+    }
+
+
+
+def _alfred_code_review_executor_check():
+    result = _run('.\\estate.bat alfred-task "review code safely" --json')
+    if not result["ok"]:
+        return {"name": "runtime:alfred_code_review_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_code_review_json", "ok": False, "detail": str(e)}
+
+    text = data.get("result", {}).get("summary") or ""
+    return {
+        "name": "runtime:alfred_code_review_json",
+        "ok": data.get("ok") is True and "Safe Code Review Result" in text,
+        "detail": data.get("job_id", "code review valid"),
     }
 
 

@@ -21,6 +21,11 @@ EXECUTION_POLICIES = {
         "uses_network": False,
         "requires_confirmation": False,
     },
+    "safe_code_review_executor": {
+        "writes_files": False,
+        "uses_network": False,
+        "requires_confirmation": False,
+    },
     "dry_run": {
         "writes_files": False,
         "uses_network": False,
@@ -306,9 +311,9 @@ def _safe_execute_step(step, goal):
         return {
             "ok": True,
             "capability": capability,
-            "mode": "safe_code_executor",
+            "mode": "safe_code_review_executor",
             "result": {
-                "summary": f"Prepared code-assistance execution plan for goal: {goal}",
+                "summary": _safe_code_review_text(goal),
                 "safety": "No filesystem writes performed by this executor.",
             },
         }
@@ -871,3 +876,23 @@ def _local_reasoning_text(goal):
         "3. Promote to a specialized service only when the task requires it.",
     ]
     return "\n".join(lines)
+
+
+
+def _safe_code_review_text(goal):
+    return "\n".join([
+        f"Goal: {goal}",
+        "",
+        "Safe Code Review Result:",
+        "Alfred prepared a non-destructive code review plan.",
+        "",
+        "Review checklist:",
+        "1. Identify target files.",
+        "2. Inspect syntax and imports.",
+        "3. Look for runtime entry points.",
+        "4. Check audit coverage.",
+        "5. Prepare proposed patches separately before applying them.",
+        "",
+        "Safety boundary:",
+        "No project files were modified by this executor.",
+    ])
