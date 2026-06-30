@@ -801,3 +801,14 @@ Classification: Estate Internal
 
 Summary:
 Added an Alfred artifact index command to list runtime job artifacts and make completed job outputs easier to find from the command surface.
+
+
+## EC-000072 - Added Alfred command aliases
+
+Timestamp: 2026-06-30 09:05:08
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added Steward-friendly Alfred command aliases. ask-alfred now runs an Alfred task, and alfred opens the operator briefing surface.

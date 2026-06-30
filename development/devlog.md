@@ -511,3 +511,10 @@ Added safe code review execution output and Audit validation.
 EC-000071 - Added Alfred artifact index
 
 Added alfred-artifacts with human-readable and JSON output plus Audit validation.
+
+
+## 2026-06-30 09:05:08
+
+EC-000072 - Added Alfred command aliases
+
+Added ask-alfred and alfred aliases with Audit validation.

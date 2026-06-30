@@ -468,6 +468,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print Alfred operator briefing JSON")
     p.set_defaults(func=cmd_alfred_briefing)
 
+    p = sub.add_parser("alfred")
+    p.add_argument("--json", action="store_true", help="Print Alfred operator briefing JSON")
+    p.set_defaults(func=cmd_alfred_briefing)
+
     p = sub.add_parser("alfred-request")
     p.add_argument("goal", help="Goal to queue as an Alfred request")
     p.add_argument("--json", action="store_true", help="Print Alfred request JSON")
@@ -487,6 +491,11 @@ def main():
     p.set_defaults(func=cmd_alfred_status)
 
     p = sub.add_parser("alfred-task")
+    p.add_argument("goal", help="Goal for Alfred to complete as one task")
+    p.add_argument("--json", action="store_true", help="Print Alfred task result JSON")
+    p.set_defaults(func=cmd_alfred_task)
+
+    p = sub.add_parser("ask-alfred")
     p.add_argument("goal", help="Goal for Alfred to complete as one task")
     p.add_argument("--json", action="store_true", help="Print Alfred task result JSON")
     p.set_defaults(func=cmd_alfred_task)

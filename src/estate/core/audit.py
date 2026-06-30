@@ -216,6 +216,7 @@ def _runtime_checks():
     checks.append(_alfred_briefing_command_check())
     checks.append(_alfred_request_queue_command_check())
     checks.append(_alfred_status_command_check())
+    checks.append(_alfred_alias_command_check())
     checks.append(_alfred_task_command_check())
     checks.append(_alfred_local_reasoning_executor_check())
     checks.append(_alfred_code_review_executor_check())
@@ -260,6 +261,8 @@ def _cli_inventory_check():
         "alfred-requests",
         "alfred-promote",
         "alfred-status",
+        "alfred",
+        "ask-alfred",
         "alfred-task",
         "alfred-plan",
         "alfred-run",
@@ -896,6 +899,29 @@ def _alfred_artifacts_command_check():
         "name": "runtime:alfred_artifacts_json",
         "ok": isinstance(data.get("artifacts"), list),
         "detail": f"{data.get('count')} artifacts",
+    }
+
+
+
+def _alfred_alias_command_check():
+    ask = _run('.\\estate.bat ask-alfred "summarize Estate status" --json')
+    briefing = _run(".\\estate.bat alfred --json")
+
+    if not ask["ok"]:
+        return {"name": "runtime:alfred_alias_json", "ok": False, "detail": ask["stderr"] or ask["stdout"]}
+    if not briefing["ok"]:
+        return {"name": "runtime:alfred_alias_json", "ok": False, "detail": briefing["stderr"] or briefing["stdout"]}
+
+    try:
+        ask_data = json.loads(ask["stdout"])
+        briefing_data = json.loads(briefing["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_alias_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:alfred_alias_json",
+        "ok": ask_data.get("ok") is True and briefing_data.get("summary", {}).get("ready") is True,
+        "detail": "aliases valid",
     }
 
 
