@@ -1,0 +1,35 @@
+{
+  "catalog_active": 6,
+  "catalog_entities": 6,
+  "catalog_inactive": 0,
+  "changed_since_previous": null,
+  "consecutive_successful_runs": 0,
+  "duration_seconds": 0.08,
+  "failures": [
+    "'tuple' object has no attribute 'get'"
+  ],
+  "finished_at": "2026-06-29T23:29:50",
+  "ok": false,
+  "ollama_models": 0,
+  "ollama_running": null,
+  "report_lines": 26,
+  "started_at": "2026-06-29T23:29:50",
+  "steps": [
+    {
+      "detail": "'tuple' object has no attribute 'get'",
+      "name": "observe",
+      "ok": false
+    },
+    {
+      "detail": "6 entities",
+      "name": "catalog",
+      "ok": true
+    },
+    {
+      "detail": "26 non-empty lines",
+      "name": "report",
+      "ok": true
+    }
+  ],
+  "version": 1
+}

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 23:26:35",
+  "timestamp": "2026-06-29 23:29:50",
   "ai_home": "A:\\AI",
   "paths": {
     "envs": "A:\\AI\\envs",
@@ -29,6 +29,7 @@
     "llama.cpp"
   ],
   "model_categories": [
+    ".desktop2-downloads",
     "CLIP",
     "Checkpoints",
     "ControlNet",
@@ -88,12 +89,11 @@
     "first_observation": false,
     "changes": {
       "python_envs": {
-        "added": [
-          "comfyui_server_py311"
-        ],
+        "added": [],
         "removed": [],
         "unchanged": [
           "aider_py311",
+          "comfyui_server_py311",
           "whisper_py311"
         ]
       },
@@ -115,7 +115,23 @@
         ]
       },
       "model_categories": {
-        "added": [
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          ".desktop2-downloads",
+          "CLIP",
+          "Checkpoints",
+          "ControlNet",
+          "Embeddings",
+          "FLUX",
+          "GGUF",
+          "IPAdapter",
+          "LLM",
+          "LoRA",
+          "Ollama",
+          "SDXL",
+          "Upscalers",
+          "VAE",
           "audio_encoders",
           "background_removal",
           "clip_vision",
@@ -137,22 +153,6 @@
           "unet",
           "upscale_models",
           "vae_approx"
-        ],
-        "removed": [],
-        "unchanged": [
-          "CLIP",
-          "Checkpoints",
-          "ControlNet",
-          "Embeddings",
-          "FLUX",
-          "GGUF",
-          "IPAdapter",
-          "LLM",
-          "LoRA",
-          "Ollama",
-          "SDXL",
-          "Upscalers",
-          "VAE"
         ]
       },
       "ollama_models": {
@@ -165,5 +165,5 @@
       }
     }
   },
-  "changed_since_previous": true
+  "changed_since_previous": false
 }

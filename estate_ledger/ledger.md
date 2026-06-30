@@ -383,3 +383,14 @@ Classification: Estate Internal
 
 Summary:
 Added a persistent Discovery Catalog at data/discovery/catalog.json. Discovery observations now update durable institutional inventory memory with first seen, last seen, observation counts, active/inactive status, and evidence. Added discovery-catalog CLI output with human-readable and JSON modes, and expanded Estate Audit to validate catalog schema, command output, and latest observation coverage.
+
+
+## EC-000036 - Added Discovery lifecycle command and metrics
+
+Timestamp: 2026-06-29 23:29:47
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added a full Discovery lifecycle command named discover. The command runs an operational Discovery cycle, updates observation and catalog state, produces human-readable or JSON cycle metrics, and persists data/discovery/metrics.json. Expanded Estate Audit to validate the lifecycle command, metrics file, updated CLI inventory, and new Discovery modules.

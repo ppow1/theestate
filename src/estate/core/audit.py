@@ -136,6 +136,8 @@ def _syntax_checks():
         "src/estate/cli/main.py",
         "src/estate/core/discovery.py",
         "src/estate/core/provider_sync.py",
+        "src/estate/core/discovery_catalog.py",
+        "src/estate/core/discovery_cycle.py",
     ]
 
     for file in py_files:
@@ -174,6 +176,7 @@ def _cli_inventory_check():
         "services",
         "capabilities",
         "providers",
+        "discover",
         "discover-ai",
         "discovery-report",
         "discovery-status",
@@ -241,6 +244,8 @@ def _observation_checks():
         _discovery_catalog_schema_check(),
         _discovery_catalog_command_check(),
         _discovery_catalog_latest_coverage_check(),
+        _discovery_cycle_command_check(),
+        _discovery_metrics_file_check(),
     ]
 
 
@@ -650,6 +655,70 @@ def _discovery_catalog_latest_coverage_check():
         "name": "observations:discovery_catalog_latest_coverage",
         "ok": not missing,
         "detail": "latest Ollama entities represented" if not missing else "missing: " + ", ".join(missing[:5]),
+    }
+
+
+
+def _discovery_cycle_command_check():
+    result = _run(".\\estate.bat discover --json")
+    if not result["ok"]:
+        return {
+            "name": "observations:discovery_cycle_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "observations:discovery_cycle_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = [
+        "version",
+        "ok",
+        "steps",
+        "duration_seconds",
+        "catalog_entities",
+        "consecutive_successful_runs",
+    ]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "observations:discovery_cycle_json",
+        "ok": not missing and data.get("ok") is True,
+        "detail": "cycle metrics valid" if not missing else "missing: " + ", ".join(missing),
+    }
+
+
+def _discovery_metrics_file_check():
+    path = ESTATE_ROOT / "data" / "discovery" / "metrics.json"
+    if not path.exists():
+        return {
+            "name": "observations:discovery_metrics_file",
+            "ok": False,
+            "detail": "missing data/discovery/metrics.json",
+        }
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {
+            "name": "observations:discovery_metrics_file",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = ["version", "started_at", "finished_at", "duration_seconds", "ok", "steps"]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "observations:discovery_metrics_file",
+        "ok": not missing and data.get("ok") is True,
+        "detail": f"{len(data.get('steps', []))} cycle steps" if not missing else "missing: " + ", ".join(missing),
     }
 
 

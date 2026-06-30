@@ -245,3 +245,10 @@ Added discovery-status with JSON support and extended Audit to validate its mach
 EC-000035 - Added Discovery persistent catalog
 
 Added persistent Discovery Catalog support, automatic catalog updates from observations, discovery-catalog CLI output, and Audit validation for catalog schema, command JSON, and latest observation coverage.
+
+
+## 2026-06-29 23:29:47
+
+EC-000036 - Added Discovery lifecycle command and metrics
+
+Added the discover lifecycle command, persisted Discovery cycle metrics, and extended Audit coverage for the lifecycle command, metrics file, CLI inventory, and new Discovery modules.

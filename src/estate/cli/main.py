@@ -6,6 +6,7 @@ from estate.core.services import list_services, list_capabilities, list_provider
 from estate.core.discovery import observe_ai_environment, generate_discovery_report
 from estate.core.provider_sync import sync_ollama_providers
 from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery_catalog_from_latest, format_discovery_catalog_report
+from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.audit import print_audit_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -105,6 +106,18 @@ def cmd_discovery_report(args):
     else:
         print(generate_discovery_report())
 
+def cmd_discover(args):
+    result = run_discovery_cycle()
+
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result["metrics"], indent=2, sort_keys=True))
+    else:
+        print(format_discovery_cycle_report(result))
+
+    if not result["ok"]:
+        raise SystemExit(1)
+
 def cmd_discover_ai(args):
     observations, out = observe_ai_environment()
     print(f"Wrote observation: {out}")
@@ -172,6 +185,10 @@ def main():
 
     p = sub.add_parser("providers")
     p.set_defaults(func=cmd_providers)
+
+    p = sub.add_parser("discover")
+    p.add_argument("--json", action="store_true", help="Run full Discovery cycle and print metrics JSON")
+    p.set_defaults(func=cmd_discover)
 
     p = sub.add_parser("discover-ai")
     p.set_defaults(func=cmd_discover_ai)
