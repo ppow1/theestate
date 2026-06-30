@@ -168,3 +168,10 @@ Added a Discovery report command that summarizes latest AI environment observati
 EC-000024 - Added Estate Audit command
 
 Implemented Estate Audit command to validate Python syntax, selected CLI runtime commands, JSON registries, Git cleanliness, and latest EC alignment between Git and the ledger.
+
+
+## 2026-06-29 22:40:56
+
+EC-000025 - Matured Estate Audit integrity checks
+
+Expanded Estate Audit to validate required Estate paths, registry record shape, duplicate registry IDs, observation history presence, and latest ledger EC presence in the development devlog.

@@ -262,3 +262,14 @@ Classification: Estate Internal
 
 Summary:
 Implemented Estate Audit command to validate Python syntax, selected CLI runtime commands, JSON registries, Git cleanliness, and latest EC alignment between Git and the ledger.
+
+
+## EC-000025 - Matured Estate Audit integrity checks
+
+Timestamp: 2026-06-29 22:40:56
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Expanded Estate Audit beyond basic syntax, runtime, JSON, Git, and EC drift checks. Added required path validation, registry shape validation, duplicate registry ID detection, observation history validation, and ledger-to-devlog EC consistency validation.
