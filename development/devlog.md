@@ -1,0 +1,72 @@
+# Development Log
+
+## 2026-06-29
+
+Established A:\theestate as the local Estate root.
+
+Created the founding governance package.
+
+Codified:
+- Steward sovereignty
+- Office vs occupant separation
+- Residents vs workers
+- Security clearance
+- Resource allocation
+- Archives continuity
+- Estate Change Process
+- Chat momentum monitor
+
+## 2026-06-29 20:15:58
+
+EC-000003 - Created Estate Builder v0.1
+
+Created the first local Estate maintenance tool for generating Estate Change records, resident records, ledger entries, and devlog entries.
+
+
+## 2026-06-29 20:26:34
+
+EC-000004 - Created Estate Core v0.2
+
+Created the first Estate Core Python package with object registry, ledger manager, resident registration, and CLI foundation.
+
+
+## 2026-06-29 20:26:34
+
+EC-000005 - Registered Resident Alfred
+
+Created resident record RES-000001 for Alfred, serving as Manager of Administration in Administration.
+
+
+## 2026-06-29 20:26:34
+
+EC-000006 - Registered Resident Ingrid
+
+Created resident record RES-000002 for Ingrid, serving as Manager of Security in Security.
+
+
+## 2026-06-29 20:26:35
+
+EC-000007 - Registered Resident Helen
+
+Created resident record RES-000003 for Helen, serving as Manager of Human Resources in Human Resources.
+
+
+## 2026-06-29 20:26:35
+
+EC-000008 - Registered Resident Eleanor
+
+Created resident record RES-000004 for Eleanor, serving as Manager of Archives / Registrar in Archives.
+
+
+## 2026-06-29 20:26:35
+
+EC-000009 - Registered Resident Marie
+
+Created resident record RES-000005 for Marie, serving as Manager of Research in Research.
+
+
+## 2026-06-29 20:26:35
+
+EC-000010 - Registered Resident Judy
+
+Created resident record RES-000006 for Judy, serving as General Counsel in Legal.

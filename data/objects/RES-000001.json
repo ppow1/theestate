@@ -1,0 +1,14 @@
+{
+  "id": "RES-000001",
+  "type": "resident",
+  "name": "Alfred",
+  "department": "Administration",
+  "office": "Manager of Administration",
+  "status": "Active",
+  "classification": "Estate Internal",
+  "created": "2026-06-29 20:26:34",
+  "role": "Coordinates the Estate, protects the Steward's attention, routes work, and maintains forward motion.",
+  "canonical": "estate://residents/res-000001",
+  "palace": "Estate / Residents / Alfred",
+  "registered_at": "2026-06-29 20:26:34"
+}

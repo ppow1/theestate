@@ -1,0 +1,14 @@
+{
+  "id": "RES-000006",
+  "type": "resident",
+  "name": "Judy",
+  "department": "Legal",
+  "office": "General Counsel",
+  "status": "Active",
+  "classification": "Estate Internal",
+  "created": "2026-06-29 20:26:35",
+  "role": "Reviews legal risk, contracts, claims, compliance, licensing, and gray-area exposure.",
+  "canonical": "estate://residents/res-000006",
+  "palace": "Estate / Residents / Judy",
+  "registered_at": "2026-06-29 20:26:35"
+}

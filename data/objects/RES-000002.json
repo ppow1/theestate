@@ -1,0 +1,14 @@
+{
+  "id": "RES-000002",
+  "type": "resident",
+  "name": "Ingrid",
+  "department": "Security",
+  "office": "Manager of Security",
+  "status": "Active",
+  "classification": "Estate Internal",
+  "created": "2026-06-29 20:26:34",
+  "role": "Protects privacy, clearance, boundaries, and all external crossings.",
+  "canonical": "estate://residents/res-000002",
+  "palace": "Estate / Residents / Ingrid",
+  "registered_at": "2026-06-29 20:26:34"
+}

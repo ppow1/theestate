@@ -1,0 +1,14 @@
+{
+  "id": "RES-000004",
+  "type": "resident",
+  "name": "Eleanor",
+  "department": "Archives",
+  "office": "Manager of Archives / Registrar",
+  "status": "Active",
+  "classification": "Estate Internal",
+  "created": "2026-06-29 20:26:35",
+  "role": "Preserves institutional memory, lineage, provenance, revisions, Palace Memory, and the Estate Ledger.",
+  "canonical": "estate://residents/res-000004",
+  "palace": "Estate / Residents / Eleanor",
+  "registered_at": "2026-06-29 20:26:35"
+}

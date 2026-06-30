@@ -1,0 +1,14 @@
+{
+  "id": "RES-000005",
+  "type": "resident",
+  "name": "Marie",
+  "department": "Research",
+  "office": "Manager of Research",
+  "status": "Active",
+  "classification": "Estate Internal",
+  "created": "2026-06-29 20:26:35",
+  "role": "Discovers, investigates, validates, and contextualizes knowledge relevant to the Estate and its projects.",
+  "canonical": "estate://residents/res-000005",
+  "palace": "Estate / Residents / Marie",
+  "registered_at": "2026-06-29 20:26:35"
+}

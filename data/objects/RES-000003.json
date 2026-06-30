@@ -1,0 +1,14 @@
+{
+  "id": "RES-000003",
+  "type": "resident",
+  "name": "Helen",
+  "department": "Human Resources",
+  "office": "Manager of Human Resources",
+  "status": "Active",
+  "classification": "Estate Internal",
+  "created": "2026-06-29 20:26:35",
+  "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+  "canonical": "estate://residents/res-000003",
+  "palace": "Estate / Residents / Helen",
+  "registered_at": "2026-06-29 20:26:35"
+}
