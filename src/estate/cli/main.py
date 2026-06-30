@@ -4,6 +4,7 @@ from estate.core.residents import register_resident
 from estate.core.registry import load_registry
 from estate.core.services import list_services, list_capabilities, list_providers
 from estate.core.discovery import observe_ai_environment
+from estate.core.provider_sync import sync_ollama_providers
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -58,6 +59,19 @@ def cmd_discover_ai(args):
     print(f"TTS items: {', '.join(observations['tts_items']) if observations['tts_items'] else '(none)'}")
     print(f"Tools: {', '.join(observations['tool_items']) if observations['tool_items'] else '(none)'}")
     print(f"Model categories: {', '.join(observations['model_categories']) if observations['model_categories'] else '(none)'}")
+    if observations.get("ollama", {}).get("running"):
+        print("Ollama: running")
+        for model in observations["ollama"].get("models", []):
+            print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
+
+def cmd_sync_ollama(args):
+    created, ec_id = sync_ollama_providers()
+    print(f"Logged {ec_id}")
+    if created:
+        for provider in created:
+            print(f"Created {provider['id']}: {provider['name']}")
+    else:
+        print("No new Ollama providers created.")
 
 def main():
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
@@ -95,6 +109,9 @@ def main():
 
     p = sub.add_parser("discover-ai")
     p.set_defaults(func=cmd_discover_ai)
+
+    p = sub.add_parser("sync-ollama")
+    p.set_defaults(func=cmd_sync_ollama)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):
