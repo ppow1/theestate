@@ -160,7 +160,39 @@ def _runtime_checks():
             "detail": detail,
         })
 
+    checks.append(_cli_inventory_check())
+
     return checks
+
+
+
+def _cli_inventory_check():
+    result = _run(".\\estate.bat --help")
+    required = [
+        "status",
+        "list",
+        "services",
+        "capabilities",
+        "providers",
+        "discover-ai",
+        "discovery-report",
+        "sync-ollama",
+        "audit",
+    ]
+
+    if not result["ok"]:
+        return {
+            "name": "runtime:cli_inventory",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    missing = [command for command in required if command not in result["stdout"]]
+    return {
+        "name": "runtime:cli_inventory",
+        "ok": not missing,
+        "detail": f"{len(required)} commands present" if not missing else "missing: " + ", ".join(missing),
+    }
 
 
 def _json_checks():

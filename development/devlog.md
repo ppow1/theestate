@@ -196,3 +196,10 @@ Grouped Estate Audit report output by check domain without changing validation b
 EC-000028 - Added Estate Audit JSON output
 
 Added --json support to the Estate Audit command so audit results can be emitted as structured machine-readable data while preserving the existing human-readable report.
+
+
+## 2026-06-29 22:59:04
+
+EC-000029 - Added Estate Audit CLI inventory validation
+
+Added an Audit runtime check that validates the Estate CLI help output includes the expected command inventory.

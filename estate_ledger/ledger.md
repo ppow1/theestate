@@ -306,3 +306,14 @@ Classification: Estate Internal
 
 Summary:
 Added machine-readable JSON output to the Estate Audit command using the --json option. This preserves the human-readable grouped report while allowing Audit results to be consumed by scripts and future operational tooling.
+
+
+## EC-000029 - Added Estate Audit CLI inventory validation
+
+Timestamp: 2026-06-29 22:59:04
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Expanded Estate Audit runtime validation to verify the Estate CLI exposes the expected command inventory. Audit now confirms core operational commands remain discoverable through the command-line interface.
