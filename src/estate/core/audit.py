@@ -235,6 +235,45 @@ def _observation_checks():
 
 
 
+
+def _devlog_structure_check():
+    text = DEVLOG_PATH.read_text(encoding="utf-8", errors="replace") if DEVLOG_PATH.exists() else ""
+    entries = re.findall(r"^EC-\d{6} - .*$", text, flags=re.MULTILINE)
+
+    if not entries:
+        return {
+            "name": "history:devlog_structure",
+            "ok": False,
+            "detail": "no devlog EC entries found",
+        }
+
+    ec_ids = [re.search(r"(EC-\d{6})", entry).group(1) for entry in entries]
+    duplicates = sorted({ec_id for ec_id in ec_ids if ec_ids.count(ec_id) > 1})
+
+    if duplicates:
+        return {
+            "name": "history:devlog_structure",
+            "ok": False,
+            "detail": "duplicate entries: " + ", ".join(duplicates),
+        }
+
+    latest_ledger = _latest_ledger_ec()
+    latest_devlog = ec_ids[-1] if ec_ids else None
+
+    if latest_ledger != latest_devlog:
+        return {
+            "name": "history:devlog_structure",
+            "ok": False,
+            "detail": f"ledger={latest_ledger} devlog={latest_devlog}",
+        }
+
+    return {
+        "name": "history:devlog_structure",
+        "ok": True,
+        "detail": f"{len(ec_ids)} EC entries; latest={latest_devlog}",
+    }
+
+
 def _ledger_structure_check():
     text = LEDGER_PATH.read_text(encoding="utf-8", errors="replace") if LEDGER_PATH.exists() else ""
     entries = re.findall(r"^## (EC-\d{6}) - .*$", text, flags=re.MULTILINE)
@@ -301,6 +340,7 @@ def _history_checks():
 
     return [
         _ledger_structure_check(),
+        _devlog_structure_check(),
         _latest_ledger_ec_in_devlog_check(),
         {
             "name": "history:latest_git_ec_matches_latest_ledger_ec",

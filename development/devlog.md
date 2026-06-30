@@ -210,3 +210,10 @@ Added an Audit runtime check that validates the Estate CLI help output includes 
 EC-000030 - Added Estate Audit ledger structure validation
 
 Added ledger structure validation to Estate Audit, including sequential EC numbering, duplicate EC detection, and required field checks for ledger entries.
+
+
+## 2026-06-29 23:03:10
+
+EC-000031 - Added Estate Audit devlog structure validation
+
+Added devlog structure validation to Estate Audit, including EC entry presence, duplicate EC detection, and latest devlog-to-ledger alignment.
