@@ -350,3 +350,10 @@ Added structured metadata to Audit checks and validation for the saved runtime a
 EC-000050 - Added Discovery service facade
 
 Introduced DiscoveryService as the canonical Discovery service boundary, added discovery-refresh, and updated CLI/Audit integration around the new service facade.
+
+
+## 2026-06-30 00:29:33
+
+EC-000051 - Repaired Discovery service runtime import
+
+Added missing discovery_runtime.py module required by the DiscoveryService facade introduced in EC-000050.

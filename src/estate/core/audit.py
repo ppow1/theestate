@@ -176,6 +176,7 @@ def _syntax_checks():
         "src/estate/core/discovery_catalog.py",
         "src/estate/core/discovery_cycle.py",
         "src/estate/core/discovery_service.py",
+        "src/estate/core/discovery_runtime.py",
         "src/estate/core/audit_runtime.py",
     ]
 

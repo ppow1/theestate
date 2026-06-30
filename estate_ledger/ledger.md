@@ -548,3 +548,14 @@ Classification: Estate Internal
 
 Summary:
 Added a DiscoveryService facade to consolidate Discovery observation, report, status, catalog, lifecycle, and provider synchronization behavior behind one service boundary. Added discovery-refresh as the service-level refresh command and extended Audit to validate the new service command and module.
+
+
+## EC-000051 - Repaired Discovery service runtime import
+
+Timestamp: 2026-06-30 00:29:33
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Repaired EC-000050 by adding the missing Discovery runtime module required by DiscoveryService. The repair preserves the committed service facade history and restores CLI importability.
