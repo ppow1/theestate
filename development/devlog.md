@@ -135,3 +135,10 @@ Synced observed Ollama models into provider registry:
 EC-000019 - Added Estate Change Validation Standard
 
 Codified that no Estate Change is complete until syntax validation, runtime validation, Git validation, and ledger validation pass before commit.
+
+
+## 2026-06-29 21:47:49
+
+EC-000020 - Added Discovery change detection
+
+Enhanced AI environment discovery to compare current observations against the previous snapshot, report additions and removals, and preserve timestamped observation history.
