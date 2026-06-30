@@ -9,7 +9,7 @@ from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
 from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities
-from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result
+from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -152,6 +152,51 @@ def cmd_alfred_run(args):
         raise SystemExit(1)
 
 
+
+
+def cmd_alfred_inspect(args):
+    result = inspect_job(args.job_id)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_job_inspection(result))
+
+    if not result.get("ok"):
+        raise SystemExit(1)
+
+
+def cmd_alfred_cancel(args):
+    result = cancel_job(args.job_id)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_job_inspection({"ok": result.get("ok"), "job": result.get("job", {}), "events": result.get("job", {}).get("events", [])}))
+
+    if not result.get("ok"):
+        raise SystemExit(1)
+
+
+def cmd_alfred_retry(args):
+    result = retry_job(args.job_id)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_job(result.get("job", {})))
+
+    if not result.get("ok"):
+        raise SystemExit(1)
+
+
+def cmd_alfred_policy(args):
+    policy = get_execution_policy()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(policy, indent=2, sort_keys=True))
+    else:
+        print(format_execution_policy(policy))
 
 def cmd_alfred_execute(args):
     result = execute_job(args.job_id)
@@ -318,6 +363,26 @@ def main():
     p.add_argument("--json", action="store_true", help="Print Alfred job JSON")
     p.set_defaults(func=cmd_alfred_run)
 
+
+
+    p = sub.add_parser("alfred-inspect")
+    p.add_argument("job_id", help="Runtime Alfred job id")
+    p.add_argument("--json", action="store_true", help="Print Alfred job inspection JSON")
+    p.set_defaults(func=cmd_alfred_inspect)
+
+    p = sub.add_parser("alfred-cancel")
+    p.add_argument("job_id", help="Runtime Alfred job id")
+    p.add_argument("--json", action="store_true", help="Print Alfred cancel result JSON")
+    p.set_defaults(func=cmd_alfred_cancel)
+
+    p = sub.add_parser("alfred-retry")
+    p.add_argument("job_id", help="Runtime Alfred job id")
+    p.add_argument("--json", action="store_true", help="Print Alfred retry result JSON")
+    p.set_defaults(func=cmd_alfred_retry)
+
+    p = sub.add_parser("alfred-policy")
+    p.add_argument("--json", action="store_true", help="Print Alfred execution policy JSON")
+    p.set_defaults(func=cmd_alfred_policy)
 
     p = sub.add_parser("alfred-execute")
     p.add_argument("job_id", help="Runtime Alfred job id")

@@ -406,3 +406,10 @@ Added alfred-plan, alfred-run, and alfred-jobs commands with runtime job records
 EC-000057 - Added Alfred safe job execution
 
 Added alfred-execute with runtime job loading, event updates, safe execution results, and Audit validation.
+
+
+## 2026-06-30 07:27:08
+
+EC-000058 - Added Alfred job control and execution policy
+
+Added alfred-inspect, alfred-cancel, alfred-retry, and alfred-policy commands with Audit validation for job control and execution policy contracts.

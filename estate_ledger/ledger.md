@@ -636,3 +636,14 @@ Classification: Estate Internal
 
 Summary:
 Added Alfred safe job execution. Alfred runtime jobs can now transition from ready to running to completed using non-destructive dry-run, reasoning, and code-planning executors. Added alfred-execute and Audit validation for execution contracts.
+
+
+## EC-000058 - Added Alfred job control and execution policy
+
+Timestamp: 2026-06-30 07:27:08
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added Alfred job inspection, retry, cancellation, and execution policy commands. Alfred runtime jobs now expose safer operational controls and explicit execution policy metadata for safe text, safe code, and dry-run execution modes.

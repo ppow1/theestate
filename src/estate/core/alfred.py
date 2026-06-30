@@ -9,6 +9,25 @@ RUNTIME_ALFRED_DIR = ESTATE_ROOT / "runtime" / "alfred"
 RUNTIME_JOBS_DIR = RUNTIME_ALFRED_DIR / "jobs"
 
 
+EXECUTION_POLICIES = {
+    "safe_text_executor": {
+        "writes_files": False,
+        "uses_network": False,
+        "requires_confirmation": False,
+    },
+    "safe_code_executor": {
+        "writes_files": False,
+        "uses_network": False,
+        "requires_confirmation": False,
+    },
+    "dry_run": {
+        "writes_files": False,
+        "uses_network": False,
+        "requires_confirmation": False,
+    },
+}
+
+
 INTENT_RULES = [
     {
         "intent": "generate_image",
@@ -362,5 +381,121 @@ def format_execution_result(result):
         summary = item.get("result", {}).get("summary")
         if summary:
             lines.append(f"     {summary}")
+
+    return "\n".join(lines)
+
+
+
+def get_execution_policy(mode=None):
+    if mode:
+        return EXECUTION_POLICIES.get(mode, {})
+    return EXECUTION_POLICIES
+
+
+def inspect_job(job_id):
+    job = load_job(job_id)
+    if not job:
+        return {
+            "ok": False,
+            "error": "job not found",
+            "job_id": job_id,
+        }
+
+    return {
+        "ok": True,
+        "job": job,
+        "events": job.get("events", []),
+        "status": job.get("status"),
+        "results": job.get("results", []),
+    }
+
+
+def cancel_job(job_id):
+    job = load_job(job_id)
+    if not job:
+        return {
+            "ok": False,
+            "error": "job not found",
+            "job_id": job_id,
+        }
+
+    if job.get("status") in ["completed", "failed", "cancelled"]:
+        return {
+            "ok": False,
+            "error": f"cannot cancel job with status {job.get('status')}",
+            "job": job,
+        }
+
+    job["status"] = "cancelled"
+    append_job_event(job, "job_cancelled", "Job cancelled by command")
+    save_job(job)
+
+    return {
+        "ok": True,
+        "job": job,
+    }
+
+
+def retry_job(job_id):
+    job = load_job(job_id)
+    if not job:
+        return {
+            "ok": False,
+            "error": "job not found",
+            "job_id": job_id,
+        }
+
+    retry = create_job(job.get("goal", ""))
+    retry["parent_job_id"] = job.get("id")
+    append_job_event(retry, "job_retry_created", f"Retry of {job.get('id')}")
+    save_job(retry)
+
+    return {
+        "ok": True,
+        "job": retry,
+        "parent_job": job,
+    }
+
+
+def format_job_inspection(result):
+    if not result.get("ok"):
+        return f"Alfred job inspection failed: {result.get('error')}"
+
+    job = result.get("job", {})
+    lines = [
+        "=========================================",
+        "Alfred Job Inspection",
+        "=========================================",
+        f"Job: {job.get('id')}",
+        f"Status: {job.get('status')}",
+        f"Goal: {job.get('goal')}",
+        "",
+        "Events:",
+    ]
+
+    for event in result.get("events", []):
+        lines.append(f"- {event.get('timestamp')} | {event.get('event')} | {event.get('detail')}")
+
+    lines.append("")
+    lines.append("Results:")
+
+    for item in result.get("results", []):
+        lines.append(f"- {item.get('mode')} | {item.get('capability')} | ok={item.get('ok')}")
+
+    return "\n".join(lines)
+
+
+def format_execution_policy(policy=None):
+    policy = policy or get_execution_policy()
+    lines = [
+        "=========================================",
+        "Alfred Execution Policy",
+        "=========================================",
+    ]
+
+    for mode, data in sorted(policy.items()):
+        lines.append(f"{mode}:")
+        for key, value in sorted(data.items()):
+            lines.append(f"  {key}: {value}")
 
     return "\n".join(lines)

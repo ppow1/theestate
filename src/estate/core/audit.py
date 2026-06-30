@@ -214,6 +214,8 @@ def _runtime_checks():
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
     checks.append(_alfred_execute_command_check())
+    checks.append(_alfred_policy_command_check())
+    checks.append(_alfred_job_control_command_check())
 
     return checks
 
@@ -243,6 +245,10 @@ def _cli_inventory_check():
         "alfred-run",
         "alfred-jobs",
         "alfred-execute",
+        "alfred-inspect",
+        "alfred-cancel",
+        "alfred-retry",
+        "alfred-policy",
     ]
 
     if not result["ok"]:
@@ -553,6 +559,85 @@ def _alfred_execute_command_check():
         "name": "runtime:alfred_execute_json",
         "ok": data.get("ok") is True and job.get("status") == "completed",
         "detail": job.get("id", "execution valid"),
+    }
+
+
+
+def _alfred_policy_command_check():
+    result = _run(".\\estate.bat alfred-policy --json")
+    if not result["ok"]:
+        return {
+            "name": "runtime:alfred_policy_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_policy_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    return {
+        "name": "runtime:alfred_policy_json",
+        "ok": "safe_text_executor" in data and "dry_run" in data,
+        "detail": f"{len(data.keys())} policies",
+    }
+
+
+def _alfred_job_control_command_check():
+    create_result = _run('.\\estate.bat alfred-run "plan a safe code review" --json')
+    if not create_result["ok"]:
+        return {
+            "name": "runtime:alfred_job_control_json",
+            "ok": False,
+            "detail": create_result["stderr"] or create_result["stdout"],
+        }
+
+    try:
+        created = json.loads(create_result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_job_control_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    job_id = created.get("id")
+    inspect_result = _run(f'.\\estate.bat alfred-inspect {job_id} --json')
+    retry_result = _run(f'.\\estate.bat alfred-retry {job_id} --json')
+
+    if not inspect_result["ok"]:
+        return {
+            "name": "runtime:alfred_job_control_json",
+            "ok": False,
+            "detail": inspect_result["stderr"] or inspect_result["stdout"],
+        }
+
+    if not retry_result["ok"]:
+        return {
+            "name": "runtime:alfred_job_control_json",
+            "ok": False,
+            "detail": retry_result["stderr"] or retry_result["stdout"],
+        }
+
+    try:
+        inspected = json.loads(inspect_result["stdout"])
+        retry = json.loads(retry_result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:alfred_job_control_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    return {
+        "name": "runtime:alfred_job_control_json",
+        "ok": inspected.get("ok") is True and retry.get("ok") is True,
+        "detail": f"inspected={job_id}",
     }
 
 
