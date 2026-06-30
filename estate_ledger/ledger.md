@@ -130,3 +130,14 @@ Classification: Estate Internal
 
 Summary:
 Added initial Estate Service Registry and Capability Registry to track callable services and local AI resources including RTX 4090 CUDA, Kokoro TTS, F5-TTS, ComfyUI, FFmpeg, and pending Whisper.
+
+
+## EC-000013 - Added service and capability CLI views
+
+Timestamp: 2026-06-29 20:42:29
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Updated Estate Core CLI to list registered services and capabilities and expanded status output to include service and capability counts.

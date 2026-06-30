@@ -2,7 +2,15 @@ import argparse
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
+from estate.core.services import list_services, list_capabilities
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
+
+def print_table(items, fields):
+    if not items:
+        print("No records.")
+        return
+    for item in items:
+        print(" | ".join(str(item.get(field, "")) for field in fields))
 
 def cmd_change(args):
     ec_id = create_change(args.title, args.summary, args.status, args.classification)
@@ -24,16 +32,18 @@ def cmd_status(args):
     print(f"Root: {ESTATE_ROOT}")
     print(f"Ledger: {LEDGER_PATH.exists()} - {LEDGER_PATH}")
     print(f"Devlog: {DEVLOG_PATH.exists()} - {DEVLOG_PATH}")
-    residents = load_registry("residents")
-    print(f"Registered residents: {len(residents)}")
+    print(f"Registered residents: {len(load_registry('residents'))}")
+    print(f"Registered services: {len(load_registry('services'))}")
+    print(f"Registered capabilities: {len(load_registry('capabilities'))}")
 
 def cmd_list_residents(args):
-    residents = load_registry("residents")
-    if not residents:
-        print("No residents registered.")
-        return
-    for item in residents:
-        print(f'{item["id"]} | {item["name"]} | {item["department"]} | {item["office"]}')
+    print_table(load_registry("residents"), ["id", "name", "department", "office"])
+
+def cmd_services(args):
+    print_table(list_services(), ["id", "name", "status", "owner", "resident"])
+
+def cmd_capabilities(args):
+    print_table(list_capabilities(), ["id", "name", "category", "status", "location"])
 
 def main():
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
@@ -59,6 +69,12 @@ def main():
 
     p = sub.add_parser("list-residents")
     p.set_defaults(func=cmd_list_residents)
+
+    p = sub.add_parser("services")
+    p.set_defaults(func=cmd_services)
+
+    p = sub.add_parser("capabilities")
+    p.set_defaults(func=cmd_capabilities)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):

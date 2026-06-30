@@ -84,3 +84,10 @@ Added .gitignore rules for Python cache files and removed committed __pycache__ 
 EC-000012 - Created Service and Capability Registries
 
 Added initial Estate Service Registry and Capability Registry to track callable services and local AI resources including RTX 4090 CUDA, Kokoro TTS, F5-TTS, ComfyUI, FFmpeg, and pending Whisper.
+
+
+## 2026-06-29 20:42:29
+
+EC-000013 - Added service and capability CLI views
+
+Updated Estate Core CLI to list registered services and capabilities and expanded status output to include service and capability counts.
