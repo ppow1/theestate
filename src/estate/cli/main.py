@@ -9,7 +9,7 @@ from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
 from estate.core.audit import print_audit_report
-from estate.core.audit_runtime import save_audit_report
+from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -127,6 +127,14 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+def cmd_audit_summary(args):
+    summary = summarize_audit_artifact()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(summary, indent=2, sort_keys=True))
+    else:
+        print(format_audit_summary(summary))
+
 def cmd_audit(args):
     if getattr(args, "json", False):
         import json
@@ -218,6 +226,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
     p.add_argument("--save", action="store_true", help="Save latest audit report to runtime/audit/latest.json")
     p.set_defaults(func=cmd_audit)
+
+    p = sub.add_parser("audit-summary")
+    p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")
+    p.set_defaults(func=cmd_audit_summary)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):

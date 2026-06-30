@@ -378,3 +378,10 @@ Repaired DiscoveryService refresh provider synchronization handling and aligned 
 EC-000053 - Hardened Discovery refresh provider sync handling
 
 Made DiscoveryService refresh tolerant of provider synchronization return-shape differences and nonfatal sync exceptions.
+
+
+## 2026-06-30 01:00:24
+
+EC-000054 - Added Audit summary command
+
+Added audit-summary with human-readable and JSON output based on runtime/audit/latest.json, plus Audit validation for the summary command.

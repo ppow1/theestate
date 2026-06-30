@@ -204,6 +204,7 @@ def _runtime_checks():
 
     checks.append(_cli_inventory_check())
     checks.append(_audit_runtime_artifact_check())
+    checks.append(_audit_summary_command_check())
 
     return checks
 
@@ -225,6 +226,7 @@ def _cli_inventory_check():
         "discovery-refresh",
         "sync-ollama",
         "audit",
+        "audit-summary",
     ]
 
     if not result["ok"]:
@@ -281,6 +283,35 @@ def _audit_runtime_artifact_check():
         "name": "runtime:audit_latest_artifact",
         "ok": not missing,
         "detail": f"{len(checks)} enriched checks" if not missing else "missing: " + ", ".join(missing[:5]),
+    }
+
+
+
+def _audit_summary_command_check():
+    result = _run(".\\estate.bat audit-summary --json")
+    if not result["ok"]:
+        return {
+            "name": "runtime:audit_summary_json",
+            "ok": False,
+            "detail": result["stderr"] or result["stdout"],
+        }
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {
+            "name": "runtime:audit_summary_json",
+            "ok": False,
+            "detail": str(e),
+        }
+
+    required = ["exists", "passed", "failed", "groups", "severities"]
+    missing = [key for key in required if key not in data]
+
+    return {
+        "name": "runtime:audit_summary_json",
+        "ok": not missing and data.get("exists") is True,
+        "detail": "summary valid" if not missing else "missing: " + ", ".join(missing),
     }
 
 

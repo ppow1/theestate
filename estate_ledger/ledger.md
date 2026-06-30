@@ -592,3 +592,14 @@ Classification: Estate Internal
 
 Summary:
 Hardened DiscoveryService refresh so provider synchronization return values are handled defensively and nonfatal provider sync shape issues do not fail the full Discovery refresh cycle.
+
+
+## EC-000054 - Added Audit summary command
+
+Timestamp: 2026-06-30 01:00:24
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added audit-summary to summarize saved Audit runtime artifacts by group and severity. This gives Audit a reusable operational summary layer without changing individual checks.
