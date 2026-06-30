@@ -287,3 +287,10 @@ Completed runtime latest observation migration so Discovery writes runtime/disco
 EC-000041 - Completed Discovery writer runtime separation
 
 Redirected remaining Discovery observation writes into runtime/discovery and removed stale versioned latest observation state.
+
+
+## 2026-06-29 23:50:43
+
+EC-000042 - Contained legacy Discovery observation writer
+
+Contained legacy Discovery writes so normal Discovery runs no longer leave observations/ dirty. New runtime observations are moved into runtime/discovery/observations and versioned latest observation output is removed.

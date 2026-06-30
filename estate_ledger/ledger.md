@@ -449,3 +449,14 @@ Classification: Estate Internal
 
 Summary:
 Redirected remaining normal Discovery observation writes into runtime/discovery so routine Discovery and Audit execution no longer mutates versioned latest observation state.
+
+
+## EC-000042 - Contained legacy Discovery observation writer
+
+Timestamp: 2026-06-29 23:50:43
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Contained the remaining legacy Discovery writer behavior by removing versioned latest observation output and moving newly-created timestamped observations into runtime discovery history during normal Discovery execution. This keeps observations/ as versioned historical snapshot space while routine Discovery and Audit mutate only ignored runtime state.

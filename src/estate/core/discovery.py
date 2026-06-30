@@ -213,6 +213,30 @@ def generate_discovery_report():
 
 
 
+
+def _estate_contain_legacy_observation_writes(before_files):
+    import shutil
+
+    versioned_dir = ESTATE_ROOT / "observations"
+    runtime_observations = RUNTIME_DISCOVERY_DIR / "observations"
+    runtime_observations.mkdir(parents=True, exist_ok=True)
+
+    # The legacy observer may still write a tracked/latest file.
+    # Runtime owns latest state, so remove the versioned latest after mirroring.
+    legacy_latest = versioned_dir / "ai_environment_latest.json"
+    if legacy_latest.exists():
+        legacy_latest.unlink()
+
+    # Normal Discovery execution should not create versioned timestamp snapshots.
+    # Move new timestamped observations into runtime history.
+    after_files = set(versioned_dir.glob("ai_environment_*.json"))
+    for path in sorted(after_files - before_files):
+        if path.name.endswith("_latest.json"):
+            continue
+        target = runtime_observations / path.name
+        shutil.move(str(path), str(target))
+
+
 def _estate_write_runtime_latest(observation):
     import json
     RUNTIME_DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
@@ -228,6 +252,9 @@ _estate_catalog_observe_ai_environment = observe_ai_environment
 
 def observe_ai_environment():
     RUNTIME_DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
+    versioned_dir = ESTATE_ROOT / "observations"
+    before_files = set(versioned_dir.glob("ai_environment_*.json"))
+
     observed = _estate_catalog_observe_ai_environment()
 
     if isinstance(observed, tuple):
@@ -239,5 +266,6 @@ def observe_ai_environment():
         raise TypeError(f"observation root is {type(observation).__name__}, expected dict")
 
     _estate_write_runtime_latest(observation)
+    _estate_contain_legacy_observation_writes(before_files)
     _estate_update_discovery_catalog(observation)
     return observation
