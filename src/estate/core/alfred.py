@@ -742,3 +742,61 @@ def format_requests(payload=None):
     for request in payload.get("requests", [])[-20:]:
         lines.append(f"{request.get('id')} | {request.get('status')} | {request.get('goal')}")
     return "\n".join(lines)
+
+
+
+def alfred_briefing():
+    status = alfred_status()
+    requests = list_requests()
+    jobs = list_jobs()
+
+    latest_jobs = jobs.get("jobs", [])[-10:]
+    queued_requests = [
+        request for request in requests.get("requests", [])
+        if request.get("status") == "queued"
+    ]
+
+    return {
+        "version": 1,
+        "created_at": _now(),
+        "status": status,
+        "queued_requests": queued_requests[-10:],
+        "latest_jobs": latest_jobs,
+        "summary": {
+            "ready": status.get("operator_summary", {}).get("ready"),
+            "services_available": status.get("services", {}).get("available"),
+            "capabilities": status.get("services", {}).get("capabilities"),
+            "jobs": jobs.get("count"),
+            "queued_requests": len(queued_requests),
+        },
+    }
+
+
+def format_alfred_briefing(payload=None):
+    payload = payload or alfred_briefing()
+    summary = payload.get("summary", {})
+
+    lines = [
+        "=========================================",
+        "Alfred Operator Briefing",
+        "=========================================",
+        f"Created: {payload.get('created_at')}",
+        f"Ready: {summary.get('ready')}",
+        f"Services Available: {summary.get('services_available')}",
+        f"Capabilities: {summary.get('capabilities')}",
+        f"Jobs: {summary.get('jobs')}",
+        f"Queued Requests: {summary.get('queued_requests')}",
+        "",
+        "Queued Requests:",
+    ]
+
+    for request in payload.get("queued_requests", []):
+        lines.append(f"- {request.get('id')} | {request.get('goal')}")
+
+    lines.append("")
+    lines.append("Latest Jobs:")
+
+    for job in payload.get("latest_jobs", []):
+        lines.append(f"- {job.get('id')} | {job.get('status')} | {job.get('goal')}")
+
+    return "\n".join(lines)

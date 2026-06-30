@@ -210,6 +210,7 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_alfred_briefing_command_check())
     checks.append(_alfred_request_queue_command_check())
     checks.append(_alfred_status_command_check())
     checks.append(_alfred_task_command_check())
@@ -246,6 +247,7 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "alfred-briefing",
         "alfred-request",
         "alfred-requests",
         "alfred-promote",
@@ -771,6 +773,25 @@ def _alfred_request_queue_command_check():
         "name": "runtime:alfred_request_queue_json",
         "ok": promotion.get("ok") is True and promotion.get("job", {}).get("id"),
         "detail": request_id,
+    }
+
+
+
+def _alfred_briefing_command_check():
+    result = _run(".\\estate.bat alfred-briefing --json")
+    if not result["ok"]:
+        return {"name": "runtime:alfred_briefing_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_briefing_json", "ok": False, "detail": str(e)}
+
+    summary = data.get("summary", {})
+    return {
+        "name": "runtime:alfred_briefing_json",
+        "ok": summary.get("ready") is True and "latest_jobs" in data,
+        "detail": f"jobs={summary.get('jobs')} requests={summary.get('queued_requests')}",
     }
 
 
