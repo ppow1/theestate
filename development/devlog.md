@@ -280,3 +280,10 @@ Moved mutable Discovery catalog, metrics, and latest observation state to runtim
 EC-000040 - Completed Discovery runtime state migration
 
 Completed runtime latest observation migration so Discovery writes runtime/discovery/ai_environment_latest.json, Audit validates runtime latest state, and the stale versioned observations/ai_environment_latest.json file is removed.
+
+
+## 2026-06-29 23:47:41
+
+EC-000041 - Completed Discovery writer runtime separation
+
+Redirected remaining Discovery observation writes into runtime/discovery and removed stale versioned latest observation state.

@@ -438,3 +438,14 @@ Classification: Estate Internal
 
 Summary:
 Completed the Discovery runtime state migration by ensuring the Discovery writer creates runtime/discovery/ai_environment_latest.json and removing the stale versioned latest observation file. Runtime readers and validators now use a single runtime latest path while timestamped observations remain historical records.
+
+
+## EC-000041 - Completed Discovery writer runtime separation
+
+Timestamp: 2026-06-29 23:47:41
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Redirected remaining normal Discovery observation writes into runtime/discovery so routine Discovery and Audit execution no longer mutates versioned latest observation state.
