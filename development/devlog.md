@@ -566,3 +566,16 @@ Added the Estate governance onboarding runway, including AI_HINTS.md, AI_START_H
 EC-000079 - Repaired Estate ledger and devlog continuity
 
 Added missing EC-000078 history entries and repaired the duplicate EC-000059 entry heading in ledger and devlog while preserving historical content.
+
+## 2026-06-30 16:55:00
+
+EC-000078 - Added Estate governance onboarding runway
+
+Added the Estate governance onboarding runway, including AI_HINTS.md, AI_START_HERE.md, lean governance documents, visual onboarding specification, worker packages, archived origin memory, and concept art assets.
+
+
+## 2026-06-30 17:00:00
+
+EC-000079 - Repaired Estate ledger and devlog continuity
+
+Added missing EC-000078 history entries and repaired the duplicate EC-000059 entry heading in ledger and devlog while preserving historical content.
