@@ -813,3 +813,45 @@ def format_alfred_briefing(payload=None):
         lines.append(f"- {job.get('id')} | {job.get('status')} | {job.get('goal')}")
 
     return "\n".join(lines)
+
+
+
+def cleanup_jobs(keep=100):
+    RUNTIME_JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    job_files = sorted(RUNTIME_JOBS_DIR.glob("job_*.json"), key=lambda path: path.stat().st_mtime)
+
+    removed = []
+    if len(job_files) > keep:
+        for path in job_files[:len(job_files) - keep]:
+            try:
+                job_id = path.stem
+                artifact_dir = _job_artifact_dir(job_id)
+                if artifact_dir.exists():
+                    for child in artifact_dir.glob("*"):
+                        child.unlink()
+                    artifact_dir.rmdir()
+                path.unlink()
+                removed.append(job_id)
+            except Exception:
+                continue
+
+    return {
+        "ok": True,
+        "kept": min(len(job_files), keep),
+        "removed": removed,
+        "removed_count": len(removed),
+    }
+
+
+def format_cleanup_result(result):
+    lines = [
+        "=========================================",
+        "Alfred Job Cleanup",
+        "=========================================",
+        f"OK: {result.get('ok')}",
+        f"Kept: {result.get('kept')}",
+        f"Removed: {result.get('removed_count')}",
+    ]
+    for job_id in result.get("removed", []):
+        lines.append(f"- {job_id}")
+    return "\n".join(lines)

@@ -210,6 +210,7 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_alfred_cleanup_command_check())
     checks.append(_alfred_briefing_command_check())
     checks.append(_alfred_request_queue_command_check())
     checks.append(_alfred_status_command_check())
@@ -247,6 +248,7 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "alfred-cleanup",
         "alfred-briefing",
         "alfred-request",
         "alfred-requests",
@@ -792,6 +794,24 @@ def _alfred_briefing_command_check():
         "name": "runtime:alfred_briefing_json",
         "ok": summary.get("ready") is True and "latest_jobs" in data,
         "detail": f"jobs={summary.get('jobs')} requests={summary.get('queued_requests')}",
+    }
+
+
+
+def _alfred_cleanup_command_check():
+    result = _run(".\\estate.bat alfred-cleanup --keep 500 --json")
+    if not result["ok"]:
+        return {"name": "runtime:alfred_cleanup_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_cleanup_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:alfred_cleanup_json",
+        "ok": data.get("ok") is True and "removed_count" in data,
+        "detail": f"removed={data.get('removed_count')}",
     }
 
 

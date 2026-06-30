@@ -735,3 +735,14 @@ Classification: Estate Internal
 
 Summary:
 Improved Alfred safe text execution so reasoning, planning, and summarization jobs produce structured useful text output instead of placeholder execution summaries.
+
+
+## EC-000066 - Added Alfred job cleanup and retention
+
+Timestamp: 2026-06-30 08:56:31
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added Alfred runtime job cleanup with retention control so runtime job artifacts can be managed without touching versioned Estate state.
