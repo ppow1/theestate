@@ -3,6 +3,7 @@ from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
 from estate.core.services import list_services, list_capabilities, list_providers
+from estate.core.discovery import observe_ai_environment
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -49,6 +50,15 @@ def cmd_capabilities(args):
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
 
+def cmd_discover_ai(args):
+    observations, out = observe_ai_environment()
+    print(f"Wrote observation: {out}")
+    print(f"AI_HOME exists: {observations['exists']['ai_home']}")
+    print(f"Python envs: {', '.join(observations['python_envs']) if observations['python_envs'] else '(none)'}")
+    print(f"TTS items: {', '.join(observations['tts_items']) if observations['tts_items'] else '(none)'}")
+    print(f"Tools: {', '.join(observations['tool_items']) if observations['tool_items'] else '(none)'}")
+    print(f"Model categories: {', '.join(observations['model_categories']) if observations['model_categories'] else '(none)'}")
+
 def main():
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
     sub = parser.add_subparsers(dest="command")
@@ -82,6 +92,9 @@ def main():
 
     p = sub.add_parser("providers")
     p.set_defaults(func=cmd_providers)
+
+    p = sub.add_parser("discover-ai")
+    p.set_defaults(func=cmd_discover_ai)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):

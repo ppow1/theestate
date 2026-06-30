@@ -98,3 +98,10 @@ Updated Estate Core CLI to list registered services and capabilities and expande
 EC-000014 - Added Provider Registry
 
 Added provider registry to separate stable service needs from interchangeable AI resources such as Kokoro, F5-TTS, ComfyUI, and pending Whisper.
+
+
+## 2026-06-29 20:58:10
+
+EC-000015 - Added AI Environment Discovery Service
+
+Added discovery support for observing A:\AI paths, Python environments, TTS installations, tools, and model categories without manually declaring them first.

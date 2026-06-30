@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-06-29 20:58:11",
+  "ai_home": "A:\\AI",
+  "paths": {
+    "envs": "A:\\AI\\envs",
+    "tts": "A:\\AI\\TTS",
+    "tools": "A:\\AI\\Tools",
+    "models": "A:\\AI\\Models"
+  },
+  "exists": {
+    "ai_home": true,
+    "envs": true,
+    "tts": true,
+    "tools": true,
+    "models": true
+  },
+  "python_envs": [
+    "aider_py311",
+    "whisper_py311"
+  ],
+  "tts_items": [
+    "F5-TTS",
+    "kokoro_auditions",
+    "kokoro_py311"
+  ],
+  "tool_items": [
+    "FFmpeg"
+  ],
+  "model_categories": [
+    "CLIP",
+    "Checkpoints",
+    "ControlNet",
+    "Embeddings",
+    "FLUX",
+    "IPAdapter",
+    "LLM",
+    "LoRA",
+    "SDXL",
+    "Upscalers",
+    "VAE"
+  ]
+}
