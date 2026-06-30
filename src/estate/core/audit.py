@@ -220,6 +220,7 @@ def _runtime_checks():
     checks.append(_alfred_task_command_check())
     checks.append(_alfred_local_reasoning_executor_check())
     checks.append(_alfred_code_review_executor_check())
+    checks.append(_alfred_code_report_executor_check())
     checks.append(_alfred_plan_command_check())
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
@@ -922,6 +923,25 @@ def _alfred_alias_command_check():
         "name": "runtime:alfred_alias_json",
         "ok": ask_data.get("ok") is True and briefing_data.get("summary", {}).get("ready") is True,
         "detail": "aliases valid",
+    }
+
+
+
+def _alfred_code_report_executor_check():
+    result = _run('.\\estate.bat alfred-task "review Estate code structure" --json')
+    if not result["ok"]:
+        return {"name": "runtime:alfred_code_report_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_code_report_json", "ok": False, "detail": str(e)}
+
+    text = data.get("result", {}).get("summary") or ""
+    return {
+        "name": "runtime:alfred_code_report_json",
+        "ok": data.get("ok") is True and "Estate Code Review Report" in text,
+        "detail": data.get("job_id", "code report valid"),
     }
 
 

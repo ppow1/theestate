@@ -313,7 +313,7 @@ def _safe_execute_step(step, goal):
             "capability": capability,
             "mode": "safe_code_review_executor",
             "result": {
-                "summary": _safe_code_review_text(goal),
+                "summary": _estate_code_review_report(goal),
                 "safety": "No filesystem writes performed by this executor.",
             },
         }
@@ -934,5 +934,36 @@ def format_artifact_index(payload=None):
         lines.append(f"{item.get('job_id')} | {item.get('status')} | {item.get('goal')}")
         for key, value in sorted((item.get("artifacts") or {}).items()):
             lines.append(f"  {key}: {value}")
+
+    return "\n".join(lines)
+
+
+
+def _estate_code_review_report(goal):
+    source_files = sorted((ESTATE_ROOT / "src" / "estate").glob("**/*.py"))
+    lines = [
+        f"Goal: {goal}",
+        "",
+        "Estate Code Review Report:",
+        f"Python files inspected: {len(source_files)}",
+        "",
+        "Observed modules:",
+    ]
+
+    for path in source_files:
+        rel = path.relative_to(ESTATE_ROOT)
+        lines.append(f"- {rel}")
+
+    lines.extend([
+        "",
+        "Review guidance:",
+        "1. Keep Alfred-facing code in service or Alfred modules.",
+        "2. Keep mutable operational state under runtime/.",
+        "3. Keep institutional records in ledger/devlog.",
+        "4. Run audit after any change.",
+        "",
+        "Safety boundary:",
+        "This report inspected file names only and made no project edits.",
+    ])
 
     return "\n".join(lines)
