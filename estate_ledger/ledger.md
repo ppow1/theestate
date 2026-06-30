@@ -317,3 +317,14 @@ Classification: Estate Internal
 
 Summary:
 Expanded Estate Audit runtime validation to verify the Estate CLI exposes the expected command inventory. Audit now confirms core operational commands remain discoverable through the command-line interface.
+
+
+## EC-000030 - Added Estate Audit ledger structure validation
+
+Timestamp: 2026-06-29 23:00:39
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Expanded Estate Audit history validation to check Estate Change ledger structure. Audit now validates sequential EC numbering, duplicate EC detection, and required ledger fields for each Estate Change entry.

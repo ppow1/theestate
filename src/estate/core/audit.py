@@ -234,11 +234,73 @@ def _observation_checks():
     ]
 
 
+
+def _ledger_structure_check():
+    text = LEDGER_PATH.read_text(encoding="utf-8", errors="replace") if LEDGER_PATH.exists() else ""
+    entries = re.findall(r"^## (EC-\d{6}) - .*$", text, flags=re.MULTILINE)
+
+    if not entries:
+        return {
+            "name": "history:ledger_structure",
+            "ok": False,
+            "detail": "no EC ledger entries found",
+        }
+
+    numbers = [int(entry.split("-")[1]) for entry in entries]
+    duplicates = sorted({entry for entry in entries if entries.count(entry) > 1})
+
+    if duplicates:
+        return {
+            "name": "history:ledger_structure",
+            "ok": False,
+            "detail": "duplicate entries: " + ", ".join(duplicates),
+        }
+
+    gaps = []
+    for previous, current in zip(numbers, numbers[1:]):
+        if current != previous + 1:
+            gaps.append(f"EC-{previous:06d}->EC-{current:06d}")
+
+    if gaps:
+        return {
+            "name": "history:ledger_structure",
+            "ok": False,
+            "detail": "sequence gaps: " + ", ".join(gaps),
+        }
+
+    required_fields = ["Timestamp:", "Location:", "Status:", "Classification:", "Summary:"]
+    missing = []
+    blocks = re.split(r"(?=^## EC-\d{6} - )", text, flags=re.MULTILINE)
+
+    for block in blocks:
+        match = re.search(r"^## (EC-\d{6}) - ", block, flags=re.MULTILINE)
+        if not match:
+            continue
+        ec_id = match.group(1)
+        for field in required_fields:
+            if field not in block:
+                missing.append(f"{ec_id}:{field.rstrip(':')}")
+
+    if missing:
+        return {
+            "name": "history:ledger_structure",
+            "ok": False,
+            "detail": "missing fields: " + ", ".join(missing[:8]),
+        }
+
+    return {
+        "name": "history:ledger_structure",
+        "ok": True,
+        "detail": f"{len(entries)} sequential entries",
+    }
+
+
 def _history_checks():
     git_ec, git_result = _latest_git_ec()
     ledger_ec = _latest_ledger_ec()
 
     return [
+        _ledger_structure_check(),
         _latest_ledger_ec_in_devlog_check(),
         {
             "name": "history:latest_git_ec_matches_latest_ledger_ec",

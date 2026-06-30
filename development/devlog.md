@@ -203,3 +203,10 @@ Added --json support to the Estate Audit command so audit results can be emitted
 EC-000029 - Added Estate Audit CLI inventory validation
 
 Added an Audit runtime check that validates the Estate CLI help output includes the expected command inventory.
+
+
+## 2026-06-29 23:00:39
+
+EC-000030 - Added Estate Audit ledger structure validation
+
+Added ledger structure validation to Estate Audit, including sequential EC numbering, duplicate EC detection, and required field checks for ledger entries.
