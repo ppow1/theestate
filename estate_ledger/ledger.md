@@ -460,3 +460,14 @@ Classification: Estate Internal
 
 Summary:
 Contained the remaining legacy Discovery writer behavior by removing versioned latest observation output and moving newly-created timestamped observations into runtime discovery history during normal Discovery execution. This keeps observations/ as versioned historical snapshot space while routine Discovery and Audit mutate only ignored runtime state.
+
+
+## EC-000043 - Pointed Discovery reports at runtime latest
+
+Timestamp: 2026-06-29 23:55:14
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Repaired Discovery report reads after runtime state separation by pointing report generation and latest-observation validation at runtime/discovery/ai_environment_latest.json instead of the removed versioned latest observation file.

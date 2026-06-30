@@ -294,3 +294,10 @@ Redirected remaining Discovery observation writes into runtime/discovery and rem
 EC-000042 - Contained legacy Discovery observation writer
 
 Contained legacy Discovery writes so normal Discovery runs no longer leave observations/ dirty. New runtime observations are moved into runtime/discovery/observations and versioned latest observation output is removed.
+
+
+## 2026-06-29 23:55:14
+
+EC-000043 - Pointed Discovery reports at runtime latest
+
+Updated Discovery report and latest-observation validation to read runtime/discovery/ai_environment_latest.json after removal of the versioned latest observation file.

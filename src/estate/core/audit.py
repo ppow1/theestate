@@ -106,7 +106,7 @@ def _registry_shape_check(path, collection_key):
 
 def _observation_history_check():
     observations = ESTATE_ROOT / "observations"
-    latest = observations / "ai_environment_latest.json"
+    latest = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
     history = [
         path for path in observations.glob("ai_environment_*.json")
         if not path.name.endswith("_latest.json")
