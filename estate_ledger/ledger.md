@@ -471,3 +471,14 @@ Classification: Estate Internal
 
 Summary:
 Repaired Discovery report reads after runtime state separation by pointing report generation and latest-observation validation at runtime/discovery/ai_environment_latest.json instead of the removed versioned latest observation file.
+
+
+## EC-000043 - Pointed Discovery reports at runtime latest
+
+Timestamp: 2026-06-29 23:56:22
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Repaired Discovery report reads after runtime state separation by pointing report generation and latest-observation validation at runtime/discovery/ai_environment_latest.json instead of the removed versioned latest observation file.

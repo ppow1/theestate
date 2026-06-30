@@ -301,3 +301,10 @@ Contained legacy Discovery writes so normal Discovery runs no longer leave obser
 EC-000043 - Pointed Discovery reports at runtime latest
 
 Updated Discovery report and latest-observation validation to read runtime/discovery/ai_environment_latest.json after removal of the versioned latest observation file.
+
+
+## 2026-06-29 23:56:22
+
+EC-000043 - Pointed Discovery reports at runtime latest
+
+Updated Discovery report and latest-observation validation to read runtime/discovery/ai_environment_latest.json after removal of the versioned latest observation file.
