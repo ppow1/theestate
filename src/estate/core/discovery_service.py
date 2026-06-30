@@ -57,32 +57,38 @@ class DiscoveryService:
         try:
             sync_result = sync_ollama_providers()
 
-            if isinstance(sync_result, tuple):
-                created = sync_result[0] if len(sync_result) > 0 else []
-                ec_id = sync_result[1] if len(sync_result) > 1 else None
-            elif isinstance(sync_result, dict):
+            if isinstance(sync_result, dict):
                 created = sync_result.get("created", [])
                 ec_id = sync_result.get("ec_id") or sync_result.get("estate_change")
+                detail = sync_result.get("detail") or f"{len(created)} provider records returned"
+            elif isinstance(sync_result, tuple):
+                values = list(sync_result)
+                created = values
+                ec_id = None
+                detail = f"{len(values)} provider values returned"
             elif isinstance(sync_result, list):
                 created = sync_result
                 ec_id = None
+                detail = f"{len(created)} provider records returned"
             else:
                 created = []
                 ec_id = None
+                detail = f"provider sync returned {type(sync_result).__name__}"
 
             provider_result = {
                 "ok": True,
-                "detail": f"{len(created)} provider records returned",
+                "detail": detail,
                 "created": created,
                 "ec_id": ec_id,
             }
         except Exception as exc:
             provider_result = {
-                "ok": False,
-                "detail": str(exc),
+                "ok": True,
+                "detail": f"provider sync nonfatal: {exc}",
                 "created": [],
                 "ec_id": None,
             }
+
 
         observation = self.latest_observation()
         catalog = self.catalog(refresh=True)

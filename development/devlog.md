@@ -371,3 +371,10 @@ Added missing discovery_runtime.py module required by the DiscoveryService facad
 EC-000052 - Stabilized Discovery service refresh and history alignment
 
 Repaired DiscoveryService refresh provider synchronization handling and aligned ledger/devlog history with existing Git commits.
+
+
+## 2026-06-30 00:41:16
+
+EC-000053 - Hardened Discovery refresh provider sync handling
+
+Made DiscoveryService refresh tolerant of provider synchronization return-shape differences and nonfatal sync exceptions.

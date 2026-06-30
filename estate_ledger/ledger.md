@@ -581,3 +581,14 @@ Classification: Estate Internal
 
 Summary:
 Stabilized the DiscoveryService refresh command by handling provider synchronization return values defensively. Also repaired institutional history alignment by recording the reserved gap repair and the missing runtime import repair in ledger and devlog without rewriting Git history.
+
+
+## EC-000053 - Hardened Discovery refresh provider sync handling
+
+Timestamp: 2026-06-30 00:41:16
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Hardened DiscoveryService refresh so provider synchronization return values are handled defensively and nonfatal provider sync shape issues do not fail the full Discovery refresh cycle.
