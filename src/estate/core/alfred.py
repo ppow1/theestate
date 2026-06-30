@@ -599,3 +599,31 @@ def format_job_result(result):
         "events": [],
         "results": result.get("results", []),
     })
+
+
+
+def run_task(goal):
+    job = create_job(goal)
+    execution = execute_job(job["id"])
+    result = get_job_result(job["id"])
+
+    return {
+        "ok": execution.get("ok") is True and result.get("ok") is True,
+        "job_id": job["id"],
+        "goal": goal,
+        "job": execution.get("job", job),
+        "execution": execution,
+        "result": result,
+    }
+
+
+def format_task_result(task):
+    if not task.get("ok"):
+        return "Alfred task failed."
+
+    result = task.get("result", {})
+    summary = result.get("summary")
+    if summary:
+        return summary
+
+    return format_execution_result(task.get("execution", {}))

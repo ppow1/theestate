@@ -210,6 +210,7 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_alfred_task_command_check())
     checks.append(_alfred_plan_command_check())
     checks.append(_alfred_run_command_check())
     checks.append(_alfred_jobs_command_check())
@@ -243,6 +244,7 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "alfred-task",
         "alfred-plan",
         "alfred-run",
         "alfred-jobs",
@@ -695,6 +697,24 @@ def _alfred_result_command_check():
         "name": "runtime:alfred_result_json",
         "ok": data.get("ok") is True and bool(artifacts.get("summary")),
         "detail": artifacts.get("summary", "result valid"),
+    }
+
+
+
+def _alfred_task_command_check():
+    result = _run('.\\estate.bat alfred-task "summarize what the Estate can currently do" --json')
+    if not result["ok"]:
+        return {"name": "runtime:alfred_task_json", "ok": False, "detail": result["stderr"] or result["stdout"]}
+
+    try:
+        data = json.loads(result["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_task_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:alfred_task_json",
+        "ok": data.get("ok") is True and bool(data.get("job_id")),
+        "detail": data.get("job_id", "task valid"),
     }
 
 

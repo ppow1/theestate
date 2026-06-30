@@ -9,7 +9,7 @@ from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
 from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities
-from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, get_job_result, format_job_result
+from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, run_task, format_task_result, get_job_result, format_job_result, run_task, format_task_result
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -129,6 +129,18 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+
+
+def cmd_alfred_task(args):
+    result = run_task(args.goal)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_task_result(result))
+
+    if not result.get("ok"):
+        raise SystemExit(1)
 
 
 def cmd_alfred_plan(args):
@@ -364,6 +376,11 @@ def main():
     p.set_defaults(func=cmd_audit)
 
 
+
+    p = sub.add_parser("alfred-task")
+    p.add_argument("goal", help="Goal for Alfred to complete as one task")
+    p.add_argument("--json", action="store_true", help="Print Alfred task result JSON")
+    p.set_defaults(func=cmd_alfred_task)
 
     p = sub.add_parser("alfred-plan")
     p.add_argument("goal", help="Goal for Alfred to plan")

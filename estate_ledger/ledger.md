@@ -669,3 +669,14 @@ Classification: Estate Internal
 
 Summary:
 Added durable Alfred job artifacts and result retrieval. Completed jobs now write result.json, events.json, and summary.txt under runtime job artifact directories. Added alfred-result and Audit validation for job result artifacts.
+
+
+## EC-000060 - Added Alfred end-to-end task command
+
+Timestamp: 2026-06-30 08:44:35
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added alfred-task as the first end-to-end Alfred command. Alfred can now create a job, execute it, write artifacts, and return the final result in one operation.
