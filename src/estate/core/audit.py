@@ -246,6 +246,13 @@ def run_audit():
         "checks": checks,
     }
 
+
+def _check_group(name):
+    if ":" in name:
+        return name.split(":", 1)[0]
+    return "estate"
+
+
 def print_audit_report():
     report = run_audit()
     print("=========================================")
@@ -254,9 +261,17 @@ def print_audit_report():
     print(f"Passed: {report['passed']}")
     print(f"Failed: {report['failed']}")
     print("")
+
+    current_group = None
     for check in report["checks"]:
+        group = _check_group(check["name"])
+        if group != current_group:
+            current_group = group
+            print(f"[{current_group}]")
+
         mark = "PASS" if check["ok"] else "FAIL"
         print(f"{mark} | {check['name']}")
         if check["detail"]:
             print(f"     {check['detail']}")
+
     return report

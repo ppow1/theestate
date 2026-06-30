@@ -182,3 +182,10 @@ Expanded Estate Audit to validate required Estate paths, registry record shape, 
 EC-000026 - Refactored Estate Audit check groups
 
 Grouped Estate Audit checks into focused internal functions without changing audit behavior. This prepares Audit for continued maturation without turning run_audit into an oversized procedural block.
+
+
+## 2026-06-29 22:56:56
+
+EC-000027 - Improved Estate Audit report grouping
+
+Grouped Estate Audit report output by check domain without changing validation behavior. This makes Audit results easier to scan during development and repair sessions.

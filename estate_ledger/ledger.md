@@ -284,3 +284,14 @@ Classification: Estate Internal
 
 Summary:
 Refactored Estate Audit internally into grouped check functions for syntax, runtime, JSON, registry, observation, history, and Git validation. Preserved existing audit behavior while making the subsystem easier to extend and maintain.
+
+
+## EC-000027 - Improved Estate Audit report grouping
+
+Timestamp: 2026-06-29 22:56:56
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Improved Estate Audit human-readable output by grouping checks by audit domain while preserving existing validation behavior. Audit reports now separate syntax, runtime, JSON, Estate path, registry, observation, history, and Git checks for faster operational review.
