@@ -52,6 +52,7 @@ def _required_paths_check():
         "estate_ledger/ledger.md",
         "development/devlog.md",
         "estate.bat",
+        "runtime/discovery",
     ]
     missing = [path for path in required if not (ESTATE_ROOT / path).exists()]
     return {
@@ -349,7 +350,7 @@ def _ledger_structure_check():
 
 
 def _observation_latest_shape_check():
-    path = ESTATE_ROOT / "observations" / "ai_environment_latest.json"
+    path = ESTATE_ROOT / "runtime" / "discovery" / "ai_environment_latest.json"
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except Exception as e:

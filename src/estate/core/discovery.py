@@ -212,6 +212,14 @@ def generate_discovery_report():
     return "\n".join(report)
 
 
+
+def _estate_write_runtime_latest(observation):
+    import json
+    RUNTIME_DISCOVERY_DIR.mkdir(parents=True, exist_ok=True)
+    runtime_latest = RUNTIME_DISCOVERY_DIR / "ai_environment_latest.json"
+    runtime_latest.write_text(json.dumps(observation, indent=2, sort_keys=True), encoding="utf-8")
+
+
 # Discovery Catalog integration.
 # Wrapped here so every normal Discovery observation updates persistent catalog memory.
 from estate.core.discovery_catalog import update_discovery_catalog as _estate_update_discovery_catalog
@@ -230,5 +238,6 @@ def observe_ai_environment():
     if not isinstance(observation, dict):
         raise TypeError(f"observation root is {type(observation).__name__}, expected dict")
 
+    _estate_write_runtime_latest(observation)
     _estate_update_discovery_catalog(observation)
     return observation

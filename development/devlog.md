@@ -273,3 +273,10 @@ Repaired the Discovery catalog wrapper to normalize tuple-shaped observation res
 EC-000039 - Separated Discovery runtime state from versioned state
 
 Moved mutable Discovery catalog, metrics, and latest observation state to runtime/discovery and ignored runtime state in Git. Audit now validates runtime Discovery state instead of treating normal runtime mutation as versioned institutional change.
+
+
+## 2026-06-29 23:36:28
+
+EC-000040 - Completed Discovery runtime state migration
+
+Completed runtime latest observation migration so Discovery writes runtime/discovery/ai_environment_latest.json, Audit validates runtime latest state, and the stale versioned observations/ai_environment_latest.json file is removed.

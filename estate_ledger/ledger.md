@@ -427,3 +427,14 @@ Classification: Estate Internal
 
 Summary:
 Separated mutable Discovery runtime state from versioned institutional records. Discovery catalog, metrics, and latest observation now use runtime/discovery, which is ignored by Git, so normal Discovery and Audit operations no longer dirty the repository merely by running.
+
+
+## EC-000040 - Completed Discovery runtime state migration
+
+Timestamp: 2026-06-29 23:36:28
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Completed the Discovery runtime state migration by ensuring the Discovery writer creates runtime/discovery/ai_environment_latest.json and removing the stale versioned latest observation file. Runtime readers and validators now use a single runtime latest path while timestamped observations remain historical records.
