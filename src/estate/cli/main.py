@@ -9,7 +9,7 @@ from estate.core.discovery_catalog import load_discovery_catalog, sync_discovery
 from estate.core.discovery_cycle import run_discovery_cycle, format_discovery_cycle_report
 from estate.core.discovery_service import get_discovery_service
 from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities
-from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status
+from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests
 from estate.core.audit import print_audit_report
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -129,6 +129,39 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+
+
+def cmd_alfred_request(args):
+    request = create_request(args.goal)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(request, indent=2, sort_keys=True))
+    else:
+        print(f"Queued Alfred request: {request['id']}")
+
+
+def cmd_alfred_requests(args):
+    payload = list_requests()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_requests(payload))
+
+
+def cmd_alfred_promote(args):
+    result = promote_request(args.request_id)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        if result.get("ok"):
+            print(f"Promoted {args.request_id} -> {result['job']['id']}")
+        else:
+            print(result.get("error"))
+
+    if not result.get("ok"):
+        raise SystemExit(1)
 
 
 def cmd_alfred_status(args):
@@ -385,6 +418,20 @@ def main():
     p.set_defaults(func=cmd_audit)
 
 
+
+    p = sub.add_parser("alfred-request")
+    p.add_argument("goal", help="Goal to queue as an Alfred request")
+    p.add_argument("--json", action="store_true", help="Print Alfred request JSON")
+    p.set_defaults(func=cmd_alfred_request)
+
+    p = sub.add_parser("alfred-requests")
+    p.add_argument("--json", action="store_true", help="Print queued Alfred requests JSON")
+    p.set_defaults(func=cmd_alfred_requests)
+
+    p = sub.add_parser("alfred-promote")
+    p.add_argument("request_id", help="Alfred request id to promote into a job")
+    p.add_argument("--json", action="store_true", help="Print promotion result JSON")
+    p.set_defaults(func=cmd_alfred_promote)
 
     p = sub.add_parser("alfred-status")
     p.add_argument("--json", action="store_true", help="Print Alfred operator status JSON")

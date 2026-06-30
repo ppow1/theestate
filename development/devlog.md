@@ -441,3 +441,10 @@ Added alfred-task with full create, execute, artifact, and result retrieval flow
 EC-000061 - Added Alfred operator status surface
 
 Added alfred-status with human-readable and JSON output plus Audit validation.
+
+
+## 2026-06-30 08:45:58
+
+EC-000062 - Added Alfred request queue
+
+Added alfred-request, alfred-requests, and alfred-promote with Audit validation.

@@ -210,6 +210,7 @@ def _runtime_checks():
     checks.append(_service_status_command_check())
     checks.append(_service_route_command_check())
     checks.append(_alfred_capabilities_command_check())
+    checks.append(_alfred_request_queue_command_check())
     checks.append(_alfred_status_command_check())
     checks.append(_alfred_task_command_check())
     checks.append(_alfred_plan_command_check())
@@ -245,6 +246,9 @@ def _cli_inventory_check():
         "service-status",
         "service-route",
         "alfred-capabilities",
+        "alfred-request",
+        "alfred-requests",
+        "alfred-promote",
         "alfred-status",
         "alfred-task",
         "alfred-plan",
@@ -735,6 +739,38 @@ def _alfred_status_command_check():
         "name": "runtime:alfred_status_json",
         "ok": data.get("operator_summary", {}).get("ready") is True,
         "detail": data.get("operator_summary", {}).get("message", "status valid"),
+    }
+
+
+
+def _alfred_request_queue_command_check():
+    created = _run('.\\estate.bat alfred-request "prepare an operator summary" --json')
+    if not created["ok"]:
+        return {"name": "runtime:alfred_request_queue_json", "ok": False, "detail": created["stderr"] or created["stdout"]}
+
+    try:
+        request = json.loads(created["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_request_queue_json", "ok": False, "detail": str(e)}
+
+    request_id = request.get("id")
+    listed = _run(".\\estate.bat alfred-requests --json")
+    promoted = _run(f".\\estate.bat alfred-promote {request_id} --json")
+
+    if not listed["ok"]:
+        return {"name": "runtime:alfred_request_queue_json", "ok": False, "detail": listed["stderr"] or listed["stdout"]}
+    if not promoted["ok"]:
+        return {"name": "runtime:alfred_request_queue_json", "ok": False, "detail": promoted["stderr"] or promoted["stdout"]}
+
+    try:
+        promotion = json.loads(promoted["stdout"])
+    except Exception as e:
+        return {"name": "runtime:alfred_request_queue_json", "ok": False, "detail": str(e)}
+
+    return {
+        "name": "runtime:alfred_request_queue_json",
+        "ok": promotion.get("ok") is True and promotion.get("job", {}).get("id"),
+        "detail": request_id,
     }
 
 

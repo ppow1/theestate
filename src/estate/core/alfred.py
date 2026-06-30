@@ -7,6 +7,7 @@ from estate.core.service_layer import alfred_capabilities, route_capability
 
 RUNTIME_ALFRED_DIR = ESTATE_ROOT / "runtime" / "alfred"
 RUNTIME_JOBS_DIR = RUNTIME_ALFRED_DIR / "jobs"
+RUNTIME_REQUESTS_DIR = RUNTIME_ALFRED_DIR / "requests"
 
 
 EXECUTION_POLICIES = {
@@ -684,4 +685,60 @@ def format_alfred_status(payload=None):
     for status, count in sorted(payload.get("jobs", {}).get("by_status", {}).items()):
         lines.append(f"  {status}: {count}")
 
+    return "\n".join(lines)
+
+
+
+def create_request(goal):
+    RUNTIME_REQUESTS_DIR.mkdir(parents=True, exist_ok=True)
+    request_id = "request_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+    request = {
+        "version": 1,
+        "id": request_id,
+        "created_at": _now(),
+        "goal": goal,
+        "status": "queued",
+    }
+    path = RUNTIME_REQUESTS_DIR / f"{request_id}.json"
+    path.write_text(json.dumps(request, indent=2, sort_keys=True), encoding="utf-8")
+    return request
+
+
+def list_requests():
+    RUNTIME_REQUESTS_DIR.mkdir(parents=True, exist_ok=True)
+    requests = []
+    for path in sorted(RUNTIME_REQUESTS_DIR.glob("request_*.json")):
+        try:
+            requests.append(json.loads(path.read_text(encoding="utf-8")))
+        except Exception:
+            continue
+    return {"version": 1, "count": len(requests), "requests": requests}
+
+
+def promote_request(request_id):
+    path = RUNTIME_REQUESTS_DIR / f"{request_id}.json"
+    if not path.exists():
+        return {"ok": False, "error": "request not found", "request_id": request_id}
+
+    request = json.loads(path.read_text(encoding="utf-8"))
+    job = create_job(request.get("goal", ""))
+    request["status"] = "promoted"
+    request["job_id"] = job["id"]
+    request["promoted_at"] = _now()
+    path.write_text(json.dumps(request, indent=2, sort_keys=True), encoding="utf-8")
+
+    return {"ok": True, "request": request, "job": job}
+
+
+def format_requests(payload=None):
+    payload = payload or list_requests()
+    lines = [
+        "=========================================",
+        "Alfred Requests",
+        "=========================================",
+        f"Requests: {payload.get('count')}",
+        "",
+    ]
+    for request in payload.get("requests", [])[-20:]:
+        lines.append(f"{request.get('id')} | {request.get('status')} | {request.get('goal')}")
     return "\n".join(lines)

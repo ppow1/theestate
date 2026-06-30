@@ -691,3 +691,14 @@ Classification: Estate Internal
 
 Summary:
 Added Alfred operator status to summarize services, capabilities, runtime jobs, and Alfred readiness in one command.
+
+
+## EC-000062 - Added Alfred request queue
+
+Timestamp: 2026-06-30 08:45:58
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added Alfred request queue commands so goals can be queued, listed, and promoted into runtime jobs. This supports asynchronous Steward interaction without requiring immediate execution.
