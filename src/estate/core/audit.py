@@ -879,8 +879,10 @@ def _alfred_code_review_executor_check():
     except Exception as e:
         return {"name": "runtime:alfred_code_review_json", "ok": False, "detail": str(e)}
 
+    payload = data.get("result", {})
     review_result = None
-    for item in data.get("results", []):
+
+    for item in payload.get("results", []):
         text = item.get("result", {}).get("summary") or ""
         if item.get("mode") == "safe_code_review_executor" and "Estate Code Review Report" in text:
             review_result = item
@@ -896,8 +898,8 @@ def _alfred_code_review_executor_check():
     text = review_result.get("result", {}).get("summary") or ""
     return {
         "name": "runtime:alfred_code_review_json",
-        "ok": data.get("ok") is True and review_result.get("ok") is True and "Estate Code Review Report" in text,
-        "detail": data.get("job_id", "code review valid"),
+        "ok": data.get("ok") is True and payload.get("ok") is True and review_result.get("ok") is True and "Estate Code Review Report" in text,
+        "detail": payload.get("job_id", "code review valid"),
     }
 
 def _alfred_artifacts_command_check():
@@ -1646,5 +1648,6 @@ def print_audit_report():
             print(f"     {check['detail']}")
 
     return report
+
 
 

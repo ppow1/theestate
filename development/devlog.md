@@ -671,3 +671,9 @@ Updated the Alfred code review audit validator to read the current results-array
 EC-000082 - Relaxed Alfred code review audit routing check
 
 Updated the Alfred code review audit validator to accept the safe_code_review_executor Estate Code Review Report regardless of routing capability label.
+
+## 2026-06-30 17:45:00
+
+EC-000083 - Corrected Alfred code review audit payload path
+
+Corrected the Alfred code review audit validator to read result.results from the current alfred-task JSON wrapper and validate the safe_code_review_executor Estate Code Review Report.

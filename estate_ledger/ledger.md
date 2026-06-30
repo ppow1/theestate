@@ -919,3 +919,13 @@ Classification: Estate Internal
 
 Summary:
 Updated the Alfred code review audit validator to accept the safe_code_review_executor result when it produces an Estate Code Review Report, regardless of whether Alfred routed the request through code.review or code.write.
+
+## EC-000083 - Corrected Alfred code review audit payload path
+
+Timestamp: 2026-06-30 17:45:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Corrected the Alfred code review audit validator to read the current alfred-task JSON wrapper. The validator now reads result.results, validates the safe_code_review_executor Estate Code Review Report, and preserves Alfred runtime behavior unchanged.
