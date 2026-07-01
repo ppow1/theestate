@@ -1,0 +1,5 @@
+{
+  "claim_target": "WP-TEST-0001",
+  "description": "Operational validation of worker claim lifecycle",
+  "status": "available"
+}

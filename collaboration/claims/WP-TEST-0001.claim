@@ -1,0 +1,3 @@
+worker=claim_status_worker_a
+claimed=2026-07-01T15:30:22.8810638-04:00
+target=WP-TEST-0001
