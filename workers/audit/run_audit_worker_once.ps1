@@ -32,20 +32,63 @@ $ActivePath = Join-Path $ActiveDir $RequestFile.Name
 Write-Host "Processing request: $($RequestFile.Name)"
 Move-Item -Path $RequestFile.FullName -Destination $ActivePath -Force
 
-$Request = Get-Content -Path $ActivePath -Raw | ConvertFrom-Json
-
-$RequestId = if ($Request.request_id) { $Request.request_id } else { [System.IO.Path]::GetFileNameWithoutExtension($RequestFile.Name) }
-$WorkPackageId = if ($Request.work_package_id) { $Request.work_package_id } else { "unknown" }
-$Classification = if ($Request.classification) { $Request.classification } else { "Estate Internal" }
-
+$RequestId = [System.IO.Path]::GetFileNameWithoutExtension($RequestFile.Name)
+$WorkPackageId = "unknown"
+$Classification = "Estate Internal"
 $Repository = "ppow1/theestate"
 $Branch = (& git rev-parse --abbrev-ref HEAD).Trim()
 $Commit = (& git rev-parse HEAD).Trim()
-
 $AuditStarted = Get-Date
+$CommandRun = ".\estate.bat audit"
+
+try {
+    $Request = Get-Content -Path $ActivePath -Raw | ConvertFrom-Json
+}
+catch {
+    $AuditFinished = Get-Date
+    $ParseError = $_.Exception.Message
+    $StdoutPath = Join-Path $ResultsDir ("$RequestId.stdout.txt")
+    $StderrPath = Join-Path $ResultsDir ("$RequestId.stderr.txt")
+    Set-Content -Path $StdoutPath -Value "" -Encoding UTF8
+    Set-Content -Path $StderrPath -Value $ParseError -Encoding UTF8
+
+    $Summary = "Audit status=error exit_code=998 branch=$Branch commit=$Commit work_package=$WorkPackageId request=$RequestId malformed_json=true"
+    $Result = [ordered]@{
+        request_id = $RequestId
+        status = "error"
+        repository = $Repository
+        branch = $Branch
+        local_commit = $Commit
+        work_package_id = $WorkPackageId
+        audit_started_at = $AuditStarted.ToString("s")
+        audit_finished_at = $AuditFinished.ToString("s")
+        command_run = $CommandRun
+        exit_code = 998
+        summary = $Summary
+        full_audit_output = ""
+        stderr = $ParseError
+        follow_up_required = $true
+        history_drift_detected = $false
+        classification = $Classification
+        malformed_request = $true
+    }
+
+    $ResultPath = Join-Path $ResultsDir ("$RequestId.result.json")
+    $Result | ConvertTo-Json -Depth 8 | Set-Content -Path $ResultPath -Encoding UTF8
+    Move-Item -Path $ActivePath -Destination (Join-Path $FailedDir $RequestFile.Name) -Force
+
+    Write-Host "Malformed audit request JSON: $ParseError"
+    Write-Host "Result written: $ResultPath"
+    Write-Host $Summary
+    exit 1
+}
+
+$RequestId = if ($Request.request_id) { $Request.request_id } else { $RequestId }
+$WorkPackageId = if ($Request.work_package_id) { $Request.work_package_id } else { $WorkPackageId }
+$Classification = if ($Request.classification) { $Request.classification } else { $Classification }
+
 $StdoutPath = Join-Path $ResultsDir ("$RequestId.stdout.txt")
 $StderrPath = Join-Path $ResultsDir ("$RequestId.stderr.txt")
-$CommandRun = ".\estate.bat audit"
 
 $ExitCode = 0
 $WorkerError = $null
