@@ -1,0 +1,157 @@
+{
+  "counts_by_type": {
+    "inbox.updated": 1,
+    "message.routed": 5
+  },
+  "errors": [],
+  "event_count": 6,
+  "event_types": [
+    "audit.result.created",
+    "inbox.updated",
+    "message.routed",
+    "promotion.requested",
+    "review.requested",
+    "work.blocked",
+    "work.claimed",
+    "work.completed"
+  ],
+  "generated_at": "2026-07-01T22:33:43",
+  "generated_files": {
+    "events_log": "runtime/collaboration/events/events.jsonl",
+    "latest": "runtime/collaboration/events/latest.json",
+    "summary": "collaboration/status/event_summary.json"
+  },
+  "latest_event": {
+    "classification": "Estate Internal",
+    "created_at": "2026-07-01T22:33:42",
+    "id": "evt_20260701_223342_942436b4",
+    "payload": {
+      "message_count": 5,
+      "worker_count": 2,
+      "workers": [
+        "office.chief_architect_2",
+        "worker.implementation"
+      ]
+    },
+    "source": "collaboration.inbox_watcher",
+    "subject_id": null,
+    "type": "inbox.updated",
+    "version": 1
+  },
+  "malformed_record_count": 0,
+  "recent_events": [
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-01T22:33:42",
+      "id": "evt_20260701_223342_747d19e7",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "routing_rule",
+          "score": 6,
+          "worker": "worker.implementation"
+        },
+        "source_path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_20260701_000000_example_routing",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-01T22:33:42",
+      "id": "evt_20260701_223342_e86dd4af",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0001_alfred_capability_brief",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-01T22:33:42",
+      "id": "evt_20260701_223342_6ef12da1",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0002_audit_malformed_json_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-01T22:33:42",
+      "id": "evt_20260701_223342_3619c610",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0003_operations_board_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-01T22:33:42",
+      "id": "evt_20260701_223342_c042857d",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0004_capability_lifecycle_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-01T22:33:42",
+      "id": "evt_20260701_223342_942436b4",
+      "payload": {
+        "message_count": 5,
+        "worker_count": 2,
+        "workers": [
+          "office.chief_architect_2",
+          "worker.implementation"
+        ]
+      },
+      "source": "collaboration.inbox_watcher",
+      "subject_id": null,
+      "type": "inbox.updated",
+      "version": 1
+    }
+  ],
+  "version": 1
+}

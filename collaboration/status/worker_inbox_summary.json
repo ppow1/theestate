@@ -1,15 +1,69 @@
 {
   "errors": [],
-  "generated_at": "2026-07-01T20:58:15",
-  "message_count": 1,
+  "generated_at": "2026-07-01T22:33:42",
+  "message_count": 5,
   "version": 1,
-  "worker_count": 1,
+  "worker_count": 2,
   "workers": [
+    {
+      "message_count": 4,
+      "messages": [
+        {
+          "created_at": "2026-07-01T22:33:42",
+          "message_id": "msg_ca3_20260701_0001_alfred_capability_brief",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-01T22:33:42",
+          "message_id": "msg_ca3_20260701_0002_audit_malformed_json_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-01T22:33:42",
+          "message_id": "msg_ca3_20260701_0003_operations_board_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-01T22:33:42",
+          "message_id": "msg_ca3_20260701_0004_capability_lifecycle_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+          "valid": true
+        }
+      ],
+      "worker": "office.chief_architect_2"
+    },
     {
       "message_count": 1,
       "messages": [
         {
-          "created_at": "2026-07-01T20:58:15",
+          "created_at": "2026-07-01T22:33:42",
           "message_id": "msg_20260701_000000_example_routing",
           "missing_fields": [],
           "route": {
