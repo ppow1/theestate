@@ -1,0 +1,348 @@
+{
+  "candidates_for_institutionalized_review": [],
+  "candidates_for_operationally_validated_review": [],
+  "capabilities_reviewed": [
+    {
+      "evidence_gaps": [],
+      "evidence_references": [],
+      "id": "CAP-000001",
+      "implementation_references": [
+        "Local AI Workstation"
+      ],
+      "institutionalization_references": [],
+      "lifecycle_state": null,
+      "name": "RTX 4090 CUDA",
+      "operational_evidence_references": [],
+      "validation_evidence_found": [
+        {
+          "source": "Local AI Workstation",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/capabilities/lifecycle_status.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/dependencies/dependency_graph.md",
+          "type": "operations_markdown"
+        }
+      ]
+    },
+    {
+      "evidence_gaps": [],
+      "evidence_references": [],
+      "id": "CAP-000002",
+      "implementation_references": [
+        "A:\\AI\\TTS"
+      ],
+      "institutionalization_references": [],
+      "lifecycle_state": null,
+      "name": "Kokoro TTS",
+      "operational_evidence_references": [],
+      "validation_evidence_found": [
+        {
+          "source": "A:\\AI\\TTS",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/capabilities/lifecycle_status.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/dependencies/dependency_graph.md",
+          "type": "operations_markdown"
+        }
+      ]
+    },
+    {
+      "evidence_gaps": [],
+      "evidence_references": [],
+      "id": "CAP-000003",
+      "implementation_references": [
+        "A:\\AI\\TTS\\F5-TTS"
+      ],
+      "institutionalization_references": [],
+      "lifecycle_state": null,
+      "name": "F5-TTS",
+      "operational_evidence_references": [],
+      "validation_evidence_found": [
+        {
+          "source": "A:\\AI\\TTS\\F5-TTS",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/capabilities/lifecycle_status.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/dependencies/dependency_graph.md",
+          "type": "operations_markdown"
+        }
+      ]
+    },
+    {
+      "evidence_gaps": [],
+      "evidence_references": [],
+      "id": "CAP-000004",
+      "implementation_references": [
+        "A:\\AI\\ComfyUI"
+      ],
+      "institutionalization_references": [],
+      "lifecycle_state": null,
+      "name": "ComfyUI",
+      "operational_evidence_references": [],
+      "validation_evidence_found": [
+        {
+          "source": "A:\\AI\\ComfyUI",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/capabilities/lifecycle_status.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/dependencies/dependency_graph.md",
+          "type": "operations_markdown"
+        }
+      ]
+    },
+    {
+      "evidence_gaps": [],
+      "evidence_references": [],
+      "id": "CAP-000005",
+      "implementation_references": [
+        "A:\\AI\\Tools\\FFmpeg"
+      ],
+      "institutionalization_references": [],
+      "lifecycle_state": null,
+      "name": "FFmpeg / FFplay",
+      "operational_evidence_references": [],
+      "validation_evidence_found": [
+        {
+          "source": "A:\\AI\\Tools\\FFmpeg",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/capabilities/lifecycle_status.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/dependencies/dependency_graph.md",
+          "type": "operations_markdown"
+        }
+      ]
+    },
+    {
+      "evidence_gaps": [],
+      "evidence_references": [],
+      "id": "CAP-000006",
+      "implementation_references": [
+        "A:\\AI"
+      ],
+      "institutionalization_references": [],
+      "lifecycle_state": null,
+      "name": "Whisper",
+      "operational_evidence_references": [],
+      "validation_evidence_found": [
+        {
+          "source": "A:\\AI",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/capabilities/lifecycle_status.md",
+          "type": "operations_markdown"
+        },
+        {
+          "source": "operations/dependencies/dependency_graph.md",
+          "type": "operations_markdown"
+        }
+      ]
+    }
+  ],
+  "evidence_gaps": [],
+  "generated_at": "2026-07-01T22:47:18+00:00",
+  "inputs": {
+    "missing": [
+      "runtime/operations/operations_board.json",
+      "runtime/audit/latest.json",
+      "runtime/collaboration/events/events.jsonl",
+      "collaboration/audit/results/*.json"
+    ],
+    "used": [
+      "runtime/capabilities/capability_lifecycle_report.json",
+      "collaboration/status/worker_inbox_summary.json",
+      "operations/README.md",
+      "operations/board/latest.md",
+      "operations/boards/active_work.md",
+      "operations/boards/daily_board.md",
+      "operations/boards/parking_lot.md",
+      "operations/boards/review_cadence.md",
+      "operations/boards/roadmap.md",
+      "operations/capabilities/lifecycle_status.md",
+      "operations/dependencies/dependency_graph.md",
+      "operations/history/EC-000086.md",
+      "operations/implementation_recommendation.md",
+      "operations/steward/dashboard.md",
+      "operations/templates/active_work_item.md",
+      "operations/templates/daily_task.md",
+      "operations/templates/parking_item.md",
+      "operations/validation/operational_validation_report.md"
+    ]
+  },
+  "limitations": [
+    "This report does not promote capabilities or alter lifecycle state.",
+    "Lifecycle promotion remains a governance/review decision."
+  ],
+  "missing_inputs": [
+    "runtime/operations/operations_board.json",
+    "runtime/audit/latest.json",
+    "runtime/collaboration/events/events.jsonl",
+    "collaboration/audit/results/*.json"
+  ],
+  "purpose": "Report evidence for capability maturity review without changing lifecycle state.",
+  "validation_evidence_found": [
+    {
+      "source": "Local AI Workstation",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/capabilities/lifecycle_status.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/dependencies/dependency_graph.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "A:\\AI\\TTS",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/capabilities/lifecycle_status.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/dependencies/dependency_graph.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "A:\\AI\\TTS\\F5-TTS",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/capabilities/lifecycle_status.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/dependencies/dependency_graph.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "A:\\AI\\ComfyUI",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/capabilities/lifecycle_status.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/dependencies/dependency_graph.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "A:\\AI\\Tools\\FFmpeg",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/capabilities/lifecycle_status.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/dependencies/dependency_graph.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "A:\\AI",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/capabilities/lifecycle_status.md",
+      "type": "operations_markdown"
+    },
+    {
+      "source": "operations/dependencies/dependency_graph.md",
+      "type": "operations_markdown"
+    }
+  ],
+  "version": 1,
+  "warnings": [
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "runtime/operations/operations_board.json",
+      "type": "missing_input"
+    },
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "runtime/audit/latest.json",
+      "type": "missing_input"
+    },
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "runtime/collaboration/events/events.jsonl",
+      "type": "missing_input"
+    },
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "collaboration/audit/results/*.json",
+      "type": "missing_input"
+    }
+  ]
+}
