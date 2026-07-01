@@ -1,0 +1,547 @@
+{
+  "edges": [],
+  "generated_at": "2026-07-01T22:39:59+00:00",
+  "inputs": {
+    "unavailable": [
+      "runtime/operations/operations_board.json",
+      "runtime/capabilities/capability_lifecycle_report.json"
+    ],
+    "used": [
+      "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+      "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+      "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+      "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "data/registry/capabilities.json",
+      "data/registry/services.json",
+      "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "operations/README.md",
+      "operations/board/latest.md",
+      "operations/boards/active_work.md",
+      "operations/boards/daily_board.md",
+      "operations/boards/parking_lot.md",
+      "operations/boards/review_cadence.md",
+      "operations/boards/roadmap.md",
+      "operations/capabilities/lifecycle_status.md",
+      "operations/history/EC-000086.md",
+      "operations/implementation_recommendation.md",
+      "operations/steward/dashboard.md",
+      "operations/templates/active_work_item.md",
+      "operations/templates/daily_task.md",
+      "operations/templates/parking_item.md"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "Active Work Board",
+      "label": "Active Work Board",
+      "source_artifact": "operations/boards/active_work.md",
+      "type": "operation"
+    },
+    {
+      "id": "Active Work Item Template",
+      "label": "Active Work Item Template",
+      "source_artifact": "operations/templates/active_work_item.md",
+      "type": "operation"
+    },
+    {
+      "id": "CAP-000001",
+      "label": "RTX 4090 CUDA",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000002",
+      "label": "Kokoro TTS",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000003",
+      "label": "F5-TTS",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000004",
+      "label": "ComfyUI",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000005",
+      "label": "FFmpeg / FFplay",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000006",
+      "label": "Whisper",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "Daily Task Board",
+      "label": "Daily Task Board",
+      "source_artifact": "operations/boards/daily_board.md",
+      "type": "operation"
+    },
+    {
+      "id": "Daily Task Template",
+      "label": "Daily Task Template",
+      "source_artifact": "operations/templates/daily_task.md",
+      "type": "operation"
+    },
+    {
+      "id": "EC-000086: Add Estate Operations Board",
+      "label": "EC-000086: Add Estate Operations Board",
+      "source_artifact": "operations/history/EC-000086.md",
+      "type": "operation"
+    },
+    {
+      "id": "Estate Capability Lifecycle Status",
+      "label": "Estate Capability Lifecycle Status",
+      "source_artifact": "operations/capabilities/lifecycle_status.md",
+      "type": "capability"
+    },
+    {
+      "id": "Estate Operations Board",
+      "label": "Estate Operations Board",
+      "source_artifact": "operations/README.md",
+      "type": "operation"
+    },
+    {
+      "id": "Estate Steward Dashboard",
+      "label": "Estate Steward Dashboard",
+      "source_artifact": "operations/steward/dashboard.md",
+      "type": "operation"
+    },
+    {
+      "id": "Operations Board Implementation Recommendation",
+      "label": "Operations Board Implementation Recommendation",
+      "source_artifact": "operations/implementation_recommendation.md",
+      "type": "operation"
+    },
+    {
+      "id": "Parking Lot",
+      "label": "Parking Lot",
+      "source_artifact": "operations/boards/parking_lot.md",
+      "type": "operation"
+    },
+    {
+      "id": "Parking Lot Item",
+      "label": "Parking Lot Item",
+      "source_artifact": "operations/templates/parking_item.md",
+      "type": "operation"
+    },
+    {
+      "id": "Review Cadence",
+      "label": "Review Cadence",
+      "source_artifact": "operations/boards/review_cadence.md",
+      "type": "operation"
+    },
+    {
+      "id": "SVC-000001",
+      "label": "Ledger Service",
+      "source_artifact": "data/registry/services.json",
+      "type": "service"
+    },
+    {
+      "id": "SVC-000002",
+      "label": "Registry Service",
+      "source_artifact": "data/registry/services.json",
+      "type": "service"
+    },
+    {
+      "id": "SVC-000003",
+      "label": "Capability Service",
+      "source_artifact": "data/registry/services.json",
+      "type": "service"
+    },
+    {
+      "id": "Strategic Roadmap",
+      "label": "Strategic Roadmap",
+      "source_artifact": "operations/boards/roadmap.md",
+      "type": "operation"
+    },
+    {
+      "id": "Work Package WP-LEAP-001",
+      "label": "Work Package WP-LEAP-001",
+      "source_artifact": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "type": "work_package"
+    },
+    {
+      "id": "msg_20260701_000000_example_routing",
+      "label": "msg_20260701_000000_example_routing",
+      "source_artifact": "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0001_alfred_capability_brief",
+      "label": "msg_ca3_20260701_0001_alfred_capability_brief",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0002_audit_malformed_json_review",
+      "label": "msg_ca3_20260701_0002_audit_malformed_json_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0003_operations_board_review",
+      "label": "msg_ca3_20260701_0003_operations_board_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0004_capability_lifecycle_review",
+      "label": "msg_ca3_20260701_0004_capability_lifecycle_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "type": "message"
+    }
+  ],
+  "orphaned_items": [
+    {
+      "id": "Active Work Board",
+      "label": "Active Work Board",
+      "source_artifact": "operations/boards/active_work.md",
+      "type": "operation"
+    },
+    {
+      "id": "Active Work Item Template",
+      "label": "Active Work Item Template",
+      "source_artifact": "operations/templates/active_work_item.md",
+      "type": "operation"
+    },
+    {
+      "id": "CAP-000001",
+      "label": "RTX 4090 CUDA",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000002",
+      "label": "Kokoro TTS",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000003",
+      "label": "F5-TTS",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000004",
+      "label": "ComfyUI",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000005",
+      "label": "FFmpeg / FFplay",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "CAP-000006",
+      "label": "Whisper",
+      "source_artifact": "data/registry/capabilities.json",
+      "type": "capability"
+    },
+    {
+      "id": "Daily Task Board",
+      "label": "Daily Task Board",
+      "source_artifact": "operations/boards/daily_board.md",
+      "type": "operation"
+    },
+    {
+      "id": "Daily Task Template",
+      "label": "Daily Task Template",
+      "source_artifact": "operations/templates/daily_task.md",
+      "type": "operation"
+    },
+    {
+      "id": "EC-000086: Add Estate Operations Board",
+      "label": "EC-000086: Add Estate Operations Board",
+      "source_artifact": "operations/history/EC-000086.md",
+      "type": "operation"
+    },
+    {
+      "id": "Estate Capability Lifecycle Status",
+      "label": "Estate Capability Lifecycle Status",
+      "source_artifact": "operations/capabilities/lifecycle_status.md",
+      "type": "capability"
+    },
+    {
+      "id": "Estate Operations Board",
+      "label": "Estate Operations Board",
+      "source_artifact": "operations/README.md",
+      "type": "operation"
+    },
+    {
+      "id": "Estate Steward Dashboard",
+      "label": "Estate Steward Dashboard",
+      "source_artifact": "operations/steward/dashboard.md",
+      "type": "operation"
+    },
+    {
+      "id": "Operations Board Implementation Recommendation",
+      "label": "Operations Board Implementation Recommendation",
+      "source_artifact": "operations/implementation_recommendation.md",
+      "type": "operation"
+    },
+    {
+      "id": "Parking Lot",
+      "label": "Parking Lot",
+      "source_artifact": "operations/boards/parking_lot.md",
+      "type": "operation"
+    },
+    {
+      "id": "Parking Lot Item",
+      "label": "Parking Lot Item",
+      "source_artifact": "operations/templates/parking_item.md",
+      "type": "operation"
+    },
+    {
+      "id": "Review Cadence",
+      "label": "Review Cadence",
+      "source_artifact": "operations/boards/review_cadence.md",
+      "type": "operation"
+    },
+    {
+      "id": "SVC-000001",
+      "label": "Ledger Service",
+      "source_artifact": "data/registry/services.json",
+      "type": "service"
+    },
+    {
+      "id": "SVC-000002",
+      "label": "Registry Service",
+      "source_artifact": "data/registry/services.json",
+      "type": "service"
+    },
+    {
+      "id": "SVC-000003",
+      "label": "Capability Service",
+      "source_artifact": "data/registry/services.json",
+      "type": "service"
+    },
+    {
+      "id": "Strategic Roadmap",
+      "label": "Strategic Roadmap",
+      "source_artifact": "operations/boards/roadmap.md",
+      "type": "operation"
+    },
+    {
+      "id": "Work Package WP-LEAP-001",
+      "label": "Work Package WP-LEAP-001",
+      "source_artifact": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "type": "work_package"
+    },
+    {
+      "id": "msg_20260701_000000_example_routing",
+      "label": "msg_20260701_000000_example_routing",
+      "source_artifact": "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0001_alfred_capability_brief",
+      "label": "msg_ca3_20260701_0001_alfred_capability_brief",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0002_audit_malformed_json_review",
+      "label": "msg_ca3_20260701_0002_audit_malformed_json_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0003_operations_board_review",
+      "label": "msg_ca3_20260701_0003_operations_board_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0004_capability_lifecycle_review",
+      "label": "msg_ca3_20260701_0004_capability_lifecycle_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "type": "message"
+    }
+  ],
+  "repository": {
+    "branch": "work",
+    "commit": "443cd96e35e7c8416b3e86dc56b52ebd8958c827"
+  },
+  "schema": {
+    "edges": "source, target, dependency_type, source_artifact",
+    "nodes": "id, type, label, source_artifact",
+    "orphaned_items": "nodes with no incoming or outgoing explicit dependency edges"
+  },
+  "summary": {
+    "edge_count": 0,
+    "node_count": 28,
+    "orphaned_item_count": 28,
+    "warning_count": 31
+  },
+  "version": 1,
+  "warnings": [
+    {
+      "message": "msg_20260701_000000_example_routing has no explicit dependency field.",
+      "path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0001_alfred_capability_brief has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0002_audit_malformed_json_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0003_operations_board_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0004_capability_lifecycle_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Optional input artifact is unavailable.",
+      "path": "runtime/operations/operations_board.json",
+      "type": "missing_optional_artifact"
+    },
+    {
+      "message": "Optional input artifact is unavailable.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_optional_artifact"
+    },
+    {
+      "message": "CAP-000001 has no explicit dependency field.",
+      "path": "data/registry/capabilities.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000002 has no explicit dependency field.",
+      "path": "data/registry/capabilities.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000003 has no explicit dependency field.",
+      "path": "data/registry/capabilities.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000004 has no explicit dependency field.",
+      "path": "data/registry/capabilities.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000005 has no explicit dependency field.",
+      "path": "data/registry/capabilities.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000006 has no explicit dependency field.",
+      "path": "data/registry/capabilities.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SVC-000001 has no explicit dependency field.",
+      "path": "data/registry/services.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SVC-000002 has no explicit dependency field.",
+      "path": "data/registry/services.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SVC-000003 has no explicit dependency field.",
+      "path": "data/registry/services.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Work Package WP-LEAP-001 has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Operations Board has no clearly labelled dependency section or field.",
+      "path": "operations/README.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Operations Board has no clearly labelled dependency section or field.",
+      "path": "operations/board/latest.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Active Work Board has no clearly labelled dependency section or field.",
+      "path": "operations/boards/active_work.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Daily Task Board has no clearly labelled dependency section or field.",
+      "path": "operations/boards/daily_board.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Parking Lot has no clearly labelled dependency section or field.",
+      "path": "operations/boards/parking_lot.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Review Cadence has no clearly labelled dependency section or field.",
+      "path": "operations/boards/review_cadence.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Strategic Roadmap has no clearly labelled dependency section or field.",
+      "path": "operations/boards/roadmap.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Capability Lifecycle Status has no clearly labelled dependency section or field.",
+      "path": "operations/capabilities/lifecycle_status.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "EC-000086: Add Estate Operations Board has no clearly labelled dependency section or field.",
+      "path": "operations/history/EC-000086.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Operations Board Implementation Recommendation has no clearly labelled dependency section or field.",
+      "path": "operations/implementation_recommendation.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Steward Dashboard has no clearly labelled dependency section or field.",
+      "path": "operations/steward/dashboard.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Active Work Item Template has no clearly labelled dependency section or field.",
+      "path": "operations/templates/active_work_item.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Daily Task Template has no clearly labelled dependency section or field.",
+      "path": "operations/templates/daily_task.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Parking Lot Item has no clearly labelled dependency section or field.",
+      "path": "operations/templates/parking_item.md",
+      "type": "missing_dependency_field"
+    }
+  ]
+}
