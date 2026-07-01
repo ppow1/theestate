@@ -13,6 +13,7 @@ from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, fo
 from estate.core.audit import print_audit_report
 from estate.core.collaboration_ops import run_routing_engine, watch_worker_inboxes, format_routing_report, format_inbox_summary
 from estate.core.operations_board import generate_operations_board, format_operations_board_summary
+from estate.core.capability_lifecycle import generate_capability_lifecycle_report, format_capability_lifecycle_summary
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -417,6 +418,15 @@ def cmd_operations_board(args):
     else:
         print(format_operations_board_summary(board))
 
+
+def cmd_capability_lifecycle(args):
+    report = generate_capability_lifecycle_report()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(format_capability_lifecycle_summary(report))
+
 def cmd_audit(args):
     if getattr(args, "json", False):
         import json
@@ -517,6 +527,11 @@ def main():
     p = sub.add_parser("operations-board")
     p.add_argument("--json", action="store_true", help="Generate Operations Board and print snapshot JSON")
     p.set_defaults(func=cmd_operations_board)
+
+
+    p = sub.add_parser("capability-lifecycle")
+    p.add_argument("--json", action="store_true", help="Generate capability lifecycle report and print JSON")
+    p.set_defaults(func=cmd_capability_lifecycle)
 
     p = sub.add_parser("audit")
     p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
