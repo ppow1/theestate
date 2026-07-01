@@ -1,0 +1,18 @@
+{
+  "request_id": "audit_bad_0003",
+  "status": "error",
+  "repository": "ppow1/theestate",
+  "branch": "audit/audit-worker-v1",
+  "local_commit": "095a8f04854117be4d3a3550cccf5a59de2cf809",
+  "work_package_id": "unknown",
+  "audit_started_at": "2026-07-01T18:20:04",
+  "audit_finished_at": "2026-07-01T18:20:04",
+  "command_run": "structure validation",
+  "exit_code": 1,
+  "summary": "Audit request failed validation.",
+  "full_audit_output": "",
+  "stderr": "Conversion from JSON failed with error: Unexpected end when deserializing object. Path 'target', line 5, position 0.",
+  "follow_up_required": true,
+  "history_drift_detected": false,
+  "classification": "Estate Internal"
+}

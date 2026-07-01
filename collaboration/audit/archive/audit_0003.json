@@ -1,0 +1,8 @@
+{
+  "request_id": "audit_0003",
+  "target": "collaboration/communication_bus",
+  "type": "structure_validation",
+  "requested_by": "Steward",
+  "work_package_id": "WP-0004",
+  "classification": "Estate Internal"
+}
