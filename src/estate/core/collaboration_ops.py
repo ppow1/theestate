@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
+from estate.core.collaboration_events import append_event
 
 DEFAULT_WORKER_RULES = [
     {
@@ -166,6 +167,22 @@ def run_routing_engine(root=None):
         "errors": errors,
     }
     _write_json(paths["routing"] / "latest.json", report)
+    for decision in decisions:
+        try:
+            append_event(
+                "message.routed",
+                "collaboration.routing_engine",
+                {
+                    "source_path": decision.get("source_path"),
+                    "valid": decision.get("valid"),
+                    "missing_fields": decision.get("missing_fields", []),
+                    "route": decision.get("route", {}),
+                },
+                subject_id=decision.get("message_id"),
+                root=paths["root"],
+            )
+        except Exception as exc:
+            errors.append({"path": "runtime/collaboration/events/events.jsonl", "error": str(exc)})
     return report
 
 
@@ -192,6 +209,15 @@ def watch_worker_inboxes(root=None):
     for worker, items in inboxes.items():
         safe_name = worker.replace("/", "_").replace("\\", "_").replace(":", "_")
         _write_json(paths["inboxes"] / f"{safe_name}.json", {"version": 1, "worker": worker, "messages": items})
+    try:
+        append_event(
+            "inbox.updated",
+            "collaboration.inbox_watcher",
+            {"worker_count": summary["worker_count"], "message_count": summary["message_count"], "workers": [item["worker"] for item in summary["workers"]]},
+            root=paths["root"],
+        )
+    except Exception as exc:
+        summary.setdefault("errors", []).append({"path": "runtime/collaboration/events/events.jsonl", "error": str(exc)})
     return summary
 
 
