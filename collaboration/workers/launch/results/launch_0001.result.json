@@ -1,0 +1,16 @@
+{
+  "request_id": "launch_0001",
+  "worker_id": "local_builder_001",
+  "status": "launched",
+  "model": "qwen2.5-coder:7b",
+  "role": "builder",
+  "work_package_id": "WP-LEAP-001",
+  "prompt_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0001\\worker_prompt.txt",
+  "transcript_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0001\\worker_output.txt",
+  "branch": "audit/audit-worker-v1",
+  "local_commit": "1d488d86c32cbee00d9c8f223e546697145febed",
+  "started_at": "2026-07-01T13:06:40",
+  "finished_at": "2026-07-01T13:07:00",
+  "classification": "Estate Internal",
+  "error": ""
+}
