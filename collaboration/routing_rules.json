@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "default_queue": "alfred.review",
+  "worker_rules": [
+    {
+      "worker": "worker.documentation",
+      "keywords": ["documentation", "docs", "manual", "readme", "handbook"],
+      "message_types": ["documentation", "work_package"]
+    },
+    {
+      "worker": "worker.audit",
+      "keywords": ["audit", "validate", "validation", "check"],
+      "message_types": ["audit", "validation"]
+    },
+    {
+      "worker": "worker.implementation",
+      "keywords": ["implement", "code", "test", "fix", "build"],
+      "message_types": ["implementation", "work_package"]
+    }
+  ]
+}
