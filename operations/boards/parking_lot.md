@@ -107,3 +107,57 @@ Investigate a secure server-side command relay that can:
 - Local Worker Launch Adapter
 - GitHub as first transport adapter
 
+
+---
+
+## Worker Execution Report Standard
+
+Priority: Near-Term Investigation  
+Status: Captured Idea  
+Category: Collaboration Layer / Worker Operations
+
+### Description
+
+Define a standard final report artifact that every worker produces after completing assigned work.
+
+The Estate already captures launch prompts, transcripts, raw output, result JSON, and archived launch requests. However, as workers begin performing real operational work, the Estate also needs a clean institutional work report that summarizes what was actually done.
+
+### Problem
+
+Current artifacts prove that a worker launched and produced output, but they do not yet provide a standardized completion report suitable for audit, review, promotion, and institutional history.
+
+### Candidate Report Contents
+
+A worker completion report should include:
+
+- Work Package ID
+- Worker ID
+- Assignment summary
+- Work performed
+- Files created or modified
+- Validation run
+- Evidence produced
+- Blockers or unresolved questions
+- Required Steward review
+- Recommended next action
+- Capability lifecycle impact, if any
+
+### Potential Locations
+
+Possible report locations include:
+
+- `collaboration/reports/`
+- `collaboration/work_packages/completed/<work_package_id>/final_report.md`
+- `runtime/worker_sessions/<request_id>/final_report.md`
+
+### Constraints
+
+- Do not block current worker launch testing.
+- Do not duplicate raw transcripts.
+- Reports should summarize institutional evidence, not replace audit artifacts.
+- Reports should support later History Queue / Drain workflows.
+
+### Success Criteria
+
+The Estate can determine what a worker accomplished without rereading the entire prompt and transcript.
+
