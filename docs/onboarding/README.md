@@ -32,5 +32,3 @@ The actual image files live under:
 ## Maintenance Rule
 
 Worker launchers should read `visual_manifest.md` rather than hard-coding image filenames.
-
-When visuals change, update the manifest and replace or add files in `visuals/`.

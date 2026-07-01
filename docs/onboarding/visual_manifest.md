@@ -9,8 +9,6 @@ Architectural Oversight: Chief Architect
 
 Every newly onboarded Estate worker shall review the visual artifacts below before reading procedural documentation or starting an assigned work package.
 
-The purpose is to give the worker an institutional mental model before it reads operational rules.
-
 ## Orientation Order
 
 1. `visuals/Estate_Master_Plan_V1_Founding_Artifact.png`
@@ -38,5 +36,3 @@ Only after reviewing the visuals should a worker continue with:
 ## Maintenance Rule
 
 Worker launchers should read this manifest instead of hard-coding image filenames.
-
-If a visual is replaced or revised, update this manifest and preserve stable versioned filenames when practical.
