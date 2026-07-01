@@ -27,7 +27,7 @@ function Remove-AnsiNoise {
     return $Clean.Trim()
 }
 
-Write-Host "=== Estate Local Worker Launcher v1.1 ==="
+Write-Host "=== Estate Local Worker Launcher v1.2 ==="
 Write-Host "Estate Root: $EstateRoot"
 Write-Host ""
 
@@ -85,6 +85,17 @@ foreach ($Doc in $Docs) {
     }
 }
 
+$WorkPackageText = Get-Content $WorkPackagePath -Raw
+$SpecificWorkPackage = $WorkPackageText
+
+if ($WorkPackageId -ne "unknown") {
+    $pattern = "(?ms)^###\s+$([regex]::Escape($WorkPackageId))\s+.*?(?=^---|\z)"
+    $match = [regex]::Match($WorkPackageText, $pattern)
+    if ($match.Success) {
+        $SpecificWorkPackage = $match.Value.Trim()
+    }
+}
+
 $Prompt = @"
 You are $WorkerId, an Estate local $Role worker.
 
@@ -96,7 +107,19 @@ Runtime authority:
 Follow the Worker Runtime Contract and Instruction Precedence.
 Do not assume GitHub is part of your runtime unless explicitly authorized.
 Review the onboarding visual manifest before beginning.
-Then review the assigned work package and produce the requested output.
+Your assigned work package is included explicitly near the end of this prompt.
+
+You must not ask the Steward to provide the work package if the work package content is present.
+
+Produce a concise operational validation report with:
+- Work Package ID
+- Objective understood
+- Evidence reviewed
+- Validation result
+- Issues discovered
+- Recommended next action
+
+Do not modify repository files.
 
 Repository context follows.
 "@
@@ -112,7 +135,7 @@ foreach ($Doc in $Docs) {
 $Prompt += "`n`n============================================================`n"
 $Prompt += "FILE: $($Request.work_package_path)`n"
 $Prompt += "============================================================`n"
-$Prompt += Get-Content $WorkPackagePath -Raw
+$Prompt += $SpecificWorkPackage
 
 Set-Content -Path $PromptPath -Value $Prompt -Encoding UTF8
 
@@ -187,3 +210,4 @@ if ($Status -eq "error") {
 }
 
 exit 0
+
