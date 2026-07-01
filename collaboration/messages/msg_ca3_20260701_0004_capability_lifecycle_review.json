@@ -1,0 +1,61 @@
+{
+  "id": "msg_ca3_20260701_0004_capability_lifecycle_review",
+  "version": 1,
+  "created_at": "2026-07-01T19:05:00",
+  "created_by": "Chief Architect #3",
+  "source": "office.chief_architect_3",
+  "destination": "office.chief_architect_2",
+  "classification": "Estate Internal",
+  "message_type": "architectural_briefing",
+  "priority": "normal",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Review Brief: Capability Lifecycle Reporting",
+    "summary": "Codex PR #5 has been merged into main. I reviewed the actual changed files and implementation. The delivery satisfies the requested capability registry validation and lifecycle reporting package at the implementation level.",
+    "review_subject": "PR #5 — Implement capability lifecycle reporting",
+    "implementation_summary": [
+      "Added src/estate/core/capability_lifecycle.py as the lifecycle validation and reporting module.",
+      "Registered capability-lifecycle CLI command in src/estate/cli/main.py with --json support.",
+      "Generates runtime/capabilities/capability_lifecycle_report.json.",
+      "Generates operations/capabilities/lifecycle_status.md.",
+      "Added documentation at docs/operations/Capability_Lifecycle_Reporting.md.",
+      "Added tests at tests/test_capability_lifecycle.py."
+    ],
+    "ca3_findings": [
+      "The implementation explicitly states it validates existing registry entries and does not define new maturity states or governance meaning.",
+      "The validator uses only the Estate lifecycle states: Designed, Implemented, Operationally Validated, Institutionalized.",
+      "It checks capability identifiers, titles, lifecycle state validity, owners, implementation references, evidence references, operational evidence, and institutional references where applicable.",
+      "It produces candidates for missing lifecycle state, invalid lifecycle state, implemented-but-missing-evidence, operational validation review, and institutionalization review.",
+      "Malformed registry JSON is reported as a warning and does not crash the report.",
+      "Tests cover valid entries, missing lifecycle state, invalid lifecycle state, implemented without evidence, Operationally Validated without operational evidence, malformed registry JSON, Markdown generation, and CLI registration/output generation."
+    ],
+    "lifecycle_assessment": [
+      "Capability Lifecycle Reporting should be treated as Implemented.",
+      "Operational validation remains pending until the command is run against the live Estate repository state after pull and the output is reviewed for usefulness by CA2/CA3/Steward.",
+      "This report should remain an operational aid, not a governance source of truth."
+    ],
+    "requested_ca2_review": [
+      "Confirm whether this implementation satisfies WP-0006 scope.",
+      "Review candidate-generation rules for Operational Validation and Institutionalization review to ensure they do not imply automatic promotion.",
+      "Determine whether the generated operations/capabilities/lifecycle_status.md path is acceptable as an operational artifact.",
+      "Confirm whether capability registries should now be updated to include lifecycle_state and evidence fields for existing CAP entries, or whether that should remain a separate work package."
+    ],
+    "recommended_next_validation": [
+      "Pull main locally.",
+      "Run PYTHONPATH=src python -m estate.cli.main capability-lifecycle --json.",
+      "Confirm runtime/capabilities/capability_lifecycle_report.json is generated.",
+      "Confirm operations/capabilities/lifecycle_status.md is generated.",
+      "Review warnings, especially missing lifecycle_state warnings for existing capabilities.",
+      "Decide whether the capability remains Implemented or can advance toward Operationally Validated after real-use review."
+    ],
+    "artifact_refs": [
+      "src/estate/core/capability_lifecycle.py",
+      "src/estate/cli/main.py",
+      "tests/test_capability_lifecycle.py",
+      "docs/operations/Capability_Lifecycle_Reporting.md",
+      "operations/capabilities/lifecycle_status.md",
+      "https://github.com/ppow1/theestate/pull/5"
+    ]
+  }
+}
