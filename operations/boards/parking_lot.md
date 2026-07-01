@@ -61,3 +61,49 @@ Each item should include:
 ## Review Guidance
 
 During planning, ask whether each idea is still valuable, whether the timing is right, and whether it should become active work, remain deferred, or be closed.
+
+---
+
+## Connector-Independent GPT-to-Estate Command Bridge
+
+Priority: Future Investigation  
+Status: Captured Idea  
+Category: Infrastructure / Transport Adapter
+
+### Description
+
+Investigate a connector-independent command bridge allowing ChatGPT or other external AI interfaces to send structured commands to Estate infrastructure without relying on the GitHub connector approval/wait cycle.
+
+The idea is inspired by the prior QMaster / iEnergy-style pattern where a GPT application sent commands to a user-controlled internet server, which parsed the command and wrote structured task/request files into GitHub or another Estate transport.
+
+### Problem
+
+The current GitHub connector introduces unpredictable wait time and permission latency. This slows down rapid operational work and makes simple repository updates less reliable than local CLI workflows.
+
+### Potential Direction
+
+Investigate a secure server-side command relay that can:
+
+- Receive structured commands from approved AI interfaces.
+- Validate and parse the request.
+- Write task/request artifacts into the appropriate Estate queue.
+- Preserve auditability.
+- Avoid exposing secrets.
+- Respect Steward authorization and clearance boundaries.
+
+### Constraints
+
+- Do not bypass governance.
+- Do not expose repository credentials.
+- Do not weaken repository privacy.
+- Must preserve audit trail and approval boundaries.
+- Should be evaluated after current Collaboration Layer work stabilizes.
+
+### Related References
+
+- QMaster repository
+- iEnergy / iEnergy7-style GPT command bridge
+- Collaboration Layer transport adapter model
+- Local Worker Launch Adapter
+- GitHub as first transport adapter
+
