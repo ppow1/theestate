@@ -3,11 +3,11 @@
 Machine-readable output: `runtime/dependencies/dependency_graph.json`.
 
 ## Summary
-- Generated: 2026-07-01T22:39:59+00:00
-- Nodes: 28
+- Generated: 2026-07-01T23:04:47+00:00
+- Nodes: 33
 - Edges: 0
-- Orphaned items: 28
-- Warnings: 31
+- Orphaned items: 33
+- Warnings: 32
 
 ## Supported dependency sources
 - JSON fields: `dependencies`, `depends_on`, `dependency_ids`, `dependency_id`, `blocked_by`, `requires`, `required_capabilities`, `required_services`, `work_package_dependencies`.
@@ -35,12 +35,13 @@ Machine-readable output: `runtime/dependencies/dependency_graph.json`.
 ## Orphaned items
 - `Active Work Board` (operation) — operations/boards/active_work.md
 - `Active Work Item Template` (operation) — operations/templates/active_work_item.md
-- `CAP-000001` (capability) — data/registry/capabilities.json
-- `CAP-000002` (capability) — data/registry/capabilities.json
-- `CAP-000003` (capability) — data/registry/capabilities.json
-- `CAP-000004` (capability) — data/registry/capabilities.json
-- `CAP-000005` (capability) — data/registry/capabilities.json
-- `CAP-000006` (capability) — data/registry/capabilities.json
+- `CAP-000001` (capability) — runtime/capabilities/capability_lifecycle_report.json
+- `CAP-000002` (capability) — runtime/capabilities/capability_lifecycle_report.json
+- `CAP-000003` (capability) — runtime/capabilities/capability_lifecycle_report.json
+- `CAP-000004` (capability) — runtime/capabilities/capability_lifecycle_report.json
+- `CAP-000005` (capability) — runtime/capabilities/capability_lifecycle_report.json
+- `CAP-000006` (capability) — runtime/capabilities/capability_lifecycle_report.json
+- `Continuous Operational Validation Report` (operation) — operations/validation/operational_validation_report.md
 - `Daily Task Board` (operation) — operations/boards/daily_board.md
 - `Daily Task Template` (operation) — operations/templates/daily_task.md
 - `EC-000086: Add Estate Operations Board` (operation) — operations/history/EC-000086.md
@@ -61,6 +62,10 @@ Machine-readable output: `runtime/dependencies/dependency_graph.json`.
 - `msg_ca3_20260701_0002_audit_malformed_json_review` (message) — collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json
 - `msg_ca3_20260701_0003_operations_board_review` (message) — collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json
 - `msg_ca3_20260701_0004_capability_lifecycle_review` (message) — collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json
+- `msg_ca3_20260701_0005_steward_dashboard_review` (message) — collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json
+- `msg_ca3_20260701_0006_collaboration_event_framework_review` (message) — collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json
+- `msg_ca3_20260701_0007_dependency_graph_review` (message) — collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json
+- `msg_ca3_20260701_0008_operational_validation_review` (message) — collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json
 
 ## Warnings
 - missing_dependency_field: collaboration/messages/example_alfred_routing_engine_v1.json — msg_20260701_000000_example_routing has no explicit dependency field.
@@ -68,17 +73,17 @@ Machine-readable output: `runtime/dependencies/dependency_graph.json`.
 - missing_dependency_field: collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json — msg_ca3_20260701_0002_audit_malformed_json_review has no explicit dependency field.
 - missing_dependency_field: collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json — msg_ca3_20260701_0003_operations_board_review has no explicit dependency field.
 - missing_dependency_field: collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json — msg_ca3_20260701_0004_capability_lifecycle_review has no explicit dependency field.
+- missing_dependency_field: collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json — msg_ca3_20260701_0005_steward_dashboard_review has no explicit dependency field.
+- missing_dependency_field: collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json — msg_ca3_20260701_0006_collaboration_event_framework_review has no explicit dependency field.
+- missing_dependency_field: collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json — msg_ca3_20260701_0007_dependency_graph_review has no explicit dependency field.
+- missing_dependency_field: collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json — msg_ca3_20260701_0008_operational_validation_review has no explicit dependency field.
 - missing_optional_artifact: runtime/operations/operations_board.json — Optional input artifact is unavailable.
-- missing_optional_artifact: runtime/capabilities/capability_lifecycle_report.json — Optional input artifact is unavailable.
-- missing_dependency_field: data/registry/capabilities.json — CAP-000001 has no explicit dependency field.
-- missing_dependency_field: data/registry/capabilities.json — CAP-000002 has no explicit dependency field.
-- missing_dependency_field: data/registry/capabilities.json — CAP-000003 has no explicit dependency field.
-- missing_dependency_field: data/registry/capabilities.json — CAP-000004 has no explicit dependency field.
-- missing_dependency_field: data/registry/capabilities.json — CAP-000005 has no explicit dependency field.
-- missing_dependency_field: data/registry/capabilities.json — CAP-000006 has no explicit dependency field.
-- missing_dependency_field: data/registry/services.json — SVC-000001 has no explicit dependency field.
-- missing_dependency_field: data/registry/services.json — SVC-000002 has no explicit dependency field.
-- missing_dependency_field: data/registry/services.json — SVC-000003 has no explicit dependency field.
+- missing_dependency_field: runtime/capabilities/capability_lifecycle_report.json — CAP-000001 has no explicit dependency field.
+- missing_dependency_field: runtime/capabilities/capability_lifecycle_report.json — CAP-000002 has no explicit dependency field.
+- missing_dependency_field: runtime/capabilities/capability_lifecycle_report.json — CAP-000003 has no explicit dependency field.
+- missing_dependency_field: runtime/capabilities/capability_lifecycle_report.json — CAP-000004 has no explicit dependency field.
+- missing_dependency_field: runtime/capabilities/capability_lifecycle_report.json — CAP-000005 has no explicit dependency field.
+- missing_dependency_field: runtime/capabilities/capability_lifecycle_report.json — CAP-000006 has no explicit dependency field.
 - missing_dependency_field: collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md — Work Package WP-LEAP-001 has no clearly labelled dependency section or field.
 - missing_dependency_field: operations/README.md — Estate Operations Board has no clearly labelled dependency section or field.
 - missing_dependency_field: operations/board/latest.md — Estate Operations Board has no clearly labelled dependency section or field.
@@ -94,3 +99,4 @@ Machine-readable output: `runtime/dependencies/dependency_graph.json`.
 - missing_dependency_field: operations/templates/active_work_item.md — Active Work Item Template has no clearly labelled dependency section or field.
 - missing_dependency_field: operations/templates/daily_task.md — Daily Task Template has no clearly labelled dependency section or field.
 - missing_dependency_field: operations/templates/parking_item.md — Parking Lot Item has no clearly labelled dependency section or field.
+- missing_dependency_field: operations/validation/operational_validation_report.md — Continuous Operational Validation Report has no clearly labelled dependency section or field.

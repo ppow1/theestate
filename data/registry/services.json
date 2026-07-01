@@ -5,7 +5,8 @@
     "status": "Active",
     "owner": "Archives",
     "resident": "Eleanor",
-    "purpose": "Create and maintain Estate Change records, ledger entries, and institutional continuity."
+    "purpose": "Create and maintain Estate Change records, ledger entries, and institutional continuity.",
+    "dependencies": []
   },
   {
     "id": "SVC-000002",
@@ -13,7 +14,8 @@
     "status": "Active",
     "owner": "Archives",
     "resident": "Eleanor",
-    "purpose": "Maintain object registries for residents, workers, departments, capabilities, and future institutional objects."
+    "purpose": "Maintain object registries for residents, workers, departments, capabilities, and future institutional objects.",
+    "dependencies": []
   },
   {
     "id": "SVC-000003",
@@ -21,6 +23,7 @@
     "status": "Draft",
     "owner": "Administration",
     "resident": "Alfred",
-    "purpose": "Track available local and cloud capabilities usable by the Estate."
+    "purpose": "Track available local and cloud capabilities usable by the Estate.",
+    "dependencies": []
   }
 ]
