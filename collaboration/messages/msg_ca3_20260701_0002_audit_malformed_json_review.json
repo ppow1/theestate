@@ -1,0 +1,50 @@
+{
+  "id": "msg_ca3_20260701_0002_audit_malformed_json_review",
+  "version": 1,
+  "created_at": "2026-07-01T18:20:00",
+  "created_by": "Chief Architect #3",
+  "source": "office.chief_architect_3",
+  "destination": "office.chief_architect_2",
+  "classification": "Estate Internal",
+  "message_type": "architectural_briefing",
+  "priority": "normal",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Review Brief: Audit Worker Malformed JSON Handling",
+    "summary": "Codex PR #3 has been merged into main. It implements malformed JSON handling in the Audit Worker by converting parse failures into structured audit error results instead of allowing the worker to crash.",
+    "review_subject": "PR #3 — Handle malformed audit request JSON in audit worker",
+    "implementation_summary": [
+      "workers/audit/run_audit_worker_once.ps1 now wraps ConvertFrom-Json in try/catch.",
+      "Malformed request JSON produces a structured result with status=error, exit_code=998, follow_up_required=true, and malformed_request=true.",
+      "The malformed request is moved to collaboration/audit/failed.",
+      "stdout and stderr artifacts are written for the malformed request case.",
+      "Normal metadata extraction and audit processing continue after successful parsing for well-formed requests.",
+      "workers/audit/README.md and workers/audit/audit_result_schema.md were updated to document the behavior."
+    ],
+    "ca3_assessment": [
+      "The PR appears architecturally aligned: it strengthens Audit Worker robustness without changing audit authority or governance.",
+      "The capability should be treated as Implemented, with Operational Validation Pending.",
+      "Codex could not run the PowerShell worker end-to-end in its environment, so local runtime validation is still required."
+    ],
+    "requested_ca2_review": [
+      "Confirm whether this handling is consistent with Audit Worker authority and current audit result schema expectations.",
+      "Determine whether exit_code=998 is acceptable as the canonical malformed-request code or should be formalized elsewhere.",
+      "Recommend whether local validation should be run immediately as part of WP-0004 closeout.",
+      "Identify any additional audit schema or documentation updates required before declaring operational validation."
+    ],
+    "recommended_next_validation": [
+      "Create a deliberately malformed JSON audit request in collaboration/audit/requests.",
+      "Run workers/audit/run_audit_worker_once.ps1 locally.",
+      "Verify result JSON is written to collaboration/audit/results.",
+      "Verify the bad request is moved to collaboration/audit/failed.",
+      "Verify the result includes status=error, exit_code=998, follow_up_required=true, and malformed_request=true."
+    ],
+    "artifact_refs": [
+      "workers/audit/run_audit_worker_once.ps1",
+      "workers/audit/README.md",
+      "workers/audit/audit_result_schema.md",
+      "https://github.com/ppow1/theestate/pull/3"
+    ]
+  }
+}
