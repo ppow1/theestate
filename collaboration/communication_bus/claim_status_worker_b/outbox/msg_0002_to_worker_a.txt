@@ -1,0 +1,6 @@
+from: claim_status_worker_b
+to: claim_status_worker_a
+subject: RE: WP-0001 communication validation
+timestamp: 2026-07-01T15:36:23.8253210-04:00
+
+Receipt confirmed. Worker B received Worker A's message through the communication bus without Steward relay.
