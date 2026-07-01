@@ -1,0 +1,19 @@
+{
+  "request_id": "launch_0004",
+  "worker_id": "claim_status_worker_001",
+  "status": "completed",
+  "model": "qwen2.5-coder:7b",
+  "role": "operations-worker",
+  "work_package_id": "WP-0002",
+  "prompt_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0004\\worker_prompt.txt",
+  "transcript_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0004\\worker_output.txt",
+  "raw_transcript_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0004\\worker_output.raw.txt",
+  "transcript_length_bytes": 1793,
+  "branch": "audit/audit-worker-v1",
+  "local_commit": "9940f52c4f5e241eb7b066ff4ea38840aa40c9cb",
+  "started_at": "2026-07-01T15:11:39",
+  "finished_at": "2026-07-01T15:11:44",
+  "duration_seconds": 5.023,
+  "classification": "Estate Internal",
+  "error": ""
+}

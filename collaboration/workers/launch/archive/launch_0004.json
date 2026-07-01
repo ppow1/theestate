@@ -1,0 +1,13 @@
+{
+  "request_id": "launch_0004",
+  "worker_id": "claim_status_worker_001",
+  "requested_by": "Steward",
+  "model": "qwen2.5-coder:7b",
+  "role": "operations-worker",
+  "work_package_id": "WP-0002",
+  "work_package_path": "collaboration/roadmap/Collaboration_Layer_Program_Roadmap_v1.md",
+  "classification": "Estate Internal",
+  "mode": "manual_one_shot",
+  "requested_at": "2026-07-01T00:00:00",
+  "notes": "Review WP-0002 Worker Claim & Status Lifecycle. Produce an operational validation plan for worker claim records and status transitions. Do not modify files."
+}
