@@ -33,3 +33,5 @@ The local Estate audit remains authoritative.
 GitHub is only a transport for request and result state after an authorized sync.
 
 The audit worker must not repair history drift directly. History drift is reported and then handled through the History Queue / Drain workflow.
+
+Malformed request JSON is reported as `status: error` with `exit_code: 998`, `follow_up_required: true`, and `malformed_request: true`.

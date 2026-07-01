@@ -56,7 +56,7 @@ The one-shot worker should:
 4. Run .\estate.bat audit locally.
 5. Capture stdout, stderr, exit code, timestamp, branch, and commit SHA.
 6. Write a result file to collaboration/audit/results.
-7. Move completed request to archive or failed.
+7. Move completed request to archive, or move malformed/execution-error requests to failed.
 8. Commit and push the result back to GitHub.
 9. Avoid modifying estate_ledger/ledger.md and development/devlog.md except through the approved history queue/drain workflow.
 
@@ -86,7 +86,7 @@ Later this may become a scheduled task or watcher.
 - A GitHub worker can request an audit without asking Pat to paste terminal output.
 - The local machine can run the audit and return results through GitHub.
 - Other workers can read the result from the repository.
-- The result distinguishes pass, fail, and execution error.
+- The result distinguishes pass, fail, execution error, and malformed request error.
 - History drift is reported but repaired only through the history queue/drain system.
 - Pat's manual role is reduced to running or approving the local worker, not transporting output.
 
