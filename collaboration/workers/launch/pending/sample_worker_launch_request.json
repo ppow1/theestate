@@ -1,0 +1,13 @@
+{
+  "request_id": "launch_0001",
+  "worker_id": "local_builder_001",
+  "requested_by": "Chief Architect #2",
+  "model": "qwen2.5-coder:7b",
+  "role": "builder",
+  "work_package_id": "WP-LEAP-001",
+  "work_package_path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+  "classification": "Estate Internal",
+  "mode": "manual_one_shot",
+  "requested_at": "2026-06-30T00:00:00",
+  "notes": "Sample launch request for Local Worker Launch Adapter v1."
+}
