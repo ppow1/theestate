@@ -1,10 +1,9 @@
 {
   "edges": [],
-  "generated_at": "2026-07-01T22:39:59+00:00",
+  "generated_at": "2026-07-01T23:04:47+00:00",
   "inputs": {
     "unavailable": [
-      "runtime/operations/operations_board.json",
-      "runtime/capabilities/capability_lifecycle_report.json"
+      "runtime/operations/operations_board.json"
     ],
     "used": [
       "collaboration/messages/example_alfred_routing_engine_v1.json",
@@ -12,6 +11,11 @@
       "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
       "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
       "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+      "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+      "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+      "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+      "runtime/capabilities/capability_lifecycle_report.json",
       "data/registry/capabilities.json",
       "data/registry/services.json",
       "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
@@ -28,7 +32,8 @@
       "operations/steward/dashboard.md",
       "operations/templates/active_work_item.md",
       "operations/templates/daily_task.md",
-      "operations/templates/parking_item.md"
+      "operations/templates/parking_item.md",
+      "operations/validation/operational_validation_report.md"
     ]
   },
   "nodes": [
@@ -47,38 +52,44 @@
     {
       "id": "CAP-000001",
       "label": "RTX 4090 CUDA",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000002",
       "label": "Kokoro TTS",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000003",
       "label": "F5-TTS",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000004",
       "label": "ComfyUI",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000005",
       "label": "FFmpeg / FFplay",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000006",
       "label": "Whisper",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
+    },
+    {
+      "id": "Continuous Operational Validation Report",
+      "label": "Continuous Operational Validation Report",
+      "source_artifact": "operations/validation/operational_validation_report.md",
+      "type": "operation"
     },
     {
       "id": "Daily Task Board",
@@ -198,6 +209,30 @@
       "id": "msg_ca3_20260701_0004_capability_lifecycle_review",
       "label": "msg_ca3_20260701_0004_capability_lifecycle_review",
       "source_artifact": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0005_steward_dashboard_review",
+      "label": "msg_ca3_20260701_0005_steward_dashboard_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0006_collaboration_event_framework_review",
+      "label": "msg_ca3_20260701_0006_collaboration_event_framework_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0007_dependency_graph_review",
+      "label": "msg_ca3_20260701_0007_dependency_graph_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0008_operational_validation_review",
+      "label": "msg_ca3_20260701_0008_operational_validation_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
       "type": "message"
     }
   ],
@@ -217,38 +252,44 @@
     {
       "id": "CAP-000001",
       "label": "RTX 4090 CUDA",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000002",
       "label": "Kokoro TTS",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000003",
       "label": "F5-TTS",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000004",
       "label": "ComfyUI",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000005",
       "label": "FFmpeg / FFplay",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
     },
     {
       "id": "CAP-000006",
       "label": "Whisper",
-      "source_artifact": "data/registry/capabilities.json",
+      "source_artifact": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "capability"
+    },
+    {
+      "id": "Continuous Operational Validation Report",
+      "label": "Continuous Operational Validation Report",
+      "source_artifact": "operations/validation/operational_validation_report.md",
+      "type": "operation"
     },
     {
       "id": "Daily Task Board",
@@ -369,11 +410,35 @@
       "label": "msg_ca3_20260701_0004_capability_lifecycle_review",
       "source_artifact": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
       "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0005_steward_dashboard_review",
+      "label": "msg_ca3_20260701_0005_steward_dashboard_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0006_collaboration_event_framework_review",
+      "label": "msg_ca3_20260701_0006_collaboration_event_framework_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0007_dependency_graph_review",
+      "label": "msg_ca3_20260701_0007_dependency_graph_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+      "type": "message"
+    },
+    {
+      "id": "msg_ca3_20260701_0008_operational_validation_review",
+      "label": "msg_ca3_20260701_0008_operational_validation_review",
+      "source_artifact": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+      "type": "message"
     }
   ],
   "repository": {
     "branch": "work",
-    "commit": "443cd96e35e7c8416b3e86dc56b52ebd8958c827"
+    "commit": "b24ffaca81a36639a1319210a9c72c81e4c9b9aa"
   },
   "schema": {
     "edges": "source, target, dependency_type, source_artifact",
@@ -382,9 +447,9 @@
   },
   "summary": {
     "edge_count": 0,
-    "node_count": 28,
-    "orphaned_item_count": 28,
-    "warning_count": 31
+    "node_count": 33,
+    "orphaned_item_count": 33,
+    "warning_count": 32
   },
   "version": 1,
   "warnings": [
@@ -414,58 +479,58 @@
       "type": "missing_dependency_field"
     },
     {
+      "message": "msg_ca3_20260701_0005_steward_dashboard_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0006_collaboration_event_framework_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0007_dependency_graph_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0008_operational_validation_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
       "message": "Optional input artifact is unavailable.",
       "path": "runtime/operations/operations_board.json",
       "type": "missing_optional_artifact"
     },
     {
-      "message": "Optional input artifact is unavailable.",
-      "path": "runtime/capabilities/capability_lifecycle_report.json",
-      "type": "missing_optional_artifact"
-    },
-    {
       "message": "CAP-000001 has no explicit dependency field.",
-      "path": "data/registry/capabilities.json",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "missing_dependency_field"
     },
     {
       "message": "CAP-000002 has no explicit dependency field.",
-      "path": "data/registry/capabilities.json",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "missing_dependency_field"
     },
     {
       "message": "CAP-000003 has no explicit dependency field.",
-      "path": "data/registry/capabilities.json",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "missing_dependency_field"
     },
     {
       "message": "CAP-000004 has no explicit dependency field.",
-      "path": "data/registry/capabilities.json",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "missing_dependency_field"
     },
     {
       "message": "CAP-000005 has no explicit dependency field.",
-      "path": "data/registry/capabilities.json",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "missing_dependency_field"
     },
     {
       "message": "CAP-000006 has no explicit dependency field.",
-      "path": "data/registry/capabilities.json",
-      "type": "missing_dependency_field"
-    },
-    {
-      "message": "SVC-000001 has no explicit dependency field.",
-      "path": "data/registry/services.json",
-      "type": "missing_dependency_field"
-    },
-    {
-      "message": "SVC-000002 has no explicit dependency field.",
-      "path": "data/registry/services.json",
-      "type": "missing_dependency_field"
-    },
-    {
-      "message": "SVC-000003 has no explicit dependency field.",
-      "path": "data/registry/services.json",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "type": "missing_dependency_field"
     },
     {
@@ -541,6 +606,11 @@
     {
       "message": "Parking Lot Item has no clearly labelled dependency section or field.",
       "path": "operations/templates/parking_item.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Continuous Operational Validation Report has no clearly labelled dependency section or field.",
+      "path": "operations/validation/operational_validation_report.md",
       "type": "missing_dependency_field"
     }
   ]

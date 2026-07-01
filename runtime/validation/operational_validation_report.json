@@ -1,16 +1,50 @@
 {
   "candidates_for_institutionalized_review": [],
-  "candidates_for_operationally_validated_review": [],
+  "candidates_for_operationally_validated_review": [
+    {
+      "basis": "Implemented capability with implementation and validation evidence found.",
+      "id": "CAP-000001",
+      "name": "RTX 4090 CUDA"
+    },
+    {
+      "basis": "Implemented capability with implementation and validation evidence found.",
+      "id": "CAP-000002",
+      "name": "Kokoro TTS"
+    },
+    {
+      "basis": "Implemented capability with implementation and validation evidence found.",
+      "id": "CAP-000003",
+      "name": "F5-TTS"
+    },
+    {
+      "basis": "Implemented capability with implementation and validation evidence found.",
+      "id": "CAP-000004",
+      "name": "ComfyUI"
+    },
+    {
+      "basis": "Implemented capability with implementation and validation evidence found.",
+      "id": "CAP-000005",
+      "name": "FFmpeg / FFplay"
+    }
+  ],
   "capabilities_reviewed": [
     {
       "evidence_gaps": [],
-      "evidence_references": [],
+      "evidence_references": [
+        "estate_ledger/ledger.md",
+        "development/devlog.md",
+        "docs/service_catalog.md",
+        "observations/ai_environment_2026-06-29_23-47-42.json",
+        "README.md"
+      ],
       "id": "CAP-000001",
       "implementation_references": [
-        "Local AI Workstation"
+        "Local AI Workstation",
+        "A:\\AI",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
       ],
       "institutionalization_references": [],
-      "lifecycle_state": null,
+      "lifecycle_state": "Implemented",
       "name": "RTX 4090 CUDA",
       "operational_evidence_references": [],
       "validation_evidence_found": [
@@ -19,6 +53,34 @@
           "type": "implementation_reference"
         },
         {
+          "source": "A:\\AI",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "estate_ledger/ledger.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "development/devlog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "docs/service_catalog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "README.md",
+          "type": "evidence_reference"
+        },
+        {
           "source": "operations/board/latest.md",
           "type": "operations_markdown"
         },
@@ -34,13 +96,19 @@
     },
     {
       "evidence_gaps": [],
-      "evidence_references": [],
+      "evidence_references": [
+        "estate_ledger/ledger.md",
+        "development/devlog.md",
+        "docs/service_catalog.md",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
+      ],
       "id": "CAP-000002",
       "implementation_references": [
-        "A:\\AI\\TTS"
+        "A:\\AI\\TTS",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
       ],
       "institutionalization_references": [],
-      "lifecycle_state": null,
+      "lifecycle_state": "Implemented",
       "name": "Kokoro TTS",
       "operational_evidence_references": [],
       "validation_evidence_found": [
@@ -49,6 +117,26 @@
           "type": "implementation_reference"
         },
         {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "estate_ledger/ledger.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "development/devlog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "docs/service_catalog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "evidence_reference"
+        },
+        {
           "source": "operations/board/latest.md",
           "type": "operations_markdown"
         },
@@ -64,13 +152,19 @@
     },
     {
       "evidence_gaps": [],
-      "evidence_references": [],
+      "evidence_references": [
+        "estate_ledger/ledger.md",
+        "development/devlog.md",
+        "docs/service_catalog.md",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
+      ],
       "id": "CAP-000003",
       "implementation_references": [
-        "A:\\AI\\TTS\\F5-TTS"
+        "A:\\AI\\TTS\\F5-TTS",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
       ],
       "institutionalization_references": [],
-      "lifecycle_state": null,
+      "lifecycle_state": "Implemented",
       "name": "F5-TTS",
       "operational_evidence_references": [],
       "validation_evidence_found": [
@@ -79,6 +173,26 @@
           "type": "implementation_reference"
         },
         {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "estate_ledger/ledger.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "development/devlog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "docs/service_catalog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "evidence_reference"
+        },
+        {
           "source": "operations/board/latest.md",
           "type": "operations_markdown"
         },
@@ -94,13 +208,19 @@
     },
     {
       "evidence_gaps": [],
-      "evidence_references": [],
+      "evidence_references": [
+        "estate_ledger/ledger.md",
+        "development/devlog.md",
+        "docs/service_catalog.md",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
+      ],
       "id": "CAP-000004",
       "implementation_references": [
-        "A:\\AI\\ComfyUI"
+        "A:\\AI\\ComfyUI",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
       ],
       "institutionalization_references": [],
-      "lifecycle_state": null,
+      "lifecycle_state": "Implemented",
       "name": "ComfyUI",
       "operational_evidence_references": [],
       "validation_evidence_found": [
@@ -109,6 +229,26 @@
           "type": "implementation_reference"
         },
         {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "estate_ledger/ledger.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "development/devlog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "docs/service_catalog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "evidence_reference"
+        },
+        {
           "source": "operations/board/latest.md",
           "type": "operations_markdown"
         },
@@ -124,13 +264,19 @@
     },
     {
       "evidence_gaps": [],
-      "evidence_references": [],
+      "evidence_references": [
+        "estate_ledger/ledger.md",
+        "development/devlog.md",
+        "docs/service_catalog.md",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
+      ],
       "id": "CAP-000005",
       "implementation_references": [
-        "A:\\AI\\Tools\\FFmpeg"
+        "A:\\AI\\Tools\\FFmpeg",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
       ],
       "institutionalization_references": [],
-      "lifecycle_state": null,
+      "lifecycle_state": "Implemented",
       "name": "FFmpeg / FFplay",
       "operational_evidence_references": [],
       "validation_evidence_found": [
@@ -139,6 +285,26 @@
           "type": "implementation_reference"
         },
         {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "implementation_reference"
+        },
+        {
+          "source": "estate_ledger/ledger.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "development/devlog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "docs/service_catalog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "evidence_reference"
+        },
+        {
           "source": "operations/board/latest.md",
           "type": "operations_markdown"
         },
@@ -154,13 +320,18 @@
     },
     {
       "evidence_gaps": [],
-      "evidence_references": [],
+      "evidence_references": [
+        "estate_ledger/ledger.md",
+        "development/devlog.md",
+        "docs/service_catalog.md",
+        "observations/ai_environment_2026-06-29_23-47-42.json"
+      ],
       "id": "CAP-000006",
       "implementation_references": [
         "A:\\AI"
       ],
       "institutionalization_references": [],
-      "lifecycle_state": null,
+      "lifecycle_state": "Designed",
       "name": "Whisper",
       "operational_evidence_references": [],
       "validation_evidence_found": [
@@ -169,11 +340,23 @@
           "type": "implementation_reference"
         },
         {
-          "source": "operations/board/latest.md",
-          "type": "operations_markdown"
+          "source": "estate_ledger/ledger.md",
+          "type": "evidence_reference"
         },
         {
-          "source": "operations/capabilities/lifecycle_status.md",
+          "source": "development/devlog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "docs/service_catalog.md",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+          "type": "evidence_reference"
+        },
+        {
+          "source": "operations/board/latest.md",
           "type": "operations_markdown"
         },
         {
@@ -184,7 +367,7 @@
     }
   ],
   "evidence_gaps": [],
-  "generated_at": "2026-07-01T22:47:18+00:00",
+  "generated_at": "2026-07-01T23:04:47+00:00",
   "inputs": {
     "missing": [
       "runtime/operations/operations_board.json",
@@ -230,6 +413,34 @@
       "type": "implementation_reference"
     },
     {
+      "source": "A:\\AI",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "estate_ledger/ledger.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "development/devlog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "docs/service_catalog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "README.md",
+      "type": "evidence_reference"
+    },
+    {
       "source": "operations/board/latest.md",
       "type": "operations_markdown"
     },
@@ -244,6 +455,26 @@
     {
       "source": "A:\\AI\\TTS",
       "type": "implementation_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "estate_ledger/ledger.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "development/devlog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "docs/service_catalog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "evidence_reference"
     },
     {
       "source": "operations/board/latest.md",
@@ -262,6 +493,26 @@
       "type": "implementation_reference"
     },
     {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "estate_ledger/ledger.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "development/devlog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "docs/service_catalog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "evidence_reference"
+    },
+    {
       "source": "operations/board/latest.md",
       "type": "operations_markdown"
     },
@@ -276,6 +527,26 @@
     {
       "source": "A:\\AI\\ComfyUI",
       "type": "implementation_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "estate_ledger/ledger.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "development/devlog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "docs/service_catalog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "evidence_reference"
     },
     {
       "source": "operations/board/latest.md",
@@ -294,6 +565,26 @@
       "type": "implementation_reference"
     },
     {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "implementation_reference"
+    },
+    {
+      "source": "estate_ledger/ledger.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "development/devlog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "docs/service_catalog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "evidence_reference"
+    },
+    {
       "source": "operations/board/latest.md",
       "type": "operations_markdown"
     },
@@ -310,11 +601,23 @@
       "type": "implementation_reference"
     },
     {
-      "source": "operations/board/latest.md",
-      "type": "operations_markdown"
+      "source": "estate_ledger/ledger.md",
+      "type": "evidence_reference"
     },
     {
-      "source": "operations/capabilities/lifecycle_status.md",
+      "source": "development/devlog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "docs/service_catalog.md",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "observations/ai_environment_2026-06-29_23-47-42.json",
+      "type": "evidence_reference"
+    },
+    {
+      "source": "operations/board/latest.md",
       "type": "operations_markdown"
     },
     {
