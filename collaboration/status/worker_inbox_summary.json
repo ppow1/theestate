@@ -1,0 +1,27 @@
+{
+  "errors": [],
+  "generated_at": "2026-07-01T20:58:15",
+  "message_count": 1,
+  "version": 1,
+  "worker_count": 1,
+  "workers": [
+    {
+      "message_count": 1,
+      "messages": [
+        {
+          "created_at": "2026-07-01T20:58:15",
+          "message_id": "msg_20260701_000000_example_routing",
+          "missing_fields": [],
+          "route": {
+            "reason": "routing_rule",
+            "score": 6,
+            "worker": "worker.implementation"
+          },
+          "source_path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+          "valid": true
+        }
+      ],
+      "worker": "worker.implementation"
+    }
+  ]
+}

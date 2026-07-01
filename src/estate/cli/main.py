@@ -11,6 +11,7 @@ from estate.core.discovery_service import get_discovery_service
 from estate.core.service_layer import service_status, route_capability, alfred_capabilities, format_service_status, format_alfred_capabilities, service_readiness, format_service_readiness, capability_help, format_capability_help
 from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, triage_requests, format_request_triage, alfred_briefing, format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, triage_requests, format_request_triage, alfred_briefing, format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report
 from estate.core.audit import print_audit_report
+from estate.core.collaboration_ops import run_routing_engine, watch_worker_inboxes, format_routing_report, format_inbox_summary
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -388,6 +389,24 @@ def cmd_audit_summary(args):
     else:
         print(format_audit_summary(summary))
 
+
+def cmd_collaboration_route(args):
+    report = run_routing_engine()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(format_routing_report(report))
+
+
+def cmd_worker_inboxes(args):
+    summary = watch_worker_inboxes()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(summary, indent=2, sort_keys=True))
+    else:
+        print(format_inbox_summary(summary))
+
 def cmd_audit(args):
     if getattr(args, "json", False):
         import json
@@ -474,6 +493,15 @@ def main():
 
     p = sub.add_parser("sync-ollama")
     p.set_defaults(func=cmd_sync_ollama)
+
+
+    p = sub.add_parser("collaboration-route")
+    p.add_argument("--json", action="store_true", help="Run Alfred routing engine and print JSON")
+    p.set_defaults(func=cmd_collaboration_route)
+
+    p = sub.add_parser("worker-inboxes")
+    p.add_argument("--json", action="store_true", help="Run worker inbox watcher and print JSON")
+    p.set_defaults(func=cmd_worker_inboxes)
 
     p = sub.add_parser("audit")
     p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
