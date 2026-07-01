@@ -47,22 +47,15 @@ try {
     if ($Request.work_package_id) { $WorkPackageId = $Request.work_package_id }
     if ($Request.classification) { $Classification = $Request.classification }
 
-    $Target = if ($Request.target) { Join-Path $EstateRoot $Request.target } else { $null }
+    if (-not $Request.request_id) { throw "Missing required field: request_id" }
+    if (-not $Request.target) { throw "Missing required field: target" }
 
-    if (-not $Request.request_id) {
-        throw "Missing required field: request_id"
-    }
-
-    if (-not $Request.target) {
-        throw "Missing required field: target"
-    }
-
+    $Target = Join-Path $EstateRoot $Request.target
     if (-not (Test-Path $Target)) {
         throw "Audit target does not exist: $($Request.target)"
     }
 
     $AuditFinished = Get-Date
-
     $Result = [ordered]@{
         request_id = $RequestId
         status = "pass"
@@ -84,7 +77,6 @@ try {
 
     $ResultPath = Join-Path $ResultsDir ("$RequestId.result.json")
     $Result | ConvertTo-Json -Depth 8 | Set-Content -Path $ResultPath -Encoding UTF8
-
     Move-Item -Path $ActivePath -Destination (Join-Path $ArchiveDir $RequestFile.Name) -Force
 
     Write-Host "Audit request passed."
@@ -93,7 +85,6 @@ try {
 }
 catch {
     $AuditFinished = Get-Date
-
     $Result = [ordered]@{
         request_id = $RequestId
         status = "error"
@@ -115,7 +106,6 @@ catch {
 
     $ResultPath = Join-Path $ResultsDir ("$RequestId.result.json")
     $Result | ConvertTo-Json -Depth 8 | Set-Content -Path $ResultPath -Encoding UTF8
-
     Move-Item -Path $ActivePath -Destination (Join-Path $FailedDir $RequestFile.Name) -Force
 
     Write-Host "Audit request failed validation."
