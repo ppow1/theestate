@@ -49,6 +49,7 @@ Each item should include:
 | PL-0001 | Automate Operations Board aggregation after manual pattern stabilizes | Automation | Strategic | Worker #1 | 2026-06-30 | Captured | Post-v1 validation | Same update pattern repeats three times |
 | PL-0002 | Add audit checks for Operations Board required files | Audit | Normal | Worker #1 | 2026-06-30 | Captured | After board stabilizes | Board file shape remains unchanged |
 | PL-0003 | Add Alfred daily briefing output sourced from Operations Board | Alfred | Strategic | Worker #1 | 2026-06-30 | Captured | Alfred coordination milestone | Daily board proves useful manually |
+| PL-0004 | Investigate Organizational Reputation and Service Record System for persistent Estate personnel; not gamification, but professional service records across achievement, authority, trust, experience, and reputation | Organizational Architecture | Strategic | Pat / Steward | 2026-06-30 | Captured | After core organizational framework stabilizes | ADR-0001 organizational model is stable and personnel/state architecture is ready for investigation |
 
 ## Review Guidance
 
