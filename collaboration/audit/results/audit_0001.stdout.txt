@@ -1,0 +1,133 @@
+=========================================
+Estate Audit Report
+=========================================
+Passed: 64
+Failed: 2
+
+[syntax]
+PASS | syntax:src/estate/cli/main.py
+PASS | syntax:src/estate/core/discovery.py
+PASS | syntax:src/estate/core/provider_sync.py
+PASS | syntax:src/estate/core/discovery_catalog.py
+PASS | syntax:src/estate/core/discovery_cycle.py
+PASS | syntax:src/estate/core/discovery_service.py
+PASS | syntax:src/estate/core/discovery_runtime.py
+PASS | syntax:src/estate/core/audit_runtime.py
+PASS | syntax:src/estate/core/service_layer.py
+PASS | syntax:src/estate/core/alfred.py
+[runtime]
+PASS | runtime:.\estate.bat status
+     Estate Core Status
+PASS | runtime:.\estate.bat discovery-report
+     =========================================
+PASS | runtime:cli_inventory
+     41 commands present
+PASS | runtime:audit_latest_artifact
+     66 enriched checks
+PASS | runtime:audit_summary_json
+     summary valid
+PASS | runtime:capability_help_json
+     13 capabilities
+PASS | runtime:service_readiness_json
+     ready=5 blocked=0
+PASS | runtime:service_status_json
+     5 services
+PASS | runtime:service_route_json
+     1 matches
+PASS | runtime:alfred_capabilities_json
+     13 capabilities
+PASS | runtime:estate_health_json
+     services=5 jobs=385
+PASS | runtime:alfred_artifacts_json
+     202 artifacts
+PASS | runtime:alfred_cleanup_json
+     removed=0
+PASS | runtime:alfred_briefing_json
+     jobs=386 requests=6
+PASS | runtime:alfred_triage_json
+     queued=7
+PASS | runtime:alfred_request_queue_json
+     request_20260701_161908
+PASS | runtime:alfred_status_json
+     Alfred can plan, create jobs, safely execute jobs, and return runtime artifacts.
+PASS | runtime:alfred_alias_json
+     aliases valid
+PASS | runtime:alfred_task_json
+     job_20260701_161909
+PASS | runtime:alfred_local_reasoning_json
+     job_20260701_161910
+PASS | runtime:alfred_code_review_json
+     job_20260701_161910
+PASS | runtime:alfred_code_report_json
+     job_20260701_161910
+PASS | runtime:alfred_plan_json
+     plan valid
+PASS | runtime:alfred_run_json
+     job_20260701_161910
+PASS | runtime:alfred_jobs_json
+     388 jobs
+PASS | runtime:alfred_execute_json
+     job_20260701_161910
+PASS | runtime:alfred_result_json
+     A:\theestate\runtime\alfred\jobs\job_20260701_161911\summary.txt
+PASS | runtime:alfred_result_json
+     A:\theestate\runtime\alfred\jobs\job_20260701_161911\summary.txt
+PASS | runtime:alfred_policy_json
+     5 policies
+PASS | runtime:alfred_job_control_json
+     inspected=job_20260701_161912
+[json]
+PASS | json:data/registry/residents.json
+PASS | json:data/registry/services.json
+PASS | json:data/registry/capabilities.json
+PASS | json:data/registry/providers.json
+[estate]
+PASS | estate:required_paths
+     8 present
+[registry_shape]
+PASS | registry_shape:data/registry/residents.json
+     6 records (list)
+PASS | registry_shape:data/registry/services.json
+     3 records (list)
+PASS | registry_shape:data/registry/capabilities.json
+     6 records (list)
+PASS | registry_shape:data/registry/providers.json
+     6 records (list)
+[observations]
+PASS | observations:history_present
+     27 historical observations
+PASS | observations:latest_shape
+     keys=ai_home, change_report, changed_since_previous, exists, model_categories, ollama, paths, python_envs
+PASS | observations:history_json
+     27 valid historical observations
+PASS | observations:discovery_report_contract
+     62 non-empty lines
+PASS | observations:discovery_report_json
+     11 top-level keys
+PASS | observations:discovery_status_json
+     status keys present
+PASS | observations:discovery_catalog_schema
+     6 catalog entities
+PASS | observations:discovery_catalog_json
+     6 entities
+PASS | observations:discovery_catalog_latest_coverage
+     latest Ollama entities represented
+PASS | observations:discovery_cycle_json
+     cycle metrics valid
+PASS | observations:discovery_metrics_file
+     3 cycle steps
+PASS | observations:discovery_refresh_json
+     refresh valid
+[history]
+PASS | history:ledger_structure
+     83 sequential entries
+PASS | history:devlog_structure
+     83 EC entries; latest=EC-000085
+PASS | history:latest_ledger_ec_in_devlog
+     EC-000085
+FAIL | history:latest_git_ec_matches_latest_ledger_ec
+     git=None ledger=EC-000085
+[git]
+FAIL | git:working_tree_clean
+     ?? collaboration/audit/active/audit_0001.json
+?? collaboration/audit/pending/audit_bad_0001.json

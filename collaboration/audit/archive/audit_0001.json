@@ -1,0 +1,6 @@
+{
+  "request_id": "audit_0001",
+  "target": "collaboration/communication_bus",
+  "type": "structure_validation",
+  "requested_by": "Steward"
+}
