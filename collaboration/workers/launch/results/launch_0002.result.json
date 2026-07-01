@@ -1,0 +1,19 @@
+{
+  "request_id": "launch_0002",
+  "worker_id": "local_validation_worker_001",
+  "status": "completed",
+  "model": "qwen2.5-coder:7b",
+  "role": "worker-launch-validation",
+  "work_package_id": "WP-0003",
+  "prompt_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0002\\worker_prompt.txt",
+  "transcript_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0002\\worker_output.txt",
+  "raw_transcript_path": "A:\\theestate\\runtime\\worker_sessions\\launch_0002\\worker_output.raw.txt",
+  "transcript_length_bytes": 1569,
+  "branch": "audit/audit-worker-v1",
+  "local_commit": "48fa5f1b20d116e227e1c43ff42b65a47931636c",
+  "started_at": "2026-07-01T14:57:20",
+  "finished_at": "2026-07-01T14:57:37",
+  "duration_seconds": 16.925,
+  "classification": "Estate Internal",
+  "error": ""
+}

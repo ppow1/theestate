@@ -1,0 +1,13 @@
+{
+  "request_id": "launch_0002",
+  "worker_id": "local_validation_worker_001",
+  "requested_by": "Steward",
+  "model": "qwen2.5-coder:7b",
+  "role": "worker-launch-validation",
+  "work_package_id": "WP-0003",
+  "work_package_path": "collaboration/roadmap/Collaboration_Layer_Program_Roadmap_v1.md",
+  "classification": "Estate Internal",
+  "mode": "manual_one_shot",
+  "requested_at": "2026-07-01T00:00:00",
+  "notes": "Validate the local worker launch process. Review WP-0003 in the roadmap and produce a concise operational validation report. Do not modify files."
+}
