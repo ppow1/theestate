@@ -1,0 +1,25 @@
+{
+  "work_package_id": "WP-0036",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T22:53:00Z",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "summary": "Implemented Gotify Adapter v1 as a bounded local-first transport for Notification Router recall events, including dry-run validation, token-safe reports, missing-configuration handling, retry-once delivery, CLI test command, and unit tests.",
+  "files_changed": [
+    "src/estate/core/gotify_adapter.py",
+    "src/estate/cli/main.py",
+    "tests/test_gotify_adapter.py",
+    "collaboration/work_packages/completions/WP-0036_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_gotify_adapter.py tests/test_notification_router.py",
+    "PYTHONPATH=src python -m estate.cli.main gotify-send-test --dry-run --json",
+    "python -m json.tool runtime/notifications/gotify_delivery_report.json"
+  ],
+  "known_limitations": [
+    "Real Gotify delivery requires ESTATE_GOTIFY_URL and ESTATE_GOTIFY_TOKEN to be provided at runtime; no credentials are stored in the repository.",
+    "The adapter only delivers Notification Router recall events that are eligible for immediate delivery; informational events are skipped."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
