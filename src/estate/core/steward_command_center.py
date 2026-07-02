@@ -12,11 +12,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
-
-RESIDENT_FILES = {
-    "Alfred": "data/objects/RES-000001.json",
-    "Helen": "data/objects/RES-000003.json",
-}
+from estate.core.resident_cards import build_resident_cards
 
 ARTIFACTS = {
     "morning_briefing": ["runtime/operations/morning_briefing.json", "operations/briefings/morning_briefing.md"],
@@ -63,26 +59,6 @@ def _read_artifact(root, candidates):
     return {"available": False, "path": None, "placeholder": "Supporting artifact is not available yet."}
 
 
-def _resident_card(root, name, rel):
-    path = root / rel
-    if not path.exists():
-        return {"available": False, "name": name, "path": rel, "placeholder": "Resident record is not available yet."}
-    try:
-        data = _read_json(path)
-    except Exception as exc:
-        return {"available": False, "name": name, "path": rel, "placeholder": f"Resident record could not be read: {exc}"}
-    return {
-        "available": True,
-        "path": rel,
-        "id": data.get("id"),
-        "name": data.get("name", name),
-        "department": data.get("department"),
-        "office": data.get("office"),
-        "status": data.get("status"),
-        "role": data.get("role"),
-    }
-
-
 def _summarize_json(data):
     if not isinstance(data, dict):
         return str(data)[:500]
@@ -95,9 +71,10 @@ def _summarize_json(data):
 
 def generate_command_center(root=None, write=True):
     root = _root(root)
+    resident_cards = build_resident_cards(root)
+    resident_panels = {f"{str(card.get('name', '')).lower()}_resident_card": card for card in resident_cards["cards"]}
     panels = {
-        "alfred_resident_card": _resident_card(root, "Alfred", RESIDENT_FILES["Alfred"]),
-        "helen_resident_card": _resident_card(root, "Helen", RESIDENT_FILES["Helen"]),
+        **resident_panels,
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "steward_decision_queue": {"available": False, "path": None, "placeholder": "Steward Decision Queue panel is reserved for the decision queue implementation."},
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
@@ -118,10 +95,19 @@ def _panel(title, body, status="placeholder"):
 
 def _resident_html(card):
     if not card.get("available"):
-        return f'<p class="placeholder">{html.escape(card.get("placeholder", "Unavailable"))}</p><p class="source">Source: {html.escape(str(card.get("path")))}</p>'
-    fields = ["id", "name", "department", "office", "status", "role"]
-    rows = "".join(f"<dt>{html.escape(field.replace('_', ' ').title())}</dt><dd>{html.escape(str(card.get(field) or ''))}</dd>" for field in fields)
-    return f"<dl>{rows}</dl><p class=\"source\">Source: {html.escape(card.get('path', ''))}</p>"
+        return f'<p class="placeholder">Resident record is not available yet.</p><p class="source">Details: {html.escape(str(card.get("details_link", "Not available yet")))}</p>'
+    fields = ["name", "role", "operational_status", "current_duty"]
+    rows = [f"<dt>{html.escape(field.replace('_', ' ').title())}</dt><dd>{html.escape(str(card.get(field) or ''))}</dd>" for field in fields]
+    mailbox = card.get("mailbox") or {}
+    mailbox_label = mailbox.get("display_name") or "Not available yet"
+    if mailbox.get("mailbox_id") is not None:
+        mailbox_label = f"{mailbox_label} ({mailbox.get('mailbox_id')})"
+    rows.append(f"<dt>Mailbox</dt><dd>{html.escape(str(mailbox_label))}</dd>")
+    activity = card.get("last_activity") or {}
+    rows.append(f"<dt>Last Activity</dt><dd>{html.escape(str(activity.get('summary') or 'Not available yet'))}</dd>")
+    rows.append(f"<dt>Needs Steward</dt><dd>{html.escape(str(card.get('needs_steward') or 'No'))}</dd>")
+    rows.append(f"<dt>Resident Details</dt><dd>{html.escape(str(card.get('details_link') or 'Not available yet'))}</dd>")
+    return f"<dl>{''.join(rows)}</dl>"
 
 
 def _artifact_html(artifact):

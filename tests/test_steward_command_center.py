@@ -15,8 +15,14 @@ def write_json(root, rel, payload):
 
 
 def seed_inputs(root):
-    write_json(root, "data/objects/RES-000001.json", {"id": "RES-000001", "name": "Alfred", "department": "Administration", "office": "Manager of Administration", "status": "Active", "role": "Coordinates the Estate."})
-    write_json(root, "data/objects/RES-000003.json", {"id": "RES-000003", "name": "Helen", "department": "Human Resources", "office": "Manager of Human Resources", "status": "Active", "role": "Manages resident and worker assignment fit."})
+    write_json(root, "data/registry/residents.json", [
+        {"id": "RES-000001", "name": "Alfred", "department": "Administration", "office": "Manager of Administration", "status": "Active", "role": "Coordinates the Estate."},
+        {"id": "RES-000003", "name": "Helen", "department": "Human Resources", "office": "Manager of Human Resources", "status": "Active", "role": "Manages resident and worker assignment fit."},
+    ])
+    write_json(root, "data/registry/personnel.json", [{"employee_id": 6, "display_name": "Helen", "mailbox_id": 6, "resident_id": "RES-000003"}])
+    write_json(root, "data/registry/mailboxes.json", [{"mailbox_id": 10100, "display_name": "Alfred Routing Intake", "owning_office": "Chief of Staff"}])
+    write_json(root, "data/objects/RES-000001.json", {"id": "RES-000001", "name": "Alfred"})
+    write_json(root, "data/objects/RES-000003.json", {"id": "RES-000003", "name": "Helen"})
     write_json(root, "collaboration/mailboxes/index.json", {"summary": {"message_count": 3}})
     (root / "operations/briefings").mkdir(parents=True, exist_ok=True)
     (root / "operations/briefings/morning_briefing.md").write_text("# Morning Briefing\n", encoding="utf-8")
