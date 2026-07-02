@@ -29,6 +29,7 @@ from estate.core.local_operational_validation import generate_local_operational_
 from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.institutional_search import search_institutional_index, format_search_report
+from estate.core.document_registry import load_document_registry, format_document_registry
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -558,6 +559,15 @@ def cmd_estate_search(args):
     else:
         print(format_search_report(result))
 
+def cmd_document_registry(args):
+    registry = load_document_registry()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(registry, indent=2, sort_keys=True))
+    else:
+        print(format_document_registry(registry))
+
+
 def cmd_check_updates(args):
     report = generate_check_updates(actor=getattr(args, "actor", None))
     if getattr(args, "json", False):
@@ -878,6 +888,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print search results JSON")
     p.add_argument("--no-refresh", action="store_true", help="Use existing runtime search index if present")
     p.set_defaults(func=cmd_estate_search)
+
+    p = sub.add_parser("document-registry", help="Print the stable Estate document registry")
+    p.add_argument("--json", action="store_true", help="Print document registry JSON")
+    p.set_defaults(func=cmd_document_registry)
 
     p = sub.add_parser("check-updates")
     p.add_argument("--actor", default=None, help="Actor requesting the update briefing")
