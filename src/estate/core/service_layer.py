@@ -4,7 +4,16 @@ from pathlib import Path
 from estate.core.paths import ESTATE_ROOT
 from estate.core.discovery_service import get_discovery_service
 
-SERVICE_RUNTIME_PATH = ESTATE_ROOT / "runtime" / "services" / "status.json"
+
+
+def estate_root(root=None):
+    if root is not None:
+        return Path(root)
+    return ESTATE_ROOT if ESTATE_ROOT.is_absolute() and ESTATE_ROOT.exists() else Path.cwd()
+
+
+def service_runtime_path(root=None):
+    return estate_root(root) / "runtime" / "services" / "status.json"
 
 
 SERVICE_DEFINITIONS = [
@@ -87,7 +96,7 @@ def list_services():
     return SERVICE_DEFINITIONS
 
 
-def service_status():
+def service_status(root=None):
     services = []
 
     for service in SERVICE_DEFINITIONS:
@@ -119,8 +128,9 @@ def service_status():
         "unavailable": [service["id"] for service in services if not service["available"]],
     }
 
-    SERVICE_RUNTIME_PATH.parent.mkdir(parents=True, exist_ok=True)
-    SERVICE_RUNTIME_PATH.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    runtime_path = service_runtime_path(root)
+    runtime_path.parent.mkdir(parents=True, exist_ok=True)
+    runtime_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
     return payload
 

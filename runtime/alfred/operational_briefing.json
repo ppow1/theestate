@@ -53,6 +53,60 @@
       "id": "WP-0020",
       "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
       "title": "SERIES TASK WP-0020 \u2014 Work Package State Machine Implementation"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md and do exactly what it says.",
+      "id": "WP-0021",
+      "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+      "title": "SERIES TASK WP-0021 \u2014 Personnel Identity and Mailbox Resolver"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md and do exactly what it says.",
+      "id": "WP-0022",
+      "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+      "title": "SERIES TASK WP-0022 \u2014 Check for Updates v2 Mailbox Integration"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md and do exactly what it says.",
+      "id": "WP-0023",
+      "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+      "title": "SERIES TASK WP-0023 \u2014 Mailbox Synchronization Duty Runtime"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md and do exactly what it says.",
+      "id": "WP-0024",
+      "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+      "title": "SERIES TASK WP-0024 \u2014 Daily Board and Parking Lot Integration"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md and do exactly what it says.",
+      "id": "WP-0025",
+      "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+      "title": "SERIES TASK WP-0025 \u2014 Local Operational Validation Runner"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md and do exactly what it says.",
+      "id": "WP-0026",
+      "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+      "title": "SERIES TASK WP-0026 \u2014 Generated Artifact Policy"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md and do exactly what it says.",
+      "id": "WP-0027",
+      "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+      "title": "SERIES TASK WP-0027 \u2014 Institutional Search v1"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md and do exactly what it says.",
+      "id": "WP-0028",
+      "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+      "title": "SERIES TASK WP-0028 \u2014 Document Registry and Stable Document IDs"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md and do exactly what it says.",
+      "id": "WP-0029",
+      "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+      "title": "SERIES TASK WP-0029 \u2014 Artifact Provenance Model"
     }
   ],
   "blocked_work": [],
@@ -374,9 +428,10 @@
     "Read /workspace/theestate/collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md and do exactly what it says.",
     "Read /workspace/theestate/collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md and do exactly what it says.",
     "Read /workspace/theestate/collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md and do exactly what it says.",
-    "Read /workspace/theestate/collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md and do exactly what it says."
+    "Read /workspace/theestate/collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md and do exactly what it says.",
+    "Read /workspace/theestate/collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md and do exactly what it says."
   ],
-  "created_at": "2026-07-02T17:27:58",
+  "created_at": "2026-07-02T21:04:16",
   "latest_jobs": [],
   "messages_requiring_acknowledgement": [
     {
@@ -747,7 +802,7 @@
     "Promote validation candidates into CA review when operational evidence is sufficient."
   ],
   "source_artifacts": {
-    "capability_lifecycle_report_available": false,
+    "capability_lifecycle_report_available": true,
     "dependency_graph_available": true,
     "operations_board_available": false,
     "steward_dashboard_available": false,
@@ -776,12 +831,12 @@
     "capabilities": 13,
     "jobs": 0,
     "messages_requiring_acknowledgement": 17,
-    "pending_work_packages": 9,
+    "pending_work_packages": 18,
     "queued_requests": 0,
     "ready": true,
     "services_available": 0,
     "validation_candidates": 5,
-    "warnings": 3
+    "warnings": 2
   },
   "validation_candidates": [
     {
@@ -819,11 +874,6 @@
     },
     {
       "path": "runtime/steward/dashboard.json",
-      "required": false,
-      "type": "missing_artifact"
-    },
-    {
-      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "required": false,
       "type": "missing_artifact"
     }

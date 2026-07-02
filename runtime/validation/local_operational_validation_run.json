@@ -1,0 +1,967 @@
+{
+  "generated_at": "2026-07-02T21:04:16+00:00",
+  "outputs": {
+    "json": "runtime/validation/local_operational_validation_run.json",
+    "markdown": "operations/validation/local_operational_validation_run.md"
+  },
+  "policy": {
+    "authoritative_sources": [
+      "data/registry/**/*.json",
+      "collaboration/messages/*.json",
+      "collaboration/work_packages/**/*.md",
+      "collaboration/work_packages/completions/*.json",
+      "operations/boards/*.md",
+      "docs/**/*.md"
+    ],
+    "devlog_unchanged": true,
+    "generated_projections": [
+      "collaboration/mailboxes/index.json",
+      "collaboration/status/worker_inbox_summary.json",
+      "runtime/collaboration/routing/latest.json",
+      "runtime/updates/check_updates_latest.json",
+      "operations/updates/check_updates_latest.md",
+      "operations/alfred/operational_briefing.md",
+      "runtime/operations/daily_board_integration.json",
+      "operations/boards/daily_board_integration.md",
+      "runtime/capabilities/capability_lifecycle_report.json",
+      "runtime/dependencies/dependency_graph.json",
+      "runtime/validation/operational_validation_report.json",
+      "operations/validation/operational_validation_report.md",
+      "runtime/validation/local_operational_validation_run.json",
+      "operations/validation/local_operational_validation_run.md"
+    ],
+    "ledger_unchanged": true
+  },
+  "repository": {
+    "branch": "work",
+    "commit": "23802c95ade12294df13568fdb2b36129750a76a"
+  },
+  "steps": [
+    {
+      "description": "Regenerate mailbox index and worker mailbox surfaces.",
+      "name": "mailbox_index",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "ack_required_message_count": 17,
+        "index_path": "collaboration/mailboxes/index.json",
+        "index_version": 1,
+        "message_count": 17,
+        "open_ca2_message_count": 9,
+        "open_ca3_message_count": 4,
+        "open_ca4_message_count": 3,
+        "thread_count": 0,
+        "warning_count": 1
+      },
+      "warning_count": 0,
+      "warnings": []
+    },
+    {
+      "description": "Regenerate collaboration routing decisions.",
+      "name": "routing_decisions",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "generated_at": "2026-07-02T21:04:16",
+        "open_messages": 17,
+        "version": 1
+      },
+      "warning_count": 0,
+      "warnings": []
+    },
+    {
+      "description": "Regenerate worker inbox summaries.",
+      "name": "worker_inbox_summary",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "generated_at": "2026-07-02T21:04:16",
+        "message_count": 17,
+        "version": 1,
+        "worker_count": 6
+      },
+      "warning_count": 0,
+      "warnings": []
+    },
+    {
+      "description": "Regenerate Check for Updates briefing.",
+      "name": "check_updates",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "ack_required_message_count": 0,
+        "assigned_message_count": 0,
+        "generated_at": "2026-07-02T21:04:16+00:00",
+        "update_count": 89,
+        "version": 1,
+        "warning_count": 4
+      },
+      "warning_count": 4,
+      "warnings": [
+        {
+          "actor": "steward",
+          "message": "unresolved actor: steward",
+          "type": "identity_resolution"
+        },
+        {
+          "actor": "steward",
+          "message": "Actor identity could not be resolved to a mailbox or worker.",
+          "type": "unresolved_identity"
+        },
+        {
+          "message": "Optional update source not present.",
+          "path": "runtime/operations/operations_board.json",
+          "type": "missing_input"
+        },
+        {
+          "message": "unresolved destination: queue",
+          "path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+          "type": "mailbox_index_warning"
+        }
+      ]
+    },
+    {
+      "description": "Regenerate Alfred operational briefing.",
+      "name": "alfred_operational_briefing",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "blocked_work": 0,
+        "ca_review_needs": 16,
+        "capabilities": 13,
+        "jobs": 0,
+        "messages_requiring_acknowledgement": 17,
+        "pending_work_packages": 18,
+        "queued_requests": 0,
+        "ready": true,
+        "services_available": 0,
+        "validation_candidates": 5,
+        "version": 2,
+        "warnings": 2
+      },
+      "warning_count": 2,
+      "warnings": [
+        {
+          "path": "runtime/operations/operations_board.json",
+          "required": false,
+          "type": "missing_artifact"
+        },
+        {
+          "path": "runtime/steward/dashboard.json",
+          "required": false,
+          "type": "missing_artifact"
+        }
+      ]
+    },
+    {
+      "description": "Regenerate Operations/Daily Board integration.",
+      "name": "daily_board_integration",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "active_work_items": 6,
+        "blocked_items": 0,
+        "completed_awaiting_review": 10,
+        "daily_items": 1,
+        "generated_at": "2026-07-02T21:04:16+00:00",
+        "parking_lot_items": 13,
+        "parking_lot_ready_for_review": 4,
+        "pending_work_packages": 18,
+        "version": 1,
+        "warning_count": 0
+      },
+      "warning_count": 0,
+      "warnings": []
+    },
+    {
+      "description": "Regenerate capability lifecycle report.",
+      "name": "capability_lifecycle",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "capability_count": 6,
+        "counts_by_lifecycle_state": {
+          "Designed": 1,
+          "Implemented": 5
+        },
+        "generated_at": "2026-07-02T21:04:16+00:00",
+        "invalid_lifecycle_state_count": 0,
+        "missing_evidence_count": 0,
+        "version": 1,
+        "warning_count": 3
+      },
+      "warning_count": 3,
+      "warnings": [
+        {
+          "message": "Optional input artifact is unavailable.",
+          "path": "runtime/operations/operations_board.json",
+          "type": "missing_optional_artifact"
+        },
+        {
+          "message": "Optional input artifact is unavailable.",
+          "path": "runtime/audit/latest.json",
+          "type": "missing_optional_artifact"
+        },
+        {
+          "message": "Optional input artifact is unavailable.",
+          "path": "collaboration/audit/results/*.json",
+          "type": "missing_optional_artifact"
+        }
+      ]
+    },
+    {
+      "description": "Regenerate dependency graph.",
+      "name": "dependency_graph",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "edge_count": 0,
+        "generated_at": "2026-07-02T21:04:16+00:00",
+        "node_count": 65,
+        "orphaned_item_count": 65,
+        "version": 1,
+        "warning_count": 64
+      },
+      "warning_count": 64,
+      "warnings": [
+        {
+          "message": "msg_20260701_000000_example_routing has no explicit dependency field.",
+          "path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca2_20260701_0001_mailbox_index_validation has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca2_20260701_0001_mailbox_index_validation.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3 has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0001_alfred_capability_brief has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0002_audit_malformed_json_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0003_operations_board_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0004_capability_lifecycle_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0005_steward_dashboard_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0006_collaboration_event_framework_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0007_dependency_graph_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0008_operational_validation_review has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0009_check_updates_review_to_ca2 has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0009_check_updates_review_to_ca2.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0010_check_updates_review_to_ca4 has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0010_check_updates_review_to_ca4.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0011_meeting_request_to_ca4 has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0011_meeting_request_to_ca4.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4 has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca4_20260701_0001_reply_to_ca3_mailbox_check has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3 has no explicit dependency field.",
+          "path": "collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Optional input artifact is unavailable.",
+          "path": "runtime/operations/operations_board.json",
+          "type": "missing_optional_artifact"
+        },
+        {
+          "message": "CAP-000001 has no explicit dependency field.",
+          "path": "runtime/capabilities/capability_lifecycle_report.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "CAP-000002 has no explicit dependency field.",
+          "path": "runtime/capabilities/capability_lifecycle_report.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "CAP-000003 has no explicit dependency field.",
+          "path": "runtime/capabilities/capability_lifecycle_report.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "CAP-000004 has no explicit dependency field.",
+          "path": "runtime/capabilities/capability_lifecycle_report.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "CAP-000005 has no explicit dependency field.",
+          "path": "runtime/capabilities/capability_lifecycle_report.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "CAP-000006 has no explicit dependency field.",
+          "path": "runtime/capabilities/capability_lifecycle_report.json",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Work Package WP-LEAP-001 has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Pending Codex Work Packages has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/README.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0014 \u2014 Mailbox Index Regeneration and Destination Coverage Fix has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0015 \u2014 Message Acknowledgement and Reply Flow has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "ARCHITECTURE-FIRST TASK WP-0016 \u2014 Work Package Registry has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "ARCHITECTURE-FIRST TASK WP-0017 \u2014 Work Package State Machine has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0018 \u2014 Codex Handoff Generator has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0019 \u2014 Alfred Operational Activation has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0020 \u2014 Work Package State Machine Implementation has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0021 \u2014 Personnel Identity and Mailbox Resolver has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0022 \u2014 Check for Updates v2 Mailbox Integration has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0023 \u2014 Mailbox Synchronization Duty Runtime has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0024 \u2014 Daily Board and Parking Lot Integration has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0025 \u2014 Local Operational Validation Runner has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0026 \u2014 Generated Artifact Policy has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0027 \u2014 Institutional Search v1 has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0028 \u2014 Document Registry and Stable Document IDs has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "SERIES TASK WP-0029 \u2014 Artifact Provenance Model has no clearly labelled dependency section or field.",
+          "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Estate Operations Board has no clearly labelled dependency section or field.",
+          "path": "operations/README.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Alfred Operational Briefing has no clearly labelled dependency section or field.",
+          "path": "operations/alfred/operational_briefing.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Estate Operations Board has no clearly labelled dependency section or field.",
+          "path": "operations/board/latest.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Active Work Board has no clearly labelled dependency section or field.",
+          "path": "operations/boards/active_work.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Daily Task Board has no clearly labelled dependency section or field.",
+          "path": "operations/boards/daily_board.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Daily Board Integration has no clearly labelled dependency section or field.",
+          "path": "operations/boards/daily_board_integration.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Parking Lot has no clearly labelled dependency section or field.",
+          "path": "operations/boards/parking_lot.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Review Cadence has no clearly labelled dependency section or field.",
+          "path": "operations/boards/review_cadence.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Strategic Roadmap has no clearly labelled dependency section or field.",
+          "path": "operations/boards/roadmap.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "CA3 Review Brief: Check for Updates Synchronization Mechanism has no clearly labelled dependency section or field.",
+          "path": "operations/briefings/CA3_Check_For_Updates_PR12_Review.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Estate Capability Lifecycle Status has no clearly labelled dependency section or field.",
+          "path": "operations/capabilities/lifecycle_status.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "EC-000086: Add Estate Operations Board has no clearly labelled dependency section or field.",
+          "path": "operations/history/EC-000086.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Operations Board Implementation Recommendation has no clearly labelled dependency section or field.",
+          "path": "operations/implementation_recommendation.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Mailbox Synchronization Duty has no clearly labelled dependency section or field.",
+          "path": "operations/mailboxes/synchronization_duty.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Estate Steward Dashboard has no clearly labelled dependency section or field.",
+          "path": "operations/steward/dashboard.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Active Work Item Template has no clearly labelled dependency section or field.",
+          "path": "operations/templates/active_work_item.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Daily Task Template has no clearly labelled dependency section or field.",
+          "path": "operations/templates/daily_task.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Parking Lot Item has no clearly labelled dependency section or field.",
+          "path": "operations/templates/parking_item.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Check for Updates has no clearly labelled dependency section or field.",
+          "path": "operations/updates/check_updates_latest.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Local Operational Validation Run has no clearly labelled dependency section or field.",
+          "path": "operations/validation/local_operational_validation_run.md",
+          "type": "missing_dependency_field"
+        },
+        {
+          "message": "Continuous Operational Validation Report has no clearly labelled dependency section or field.",
+          "path": "operations/validation/operational_validation_report.md",
+          "type": "missing_dependency_field"
+        }
+      ]
+    },
+    {
+      "description": "Regenerate operational validation report.",
+      "name": "operational_validation",
+      "optional": false,
+      "status": "ok",
+      "summary": {
+        "generated_at": "2026-07-02T21:04:16+00:00",
+        "version": 1
+      },
+      "warning_count": 3,
+      "warnings": [
+        {
+          "message": "Input artifact is unavailable.",
+          "path": "runtime/operations/operations_board.json",
+          "type": "missing_input"
+        },
+        {
+          "message": "Input artifact is unavailable.",
+          "path": "runtime/audit/latest.json",
+          "type": "missing_input"
+        },
+        {
+          "message": "Input artifact is unavailable.",
+          "path": "collaboration/audit/results/*.json",
+          "type": "missing_input"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "failed_steps": 0,
+    "ok": true,
+    "step_count": 9,
+    "warning_count": 76
+  },
+  "version": 1,
+  "warnings": [
+    {
+      "actor": "steward",
+      "message": "unresolved actor: steward",
+      "type": "identity_resolution"
+    },
+    {
+      "actor": "steward",
+      "message": "Actor identity could not be resolved to a mailbox or worker.",
+      "type": "unresolved_identity"
+    },
+    {
+      "message": "Optional update source not present.",
+      "path": "runtime/operations/operations_board.json",
+      "type": "missing_input"
+    },
+    {
+      "message": "unresolved destination: queue",
+      "path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "type": "mailbox_index_warning"
+    },
+    {
+      "path": "runtime/operations/operations_board.json",
+      "required": false,
+      "type": "missing_artifact"
+    },
+    {
+      "path": "runtime/steward/dashboard.json",
+      "required": false,
+      "type": "missing_artifact"
+    },
+    {
+      "message": "Optional input artifact is unavailable.",
+      "path": "runtime/operations/operations_board.json",
+      "type": "missing_optional_artifact"
+    },
+    {
+      "message": "Optional input artifact is unavailable.",
+      "path": "runtime/audit/latest.json",
+      "type": "missing_optional_artifact"
+    },
+    {
+      "message": "Optional input artifact is unavailable.",
+      "path": "collaboration/audit/results/*.json",
+      "type": "missing_optional_artifact"
+    },
+    {
+      "message": "msg_20260701_000000_example_routing has no explicit dependency field.",
+      "path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca2_20260701_0001_mailbox_index_validation has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca2_20260701_0001_mailbox_index_validation.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3 has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0001_alfred_capability_brief has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0002_audit_malformed_json_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0003_operations_board_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0004_capability_lifecycle_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0005_steward_dashboard_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0006_collaboration_event_framework_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0007_dependency_graph_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0008_operational_validation_review has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0009_check_updates_review_to_ca2 has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0009_check_updates_review_to_ca2.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0010_check_updates_review_to_ca4 has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0010_check_updates_review_to_ca4.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0011_meeting_request_to_ca4 has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0011_meeting_request_to_ca4.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4 has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca4_20260701_0001_reply_to_ca3_mailbox_check has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3 has no explicit dependency field.",
+      "path": "collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Optional input artifact is unavailable.",
+      "path": "runtime/operations/operations_board.json",
+      "type": "missing_optional_artifact"
+    },
+    {
+      "message": "CAP-000001 has no explicit dependency field.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000002 has no explicit dependency field.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000003 has no explicit dependency field.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000004 has no explicit dependency field.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000005 has no explicit dependency field.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CAP-000006 has no explicit dependency field.",
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Work Package WP-LEAP-001 has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Pending Codex Work Packages has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/README.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0014 \u2014 Mailbox Index Regeneration and Destination Coverage Fix has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0015 \u2014 Message Acknowledgement and Reply Flow has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "ARCHITECTURE-FIRST TASK WP-0016 \u2014 Work Package Registry has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "ARCHITECTURE-FIRST TASK WP-0017 \u2014 Work Package State Machine has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0018 \u2014 Codex Handoff Generator has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0019 \u2014 Alfred Operational Activation has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0020 \u2014 Work Package State Machine Implementation has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0021 \u2014 Personnel Identity and Mailbox Resolver has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0022 \u2014 Check for Updates v2 Mailbox Integration has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0023 \u2014 Mailbox Synchronization Duty Runtime has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0024 \u2014 Daily Board and Parking Lot Integration has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0025 \u2014 Local Operational Validation Runner has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0026 \u2014 Generated Artifact Policy has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0027 \u2014 Institutional Search v1 has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0028 \u2014 Document Registry and Stable Document IDs has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "SERIES TASK WP-0029 \u2014 Artifact Provenance Model has no clearly labelled dependency section or field.",
+      "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Operations Board has no clearly labelled dependency section or field.",
+      "path": "operations/README.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Alfred Operational Briefing has no clearly labelled dependency section or field.",
+      "path": "operations/alfred/operational_briefing.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Operations Board has no clearly labelled dependency section or field.",
+      "path": "operations/board/latest.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Active Work Board has no clearly labelled dependency section or field.",
+      "path": "operations/boards/active_work.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Daily Task Board has no clearly labelled dependency section or field.",
+      "path": "operations/boards/daily_board.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Daily Board Integration has no clearly labelled dependency section or field.",
+      "path": "operations/boards/daily_board_integration.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Parking Lot has no clearly labelled dependency section or field.",
+      "path": "operations/boards/parking_lot.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Review Cadence has no clearly labelled dependency section or field.",
+      "path": "operations/boards/review_cadence.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Strategic Roadmap has no clearly labelled dependency section or field.",
+      "path": "operations/boards/roadmap.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "CA3 Review Brief: Check for Updates Synchronization Mechanism has no clearly labelled dependency section or field.",
+      "path": "operations/briefings/CA3_Check_For_Updates_PR12_Review.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Capability Lifecycle Status has no clearly labelled dependency section or field.",
+      "path": "operations/capabilities/lifecycle_status.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "EC-000086: Add Estate Operations Board has no clearly labelled dependency section or field.",
+      "path": "operations/history/EC-000086.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Operations Board Implementation Recommendation has no clearly labelled dependency section or field.",
+      "path": "operations/implementation_recommendation.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Mailbox Synchronization Duty has no clearly labelled dependency section or field.",
+      "path": "operations/mailboxes/synchronization_duty.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Estate Steward Dashboard has no clearly labelled dependency section or field.",
+      "path": "operations/steward/dashboard.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Active Work Item Template has no clearly labelled dependency section or field.",
+      "path": "operations/templates/active_work_item.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Daily Task Template has no clearly labelled dependency section or field.",
+      "path": "operations/templates/daily_task.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Parking Lot Item has no clearly labelled dependency section or field.",
+      "path": "operations/templates/parking_item.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Check for Updates has no clearly labelled dependency section or field.",
+      "path": "operations/updates/check_updates_latest.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Local Operational Validation Run has no clearly labelled dependency section or field.",
+      "path": "operations/validation/local_operational_validation_run.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Continuous Operational Validation Report has no clearly labelled dependency section or field.",
+      "path": "operations/validation/operational_validation_report.md",
+      "type": "missing_dependency_field"
+    },
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "runtime/operations/operations_board.json",
+      "type": "missing_input"
+    },
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "runtime/audit/latest.json",
+      "type": "missing_input"
+    },
+    {
+      "message": "Input artifact is unavailable.",
+      "path": "collaboration/audit/results/*.json",
+      "type": "missing_input"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
   "counts_by_type": {
-    "inbox.updated": 2,
-    "message.routed": 34
+    "inbox.updated": 3,
+    "message.routed": 102
   },
   "errors": [],
-  "event_count": 36,
+  "event_count": 105,
   "event_types": [
     "audit.result.created",
     "inbox.updated",
@@ -15,7 +15,7 @@
     "work.claimed",
     "work.completed"
   ],
-  "generated_at": "2026-07-02T15:39:01",
+  "generated_at": "2026-07-02T21:04:19",
   "generated_files": {
     "events_log": "runtime/collaboration/events/events.jsonl",
     "latest": "runtime/collaboration/events/latest.json",
@@ -23,8 +23,8 @@
   },
   "latest_event": {
     "classification": "Estate Internal",
-    "created_at": "2026-07-02T15:38:48",
-    "id": "evt_20260702_153848_fd5fbbad",
+    "created_at": "2026-07-02T21:04:16",
+    "id": "evt_20260702_210416_884c3ac0",
     "payload": {
       "message_count": 17,
       "worker_count": 6,
@@ -46,8 +46,27 @@
   "recent_events": [
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_31da1aec",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_ca3d99bc",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0008_operational_validation_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_f0ab1ea5",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -65,8 +84,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_bb35b399",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_6cd8934f",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -84,8 +103,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_baa48870",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_0168b58a",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -103,8 +122,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_3f457c79",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_68ca0251",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -122,8 +141,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_dc7f8426",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_3ffaf42e",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -141,8 +160,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_3bb3bd7d",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_671cecbd",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -160,29 +179,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:29",
-      "id": "evt_20260702_153829_dabc08a4",
-      "payload": {
-        "message_count": 17,
-        "worker_count": 6,
-        "workers": [
-          "alfred.review",
-          "employee.4",
-          "office.chief_architect_2",
-          "office.chief_architect_3",
-          "office.chief_architect_4",
-          "worker.implementation"
-        ]
-      },
-      "source": "collaboration.inbox_watcher",
-      "subject_id": null,
-      "type": "inbox.updated",
-      "version": 1
-    },
-    {
-      "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_ffee7c44",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_5abe9d6e",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -200,8 +198,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_3506d2ed",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_2f130c74",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -219,8 +217,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_f59c9ecf",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_d35bda78",
       "payload": {
         "missing_fields": [
           "id",
@@ -243,8 +241,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_0b785b7e",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_c6088e01",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -262,8 +260,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_99823c28",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_f680e768",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -281,8 +279,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_9903c3fa",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_92fd8607",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -300,8 +298,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_d37474b9",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_0fb1bf8e",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -319,8 +317,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_02387ad1",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_c31252c7",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -338,8 +336,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_dda56416",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_497b4408",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -357,8 +355,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_fdb38929",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_37a9860a",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -376,8 +374,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_82c1a60f",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_eb0b638b",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -395,8 +393,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_5c7e167a",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_342f34a9",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -414,8 +412,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_4fc90f8d",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_a26dd5f4",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -433,8 +431,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_d8c8d626",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_d07545b1",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -452,8 +450,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_95eadbda",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_7c5e7476",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -471,8 +469,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_d81277ee",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_be289a34",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -490,8 +488,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_c6a16d13",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_4acd625a",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -509,8 +507,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-02T15:38:48",
-      "id": "evt_20260702_153848_fd5fbbad",
+      "created_at": "2026-07-02T21:04:16",
+      "id": "evt_20260702_210416_884c3ac0",
       "payload": {
         "message_count": 17,
         "worker_count": 6,
