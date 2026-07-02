@@ -12,6 +12,7 @@ from estate.core.service_layer import service_status, route_capability, alfred_c
 from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, format_job, format_jobs, execute_job, format_execution_result, inspect_job, cancel_job, retry_job, get_execution_policy, format_job_inspection, format_execution_policy, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, triage_requests, format_request_triage, alfred_briefing, format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report, get_job_result, format_job_result, run_task, format_task_result, alfred_status, format_alfred_status, create_request, list_requests, promote_request, format_requests, triage_requests, format_request_triage, alfred_briefing, format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report
 from estate.core.audit import print_audit_report
 from estate.core.collaboration_ops import run_routing_engine, watch_worker_inboxes, format_routing_report, format_inbox_summary
+from estate.core.collaboration_messages import acknowledge_message, create_reply
 from estate.core.collaboration_events import generate_event_summary, format_event_summary
 from estate.core.operations_board import generate_operations_board, format_operations_board_summary
 from estate.core.capability_lifecycle import generate_capability_lifecycle_report, format_capability_lifecycle_summary
@@ -417,6 +418,24 @@ def cmd_worker_inboxes(args):
         print(format_inbox_summary(summary))
 
 
+def cmd_message_ack(args):
+    result = acknowledge_message(args.message_id, actor=args.actor, note=args.note)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(f"Acknowledged {args.message_id}: {result['acknowledgement_path']}")
+
+
+def cmd_message_reply(args):
+    result = create_reply(args.message_id, actor=args.actor, body=args.body, title=args.title)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(f"Replied to {args.message_id}: {result['reply_path']}")
+
+
 def cmd_collaboration_events(args):
     summary = generate_event_summary()
     if getattr(args, "json", False):
@@ -483,6 +502,8 @@ def cmd_mailbox_index(args):
         print(f"Open CA2 messages: {summary['open_ca2_message_count']}")
         print(f"Open CA3 messages: {summary['open_ca3_message_count']}")
         print(f"Open CA4 messages: {summary.get('open_ca4_message_count', 0)}")
+        print(f"Ack-required messages: {summary.get('ack_required_message_count', 0)}")
+        print(f"Threads: {summary.get('thread_count', 0)}")
         print(f"Index: {summary['index_path']}")
 
 
@@ -602,6 +623,21 @@ def main():
     p = sub.add_parser("worker-inboxes")
     p.add_argument("--json", action="store_true", help="Run worker inbox watcher and print JSON")
     p.set_defaults(func=cmd_worker_inboxes)
+
+    p = sub.add_parser("message-ack")
+    p.add_argument("message_id", help="Message id to acknowledge")
+    p.add_argument("--actor", default="Alfred", help="Actor creating the acknowledgement")
+    p.add_argument("--note", default="Acknowledged.", help="Acknowledgement note")
+    p.add_argument("--json", action="store_true", help="Print acknowledgement result JSON")
+    p.set_defaults(func=cmd_message_ack)
+
+    p = sub.add_parser("message-reply")
+    p.add_argument("message_id", help="Message id to reply to")
+    p.add_argument("--actor", default="Alfred", help="Actor creating the reply")
+    p.add_argument("--title", default=None, help="Reply title")
+    p.add_argument("--body", default="", help="Reply body/summary")
+    p.add_argument("--json", action="store_true", help="Print reply result JSON")
+    p.set_defaults(func=cmd_message_reply)
 
     p = sub.add_parser("collaboration-events")
     p.add_argument("--json", action="store_true", help="Summarize Collaboration Layer events and print JSON")

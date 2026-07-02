@@ -1,0 +1,22 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T16:53:22+00:00",
+  "files_changed": [
+    "src/estate/core/collaboration_messages.py",
+    "src/estate/core/mailbox_index.py",
+    "src/estate/cli/main.py",
+    "tests/test_collaboration_messages.py",
+    "docs/collaboration/Communication_Bus_v1_Operational_Flow.md",
+    "collaboration/work_packages/completions/WP-0015_codex_done.json"
+  ],
+  "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending_make_pr_tool",
+  "ready_for_ca_review": true,
+  "summary": "Added minimal Communication Bus acknowledgement and reply/threading helpers, CLI commands, mailbox index acknowledgement/thread metadata, tests, and documentation.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_collaboration_messages.py tests/test_mailbox_index.py tests/test_collaboration_ops.py"
+  ],
+  "work_package_id": "WP-0015"
+}
