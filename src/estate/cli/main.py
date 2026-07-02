@@ -15,6 +15,7 @@ from estate.core.collaboration_ops import run_routing_engine, watch_worker_inbox
 from estate.core.collaboration_messages import acknowledge_message, create_reply
 from estate.core.collaboration_events import generate_event_summary, format_event_summary
 from estate.core.operations_board import generate_operations_board, format_operations_board_summary
+from estate.core.daily_board_integration import generate_daily_board_integration, format_daily_board_integration_summary
 from estate.core.capability_lifecycle import generate_capability_lifecycle_report, format_capability_lifecycle_summary
 from estate.core.operational_validation import generate_operational_validation_report, format_operational_validation_summary
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
@@ -457,6 +458,15 @@ def cmd_operations_board(args):
         print(format_operations_board_summary(board))
 
 
+def cmd_daily_board(args):
+    board = generate_daily_board_integration()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(board, indent=2, sort_keys=True))
+    else:
+        print(format_daily_board_integration_summary(board))
+
+
 def cmd_dependency_graph(args):
     graph = generate_dependency_graph()
     if getattr(args, "json", False):
@@ -673,6 +683,10 @@ def main():
     p = sub.add_parser("operations-board")
     p.add_argument("--json", action="store_true", help="Generate Operations Board and print snapshot JSON")
     p.set_defaults(func=cmd_operations_board)
+
+    p = sub.add_parser("daily-board")
+    p.add_argument("--json", action="store_true", help="Generate Daily Board integration and print JSON")
+    p.set_defaults(func=cmd_daily_board)
 
 
     p = sub.add_parser("dependency-graph")

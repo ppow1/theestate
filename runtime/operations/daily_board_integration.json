@@ -1,0 +1,492 @@
+{
+  "active_work": [
+    {
+      "Current Milestone": "v1 operational validation",
+      "Dependency": "EC-000085",
+      "Effort": "Estate Collaboration Layer",
+      "ID": "AW-0001",
+      "Next Action": "Validate with WP-OPS-001",
+      "Owner": "Chief Architect / Alfred",
+      "Status": "Active"
+    },
+    {
+      "Current Milestone": "Initial board implementation",
+      "Dependency": "Communication Protocol v1",
+      "Effort": "Operations Board",
+      "ID": "AW-0002",
+      "Next Action": "Review and pull locally",
+      "Owner": "Worker #1",
+      "Status": "Active"
+    },
+    {
+      "Current Milestone": "Future board aggregation",
+      "Dependency": "Stable board pattern",
+      "Effort": "Alfred",
+      "ID": "AW-0003",
+      "Next Action": "Observe manual cadence",
+      "Owner": "Alfred / Chief of Staff",
+      "Status": "Planned"
+    },
+    {
+      "Current Milestone": "Observe operations surfaces",
+      "Dependency": "Board paths stable",
+      "Effort": "Discovery",
+      "ID": "AW-0004",
+      "Next Action": "Add future checks when justified",
+      "Owner": "Discovery",
+      "Status": "Planned"
+    },
+    {
+      "Current Milestone": "Validate board structure",
+      "Dependency": "Stable schemas",
+      "Effort": "Audit",
+      "ID": "AW-0005",
+      "Next Action": "Add future audit rules",
+      "Owner": "Audit",
+      "Status": "Planned"
+    },
+    {
+      "Current Milestone": "Estate onboarding runway",
+      "Dependency": "EC-000084",
+      "Effort": "Orientation Package",
+      "ID": "AW-0006",
+      "Next Action": "Keep aligned with operations model",
+      "Owner": "Governance",
+      "Status": "Active"
+    }
+  ],
+  "blocked_work": [],
+  "completed_awaiting_review": [
+    {
+      "codex_status": "done",
+      "id": "WP-0014",
+      "path": "collaboration/work_packages/completions/WP-0014_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0014_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0015",
+      "path": "collaboration/work_packages/completions/WP-0015_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0015_codex_done"
+    },
+    {
+      "codex_status": null,
+      "id": "WP-0018",
+      "path": "collaboration/work_packages/completions/WP-0018_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0018_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0019",
+      "path": "collaboration/work_packages/completions/WP-0019_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0019_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0020",
+      "path": "collaboration/work_packages/completions/WP-0020_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0020_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0021",
+      "path": "collaboration/work_packages/completions/WP-0021_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0021_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0022",
+      "path": "collaboration/work_packages/completions/WP-0022_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0022_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0023",
+      "path": "collaboration/work_packages/completions/WP-0023_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0023_codex_done"
+    }
+  ],
+  "daily_today": [
+    {
+      "Blocker": "None",
+      "ID": "DT-0001",
+      "Next Action": "Review GitHub-side implementation and pull locally",
+      "Owner": "Worker #1",
+      "Review Required": "Yes",
+      "Status": "Active",
+      "Task": "WP-OPS-001: Estate Operations Board"
+    }
+  ],
+  "generated_at": "2026-07-02T20:53:55+00:00",
+  "parking_lot": {
+    "items": [
+      {
+        "Category": "Automation",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0001",
+        "Idea": "Automate Operations Board aggregation after manual pattern stabilizes",
+        "Originator": "Worker #1",
+        "Priority": "Strategic",
+        "Promotion Condition": "Same update pattern repeats three times",
+        "Status": "Captured",
+        "Target Milestone": "Post-v1 validation",
+        "promotion_review": {
+          "classification": "deferred",
+          "reason": "Condition depends on a later milestone or maturity signal."
+        }
+      },
+      {
+        "Category": "Audit",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0002",
+        "Idea": "Add audit checks for Operations Board required files",
+        "Originator": "Worker #1",
+        "Priority": "Normal",
+        "Promotion Condition": "Board file shape remains unchanged",
+        "Status": "Captured",
+        "Target Milestone": "After board stabilizes",
+        "promotion_review": {
+          "classification": "deferred",
+          "reason": "Condition depends on a later milestone or maturity signal."
+        }
+      },
+      {
+        "Category": "Alfred",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0003",
+        "Idea": "Add Alfred daily briefing output sourced from Operations Board",
+        "Originator": "Worker #1",
+        "Priority": "Strategic",
+        "Promotion Condition": "Daily board proves useful manually",
+        "Status": "Captured",
+        "Target Milestone": "Alfred coordination milestone",
+        "promotion_review": {
+          "classification": "watch",
+          "reason": "Condition exists but readiness is not obvious from artifacts."
+        }
+      },
+      {
+        "Category": "Organizational Architecture",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0004",
+        "Idea": "Investigate Organizational Reputation and Service Record System for persistent Estate personnel; not gamification, but professional service records across achievement, authority, trust, experience, and reputation",
+        "Originator": "Pat / Steward",
+        "Priority": "Strategic",
+        "Status": "Captured",
+        "Target Milestone": "ADR-0001 organizational model is stable and personnel/state architecture is ready for investigation",
+        "promotion_review": {
+          "classification": "needs_condition",
+          "reason": "No promotion condition is recorded."
+        }
+      },
+      {
+        "Category": "Institutional Governance",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0004",
+        "Idea": "Office of Chief Architect lifecycle, including occupancy, succession, retirement, mentorship, historical identity, and active assignment",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "Collaboration layer and operations board are stable enough to formalize office succession",
+        "Status": "Captured",
+        "Target Milestone": "Office lifecycle review",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      },
+      {
+        "Category": "Engineering Philosophy",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0005",
+        "Idea": "Institutional Trust Principle: distinguish proposed work, attempted work, and verified work before admitting claims as institutional fact",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "History queue and audit result workflow are stable",
+        "Status": "Captured",
+        "Target Milestone": "Audit/history standards review",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      },
+      {
+        "Category": "Engineering Philosophy",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0006",
+        "Idea": "Architect Once. Automate Many Times as a strategic engineering principle for compounding automation investment",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "Governance v1 is reopened for a scheduled philosophy update",
+        "Status": "Captured",
+        "Target Milestone": "Engineering Matrix revision",
+        "promotion_review": {
+          "classification": "deferred",
+          "reason": "Condition depends on a later milestone or maturity signal."
+        }
+      },
+      {
+        "Category": "Engineering Standards",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0007",
+        "Idea": "Rule of Three automation standard with Observation Trigger and Design Trigger",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "Repeated manual workflow patterns are being converted into formal automation criteria",
+        "Status": "Captured",
+        "Target Milestone": "Automation standards review",
+        "promotion_review": {
+          "classification": "watch",
+          "reason": "Condition exists but readiness is not obvious from artifacts."
+        }
+      },
+      {
+        "Category": "Institutional Architecture",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0008",
+        "Idea": "Chief Architect final memorandum standard for retiring architects to leave lessons learned, mistakes, surviving principles, and guidance",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "Normal",
+        "Promotion Condition": "Office lifecycle policy is active",
+        "Status": "Captured",
+        "Target Milestone": "Chief Architect lifecycle implementation",
+        "promotion_review": {
+          "classification": "watch",
+          "reason": "Condition exists but readiness is not obvious from artifacts."
+        }
+      },
+      {
+        "Category": "Institutional Memory",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0009",
+        "Idea": "Eleanor and Marie knowledge architecture with spider-based indexing of A drive and GitHub into a searchable tag-based institutional knowledge base",
+        "Originator": "Steward",
+        "Priority": "Strategic",
+        "Promotion Condition": "Collaboration, audit, history queue, and operations board are operational and Discovery is ready for knowledge indexing",
+        "Status": "Captured",
+        "Target Milestone": "Institutional memory phase",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      },
+      {
+        "Category": "Institutional Architecture",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0010",
+        "Idea": "Institutional memory progression model from chat context to GitHub, Parking Lot, institutional documents, curated knowledge base, and institutional reasoning",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "Normal",
+        "Promotion Condition": "Eleanor and Marie knowledge architecture is promoted for design",
+        "Status": "Captured",
+        "Target Milestone": "Knowledge architecture planning",
+        "promotion_review": {
+          "classification": "watch",
+          "reason": "Condition exists but readiness is not obvious from artifacts."
+        }
+      },
+      {
+        "Category": "Personnel Operations",
+        "Date Captured": "2026-07-01",
+        "ID": "PL-0011",
+        "Idea": "Mailbox Synchronization Duty Standard: define when Estate personnel must check institutional mailboxes, with different synchronization modes for local workers, ChatGPT workers, Alfred, Audit, Chief Architects, and future autonomous workers; avoid fixed polling intervals until HR/security/worker runtime authority matures",
+        "Originator": "Steward / Chief Architect #3",
+        "Priority": "High",
+        "Promotion Condition": "Helen/HR and mailbox authority are mature enough to define duty, cadence, and implementation modes",
+        "Status": "Captured",
+        "Target Milestone": "HR/personnel governance phase",
+        "promotion_review": {
+          "classification": "deferred",
+          "reason": "Condition depends on a later milestone or maturity signal."
+        }
+      },
+      {
+        "Category": "Institutional Onboarding",
+        "Date Captured": "2026-07-02",
+        "ID": "PL-0012",
+        "Idea": "Treat onboarding as an institutional capability driven by a canonical onboarding manifest that serves as the configuration for repeatable onboarding rather than documentation; include ordered entries with purpose, required status, canonical path, and lifecycle state while keeping meaning in the referenced documents",
+        "Originator": "Chief Architect #4 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "Alfred and Helen onboarding workflow is being formalized",
+        "Status": "Captured",
+        "Target Milestone": "HR onboarding implementation",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      }
+    ],
+    "ready_for_review": [
+      {
+        "Category": "Institutional Governance",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0004",
+        "Idea": "Office of Chief Architect lifecycle, including occupancy, succession, retirement, mentorship, historical identity, and active assignment",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "Collaboration layer and operations board are stable enough to formalize office succession",
+        "Status": "Captured",
+        "Target Milestone": "Office lifecycle review",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      },
+      {
+        "Category": "Engineering Philosophy",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0005",
+        "Idea": "Institutional Trust Principle: distinguish proposed work, attempted work, and verified work before admitting claims as institutional fact",
+        "Originator": "Chief Architect #1 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "History queue and audit result workflow are stable",
+        "Status": "Captured",
+        "Target Milestone": "Audit/history standards review",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      },
+      {
+        "Category": "Institutional Memory",
+        "Date Captured": "2026-06-30",
+        "ID": "PL-0009",
+        "Idea": "Eleanor and Marie knowledge architecture with spider-based indexing of A drive and GitHub into a searchable tag-based institutional knowledge base",
+        "Originator": "Steward",
+        "Priority": "Strategic",
+        "Promotion Condition": "Collaboration, audit, history queue, and operations board are operational and Discovery is ready for knowledge indexing",
+        "Status": "Captured",
+        "Target Milestone": "Institutional memory phase",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      },
+      {
+        "Category": "Institutional Onboarding",
+        "Date Captured": "2026-07-02",
+        "ID": "PL-0012",
+        "Idea": "Treat onboarding as an institutional capability driven by a canonical onboarding manifest that serves as the configuration for repeatable onboarding rather than documentation; include ordered entries with purpose, required status, canonical path, and lifecycle state while keeping meaning in the referenced documents",
+        "Originator": "Chief Architect #4 / Steward",
+        "Priority": "High",
+        "Promotion Condition": "Alfred and Helen onboarding workflow is being formalized",
+        "Status": "Captured",
+        "Target Milestone": "HR onboarding implementation",
+        "promotion_review": {
+          "classification": "ready_for_review",
+          "reason": "Condition refers to current stability/readiness signals and should be reviewed by humans."
+        }
+      }
+    ]
+  },
+  "pending_codex_queue": [
+    {
+      "id": "README",
+      "path": "collaboration/work_packages/pending/README.md",
+      "title": "Pending Codex Work Packages"
+    },
+    {
+      "id": "WP-0014",
+      "path": "collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md",
+      "title": "SERIES TASK WP-0014 \u2014 Mailbox Index Regeneration and Destination Coverage Fix"
+    },
+    {
+      "id": "WP-0015",
+      "path": "collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md",
+      "title": "SERIES TASK WP-0015 \u2014 Message Acknowledgement and Reply Flow"
+    },
+    {
+      "id": "WP-0016",
+      "path": "collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md",
+      "title": "ARCHITECTURE-FIRST TASK WP-0016 \u2014 Work Package Registry"
+    },
+    {
+      "id": "WP-0017",
+      "path": "collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md",
+      "title": "ARCHITECTURE-FIRST TASK WP-0017 \u2014 Work Package State Machine"
+    },
+    {
+      "id": "WP-0018",
+      "path": "collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md",
+      "title": "SERIES TASK WP-0018 \u2014 Codex Handoff Generator"
+    },
+    {
+      "id": "WP-0019",
+      "path": "collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md",
+      "title": "SERIES TASK WP-0019 \u2014 Alfred Operational Activation"
+    },
+    {
+      "id": "WP-0020",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "title": "SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding"
+    },
+    {
+      "id": "WP-0020",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+      "title": "SERIES TASK WP-0020 \u2014 Work Package State Machine Implementation"
+    },
+    {
+      "id": "WP-0021",
+      "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+      "title": "SERIES TASK WP-0021 \u2014 Personnel Identity and Mailbox Resolver"
+    },
+    {
+      "id": "WP-0022",
+      "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+      "title": "SERIES TASK WP-0022 \u2014 Check for Updates v2 Mailbox Integration"
+    },
+    {
+      "id": "WP-0023",
+      "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+      "title": "SERIES TASK WP-0023 \u2014 Mailbox Synchronization Duty Runtime"
+    },
+    {
+      "id": "WP-0024",
+      "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+      "title": "SERIES TASK WP-0024 \u2014 Daily Board and Parking Lot Integration"
+    },
+    {
+      "id": "WP-0025",
+      "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+      "title": "SERIES TASK WP-0025 \u2014 Local Operational Validation Runner"
+    },
+    {
+      "id": "WP-0026",
+      "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+      "title": "SERIES TASK WP-0026 \u2014 Generated Artifact Policy"
+    },
+    {
+      "id": "WP-0027",
+      "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+      "title": "SERIES TASK WP-0027 \u2014 Institutional Search v1"
+    }
+  ],
+  "recommended_next_actions": [
+    "Review completed work packages marked ready_for_ca_review before starting additional queue items.",
+    "Use pending_codex_queue for active execution planning; keep Parking Lot items deferred until intentionally selected.",
+    "Human-review parking_lot.ready_for_review; do not auto-promote from this report."
+  ],
+  "repository": {
+    "branch": "work",
+    "commit": "d4cece56b4c29a289e784e96ef43cbb23f34ef33"
+  },
+  "summary": {
+    "active_work_items": 6,
+    "blocked_items": 0,
+    "completed_awaiting_review": 8,
+    "daily_items": 1,
+    "parking_lot_items": 13,
+    "parking_lot_ready_for_review": 4,
+    "pending_work_packages": 16,
+    "warning_count": 0
+  },
+  "version": 1,
+  "warnings": []
+}
