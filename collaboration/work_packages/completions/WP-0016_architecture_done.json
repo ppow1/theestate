@@ -1,0 +1,9 @@
+{
+  "work_package_id": "WP-0016",
+  "status": "architecture_done",
+  "mode": "ARCHITECTURE-FIRST",
+  "ready_for_codex_package": false,
+  "implementation_authorized": false,
+  "architecture_artifact": "Architecture/ADR/ADR-0002-Work-Package-Registry-Proposal.md",
+  "completion_note": "Produced a proposed ADR for Chief Architect review. No registry schema or implementation was created. A follow-on Codex implementation package should be created only after CA approval defines the registry model."
+}
