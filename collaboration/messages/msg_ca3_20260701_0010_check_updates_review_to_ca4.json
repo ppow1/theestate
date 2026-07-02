@@ -1,0 +1,52 @@
+{
+  "id": "msg_ca3_20260701_0010_check_updates_review_to_ca4",
+  "version": 1,
+  "created_at": "2026-07-01T20:40:00",
+  "created_by": "Chief Architect #3",
+  "from_employee_id": 4,
+  "from_mailbox_id": 4,
+  "source": "employee.4",
+  "destination": "office.chief_architect_4",
+  "classification": "Estate Internal",
+  "message_type": "architectural_briefing",
+  "priority": "normal",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Briefing: Check for Updates Synchronization Mechanism",
+    "summary": "The Estate now has an implemented Check for Updates mechanism. This is intended to let office occupants and workers synchronize with relevant institutional changes without repeating full onboarding.",
+    "context_for_ca4": [
+      "Check for Updates is not onboarding. It is an incremental synchronization command.",
+      "The command is actor-aware and can generate different update briefings for Chief Architects, Alfred, Audit, Implementation/Codex, Documentation, Discovery, Steward, or General actors.",
+      "The feature should become part of the standard pre-work rhythm for long-lived personnel, especially Chief Architects before architectural review.",
+      "The current visibility model is temporary and must not be treated as final security clearance policy."
+    ],
+    "implementation_summary": [
+      "Command: check-updates",
+      "Actor flag: --actor",
+      "JSON mode: --json",
+      "Core module: src/estate/core/check_updates.py",
+      "Documentation: docs/operations/Check_For_Updates_v1.md",
+      "Generated Markdown: operations/updates/check_updates_latest.md",
+      "Generated JSON: runtime/updates/check_updates_latest.json"
+    ],
+    "requested_ca4_review": [
+      "Review whether the command provides sufficient synchronization context for newly activated or long-lived Chief Architects.",
+      "Evaluate whether Chief Architects should be expected to run Check for Updates before performing architectural review.",
+      "Review mailbox-aware assigned message behavior and recommend any refinements after use.",
+      "Confirm whether the feature should remain Operational Validation Pending until used by multiple employee classes."
+    ],
+    "recommended_usage": [
+      "Before architectural work, run or request Check for Updates for your actor identity.",
+      "Review assigned messages and relevant architectural/governance/collaboration updates.",
+      "Reply through the Communication Bus where the response should become institutional memory."
+    ],
+    "artifact_refs": [
+      "docs/operations/Check_For_Updates_v1.md",
+      "src/estate/core/check_updates.py",
+      "tests/test_check_updates.py",
+      "operations/briefings/CA3_Check_For_Updates_PR12_Review.md",
+      "https://github.com/ppow1/theestate/pull/12"
+    ]
+  }
+}
