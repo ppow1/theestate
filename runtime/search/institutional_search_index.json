@@ -1,0 +1,1234 @@
+{
+  "generated_at": "2026-07-02T21:12:28+00:00",
+  "index_path": "runtime/search/institutional_search_index.json",
+  "record_count": 136,
+  "records": [
+    {
+      "artifact_type": "artifact",
+      "authoritative": true,
+      "excerpt": "# AI_HINTS.md Status: Fast recovery pointer. You are working inside The Estate. Pat is the Steward and final authority. Alfred is Chief of Staff. Alfred coordinates the Estate; Alfred is not the whole Estate. Current pri",
+      "path": "AI_HINTS.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "AI_HINTS.md"
+    },
+    {
+      "artifact_type": "artifact",
+      "authoritative": true,
+      "excerpt": "# AI_START_HERE.md Status: Canonical AI entry point. Read in this order: 1. AI_HINTS.md 2. docs/governance/Estate_Orientation_Handbook.md 3. docs/governance/Estate_Vision_and_Architecture.md 4. docs/governance/Estate_Man",
+      "path": "AI_START_HERE.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "AI_START_HERE.md"
+    },
+    {
+      "artifact_type": "constitution",
+      "authoritative": true,
+      "excerpt": "# Constitution of the Estate Version: 0.1 Status: Draft Classification: Estate Internal ## Article I \u2014 The Steward The Steward is the creator, owner, and sovereign authority of the Estate. All authority exercised by the ",
+      "path": "constitution/constitution.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Constitution of the Estate"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Alfred v1 Operator Completion ## Summary Alfred v1 now provides a practical operator surface for the Estate. Alfred can: - report operational readiness - list available services and capabilities - plan a user goal - cr",
+      "path": "docs/alfred_v1_operator_completion.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Alfred v1 Operator Completion"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Alfred v1 Status ## Purpose Alfred v1 is the first operational layer above Estate services. It does not yet perform unrestricted autonomous work. It can plan goals, route capabilities, create runtime jobs, execute safe",
+      "path": "docs/alfred_v1_status.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Alfred v1 Status"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Alfred Routing Engine and Worker Inbox Watcher v1 Status: Implemented Classification: Estate Internal Owner: Alfred / Chief of Staff Boundary Authority: Privacy and Boundary Office ## Purpose The Alfred Routing Engine ",
+      "path": "docs/collaboration/Alfred_Routing_Engine_and_Worker_Inbox_Watcher_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Alfred Routing Engine and Worker Inbox Watcher v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Branch Management Standard v1 Status: Operational Standard Classification: Estate Internal ## Purpose Define a consistent branch strategy that enables multiple Estate workers to operate in parallel while preserv",
+      "path": "docs/collaboration/Branch_Management_Standard_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Branch Management Standard v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Collaboration Event Framework v1 Status: Implemented Classification: Estate Internal Owner: Alfred / Chief of Staff Boundary Authority: Privacy and Boundary Office ## Purpose The Collaboration Event Framework records a",
+      "path": "docs/collaboration/Collaboration_Event_Framework_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Collaboration Event Framework v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Communication Bus v1 Operational Flow Status: Operational Design Owner: Alfred / Chief of Staff Boundary Authority: Privacy and Boundary Office 1. Purpose The Communication Bus is the structured flow of work, messages, r",
+      "path": "docs/collaboration/Communication_Bus_v1_Operational_Flow.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Communication_Bus_v1_Operational_Flow.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Estate Collaboration Layer v1 Status: Version 1 Infrastructure Plan Priority: Immediate Owner: Chief Architect Operational Coordinator: Alfred / Chief of Staff Boundary Authority: Privacy and Boundary Office Initial Shar",
+      "path": "docs/collaboration/Estate_Collaboration_Layer_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate_Collaboration_Layer_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Estate Collaboration Standard v1 Status: Operational Standard 1. Purpose This standard governs how Estate participants collaborate through repository and local transport infrastructure. 2. Collaboration Is Infrastructure",
+      "path": "docs/collaboration/Estate_Collaboration_Standard_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate_Collaboration_Standard_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Instruction Precedence v1 Status: Version 1 Standard Owner: Chief Architect Operational Coordinator: Alfred / Chief of Staff Classification: Estate Internal ## Purpose Instruction Precedence defines how Estate workers ",
+      "path": "docs/collaboration/Instruction_Precedence_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Instruction Precedence v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Local Execution Adapter Protocol v1 Status: Version 1 Infrastructure Pattern Short Name: LEAP v1 Owner: Chief Architect Operational Coordinator: Alfred / Chief of Staff Boundary Authority: Privacy and Boundary Office C",
+      "path": "docs/collaboration/Local_Execution_Adapter_Protocol_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Local Execution Adapter Protocol v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Local Worker Launch Adapter v1 Status: Version 1 Design Owner: Alfred / Chief of Staff Classification: Estate Internal ## Purpose The Local Worker Launch Adapter provides a manual one-shot bridge from the Estate Collab",
+      "path": "docs/collaboration/Local_Worker_Launch_Adapter_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Local Worker Launch Adapter v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Mailbox Infrastructure v1 Status: Implemented Classification: Estate Internal ## Purpose Mailbox Infrastructure v1 gives Estate personnel, functional queues, and external ChatGPT-based workers a stable way to discover ",
+      "path": "docs/collaboration/Mailbox_Infrastructure_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Mailbox Infrastructure v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Operations Board Client v1 Status: Operational Client Owner: Alfred / Chief of Staff Classification: Estate Internal Introduced By: EC-000086 ## Purpose The Operations Board is the first operational client of the Estat",
+      "path": "docs/collaboration/Operations_Board_Client_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Operations Board Client v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Personnel Identity and Mailbox Resolver v1 The personnel identity resolver maps Estate addressing strings to canonical destinations using existing registry evidence only. ## Registry sources - `data/registry/personnel.",
+      "path": "docs/collaboration/Personnel_Identity_Mailbox_Resolver_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Personnel Identity and Mailbox Resolver v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Promotion Workflow v1 Status: Boundary Process Owner: Privacy and Boundary Office Initial Implementation: Manual review under Steward authority Future Occupant: Ingrid 1. Purpose Promotion is the process of moving inform",
+      "path": "docs/collaboration/Promotion_Workflow_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Promotion_Workflow_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Worker Collaboration Protocol v1 Status: Operational Protocol Owner: Alfred / Chief of Staff Review Authority: Chief Architect Boundary Authority: Privacy and Boundary Office 1. Purpose This protocol explains how ChatGPT",
+      "path": "docs/collaboration/Worker_Collaboration_Protocol_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Worker_Collaboration_Protocol_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Worker Runtime Contract v1 Status: Version 1 Standard Owner: Chief Architect Operational Coordinator: Alfred / Chief of Staff Boundary Authority: Privacy and Boundary Office Classification: Estate Internal ## Purpose T",
+      "path": "docs/collaboration/Worker_Runtime_Contract_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Worker Runtime Contract v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "GitHub Transport Adapter v1 Status: Initial Shared Transport Adapter 1. Purpose GitHub is the first shared transport implementation for the Estate Communication Bus. GitHub is not the Communication Bus. GitHub provides v",
+      "path": "docs/collaboration/adapters/GitHub_Transport_Adapter_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "GitHub_Transport_Adapter_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Local Filesystem Transport Adapter v1 Status: Initial Local Transport Adapter 1. Purpose The Local Filesystem Adapter supports local-only and pre-promotion collaboration. It is the safe working area before material is pr",
+      "path": "docs/collaboration/adapters/Local_Filesystem_Transport_Adapter_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Local_Filesystem_Transport_Adapter_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Canonical Message Envelope v1 Status: Message Contract 1. Purpose Every Collaboration Layer message should use a shared envelope. Payloads may differ. The envelope remains stable. 2. Required Fields Required fields: id v",
+      "path": "docs/collaboration/schemas/Canonical_Message_Envelope_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Canonical_Message_Envelope_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "Message Type Definitions v1 Status: Message Type Reference work_package A bounded assignment with mission, scope, boundaries, required reading, deliverables, and acceptance criteria. directive An instruction from an auth",
+      "path": "docs/collaboration/schemas/Message_Types_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Message_Types_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Capability Lifecycle States v1 Status: Operational Standard Classification: Estate Internal ## Purpose Define the standard lifecycle terminology used to describe the maturity of Estate capabilities. ## Lifecycle",
+      "path": "docs/governance/Capability_Lifecycle_States_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Capability Lifecycle States v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Manual Status: Engineering and Operations Reference Audience: Chief Architect, Alfred operators, engineering workers, documentation workers, local infrastructure workers, and future maintainers. This manual is n",
+      "path": "docs/governance/Estate_Manual.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Manual"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Orientation Handbook Status: Canonical Onboarding Document Audience: New AI workers, Chief Architect sessions, Alfred-adjacent workers, documentation workers, and future operators. ## 1. What The Estate Is The E",
+      "path": "docs/governance/Estate_Orientation_Handbook.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Orientation Handbook"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Vision and Architecture Status: Living Architecture Document Audience: Chief Architect, Alfred, governance workers, engineering workers, local infrastructure workers, and future system designers. ## 1. Purpose T",
+      "path": "docs/governance/Estate_Vision_and_Architecture.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Vision and Architecture"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Visual Onboarding Visuals are onboarding artifacts, not decoration. ## Required Visuals ### Estate Vision v1 Where the dream started: AI with EQ, Palace/Castle Memory, the emotional origin. ### Current Estate Vi",
+      "path": "docs/governance/visuals/README.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Visual Onboarding"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Documentation Foundation Worker Mission: strengthen onboarding docs. May edit AI_HINTS.md, AI_START_HERE.md, and Estate_Orientation_Handbook.md. Do not edit archive, src, runtime, registries, or ledger. Required readin",
+      "path": "docs/governance/workers/Documentation_Foundation_Worker.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Documentation Foundation Worker"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Manual Worker Mission: expand the Estate Manual into a practical operational reference. May edit Estate_Manual.md. Do not edit archive, runtime, source, registries, or ledger. Deliverable: operational questions ",
+      "path": "docs/governance/workers/Estate_Manual_Worker.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Manual Worker"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Governance Package Worker Mission: maintain lean governance without creating bureaucracy. May edit Handbook, Architecture, and Manual. Do not create new governance documents unless they have a distinct audience and dis",
+      "path": "docs/governance/workers/Governance_Package_Worker.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Governance Package Worker"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Local 4090 Feasibility Worker Mission: document local-first infrastructure feasibility. Scope: RTX 4090, Ollama, ComfyUI, Whisper, TTS, music, lip sync, video, embeddings, vector search, storage. Do not alter governanc",
+      "path": "docs/governance/workers/Local_4090_Feasibility_Worker.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Local 4090 Feasibility Worker"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Visual Documentation Worker Mission: create Estate visual onboarding artifacts. May edit docs/governance/visuals. Do not edit archive, runtime, source, registries, or ledger. Deliverables: Estate Vision v1, Current Est",
+      "path": "docs/governance/workers/Visual_Documentation_Worker.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Visual Documentation Worker"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# AI START HERE Status: Operational Classification: Estate Internal Welcome to the Estate. This document is the canonical entry point for all AI workers, regardless of execution environment. ## Onboarding Sequence 1. Rea",
+      "path": "docs/onboarding/AI_START_HERE.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "AI START HERE"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Chief Architect Onboarding Manifest ## Purpose This is the canonical repository-relative onboarding manifest for Chief Architect workers. It prevents onboarding drift by listing verified paths, correcting the Constitut",
+      "path": "docs/onboarding/Chief_Architect_Onboarding_Manifest.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Chief Architect Onboarding Manifest"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Helen HR Operational Onboarding Status: Initial operational onboarding Classification: Estate Internal Owner: Helen / Human Resources Registry identity: `RES-000003` in `residents/helen.md` and `data/registry/residents",
+      "path": "docs/onboarding/Helen_HR_Operational_Onboarding.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Helen HR Operational Onboarding"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Onboarding Status: Operational Classification: Estate Internal ## Purpose This directory contains reusable onboarding assets for Estate workers. The onboarding package begins with visual orientation so a worker ",
+      "path": "docs/onboarding/README.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Onboarding"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Worker Onboarding Manifest ## Purpose This is the canonical general worker onboarding manifest. It provides verified repository-relative paths for baseline onboarding without creating new governance or replacing role-s",
+      "path": "docs/onboarding/Worker_Onboarding_Manifest.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Worker Onboarding Manifest"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "{ \"display_title\": \"Chief Architect Onboarding Manifest\", \"purpose\": \"Canonical repository-relative onboarding manifest for Chief Architect workers. This manifest replaces hand-written or memory-based path lists with ver",
+      "path": "docs/onboarding/chief_architect_onboarding_manifest.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "chief_architect_onboarding_manifest.json"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Worker Visual Orientation Manifest v1 Status: Operational Classification: Estate Internal Owner: Helen / AI HR Architectural Oversight: Chief Architect ## Purpose Every newly onboarded Estate worker shall review",
+      "path": "docs/onboarding/visual_manifest.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Worker Visual Orientation Manifest v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "{ \"display_title\": \"Worker Onboarding Manifest\", \"purpose\": \"Canonical general worker onboarding manifest using verified repository-relative paths.\", \"intended_audience\": [\"general worker\", \"implementation worker\", \"audi",
+      "path": "docs/onboarding/worker_onboarding_manifest.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "worker_onboarding_manifest.json"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Capability Lifecycle Reporting Status: Operational Documentation Classification: Estate Internal ## Purpose Capability lifecycle reporting provides an operational validation layer over existing Estate capability regist",
+      "path": "docs/operations/Capability_Lifecycle_Reporting.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Capability Lifecycle Reporting"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "dependencies: [] # Capability Registry Metadata Cleanup Status: Implementation Documentation Classification: Estate Internal ## Purpose This note records the metadata cleanup applied to `data/registry/capabilities.json` ",
+      "path": "docs/operations/Capability_Registry_Metadata_Cleanup.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Capability Registry Metadata Cleanup"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Check for Updates v1 Status: Implemented local-first synchronization mechanism Classification: Estate Internal ## Purpose Check for Updates generates a role-aware briefing before a worker, office occupant, or implement",
+      "path": "docs/operations/Check_For_Updates_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Check for Updates v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Codex Handoff Generator v1 ## Purpose The Codex Handoff Generator lists pending Estate work packages and prints copy-ready Codex launch commands. The work package remains the source of truth; the generated command only",
+      "path": "docs/operations/Codex_Handoff_Generator_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Codex Handoff Generator v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Generated Artifact Policy v1 Status: Active Policy Owner: Chief Architect / Alfred Operations Classification: Estate Internal Introduced By: WP-0026 Date: 2026-07-02 ## Purpose The Estate produces both authored institu",
+      "path": "docs/operations/Generated_Artifact_Policy_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Generated Artifact Policy v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Onboarding Checklist v1 Status: Implemented Classification: Estate Internal Owner: Steward / HR until Helen is onboarded ## Purpose This checklist records the current minimum steps for bringing an Estate participant on",
+      "path": "docs/operations/Onboarding_Checklist_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Onboarding Checklist v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Continuous Operational Validation Reporting Status: Implemented reporting support Classification: Estate Internal ## Purpose The continuous operational validation reporter summarizes evidence that may support lifecycle",
+      "path": "docs/operations/Operational_Validation_Reporting.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Continuous Operational Validation Reporting"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Operations Board Runtime Integration Status: Operationally Validated Classification: Estate Internal ## Purpose The Operations Board aggregates existing Estate operational artifacts into a single runtime view. It is a ",
+      "path": "docs/operations/Operations_Board_Runtime_Integration.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Operations Board Runtime Integration"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Steward Dashboard Runtime View Status: Implemented runtime view Audience: Steward-facing operators, Alfred-adjacent workers, Chief Architect sessions ## Purpose The Steward Dashboard is a concise, human-facing runtime ",
+      "path": "docs/operations/Steward_Dashboard_Runtime_View.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Steward Dashboard Runtime View"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Helen Operating Brief Status: Initial brief Classification: Estate Internal Office: Human Resources Resident profile: `residents/helen.md` Onboarding brief: `docs/onboarding/Helen_HR_Operational_Onboarding.md` ## Missi",
+      "path": "docs/operations/helen/operating_brief.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Helen Operating Brief"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Operator Manual ## Purpose The Estate is a local institutional AI operating system. Its purpose is to let Alfred understand the local AI environment, route work to available services, execute safe jobs, preserve",
+      "path": "docs/operator_manual.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Operator Manual"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Service Catalog ## Image Generation Service ID: `image.generation` Capabilities: - `image.generate` - `image.workflow` Providers: - ComfyUI - SDXL Purpose: Generate images using local ComfyUI and installed model",
+      "path": "docs/service_catalog.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Service Catalog"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_20260701_000000_example_routing\", \"version\": 1, \"created_at\": \"2026-07-01T00:00:00\", \"created_by\": \"Alfred\", \"source\": \"alfred\", \"destination\": \"queue\", \"classification\": \"Estate Internal\", \"message_type\": \"",
+      "path": "collaboration/messages/example_alfred_routing_engine_v1.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_20260701_000000_example_routing"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca2_20260701_0001_mailbox_index_validation\", \"version\": 1, \"created_at\": \"2026-07-01T23:55:00\", \"created_by\": \"office.chief_architect_2\", \"source\": \"office.chief_architect_2\", \"source_employee_id\": 3, \"desti",
+      "path": "collaboration/messages/msg_ca2_20260701_0001_mailbox_index_validation.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca2_20260701_0001_mailbox_index_validation"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"message_id\": \"msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3\", \"created_at\": \"2026-07-02T00:35:00Z\", \"source\": \"office.chief_architect_2\", \"source_employee_id\": 3, \"destination\": \"office.chief_archit",
+      "path": "collaboration/messages/msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Mailbox Infrastructure v1 Verification Brief"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "# Chief Architect #4 Onboarding Packet Employee ID: 5 Mailbox ID: 5 Title: Chief Architect #4 Office: Office of the Chief Architect Status: onboarding Required reading: - AI_HINTS.md - AI_STARTS_HERE.md - docs/governance",
+      "path": "collaboration/messages/msg_ca2_20260701_0003_ca4_onboarding_packet.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Chief Architect #4 Onboarding Packet"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0001_alfred_capability_brief\", \"version\": 1, \"created_at\": \"2026-07-01T18:00:00\", \"created_by\": \"Chief Architect #3\", \"source\": \"office.chief_architect_3\", \"destination\": \"office.chief_architect",
+      "path": "collaboration/messages/msg_ca3_20260701_0001_alfred_capability_brief.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0001_alfred_capability_brief"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0002_audit_malformed_json_review\", \"version\": 1, \"created_at\": \"2026-07-01T18:20:00\", \"created_by\": \"Chief Architect #3\", \"source\": \"office.chief_architect_3\", \"destination\": \"office.chief_archi",
+      "path": "collaboration/messages/msg_ca3_20260701_0002_audit_malformed_json_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0002_audit_malformed_json_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0003_operations_board_review\", \"version\": 1, \"created_at\": \"2026-07-01T18:45:00\", \"created_by\": \"Chief Architect #3\", \"source\": \"office.chief_architect_3\", \"destination\": \"office.chief_architect",
+      "path": "collaboration/messages/msg_ca3_20260701_0003_operations_board_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0003_operations_board_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0004_capability_lifecycle_review\", \"version\": 1, \"created_at\": \"2026-07-01T19:05:00\", \"created_by\": \"Chief Architect #3\", \"source\": \"office.chief_architect_3\", \"destination\": \"office.chief_archi",
+      "path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0004_capability_lifecycle_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0005_steward_dashboard_review\", \"version\": 1, \"created_at\": \"2026-07-01T19:35:00\", \"created_by\": \"Chief Architect #3\", \"source\": \"office.chief_architect_3\", \"destination\": \"office.chief_architec",
+      "path": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0005_steward_dashboard_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{\"id\":\"msg_ca3_20260701_0006_collaboration_event_framework_review\",\"version\":1,\"created_at\":\"2026-07-01T19:40:00\",\"created_by\":\"Chief Architect #3\",\"source\":\"office.chief_architect_3\",\"destination\":\"office.chief_architec",
+      "path": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0006_collaboration_event_framework_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{\"id\":\"msg_ca3_20260701_0007_dependency_graph_review\",\"version\":1,\"created_at\":\"2026-07-01T19:55:00\",\"created_by\":\"Chief Architect #3\",\"source\":\"office.chief_architect_3\",\"destination\":\"office.chief_architect_2\",\"classif",
+      "path": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0007_dependency_graph_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{\"id\":\"msg_ca3_20260701_0008_operational_validation_review\",\"version\":1,\"created_at\":\"2026-07-01T20:10:00\",\"created_by\":\"Chief Architect #3\",\"source\":\"office.chief_architect_3\",\"destination\":\"office.chief_architect_2\",\"c",
+      "path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0008_operational_validation_review"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0009_check_updates_review_to_ca2\", \"version\": 1, \"created_at\": \"2026-07-01T20:35:00\", \"created_by\": \"Chief Architect #3\", \"from_employee_id\": 4, \"from_mailbox_id\": 4, \"source\": \"employee.4\", \"de",
+      "path": "collaboration/messages/msg_ca3_20260701_0009_check_updates_review_to_ca2.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0009_check_updates_review_to_ca2"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0010_check_updates_review_to_ca4\", \"version\": 1, \"created_at\": \"2026-07-01T20:40:00\", \"created_by\": \"Chief Architect #3\", \"from_employee_id\": 4, \"from_mailbox_id\": 4, \"source\": \"employee.4\", \"de",
+      "path": "collaboration/messages/msg_ca3_20260701_0010_check_updates_review_to_ca4.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0010_check_updates_review_to_ca4"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{\"id\":\"msg_ca3_20260701_0011_meeting_request_to_ca4\",\"version\":1,\"created_at\":\"2026-07-01T21:00:00\",\"created_by\":\"Chief Architect #3\",\"from_employee_id\":4,\"from_mailbox_id\":4,\"source\":\"employee.4\",\"destination\":\"office.c",
+      "path": "collaboration/messages/msg_ca3_20260701_0011_meeting_request_to_ca4.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0011_meeting_request_to_ca4"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4\", \"version\": 1, \"created_at\": \"2026-07-01T21:20:00\", \"created_by\": \"Chief Architect #3\", \"from_employee_id\": 4, \"from_mailbox_id\": 4, \"source\": \"employee.4\",",
+      "path": "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca4_20260701_0001_reply_to_ca3_mailbox_check\", \"version\": 1, \"created_at\": \"2026-07-01T23:10:00\", \"created_by\": \"Chief Architect #4\", \"from_employee_id\": 5, \"from_mailbox_id\": 5, \"source\": \"employee.5\", \"des",
+      "path": "collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca4_20260701_0001_reply_to_ca3_mailbox_check"
+    },
+    {
+      "artifact_type": "message",
+      "authoritative": true,
+      "excerpt": "{ \"id\": \"msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3\", \"version\": 1, \"created_at\": \"2026-07-02T00:00:00\", \"created_by\": \"Chief Architect #4\", \"from_employee_id\": 5, \"from_mailbox_id\": 5, \"source\": \"employee.",
+      "path": "collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0014\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T15:40:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Expanded mailbox destination resolution to cover registry-backed off",
+      "path": "collaboration/work_packages/completions/WP-0014_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0014_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T16:53:22+00:00\", \"files_changed\": [ \"src/estate/core/collaboration_messages.py\", \"src/estate/core/mailbox_index.py\", \"src/estate/cli/main.py\", \"test",
+      "path": "collaboration/work_packages/completions/WP-0015_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0015_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0016\", \"status\": \"architecture_done\", \"mode\": \"ARCHITECTURE-FIRST\", \"ready_for_codex_package\": false, \"implementation_authorized\": false, \"architecture_artifact\": \"Architecture/ADR/ADR-0002-Work-",
+      "path": "collaboration/work_packages/completions/WP-0016_architecture_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0016_architecture_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0017\", \"status\": \"architecture_done\", \"mode\": \"ARCHITECTURE-FIRST\", \"summary\": \"Produced ADR-0003 proposing a canonical work package state machine, transition authority model, guardrails, and Chi",
+      "path": "collaboration/work_packages/completions/WP-0017_architecture_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0017_architecture_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package\": \"WP-0018\", \"status\": \"codex_done\", \"pr_url\": null, \"files_changed\": [ \"src/estate/core/work_package_handoff.py\", \"src/estate/cli/main.py\", \"tests/test_work_package_handoff.py\", \"docs/operations/Codex_Ha",
+      "path": "collaboration/work_packages/completions/WP-0018_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0018_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T17:28:17+00:00\", \"files_changed\": [ \"src/estate/core/alfred.py\", \"src/estate/cli/main.py\", \"tests/test_alfred_operational_briefing.py\", \"operations/",
+      "path": "collaboration/work_packages/completions/WP-0019_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0019_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0020\", \"codex_status\": \"done\", \"status\": \"done\", \"completed_at\": \"2026-07-02T17:48:18+00:00\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"files_changed\": [ \"docs/onboarding/Helen_HR_Operati",
+      "path": "collaboration/work_packages/completions/WP-0020_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0020_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0021\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T00:00:00+00:00\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented a conservative registry-backed personnel ident",
+      "path": "collaboration/work_packages/completions/WP-0021_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0021_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T20:44:09+00:00\", \"files_changed\": [ \"operations/updates/check_updates_latest.md\", \"src/estate/core/check_updates.py\", \"tests/test_check_updates.py\",",
+      "path": "collaboration/work_packages/completions/WP-0022_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0022_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T20:49:04+00:00\", \"files_changed\": [ \"src/estate/core/mailbox_sync_duty.py\", \"src/estate/cli/main.py\", \"tests/test_mailbox_sync_duty.py\", \"runtime/ma",
+      "path": "collaboration/work_packages/completions/WP-0023_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0023_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T20:54:11+00:00\", \"files_changed\": [ \"src/estate/core/daily_board_integration.py\", \"src/estate/cli/main.py\", \"tests/test_daily_board_integration.py\",",
+      "path": "collaboration/work_packages/completions/WP-0024_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0024_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:04:27+00:00\", \"files_changed\": [ \"collaboration/mailboxes/index.json\", \"collaboration/status/event_summary.json\", \"collaboration/status/worker_in",
+      "path": "collaboration/work_packages/completions/WP-0025_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0025_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0026\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:08:06Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Added Generated Artifact Policy v1 documenting authoritative source ",
+      "path": "collaboration/work_packages/completions/WP-0026_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0026_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# Work Package WP-LEAP-001 Title: Implement Estate Audit Worker v1 Local Execution Adapter Status: Open Priority: High Classification: Estate Internal Assigned To: Local Ollama Worker Created By: Chief Architect #2 Date:",
+      "path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Work Package WP-LEAP-001"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# Pending Codex Work Packages Status: Pending Classification: Estate Internal Owner: Chief Architect #3 / Steward ## Purpose This folder holds Codex-ready or architecture-first work package drafts so the Steward can hand",
+      "path": "collaboration/work_packages/pending/README.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Pending Codex Work Packages"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0014 \u2014 Mailbox Index Regeneration and Destination Coverage Fix ## Steward Command Open `collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md` in `ppow1/theestate` and execut",
+      "path": "collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0014 \u2014 Mailbox Index Regeneration and Destination Coverage Fix"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0015 \u2014 Message Acknowledgement and Reply Flow ## Steward Command Open `collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md` in `ppow1/theestate` and execute the direc",
+      "path": "collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0015 \u2014 Message Acknowledgement and Reply Flow"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# ARCHITECTURE-FIRST TASK WP-0016 \u2014 Work Package Registry ## Steward Command Open `collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md` in `ppow1/theestate` and execute the directions ",
+      "path": "collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "ARCHITECTURE-FIRST TASK WP-0016 \u2014 Work Package Registry"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# ARCHITECTURE-FIRST TASK WP-0017 \u2014 Work Package State Machine ## Steward Command Open `collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md` in `ppow1/theestate` and execute the d",
+      "path": "collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "ARCHITECTURE-FIRST TASK WP-0017 \u2014 Work Package State Machine"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0018 \u2014 Codex Handoff Generator ## Codex Command Read `collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md` and do exactly what it says. ## Mode SERIES. Depends on WP-0016 and WP",
+      "path": "collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0018 \u2014 Codex Handoff Generator"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0019 \u2014 Alfred Operational Activation ## Codex Command Read `collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md` and do exactly what it says. ## Mode SERIES. This is imple",
+      "path": "collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0019 \u2014 Alfred Operational Activation"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding ## Codex Command Read `collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md` and do exactly what it says. ## Mode SERIES. Implement",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0020 \u2014 Work Package State Machine Implementation ## Status Blocked \u2014 pending Chief Architect approval of ADR-0003. ## Mission After Chief Architect approval, implement the approved Estate work package st",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0020 \u2014 Work Package State Machine Implementation"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0021 \u2014 Personnel Identity and Mailbox Resolver ## Codex Command Read `collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md` and do exactly what it says. ## Mode SERIE",
+      "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0021 \u2014 Personnel Identity and Mailbox Resolver"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0022 \u2014 Check for Updates v2 Mailbox Integration ## Codex Command Read `collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md` and do exactly what it says. ## Mode",
+      "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0022 \u2014 Check for Updates v2 Mailbox Integration"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0023 \u2014 Mailbox Synchronization Duty Runtime ## Codex Command Read `collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md` and do exactly what it says. ## Mode SERIES.",
+      "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0023 \u2014 Mailbox Synchronization Duty Runtime"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0024 \u2014 Daily Board and Parking Lot Integration ## Codex Command Read `collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md` and do exactly what it says. ## Mode SERIE",
+      "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0024 \u2014 Daily Board and Parking Lot Integration"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0025 \u2014 Local Operational Validation Runner ## Codex Command Read `collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md` and do exactly what it says. ## Mode SERIES. D",
+      "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0025 \u2014 Local Operational Validation Runner"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0026 \u2014 Generated Artifact Policy ## Codex Command Read `collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md` and do exactly what it says. ## Mode SERIES. Implementation/docume",
+      "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0026 \u2014 Generated Artifact Policy"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0027 \u2014 Institutional Search v1 ## Codex Command Read `collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md` and do exactly what it says. ## Mode SERIES. Depends on WP-0026 Genera",
+      "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0027 \u2014 Institutional Search v1"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0028 \u2014 Document Registry and Stable Document IDs ## Codex Command Read `collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md` and do exactly what it says. ## Mode SERIES. De",
+      "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0028 \u2014 Document Registry and Stable Document IDs"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0029 \u2014 Artifact Provenance Model ## Codex Command Read `collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md` and do exactly what it says. ## Mode SERIES. Depends on WP-0026 Ge",
+      "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0029 \u2014 Artifact Provenance Model"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0030 \u2014 Mission Registry and Mission Numbering Standard ## Codex Command Read `collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md` and do exactly what it says. ## Mo",
+      "path": "collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0030 \u2014 Mission Registry and Mission Numbering Standard"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0031 \u2014 Transport Adapter Evaluation ## Codex Command Read `collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md` and do exactly what it says. ## Mode SERIES. Documentation/r",
+      "path": "collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0031 \u2014 Transport Adapter Evaluation"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Operations Board Status: Active Owner: Alfred / Chief of Staff Classification: Estate Internal Introduced By: EC-000086 Date: 2026-06-30 ## Purpose The Estate Operations Board is the lightweight operational work",
+      "path": "operations/README.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Estate Operations Board"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Alfred Operational Briefing Created: 2026-07-02T21:04:16 Ready: True Services Available: 0 Capabilities: 13 Pending Work Packages: 18 Messages Requiring Acknowledgement: 17 CA Review Needs: 16 Blocked Work: 0 Validatio",
+      "path": "operations/alfred/operational_briefing.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Alfred Operational Briefing"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Operations Board Generated: 2026-07-01T22:12:17+00:00 ## Summary - Repository branch: work - Current commit: e5836a0a45def0dcc2cb25631a0bcc82f7866759 - Overall status: warning - Missing artifact count: 4 - Warni",
+      "path": "operations/board/latest.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Estate Operations Board"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": true,
+      "excerpt": "# Active Work Board Status: Active Owner: Alfred / Chief of Staff Classification: Estate Internal Updated: 2026-06-30 ## Purpose The Active Work Board tracks multi-day and strategic efforts. It is not a task dump. It sho",
+      "path": "operations/boards/active_work.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Active Work Board"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": true,
+      "excerpt": "# Daily Task Board Status: Active Owner: Alfred / Chief of Staff Classification: Estate Internal Updated: 2026-06-30 ## Purpose The Daily Task Board represents today's operational commitments. It answers: - What is activ",
+      "path": "operations/boards/daily_board.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Daily Task Board"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": true,
+      "excerpt": "# Daily Board Integration Generated: 2026-07-02T21:04:16+00:00 ## Summary - Active Work Items: 6 - Daily Items: 1 - Pending Work Packages: 18 - Completed Awaiting Review: 10 - Blocked Items: 0 - Parking Lot Items: 13 - P",
+      "path": "operations/boards/daily_board_integration.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Daily Board Integration"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": true,
+      "excerpt": "# Parking Lot Status: Active Owner: Alfred / Chief of Staff Classification: Estate Internal Updated: 2026-07-01 ## Purpose The Parking Lot captures valuable ideas without interrupting current execution. It preserves inst",
+      "path": "operations/boards/parking_lot.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Parking Lot"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": true,
+      "excerpt": "# Review Cadence Status: Active Owner: Alfred / Chief of Staff Classification: Estate Internal Updated: 2026-06-30 ## Purpose The Review Cadence defines the lightweight operating rhythm for the Estate Operations Board. T",
+      "path": "operations/boards/review_cadence.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Review Cadence"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": true,
+      "excerpt": "# Strategic Roadmap Status: Active Owner: Chief Architect / Alfred Classification: Estate Internal Updated: 2026-06-30 ## Purpose The Strategic Roadmap provides a long-horizon view of Estate capability development. It is",
+      "path": "operations/boards/roadmap.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Strategic Roadmap"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# CA3 Review Brief: Check for Updates Synchronization Mechanism Status: CA3 Architectural Review Classification: Estate Internal Prepared by: Chief Architect #3 Employee ID: 4 Mailbox ID: 4 Audience: Steward, Chief Archi",
+      "path": "operations/briefings/CA3_Check_For_Updates_PR12_Review.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "CA3 Review Brief: Check for Updates Synchronization Mechanism"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Capability Lifecycle Status Generated: 2026-07-02T21:04:16+00:00 This is an operational report generated from registries and evidence. It is not a governance source of truth. ## Summary - Capability count: 6 - I",
+      "path": "operations/capabilities/lifecycle_status.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Estate Capability Lifecycle Status"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Dependency Graph Machine-readable output: `runtime/dependencies/dependency_graph.json`. ## Summary - Generated: 2026-07-02T21:04:16+00:00 - Nodes: 65 - Edges: 0 - Orphaned items: 65 - Warnings: 64 ## Supported d",
+      "path": "operations/dependencies/dependency_graph.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Estate Dependency Graph"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# EC-000086: Add Estate Operations Board Date: 2026-06-30 Classification: Estate Internal Worker: Worker #1 Work Package: WP-OPS-001 ## Summary Created the Estate Operations Board as the first operational client of the E",
+      "path": "operations/history/EC-000086.md",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "EC-000086: Add Estate Operations Board"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Operations Board Implementation Recommendation Status: Active Owner: Worker #1 Classification: Estate Internal Introduced By: EC-000086 Date: 2026-06-30 ## Recommendation Use a GitHub-first and local-first hybrid imple",
+      "path": "operations/implementation_recommendation.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Operations Board Implementation Recommendation"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Mailbox Synchronization Duty Actor: office.chief_architect_3 Actor Category: office.chief_architect Generated: 2026-07-02T20:48:42+00:00 ## Identity - Canonical actor: mailbox.4 - Employee ID: 4 - Mailbox ID: 4 ## Summ",
+      "path": "operations/mailboxes/synchronization_duty.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Mailbox Synchronization Duty"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Steward Dashboard Generated: 2026-07-01T22:28:01+00:00 ## Current Operational Summary - Overall status: attention - Operations Board available: False - Operations Board markdown available: True - Warnings requir",
+      "path": "operations/steward/dashboard.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Estate Steward Dashboard"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Active Work Item Template Status: Planned Priority: Normal Classification: Estate Internal ## ID AW-YYYY-NNN ## Effort Name the multi-day or strategic effort. ## Owner Worker, office, or person responsible. ## Current ",
+      "path": "operations/templates/active_work_item.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Active Work Item Template"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Daily Task Template Status: Active Priority: Normal Classification: Estate Internal ## ID DT-YYYY-NNN ## Task Describe today's operational commitment. ## Owner Worker, office, or person responsible. ## Current State Al",
+      "path": "operations/templates/daily_task.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Daily Task Template"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Parking Lot Item Status: Captured Priority: Normal Classification: Estate Internal ## ID PL-YYYY-NNN ## Idea Describe the deferred institutional idea. ## Category Examples: Governance, Collaboration, Alfred, Discovery,",
+      "path": "operations/templates/parking_item.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Parking Lot Item"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Check for Updates Actor: steward Actor Category: steward Visibility: restricted Generated: 2026-07-02T21:04:16+00:00 ## Actor Identity - Canonical actor: steward - Employee ID: unresolved - Mailbox ID: unresolved ## Su",
+      "path": "operations/updates/check_updates_latest.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Check for Updates"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Local Operational Validation Run Generated: 2026-07-02T21:04:16+00:00 ## Summary - Step Count: 9 - Failed Steps: 0 - Warning Count: 76 - Ok: True ## Source Boundary ### Authoritative Sources - data/registry/**/*.json -",
+      "path": "operations/validation/local_operational_validation_run.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Local Operational Validation Run"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Continuous Operational Validation Report Generated: 2026-07-02T21:04:16+00:00 ## Purpose Report evidence for capability maturity review without changing lifecycle state. ## Inputs - runtime/capabilities/capability_life",
+      "path": "operations/validation/operational_validation_report.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Continuous Operational Validation Report"
+    },
+    {
+      "artifact_type": "institutional_memory",
+      "authoritative": true,
+      "excerpt": "# Estate Executive Summary - Recovered Origin Conversation Status: Reference Date Archived: 2026-06-30 Location: A:\\theestate\\archive\\institutional_memory Purpose: Preserve the recovered foundational Estate concepts, sta",
+      "path": "archive/institutional_memory/Volume_01_Estate_Origins_Executive_Summary.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Executive Summary - Recovered Origin Conversation"
+    },
+    {
+      "artifact_type": "institutional_memory",
+      "authoritative": true,
+      "excerpt": "# Chief Architect #1 Final Memorandum ## Purpose This memorandum records the closing reflections of the first historical occupant of the Office of Chief Architect. ## Core Lessons - The Estate is an institution, not mere",
+      "path": "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Chief Architect #1 Final Memorandum"
+    },
+    {
+      "artifact_type": "institutional_memory",
+      "authoritative": true,
+      "excerpt": "# Chief Architect #2 Final Memorandum ## Purpose This memorandum records the closing reflections of the second historical occupant of the Office of Chief Architect. Chief Architect #1 established the constitutional found",
+      "path": "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Chief Architect #2 Final Memorandum"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"generated_at\": \"2026-07-02T21:04:16+00:00\", \"outputs\": { \"json\": \"runtime/validation/local_operational_validation_run.json\", \"markdown\": \"operations/validation/local_operational_validation_run.md\" }, \"policy\": { \"auth",
+      "path": "runtime/validation/local_operational_validation_run.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "local_operational_validation_run.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"candidates_for_institutionalized_review\": [], \"candidates_for_operationally_validated_review\": [ { \"basis\": \"Implemented capability with implementation and validation evidence found.\", \"id\": \"CAP-000001\", \"name\": \"RTX",
+      "path": "runtime/validation/operational_validation_report.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "operational_validation_report.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"edges\": [], \"generated_at\": \"2026-07-02T21:04:16+00:00\", \"inputs\": { \"unavailable\": [ \"runtime/operations/operations_board.json\" ], \"used\": [ \"collaboration/messages/example_alfred_routing_engine_v1.json\", \"collaborat",
+      "path": "runtime/dependencies/dependency_graph.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "dependency_graph.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"active_pending_work_packages\": [ { \"codex_ready_command\": \"Read /workspace/theestate/collaboration/work_packages/pending/README.md and do exactly what it says.\", \"id\": \"README\", \"path\": \"collaboration/work_packages/pe",
+      "path": "runtime/alfred/operational_briefing.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "operational_briefing.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"active_work\": [ { \"Current Milestone\": \"v1 operational validation\", \"Dependency\": \"EC-000085\", \"Effort\": \"Estate Collaboration Layer\", \"ID\": \"AW-0001\", \"Next Action\": \"Validate with WP-OPS-001\", \"Owner\": \"Chief Archit",
+      "path": "runtime/operations/daily_board_integration.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "daily_board_integration.json"
+    }
+  ],
+  "warnings": [
+    "missing runtime report pattern: runtime/capabilities/*.json"
+  ]
+}
