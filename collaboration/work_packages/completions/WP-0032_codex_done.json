@@ -1,0 +1,23 @@
+{
+  "work_package_id": "WP-0032",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T22:15:00Z",
+  "branch": "work",
+  "pull_request_url": null,
+  "summary": "Documented a local Codex completion detection strategy that uses standard completion records as the primary pre-merge signal and added helper support for reading and validating those records.",
+  "files_changed": [
+    "docs/operations/Codex_Completion_Detection_Strategy_v1.md",
+    "src/estate/core/codex_completion.py",
+    "tests/test_codex_completion.py",
+    "collaboration/work_packages/completions/WP-0032_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_codex_completion.py tests/test_work_package_handoff.py"
+  ],
+  "known_limitations": [
+    "Completion detection remains a local review-readiness signal and does not replace Steward or Chief Architect approval before merge.",
+    "Future Codex API integration is documented as optional and was not implemented."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
