@@ -17,7 +17,7 @@
     "mailbox_id": 1,
     "security_clearance": "metadata_only",
     "status": "active",
-    "notes": "Seeded personnel identity for mailbox discovery."
+    "notes": "Seeded personnel identity for mailbox discovery. Employee ID issued by Steward authority."
   },
   {
     "employee_id": 2,
@@ -26,8 +26,8 @@
     "current_office": "Office of the Chief Architect",
     "mailbox_id": 2,
     "security_clearance": "metadata_only",
-    "status": "active",
-    "notes": "Seeded personnel identity for mailbox discovery."
+    "status": "historical",
+    "notes": "First historical occupant of the Office of Chief Architect. Employee ID issued by Steward authority."
   },
   {
     "employee_id": 3,
@@ -36,8 +36,8 @@
     "current_office": "Office of the Chief Architect",
     "mailbox_id": 3,
     "security_clearance": "metadata_only",
-    "status": "active",
-    "notes": "Seeded personnel identity for mailbox discovery."
+    "status": "advisory",
+    "notes": "Second historical occupant of the Office of Chief Architect; retained as advisory peer reviewer. Employee ID issued by Steward authority."
   },
   {
     "employee_id": 4,
@@ -47,6 +47,16 @@
     "mailbox_id": 4,
     "security_clearance": "metadata_only",
     "status": "active",
-    "notes": "Seeded personnel identity for mailbox discovery."
+    "notes": "Active occupant of the Office of Chief Architect. Employee ID issued by Steward authority."
+  },
+  {
+    "employee_id": 5,
+    "display_name": "Chief Architect #4",
+    "current_title": "Chief Architect #4",
+    "current_office": "Office of the Chief Architect",
+    "mailbox_id": 5,
+    "security_clearance": "metadata_only",
+    "status": "onboarding",
+    "notes": "Fourth historical identity in the Office of Chief Architect and second active Chief Architect after onboarding. Employee ID issued by Steward authority."
   }
 ]
