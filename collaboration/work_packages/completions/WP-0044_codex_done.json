@@ -1,0 +1,29 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:49:32Z",
+  "files_changed": [
+    "src/estate/core/resident_cards.py",
+    "src/estate/core/steward_command_center.py",
+    "tests/test_resident_cards.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0044_codex_done.json"
+  ],
+  "known_limitations": [
+    "Resident current duty uses runtime/residents/status.json when available and otherwise displays local placeholders or baseline resident duty text for initial Alfred/Helen cards.",
+    "Last activity is inferred from existing local resident/runtime/operations artifacts and shows a placeholder when no artifact is available.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Added a reusable local-first resident card framework, integrated it into the Office of the Steward command center for Alfred and Helen, preserved graceful placeholders for missing data, and added tests for populated data, missing data, HTML rendering, and future resident extensibility.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_resident_cards.py tests/test_steward_command_center.py",
+    "PYTHONPATH=src pytest",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json > /tmp/command_center.json",
+    "python -m json.tool /tmp/command_center.json >/dev/null",
+    "python -m json.tool collaboration/work_packages/completions/WP-0044_codex_done.json >/dev/null"
+  ],
+  "work_package_id": "WP-0044"
+}
