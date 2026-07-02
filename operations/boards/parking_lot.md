@@ -3,7 +3,7 @@
 Status: Active
 Owner: Alfred / Chief of Staff
 Classification: Estate Internal
-Updated: 2026-06-30
+Updated: 2026-07-01
 
 ## Purpose
 
@@ -57,6 +57,7 @@ Each item should include:
 | PL-0008 | Chief Architect final memorandum standard for retiring architects to leave lessons learned, mistakes, surviving principles, and guidance | Institutional Architecture | Normal | Chief Architect #1 / Steward | 2026-06-30 | Captured | Chief Architect lifecycle implementation | Office lifecycle policy is active |
 | PL-0009 | Eleanor and Marie knowledge architecture with spider-based indexing of A drive and GitHub into a searchable tag-based institutional knowledge base | Institutional Memory | Strategic | Steward | 2026-06-30 | Captured | Institutional memory phase | Collaboration, audit, history queue, and operations board are operational and Discovery is ready for knowledge indexing |
 | PL-0010 | Institutional memory progression model from chat context to GitHub, Parking Lot, institutional documents, curated knowledge base, and institutional reasoning | Institutional Architecture | Normal | Chief Architect #1 / Steward | 2026-06-30 | Captured | Knowledge architecture planning | Eleanor and Marie knowledge architecture is promoted for design |
+| PL-0011 | Mailbox Synchronization Duty Standard: define when Estate personnel must check institutional mailboxes, with different synchronization modes for local workers, ChatGPT workers, Alfred, Audit, Chief Architects, and future autonomous workers; avoid fixed polling intervals until HR/security/worker runtime authority matures | Personnel Operations | High | Steward / Chief Architect #3 | 2026-07-01 | Captured | HR/personnel governance phase | Helen/HR and mailbox authority are mature enough to define duty, cadence, and implementation modes |
 
 ## Review Guidance
 
