@@ -76,6 +76,118 @@ def _safe_job_id():
     return "job_" + datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+
+
+def estate_root(root=None):
+    if root is not None:
+        return Path(root)
+    if ESTATE_ROOT.exists():
+        return ESTATE_ROOT
+    return Path.cwd()
+
+
+def _rel(path, root):
+    try:
+        return str(path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        return str(path).replace("\\", "/")
+
+
+def _read_json_artifact(root, rel_path, warnings, required=False):
+    path = root / rel_path
+    if not path.exists():
+        warnings.append({"type": "missing_artifact", "path": rel_path, "required": required})
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        warnings.append({"type": "malformed_json", "path": rel_path, "error": str(exc)})
+        return None
+
+
+def _read_text_artifact(root, rel_path, warnings):
+    path = root / rel_path
+    if not path.exists():
+        warnings.append({"type": "missing_artifact", "path": rel_path, "required": False})
+        return None
+    try:
+        return path.read_text(encoding="utf-8")
+    except Exception as exc:
+        warnings.append({"type": "unreadable_artifact", "path": rel_path, "error": str(exc)})
+        return None
+
+
+def _message_title(message):
+    payload = message.get("payload") or {}
+    return payload.get("title") or message.get("subject") or message.get("id")
+
+
+def _load_collaboration_messages(root, warnings):
+    messages_dir = root / "collaboration" / "messages"
+    messages = []
+    if not messages_dir.exists():
+        warnings.append({"type": "missing_artifact", "path": "collaboration/messages", "required": False})
+        return messages
+    for path in sorted(messages_dir.glob("*.json")):
+        try:
+            message = json.loads(path.read_text(encoding="utf-8"))
+            messages.append({
+                "id": message.get("id") or path.stem,
+                "path": _rel(path, root),
+                "created_at": message.get("created_at"),
+                "created_by": message.get("created_by"),
+                "source": message.get("source"),
+                "destination": message.get("destination"),
+                "message_type": message.get("message_type"),
+                "priority": message.get("priority"),
+                "status": message.get("status"),
+                "requires_ack": bool(message.get("requires_ack")),
+                "ack_status": message.get("ack_status"),
+                "title": _message_title(message),
+                "artifact_refs": (message.get("payload") or {}).get("artifact_refs", []),
+            })
+        except Exception as exc:
+            warnings.append({"type": "malformed_json", "path": _rel(path, root), "error": str(exc)})
+    return messages
+
+
+def _pending_work_packages(root, warnings):
+    pending_dir = root / "collaboration" / "work_packages" / "pending"
+    packages = []
+    if not pending_dir.exists():
+        warnings.append({"type": "missing_artifact", "path": "collaboration/work_packages/pending", "required": False})
+        return packages
+    for path in sorted(pending_dir.glob("*.md")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        title = next((line.lstrip("# ").strip() for line in text.splitlines() if line.startswith("#")), path.stem)
+        package_id = path.stem.split("_")[0]
+        packages.append({"id": package_id, "title": title, "path": _rel(path, root), "codex_ready_command": f"Read {path.as_posix()} and do exactly what it says."})
+    return packages
+
+
+def _parking_lot_items(root, warnings, limit=5):
+    text = _read_text_artifact(root, "operations/boards/parking_lot.md", warnings)
+    items = []
+    if not text:
+        return items
+    for line in text.splitlines():
+        if not line.startswith("| PL-"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) >= 7:
+            items.append({"id": cells[0], "idea": cells[1], "category": cells[2], "priority": cells[3], "status": cells[6]})
+    return items[-limit:]
+
+
+def _validation_candidates(validation_report, lifecycle_report):
+    candidates = []
+    if isinstance(validation_report, dict):
+        candidates.extend(validation_report.get("candidates_for_operationally_validated_review", [])[:10])
+        candidates.extend(validation_report.get("candidates_for_institutionalized_review", [])[:10])
+    if not candidates and isinstance(lifecycle_report, dict):
+        candidates.extend(lifecycle_report.get("candidates_for_operationally_validated_review", [])[:10])
+    return candidates
+
 def infer_intents(goal):
     text = goal.lower()
     matches = []
@@ -180,11 +292,12 @@ def create_job(goal):
     return job
 
 
-def list_jobs():
-    RUNTIME_JOBS_DIR.mkdir(parents=True, exist_ok=True)
+def list_jobs(root=None):
+    jobs_dir = estate_root(root) / "runtime" / "alfred" / "jobs"
+    jobs_dir.mkdir(parents=True, exist_ok=True)
     jobs = []
 
-    for path in sorted(RUNTIME_JOBS_DIR.glob("job_*.json")):
+    for path in sorted(jobs_dir.glob("job_*.json")):
         try:
             jobs.append(json.loads(path.read_text(encoding="utf-8")))
         except Exception:
@@ -643,8 +756,8 @@ def format_task_result(task):
 
 
 
-def alfred_status():
-    jobs = list_jobs().get("jobs", [])
+def alfred_status(root=None):
+    jobs = list_jobs(root).get("jobs", [])
     service_surface = alfred_capabilities()
 
     by_status = {}
@@ -716,10 +829,11 @@ def create_request(goal):
     return request
 
 
-def list_requests():
-    RUNTIME_REQUESTS_DIR.mkdir(parents=True, exist_ok=True)
+def list_requests(root=None):
+    requests_dir = estate_root(root) / "runtime" / "alfred" / "requests"
+    requests_dir.mkdir(parents=True, exist_ok=True)
     requests = []
-    for path in sorted(RUNTIME_REQUESTS_DIR.glob("request_*.json")):
+    for path in sorted(requests_dir.glob("request_*.json")):
         try:
             requests.append(json.loads(path.read_text(encoding="utf-8")))
         except Exception:
@@ -757,62 +871,139 @@ def format_requests(payload=None):
 
 
 
-def alfred_briefing():
-    status = alfred_status()
-    requests = list_requests()
-    jobs = list_jobs()
+def alfred_briefing(root=None, write=True):
+    root = estate_root(root)
+    warnings = []
+    status = alfred_status(root)
+    requests = list_requests(root)
+    jobs = list_jobs(root)
 
-    latest_jobs = jobs.get("jobs", [])[-10:]
-    queued_requests = [
-        request for request in requests.get("requests", [])
-        if request.get("status") == "queued"
+    messages = _load_collaboration_messages(root, warnings)
+    messages_requiring_ack = [
+        message for message in messages
+        if message.get("requires_ack") and message.get("ack_status") not in {"acknowledged", "complete", "completed"}
     ]
+    pending_packages = _pending_work_packages(root, warnings)
 
-    return {
-        "version": 1,
+    operations_board = _read_json_artifact(root, "runtime/operations/operations_board.json", warnings)
+    steward_dashboard = _read_json_artifact(root, "runtime/steward/dashboard.json", warnings)
+    if steward_dashboard is None:
+        _read_text_artifact(root, "operations/steward/dashboard.md", warnings)
+    lifecycle_report = _read_json_artifact(root, "runtime/capabilities/capability_lifecycle_report.json", warnings)
+    dependency_graph = _read_json_artifact(root, "runtime/dependencies/dependency_graph.json", warnings)
+    validation_report = _read_json_artifact(root, "runtime/validation/operational_validation_report.json", warnings)
+
+    ca_review_needs = [
+        message for message in messages
+        if "chief_architect" in str(message.get("destination", "")).lower()
+        or "ca" in str(message.get("message_type", "")).lower()
+        or "review" in str(message.get("title", "")).lower()
+    ][:20]
+    blocked_work = [job for job in jobs.get("jobs", []) if job.get("status") == "blocked"]
+    validation_candidates = _validation_candidates(validation_report, lifecycle_report)
+    queued_requests = [request for request in requests.get("requests", []) if request.get("status") == "queued"]
+    codex_ready_next_commands = [pkg["codex_ready_command"] for pkg in pending_packages[:10]]
+
+    recommended_next_actions = []
+    if messages_requiring_ack:
+        recommended_next_actions.append("Acknowledge or route messages requiring acknowledgement.")
+    if pending_packages:
+        recommended_next_actions.append("Select the next pending work package and hand it to Codex using the provided ready command.")
+    if ca_review_needs:
+        recommended_next_actions.append("Ask Chief Architect review owners to resolve open review needs.")
+    if validation_candidates:
+        recommended_next_actions.append("Promote validation candidates into CA review when operational evidence is sufficient.")
+    if not recommended_next_actions:
+        recommended_next_actions.append("Continue monitoring operations artifacts; no urgent Alfred coordination action detected.")
+
+    payload = {
+        "version": 2,
         "created_at": _now(),
         "status": status,
         "queued_requests": queued_requests[-10:],
-        "latest_jobs": latest_jobs,
+        "latest_jobs": jobs.get("jobs", [])[-10:],
+        "active_pending_work_packages": pending_packages,
+        "messages_requiring_acknowledgement": messages_requiring_ack,
+        "ca_review_needs": ca_review_needs,
+        "codex_ready_next_commands": codex_ready_next_commands,
+        "blocked_work": blocked_work,
+        "validation_candidates": validation_candidates,
+        "parking_lot_items_recently_relevant": _parking_lot_items(root, warnings),
+        "recommended_next_actions": recommended_next_actions,
+        "source_artifacts": {
+            "operations_board_available": isinstance(operations_board, dict),
+            "steward_dashboard_available": isinstance(steward_dashboard, dict),
+            "dependency_graph_available": isinstance(dependency_graph, dict),
+            "validation_report_available": isinstance(validation_report, dict),
+            "capability_lifecycle_report_available": isinstance(lifecycle_report, dict),
+        },
+        "warnings": warnings,
         "summary": {
             "ready": status.get("operator_summary", {}).get("ready"),
             "services_available": status.get("services", {}).get("available"),
             "capabilities": status.get("services", {}).get("capabilities"),
             "jobs": jobs.get("count"),
             "queued_requests": len(queued_requests),
+            "pending_work_packages": len(pending_packages),
+            "messages_requiring_acknowledgement": len(messages_requiring_ack),
+            "ca_review_needs": len(ca_review_needs),
+            "blocked_work": len(blocked_work),
+            "validation_candidates": len(validation_candidates),
+            "warnings": len(warnings),
         },
     }
-
+    if write:
+        (root / "runtime" / "alfred").mkdir(parents=True, exist_ok=True)
+        (root / "operations" / "alfred").mkdir(parents=True, exist_ok=True)
+        (root / "runtime" / "alfred" / "operational_briefing.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        (root / "operations" / "alfred" / "operational_briefing.md").write_text(format_alfred_briefing(payload), encoding="utf-8")
+    return payload
 
 def format_alfred_briefing(payload=None):
     payload = payload or alfred_briefing()
     summary = payload.get("summary", {})
 
     lines = [
-        "=========================================",
-        "Alfred Operator Briefing",
-        "=========================================",
+        "# Alfred Operational Briefing",
+        "",
         f"Created: {payload.get('created_at')}",
         f"Ready: {summary.get('ready')}",
         f"Services Available: {summary.get('services_available')}",
         f"Capabilities: {summary.get('capabilities')}",
-        f"Jobs: {summary.get('jobs')}",
-        f"Queued Requests: {summary.get('queued_requests')}",
+        f"Pending Work Packages: {summary.get('pending_work_packages')}",
+        f"Messages Requiring Acknowledgement: {summary.get('messages_requiring_acknowledgement')}",
+        f"CA Review Needs: {summary.get('ca_review_needs')}",
+        f"Blocked Work: {summary.get('blocked_work')}",
+        f"Validation Candidates: {summary.get('validation_candidates')}",
         "",
-        "Queued Requests:",
+        "## Recommended Next Actions",
     ]
+    for action in payload.get("recommended_next_actions", []):
+        lines.append(f"- {action}")
 
-    for request in payload.get("queued_requests", []):
-        lines.append(f"- {request.get('id')} | {request.get('goal')}")
+    sections = [
+        ("Active/Pending Work Packages", "active_pending_work_packages", lambda item: f"{item.get('id')} | {item.get('title')} | {item.get('path')}"),
+        ("Messages Requiring Acknowledgement", "messages_requiring_acknowledgement", lambda item: f"{item.get('id')} | {item.get('destination')} | {item.get('title')}"),
+        ("CA Review Needs", "ca_review_needs", lambda item: f"{item.get('id')} | {item.get('destination')} | {item.get('title')}"),
+        ("Codex-Ready Next Commands", "codex_ready_next_commands", lambda item: item),
+        ("Blocked Work", "blocked_work", lambda item: f"{item.get('id')} | {item.get('goal')}"),
+        ("Validation Candidates", "validation_candidates", lambda item: f"{item.get('id')} | {item.get('name')} | {item.get('basis')}") ,
+        ("Parking Lot Items Recently Relevant", "parking_lot_items_recently_relevant", lambda item: f"{item.get('id')} | {item.get('priority')} | {item.get('idea')}"),
+    ]
+    for title, key, formatter in sections:
+        lines.extend(["", f"## {title}"])
+        values = payload.get(key, [])
+        if not values:
+            lines.append("- None")
+        for item in values:
+            lines.append(f"- {formatter(item)}")
 
-    lines.append("")
-    lines.append("Latest Jobs:")
-
-    for job in payload.get("latest_jobs", []):
-        lines.append(f"- {job.get('id')} | {job.get('status')} | {job.get('goal')}")
+    if payload.get("warnings"):
+        lines.extend(["", "## Warnings"])
+        for warning in payload.get("warnings", []):
+            lines.append(f"- {warning.get('type')} | {warning.get('path')}")
 
     return "\n".join(lines)
-
 
 
 def cleanup_jobs(keep=100):
