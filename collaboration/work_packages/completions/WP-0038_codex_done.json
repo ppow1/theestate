@@ -1,0 +1,25 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:09:13+00:00",
+  "files_changed": [
+    "src/estate/core/morning_briefing.py",
+    "src/estate/cli/main.py",
+    "tests/test_morning_briefing.py",
+    "operations/briefings/morning_briefing.md",
+    "collaboration/work_packages/completions/WP-0038_codex_done.json"
+  ],
+  "known_limitations": [
+    "Briefing is intentionally concise and non-authoritative; it summarizes existing artifacts and reports missing optional inputs as warnings."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending",
+  "ready_for_ca_review": true,
+  "summary": "Implemented Morning Briefing v1 generator, CLI integration, Markdown/JSON output generation, and representative test coverage for summaries and warning behavior.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_morning_briefing.py -q",
+    "PYTHONPATH=src python -m estate.cli.main morning-briefing --json > /tmp/morning.json && python -m json.tool /tmp/morning.json >/dev/null && PYTHONPATH=src pytest tests/test_morning_briefing.py -q",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "work_package_id": "WP-0038"
+}
