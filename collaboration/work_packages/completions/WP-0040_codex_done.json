@@ -1,0 +1,29 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:19:20Z",
+  "files_changed": [
+    "src/estate/core/assignment_queue.py",
+    "src/estate/cli/main.py",
+    "tests/test_assignment_queue.py",
+    "runtime/work_packages/assignment_queue.json",
+    "operations/work_packages/assignment_queue.md",
+    "collaboration/work_packages/completions/WP-0040_codex_done.json"
+  ],
+  "known_limitations": [
+    "Queue ownership is derived only from explicit owner fields; packages without an owner are marked unassigned and warned.",
+    "Dependency and blocker extraction is limited to explicit fields and labelled Markdown sections.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented Assignment Queue v1 with JSON and Markdown outputs, CLI generation, dependency and blocker extraction, missing-owner warnings, tests, and generated current queue artifacts.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_assignment_queue.py",
+    "PYTHONPATH=src python -m estate.cli.main assignment-queue --json > /tmp/assignment_queue.json",
+    "python -m json.tool /tmp/assignment_queue.json >/dev/null",
+    "PYTHONPATH=src python -m estate.cli.main assignment-queue >/tmp/assignment_queue.md"
+  ],
+  "work_package_id": "WP-0040"
+}
