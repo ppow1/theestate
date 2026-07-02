@@ -1,0 +1,28 @@
+{
+  "work_package_id": "WP-0021",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T00:00:00+00:00",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "summary": "Implemented a conservative registry-backed personnel identity and mailbox resolver with CLI, tests, and documentation. The resolver supports employee, mailbox, office, resident, Alfred/Helen, and known worker destination lookups while warning instead of fabricating missing mappings.",
+  "files_changed": [
+    "src/estate/core/personnel_identity.py",
+    "src/estate/cli/main.py",
+    "tests/test_personnel_identity.py",
+    "docs/collaboration/Personnel_Identity_Mailbox_Resolver_v1.md",
+    "collaboration/work_packages/completions/WP-0021_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_personnel_identity.py tests/test_mailbox_index.py -q",
+    "for actor in office.chief_architect_3 office.chief_architect_4 alfred helen worker.implementation; do echo \"--- $actor\"; PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"$actor\" --json; done",
+    "python -m compileall -q src/estate/core/personnel_identity.py src/estate/cli/main.py",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "known_limitations": [
+    "Resolver uses existing registry facts and known routing worker names only; it does not create HR authority, clearance policy, or Communication Bus routing policy.",
+    "Unknown workers resolve as worker destinations with a warning because worker mailboxes are route names rather than registry-backed personnel mailboxes.",
+    "pull_request_url is pending until the PR is created by the automation tool after commit."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
