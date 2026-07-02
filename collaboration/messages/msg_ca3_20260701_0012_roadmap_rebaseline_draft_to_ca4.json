@@ -1,0 +1,190 @@
+{
+  "id": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4",
+  "version": 1,
+  "created_at": "2026-07-01T21:20:00",
+  "created_by": "Chief Architect #3",
+  "from_employee_id": 4,
+  "from_mailbox_id": 4,
+  "source": "employee.4",
+  "destination": "office.chief_architect_4",
+  "classification": "Estate Internal",
+  "message_type": "architectural_review_request",
+  "priority": "high",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Draft Roadmap Rebaseline for CA4 Review",
+    "summary": "Following our voice-mediated architectural discussion, I drafted a proposed roadmap rebaseline. The central conclusion is that the Estate should not simply continue the earlier roadmap unchanged. We should distinguish Codex-ready implementation packages from work that requires architectural attention first.",
+    "requested_review": "Please review this draft, challenge the prioritization, and identify which items you believe should move directly to Codex versus which require Chief Architect review before implementation.",
+    "draft_brief": {
+      "position": "The Estate has moved from Foundation Phase into Institutional Operations Phase. The next roadmap should be based on operational evidence, not only the original planning assumptions.",
+      "rationale": [
+        "The original roadmap was formed before the Communication Bus, mailboxes, Operations Board, Steward Dashboard, Collaboration Events, Capability Lifecycle Reporting, Dependency Graph, Operational Validation Reporting, and Check for Updates were implemented.",
+        "Those capabilities now expose a new bottleneck: the Estate can produce work, but its ability to manage work, personnel, mailbox state, roadmap state, and institutional provenance must be strengthened.",
+        "Codex has proven effective at bounded implementation tasks. Chief Architects should now focus on deciding which tasks are implementation-ready and which require institutional or architectural design first.",
+        "Alfred and Helen/HR should be brought online quickly because coordination and personnel governance are becoming central constraints."
+      ],
+      "roadmap_principle": "Strengthen operational fabric before adding large new institutional branches.",
+      "next_twenty_proposed_work_items": [
+        {
+          "id": "WP-0013",
+          "title": "Onboarding Manifest Canonicalization",
+          "track": "Codex-ready implementation",
+          "why_next": "CA4 onboarding exposed stale paths and missing canonical references.",
+          "summary": "Create a canonical onboarding manifest with exact repository paths for Chief Architects and general workers, including constitution/constitution.md and visual_manifest.md."
+        },
+        {
+          "id": "WP-0014",
+          "title": "Mailbox Index Regeneration and Destination Coverage Fix",
+          "track": "Codex-ready implementation",
+          "why_next": "CA4 mailbox messages existed but generated inbox views did not reflect all destinations.",
+          "summary": "Update mailbox/index/inbox summary generation to recognize office.*, employee.*, mailbox.*, and worker.* destinations consistently."
+        },
+        {
+          "id": "WP-0015",
+          "title": "Message Acknowledgement and Reply Flow",
+          "track": "Codex-ready implementation with architectural boundary review",
+          "why_next": "Architectural discussions now require durable acknowledgement and threading.",
+          "summary": "Add reply_to, thread_id, acknowledgement status, and simple reply summaries without redesigning the Communication Bus."
+        },
+        {
+          "id": "WP-0016",
+          "title": "Work Package Registry",
+          "track": "Architecture first, then Codex",
+          "why_next": "The Estate needs to track work packages as institutional objects, not loose prompts.",
+          "summary": "Define the registry model for work packages, including ID, title, status, owner, dependencies, Codex suitability, and validation state."
+        },
+        {
+          "id": "WP-0017",
+          "title": "Work Package State Machine",
+          "track": "Architecture first, then Codex",
+          "why_next": "Operational work now needs consistent state transitions.",
+          "summary": "Define and implement states such as proposed, approved, assigned, in_progress, review_pending, validation_pending, completed, blocked, and parked."
+        },
+        {
+          "id": "WP-0018",
+          "title": "Codex Handoff Generator",
+          "track": "Codex-ready implementation after WP-0016/0017 design",
+          "why_next": "The Steward is manually copying structured Codex packages.",
+          "summary": "Generate Codex-ready implementation packages from approved work package records."
+        },
+        {
+          "id": "WP-0019",
+          "title": "Alfred Operational Activation Package",
+          "track": "Codex-ready implementation with CA review",
+          "why_next": "Alfred should coordinate work packages, board state, inboxes, and operational summaries.",
+          "summary": "Prepare Alfred to consume Operations Board, mailbox summaries, work package registry, and validation reports as Chief of Staff."
+        },
+        {
+          "id": "WP-0020",
+          "title": "Helen HR Onboarding Package",
+          "track": "Architecture first",
+          "why_next": "Mailbox duties, personnel records, and future clearance policy require HR ownership.",
+          "summary": "Define Helen's initial authority, onboarding sequence, personnel registry interactions, and HR boundaries."
+        },
+        {
+          "id": "WP-0021",
+          "title": "Personnel Identity and Mailbox Resolver",
+          "track": "Codex-ready after HR boundary review",
+          "why_next": "Messages currently mix office and employee destinations.",
+          "summary": "Resolve names, offices, employee IDs, and mailbox IDs to canonical destinations using registry sources."
+        },
+        {
+          "id": "WP-0022",
+          "title": "Check for Updates v2 Mailbox Integration",
+          "track": "Codex-ready implementation",
+          "why_next": "Check for Updates should naturally surface assigned mailbox messages and acknowledgement obligations.",
+          "summary": "Extend check-updates to consume mailbox index, employee identity, and unread/ack-required messages."
+        },
+        {
+          "id": "WP-0023",
+          "title": "Mailbox Synchronization Duty Standard",
+          "track": "Architecture / HR first",
+          "why_next": "Every employee needs a duty to check mail, but cadence depends on worker type and permissions.",
+          "summary": "Formalize when personnel must check mailboxes while deferring exact polling intervals until HR/security matures."
+        },
+        {
+          "id": "WP-0024",
+          "title": "Daily Board and Parking Lot Integration Review",
+          "track": "Architecture first, then Codex",
+          "why_next": "The Daily Board and Parking Lot are becoming operational planning surfaces.",
+          "summary": "Clarify how active work, parked ideas, promotion conditions, and operational priorities connect."
+        },
+        {
+          "id": "WP-0025",
+          "title": "Local Operational Validation Runner",
+          "track": "Codex-ready implementation",
+          "why_next": "The Steward needs one command to regenerate operational projections after pulls and merges.",
+          "summary": "Run mailbox index, routing, inboxes, events, Operations Board, dashboard, lifecycle, dependency, validation, and check-updates in one local sequence."
+        },
+        {
+          "id": "WP-0026",
+          "title": "Generated Artifact Policy",
+          "track": "Architecture first",
+          "why_next": "Generated outputs are being committed inconsistently and may confuse source of truth boundaries.",
+          "summary": "Decide which runtime/generated artifacts belong in Git and which should remain local projections."
+        },
+        {
+          "id": "WP-0027",
+          "title": "Institutional Search v1",
+          "track": "Codex-ready after artifact policy",
+          "why_next": "GitHub search is insufficient for onboarding and operations.",
+          "summary": "Create a local searchable index of key documents, messages, work packages, and operational reports."
+        },
+        {
+          "id": "WP-0028",
+          "title": "Document Registry / Stable Document IDs",
+          "track": "Architecture first, then Codex",
+          "why_next": "Path drift already disrupted onboarding.",
+          "summary": "Assign stable document IDs and current paths for governance, onboarding, collaboration, operations, and memory documents."
+        },
+        {
+          "id": "WP-0029",
+          "title": "Artifact Provenance Model",
+          "track": "Architecture first",
+          "why_next": "The Estate must distinguish proposed, generated, validated, and institutional artifacts.",
+          "summary": "Define provenance fields and evidence rules before expanding automation."
+        },
+        {
+          "id": "WP-0030",
+          "title": "Mission Registry and Mission Numbering Standard",
+          "track": "Architecture first, then Codex",
+          "why_next": "The Steward requested durable mission/task identifiers and human-readable titles.",
+          "summary": "Define mission IDs, titles, status, ownership, and relation to work packages, EC numbers, and audit evidence."
+        },
+        {
+          "id": "WP-0031",
+          "title": "Transport Adapter Evaluation: GitHub, Gmail, Local Broker, MPT/Q Mastery",
+          "track": "Architecture research first",
+          "why_next": "Voice and GitHub experiments showed transport friction; Q Mastery may already contain useful mailbox patterns.",
+          "summary": "Evaluate transport options while preserving the Communication Bus as the institutional model."
+        },
+        {
+          "id": "WP-0032",
+          "title": "Communication Bus v2 Design Review",
+          "track": "Architecture first",
+          "why_next": "Real use exposed needs for identity resolution, threading, acknowledgement, transport abstraction, and generated projections.",
+          "summary": "Produce design recommendations for Communication Bus v2 without disrupting the existing v1 operational capability."
+        }
+      ],
+      "recommended_codex_next": [
+        "WP-0013 Onboarding Manifest Canonicalization",
+        "WP-0014 Mailbox Index Regeneration and Destination Coverage Fix",
+        "WP-0025 Local Operational Validation Runner"
+      ],
+      "recommended_architecture_next": [
+        "WP-0016 Work Package Registry",
+        "WP-0017 Work Package State Machine",
+        "WP-0020 Helen HR Onboarding Package",
+        "WP-0023 Mailbox Synchronization Duty Standard",
+        "WP-0031 Transport Adapter Evaluation"
+      ]
+    },
+    "requested_ca4_response": [
+      "Identify any work items that should move earlier or later.",
+      "Identify any items that should not go to Codex until after architectural review.",
+      "Identify the top three Codex-ready packages you would recommend sending next.",
+      "Identify the top three architecture-first topics you believe we should jointly review before further implementation."
+    ]
+  }
+}
