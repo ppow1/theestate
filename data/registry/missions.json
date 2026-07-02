@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0",
+  "registry_id": "REG-MISSIONS-0001",
+  "title": "Estate Mission Registry",
+  "standard": "docs/operations/Mission_Registry_Standard_v1.md",
+  "mission_id_convention": "MISSION-####",
+  "created_at": "2026-07-02",
+  "updated_at": "2026-07-02",
+  "missions": [
+    {
+      "mission_id": "MISSION-0001",
+      "mission_title": "Estate Operational Stabilization",
+      "mission_type": "operations",
+      "status": "active",
+      "owner": "Chief Architect / Alfred Operations",
+      "steward_authorization": "not_asserted",
+      "related_work_packages": [
+        "WP-0024",
+        "WP-0025",
+        "WP-0026",
+        "WP-0028",
+        "WP-0029"
+      ],
+      "related_documents": [
+        "DOC-OPERATIONS-BOARD-RUNTIME",
+        "DOC-OPERATIONAL-VALIDATION-REPORTING",
+        "DOC-GENERATED-ARTIFACT-POLICY",
+        "docs/operations/Document_Registry_v1.md",
+        "DOC-ARTIFACT-PROVENANCE-MODEL"
+      ],
+      "related_artifacts": [
+        "operations/board/latest.md",
+        "operations/steward/dashboard.md",
+        "operations/validation/operational_validation_report.md",
+        "data/registry/documents.json",
+        "data/registry/artifact_provenance_schema.json"
+      ],
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02",
+      "notes": "Tracks bounded stabilization of operational views, validation reporting, generated artifact handling, document indexing, and provenance metadata. Registry entry does not assert Steward approval."
+    },
+    {
+      "mission_id": "MISSION-0002",
+      "mission_title": "Work Package Pipeline",
+      "mission_type": "pipeline",
+      "status": "active",
+      "owner": "Chief Architect / Collaboration Layer",
+      "steward_authorization": "not_asserted",
+      "related_work_packages": [
+        "WP-0016",
+        "WP-0017",
+        "WP-0018",
+        "WP-0030"
+      ],
+      "related_documents": [
+        "Architecture/ADR/ADR-0002-Work-Package-Registry-Proposal.md",
+        "Architecture/ADR/ADR-0003-Work-Package-State-Machine-Proposal.md",
+        "docs/operations/Codex_Handoff_Generator_v1.md"
+      ],
+      "related_artifacts": [
+        "collaboration/work_packages/pending",
+        "collaboration/work_packages/completions",
+        "collaboration/work_packages/open"
+      ],
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02",
+      "notes": "Tracks durable work package identification, state concepts, handoff generation, and completion evidence without replacing WP IDs."
+    },
+    {
+      "mission_id": "MISSION-0003",
+      "mission_title": "Alfred Operational Activation",
+      "mission_type": "activation",
+      "status": "active",
+      "owner": "Alfred / Chief of Staff",
+      "steward_authorization": "not_asserted",
+      "related_work_packages": [
+        "WP-0019"
+      ],
+      "related_documents": [
+        "docs/alfred_v1_status.md",
+        "docs/alfred_v1_operator_completion.md",
+        "operations/alfred/operational_briefing.md"
+      ],
+      "related_artifacts": [
+        "runtime/alfred/operational_briefing.json",
+        "operations/boards/daily_board_integration.md"
+      ],
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02",
+      "notes": "Tracks activation of Alfred as an operational coordination surface. This entry does not expand Alfred authority beyond existing documents."
+    },
+    {
+      "mission_id": "MISSION-0004",
+      "mission_title": "Helen HR Operational Onboarding",
+      "mission_type": "onboarding",
+      "status": "active",
+      "owner": "Helen / Human Resources",
+      "steward_authorization": "not_asserted",
+      "related_work_packages": [
+        "WP-0020"
+      ],
+      "related_documents": [
+        "docs/onboarding/Helen_HR_Operational_Onboarding.md",
+        "docs/operations/Onboarding_Checklist_v1.md",
+        "docs/operations/helen/operating_brief.md",
+        "residents/helen.md"
+      ],
+      "related_artifacts": [
+        "data/registry/personnel.json",
+        "data/registry/mailboxes.json"
+      ],
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02",
+      "notes": "Tracks Helen's initial HR/personnel coordination onboarding. Existing onboarding documents state this does not create final security or lifecycle authority."
+    },
+    {
+      "mission_id": "MISSION-0005",
+      "mission_title": "Autonomous Estate Operations and Steward Recall Planning",
+      "mission_type": "strategic_initiative",
+      "status": "proposed",
+      "owner": "Chief Architect / Alfred Operations",
+      "steward_authorization": "not_asserted",
+      "related_work_packages": [
+        "WP-0033",
+        "WP-0034"
+      ],
+      "related_documents": [
+        "collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md",
+        "collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md",
+        "docs/governance/Estate_Vision_and_Architecture.md"
+      ],
+      "related_artifacts": [],
+      "created_at": "2026-07-02",
+      "updated_at": "2026-07-02",
+      "notes": "Seeded as proposed because current evidence is pending work package intent rather than an approved autonomous operations charter or Steward recall decision model."
+    }
+  ]
+}
