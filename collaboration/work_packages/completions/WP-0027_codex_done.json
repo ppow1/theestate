@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T21:12:57+00:00",
+  "files_changed": [
+    "src/estate/core/institutional_search.py",
+    "src/estate/cli/main.py",
+    "tests/test_institutional_search.py",
+    "runtime/search/institutional_search_index.json",
+    "collaboration/work_packages/completions/WP-0027_codex_done.json"
+  ],
+  "known_limitations": [
+    "v1 uses simple keyword/substring matching only; no embeddings or external search service.",
+    "Runtime report indexing is limited to policy-recognized report patterns."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending",
+  "ready_for_ca_review": true,
+  "summary": "Implemented local institutional search indexing and CLI for Estate documents, messages, work packages, operational records, generated projection labeling, warnings, and JSON output.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main estate-search \"Chief Architect memorandum\" --json",
+    "PYTHONPATH=src pytest -q tests/test_institutional_search.py",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "work_package_id": "WP-0027"
+}
