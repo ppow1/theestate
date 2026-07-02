@@ -136,6 +136,14 @@ Local-only state:
 runtime/collaboration/local_only
 runtime/collaboration/outbox
 runtime/collaboration/dead_letter
+Acknowledgement and Reply Threading
+
+Messages may request durable receipt confirmation by setting `requires_ack` to `true`. The receiver may acknowledge the message by updating the original message with `ack_status: acknowledged`, `acknowledged_at`, and `acknowledged_by`, while also creating a closed acknowledgement message that sets `message_type: acknowledgement`, `acknowledges`, `reply_to`, and `thread_id`.
+
+Replies are ordinary message JSON files with `message_type: reply`, `reply_to` set to the original message id, and `thread_id` set to the original thread id or original message id. Acknowledgements and replies do not alter authority, privacy, classification, or routing semantics; they only add durable receipt and review traceability.
+
+Operators can use `estate message-ack <message_id>` to acknowledge a message and `estate message-reply <message_id> --body "..."` to create a threaded reply. The mailbox index surfaces `requires_ack`, `ack_status`, `thread_id`, `reply_to`, `acknowledges`, and acknowledgement-required message counts.
+
 6. Operational Rule
 
 If a message may leave local-only state, it must pass through the Privacy and Boundary Office.

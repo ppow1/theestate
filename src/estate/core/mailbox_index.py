@@ -235,6 +235,10 @@ def index_message(path, message, root, personnel, functional_mailboxes):
         "priority": message.get("priority", "normal"),
         "status": message.get("status"),
         "requires_ack": message.get("requires_ack", False),
+        "ack_status": message.get("ack_status"),
+        "thread_id": message.get("thread_id"),
+        "reply_to": message.get("reply_to"),
+        "acknowledges": message.get("acknowledges"),
         "created_at": message.get("created_at"),
     }
     if warning:
@@ -291,6 +295,11 @@ def mailbox_index_summary(index):
     open_ca2 = [m for m in index.get("messages", []) if m.get("destination_employee_id") == 3 and str(m.get("status", "")).lower() == "open"]
     open_ca3 = [m for m in index.get("messages", []) if m.get("destination_employee_id") == 4 and str(m.get("status", "")).lower() == "open"]
     open_ca4 = [m for m in index.get("messages", []) if m.get("destination_employee_id") == 5 and str(m.get("status", "")).lower() == "open"]
+    ack_required = [
+        m for m in index.get("messages", [])
+        if m.get("requires_ack") is True and str(m.get("ack_status", "pending")).lower() not in {"acknowledged", "not_required"}
+    ]
+    threads = sorted({m.get("thread_id") for m in index.get("messages", []) if m.get("thread_id")})
     return {
         "index_version": index.get("index_version"),
         "message_count": index.get("message_count", len(index.get("messages", []))),
@@ -298,5 +307,7 @@ def mailbox_index_summary(index):
         "open_ca2_message_count": len(open_ca2),
         "open_ca3_message_count": len(open_ca3),
         "open_ca4_message_count": len(open_ca4),
+        "ack_required_message_count": len(ack_required),
+        "thread_count": len(threads),
         "index_path": "collaboration/mailboxes/index.json",
     }
