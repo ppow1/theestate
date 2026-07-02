@@ -23,6 +23,7 @@ from estate.core.audit_runtime import save_audit_report, summarize_audit_artifac
 from estate.core.mailbox_index import generate_mailbox_index, mailbox_index_summary
 from estate.core.check_updates import generate_check_updates, format_check_updates
 from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
+from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -520,6 +521,11 @@ def cmd_onboarding_manifest_check(args):
         raise SystemExit(1)
 
 
+def cmd_work_package_handoffs(args):
+    handoffs = list_pending_handoffs()
+    print(format_handoff_list(handoffs))
+
+
 def cmd_check_updates(args):
     report = generate_check_updates(actor=getattr(args, "actor", None))
     if getattr(args, "json", False):
@@ -800,6 +806,9 @@ def main():
     p = sub.add_parser("onboarding-manifest-check")
     p.add_argument("--json", action="store_true", help="Validate onboarding manifest required paths and print JSON")
     p.set_defaults(func=cmd_onboarding_manifest_check)
+
+    p = sub.add_parser("work-package-handoffs", help="List pending work packages and copy-ready Codex launch commands")
+    p.set_defaults(func=cmd_work_package_handoffs)
 
     p = sub.add_parser("check-updates")
     p.add_argument("--actor", default=None, help="Actor requesting the update briefing")

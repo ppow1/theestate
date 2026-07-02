@@ -1,0 +1,18 @@
+{
+  "work_package": "WP-0018",
+  "status": "codex_done",
+  "pr_url": null,
+  "files_changed": [
+    "src/estate/core/work_package_handoff.py",
+    "src/estate/cli/main.py",
+    "tests/test_work_package_handoff.py",
+    "docs/operations/Codex_Handoff_Generator_v1.md",
+    "collaboration/work_packages/completions/WP-0018_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_handoff.py",
+    "PYTHONPATH=src python -m estate.cli.main work-package-handoffs",
+    "PYTHONPATH=src pytest"
+  ],
+  "ready_for_ca_review": true
+}
