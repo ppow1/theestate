@@ -33,6 +33,7 @@ from estate.core.document_registry import load_document_registry, format_documen
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
+from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -627,6 +628,31 @@ def cmd_mailbox_sync_duty(args):
 
 
 
+
+def cmd_worker_heartbeat(args):
+    heartbeat = create_worker_heartbeat(
+        args.worker_id,
+        activity=args.activity,
+        status=args.status,
+        last_completed_work_package=args.last_completed_work_package,
+        blocking_reason=args.blocking_reason,
+    )
+    summary = generate_worker_runtime_summary()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps({"heartbeat": heartbeat, "summary": summary["summary"]}, indent=2, sort_keys=True))
+    else:
+        print(f"Recorded heartbeat for {heartbeat['worker_id']} with status {heartbeat['status']}.")
+
+
+def cmd_worker_runtime_summary(args):
+    payload = generate_worker_runtime_summary(stale_after_minutes=args.stale_after_minutes)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_worker_runtime_summary(payload))
+
 def cmd_morning_briefing(args):
     briefing = generate_morning_briefing()
     if getattr(args, "json", False):
@@ -962,6 +988,21 @@ def main():
     p.add_argument("--actor", default=None, help="Actor whose mailbox synchronization duty should be checked")
     p.add_argument("--json", action="store_true", help="Print mailbox synchronization duty report JSON")
     p.set_defaults(func=cmd_mailbox_sync_duty)
+
+
+    p = sub.add_parser("worker-heartbeat", help="Record a local Estate worker runtime heartbeat")
+    p.add_argument("worker_id", help="Worker identity or route id")
+    p.add_argument("--activity", required=True, help="Current worker activity reported in this heartbeat")
+    p.add_argument("--status", required=True, choices=["idle", "active", "blocked", "offline"], help="Reported worker status")
+    p.add_argument("--last-completed-work-package", default=None, help="Most recent completed work package id")
+    p.add_argument("--blocking-reason", default=None, help="Required when status is blocked")
+    p.add_argument("--json", action="store_true", help="Print heartbeat result JSON")
+    p.set_defaults(func=cmd_worker_heartbeat)
+
+    p = sub.add_parser("worker-runtime-summary", help="Generate Worker Runtime Heartbeat summary")
+    p.add_argument("--stale-after-minutes", type=int, default=60, help="Flag heartbeats older than this as stale")
+    p.add_argument("--json", action="store_true", help="Print runtime summary JSON")
+    p.set_defaults(func=cmd_worker_runtime_summary)
 
     p = sub.add_parser("morning-briefing")
     p.add_argument("--json", action="store_true", help="Generate Morning Briefing v1 and print JSON")

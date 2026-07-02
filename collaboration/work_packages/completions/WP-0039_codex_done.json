@@ -1,0 +1,31 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:13:57Z",
+  "files_changed": [
+    "src/estate/core/worker_runtime_heartbeat.py",
+    "src/estate/cli/main.py",
+    "tests/test_worker_runtime_heartbeat.py",
+    "runtime/workers/heartbeats/codex.json",
+    "runtime/workers/worker_runtime_heartbeat.json",
+    "operations/workers/runtime_heartbeat.md",
+    "collaboration/work_packages/completions/WP-0039_codex_done.json"
+  ],
+  "known_limitations": [
+    "No scheduling engine or remote monitoring is provided.",
+    "Worker status is recorded from heartbeat evidence only; stale flags do not rewrite reported status.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented Worker Runtime Heartbeat service with local heartbeat recording, stale-heartbeat detection without state inference, blocked-state validation, runtime JSON output, operational Markdown summary, CLI commands, tests, and generated current runtime artifacts.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_worker_runtime_heartbeat.py",
+    "PYTHONPATH=src python -m estate.cli.main worker-heartbeat codex --activity \"Completed WP-0039 Worker Runtime Heartbeat implementation\" --status idle --last-completed-work-package WP-0039 --json > /tmp/worker_heartbeat.json",
+    "python -m json.tool /tmp/worker_heartbeat.json >/dev/null",
+    "PYTHONPATH=src python -m estate.cli.main worker-runtime-summary --json > /tmp/worker_runtime_summary.json",
+    "python -m json.tool /tmp/worker_runtime_summary.json >/dev/null"
+  ],
+  "work_package_id": "WP-0039"
+}
