@@ -176,7 +176,7 @@ def cmd_alfred_briefing(args):
         import json
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
-        print(format_alfred_briefing, cleanup_jobs, format_cleanup_result, artifact_index, format_artifact_index, estate_health_report, format_estate_health_report(payload))
+        print(format_alfred_briefing(payload))
 
 
 def cmd_alfred_triage(args):
@@ -697,6 +697,10 @@ def main():
 
     p = sub.add_parser("alfred-briefing")
     p.add_argument("--json", action="store_true", help="Print Alfred operator briefing JSON")
+    p.set_defaults(func=cmd_alfred_briefing)
+
+    p = sub.add_parser("alfred-operational-briefing")
+    p.add_argument("--json", action="store_true", help="Generate Alfred operational briefing and print JSON")
     p.set_defaults(func=cmd_alfred_briefing)
 
     p = sub.add_parser("alfred")
