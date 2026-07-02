@@ -1,0 +1,17 @@
+{
+  "work_package_id": "WP-0017",
+  "status": "architecture_done",
+  "mode": "ARCHITECTURE-FIRST",
+  "summary": "Produced ADR-0003 proposing a canonical work package state machine, transition authority model, guardrails, and Chief Architect review questions. Drafted a blocked follow-on Codex implementation package that must not start until Chief Architect approval authorizes implementation.",
+  "open_questions": [
+    "Should ca_review_pending be mandatory for all Class B work, or only architecture/governance-adjacent Class B work?",
+    "Should closed be reachable directly from merged, or should all implementation packages pass through validation_pending first?",
+    "Should blocked return only to its immediately prior state, or may the resolving office choose a different authorized state?",
+    "Should merge authority be held only by the Steward, or may Chief Architect verification explicitly delegate merge authority for predefined classes?",
+    "Should architecture-only packages close after ca_verified, or should they also require a separate validation state?"
+  ],
+  "ready_for_codex_package": false,
+  "implementation_authorized": false,
+  "architecture_artifact": "Architecture/ADR/ADR-0003-Work-Package-State-Machine-Proposal.md",
+  "follow_on_package": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md"
+}
