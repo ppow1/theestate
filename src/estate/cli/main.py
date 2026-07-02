@@ -21,6 +21,7 @@ from estate.core.dependency_graph import generate_dependency_graph, format_depen
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
 from estate.core.mailbox_index import generate_mailbox_index, mailbox_index_summary
 from estate.core.check_updates import generate_check_updates, format_check_updates
+from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -485,6 +486,18 @@ def cmd_mailbox_index(args):
 
 
 
+def cmd_onboarding_manifest_check(args):
+    report = check_onboarding_manifests()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(format_onboarding_manifest_check(report))
+
+    if not report["ok"]:
+        raise SystemExit(1)
+
+
 def cmd_check_updates(args):
     report = generate_check_updates(actor=getattr(args, "actor", None))
     if getattr(args, "json", False):
@@ -746,6 +759,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print Alfred capability surface JSON")
     p.set_defaults(func=cmd_alfred_capabilities)
 
+
+    p = sub.add_parser("onboarding-manifest-check")
+    p.add_argument("--json", action="store_true", help="Validate onboarding manifest required paths and print JSON")
+    p.set_defaults(func=cmd_onboarding_manifest_check)
 
     p = sub.add_parser("check-updates")
     p.add_argument("--actor", default=None, help="Actor requesting the update briefing")

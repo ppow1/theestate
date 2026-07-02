@@ -1,0 +1,15 @@
+{
+  "display_title": "Worker Onboarding Manifest",
+  "purpose": "Canonical general worker onboarding manifest using verified repository-relative paths.",
+  "intended_audience": ["general worker", "implementation worker", "audit worker"],
+  "visual_onboarding_entry_point": "docs/onboarding/visual_manifest.md",
+  "required_reading_order": [
+    {"order": 1, "title": "AI Hints", "path": "AI_HINTS.md", "required": true, "audience": "all workers", "notes": "Repository-specific working hints."},
+    {"order": 2, "title": "AI Start Here", "path": "AI_START_HERE.md", "required": true, "audience": "all workers", "notes": "Primary repository entry point."},
+    {"order": 3, "title": "Visual Manifest", "path": "docs/onboarding/visual_manifest.md", "required": true, "audience": "all workers", "notes": "Canonical visual onboarding entry point."},
+    {"order": 4, "title": "Worker Runtime Contract v1", "path": "docs/collaboration/Worker_Runtime_Contract_v1.md", "required": true, "audience": "all workers", "notes": "Runtime expectations for workers."},
+    {"order": 5, "title": "Instruction Precedence v1", "path": "docs/collaboration/Instruction_Precedence_v1.md", "required": true, "audience": "all workers", "notes": "Instruction precedence rules."},
+    {"order": 6, "title": "Estate Orientation Handbook", "path": "docs/governance/Estate_Orientation_Handbook.md", "required": false, "audience": "all workers", "notes": "Useful orientation context."}
+  ],
+  "unresolved_items": []
+}
