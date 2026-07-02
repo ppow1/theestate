@@ -112,6 +112,20 @@
       "path": "collaboration/work_packages/completions/WP-0023_codex_done.json",
       "ready_for_ca_review": true,
       "title": "WP-0023_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0024",
+      "path": "collaboration/work_packages/completions/WP-0024_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0024_codex_done"
+    },
+    {
+      "codex_status": "done",
+      "id": "WP-0025",
+      "path": "collaboration/work_packages/completions/WP-0025_codex_done.json",
+      "ready_for_ca_review": true,
+      "title": "WP-0025_codex_done"
     }
   ],
   "daily_today": [
@@ -125,7 +139,7 @@
       "Task": "WP-OPS-001: Estate Operations Board"
     }
   ],
-  "generated_at": "2026-07-02T20:53:55+00:00",
+  "generated_at": "2026-07-02T21:04:16+00:00",
   "parking_lot": {
     "items": [
       {
@@ -466,6 +480,16 @@
       "id": "WP-0027",
       "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
       "title": "SERIES TASK WP-0027 \u2014 Institutional Search v1"
+    },
+    {
+      "id": "WP-0028",
+      "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+      "title": "SERIES TASK WP-0028 \u2014 Document Registry and Stable Document IDs"
+    },
+    {
+      "id": "WP-0029",
+      "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+      "title": "SERIES TASK WP-0029 \u2014 Artifact Provenance Model"
     }
   ],
   "recommended_next_actions": [
@@ -475,16 +499,16 @@
   ],
   "repository": {
     "branch": "work",
-    "commit": "d4cece56b4c29a289e784e96ef43cbb23f34ef33"
+    "commit": "23802c95ade12294df13568fdb2b36129750a76a"
   },
   "summary": {
     "active_work_items": 6,
     "blocked_items": 0,
-    "completed_awaiting_review": 8,
+    "completed_awaiting_review": 10,
     "daily_items": 1,
     "parking_lot_items": 13,
     "parking_lot_ready_for_review": 4,
-    "pending_work_packages": 16,
+    "pending_work_packages": 18,
     "warning_count": 0
   },
   "version": 1,

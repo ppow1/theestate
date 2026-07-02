@@ -1,12 +1,12 @@
 # Daily Board Integration
 
-Generated: 2026-07-02T20:53:55+00:00
+Generated: 2026-07-02T21:04:16+00:00
 
 ## Summary
 - Active Work Items: 6
 - Daily Items: 1
-- Pending Work Packages: 16
-- Completed Awaiting Review: 8
+- Pending Work Packages: 18
+- Completed Awaiting Review: 10
 - Blocked Items: 0
 - Parking Lot Items: 13
 - Parking Lot Ready For Review: 4
@@ -37,6 +37,8 @@ Generated: 2026-07-02T20:53:55+00:00
 - WP-0025: SERIES TASK WP-0025 — Local Operational Validation Runner (collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md)
 - WP-0026: SERIES TASK WP-0026 — Generated Artifact Policy (collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md)
 - WP-0027: SERIES TASK WP-0027 — Institutional Search v1 (collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md)
+- WP-0028: SERIES TASK WP-0028 — Document Registry and Stable Document IDs (collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md)
+- WP-0029: SERIES TASK WP-0029 — Artifact Provenance Model (collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md)
 
 ## Completed Awaiting Review/Validation
 - WP-0014: WP-0014_codex_done (collaboration/work_packages/completions/WP-0014_codex_done.json)
@@ -47,6 +49,8 @@ Generated: 2026-07-02T20:53:55+00:00
 - WP-0021: WP-0021_codex_done (collaboration/work_packages/completions/WP-0021_codex_done.json)
 - WP-0022: WP-0022_codex_done (collaboration/work_packages/completions/WP-0022_codex_done.json)
 - WP-0023: WP-0023_codex_done (collaboration/work_packages/completions/WP-0023_codex_done.json)
+- WP-0024: WP-0024_codex_done (collaboration/work_packages/completions/WP-0024_codex_done.json)
+- WP-0025: WP-0025_codex_done (collaboration/work_packages/completions/WP-0025_codex_done.json)
 
 ## Blocked Work
 - No blocked work found in available board tables.

@@ -25,6 +25,7 @@ from estate.core.mailbox_index import generate_mailbox_index, mailbox_index_summ
 from estate.core.personnel_identity import resolve_personnel_identity, format_resolution
 from estate.core.check_updates import generate_check_updates, format_check_updates
 from estate.core.mailbox_sync_duty import generate_mailbox_sync_duty, format_mailbox_sync_duty
+from estate.core.local_operational_validation import generate_local_operational_validation_run, format_local_operational_validation_summary
 from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -564,6 +565,15 @@ def cmd_mailbox_sync_duty(args):
         print(format_mailbox_sync_duty(report))
 
 
+def cmd_estate_validate_local(args):
+    report = generate_local_operational_validation_run()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(format_local_operational_validation_summary(report))
+
+
 def cmd_audit(args):
     if getattr(args, "json", False):
         import json
@@ -862,6 +872,10 @@ def main():
     p.add_argument("--actor", default=None, help="Actor whose mailbox synchronization duty should be checked")
     p.add_argument("--json", action="store_true", help="Print mailbox synchronization duty report JSON")
     p.set_defaults(func=cmd_mailbox_sync_duty)
+
+    p = sub.add_parser("estate-validate-local")
+    p.add_argument("--json", action="store_true", help="Run local operational validation and print JSON")
+    p.set_defaults(func=cmd_estate_validate_local)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

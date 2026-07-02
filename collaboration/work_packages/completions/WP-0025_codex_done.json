@@ -1,0 +1,40 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T21:04:27+00:00",
+  "files_changed": [
+    "collaboration/mailboxes/index.json",
+    "collaboration/status/event_summary.json",
+    "collaboration/status/worker_inbox_summary.json",
+    "operations/alfred/operational_briefing.md",
+    "operations/boards/daily_board_integration.md",
+    "operations/capabilities/lifecycle_status.md",
+    "operations/dependencies/dependency_graph.md",
+    "operations/updates/check_updates_latest.md",
+    "operations/validation/operational_validation_report.md",
+    "runtime/alfred/operational_briefing.json",
+    "runtime/dependencies/dependency_graph.json",
+    "runtime/operations/daily_board_integration.json",
+    "runtime/validation/operational_validation_report.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/service_layer.py",
+    "collaboration/work_packages/completions/WP-0025_codex_done.json",
+    "operations/validation/local_operational_validation_run.md",
+    "src/estate/core/local_operational_validation.py",
+    "tests/test_local_operational_validation.py",
+    "runtime/validation/local_operational_validation_run.json"
+  ],
+  "known_limitations": [
+    "The runner invokes existing generators and reports their warnings; it does not make generated projections authoritative or mutate lifecycle/governance source-of-truth records."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented estate-validate-local runner that coordinates operational projection generators, writes JSON/Markdown validation reports, captures warnings and failed sub-steps, and verifies ledger/devlog remain unchanged.",
+  "tests_run": [
+    "pytest -q tests/test_local_operational_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main estate-validate-local --json",
+    "pytest -q"
+  ],
+  "work_package_id": "WP-0025"
+}

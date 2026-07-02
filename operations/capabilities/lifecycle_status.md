@@ -1,6 +1,6 @@
 # Estate Capability Lifecycle Status
 
-Generated: 2026-07-01T23:04:46+00:00
+Generated: 2026-07-02T21:04:16+00:00
 
 This is an operational report generated from registries and evidence. It is not a governance source of truth.
 
