@@ -31,6 +31,7 @@ from estate.core.work_package_handoff import list_pending_handoffs, format_hando
 from estate.core.institutional_search import search_institutional_index, format_search_report
 from estate.core.document_registry import load_document_registry, format_document_registry
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
+from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -625,6 +626,15 @@ def cmd_mailbox_sync_duty(args):
         print(format_mailbox_sync_duty(report))
 
 
+
+def cmd_morning_briefing(args):
+    briefing = generate_morning_briefing()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(briefing, indent=2, sort_keys=True))
+    else:
+        print(format_morning_briefing(briefing))
+
 def cmd_estate_validate_local(args):
     report = generate_local_operational_validation_run()
     if getattr(args, "json", False):
@@ -952,6 +962,10 @@ def main():
     p.add_argument("--actor", default=None, help="Actor whose mailbox synchronization duty should be checked")
     p.add_argument("--json", action="store_true", help="Print mailbox synchronization duty report JSON")
     p.set_defaults(func=cmd_mailbox_sync_duty)
+
+    p = sub.add_parser("morning-briefing")
+    p.add_argument("--json", action="store_true", help="Generate Morning Briefing v1 and print JSON")
+    p.set_defaults(func=cmd_morning_briefing)
 
     p = sub.add_parser("estate-validate-local")
     p.add_argument("--json", action="store_true", help="Run local operational validation and print JSON")
