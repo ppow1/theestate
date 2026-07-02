@@ -482,6 +482,7 @@ def cmd_mailbox_index(args):
         print(f"Warnings: {summary['warning_count']}")
         print(f"Open CA2 messages: {summary['open_ca2_message_count']}")
         print(f"Open CA3 messages: {summary['open_ca3_message_count']}")
+        print(f"Open CA4 messages: {summary.get('open_ca4_message_count', 0)}")
         print(f"Index: {summary['index_path']}")
 
 

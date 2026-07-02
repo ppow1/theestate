@@ -64,14 +64,18 @@ The mailbox index is a generated operational artifact. It is rebuilt by scanning
 
 The index includes message path, source, destination, resolved numeric destination fields, title, message type, priority, status, acknowledgment metadata, creation timestamp, and warnings for unresolved or malformed messages.
 
-## Legacy Destination Compatibility
+## Destination Compatibility
 
-Mailbox Infrastructure v1 supports legacy destination strings already used by existing messages:
+Mailbox Infrastructure v1 resolves destination strings from registry-backed aliases while preserving legacy destination strings already used by existing messages. Supported forms include:
 
-- `office.chief_architect_2` resolves to `employee_id: 3` and `mailbox_id: 3`.
-- `office.chief_architect_3` resolves to `employee_id: 4` and `mailbox_id: 4`.
+- `office.<slug>` for office/personnel title aliases such as `office.chief_architect_4`.
+- `employee.<id>` and `employee.<slug>` for personnel registry entries.
+- `mailbox.<id>`, zero-padded mailbox names, and direct known mailbox IDs when present in the personnel or functional mailbox registry.
+- `worker.<name>` as a valid operational worker destination; worker destinations are routed by the worker inbox watcher and do not require a numeric mailbox resolution in the generated mailbox index.
 
-If a message includes `destination_employee_id`, that explicit numeric field takes precedence over legacy destination text. If a message includes `destination_mailbox_id`, it is used when no explicit destination employee ID is present.
+The historical aliases `office.chief_architect_2` and `office.chief_architect_3` remain pinned to `employee_id: 3` / `mailbox_id: 3` and `employee_id: 4` / `mailbox_id: 4` for backward compatibility.
+
+If a message includes `destination_employee_id`, that explicit numeric field takes precedence over destination text. If a message includes `destination_mailbox_id`, it is used when no explicit destination employee ID is present.
 
 Unresolved destinations and malformed messages are included in the generated index with warning metadata rather than causing generation to fail.
 
