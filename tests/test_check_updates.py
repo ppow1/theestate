@@ -12,6 +12,20 @@ def write(path: Path, text: str):
 
 
 def seed(root: Path):
+    write(root / "data/registry/personnel.json", json.dumps([
+        {"employee_id": 4, "display_name": "Chief Architect #3", "current_title": "Chief Architect #3", "current_office": "Office of the Chief Architect", "mailbox_id": 4},
+        {"employee_id": 5, "display_name": "Chief Architect #4", "current_title": "Chief Architect #4", "current_office": "Office of the Chief Architect", "mailbox_id": 5},
+        {"employee_id": 6, "display_name": "Helen", "current_title": "Manager of Human Resources", "current_office": "Human Resources", "mailbox_id": 6, "resident_id": "RES-000003"},
+    ]))
+    write(root / "data/registry/mailboxes.json", json.dumps([
+        {"mailbox_id": 10001, "mailbox_type": "office", "display_name": "Office of the Chief Architect", "owning_office": "Office of the Chief Architect", "responsible_employee_id": 4},
+        {"mailbox_id": 10100, "mailbox_type": "queue", "display_name": "Alfred Routing Intake", "owning_office": "Chief of Staff", "responsible_employee_id": None},
+        {"mailbox_id": 10004, "mailbox_type": "office", "display_name": "Human Resources Office", "owning_office": "Human Resources", "responsible_employee_id": 6},
+    ]))
+    write(root / "data/registry/residents.json", json.dumps([
+        {"id": "RES-000001", "name": "Alfred", "office": "Manager of Administration"},
+        {"id": "RES-000003", "name": "Helen", "office": "Manager of Human Resources"},
+    ]))
     write(root / "docs/governance/policy.md", "# Governance Change\nClassification: Estate Internal\n")
     write(root / "Architecture/ADR/adr-1.md", "# ADR One\nClassification: Estate Internal\n")
     write(root / "docs/collaboration/Worker_Runtime_Contract_v1.md", "# Worker Runtime Contract v1\nClassification: Estate Internal\n")
@@ -21,6 +35,10 @@ def seed(root: Path):
     write(root / "runtime/validation/operational_validation_report.json", json.dumps({"title": "Operational Validation"}))
     write(root / "collaboration/messages/impl.json", json.dumps({"id": "m1", "destination": "worker.implementation", "subject": "Implement package"}))
     write(root / "collaboration/messages/ca.json", json.dumps({"id": "m2", "destination": "office.chief_architect_2", "subject": "Architecture briefing"}))
+    write(root / "collaboration/messages/ca3.json", json.dumps({"id": "m3", "destination_employee_id": 4, "requires_ack": True, "ack_status": "pending", "thread_id": "t-ca3", "payload": {"title": "CA3 mailbox briefing"}}))
+    write(root / "collaboration/messages/ca4.json", json.dumps({"id": "m4", "destination": "mailbox.5", "requires_ack": True, "reply_to": "m3", "payload": {"title": "CA4 mailbox briefing"}}))
+    write(root / "collaboration/messages/alfred.json", json.dumps({"id": "m5", "destination_mailbox_id": 10100, "payload": {"title": "Alfred routing note"}}))
+    write(root / "collaboration/messages/helen.json", json.dumps({"id": "m6", "destination": "employee.6", "payload": {"title": "Helen personnel note"}}))
     write(root / "runtime/collaboration/events/events.jsonl", '{"id":"e1"}\n')
     write(root / "archive/institutional_memory/memo.md", "# Memory\nClassification: Estate Internal\n")
 
@@ -66,6 +84,31 @@ def test_assigned_messages_detected_by_destination(tmp_path):
     seed(tmp_path)
     report = generate_check_updates("worker.implementation", root=tmp_path)
     assert len(report["updates"]["assigned_messages"]) == 1
+
+
+def test_ca3_mailbox_identity_ack_and_thread(tmp_path):
+    seed(tmp_path)
+    report = generate_check_updates("office.chief_architect_3", root=tmp_path)
+    assert report["identity"]["canonical_destination"] == "mailbox.4"
+    assert report["mailbox"] == {"canonical_actor": "mailbox.4", "employee_id": 4, "mailbox_id": 4}
+    assert report["mailbox_obligations"]["messages_requiring_ack"][0]["thread_id"] == "t-ca3"
+
+
+def test_ca4_mailbox_resolution_by_mailbox_destination(tmp_path):
+    seed(tmp_path)
+    report = generate_check_updates("office.chief_architect_4", root=tmp_path)
+    assert report["identity"]["employee_id"] == 5
+    assert any(message["message_id"] == "m4" and message["reply_to"] == "m3" for message in report["updates"]["assigned_messages"])
+
+
+def test_alfred_and_helen_mailbox_resolution(tmp_path):
+    seed(tmp_path)
+    alfred = generate_check_updates("alfred", root=tmp_path)
+    helen = generate_check_updates("helen", root=tmp_path)
+    assert alfred["identity"]["mailbox_id"] == 10100
+    assert any(message["message_id"] == "m5" for message in alfred["updates"]["assigned_messages"])
+    assert helen["identity"]["employee_id"] == 6
+    assert any(message["message_id"] == "m6" for message in helen["updates"]["assigned_messages"])
 
 
 def test_missing_artifacts_become_warnings(tmp_path):

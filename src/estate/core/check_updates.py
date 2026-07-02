@@ -12,7 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.paths import ESTATE_ROOT
+from estate.core.personnel_identity import resolve_personnel_identity
 
 UPDATE_KEYS = [
     "governance_updates",
@@ -38,6 +40,8 @@ ACTOR_VISIBILITY = {
     "office.chief_architect_1": "estate_internal",
     "office.chief_architect_2": "estate_internal",
     "office.chief_architect_3": "estate_internal",
+    "office.chief_architect_4": "estate_internal",
+    "helen": "estate_internal",
     "steward": "restricted",
 }
 
@@ -52,6 +56,10 @@ ALIASES = {
     "ca2": "office.chief_architect_2",
     "chief_architect_3": "office.chief_architect_3",
     "ca3": "office.chief_architect_3",
+    "chief_architect_4": "office.chief_architect_4",
+    "ca4": "office.chief_architect_4",
+    "office.chief_architect_4": "office.chief_architect_4",
+    "helen": "helen",
     "alfred": "alfred",
     "audit": "worker.audit",
     "worker.audit": "worker.audit",
@@ -69,6 +77,7 @@ CATEGORY_INTERESTS = {
     "general": {"operations_updates"},
     "office.chief_architect": set(UPDATE_KEYS) - {"audit_updates"},
     "alfred": {"operations_updates", "collaboration_updates", "assigned_messages"},
+    "helen": {"operations_updates", "collaboration_updates", "assigned_messages"},
     "worker.audit": {"audit_updates", "operations_updates", "assigned_messages"},
     "worker.implementation": {"collaboration_updates", "operations_updates", "capability_updates", "assigned_messages"},
     "worker.documentation": {"governance_updates", "collaboration_updates", "operations_updates", "assigned_messages"},
@@ -196,8 +205,65 @@ def _destination_matches(dest: str, actor: str, family: str) -> bool:
     return False
 
 
-def _collect_messages(root: Path, actor: str, family: str, warnings: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    messages = []
+def _message_title(data: dict[str, Any], fallback: str) -> str:
+    payload = data.get("payload") if isinstance(data.get("payload"), dict) else {}
+    return str(data.get("subject") or data.get("title") or payload.get("title") or payload.get("summary") or data.get("id") or fallback)
+
+
+def _actor_destinations(actor: str, family: str, identity: dict[str, Any]) -> set[str]:
+    destinations = {actor, family}
+    canonical = identity.get("canonical_destination")
+    if canonical:
+        destinations.add(str(canonical).lower())
+    if identity.get("employee_id") is not None:
+        destinations.add(f"employee.{identity['employee_id']}")
+        destinations.add(str(identity["employee_id"]))
+    if identity.get("mailbox_id") is not None:
+        destinations.add(f"mailbox.{identity['mailbox_id']}")
+        destinations.add(str(identity["mailbox_id"]))
+        try:
+            destinations.add(f"mailbox.{int(identity['mailbox_id']):04d}")
+            destinations.add(f"{int(identity['mailbox_id']):04d}")
+        except (TypeError, ValueError):
+            pass
+    if identity.get("worker"):
+        destinations.add(str(identity["worker"]).lower())
+    if family.startswith("worker."):
+        destinations.add(family.split(".", 1)[1])
+    if family == "office.chief_architect":
+        destinations.update({"chief_architect", "ca"})
+    return {item.strip().lower() for item in destinations if item}
+
+
+def _message_matches_actor(item: dict[str, Any], destinations: set[str], identity: dict[str, Any]) -> bool:
+    destination = str(item.get("destination") or "").strip().lower()
+    if destination in destinations:
+        return True
+    if identity.get("employee_id") is not None and item.get("destination_employee_id") == identity.get("employee_id"):
+        return True
+    if identity.get("mailbox_id") is not None and item.get("destination_mailbox_id") == identity.get("mailbox_id"):
+        return True
+    return False
+
+
+def _collect_messages(root: Path, actor: str, family: str, identity: dict[str, Any], warnings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    destinations = _actor_destinations(actor, family, identity)
+    messages_by_path: dict[str, dict[str, Any]] = {}
+    try:
+        index = generate_mailbox_index(root, write=False)
+    except Exception as exc:
+        warnings.append({"type": "mailbox_index_unavailable", "message": str(exc)})
+        index = {"messages": []}
+    for index_warning in index.get("warnings", []):
+        warnings.append({"type": "mailbox_index_warning", "path": index_warning.get("path"), "message": index_warning.get("warning", "")})
+    for item in index.get("messages", []):
+        if not _message_matches_actor(item, destinations, identity):
+            continue
+        message = dict(item)
+        message["title"] = str(message.get("title") or message.get("message_id") or Path(str(message.get("path", "message"))).stem)
+        message["visibility"] = "estate_internal"
+        messages_by_path[str(message.get("path") or message.get("message_id"))] = message
+
     for path in _iter_matches(root, "collaboration/messages/*.json"):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
@@ -205,18 +271,33 @@ def _collect_messages(root: Path, actor: str, family: str, warnings: list[dict[s
             warnings.append({"type": "malformed_json", "path": _rel(path, root), "message": str(exc)})
             continue
         if not isinstance(data, dict):
-            warnings.append({"type": "malformed_message", "path": _rel(path, root), "message": "message JSON is not an object"})
+            continue
+        rel = _rel(path, root)
+        if rel in messages_by_path:
+            messages_by_path[rel]["title"] = _message_title(data, path.stem)
             continue
         dest = _message_destination(data)
         if _destination_matches(dest, actor, family):
-            messages.append({"path": _rel(path, root), "title": str(data.get("subject") or data.get("title") or data.get("id") or path.stem), "destination": dest, "visibility": "estate_internal"})
-    return messages
+            messages_by_path[rel] = {
+                "message_id": data.get("message_id") or data.get("id") or path.stem,
+                "path": rel,
+                "title": _message_title(data, path.stem),
+                "destination": dest,
+                "requires_ack": data.get("requires_ack", False),
+                "ack_status": data.get("ack_status"),
+                "thread_id": data.get("thread_id"),
+                "reply_to": data.get("reply_to"),
+                "acknowledges": data.get("acknowledges"),
+                "visibility": "estate_internal",
+            }
+    return sorted(messages_by_path.values(), key=lambda item: (str(item.get("created_at") or ""), str(item.get("message_id") or "")))
 
 
 def generate_check_updates(actor: str | None = None, root: str | Path | None = None) -> dict[str, Any]:
     root_path = estate_root(root)
     normalized = normalize_actor(actor)
     family = actor_category(normalized)
+    identity = resolve_personnel_identity(actor or normalized, root_path)
     visibility = ACTOR_VISIBILITY.get(normalized, "public")
     interests = CATEGORY_INTERESTS.get(family, CATEGORY_INTERESTS["general"])
     warnings: list[dict[str, Any]] = []
@@ -225,6 +306,11 @@ def generate_check_updates(actor: str | None = None, root: str | Path | None = N
 
     if actor and normalize_actor(actor) == "general" and actor.strip().lower() not in ALIASES:
         warnings.append({"type": "unknown_actor", "actor": actor, "message": "Actor was not recognized; generated general briefing."})
+
+    for resolver_warning in identity.get("warnings", []):
+        warnings.append({"type": "identity_resolution", "actor": actor or normalized, "message": resolver_warning})
+    if actor and not identity.get("resolved") and normalized != "general":
+        warnings.append({"type": "unresolved_identity", "actor": actor, "message": "Actor identity could not be resolved to a mailbox or worker."})
 
     for pattern in EXPECTED_INPUTS:
         matches = _iter_matches(root_path, pattern)
@@ -250,7 +336,8 @@ def generate_check_updates(actor: str | None = None, root: str | Path | None = N
                 if item and _allowed(item["visibility"], visibility):
                     updates[category].append(item)
 
-    updates["assigned_messages"] = [m for m in _collect_messages(root_path, normalized, family, warnings) if _allowed(m["visibility"], visibility)]
+    updates["assigned_messages"] = [m for m in _collect_messages(root_path, normalized, family, identity, warnings) if _allowed(m["visibility"], visibility)]
+    ack_required = [m for m in updates["assigned_messages"] if m.get("requires_ack") is True and str(m.get("ack_status", "pending")).lower() not in {"acknowledged", "not_required"}]
     update_count = sum(len(v) for k, v in updates.items() if k != "assigned_messages")
     report = {
         "version": 1,
@@ -258,8 +345,11 @@ def generate_check_updates(actor: str | None = None, root: str | Path | None = N
         "actor": normalized,
         "actor_category": family,
         "visibility_level": visibility,
-        "summary": {"update_count": update_count, "assigned_message_count": len(updates["assigned_messages"]), "warning_count": len(warnings)},
+        "identity": identity,
+        "mailbox": {"canonical_actor": identity.get("canonical_destination") or normalized, "employee_id": identity.get("employee_id"), "mailbox_id": identity.get("mailbox_id")},
+        "summary": {"update_count": update_count, "assigned_message_count": len(updates["assigned_messages"]), "ack_required_message_count": len(ack_required), "warning_count": len(warnings)},
         "updates": updates,
+        "mailbox_obligations": {"messages_requiring_ack": ack_required},
         "inputs": {"used": sorted(set(used)), "missing": missing},
         "warnings": warnings,
     }
@@ -291,14 +381,20 @@ def format_check_updates(report: dict[str, Any]) -> str:
         "# Check for Updates", "",
         f"Actor: {report['actor']}", f"Actor Category: {report['actor_category']}",
         f"Visibility: {report['visibility_level']}", f"Generated: {report['generated_at']}", "",
+        "## Actor Identity", "",
+        f"- Canonical actor: {report.get('mailbox', {}).get('canonical_actor') or report['actor']}",
+        f"- Employee ID: {report.get('mailbox', {}).get('employee_id') or 'unresolved'}",
+        f"- Mailbox ID: {report.get('mailbox', {}).get('mailbox_id') or 'unresolved'}", "",
         "## Summary", "",
         f"- Updates: {report['summary']['update_count']}",
         f"- Assigned messages: {report['summary']['assigned_message_count']}",
+        f"- Messages requiring acknowledgement: {report['summary'].get('ack_required_message_count', 0)}",
         f"- Warnings: {report['summary']['warning_count']}", "",
     ]
     names = [("Assigned Messages", "assigned_messages"), ("Governance Updates", "governance_updates"), ("Architecture Updates", "architecture_updates"), ("Collaboration Updates", "collaboration_updates"), ("Operations Updates", "operations_updates"), ("Capability Updates", "capability_updates"), ("Audit Updates", "audit_updates"), ("Institutional Memory Updates", "institutional_memory_updates")]
     for title, key in names:
         lines.extend(_section(title, report["updates"].get(key, [])))
+    lines.extend(_section("Messages Requiring Acknowledgement", report.get("mailbox_obligations", {}).get("messages_requiring_ack", [])))
     lines.append("## Warnings")
     lines.append("")
     if report["warnings"]:

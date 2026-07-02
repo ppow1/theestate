@@ -1,15 +1,22 @@
 # Check for Updates
 
-Actor: worker.implementation
-Actor Category: worker.implementation
+Actor: alfred
+Actor Category: alfred
 Visibility: estate_internal
-Generated: 2026-07-02T00:50:49+00:00
+Generated: 2026-07-02T20:43:53+00:00
+
+## Actor Identity
+
+- Canonical actor: mailbox.10100
+- Employee ID: unresolved
+- Mailbox ID: 10100
 
 ## Summary
 
-- Updates: 39
+- Updates: 42
 - Assigned messages: 0
-- Warnings: 3
+- Messages requiring acknowledgement: 0
+- Warnings: 4
 
 ## Assigned Messages
 
@@ -35,6 +42,7 @@ No relevant updates found.
 - Local Worker Launch Adapter v1 — docs/collaboration/Local_Worker_Launch_Adapter_v1.md
 - Mailbox Infrastructure v1 — docs/collaboration/Mailbox_Infrastructure_v1.md
 - Operations Board Client v1 — docs/collaboration/Operations_Board_Client_v1.md
+- Personnel Identity and Mailbox Resolver v1 — docs/collaboration/Personnel_Identity_Mailbox_Resolver_v1.md
 - Worker_Collaboration_Protocol_v1.md — docs/collaboration/Worker_Collaboration_Protocol_v1.md
 - Local_Filesystem_Transport_Adapter_v1.md — docs/collaboration/adapters/Local_Filesystem_Transport_Adapter_v1.md
 - Message_Types_v1.md — docs/collaboration/schemas/Message_Types_v1.md
@@ -45,11 +53,14 @@ No relevant updates found.
 
 - Capability Lifecycle Reporting — docs/operations/Capability_Lifecycle_Reporting.md
 - Capability Registry Metadata Cleanup — docs/operations/Capability_Registry_Metadata_Cleanup.md
+- Codex Handoff Generator v1 — docs/operations/Codex_Handoff_Generator_v1.md
 - Onboarding Checklist v1 — docs/operations/Onboarding_Checklist_v1.md
 - Continuous Operational Validation Reporting — docs/operations/Operational_Validation_Reporting.md
 - Operations Board Runtime Integration — docs/operations/Operations_Board_Runtime_Integration.md
 - Steward Dashboard Runtime View — docs/operations/Steward_Dashboard_Runtime_View.md
+- Helen Operating Brief — docs/operations/helen/operating_brief.md
 - Estate Operations Board — operations/README.md
+- Alfred Operational Briefing — operations/alfred/operational_briefing.md
 - Estate Operations Board — operations/board/latest.md
 - Active Work Board — operations/boards/active_work.md
 - Daily Task Board — operations/boards/daily_board.md
@@ -69,7 +80,7 @@ No relevant updates found.
 
 ## Capability Updates
 
-- dependency_graph.json — runtime/dependencies/dependency_graph.json
+No relevant updates found.
 
 ## Audit Updates
 
@@ -79,8 +90,13 @@ No relevant updates found.
 
 No relevant updates found.
 
+## Messages Requiring Acknowledgement
+
+No relevant updates found.
+
 ## Warnings
 
 - missing_input: runtime/collaboration/events/events.jsonl Optional update source not present.
 - missing_input: runtime/operations/operations_board.json Optional update source not present.
 - missing_input: runtime/capabilities/capability_lifecycle_report.json Optional update source not present.
+- mailbox_index_warning: collaboration/messages/example_alfred_routing_engine_v1.json unresolved destination: queue
