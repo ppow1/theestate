@@ -1,0 +1,25 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T20:44:09+00:00",
+  "files_changed": [
+    "operations/updates/check_updates_latest.md",
+    "src/estate/core/check_updates.py",
+    "tests/test_check_updates.py",
+    "collaboration/work_packages/completions/WP-0022_codex_done.json"
+  ],
+  "known_limitations": [
+    "pull_request_url will be filled after PR creation."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Integrated Check for Updates with personnel identity and mailbox resolution, added mailbox obligation reporting for assigned messages and acknowledgements, updated Markdown/JSON report fields, and expanded tests for CA3, CA4, Alfred, Helen, implementation worker, and general actors.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main check-updates --actor office.chief_architect_3 --json",
+    "PYTHONPATH=src python -m estate.cli.main check-updates --actor office.chief_architect_4 --json",
+    "PYTHONPATH=src python -m estate.cli.main check-updates --actor alfred --json",
+    "PYTHONPATH=src pytest -q tests/test_check_updates.py"
+  ],
+  "work_package_id": "WP-0022"
+}
