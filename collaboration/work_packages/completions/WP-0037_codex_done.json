@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:03:47+00:00",
+  "files_changed": [
+    "src/estate/core/recall_audit_log.py",
+    "tests/test_recall_audit_log.py",
+    "runtime/audit/recall_audit_log.json",
+    "collaboration/work_packages/completions/WP-0037_codex_done.json"
+  ],
+  "known_limitations": [
+    "Recall Audit Log v1 records router-approved recall deliveries but does not implement acknowledgement UX.",
+    "No ledger or devlog entries were modified, per work package constraints."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending",
+  "ready_for_ca_review": true,
+  "summary": "Implemented Recall Audit Log v1 for durable, duplicate-safe records of Notification Router-approved Steward Recall deliveries, including dry-run support and tests.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_recall_audit_log.py",
+    "python -m json.tool runtime/audit/recall_audit_log.json",
+    "python -m json.tool collaboration/work_packages/completions/WP-0037_codex_done.json",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "work_package_id": "WP-0037"
+}

@@ -1,0 +1,15 @@
+{
+  "constraints": {
+    "acknowledgement_ux_implemented": false,
+    "append_only": true,
+    "notification_router_required": true
+  },
+  "generated_at": "2026-07-02T23:03:33+00:00",
+  "records": [],
+  "summary": {
+    "acknowledged_count": 0,
+    "pending_acknowledgement_count": 0,
+    "record_count": 0
+  },
+  "version": 1
+}
