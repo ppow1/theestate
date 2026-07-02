@@ -30,6 +30,7 @@ from estate.core.onboarding_manifest import check_onboarding_manifests, format_o
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.institutional_search import search_institutional_index, format_search_report
 from estate.core.document_registry import load_document_registry, format_document_registry
+from estate.core.notification_router import generate_notification_router_report, format_notification_router_report
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -147,6 +148,15 @@ def cmd_discover_ai(args):
         for model in observations["ollama"].get("models", []):
             print(f"Ollama model: {model['name']} | {model['id']} | {model['size']} | {model['modified']}")
 
+
+
+def cmd_notification_router(args):
+    payload = generate_notification_router_report()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_notification_router_report(payload))
 
 
 def cmd_estate_health(args):
@@ -750,6 +760,10 @@ def main():
     p.set_defaults(func=cmd_audit)
 
 
+
+    p = sub.add_parser("notification-router")
+    p.add_argument("--json", action="store_true", help="Generate notification router report and print JSON")
+    p.set_defaults(func=cmd_notification_router)
 
     p = sub.add_parser("estate-health")
     p.add_argument("--json", action="store_true", help="Print Estate health report JSON")

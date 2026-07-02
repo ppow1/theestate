@@ -1,0 +1,18 @@
+{
+  "constraints": {
+    "adapter_implemented": false,
+    "alfred_required_for_recall": true,
+    "transport_independent": true,
+    "workers_may_notify_steward_directly": false
+  },
+  "generated_at": "2026-07-02T22:42:06+00:00",
+  "notifications": [],
+  "summary": {
+    "event_count": 0,
+    "immediate_delivery_eligible_count": 0,
+    "informational_count": 0,
+    "recall_count": 0
+  },
+  "version": 1,
+  "warnings": []
+}
