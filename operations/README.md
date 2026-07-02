@@ -79,3 +79,7 @@ Automation should wait until update patterns stabilize.
 - operations/boards/roadmap.md
 - operations/boards/review_cadence.md
 - operations/implementation_recommendation.md
+
+## Generated Artifact Policy
+
+Workers should classify generated reports, runtime outputs, mailbox summaries, dashboards, board integrations, validation reports, and completion evidence according to `docs/operations/Generated_Artifact_Policy_v1.md` before relying on them as operational context or committing refreshed views.
