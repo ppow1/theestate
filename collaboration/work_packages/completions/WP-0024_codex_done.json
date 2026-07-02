@@ -1,0 +1,27 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T20:54:11+00:00",
+  "files_changed": [
+    "src/estate/core/daily_board_integration.py",
+    "src/estate/cli/main.py",
+    "tests/test_daily_board_integration.py",
+    "operations/boards/daily_board_integration.md",
+    "runtime/operations/daily_board_integration.json",
+    "collaboration/work_packages/completions/WP-0024_codex_done.json"
+  ],
+  "known_limitations": [
+    "Promotion readiness is a conservative review classification derived from artifact text; it does not promote Parking Lot items or verify external milestone truth."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Added Daily Board and Parking Lot integration reporting with JSON/Markdown outputs, CLI access, and tests for parking lot parsing, promotion-condition review classification, work package summaries, warnings, and report generation.",
+  "tests_run": [
+    "pytest -q tests/test_daily_board_integration.py",
+    "PYTHONPATH=src python -m estate.cli.main daily-board --json > /tmp/daily.json",
+    "python -m json.tool /tmp/daily.json",
+    "pytest -q"
+  ],
+  "work_package_id": "WP-0024"
+}
