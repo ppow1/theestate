@@ -49,6 +49,7 @@ def registry_paths(root=None):
     return {
         "personnel": base / "data" / "registry" / "personnel.json",
         "mailboxes": base / "data" / "registry" / "mailboxes.json",
+        "residents": base / "data" / "registry" / "residents.json",
         "messages": base / "collaboration" / "messages",
         "mailboxes_root": base / "collaboration" / "mailboxes",
         "index": base / "collaboration" / "mailboxes" / "index.json",
@@ -89,6 +90,66 @@ def personnel_by_mailbox_id(personnel):
 
 def functional_by_mailbox_id(mailboxes):
     return {int(entry["mailbox_id"]): entry for entry in mailboxes if "mailbox_id" in entry}
+
+
+def _slug(value):
+    text = str(value or "").strip().lower().replace("#", " ")
+    chars = []
+    previous_sep = False
+    for char in text:
+        if char.isalnum():
+            chars.append(char)
+            previous_sep = False
+        elif not previous_sep:
+            chars.append("_")
+            previous_sep = True
+    return "".join(chars).strip("_")
+
+
+def _mailbox_destination_aliases(personnel, functional_mailboxes):
+    aliases = {}
+
+    def add(alias, employee_id, mailbox_id):
+        if alias:
+            aliases.setdefault(alias, (employee_id, mailbox_id))
+
+    for entry in personnel:
+        employee_id = entry.get("employee_id")
+        mailbox_id = entry.get("mailbox_id", employee_id)
+        if employee_id is None or mailbox_id is None:
+            continue
+        employee_id = int(employee_id)
+        mailbox_id = int(mailbox_id)
+        add(str(mailbox_id), employee_id, mailbox_id)
+        add(mailbox_directory_name(mailbox_id), employee_id, mailbox_id)
+        add(f"employee.{employee_id}", employee_id, mailbox_id)
+        add(f"mailbox.{mailbox_id}", employee_id, mailbox_id)
+        add(f"mailbox.{mailbox_directory_name(mailbox_id)}", employee_id, mailbox_id)
+        for field in ("display_name", "current_title"):
+            slug = _slug(entry.get(field))
+            add(f"employee.{slug}", employee_id, mailbox_id)
+            add(f"office.{slug}", employee_id, mailbox_id)
+        office_slug = _slug(entry.get("current_office"))
+        add(f"office.{office_slug}", employee_id, mailbox_id)
+
+    for entry in functional_mailboxes:
+        mailbox_id = entry.get("mailbox_id")
+        if mailbox_id is None:
+            continue
+        mailbox_id = int(mailbox_id)
+        responsible = entry.get("responsible_employee_id")
+        employee_id = int(responsible) if responsible is not None else None
+        add(str(mailbox_id), employee_id, mailbox_id)
+        add(f"mailbox.{mailbox_id}", employee_id, mailbox_id)
+        for field in ("display_name", "owning_office"):
+            slug = _slug(entry.get(field))
+            add(f"mailbox.{slug}", employee_id, mailbox_id)
+            if entry.get("mailbox_type") == "office":
+                add(f"office.{slug}", employee_id, mailbox_id)
+
+    for alias, mapped in LEGACY_DESTINATIONS.items():
+        aliases[alias] = (mapped["employee_id"], mapped["mailbox_id"])
+    return aliases
 
 
 def ensure_mailbox_directories(root=None):
@@ -139,9 +200,17 @@ def resolve_destination(message, personnel=None, functional_mailboxes=None):
             return None, None, f"invalid destination_mailbox_id: {destination_mailbox_id}"
 
     destination = message.get("destination")
-    if destination in LEGACY_DESTINATIONS:
-        mapped = LEGACY_DESTINATIONS[destination]
-        return mapped["employee_id"], mapped["mailbox_id"], None
+    normalized_destination = str(destination or "").strip().lower()
+    if normalized_destination.startswith("worker."):
+        return None, None, None
+
+    aliases = _mailbox_destination_aliases(personnel, functional_mailboxes)
+    if normalized_destination in aliases:
+        employee_id, mailbox_id = aliases[normalized_destination]
+        return employee_id, mailbox_id, None
+
+    if normalized_destination.startswith(("employee.", "mailbox.", "office.")):
+        return None, None, f"unresolved destination: {destination}"
 
     return None, None, f"unresolved destination: {destination}"
 
@@ -221,11 +290,13 @@ def generate_mailbox_index(root=None, write=True):
 def mailbox_index_summary(index):
     open_ca2 = [m for m in index.get("messages", []) if m.get("destination_employee_id") == 3 and str(m.get("status", "")).lower() == "open"]
     open_ca3 = [m for m in index.get("messages", []) if m.get("destination_employee_id") == 4 and str(m.get("status", "")).lower() == "open"]
+    open_ca4 = [m for m in index.get("messages", []) if m.get("destination_employee_id") == 5 and str(m.get("status", "")).lower() == "open"]
     return {
         "index_version": index.get("index_version"),
         "message_count": index.get("message_count", len(index.get("messages", []))),
         "warning_count": index.get("warning_count", len(index.get("warnings", []))),
         "open_ca2_message_count": len(open_ca2),
         "open_ca3_message_count": len(open_ca3),
+        "open_ca4_message_count": len(open_ca4),
         "index_path": "collaboration/mailboxes/index.json",
     }

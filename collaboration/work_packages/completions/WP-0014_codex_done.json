@@ -1,0 +1,29 @@
+{
+  "work_package_id": "WP-0014",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T15:40:00Z",
+  "branch": "work",
+  "pull_request_url": null,
+  "summary": "Expanded mailbox destination resolution to cover registry-backed office, employee, mailbox, worker, and direct mailbox ID destination forms; regenerated mailbox and worker inbox summaries; added CA4 summary coverage and tests.",
+  "files_changed": [
+    "collaboration/mailboxes/index.json",
+    "collaboration/status/event_summary.json",
+    "collaboration/status/worker_inbox_summary.json",
+    "collaboration/work_packages/completions/WP-0014_codex_done.json",
+    "docs/collaboration/Mailbox_Infrastructure_v1.md",
+    "src/estate/cli/main.py",
+    "src/estate/core/mailbox_index.py",
+    "tests/test_mailbox_index.py"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_mailbox_index.py",
+    "PYTHONPATH=src python -m estate.cli.main worker-inboxes --json",
+    "PYTHONPATH=src python -m estate.cli.main mailbox-index --json",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "known_limitations": [
+    "Worker destinations are treated as valid operational destinations without numeric mailbox IDs in the mailbox index."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}

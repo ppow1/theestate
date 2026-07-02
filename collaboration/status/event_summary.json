@@ -1,10 +1,10 @@
 {
   "counts_by_type": {
-    "inbox.updated": 1,
-    "message.routed": 5
+    "inbox.updated": 2,
+    "message.routed": 34
   },
   "errors": [],
-  "event_count": 6,
+  "event_count": 36,
   "event_types": [
     "audit.result.created",
     "inbox.updated",
@@ -15,7 +15,7 @@
     "work.claimed",
     "work.completed"
   ],
-  "generated_at": "2026-07-01T22:33:43",
+  "generated_at": "2026-07-02T15:39:01",
   "generated_files": {
     "events_log": "runtime/collaboration/events/events.jsonl",
     "latest": "runtime/collaboration/events/latest.json",
@@ -23,13 +23,17 @@
   },
   "latest_event": {
     "classification": "Estate Internal",
-    "created_at": "2026-07-01T22:33:42",
-    "id": "evt_20260701_223342_942436b4",
+    "created_at": "2026-07-02T15:38:48",
+    "id": "evt_20260702_153848_fd5fbbad",
     "payload": {
-      "message_count": 5,
-      "worker_count": 2,
+      "message_count": 17,
+      "worker_count": 6,
       "workers": [
+        "alfred.review",
+        "employee.4",
         "office.chief_architect_2",
+        "office.chief_architect_3",
+        "office.chief_architect_4",
         "worker.implementation"
       ]
     },
@@ -42,8 +46,143 @@
   "recent_events": [
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-01T22:33:42",
-      "id": "evt_20260701_223342_747d19e7",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_31da1aec",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0009_check_updates_review_to_ca2.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0009_check_updates_review_to_ca2",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_bb35b399",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_4"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0010_check_updates_review_to_ca4.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0010_check_updates_review_to_ca4",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_baa48870",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_4"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0011_meeting_request_to_ca4.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0011_meeting_request_to_ca4",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_3f457c79",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_4"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_dc7f8426",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "employee.4"
+        },
+        "source_path": "collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca4_20260701_0001_reply_to_ca3_mailbox_check",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_3bb3bd7d",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "employee.4"
+        },
+        "source_path": "collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:29",
+      "id": "evt_20260702_153829_dabc08a4",
+      "payload": {
+        "message_count": 17,
+        "worker_count": 6,
+        "workers": [
+          "alfred.review",
+          "employee.4",
+          "office.chief_architect_2",
+          "office.chief_architect_3",
+          "office.chief_architect_4",
+          "worker.implementation"
+        ]
+      },
+      "source": "collaboration.inbox_watcher",
+      "subject_id": null,
+      "type": "inbox.updated",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_ffee7c44",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -61,8 +200,51 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-01T22:33:42",
-      "id": "evt_20260701_223342_e86dd4af",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_3506d2ed",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_3"
+        },
+        "source_path": "collaboration/messages/msg_ca2_20260701_0001_mailbox_index_validation.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca2_20260701_0001_mailbox_index_validation",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_f59c9ecf",
+      "payload": {
+        "missing_fields": [
+          "id",
+          "version",
+          "created_by",
+          "payload"
+        ],
+        "route": {
+          "reason": "invalid_envelope",
+          "score": 0,
+          "worker": "alfred.review"
+        },
+        "source_path": "collaboration/messages/msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3.json",
+        "valid": false
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": null,
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_0b785b7e",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -80,8 +262,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-01T22:33:42",
-      "id": "evt_20260701_223342_6ef12da1",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_99823c28",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -99,8 +281,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-01T22:33:42",
-      "id": "evt_20260701_223342_3619c610",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_9903c3fa",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -118,8 +300,8 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-01T22:33:42",
-      "id": "evt_20260701_223342_c042857d",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_d37474b9",
       "payload": {
         "missing_fields": [],
         "route": {
@@ -137,13 +319,207 @@
     },
     {
       "classification": "Estate Internal",
-      "created_at": "2026-07-01T22:33:42",
-      "id": "evt_20260701_223342_942436b4",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_02387ad1",
       "payload": {
-        "message_count": 5,
-        "worker_count": 2,
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0005_steward_dashboard_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_dda56416",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0006_collaboration_event_framework_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_fdb38929",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0007_dependency_graph_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_82c1a60f",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0008_operational_validation_review",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_5c7e167a",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_2"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0009_check_updates_review_to_ca2.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0009_check_updates_review_to_ca2",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_4fc90f8d",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_4"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0010_check_updates_review_to_ca4.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0010_check_updates_review_to_ca4",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_d8c8d626",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_4"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0011_meeting_request_to_ca4.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0011_meeting_request_to_ca4",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_95eadbda",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "office.chief_architect_4"
+        },
+        "source_path": "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_d81277ee",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "employee.4"
+        },
+        "source_path": "collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca4_20260701_0001_reply_to_ca3_mailbox_check",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_c6a16d13",
+      "payload": {
+        "missing_fields": [],
+        "route": {
+          "reason": "explicit_destination",
+          "score": 100,
+          "worker": "employee.4"
+        },
+        "source_path": "collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json",
+        "valid": true
+      },
+      "source": "collaboration.routing_engine",
+      "subject_id": "msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3",
+      "type": "message.routed",
+      "version": 1
+    },
+    {
+      "classification": "Estate Internal",
+      "created_at": "2026-07-02T15:38:48",
+      "id": "evt_20260702_153848_fd5fbbad",
+      "payload": {
+        "message_count": 17,
+        "worker_count": 6,
         "workers": [
+          "alfred.review",
+          "employee.4",
           "office.chief_architect_2",
+          "office.chief_architect_3",
+          "office.chief_architect_4",
           "worker.implementation"
         ]
       },

@@ -1,15 +1,68 @@
 {
   "errors": [],
-  "generated_at": "2026-07-01T22:33:42",
-  "message_count": 5,
+  "generated_at": "2026-07-02T15:38:48",
+  "message_count": 17,
   "version": 1,
-  "worker_count": 2,
+  "worker_count": 6,
   "workers": [
     {
-      "message_count": 4,
+      "message_count": 1,
       "messages": [
         {
-          "created_at": "2026-07-01T22:33:42",
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": null,
+          "missing_fields": [
+            "id",
+            "version",
+            "created_by",
+            "payload"
+          ],
+          "route": {
+            "reason": "invalid_envelope",
+            "score": 0,
+            "worker": "alfred.review"
+          },
+          "source_path": "collaboration/messages/msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3.json",
+          "valid": false
+        }
+      ],
+      "worker": "alfred.review"
+    },
+    {
+      "message_count": 2,
+      "messages": [
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca4_20260701_0001_reply_to_ca3_mailbox_check",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "employee.4"
+          },
+          "source_path": "collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "employee.4"
+          },
+          "source_path": "collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json",
+          "valid": true
+        }
+      ],
+      "worker": "employee.4"
+    },
+    {
+      "message_count": 9,
+      "messages": [
+        {
+          "created_at": "2026-07-02T15:38:48",
           "message_id": "msg_ca3_20260701_0001_alfred_capability_brief",
           "missing_fields": [],
           "route": {
@@ -21,7 +74,7 @@
           "valid": true
         },
         {
-          "created_at": "2026-07-01T22:33:42",
+          "created_at": "2026-07-02T15:38:48",
           "message_id": "msg_ca3_20260701_0002_audit_malformed_json_review",
           "missing_fields": [],
           "route": {
@@ -33,7 +86,7 @@
           "valid": true
         },
         {
-          "created_at": "2026-07-01T22:33:42",
+          "created_at": "2026-07-02T15:38:48",
           "message_id": "msg_ca3_20260701_0003_operations_board_review",
           "missing_fields": [],
           "route": {
@@ -45,7 +98,7 @@
           "valid": true
         },
         {
-          "created_at": "2026-07-01T22:33:42",
+          "created_at": "2026-07-02T15:38:48",
           "message_id": "msg_ca3_20260701_0004_capability_lifecycle_review",
           "missing_fields": [],
           "route": {
@@ -55,6 +108,66 @@
           },
           "source_path": "collaboration/messages/msg_ca3_20260701_0004_capability_lifecycle_review.json",
           "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0005_steward_dashboard_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0005_steward_dashboard_review.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0006_collaboration_event_framework_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0006_collaboration_event_framework_review.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0007_dependency_graph_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0007_dependency_graph_review.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0008_operational_validation_review",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0008_operational_validation_review.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0009_check_updates_review_to_ca2",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_2"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0009_check_updates_review_to_ca2.json",
+          "valid": true
         }
       ],
       "worker": "office.chief_architect_2"
@@ -63,7 +176,67 @@
       "message_count": 1,
       "messages": [
         {
-          "created_at": "2026-07-01T22:33:42",
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca2_20260701_0001_mailbox_index_validation",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_3"
+          },
+          "source_path": "collaboration/messages/msg_ca2_20260701_0001_mailbox_index_validation.json",
+          "valid": true
+        }
+      ],
+      "worker": "office.chief_architect_3"
+    },
+    {
+      "message_count": 3,
+      "messages": [
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0010_check_updates_review_to_ca4",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_4"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0010_check_updates_review_to_ca4.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0011_meeting_request_to_ca4",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_4"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0011_meeting_request_to_ca4.json",
+          "valid": true
+        },
+        {
+          "created_at": "2026-07-02T15:38:48",
+          "message_id": "msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4",
+          "missing_fields": [],
+          "route": {
+            "reason": "explicit_destination",
+            "score": 100,
+            "worker": "office.chief_architect_4"
+          },
+          "source_path": "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+          "valid": true
+        }
+      ],
+      "worker": "office.chief_architect_4"
+    },
+    {
+      "message_count": 1,
+      "messages": [
+        {
+          "created_at": "2026-07-02T15:38:48",
           "message_id": "msg_20260701_000000_example_routing",
           "missing_fields": [],
           "route": {

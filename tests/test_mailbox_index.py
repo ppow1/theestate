@@ -3,6 +3,7 @@ from pathlib import Path
 
 from estate.core.mailbox_index import (
     generate_mailbox_index,
+    mailbox_index_summary,
     load_functional_mailbox_registry,
     load_personnel_registry,
     resolve_destination,
@@ -16,8 +17,9 @@ def write_json(path, payload):
 
 def seed(tmp_path):
     write_json(tmp_path / "data/registry/personnel.json", [
-        {"employee_id": 3, "display_name": "Chief Architect #2", "mailbox_id": 3},
-        {"employee_id": 4, "display_name": "Chief Architect #3", "mailbox_id": 4},
+        {"employee_id": 3, "display_name": "Chief Architect #2", "current_title": "Chief Architect #2", "mailbox_id": 3},
+        {"employee_id": 4, "display_name": "Chief Architect #3", "current_title": "Chief Architect #3", "mailbox_id": 4},
+        {"employee_id": 5, "display_name": "Chief Architect #4", "current_title": "Chief Architect #4", "mailbox_id": 5},
     ])
     write_json(tmp_path / "data/registry/mailboxes.json", [
         {"mailbox_id": 10001, "mailbox_type": "office", "display_name": "Office of the Chief Architect"},
@@ -28,7 +30,7 @@ def seed(tmp_path):
 def test_personnel_id_mapping(tmp_path):
     seed(tmp_path)
     personnel = load_personnel_registry(tmp_path)
-    assert {entry["employee_id"]: entry["mailbox_id"] for entry in personnel} == {3: 3, 4: 4}
+    assert {entry["employee_id"]: entry["mailbox_id"] for entry in personnel} == {3: 3, 4: 4, 5: 5}
 
 
 def test_functional_mailbox_registry_parsing(tmp_path):
@@ -42,6 +44,18 @@ def test_legacy_destination_mapping(tmp_path):
     personnel = load_personnel_registry(tmp_path)
     employee_id, mailbox_id, warning = resolve_destination({"destination": "office.chief_architect_2"}, personnel, [])
     assert (employee_id, mailbox_id, warning) == (3, 3, None)
+
+
+def test_registry_destination_aliases(tmp_path):
+    seed(tmp_path)
+    personnel = load_personnel_registry(tmp_path)
+    functional = load_functional_mailbox_registry(tmp_path)
+
+    assert resolve_destination({"destination": "office.chief_architect_4"}, personnel, functional) == (5, 5, None)
+    assert resolve_destination({"destination": "employee.chief_architect_4"}, personnel, functional) == (5, 5, None)
+    assert resolve_destination({"destination": "mailbox.10001"}, personnel, functional) == (None, 10001, None)
+    assert resolve_destination({"destination": "10001"}, personnel, functional) == (None, 10001, None)
+    assert resolve_destination({"destination": "worker.implementation"}, personnel, functional) == (None, None, None)
 
 
 def test_destination_employee_id_precedence(tmp_path):
@@ -73,9 +87,11 @@ def test_mailbox_index_generation_and_warnings(tmp_path):
     assert (tmp_path / "collaboration/mailboxes/index.json").exists()
     assert (tmp_path / "collaboration/mailboxes/0003/inbox").is_dir()
     assert (tmp_path / "collaboration/mailboxes/0004/inbox").is_dir()
+    assert (tmp_path / "collaboration/mailboxes/0005/inbox").is_dir()
     assert (tmp_path / "collaboration/mailboxes/10001/inbox").is_dir()
     assert any(m["destination_employee_id"] == 3 for m in index["messages"])
     assert any(m["destination_employee_id"] == 4 for m in index["messages"])
+    assert mailbox_index_summary(index)["open_ca4_message_count"] == 0
     assert any("malformed message" in m.get("warning", "") for m in index["messages"])
     assert any("unresolved destination" in m.get("warning", "") for m in index["messages"])
 
