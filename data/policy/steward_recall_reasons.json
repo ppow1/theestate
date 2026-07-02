@@ -1,0 +1,82 @@
+{
+  "policy_id": "steward_recall_reasons",
+  "version": "1.0",
+  "source_document": "docs/operations/Steward_Recall_Decision_Model_v1.md",
+  "source_charter": "docs/operations/Autonomous_Estate_Operations_Charter_v1.md",
+  "alfred_role": "coordinator_not_sovereign_authority",
+  "approved_recall_reasons": [
+    {
+      "id": "constitutional",
+      "description": "A blocked decision could alter Estate governance, Steward authority, role boundaries, approval powers, mission authority, or constitutional operating principles."
+    },
+    {
+      "id": "architectural",
+      "description": "A blocked decision requires selecting or changing foundational architecture beyond delegated implementation details."
+    },
+    {
+      "id": "operational",
+      "description": "Ordinary Estate operation is blocked by a decision requiring Steward prioritization, tradeoff acceptance, external commitment, or exception handling."
+    },
+    {
+      "id": "security",
+      "description": "A blocked decision involves security, privacy, secrets, access, trust boundaries, data exposure, or incident response beyond approved routine handling."
+    },
+    {
+      "id": "hr",
+      "description": "A blocked decision involves personnel, worker trust, conduct, role assignment, accountability, conflict, performance, or human-sensitive information requiring Steward judgment."
+    }
+  ],
+  "non_recall_events": [
+    "routine_mail",
+    "completed_work",
+    "normal_validation",
+    "normal_board_updates",
+    "parking_lot_additions",
+    "successful_codex_runs",
+    "informational_status_changes"
+  ],
+  "required_evidence": [
+    "triggering_artifact",
+    "blocked_decision",
+    "recall_reason",
+    "steward_only_rationale",
+    "options_or_recommended_next_action",
+    "consequence_of_waiting",
+    "continuity_assessment",
+    "supporting_references"
+  ],
+  "required_audit_fields": [
+    "recall_id",
+    "created_at",
+    "created_by",
+    "coordinator",
+    "recall_status",
+    "primary_recall_reason",
+    "secondary_recall_reasons",
+    "triggering_artifact",
+    "related_work_package_id",
+    "related_mailbox_path",
+    "branch",
+    "blocked_decision",
+    "steward_only_rationale",
+    "evidence_summary",
+    "supporting_references",
+    "options_or_recommended_next_action",
+    "consequence_of_waiting",
+    "continuity_assessment",
+    "non_recall_events_checked",
+    "policy_version",
+    "transport_adapter",
+    "notification_attempt_id",
+    "steward_response_required",
+    "steward_response_received_at",
+    "final_resolution",
+    "reviewer_notes"
+  ],
+  "constraints": {
+    "notifications_implemented": false,
+    "final_security_clearance_policy": false,
+    "alfred_constitutional_authority": false,
+    "may_bypass_steward": false
+  }
+}
