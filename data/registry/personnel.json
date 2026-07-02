@@ -58,5 +58,16 @@
     "security_clearance": "metadata_only",
     "status": "onboarding",
     "notes": "Fourth historical identity in the Office of Chief Architect and second active Chief Architect after onboarding. Employee ID issued by Steward authority."
+  },
+  {
+    "employee_id": 6,
+    "display_name": "Helen",
+    "current_title": "Manager of Human Resources",
+    "current_office": "Human Resources",
+    "mailbox_id": 6,
+    "security_clearance": "metadata_only",
+    "status": "active",
+    "resident_id": "RES-000003",
+    "notes": "Initial HR/personnel coordination identity. Clearance value is metadata only; no final HR authority or security policy is created by WP-0020."
   }
 ]

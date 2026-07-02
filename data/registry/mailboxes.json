@@ -48,5 +48,15 @@
     "status": "active",
     "purpose": "Functional mailbox example for work-package intake.",
     "notes": "Functional mailbox only; execution accountability must still be claimed when required."
+  },
+  {
+    "mailbox_id": 10004,
+    "mailbox_type": "office",
+    "display_name": "Human Resources Office",
+    "owning_office": "Human Resources",
+    "responsible_employee_id": 6,
+    "status": "active",
+    "purpose": "Functional office mailbox for HR/personnel questions, onboarding status awareness, and personnel identity routing.",
+    "notes": "Functional HR intake surface; does not create final HR authority, clearance policy, or lifecycle-state changes."
   }
 ]

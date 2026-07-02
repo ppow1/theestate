@@ -1,0 +1,29 @@
+{
+  "work_package_id": "WP-0020",
+  "codex_status": "done",
+  "status": "done",
+  "completed_at": "2026-07-02T17:48:18+00:00",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "files_changed": [
+    "docs/onboarding/Helen_HR_Operational_Onboarding.md",
+    "docs/operations/helen/operating_brief.md",
+    "data/registry/personnel.json",
+    "data/registry/mailboxes.json",
+    "collaboration/work_packages/completions/WP-0020_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main onboarding-manifest-check --json",
+    "PYTHONPATH=src pytest -q tests/test_onboarding_manifest.py tests/test_mailbox_index.py",
+    "python -m json.tool data/registry/personnel.json >/dev/null && python -m json.tool data/registry/mailboxes.json >/dev/null && python -m json.tool collaboration/work_packages/completions/WP-0020_codex_done.json >/dev/null"
+  ],
+  "limitations": [
+    "pull_request_url is pending until the PR is created by the repository host."
+  ],
+  "known_limitations": [
+    "pull_request_url is pending until the PR is created by the repository host."
+  ],
+  "ready_for_ca_review": true,
+  "merge_class": "Class A documentation/integration after CA verification",
+  "summary": "Added Helen's initial HR operational onboarding artifacts and integrated Helen/HR mailbox identities with the personnel and functional mailbox registries without creating final HR authority, clearance policy, lifecycle-state changes, or constitutional role changes."
+}
