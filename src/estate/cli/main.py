@@ -19,6 +19,7 @@ from estate.core.operational_validation import generate_operational_validation_r
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
 from estate.core.dependency_graph import generate_dependency_graph, format_dependency_graph_summary
 from estate.core.audit_runtime import save_audit_report, summarize_audit_artifact, format_audit_summary
+from estate.core.mailbox_index import generate_mailbox_index, mailbox_index_summary
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -467,6 +468,21 @@ def cmd_steward_dashboard(args):
     else:
         print(format_steward_dashboard_summary(dashboard))
 
+def cmd_mailbox_index(args):
+    index = generate_mailbox_index()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(mailbox_index_summary(index), indent=2, sort_keys=True))
+    else:
+        summary = mailbox_index_summary(index)
+        print("Estate Mailbox Index")
+        print(f"Messages: {summary['message_count']}")
+        print(f"Warnings: {summary['warning_count']}")
+        print(f"Open CA2 messages: {summary['open_ca2_message_count']}")
+        print(f"Open CA3 messages: {summary['open_ca3_message_count']}")
+        print(f"Index: {summary['index_path']}")
+
+
 def cmd_audit(args):
     if getattr(args, "json", False):
         import json
@@ -588,6 +604,10 @@ def main():
     p = sub.add_parser("steward-dashboard")
     p.add_argument("--json", action="store_true", help="Generate Steward dashboard and print JSON")
     p.set_defaults(func=cmd_steward_dashboard)
+
+    p = sub.add_parser("mailbox-index")
+    p.add_argument("--json", action="store_true", help="Generate mailbox index and print JSON summary")
+    p.set_defaults(func=cmd_mailbox_index)
 
     p = sub.add_parser("audit")
     p.add_argument("--json", action="store_true", help="Print machine-readable audit report JSON")
