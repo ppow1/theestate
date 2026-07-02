@@ -34,6 +34,8 @@ Stable registry for durable Estate document IDs. Current paths may move in futur
 | `DOC-CA-MEMORANDUM-01` | Chief Architect 01 Final Memorandum | `archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md` | institutional memory | required | Chief Architect and archivists | canonical_archive | Archived Chief Architect memorandum. | — |
 | `DOC-CA-MEMORANDUM-02` | Chief Architect 02 Final Memorandum | `archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md` | institutional memory | required | Chief Architect and archivists | canonical_archive | Archived Chief Architect memorandum. | — |
 | `DOC-GENERATED-ARTIFACT-POLICY` | Generated Artifact Policy | `docs/operations/Generated_Artifact_Policy_v1.md` | operations/policy | required | all personnel | canonical | Policy distinguishing generated artifacts from authoritative sources. | — |
+| `DOC-ARTIFACT-PROVENANCE-MODEL` | Artifact Provenance Model | `docs/operations/Artifact_Provenance_Model_v1.md` | operations/provenance | required | all personnel | canonical | Lightweight provenance model for artifact origin, state, review, validation, and supersession metadata. | — |
+| `DOC-ARTIFACT-PROVENANCE-SCHEMA` | Artifact Provenance Schema | `data/registry/artifact_provenance_schema.json` | operations/provenance | required | systems and workers | canonical_schema | Machine-readable JSON Schema for Artifact Provenance Model records. | — |
 
 ## Unresolved Documents
 

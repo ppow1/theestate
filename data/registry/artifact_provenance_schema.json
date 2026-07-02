@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://estate.local/schemas/artifact_provenance_schema.json",
+  "title": "Estate Artifact Provenance Record",
+  "description": "Lightweight schema for recording the provenance state and traceability metadata of Estate artifacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_id",
+    "path",
+    "artifact_type",
+    "provenance_state"
+  ],
+  "properties": {
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable local identifier for the artifact or provenance record."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository-relative path to the artifact being described."
+    },
+    "artifact_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable artifact type such as document, registry, work_package, completion_record, review_record, generated_projection, runtime_projection, asset, or other."
+    },
+    "provenance_state": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "authored",
+        "generated",
+        "reviewed",
+        "validated",
+        "institutional_evidence",
+        "superseded",
+        "unresolved"
+      ],
+      "description": "Current provenance state for the artifact."
+    },
+    "created_by": {
+      "type": ["string", "null"],
+      "description": "Human, worker, role, or institution that authored or initiated the artifact."
+    },
+    "generated_by": {
+      "type": ["string", "null"],
+      "description": "Tool, command, worker, or automation that generated the artifact."
+    },
+    "source_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": [],
+      "description": "Repository-relative paths, IDs, or descriptors for inputs used to create or generate the artifact."
+    },
+    "reviewed_by": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": [],
+      "description": "People, roles, workers, or review record IDs that reviewed the artifact."
+    },
+    "validation_status": {
+      "type": "string",
+      "enum": [
+        "not_checked",
+        "pending",
+        "passed",
+        "failed",
+        "warning",
+        "not_applicable"
+      ],
+      "default": "not_checked",
+      "description": "Validation posture for the artifact or provenance record."
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": [],
+      "description": "Artifact IDs or paths this artifact replaces."
+    },
+    "superseded_by": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": [],
+      "description": "Artifact IDs or paths that replace this artifact."
+    },
+    "notes": {
+      "type": "string",
+      "default": "",
+      "description": "Short explanatory note, limitation, or reviewer guidance."
+    }
+  }
+}
