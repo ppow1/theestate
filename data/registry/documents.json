@@ -364,6 +364,30 @@
       "notes": "Policy distinguishing generated artifacts from authoritative sources.",
       "superseded_paths": [],
       "resolved": true
+    },
+    {
+      "id": "DOC-ARTIFACT-PROVENANCE-MODEL",
+      "title": "Artifact Provenance Model",
+      "path": "docs/operations/Artifact_Provenance_Model_v1.md",
+      "category": "operations/provenance",
+      "status": "required",
+      "audience": "all personnel",
+      "source_of_truth": "canonical",
+      "notes": "Lightweight provenance model for artifact origin, state, review, validation, and supersession metadata.",
+      "superseded_paths": [],
+      "resolved": true
+    },
+    {
+      "id": "DOC-ARTIFACT-PROVENANCE-SCHEMA",
+      "title": "Artifact Provenance Schema",
+      "path": "data/registry/artifact_provenance_schema.json",
+      "category": "operations/provenance",
+      "status": "required",
+      "audience": "systems and workers",
+      "source_of_truth": "canonical_schema",
+      "notes": "Machine-readable JSON Schema for Artifact Provenance Model records.",
+      "superseded_paths": [],
+      "resolved": true
     }
   ],
   "unresolved_documents": []

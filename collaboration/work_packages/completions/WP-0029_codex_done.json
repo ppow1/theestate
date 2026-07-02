@@ -1,0 +1,26 @@
+{
+  "work_package_id": "WP-0029",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T21:28:05.455403Z",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "summary": "Implemented the Artifact Provenance Model v1 documentation, machine-readable JSON Schema, and document registry entries without migrating existing artifacts or changing governance authority.",
+  "files_changed": [
+    "docs/operations/Artifact_Provenance_Model_v1.md",
+    "data/registry/artifact_provenance_schema.json",
+    "docs/operations/Document_Registry_v1.md",
+    "data/registry/documents.json",
+    "collaboration/work_packages/completions/WP-0029_codex_done.json"
+  ],
+  "tests_run": [
+    "python3 -m json.tool data/registry/artifact_provenance_schema.json >/tmp/artifact_provenance_schema.validated.json",
+    "python3 -m json.tool data/registry/documents.json >/tmp/documents.validated.json",
+    "test -f docs/operations/Artifact_Provenance_Model_v1.md && test -f data/registry/artifact_provenance_schema.json"
+  ],
+  "known_limitations": [
+    "No existing artifacts were migrated into individual provenance records, per work package constraints.",
+    "No helper CLI was added because documentation and schema were sufficient for the bounded model."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
