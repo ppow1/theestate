@@ -1,0 +1,52 @@
+[
+  {
+    "mailbox_id": 10001,
+    "mailbox_type": "office",
+    "display_name": "Office of the Chief Architect",
+    "owning_office": "Office of the Chief Architect",
+    "responsible_employee_id": 2,
+    "status": "active",
+    "purpose": "Functional office mailbox for Chief Architect coordination intake.",
+    "notes": "Functional mailbox; personnel accountability remains with a specific employee, worker, or service when required."
+  },
+  {
+    "mailbox_id": 10002,
+    "mailbox_type": "office",
+    "display_name": "Audit Office",
+    "owning_office": "Audit Office",
+    "responsible_employee_id": null,
+    "status": "active",
+    "purpose": "Functional office mailbox for audit-related intake.",
+    "notes": "No permanent employee accountability assigned by this package."
+  },
+  {
+    "mailbox_id": 10003,
+    "mailbox_type": "office",
+    "display_name": "Discovery Office",
+    "owning_office": "Discovery Office",
+    "responsible_employee_id": null,
+    "status": "active",
+    "purpose": "Functional office mailbox for discovery-related intake.",
+    "notes": "No permanent employee accountability assigned by this package."
+  },
+  {
+    "mailbox_id": 10100,
+    "mailbox_type": "queue",
+    "display_name": "Alfred Routing Intake",
+    "owning_office": "Chief of Staff",
+    "responsible_employee_id": null,
+    "status": "active",
+    "purpose": "Functional queue for routing-intake visibility.",
+    "notes": "Alfred may consume mailbox state for orchestration but does not own the mailbox system."
+  },
+  {
+    "mailbox_id": 10200,
+    "mailbox_type": "work_package",
+    "display_name": "WP-0005 Discovery Validation",
+    "owning_office": "Discovery Office",
+    "responsible_employee_id": null,
+    "status": "active",
+    "purpose": "Functional mailbox example for work-package intake.",
+    "notes": "Functional mailbox only; execution accountability must still be claimed when required."
+  }
+]

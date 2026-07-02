@@ -1,0 +1,52 @@
+[
+  {
+    "employee_id": 0,
+    "display_name": "Reserved / Special Institutional Identity",
+    "current_title": "Reserved / Special Institutional Identity",
+    "current_office": "Institutional Reserve",
+    "mailbox_id": 0,
+    "security_clearance": "metadata_only",
+    "status": "reserved",
+    "notes": "Reserved identity. No operational behavior assigned by Mailbox Infrastructure v1."
+  },
+  {
+    "employee_id": 1,
+    "display_name": "Steward / Founder",
+    "current_title": "Steward / Founder",
+    "current_office": "Stewardship",
+    "mailbox_id": 1,
+    "security_clearance": "metadata_only",
+    "status": "active",
+    "notes": "Seeded personnel identity for mailbox discovery."
+  },
+  {
+    "employee_id": 2,
+    "display_name": "Chief Architect #1",
+    "current_title": "Chief Architect #1",
+    "current_office": "Office of the Chief Architect",
+    "mailbox_id": 2,
+    "security_clearance": "metadata_only",
+    "status": "active",
+    "notes": "Seeded personnel identity for mailbox discovery."
+  },
+  {
+    "employee_id": 3,
+    "display_name": "Chief Architect #2",
+    "current_title": "Chief Architect #2",
+    "current_office": "Office of the Chief Architect",
+    "mailbox_id": 3,
+    "security_clearance": "metadata_only",
+    "status": "active",
+    "notes": "Seeded personnel identity for mailbox discovery."
+  },
+  {
+    "employee_id": 4,
+    "display_name": "Chief Architect #3",
+    "current_title": "Chief Architect #3",
+    "current_office": "Office of the Chief Architect",
+    "mailbox_id": 4,
+    "security_clearance": "metadata_only",
+    "status": "active",
+    "notes": "Seeded personnel identity for mailbox discovery."
+  }
+]
