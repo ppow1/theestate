@@ -34,6 +34,7 @@ from estate.core.notification_router import generate_notification_router_report,
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
+from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -629,6 +630,15 @@ def cmd_mailbox_sync_duty(args):
 
 
 
+def cmd_assignment_queue(args):
+    queue = generate_assignment_queue()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(queue, indent=2, sort_keys=True))
+    else:
+        print(format_assignment_queue_markdown(queue))
+
+
 def cmd_worker_heartbeat(args):
     heartbeat = create_worker_heartbeat(
         args.worker_id,
@@ -989,6 +999,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print mailbox synchronization duty report JSON")
     p.set_defaults(func=cmd_mailbox_sync_duty)
 
+
+    p = sub.add_parser("assignment-queue", help="Generate Estate work package assignment queue")
+    p.add_argument("--json", action="store_true", help="Print assignment queue JSON")
+    p.set_defaults(func=cmd_assignment_queue)
 
     p = sub.add_parser("worker-heartbeat", help="Record a local Estate worker runtime heartbeat")
     p.add_argument("worker_id", help="Worker identity or route id")

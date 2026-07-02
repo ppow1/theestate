@@ -1,0 +1,575 @@
+{
+  "generated_at": "2026-07-02T23:19:39Z",
+  "summary": {
+    "blocked_count": 0,
+    "unassigned_count": 33,
+    "warning_count": 33,
+    "work_package_count": 33
+  },
+  "version": 1,
+  "warnings": [
+    {
+      "message": "WP-0014 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0014"
+    },
+    {
+      "message": "WP-0015 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0015"
+    },
+    {
+      "message": "WP-0016 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0016"
+    },
+    {
+      "message": "WP-0017 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0017"
+    },
+    {
+      "message": "WP-0018 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0018"
+    },
+    {
+      "message": "WP-0019 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0019"
+    },
+    {
+      "message": "WP-0020 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0020"
+    },
+    {
+      "message": "WP-0020 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0020"
+    },
+    {
+      "message": "WP-0021 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0021"
+    },
+    {
+      "message": "WP-0022 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0022"
+    },
+    {
+      "message": "WP-0023 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0023"
+    },
+    {
+      "message": "WP-0024 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0024"
+    },
+    {
+      "message": "WP-0025 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0025"
+    },
+    {
+      "message": "WP-0026 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0026"
+    },
+    {
+      "message": "WP-0027 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0027"
+    },
+    {
+      "message": "WP-0028 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0028"
+    },
+    {
+      "message": "WP-0029 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0029"
+    },
+    {
+      "message": "WP-0030 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0030"
+    },
+    {
+      "message": "WP-0031 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0031"
+    },
+    {
+      "message": "WP-0032 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0032"
+    },
+    {
+      "message": "WP-0033 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0033"
+    },
+    {
+      "message": "WP-0034 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0034"
+    },
+    {
+      "message": "WP-0035 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0035"
+    },
+    {
+      "message": "WP-0036 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0036"
+    },
+    {
+      "message": "WP-0037 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0037"
+    },
+    {
+      "message": "WP-0038 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0038"
+    },
+    {
+      "message": "WP-0039 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0039"
+    },
+    {
+      "message": "WP-0040 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0040"
+    },
+    {
+      "message": "WP-0041 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0041"
+    },
+    {
+      "message": "WP-0042 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0042"
+    },
+    {
+      "message": "WP-0043 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0043"
+    },
+    {
+      "message": "WP-0044 has no explicit owner.",
+      "path": "collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-0044"
+    },
+    {
+      "message": "WP-LEAP-001 has no explicit owner.",
+      "path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "type": "missing_owner",
+      "work_package_id": "WP-LEAP-001"
+    }
+  ],
+  "work_packages": [
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md",
+      "state": "pending",
+      "work_package_id": "WP-0041"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md",
+      "state": "pending",
+      "work_package_id": "WP-0042"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md",
+      "state": "pending",
+      "work_package_id": "WP-0043"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md",
+      "state": "pending",
+      "work_package_id": "WP-0044"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "UNKNOWN",
+      "next_action": "Review work package and execute the stated mission.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md",
+      "state": "open",
+      "work_package_id": "WP-LEAP-001"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Review work package and execute the stated mission.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md",
+      "state": "completed",
+      "work_package_id": "WP-0014"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Review work package and execute the stated mission.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md",
+      "state": "completed",
+      "work_package_id": "WP-0015"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "UNKNOWN",
+      "next_action": "Review work package and execute the stated mission.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md",
+      "state": "completed",
+      "work_package_id": "WP-0016"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "UNKNOWN",
+      "next_action": "Review work package and execute the stated mission.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md",
+      "state": "completed",
+      "work_package_id": "WP-0017"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md",
+      "state": "completed",
+      "work_package_id": "WP-0018"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md",
+      "state": "completed",
+      "work_package_id": "WP-0019"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "state": "completed",
+      "work_package_id": "WP-0020"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Review work package and execute the stated mission.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+      "state": "completed",
+      "work_package_id": "WP-0020"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md",
+      "state": "completed",
+      "work_package_id": "WP-0021"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0022_SERIES_check_for_updates_v2_mailbox_integration.md",
+      "state": "completed",
+      "work_package_id": "WP-0022"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0023_SERIES_mailbox_synchronization_duty_runtime.md",
+      "state": "completed",
+      "work_package_id": "WP-0023"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0024_SERIES_daily_board_parking_lot_integration.md",
+      "state": "completed",
+      "work_package_id": "WP-0024"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0025_SERIES_local_operational_validation_runner.md",
+      "state": "completed",
+      "work_package_id": "WP-0025"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0026_SERIES_generated_artifact_policy.md",
+      "state": "completed",
+      "work_package_id": "WP-0026"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md",
+      "state": "completed",
+      "work_package_id": "WP-0027"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0028_SERIES_document_registry_stable_ids.md",
+      "state": "completed",
+      "work_package_id": "WP-0028"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
+      "state": "completed",
+      "work_package_id": "WP-0029"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md",
+      "state": "completed",
+      "work_package_id": "WP-0030"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md",
+      "state": "completed",
+      "work_package_id": "WP-0031"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md",
+      "state": "completed",
+      "work_package_id": "WP-0032"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md",
+      "state": "completed",
+      "work_package_id": "WP-0033"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md",
+      "state": "completed",
+      "work_package_id": "WP-0034"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md",
+      "state": "completed",
+      "work_package_id": "WP-0035"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md",
+      "state": "completed",
+      "work_package_id": "WP-0036"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md",
+      "state": "completed",
+      "work_package_id": "WP-0037"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md",
+      "state": "completed",
+      "work_package_id": "WP-0038"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md",
+      "state": "completed",
+      "work_package_id": "WP-0039"
+    },
+    {
+      "blockers": [],
+      "dependencies": [],
+      "last_updated": "2026-07-02T23:19:39Z",
+      "mode": "SERIES",
+      "next_action": "Read `collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md` and do exactly what it says.",
+      "owner": "unassigned",
+      "path": "collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md",
+      "state": "completed",
+      "work_package_id": "WP-0040"
+    }
+  ]
+}
