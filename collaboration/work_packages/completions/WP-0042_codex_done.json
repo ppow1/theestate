@@ -1,0 +1,24 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:45:00Z",
+  "files_changed": [
+    "collaboration/work_packages/codex_parallel_queue.md",
+    "collaboration/work_packages/completions/WP-0042_codex_done.json"
+  ],
+  "known_limitations": [
+    "Queue contents are a point-in-time document and must be refreshed when work package completion records change.",
+    "No packages are currently listed because the remaining incomplete pending packages are part of, or depend on, the active SERIES queue.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Created the repository-resident Codex Parallel Launch Queue document, identified no current out-of-series launch candidates, and added the WP-0042 completion signal.",
+  "tests_run": [
+    "test -f collaboration/work_packages/codex_parallel_queue.md",
+    "test -f collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md && test -f collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md && test -f collaboration/work_packages/pending/WP-0045_SERIES_decision_queue_panel.md",
+    "python -m json.tool collaboration/work_packages/completions/WP-0042_codex_done.json >/dev/null"
+  ],
+  "work_package_id": "WP-0042"
+}
