@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T20:49:04+00:00",
+  "files_changed": [
+    "src/estate/core/mailbox_sync_duty.py",
+    "src/estate/cli/main.py",
+    "tests/test_mailbox_sync_duty.py",
+    "runtime/mailboxes/synchronization_duty.json",
+    "operations/mailboxes/synchronization_duty.md",
+    "collaboration/work_packages/completions/WP-0023_codex_done.json"
+  ],
+  "known_limitations": [
+    "No fixed polling interval, HR policy, or security clearance policy is defined; the checker reports current local artifacts only."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented a lightweight mailbox synchronization duty runtime checker with CLI, JSON/Markdown reports, identity warnings, assigned/open/ack/reply obligation detection, and tests.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main mailbox-sync-duty --actor office.chief_architect_3 --json > /tmp/mailbox_sync.json",
+    "python -m json.tool /tmp/mailbox_sync.json >/dev/null",
+    "PYTHONPATH=src pytest -q tests/test_mailbox_sync_duty.py tests/test_check_updates.py tests/test_personnel_identity.py tests/test_mailbox_index.py"
+  ],
+  "work_package_id": "WP-0023"
+}

@@ -23,6 +23,7 @@ from estate.core.audit_runtime import save_audit_report, summarize_audit_artifac
 from estate.core.mailbox_index import generate_mailbox_index, mailbox_index_summary
 from estate.core.personnel_identity import resolve_personnel_identity, format_resolution
 from estate.core.check_updates import generate_check_updates, format_check_updates
+from estate.core.mailbox_sync_duty import generate_mailbox_sync_duty, format_mailbox_sync_duty
 from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -544,6 +545,15 @@ def cmd_check_updates(args):
     else:
         print(format_check_updates(report))
 
+def cmd_mailbox_sync_duty(args):
+    report = generate_mailbox_sync_duty(actor=getattr(args, "actor", None))
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(format_mailbox_sync_duty(report))
+
+
 def cmd_audit(args):
     if getattr(args, "json", False):
         import json
@@ -833,6 +843,11 @@ def main():
     p.add_argument("--actor", default=None, help="Actor requesting the update briefing")
     p.add_argument("--json", action="store_true", help="Print Check for Updates report JSON")
     p.set_defaults(func=cmd_check_updates)
+
+    p = sub.add_parser("mailbox-sync-duty")
+    p.add_argument("--actor", default=None, help="Actor whose mailbox synchronization duty should be checked")
+    p.add_argument("--json", action="store_true", help="Print mailbox synchronization duty report JSON")
+    p.set_defaults(func=cmd_mailbox_sync_duty)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")
