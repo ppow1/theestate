@@ -39,6 +39,7 @@ from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, 
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
+from estate.core.autonomous_operations_audit import append_autonomous_operations_audit, format_autonomous_operations_audit
 from estate.core.steward_command_center import generate_command_center, serve_command_center
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -675,6 +676,15 @@ def cmd_autonomous_work_queue_scheduler(args):
         print(format_autonomous_work_queue_scheduler(payload))
 
 
+def cmd_autonomous_operations_audit(args):
+    payload = append_autonomous_operations_audit()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_autonomous_operations_audit())
+
+
 def cmd_decision_queue(args):
     queue = generate_decision_queue()
     if getattr(args, "json", False):
@@ -1103,6 +1113,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print scheduler JSON")
     p.set_defaults(func=cmd_autonomous_work_queue_scheduler)
 
+
+    p = sub.add_parser("autonomous-operations-audit", help="Append an Autonomous Operations Audit Trail record")
+    p.add_argument("--json", action="store_true", help="Print appended audit record JSON")
+    p.set_defaults(func=cmd_autonomous_operations_audit)
 
     p = sub.add_parser("decision-queue", help="Generate the local Steward Decision Queue panel")
     p.add_argument("--json", action="store_true", help="Print decision queue JSON")
