@@ -225,7 +225,28 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "id='workspace-search'" in html
     assert "id='workspace-about'" in html
     assert "Global Search and Command Palette" in html
-    assert "Settings are reserved for local theme" in html
+    assert "Theme <select disabled>" in html
+    assert "Per-topic verbosity placeholders" in html
+    assert "Component / Version Inventory" in html
+    assert "unknown/unavailable" in html
+
+
+def test_command_center_settings_and_about_inventory_handle_unknown_versions(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    settings = payload["panels"]["settings"]
+    about = payload["panels"]["about"]
+
+    assert settings["available"] is True
+    assert settings["data"]["theme"]["options"] == ["light", "dark", "system"]
+    assert settings["data"]["activity_console_visible"] is True
+    assert "per_topic_verbosity" in settings["data"]
+    assert "per_resident_verbosity" in settings["data"]
+    assert about["available"] is True
+    assert any(item["version"] == "unknown/unavailable" for item in about["data"]["inventory"])
+    assert "runtime/steward/command_center.html" in html
+    assert "unknown/unavailable" in html
 
 
 def test_command_center_tab_switch_script_and_collapsible_navigation_are_rendered(tmp_path):

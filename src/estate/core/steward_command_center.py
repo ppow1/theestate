@@ -734,8 +734,8 @@ def generate_command_center(root=None, write=True):
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
         "daily_board_workspace": _daily_board_workspace_artifact(root),
         "search": _global_search_panel(root),
-        "settings": _placeholder_panel("settings", "Settings", "Settings are reserved for local theme, refresh, filter, layout, notification, and verbosity controls."),
-        "about": {"available": True, "path": "src/estate/core/steward_command_center.py", "kind": "about", "data": {"component": "Office of the Steward command center", "version": "Operations Center v1 / Office Shell v1", "local_only": True}},
+        "settings": _settings_panel(root),
+        "about": _about_panel(root),
     }
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
@@ -776,6 +776,68 @@ def _office_tabs(panels):
 
 def _office_placeholder_html(title, description, source="future Office package"):
     return f'<p class="placeholder">{html.escape(description)}</p><p class="source">Integration point: {html.escape(source)}</p>'
+
+
+def _unknown(value="unknown/unavailable"):
+    return value
+
+
+def _safe_version(data):
+    if not isinstance(data, dict):
+        return _unknown()
+    for key in ("version", "schema_version", "index_version", "router_version", "policy_version"):
+        value = data.get(key)
+        if value not in (None, ""):
+            return value
+    return _unknown()
+
+
+def _runtime_path(root, rel):
+    return {"label": rel, "path": str((root / rel).resolve()), "available": (root / rel).exists()}
+
+
+def _settings_panel(root):
+    visible = [item["id"] for item in OFFICE_NAVIGATION]
+    tab_order = [tab["id"] for tab in OFFICE_TABS]
+    return {
+        "available": True,
+        "path": "browser-local UI preferences",
+        "kind": "settings",
+        "data": {
+            "theme": {"value": "system", "options": ["light", "dark", "system"]},
+            "refresh_behavior": {"quiet_refresh_seconds": 30, "mode": "local artifact refresh"},
+            "visible_panels": {panel_id: True for panel_id in visible},
+            "tab_order": tab_order,
+            "pinned_views": ["home", "validation", "mailboxes"],
+            "global_verbosity": {"value": "standard", "options": ["brief", "standard", "detailed"]},
+            "per_topic_verbosity": {"operations": "standard", "validation": "detailed", "mailboxes": "standard"},
+            "per_resident_verbosity": {"Alfred": "standard", "Helen": "standard"},
+            "activity_console_visible": True,
+            "persistence": "local UI preferences only; no secrets, cloud settings, or account policy",
+        },
+    }
+
+
+def _about_panel(root):
+    package = _read_artifact(root, ["pyproject.toml", "package.json"])
+    alfred = _read_artifact(root, ["docs/alfred_v1_status.md", "residents/alfred.md"])
+    helen = _read_artifact(root, ["residents/helen.md", "docs/operations/helen/operating_brief.md"])
+    document_registry = _read_artifact(root, ["data/registry/documents.json"])
+    mailbox_registry = _read_artifact(root, ["data/registry/mailboxes.json"])
+    routing = _read_artifact(root, ["collaboration/routing_rules.json"])
+    work_package_schema = _read_artifact(root, ["collaboration/templates/work_package_v1.md"])
+    envelope_schema = _read_artifact(root, ["docs/collaboration/schemas/Canonical_Message_Envelope_v1.md", "collaboration/templates/message_envelope_v1.json"])
+    inventory = [
+        {"component": "Estate", "version": _safe_version(package.get("data")), "status": "local repository available"},
+        {"component": "Operations Center UI", "version": "Operations Center v1 / Settings & About inventory v1", "status": "available"},
+        {"component": "Alfred", "version": "v1" if alfred.get("available") else _unknown(), "status": "available" if alfred.get("available") else _unknown()},
+        {"component": "Helen", "version": "unknown/unavailable", "status": "available" if helen.get("available") else _unknown()},
+        {"component": "Document registry/schema", "version": _safe_version(document_registry.get("data")), "status": "available" if document_registry.get("available") else _unknown()},
+        {"component": "Mailbox registry/schema", "version": _safe_version(mailbox_registry.get("data")), "status": "available" if mailbox_registry.get("available") else _unknown()},
+        {"component": "Communication Bus", "version": _safe_version(routing.get("data")), "status": "available" if routing.get("available") or envelope_schema.get("available") else _unknown()},
+        {"component": "Work Package schema", "version": "v1" if work_package_schema.get("available") else _unknown(), "status": "available" if work_package_schema.get("available") else _unknown()},
+    ]
+    return {"available": True, "path": "local component inventory", "kind": "about", "data": {"inventory": inventory, "runtime_paths": [_runtime_path(root, rel) for rel in ["runtime/steward/command_center.html", "runtime", "data/registry", "collaboration", "operations"]], "local_only": True}}
 
 
 def _global_search_html(artifact):
@@ -1123,10 +1185,51 @@ async function refreshOperationsChrome(){
 window.addEventListener('load', () => window.setInterval(refreshOperationsChrome, 30000));
 </script>"""
 
+def _settings_html(artifact):
+    data = artifact.get("data") or {}
+    theme = data.get("theme") or {}
+    verbosity = data.get("global_verbosity") or {}
+    visible = data.get("visible_panels") or {}
+    topic = data.get("per_topic_verbosity") or {}
+    resident = data.get("per_resident_verbosity") or {}
+    theme_options = "".join(f"<option {'selected' if option == theme.get('value') else ''}>{html.escape(str(option))}</option>" for option in theme.get("options", []))
+    verbosity_options = "".join(f"<option {'selected' if option == verbosity.get('value') else ''}>{html.escape(str(option))}</option>" for option in verbosity.get("options", []))
+    panel_rows = "".join(f"<label><input type='checkbox' checked disabled> {html.escape(str(label))}</label>" for label in visible)
+    topic_rows = "".join(f"<dt>{html.escape(str(k).title())}</dt><dd>{html.escape(str(v))}</dd>" for k, v in topic.items())
+    resident_rows = "".join(f"<dt>{html.escape(str(k))}</dt><dd>{html.escape(str(v))}</dd>" for k, v in resident.items())
+    tab_order = ", ".join(str(tab) for tab in data.get("tab_order") or [])
+    pinned = ", ".join(str(tab) for tab in data.get("pinned_views") or [])
+    refresh = data.get("refresh_behavior") or {}
+    return (
+        "<div class='settings-surface'>"
+        "<p class='source'>Local-first UI preferences. Controls are initial placeholders unless marked by the browser shell; no secrets or cloud settings are stored.</p>"
+        f"<label>Theme <select disabled>{theme_options}</select></label>"
+        f"<label>Global verbosity <select disabled>{verbosity_options}</select></label>"
+        f"<p><strong>Refresh behavior:</strong> quiet local refresh every {html.escape(str(refresh.get('quiet_refresh_seconds', 'unknown/unavailable')))} seconds.</p>"
+        f"<p><strong>Activity console visible:</strong> {html.escape(str(data.get('activity_console_visible', 'unknown/unavailable')))}</p>"
+        f"<p><strong>Tab order:</strong> {html.escape(tab_order)}</p>"
+        f"<p><strong>Pinned views:</strong> {html.escape(pinned)}</p>"
+        f"<h3>Visible panels</h3><div class='settings-grid'>{panel_rows}</div>"
+        f"<h3>Per-topic verbosity placeholders</h3><dl>{topic_rows}</dl>"
+        f"<h3>Per-resident verbosity placeholders</h3><dl>{resident_rows}</dl>"
+        f"<p class='source'>{html.escape(str(data.get('persistence')))}</p>"
+        "</div>"
+    )
+
+
 def _about_html(artifact):
     data = artifact.get("data") or {}
-    rows = "".join(f"<dt>{html.escape(str(k).replace('_', ' ').title())}</dt><dd>{html.escape(str(v))}</dd>" for k, v in data.items())
-    return f"<dl>{rows}</dl><p class='source'>Source: {html.escape(str(artifact.get('path') or 'local component inventory'))}</p>"
+    inventory = data.get("inventory") or []
+    runtime_paths = data.get("runtime_paths") or []
+    rows = "".join(f"<tr><td>{html.escape(str(item.get('component')))}</td><td>{html.escape(str(item.get('version') or 'unknown/unavailable'))}</td><td>{html.escape(str(item.get('status') or 'unknown/unavailable'))}</td></tr>" for item in inventory)
+    path_rows = "".join(f"<tr><td>{html.escape(str(item.get('label')))}</td><td>{html.escape(str(item.get('path')))}</td><td>{html.escape('available' if item.get('available') else 'unknown/unavailable')}</td></tr>" for item in runtime_paths)
+    return (
+        "<h3>Component / Version Inventory</h3>"
+        f"<table><thead><tr><th>Component</th><th>Version</th><th>Status</th></tr></thead><tbody>{rows}</tbody></table>"
+        "<h3>Local Runtime Paths Used by the UI</h3>"
+        f"<table><thead><tr><th>Artifact</th><th>Path</th><th>Status</th></tr></thead><tbody>{path_rows}</tbody></table>"
+        f"<p class='source'>Source: {html.escape(str(artifact.get('path') or 'local component inventory'))}; local-only: {html.escape(str(data.get('local_only', True)))}</p>"
+    )
 
 
 def _nav_html(navigation):
@@ -1167,14 +1270,14 @@ def render_command_center_html(payload):
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
-        ("settings", "Settings", _office_placeholder_html("Settings", p.get("settings", {}).get("placeholder", "Settings workspace is not implemented yet."))),
+        ("settings", "Settings", _settings_html(p.get("settings", {}))),
         ("about", "About", _about_html(p.get("about", {}))),
     ]
     workspace = "".join(_workspace_section(tab_id, label, body, active=(i == 0)) for i, (tab_id, label, body) in enumerate(tab_bodies))
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 function activateOfficeTab(id){
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
