@@ -559,6 +559,99 @@ def _pipeline_title(root, rel_path, fallback):
         pass
     return fallback or "Unknown work package"
 
+
+
+def _markdown_table(text, heading):
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip().lower() == f"## {heading}".lower():
+            start = i + 1
+            break
+    if start is None:
+        return []
+    table = []
+    for line in lines[start:]:
+        if line.startswith("## "):
+            break
+        if line.strip().startswith("|"):
+            table.append(line.strip())
+    if len(table) < 2:
+        return []
+    headers = [h.strip() for h in table[0].strip("|").split("|")]
+    rows = []
+    for raw in table[2:]:
+        values = [v.strip() for v in raw.strip("|").split("|")]
+        if not values or all(v in {"", "-"} for v in values):
+            continue
+        rows.append({headers[i]: values[i] if i < len(values) else "" for i in range(len(headers))})
+    return rows
+
+
+def _markdown_bullets(text, heading):
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip().lower() == f"## {heading}".lower():
+            start = i + 1
+            break
+    if start is None:
+        return []
+    items = []
+    for line in lines[start:]:
+        if line.startswith("## "):
+            break
+        if line.strip().startswith("- "):
+            items.append(line.strip()[2:])
+    return items
+
+
+def _source_status(artifact):
+    return {"available": bool(artifact.get("available")), "path": artifact.get("path"), "placeholder": artifact.get("placeholder")}
+
+
+def _daily_board_workspace_artifact(root):
+    daily = _read_artifact(root, ["operations/boards/daily_board.md", "operations/board/latest.md"])
+    active = _read_artifact(root, ["operations/boards/active_work.md"])
+    integration = _read_artifact(root, ["runtime/operations/daily_board_integration.json", "operations/boards/daily_board_integration.md"])
+    parking = _read_artifact(root, ["operations/boards/parking_lot.md"])
+    alfred = _read_artifact(root, ["runtime/alfred/operational_briefing.json", "operations/alfred/operational_briefing.md"])
+    pipeline = _work_package_pipeline_artifact(root)
+
+    daily_text = daily.get("text") or ""
+    parking_text = parking.get("text") or ""
+    integration_text = integration.get("text") or ""
+    alfred_text = alfred.get("text") or ""
+    priorities = _markdown_table(daily_text, "Today")
+    waiting = _markdown_table(daily_text, "Waiting")
+    blocked = _markdown_table(daily_text, "Blocked")
+    review = _markdown_table(daily_text, "Review Required")
+    parking_items = _markdown_table(parking_text, "Parking Lot Items")
+    promotion_conditions = _markdown_bullets(integration_text, "Parking Lot Promotion Conditions")
+    recommended = _markdown_bullets(integration_text, "Recommended Next Actions") + _markdown_bullets(alfred_text, "Recommended Next Actions")
+    pipeline_sections = (((pipeline.get("data") or {}).get("sections") or {}) if pipeline.get("available") else {})
+    active_items = _markdown_table(active.get("text") or "", "Active Work") or (pipeline_sections.get("active") or [])[:8]
+    pipeline_blocked = pipeline_sections.get("blocked") or []
+    available = any(a.get("available") for a in [daily, active, integration, parking, alfred])
+    return {
+        "available": available,
+        "path": "operations/boards/daily_board.md; operations/boards/parking_lot.md",
+        "kind": "daily_board_workspace",
+        "placeholder": None if available else "Daily Board and Parking Lot source artifacts are not available yet.",
+        "data": {
+            "daily_priorities": priorities,
+            "waiting_items": waiting,
+            "blocked_items": blocked + pipeline_blocked,
+            "review_required": review,
+            "active_board_items": active_items,
+            "parking_lot_items": parking_items,
+            "promotion_conditions": promotion_conditions,
+            "items_recommended_for_review": _markdown_bullets(integration_text, "Parking Lot Items Ready for Review"),
+            "recommended_next_actions": recommended,
+            "sources": {"daily_board": _source_status(daily), "active_work": _source_status(active), "daily_board_integration": _source_status(integration), "parking_lot": _source_status(parking), "work_package_pipeline": _source_status(pipeline), "alfred_operational_briefing": _source_status(alfred)},
+        },
+    }
+
 def generate_command_center(root=None, write=True):
     root = _root(root)
     resident_cards = build_resident_cards(root)
@@ -573,6 +666,7 @@ def generate_command_center(root=None, write=True):
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _read_artifact(root, ["operations/boards/roadmap.md"]),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
+        "daily_board_workspace": _daily_board_workspace_artifact(root),
         "search": _placeholder_panel("search", "Search", "Institutional search workspace is reserved for a future interactive panel; use the local estate-search CLI until then."),
         "settings": _placeholder_panel("settings", "Settings", "Settings are reserved for local theme, refresh, filter, layout, notification, and verbosity controls."),
         "about": {"available": True, "path": "src/estate/core/steward_command_center.py", "kind": "about", "data": {"component": "Office of the Steward command center", "version": "Operations Center v1 / Office Shell v1", "local_only": True}},
@@ -785,6 +879,43 @@ def _mailbox_operations_center_html(artifact):
     out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(str(k))}: {html.escape(str(v or 'not available'))}" for k, v in sources.items()) + ". This panel summarizes only; it does not mark mail read or acknowledged.</p></div>")
     return "".join(out)
 
+
+
+def _board_rows(items, columns, empty_text):
+    if not items:
+        return f"<p class='placeholder'>{html.escape(empty_text)}</p>"
+    out = ["<table><thead><tr>" + "".join(f"<th>{html.escape(c)}</th>" for c in columns) + "</tr></thead><tbody>"]
+    for item in items[:20]:
+        out.append("<tr>" + "".join(f"<td>{html.escape(str(item.get(c) or item.get(c.lower()) or ''))}</td>" for c in columns) + "</tr>")
+    out.append("</tbody></table>")
+    return "".join(out)
+
+
+def _daily_board_workspace_html(artifact, parking_only=False):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    out = ["<div class='daily-board-workspace'>"]
+    if not parking_only:
+        out.append("<p>This workspace keeps today’s Daily Board separate from deferred Parking Lot ideas. Parking Lot items are shown for review only and are not automatically promoted.</p>")
+        out.append("<h3>Current daily priorities</h3>" + _board_rows(data.get("daily_priorities") or [], ["ID", "Task", "Owner", "Status", "Blocker", "Review Required", "Next Action"], "No current daily priorities were found in the Daily Board."))
+        out.append("<h3>Active board items</h3>" + _board_rows(data.get("active_board_items") or [], ["ID", "Item", "Owner", "Status", "Next Action"], "No active board items were found in available artifacts."))
+        out.append("<h3>Blocked items</h3>" + _board_rows(data.get("blocked_items") or [], ["ID", "Item", "Blocker", "Owner", "Escalation Needed"], "No blocked items were found in available board or pipeline artifacts."))
+        out.append("<h3>Review required</h3>" + _board_rows(data.get("review_required") or [], ["ID", "Item", "Reviewer", "Reason", "Ready Since"], "No Daily Board review-required items were found."))
+    out.append("<h3>Parking Lot items</h3>" + _board_rows(data.get("parking_lot_items") or [], ["ID", "Idea", "Category", "Priority", "Originator", "Status", "Promotion Condition"], "No Parking Lot items were found."))
+    out.append("<h3>Promotion conditions (informational only)</h3>")
+    conditions = data.get("promotion_conditions") or []
+    out.append("<ul>" + "".join(f"<li>{html.escape(str(item))}</li>" for item in conditions[:20]) + "</ul>" if conditions else "<p class='placeholder'>No documented promotion conditions were found.</p>")
+    out.append("<h3>Items recommended for review</h3>")
+    review = data.get("items_recommended_for_review") or []
+    out.append("<ul>" + "".join(f"<li>{html.escape(str(item))}</li>" for item in review[:12]) + "</ul>" if review else "<p class='placeholder'>No review recommendations were found.</p>")
+    if not parking_only:
+        actions = data.get("recommended_next_actions") or []
+        out.append("<h3>Recommended next actions</h3>" + ("<ul>" + "".join(f"<li>{html.escape(str(item))}</li>" for item in actions[:12]) + "</ul>" if actions else "<p class='placeholder'>No recommended next actions were found.</p>"))
+    sources = data.get("sources") or {}
+    out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ".</p></div>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -904,10 +1035,10 @@ def render_command_center_html(payload):
         ("home", "Home", _home_workspace_html(payload)),
         ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
-        ("daily-board", "Morning Briefing", _artifact_html(p.get("morning_briefing", {}))),
+        ("daily-board", "Daily Board / Parking Lot Workspace", _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _artifact_html(p.get("expansion_roadmap", {}))),
-        ("parking", "Parking Lot", _artifact_html(p.get("parking_lot", {}))),
+        ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
         ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
