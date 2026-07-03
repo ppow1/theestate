@@ -13,6 +13,7 @@ from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_cards import build_resident_cards
+from estate.core.decision_queue import generate_decision_queue
 
 ARTIFACTS = {
     "morning_briefing": ["runtime/operations/morning_briefing.json", "operations/briefings/morning_briefing.md"],
@@ -76,7 +77,7 @@ def generate_command_center(root=None, write=True):
     panels = {
         **resident_panels,
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
-        "steward_decision_queue": {"available": False, "path": None, "placeholder": "Steward Decision Queue panel is reserved for the decision queue implementation."},
+        "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "work_package_pipeline": _read_artifact(root, ARTIFACTS["work_package_pipeline"]),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
@@ -110,6 +111,32 @@ def _resident_html(card):
     return f"<dl>{''.join(rows)}</dl>"
 
 
+
+def _decision_queue_artifact(root):
+    try:
+        queue = generate_decision_queue(root=root, write=True)
+        return {"available": True, "path": "runtime/steward/decision_queue.json", "kind": "decision_queue", "data": queue}
+    except Exception as exc:
+        return {"available": False, "path": "runtime/steward/decision_queue.json", "placeholder": f"Decision queue could not be generated: {exc}"}
+
+
+def _decision_queue_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    decisions = data.get("decisions") or []
+    if not decisions:
+        return f'<p class="placeholder">{html.escape(data.get("empty_state") or "No pending Steward decisions were found.")}</p><p class="source">Source: {html.escape(artifact.get("path", ""))}</p>'
+    rows = []
+    for decision in decisions[:10]:
+        title = html.escape(str(decision.get("title") or "Untitled decision item"))
+        meta = html.escape(f"{decision.get('urgency') or 'normal'} · {decision.get('status') or 'pending'} · requested by {decision.get('requested_by') or 'unknown'}")
+        reason = html.escape(str(decision.get("reason") or ""))
+        action = html.escape(str(decision.get("recommended_action") or ""))
+        source = html.escape(str(decision.get("source_artifact") or artifact.get("path") or ""))
+        rows.append(f"<li><strong>{title}</strong><br><span class='source'>{meta}</span><br>{reason}<br><em>{action}</em><br><span class='source'>Source: {source}</span></li>")
+    return f"<ul>{''.join(rows)}</ul><p class='source'>Source: {html.escape(artifact.get('path', ''))}</p>"
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -127,7 +154,7 @@ def render_command_center_html(payload):
         _panel("Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {})), "ready" if p.get("alfred_resident_card", {}).get("available") else "placeholder"),
         _panel("Helen Resident Card", _resident_html(p.get("helen_resident_card", {})), "ready" if p.get("helen_resident_card", {}).get("available") else "placeholder"),
         _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder"),
-        _panel("Steward Decision Queue", _artifact_html(p.get("steward_decision_queue", {})), "placeholder"),
+        _panel("Steward Decision Queue", _decision_queue_html(p.get("steward_decision_queue", {})), "ready" if p.get("steward_decision_queue", {}).get("available") else "placeholder"),
         _panel("Mailbox Summary", _artifact_html(p.get("mailbox_summary", {})), "ready" if p.get("mailbox_summary", {}).get("available") else "placeholder"),
         _panel("Work Package Pipeline", _artifact_html(p.get("work_package_pipeline", {})), "ready" if p.get("work_package_pipeline", {}).get("available") else "placeholder"),
         _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder"),

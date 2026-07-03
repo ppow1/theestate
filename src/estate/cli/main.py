@@ -36,6 +36,7 @@ from estate.core.gotify_adapter import send_gotify_recall, format_gotify_deliver
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
 from estate.core.steward_command_center import generate_command_center, serve_command_center
+from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -641,6 +642,15 @@ def cmd_assignment_queue(args):
 
 
 
+def cmd_decision_queue(args):
+    queue = generate_decision_queue()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(queue, indent=2, sort_keys=True))
+    else:
+        print(format_decision_queue_markdown(queue))
+
+
 def cmd_steward_command_center(args):
     if getattr(args, "serve", False):
         server = serve_command_center(host=args.host, port=args.port)
@@ -1026,6 +1036,10 @@ def main():
     p.add_argument("--json", action="store_true", help="Print assignment queue JSON")
     p.set_defaults(func=cmd_assignment_queue)
 
+
+    p = sub.add_parser("decision-queue", help="Generate the local Steward Decision Queue panel")
+    p.add_argument("--json", action="store_true", help="Print decision queue JSON")
+    p.set_defaults(func=cmd_decision_queue)
 
     p = sub.add_parser("steward-command-center", help="Generate or serve the local Office of the Steward command center")
     p.add_argument("--json", action="store_true", help="Print command center payload JSON")
