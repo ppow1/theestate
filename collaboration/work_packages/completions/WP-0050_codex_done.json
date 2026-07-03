@@ -1,0 +1,22 @@
+{
+  "work_package_id": "WP-0050",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:57:31+00:00",
+  "branch": "work",
+  "pull_request_url": null,
+  "summary": "Implemented the Office navigation and tabbed layout shell with placeholders, status bar, and activity console integration points.",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0050_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src python -m pytest tests/test_steward_command_center.py tests/test_codex_completion.py",
+    "PYTHONPATH=src python -m pytest"
+  ],
+  "known_limitations": [
+    "Future Office panels remain placeholders where no local artifact-backed UI exists yet."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}

@@ -17,6 +17,39 @@ from estate.core.resident_cards import build_resident_cards
 from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
 
+
+OFFICE_NAVIGATION = [
+    {"id": "home", "label": "Home", "panel": "home", "tab": "home"},
+    {"id": "alfred", "label": "Alfred", "panel": "alfred_resident_card", "tab": "alfred"},
+    {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
+    {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
+    {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
+    {"id": "expansion-roadmap", "label": "Expansion Roadmap", "panel": "expansion_roadmap", "tab": "roadmap"},
+    {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
+    {"id": "work-packages", "label": "Work Packages", "panel": "work_package_pipeline", "tab": "work-packages"},
+    {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_summary", "tab": "mailboxes"},
+    {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
+    {"id": "search", "label": "Search", "panel": "search", "tab": "search"},
+    {"id": "settings", "label": "Settings", "panel": "settings", "tab": "settings"},
+    {"id": "about", "label": "About", "panel": "about", "tab": "about"},
+]
+
+OFFICE_TABS = [
+    {"id": "home", "label": "Home"},
+    {"id": "alfred", "label": "Alfred"},
+    {"id": "helen", "label": "Helen"},
+    {"id": "daily-board", "label": "Daily Board"},
+    {"id": "projects", "label": "Projects"},
+    {"id": "roadmap", "label": "Roadmap"},
+    {"id": "parking", "label": "Parking Lot"},
+    {"id": "work-packages", "label": "Work Packages"},
+    {"id": "mailboxes", "label": "Mailboxes"},
+    {"id": "validation", "label": "Validation"},
+    {"id": "search", "label": "Search"},
+    {"id": "settings", "label": "Settings"},
+    {"id": "about", "label": "About"},
+]
+
 ARTIFACTS = {
     "morning_briefing": ["runtime/operations/morning_briefing.json", "operations/briefings/morning_briefing.md"],
     "mailbox_summary": ["runtime/collaboration/mailbox_index.json", "collaboration/mailboxes/index.json"],
@@ -395,10 +428,15 @@ def generate_command_center(root=None, write=True):
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
+        "expansion_roadmap": _read_artifact(root, ["operations/boards/roadmap.md"]),
+        "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
+        "search": _placeholder_panel("search", "Search", "Institutional search workspace is reserved for a future interactive panel; use the local estate-search CLI until then."),
+        "settings": _placeholder_panel("settings", "Settings", "Settings are reserved for local theme, refresh, filter, layout, notification, and verbosity controls."),
+        "about": {"available": True, "path": "src/estate/core/steward_command_center.py", "kind": "about", "data": {"component": "Office of the Steward command center", "version": "Operations Center v1 / Office Shell v1", "local_only": True}},
     }
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels}
+    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels)}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -407,6 +445,39 @@ def generate_command_center(root=None, write=True):
         out.write_text(render_command_center_html(payload), encoding="utf-8")
     return payload
 
+
+
+def _placeholder_panel(panel_id, title, description, source="future Office package"):
+    return {"available": False, "path": source, "kind": "placeholder", "panel_id": panel_id, "title": title, "placeholder": description}
+
+
+def _office_navigation(panels):
+    items = []
+    for item in OFFICE_NAVIGATION:
+        panel = panels.get(item["panel"], {})
+        items.append({**item, "available": bool(panel.get("available")) if isinstance(panel, dict) else False})
+    return {"collapsed_by_default": False, "items": items}
+
+
+def _office_tabs(panels):
+    return [{**tab, "available": True} for tab in OFFICE_TABS]
+
+
+def _office_placeholder_html(title, description, source="future Office package"):
+    return f'<p class="placeholder">{html.escape(description)}</p><p class="source">Integration point: {html.escape(source)}</p>'
+
+
+def _home_workspace_html(payload):
+    status = payload.get("status_bar", {})
+    return "".join([
+        "<p>The Office shell is active. Use the left navigation or workspace tabs to switch between operational areas without crowding every panel onto one screen.</p>",
+        _panel("Steward Decision Queue", _decision_queue_html(payload.get("panels", {}).get("steward_decision_queue", {})), "ready"),
+        "<ul>",
+        f"<li>Estate status: {html.escape(str(status.get('estate_status') or 'unknown'))}</li>",
+        f"<li>Validation: {html.escape(str(status.get('validation_state') or 'unknown'))}</li>",
+        f"<li>Recommended next action: {html.escape(str(status.get('recommended_next_action') or 'Review local artifacts.'))}</li>",
+        "</ul>",
+    ])
 
 def _panel(title, body, status="placeholder"):
     return f'<section class="panel {html.escape(status)}"><h2>{html.escape(title)}</h2>{body}</section>'
@@ -592,25 +663,69 @@ async function refreshOperationsChrome(){
 window.addEventListener('load', () => window.setInterval(refreshOperationsChrome, 30000));
 </script>"""
 
+def _about_html(artifact):
+    data = artifact.get("data") or {}
+    rows = "".join(f"<dt>{html.escape(str(k).replace('_', ' ').title())}</dt><dd>{html.escape(str(v))}</dd>" for k, v in data.items())
+    return f"<dl>{rows}</dl><p class='source'>Source: {html.escape(str(artifact.get('path') or 'local component inventory'))}</p>"
+
+
+def _nav_html(navigation):
+    items = navigation.get("items") or []
+    buttons = []
+    for item in items:
+        status = "ready" if item.get("available") else "placeholder"
+        buttons.append(f"<button class='nav-item {status}' data-tab='{html.escape(str(item.get('tab')))}'>{html.escape(str(item.get('label')))}</button>")
+    return f"<aside id='office-navigation' class='office-navigation'><details open><summary>Office Navigation</summary>{''.join(buttons)}</details></aside>"
+
+
+def _tab_bar_html(tabs):
+    buttons = []
+    for index, tab in enumerate(tabs or []):
+        selected = "true" if index == 0 else "false"
+        active = " active" if index == 0 else ""
+        buttons.append(f"<button id='tab-{html.escape(str(tab.get('id')))}' class='workspace-tab{active}' role='tab' aria-selected='{selected}' data-tab='{html.escape(str(tab.get('id')))}'>{html.escape(str(tab.get('label')))}</button>")
+    return f"<div id='workspace-tabs' class='workspace-tabs' role='tablist'>{''.join(buttons)}</div>"
+
+
+def _workspace_section(tab_id, label, body, active=False):
+    active_class = " active" if active else ""
+    hidden = "" if active else " hidden"
+    return f"<section id='workspace-{html.escape(tab_id)}' class='workspace-view{active_class}' role='tabpanel'{hidden}><h2>{html.escape(label)}</h2>{body}</section>"
+
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
-    panels = [
-        _panel("Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {})), "ready" if p.get("alfred_resident_card", {}).get("available") else "placeholder"),
-        _panel("Helen Resident Card", _resident_html(p.get("helen_resident_card", {})), "ready" if p.get("helen_resident_card", {}).get("available") else "placeholder"),
-        _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder"),
-        _panel("Steward Decision Queue", _decision_queue_html(p.get("steward_decision_queue", {})), "ready" if p.get("steward_decision_queue", {}).get("available") else "placeholder"),
-        _panel("Mailbox Summary", _artifact_html(p.get("mailbox_summary", {})), "ready" if p.get("mailbox_summary", {}).get("available") else "placeholder"),
-        _panel("Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {})), "ready" if p.get("work_package_pipeline", {}).get("available") else "placeholder"),
-        _panel("Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})), "ready"),
-        _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder"),
+    tab_bodies = [
+        ("home", "Home", _home_workspace_html(payload)),
+        ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {}))),
+        ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
+        ("daily-board", "Morning Briefing", _artifact_html(p.get("morning_briefing", {}))),
+        ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
+        ("roadmap", "Expansion Roadmap", _artifact_html(p.get("expansion_roadmap", {}))),
+        ("parking", "Parking Lot", _artifact_html(p.get("parking_lot", {}))),
+        ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
+        ("mailboxes", "Mailbox Summary", _artifact_html(p.get("mailbox_summary", {}))),
+        ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
+        ("search", "Search", _office_placeholder_html("Search", p.get("search", {}).get("placeholder", "Search workspace is not implemented yet."))),
+        ("settings", "Settings", _office_placeholder_html("Settings", p.get("settings", {}).get("placeholder", "Settings workspace is not implemented yet."))),
+        ("about", "About", _about_html(p.get("about", {}))),
     ]
+    workspace = "".join(_workspace_section(tab_id, label, body, active=(i == 0)) for i, (tab_id, label, body) in enumerate(tab_bodies))
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    script = """<script>
+function activateOfficeTab(id){
+  document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
+  document.querySelectorAll('[data-tab]').forEach(button => { const active = button.dataset.tab === id; if(button.classList.contains('workspace-tab')) button.setAttribute('aria-selected', active ? 'true' : 'false'); button.classList.toggle('active', active); });
+}
+document.addEventListener('click', event => { const button = event.target.closest('[data-tab]'); if(button) activateOfficeTab(button.dataset.tab); });
+</script>"""
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
-        '<style>body{font-family:system-ui,sans-serif;margin:2rem 2rem 9rem;background:#f6f3ed;color:#241f1a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;box-shadow:0 1px 4px #0001}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}</style></head>\n'
-        f'<body><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only skeleton. Generated: {generated}. This dashboard summarizes existing Estate artifacts and shows placeholders for missing capabilities.</p></header><main class="grid">{"".join(panels)}</main>{activity_console}{status_bar}{_refresh_script()}</body></html>\n'
+        f'<style>{css}</style></head>\n'
+        f'<body><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p></header><div class="office-shell">{_nav_html(payload.get("navigation", {}))}<main class="workspace">{_tab_bar_html(payload.get("tabs", []))}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
