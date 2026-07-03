@@ -19,10 +19,12 @@ from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.global_search_command_palette import build_global_palette
+from estate.core.mission_control_workspace import build_mission_control_workspace
 
 
 OFFICE_NAVIGATION = [
     {"id": "home", "label": "Home", "panel": "home", "tab": "home"},
+    {"id": "mission-control", "label": "Mission Control", "panel": "mission_control_workspace", "tab": "mission-control"},
     {"id": "alfred", "label": "Alfred", "panel": "alfred_resident_card", "tab": "alfred"},
     {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
@@ -41,6 +43,7 @@ OFFICE_NAVIGATION = [
 
 OFFICE_TABS = [
     {"id": "home", "label": "Home"},
+    {"id": "mission-control", "label": "Mission Control"},
     {"id": "alfred", "label": "Alfred"},
     {"id": "helen", "label": "Helen"},
     {"id": "resident-conversations", "label": "Resident Conversations"},
@@ -870,6 +873,7 @@ def generate_command_center(root=None, write=True):
     resident_panels = {f"{str(card.get('name', '')).lower()}_resident_card": card for card in resident_cards["cards"]}
     panels = {
         **resident_panels,
+        "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
@@ -1500,10 +1504,29 @@ def _workspace_section(tab_id, label, body, active=False):
     return f"<section id='workspace-{html.escape(tab_id)}' class='workspace-view{active_class}' role='tabpanel'{hidden}><h2>{html.escape(label)}</h2>{body}</section>"
 
 
+
+def _mission_control_html(panel):
+    data = panel.get("data") if isinstance(panel.get("data"), dict) else panel
+    summary = data.get("summary", {}) if isinstance(data, dict) else {}
+    sources = data.get("sources", []) if isinstance(data, dict) else []
+    lanes = data.get("lanes", []) if isinstance(data, dict) else []
+    source_map = {source.get("name"): source for source in sources if isinstance(source, dict)}
+    lane_cards = []
+    for lane in lanes:
+        cards = []
+        for source_id in lane.get("sources", []):
+            source = source_map.get(source_id, {"name": source_id, "available": False, "state": "missing", "path": "", "summary": "Not registered."})
+            state = "ready" if source.get("available") else "placeholder"
+            cards.append(f"<li class='{state}'><strong>{html.escape(str(source.get('name')))}</strong><br><span class='source'>{html.escape(str(source.get('path') or ''))}</span><br>{html.escape(str(source.get('state')))}</li>")
+        lane_cards.append(f"<section class='panel'><h3>{html.escape(str(lane.get('title')))}</h3><ul>{''.join(cards)}</ul></section>")
+    warnings = ''.join(f"<li>{html.escape(str(w.get('source')))}: {html.escape(str(w.get('message')))}</li>" for w in data.get("warnings", [])) if isinstance(data, dict) else ""
+    return _panel("Mission Control", f"<p>State: <strong>{html.escape(str(summary.get('state', 'unknown')))}</strong> · Ready sources: {html.escape(str(summary.get('ready_source_count', 0)))} / {html.escape(str(summary.get('source_count', 0)))}</p><p>{html.escape(str(summary.get('recommended_next_action', '')))}</p>{''.join(lane_cards)}<h3>Warnings</h3><ul>{warnings or '<li>No Mission Control source warnings.</li>'}</ul>", "ready" if panel.get("available") else "placeholder")
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
+        ("mission-control", "Mission Control Workspace", _mission_control_html(p.get("mission_control_workspace", {}))),
         ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),

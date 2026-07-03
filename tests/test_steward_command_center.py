@@ -206,6 +206,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     labels = [item["label"] for item in payload["navigation"]["items"]]
     assert labels == [
         "Home",
+        "Mission Control",
         "Alfred",
         "Helen",
         "Resident Conversations",
@@ -224,6 +225,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "id='workspace-tabs'" in html
     assert "id='office-navigation'" in html
     assert "data-tab='settings'" in html
+    assert "id='workspace-mission-control'" in html
     assert "id='workspace-search'" in html
     assert "id='workspace-recalls'" in html
     assert "id='workspace-resident-conversations'" in html
