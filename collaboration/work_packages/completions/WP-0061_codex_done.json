@@ -1,0 +1,29 @@
+{
+  "work_package_id": "WP-0061",
+  "codex_status": "done",
+  "ready_for_ca_review": true,
+  "completed_at": "2026-07-03T00:00:00Z",
+  "branch": "work",
+  "merge_class": "Class A",
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "summary": "Implemented a local-first Mission Control workspace payload and added it to the Office of the Steward command center as a read-only overview tab with graceful missing-artifact warnings.",
+  "files_changed": [
+    "src/estate/core/mission_control_workspace.py",
+    "src/estate/core/steward_command_center.py",
+    "docs/operations/Mission_Control_Workspace_v1.md",
+    "tests/test_mission_control_workspace.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0061_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_mission_control_workspace.py tests/test_steward_command_center.py",
+    "python -m json.tool collaboration/work_packages/completions/WP-0061_codex_done.json >/tmp/WP-0061_codex_done.json",
+    "git diff --check"
+  ],
+  "known_limitations": [
+    "Mission Control summarizes existing local artifacts only and intentionally does not become a source of truth.",
+    "External providers, worker launch automation, and recall delivery are intentionally out of scope.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "pull_request_url": null
+}
