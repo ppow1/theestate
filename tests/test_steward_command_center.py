@@ -130,3 +130,33 @@ def test_command_center_status_json_supports_quiet_refresh(tmp_path):
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_work_package_pipeline_groups_representative_states_and_copyable_commands(tmp_path):
+    seed_inputs(tmp_path)
+    base = tmp_path / "collaboration/work_packages"
+    (base / "pending").mkdir(parents=True, exist_ok=True)
+    (base / "open").mkdir(parents=True, exist_ok=True)
+    (base / "completions").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "collaboration/messages").mkdir(parents=True, exist_ok=True)
+    (base / "pending/WP-9001_SERIES_ready.md").write_text("# SERIES TASK WP-9001 — Ready Package\n\n## Codex Command\nRun me.\n", encoding="utf-8")
+    (base / "pending/WP-9002_SERIES_blocked.md").write_text("# SERIES TASK WP-9002 — Blocked Package\n\n## Blockers\n- Needs approval\n", encoding="utf-8")
+    (base / "open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md").write_text("# Work Package WP-LEAP-001\n", encoding="utf-8")
+    write_json(tmp_path, "collaboration/work_packages/completions/WP-9003_codex_done.json", {"work_package_id": "WP-9003", "codex_status": "done", "ready_for_ca_review": True})
+    (base / "pending/WP-9003_SERIES_review_ready.md").write_text("# SERIES TASK WP-9003 — Review Ready\n", encoding="utf-8")
+    write_json(tmp_path, "collaboration/work_packages/completions/WP-9004_codex_done.json", {"work_package_id": "WP-9004", "codex_status": "done", "ready_for_ca_review": True})
+    (base / "pending/WP-9004_SERIES_completed.md").write_text("# SERIES TASK WP-9004 — Completed Package\n", encoding="utf-8")
+    write_json(tmp_path, "collaboration/messages/msg_review_wp9004.json", {"payload": {"title": "Review WP-9004", "summary": "WP-9004 reviewed"}})
+
+    payload = generate_command_center(tmp_path, write=False)
+    pipeline = payload["panels"]["work_package_pipeline"]["data"]["sections"]
+    html = render_command_center_html(payload)
+
+    assert any(item["work_package_id"] == "WP-9001" for item in pipeline["pending"])
+    assert any(item["work_package_id"] == "WP-9002" for item in pipeline["blocked"])
+    assert any(item["work_package_id"] == "WP-LEAP-001" for item in pipeline["active"])
+    assert any(item["work_package_id"] == "WP-9003" for item in pipeline["review-ready"])
+    assert any(item["work_package_id"] == "WP-9004" for item in pipeline["completed"])
+    assert "Missing-data" in html
+    assert "textarea readonly" in html
+    assert "collaboration/work_packages/pending/WP-9001_SERIES_ready.md" in html

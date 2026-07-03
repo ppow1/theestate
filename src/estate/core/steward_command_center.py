@@ -7,6 +7,7 @@ new business logic; missing support artifacts become visible placeholders.
 
 import html
 import json
+import re
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -14,6 +15,7 @@ from pathlib import Path
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_cards import build_resident_cards
 from estate.core.decision_queue import generate_decision_queue
+from estate.core.assignment_queue import generate_assignment_queue
 
 ARTIFACTS = {
     "morning_briefing": ["runtime/operations/morning_briefing.json", "operations/briefings/morning_briefing.md"],
@@ -166,6 +168,102 @@ def _build_activity_console(root, panels, generated_at):
         events.append(_event(generated_at, "local artifacts", "empty", "info", "No recent operational activity records were found."))
     return {"collapsed_by_default": True, "verbosity_options": ["quiet", "normal", "detailed", "diagnostic"], "selected_verbosity": "normal", "events": events[:25]}
 
+
+def _completion_records(root):
+    records = {}
+    completion_dir = root / "collaboration" / "work_packages" / "completions"
+    if not completion_dir.exists():
+        return records
+    for path in sorted(completion_dir.glob("*.json")):
+        try:
+            data = _read_json(path)
+        except Exception:
+            continue
+        wp_id = data.get("work_package_id")
+        if wp_id:
+            data = dict(data)
+            data["path"] = _rel(path, root)
+            records[wp_id] = data
+    return records
+
+
+def _review_records(root):
+    records = {}
+    for path in sorted((root / "collaboration" / "messages").glob("*review*.json")):
+        try:
+            data = _read_json(path)
+        except Exception:
+            continue
+        text = json.dumps(data)
+        for wp_id in set(re.findall(r"WP-\d{4}|WP-[A-Z]+-\d{3}", text)):
+            records.setdefault(wp_id, []).append({"path": _rel(path, root), "title": (data.get("payload") or {}).get("title") or data.get("id")})
+    return records
+
+
+def _codex_command_for_package(root, rel_path):
+    path = root / rel_path
+    if not path.exists() or path.suffix != ".md":
+        return None
+    return f"Read:\n\n{rel_path}\n\nand do exactly what it says."
+
+
+def _pipeline_state(entry, completion, reviews):
+    if completion and completion.get("ready_for_ca_review") and not reviews:
+        return "review-ready"
+    state = str(entry.get("state") or "missing-data").lower()
+    if state in {"claimed", "open", "active"}:
+        return "active"
+    if state == "blocked" or entry.get("blockers"):
+        return "blocked"
+    if state == "completed":
+        return "completed"
+    if state == "pending":
+        return "pending"
+    return "missing-data"
+
+
+def _work_package_pipeline_artifact(root):
+    try:
+        queue = generate_assignment_queue(root=root, write=True)
+        completions = _completion_records(root)
+        reviews = _review_records(root)
+        sections = {name: [] for name in ["pending", "active", "blocked", "review-ready", "completed", "missing-data"]}
+        for entry in queue.get("work_packages", []):
+            wp_id = entry.get("work_package_id")
+            completion = completions.get(wp_id, {})
+            review = reviews.get(wp_id, [])
+            state = _pipeline_state(entry, completion, review)
+            command = _codex_command_for_package(root, entry.get("path", "")) if state == "pending" else None
+            item = {
+                "work_package_id": wp_id or "unknown",
+                "title": wp_id or "Unknown work package",
+                "path": entry.get("path"),
+                "state": state,
+                "source_state": entry.get("state"),
+                "mode": str(entry.get("mode") or "missing").lower(),
+                "dependency_notes": "; ".join(entry.get("dependencies") or entry.get("blockers") or []) or "None recorded",
+                "owner": entry.get("owner") or "unassigned",
+                "next_action": entry.get("next_action") or "Review missing work package metadata.",
+                "completion_status": "ready_for_ca_review" if completion.get("ready_for_ca_review") else (completion.get("codex_status") or "not completed"),
+                "review_status": "review recorded" if review else "review not recorded",
+                "codex_command": command,
+            }
+            item["title"] = _pipeline_title(root, item["path"], item["work_package_id"])
+            sections[state].append(item)
+        return {"available": True, "path": "runtime/work_packages/assignment_queue.json", "kind": "work_package_pipeline", "data": {"summary": queue.get("summary", {}), "sections": sections, "source": "assignment queue, completion records, review messages, launch queue documents, local validation artifacts"}}
+    except Exception as exc:
+        return {"available": False, "path": "runtime/work_packages/assignment_queue.json", "placeholder": f"Work package pipeline could not be generated: {exc}"}
+
+
+def _pipeline_title(root, rel_path, fallback):
+    try:
+        for line in (root / rel_path).read_text(encoding="utf-8").splitlines():
+            if line.startswith("# "):
+                return line[2:].strip()
+    except Exception:
+        pass
+    return fallback or "Unknown work package"
+
 def generate_command_center(root=None, write=True):
     root = _root(root)
     resident_cards = build_resident_cards(root)
@@ -175,7 +273,7 @@ def generate_command_center(root=None, write=True):
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
-        "work_package_pipeline": _read_artifact(root, ARTIFACTS["work_package_pipeline"]),
+        "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
     }
     generated_at = _now()
@@ -235,6 +333,39 @@ def _decision_queue_html(artifact):
         source = html.escape(str(decision.get("source_artifact") or artifact.get("path") or ""))
         rows.append(f"<li><strong>{title}</strong><br><span class='source'>{meta}</span><br>{reason}<br><em>{action}</em><br><span class='source'>Source: {source}</span></li>")
     return f"<ul>{''.join(rows)}</ul><p class='source'>Source: {html.escape(artifact.get('path', ''))}</p>"
+
+
+def _work_package_pipeline_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    sections = data.get("sections") or {}
+    order = [("pending", "Pending"), ("active", "Active"), ("blocked", "Blocked"), ("review-ready", "Review-ready"), ("completed", "Completed"), ("missing-data", "Missing-data")]
+    out = ["<div class='pipeline-view'>"]
+    for key, label in order:
+        items = sections.get(key) or []
+        out.append(f"<section class='pipeline-section {html.escape(key)}'><h3>{html.escape(label)} ({len(items)})</h3>")
+        if not items:
+            out.append("<p class='placeholder'>No work packages in this state.</p></section>")
+            continue
+        out.append("<table><thead><tr><th>ID</th><th>Title</th><th>Mode</th><th>Owner</th><th>Dependencies</th><th>Next action</th><th>Completion / Review</th></tr></thead><tbody>")
+        for item in items[:12]:
+            command = item.get("codex_command")
+            action = html.escape(str(item.get("next_action") or ""))
+            if command:
+                action += f"<br><textarea readonly rows='4' aria-label='Codex command for {html.escape(str(item.get('work_package_id')))}'>{html.escape(command)}</textarea>"
+            out.append("<tr>"
+                f"<td>{html.escape(str(item.get('work_package_id')))}</td>"
+                f"<td>{html.escape(str(item.get('title')))}<br><span class='source'>{html.escape(str(item.get('path') or 'missing path'))}</span></td>"
+                f"<td>{html.escape(str(item.get('mode')))}</td>"
+                f"<td>{html.escape(str(item.get('owner')))}</td>"
+                f"<td>{html.escape(str(item.get('dependency_notes')))}</td>"
+                f"<td>{action}</td>"
+                f"<td>{html.escape(str(item.get('completion_status')))} / {html.escape(str(item.get('review_status')))}</td>"
+                "</tr>")
+        out.append("</tbody></table></section>")
+    out.append(f"<p class='source'>Source: {html.escape(artifact.get('path', ''))}; {html.escape(str(data.get('source') or 'local artifacts'))}</p></div>")
+    return "".join(out)
 
 def _artifact_html(artifact):
     if not artifact.get("available"):
@@ -323,7 +454,7 @@ def render_command_center_html(payload):
         _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder"),
         _panel("Steward Decision Queue", _decision_queue_html(p.get("steward_decision_queue", {})), "ready" if p.get("steward_decision_queue", {}).get("available") else "placeholder"),
         _panel("Mailbox Summary", _artifact_html(p.get("mailbox_summary", {})), "ready" if p.get("mailbox_summary", {}).get("available") else "placeholder"),
-        _panel("Work Package Pipeline", _artifact_html(p.get("work_package_pipeline", {})), "ready" if p.get("work_package_pipeline", {}).get("available") else "placeholder"),
+        _panel("Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {})), "ready" if p.get("work_package_pipeline", {}).get("available") else "placeholder"),
         _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder"),
     ]
     status_bar = _status_bar_html(payload.get("status_bar", {}))
@@ -331,7 +462,7 @@ def render_command_center_html(payload):
     generated = html.escape(str(payload.get("generated_at")))
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
-        '<style>body{font-family:system-ui,sans-serif;margin:2rem 2rem 9rem;background:#f6f3ed;color:#241f1a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;box-shadow:0 1px 4px #0001}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.severity{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing{background:#fff3cd;color:#6b4e16}</style></head>\n'
+        '<style>body{font-family:system-ui,sans-serif;margin:2rem 2rem 9rem;background:#f6f3ed;color:#241f1a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;box-shadow:0 1px 4px #0001}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing{background:#fff3cd;color:#6b4e16}</style></head>\n'
         f'<body><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only skeleton. Generated: {generated}. This dashboard summarizes existing Estate artifacts and shows placeholders for missing capabilities.</p></header><main class="grid">{"".join(panels)}</main>{activity_console}{status_bar}{_refresh_script()}</body></html>\n'
     )
 
