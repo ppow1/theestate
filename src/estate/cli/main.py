@@ -36,6 +36,7 @@ from estate.core.morning_briefing import generate_morning_briefing, format_morni
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
+from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
 from estate.core.steward_command_center import generate_command_center, serve_command_center
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -663,6 +664,15 @@ def cmd_assignment_queue(args):
 
 
 
+def cmd_autonomous_work_queue_scheduler(args):
+    payload = generate_autonomous_work_queue_scheduler()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_autonomous_work_queue_scheduler(payload))
+
+
 def cmd_decision_queue(args):
     queue = generate_decision_queue()
     if getattr(args, "json", False):
@@ -1067,6 +1077,11 @@ def main():
     p = sub.add_parser("assignment-queue", help="Generate Estate work package assignment queue")
     p.add_argument("--json", action="store_true", help="Print assignment queue JSON")
     p.set_defaults(func=cmd_assignment_queue)
+
+
+    p = sub.add_parser("autonomous-work-queue-scheduler", help="Generate the local advisory autonomous work queue scheduler")
+    p.add_argument("--json", action="store_true", help="Print scheduler JSON")
+    p.set_defaults(func=cmd_autonomous_work_queue_scheduler)
 
 
     p = sub.add_parser("decision-queue", help="Generate the local Steward Decision Queue panel")
