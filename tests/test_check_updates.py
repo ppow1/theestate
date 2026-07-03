@@ -16,6 +16,7 @@ def seed(root: Path):
         {"employee_id": 4, "display_name": "Chief Architect #3", "current_title": "Chief Architect #3", "current_office": "Office of the Chief Architect", "mailbox_id": 4},
         {"employee_id": 5, "display_name": "Chief Architect #4", "current_title": "Chief Architect #4", "current_office": "Office of the Chief Architect", "mailbox_id": 5},
         {"employee_id": 6, "display_name": "Helen", "current_title": "Manager of Human Resources", "current_office": "Human Resources", "mailbox_id": 6, "resident_id": "RES-000003"},
+        {"employee_id": 7, "display_name": "Alfred", "current_title": "Manager of Administration", "current_office": "Administration", "mailbox_id": 7, "resident_id": "RES-000001"},
     ]))
     write(root / "data/registry/mailboxes.json", json.dumps([
         {"mailbox_id": 10001, "mailbox_type": "office", "display_name": "Office of the Chief Architect", "owning_office": "Office of the Chief Architect", "responsible_employee_id": 4},
@@ -38,6 +39,7 @@ def seed(root: Path):
     write(root / "collaboration/messages/ca3.json", json.dumps({"id": "m3", "destination_employee_id": 4, "requires_ack": True, "ack_status": "pending", "thread_id": "t-ca3", "payload": {"title": "CA3 mailbox briefing"}}))
     write(root / "collaboration/messages/ca4.json", json.dumps({"id": "m4", "destination": "mailbox.5", "requires_ack": True, "reply_to": "m3", "payload": {"title": "CA4 mailbox briefing"}}))
     write(root / "collaboration/messages/alfred.json", json.dumps({"id": "m5", "destination_mailbox_id": 10100, "payload": {"title": "Alfred routing note"}}))
+    write(root / "collaboration/messages/alfred_personal.json", json.dumps({"id": "m7", "destination": "alfred", "payload": {"title": "Alfred personnel note"}}))
     write(root / "collaboration/messages/helen.json", json.dumps({"id": "m6", "destination": "employee.6", "payload": {"title": "Helen personnel note"}}))
     write(root / "runtime/collaboration/events/events.jsonl", '{"id":"e1"}\n')
     write(root / "archive/institutional_memory/memo.md", "# Memory\nClassification: Estate Internal\n")
@@ -105,8 +107,15 @@ def test_alfred_and_helen_mailbox_resolution(tmp_path):
     seed(tmp_path)
     alfred = generate_check_updates("alfred", root=tmp_path)
     helen = generate_check_updates("helen", root=tmp_path)
-    assert alfred["identity"]["mailbox_id"] == 10100
-    assert any(message["message_id"] == "m5" for message in alfred["updates"]["assigned_messages"])
+    assert alfred["identity"]["employee_id"] == 7
+    assert alfred["identity"]["mailbox_id"] == 7
+    assert alfred["identity"]["resident_id"] == "RES-000001"
+    assert any(message["message_id"] == "m7" for message in alfred["updates"]["assigned_messages"])
+    assert not any(message["message_id"] == "m5" for message in alfred["updates"]["assigned_messages"])
+    queue = generate_check_updates("alfred.queue", root=tmp_path)
+    assert queue["identity"]["employee_id"] is None
+    assert queue["identity"]["mailbox_id"] == 10100
+    assert any(message["message_id"] == "m5" for message in queue["updates"]["assigned_messages"])
     assert helen["identity"]["employee_id"] == 6
     assert any(message["message_id"] == "m6" for message in helen["updates"]["assigned_messages"])
 
