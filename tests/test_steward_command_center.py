@@ -224,7 +224,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "data-tab='settings'" in html
     assert "id='workspace-search'" in html
     assert "id='workspace-about'" in html
-    assert "Institutional search workspace is reserved" in html
+    assert "Global Search and Command Palette" in html
     assert "Settings are reserved for local theme" in html
 
 
