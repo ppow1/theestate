@@ -1,0 +1,23 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T12:07:37+00:00",
+  "files_changed": [
+    "src/estate/core/voice.py",
+    "tests/test_voice_integration_framework.py",
+    "collaboration/work_packages/completions/WP-0057_codex_done.json"
+  ],
+  "known_limitations": [
+    "No cloud providers or concrete STT/TTS engines were implemented, per work package constraints.",
+    "Voice command handling plans through Alfred authority paths and does not execute commands directly.",
+    "No ledger or devlog entries were modified, per work package constraints."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending_make_pr_tool",
+  "ready_for_ca_review": true,
+  "summary": "Implemented a local-first voice integration framework with pluggable STT, TTS, SillyTavern, resident voice profile, session management, Alfred authority-path command planning, transcript generation, mock adapters, and tests for graceful unconfigured behavior.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_voice_integration_framework.py"
+  ],
+  "work_package_id": "WP-0057"
+}
