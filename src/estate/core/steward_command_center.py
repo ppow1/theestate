@@ -20,6 +20,7 @@ from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.global_search_command_palette import build_global_palette
 from estate.core.mission_control_workspace import build_mission_control_workspace
+from estate.core.steward_presence import generate_steward_presence_state
 
 
 OFFICE_NAVIGATION = [
@@ -77,6 +78,7 @@ ARTIFACTS = {
     "recall_decision_model": ["docs/operations/Steward_Recall_Decision_Model_v1.md", "data/policy/steward_recall_reasons.json"],
     "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
     "worker_runtime_monitor": ["runtime/workers/worker_runtime_monitor.json", "operations/workers/worker_runtime_monitor.md"],
+    "steward_presence": ["runtime/steward/steward_presence_state.json", "operations/steward/steward_presence_state.md"],
 }
 
 
@@ -438,6 +440,7 @@ def _build_status_bar(root, panels, generated_at):
     mailbox_ops_summary = (((panels.get("mailbox_operations_center") or {}).get("data") or {}).get("summary") or {})
     recall_ops_summary = (((panels.get("steward_recall_operations") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
+    steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
     health = ((panels.get("validation_health_dashboard") or {}).get("data") or {})
     health_state = health.get("overall_health")
@@ -453,6 +456,7 @@ def _build_status_bar(root, panels, generated_at):
         "mailbox_warning_count": mailbox_ops_summary.get("warning_count"),
         "active_recall_count": recall_ops_summary.get("active_recall_count"),
         "active_workers": active_workers,
+        "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
         "verbosity": "normal",
         "missing_sources": missing,
@@ -891,6 +895,7 @@ def generate_command_center(root=None, write=True):
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
         "daily_board_workspace": _daily_board_workspace_artifact(root),
         "search": _global_search_panel(root),
+        "steward_presence": {"available": True, "path": "runtime/steward/steward_presence_state.json", "kind": "json", "data": generate_steward_presence_state(root=root, write=False)},
         "settings": _settings_panel(root),
         "about": _about_panel(root),
     }
@@ -1384,6 +1389,7 @@ def _status_bar_html(status):
         ("Mail warn", status.get("mailbox_warning_count")),
         ("Active recalls", status.get("active_recall_count")),
         ("Workers", status.get("active_workers")),
+        ("Steward", status.get("steward_presence_state")),
         ("Verbosity", status.get("verbosity")),
         ("Version", status.get("version")),
     ]

@@ -36,6 +36,7 @@ from estate.core.morning_briefing import generate_morning_briefing, format_morni
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, format_worker_runtime_monitor
+from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
 from estate.core.steward_command_center import generate_command_center, serve_command_center
@@ -736,6 +737,15 @@ def cmd_worker_runtime_monitor(args):
         print(format_worker_runtime_monitor(payload))
 
 
+def cmd_steward_presence(args):
+    payload = generate_steward_presence_state()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_steward_presence_state(payload))
+
+
 def cmd_morning_briefing(args):
     briefing = generate_morning_briefing()
     if getattr(args, "json", False):
@@ -1123,6 +1133,10 @@ def main():
     p.add_argument("--stale-after-minutes", type=int, default=60, help="Flag worker heartbeats older than this as stale")
     p.add_argument("--json", action="store_true", help="Print runtime monitor JSON")
     p.set_defaults(func=cmd_worker_runtime_monitor)
+
+    p = sub.add_parser("steward-presence", help="Generate Steward Presence and Recall state report")
+    p.add_argument("--json", action="store_true", help="Print Steward presence state JSON")
+    p.set_defaults(func=cmd_steward_presence)
 
     p = sub.add_parser("morning-briefing")
     p.add_argument("--json", action="store_true", help="Generate Morning Briefing v1 and print JSON")
