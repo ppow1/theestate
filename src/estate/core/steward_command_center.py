@@ -17,6 +17,7 @@ from estate.core.resident_cards import build_resident_cards
 from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.mailbox_index import generate_mailbox_index
+from estate.core.global_search_command_palette import build_global_palette
 
 
 OFFICE_NAVIGATION = [
@@ -732,7 +733,7 @@ def generate_command_center(root=None, write=True):
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
         "daily_board_workspace": _daily_board_workspace_artifact(root),
-        "search": _placeholder_panel("search", "Search", "Institutional search workspace is reserved for a future interactive panel; use the local estate-search CLI until then."),
+        "search": _global_search_panel(root),
         "settings": _placeholder_panel("settings", "Settings", "Settings are reserved for local theme, refresh, filter, layout, notification, and verbosity controls."),
         "about": {"available": True, "path": "src/estate/core/steward_command_center.py", "kind": "about", "data": {"component": "Office of the Steward command center", "version": "Operations Center v1 / Office Shell v1", "local_only": True}},
     }
@@ -753,6 +754,14 @@ def _placeholder_panel(panel_id, title, description, source="future Office packa
     return {"available": False, "path": source, "kind": "placeholder", "panel_id": panel_id, "title": title, "placeholder": description}
 
 
+def _global_search_panel(root):
+    try:
+        palette = build_global_palette(root, write=True)
+        return {"available": True, "path": palette.get("index_path"), "kind": "global_search_command_palette", "data": palette}
+    except Exception as exc:
+        return {"available": False, "path": "runtime/search/global_command_palette.json", "kind": "global_search_command_palette", "placeholder": f"Global search palette is unavailable: {exc}"}
+
+
 def _office_navigation(panels):
     items = []
     for item in OFFICE_NAVIGATION:
@@ -767,6 +776,24 @@ def _office_tabs(panels):
 
 def _office_placeholder_html(title, description, source="future Office package"):
     return f'<p class="placeholder">{html.escape(description)}</p><p class="source">Integration point: {html.escape(source)}</p>'
+
+
+def _global_search_html(artifact):
+    if not artifact.get("available"):
+        return _office_placeholder_html("Search", artifact.get("placeholder", "Search is unavailable."), artifact.get("path", "runtime/search/global_command_palette.json"))
+    data = artifact.get("data") or {}
+    records = (data.get("commands") or []) + (data.get("artifacts") or [])
+    safe_records = html.escape(json.dumps(records))
+    domains = ", ".join(data.get("domains") or [])
+    return f"""<section class="global-search-palette" aria-label="Global Search and Command Palette">
+<p>Search updates incrementally across Work Packages, Missions, Mailboxes, Residents, Daily Board, Parking Lot, Validation artifacts, Documentation, and registered commands. Press <kbd>/</kbd> to focus search.</p>
+<label for="global-search-input">Global search / command</label>
+<input id="global-search-input" type="search" autocomplete="off" placeholder="Search artifacts or commands" aria-describedby="global-search-help" />
+<p id="global-search-help" class="source">Local-only. Commands are explicit registrations; unavailable commands report why they cannot run. Domains: {html.escape(domains)}</p>
+<div id="global-search-results" role="list" aria-live="polite"></div>
+<script id="global-palette-data" type="application/json">{safe_records}</script>
+<p class="source">Source: {html.escape(str(artifact.get("path") or "runtime/search/global_command_palette.json"))}</p>
+</section>"""
 
 
 def _home_workspace_html(payload):
@@ -1139,7 +1166,7 @@ def render_command_center_html(payload):
         ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
-        ("search", "Search", _office_placeholder_html("Search", p.get("search", {}).get("placeholder", "Search workspace is not implemented yet."))),
+        ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
         ("settings", "Settings", _office_placeholder_html("Settings", p.get("settings", {}).get("placeholder", "Settings workspace is not implemented yet."))),
         ("about", "About", _about_html(p.get("about", {}))),
     ]
@@ -1147,13 +1174,33 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 function activateOfficeTab(id){
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
   document.querySelectorAll('[data-tab]').forEach(button => { const active = button.dataset.tab === id; if(button.classList.contains('workspace-tab')) button.setAttribute('aria-selected', active ? 'true' : 'false'); button.classList.toggle('active', active); });
 }
 document.addEventListener('click', event => { const button = event.target.closest('[data-tab]'); if(button) activateOfficeTab(button.dataset.tab); });
+function renderGlobalPaletteResults(){
+  const input = document.querySelector('#global-search-input');
+  const output = document.querySelector('#global-search-results');
+  const dataEl = document.querySelector('#global-palette-data');
+  if(!input || !output || !dataEl) return;
+  const records = JSON.parse(dataEl.textContent || '[]');
+  const terms = input.value.trim().toLowerCase().split(/\\s+/).filter(Boolean);
+  const matches = records.filter(item => !terms.length || terms.every(term => [item.id,item.title,item.domain,item.path,item.excerpt,item.category,item.cli].join(' ').toLowerCase().includes(term))).slice(0, 25);
+  output.innerHTML = matches.length ? matches.map(item => {
+    const available = item.available !== false;
+    const title = item.title || item.id || item.path || 'Untitled';
+    const meta = [item.kind, item.domain, item.path || item.cli || item.operation].filter(Boolean).join(' · ');
+    const reason = available ? '' : `<p class="placeholder">Unavailable: ${item.unavailable_reason || 'Command unavailable.'}</p>`;
+    const action = available && item.operation === 'activate_tab' ? `<button type="button" onclick="activateOfficeTab('${item.target}')">Open</button>` : '';
+    return `<article class="palette-result ${available ? '' : 'unavailable'}" role="listitem"><strong>${title}</strong><div class="result-meta">${meta}</div>${reason}${action}</article>`;
+  }).join('') : '<p class="placeholder">No matching local artifacts or registered commands.</p>';
+}
+document.addEventListener('input', event => { if(event.target && event.target.id === 'global-search-input') renderGlobalPaletteResults(); });
+document.addEventListener('keydown', event => { if(event.key === '/' && !event.target.matches('input, textarea')){ event.preventDefault(); activateOfficeTab('search'); setTimeout(() => document.querySelector('#global-search-input')?.focus(), 0); } });
+window.addEventListener('load', renderGlobalPaletteResults);
 </script>"""
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'

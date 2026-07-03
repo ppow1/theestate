@@ -29,6 +29,7 @@ from estate.core.local_operational_validation import generate_local_operational_
 from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.institutional_search import search_institutional_index, format_search_report
+from estate.core.global_search_command_palette import search_global_palette, execute_registered_command, format_palette_report
 from estate.core.document_registry import load_document_registry, format_document_registry
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
@@ -604,6 +605,26 @@ def cmd_estate_search(args):
     else:
         print(format_search_report(result))
 
+def cmd_global_search(args):
+    result = search_global_palette(args.query, refresh=not getattr(args, "no_refresh", False))
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_palette_report(result))
+
+
+def cmd_palette_command(args):
+    result = execute_registered_command(args.command_id)
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(result.get("message"))
+    if not result.get("ok"):
+        raise SystemExit(1)
+
+
 def cmd_document_registry(args):
     registry = load_document_registry()
     if getattr(args, "json", False):
@@ -1016,6 +1037,17 @@ def main():
     p.add_argument("--json", action="store_true", help="Print search results JSON")
     p.add_argument("--no-refresh", action="store_true", help="Use existing runtime search index if present")
     p.set_defaults(func=cmd_estate_search)
+
+    p = sub.add_parser("global-search", help="Search artifacts and registered command palette entries")
+    p.add_argument("query", nargs="?", default="", help="Keyword query to search for")
+    p.add_argument("--json", action="store_true", help="Print global search results JSON")
+    p.add_argument("--no-refresh", action="store_true", help="Use existing runtime palette index if present")
+    p.set_defaults(func=cmd_global_search)
+
+    p = sub.add_parser("palette-command", help="Look up a registered command palette command")
+    p.add_argument("command_id", help="Registered command id")
+    p.add_argument("--json", action="store_true", help="Print command lookup JSON")
+    p.set_defaults(func=cmd_palette_command)
 
     p = sub.add_parser("document-registry", help="Print the stable Estate document registry")
     p.add_argument("--json", action="store_true", help="Print document registry JSON")
