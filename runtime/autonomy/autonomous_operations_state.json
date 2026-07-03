@@ -1,0 +1,103 @@
+{
+  "authority_boundary": "advisory_only_does_not_execute_work_notify_steward_or_bypass_alfred_recall_or_steward_approval",
+  "blocked_conditions": [
+    {
+      "items": [
+        {
+          "message": "Required control-loop evidence is unavailable: runtime/work_packages/autonomous_work_queue_scheduler.json",
+          "path": "runtime/work_packages/autonomous_work_queue_scheduler.json",
+          "type": "missing_evidence"
+        },
+        {
+          "message": "Required control-loop evidence is unavailable: runtime/workers/worker_runtime_monitor.json",
+          "path": "runtime/workers/worker_runtime_monitor.json",
+          "type": "missing_evidence"
+        },
+        {
+          "message": "Required control-loop evidence is unavailable: runtime/steward/steward_presence_state.json",
+          "path": "runtime/steward/steward_presence_state.json",
+          "type": "missing_evidence"
+        },
+        {
+          "message": "Required control-loop evidence is unavailable: runtime/operations/morning_briefing.json",
+          "path": "runtime/operations/morning_briefing.json",
+          "type": "missing_evidence"
+        }
+      ],
+      "message": "One or more evidence artifacts are missing or unreadable.",
+      "type": "missing_or_unreadable_evidence"
+    },
+    {
+      "message": "Scheduler reports no ready autonomous work.",
+      "path": "runtime/work_packages/autonomous_work_queue_scheduler.json",
+      "type": "no_ready_work"
+    }
+  ],
+  "decision": "pause",
+  "evidence_paths_used": {
+    "local_validation": {
+      "available": true,
+      "path": "runtime/validation/local_operational_validation_run.json"
+    },
+    "morning_briefing": {
+      "available": false,
+      "path": "runtime/operations/morning_briefing.json"
+    },
+    "notification_router": {
+      "available": true,
+      "path": "runtime/notifications/notification_router_report.json"
+    },
+    "operational_validation": {
+      "available": true,
+      "path": "runtime/validation/operational_validation_report.json"
+    },
+    "operations_board": {
+      "available": true,
+      "path": "runtime/operations/daily_board_integration.json"
+    },
+    "recall_audit": {
+      "available": true,
+      "path": "runtime/audit/recall_audit_log.json"
+    },
+    "scheduler": {
+      "available": false,
+      "path": "runtime/work_packages/autonomous_work_queue_scheduler.json"
+    },
+    "steward_presence": {
+      "available": false,
+      "path": "runtime/steward/steward_presence_state.json"
+    },
+    "worker_monitor": {
+      "available": false,
+      "path": "runtime/workers/worker_runtime_monitor.json"
+    }
+  },
+  "generated_at": "2026-07-03T23:35:24Z",
+  "local_first": true,
+  "reason": "Control-loop evidence is missing, conflicting, failed, or has no ready work.",
+  "recommended_next_action": "Refresh evidence artifacts and ask Alfred/Steward authority to review blocked conditions before continuing.",
+  "status": "paused_or_unknown",
+  "version": 1,
+  "warnings": [
+    {
+      "message": "Required control-loop evidence is unavailable: runtime/work_packages/autonomous_work_queue_scheduler.json",
+      "path": "runtime/work_packages/autonomous_work_queue_scheduler.json",
+      "type": "missing_evidence"
+    },
+    {
+      "message": "Required control-loop evidence is unavailable: runtime/workers/worker_runtime_monitor.json",
+      "path": "runtime/workers/worker_runtime_monitor.json",
+      "type": "missing_evidence"
+    },
+    {
+      "message": "Required control-loop evidence is unavailable: runtime/steward/steward_presence_state.json",
+      "path": "runtime/steward/steward_presence_state.json",
+      "type": "missing_evidence"
+    },
+    {
+      "message": "Required control-loop evidence is unavailable: runtime/operations/morning_briefing.json",
+      "path": "runtime/operations/morning_briefing.json",
+      "type": "missing_evidence"
+    }
+  ]
+}
