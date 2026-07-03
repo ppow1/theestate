@@ -29,6 +29,12 @@ OPTIONAL_ARTIFACTS = {
     "parking_lot": "operations/boards/parking_lot.md",
     "recall_audit_log": "runtime/audit/recall_audit_log.json",
     "notification_router": "runtime/notifications/notification_router_report.json",
+    "worker_runtime_monitor": "runtime/workers/worker_runtime_monitor.json",
+    "worker_runtime_heartbeat": "runtime/workers/worker_runtime_heartbeat.json",
+    "mission_registry": "data/registry/missions.json",
+    "assignment_queue": "runtime/work_packages/assignment_queue.json",
+    "autonomous_work_queue_scheduler": "operations/work_packages/autonomous_work_queue_scheduler.md",
+    "mission_control_workspace": "runtime/steward/mission_control_workspace.json",
 }
 
 WORK_PACKAGE_DIRS = {
@@ -87,7 +93,14 @@ def _list_files(root: Path, rel: str) -> list[Path]:
     return sorted([item for item in path.iterdir() if item.is_file() and item.name != ".gitkeep"])
 
 
-def _completion_summary(path: Path) -> dict[str, Any]:
+def _rel(root: Path, path: Path) -> str:
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
+def _completion_summary(path: Path, root: Path | None = None) -> dict[str, Any]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
@@ -96,8 +109,37 @@ def _completion_summary(path: Path) -> dict[str, Any]:
         "id": data.get("work_package_id") or path.stem.replace("_codex_done", ""),
         "status": data.get("codex_status") or data.get("status") or "completed",
         "summary": data.get("summary") or path.stem,
-        "path": str(path),
+        "path": _rel(root, path) if root is not None else str(path),
     }
+
+
+def _mission_status(mission_data: Any) -> dict[str, Any]:
+    missions = mission_data.get("missions", []) if isinstance(mission_data, dict) else []
+    counts: dict[str, int] = {}
+    highlighted = []
+    for mission in missions:
+        if not isinstance(mission, dict):
+            continue
+        status = str(mission.get("status") or "unknown")
+        counts[status] = counts.get(status, 0) + 1
+        if status in {"active", "planned", "blocked", "at_risk", "warning"}:
+            highlighted.append({
+                "mission_id": mission.get("mission_id"),
+                "title": mission.get("mission_title") or mission.get("title"),
+                "status": status,
+                "related_work_packages": mission.get("related_work_packages") or [],
+                "notes": mission.get("notes"),
+                "path": OPTIONAL_ARTIFACTS["mission_registry"],
+            })
+    return {"counts": counts, "highlighted": highlighted[:5]}
+
+
+def _worker_runtime_summary(monitor: Any, heartbeat: Any) -> dict[str, Any]:
+    source = monitor if isinstance(monitor, dict) else heartbeat if isinstance(heartbeat, dict) else {}
+    summary = source.get("summary", {}) if isinstance(source, dict) else {}
+    warnings = source.get("warnings", []) if isinstance(source, dict) else []
+    workers = source.get("workers", []) if isinstance(source, dict) else []
+    return {"summary": summary, "warnings": warnings[:5], "workers": workers[:5]}
 
 
 def _work_packages(root: Path) -> dict[str, Any]:
@@ -106,7 +148,7 @@ def _work_packages(root: Path) -> dict[str, Any]:
     completions = _list_files(root, WORK_PACKAGE_DIRS["completions"])
     recent_completions = sorted(completions, key=lambda p: p.stat().st_mtime, reverse=True)[:5]
     return {
-        "completed_work": [_completion_summary(path) for path in recent_completions],
+        "completed_work": [_completion_summary(path, root) for path in recent_completions],
         "pending_approvals": [{"id": p.stem.split("_")[0], "title": p.stem, "path": str(p.relative_to(root))} for p in pending[:10]],
         "failed_or_blocked_work": [{"id": p.stem.split("_")[0], "title": p.stem, "path": str(p.relative_to(root))} for p in open_items[:10]],
         "counts": {"pending": len(pending), "open": len(open_items), "completions": len(completions)},
@@ -127,6 +169,8 @@ def generate_morning_briefing(root: str | Path | None = None, write: bool = True
     recall_counts = _summary_counts(artifacts["recall_audit_log"].get("data"))
     router_counts = _summary_counts(artifacts["notification_router"].get("data"))
     validation_counts = _summary_counts(artifacts["local_operational_validation"].get("data"))
+    worker_runtime = _worker_runtime_summary(artifacts["worker_runtime_monitor"].get("data"), artifacts["worker_runtime_heartbeat"].get("data"))
+    mission_status = _mission_status(artifacts["mission_registry"].get("data"))
 
     outstanding_recalls = []
     recall_data = artifacts["recall_audit_log"].get("data")
@@ -138,6 +182,12 @@ def generate_morning_briefing(root: str | Path | None = None, write: bool = True
         recommended.append("Review pending work package approvals.")
     if outstanding_recalls:
         recommended.append("Review outstanding recall acknowledgements.")
+    if validation_counts.get("failure_count") or validation_counts.get("error_count"):
+        recommended.append("Review local operational validation failures before merging or launching additional work.")
+    if worker_runtime.get("summary", {}).get("stale_worker_count") or worker_runtime.get("summary", {}).get("blocked_worker_count"):
+        recommended.append("Review worker runtime warnings and blocked or stale workers.")
+    if mission_status.get("highlighted"):
+        recommended.append("Review highlighted mission status items against the mission registry.")
     if warnings:
         recommended.append("Regenerate or inspect missing optional operational artifacts.")
     if not recommended:
@@ -148,8 +198,19 @@ def generate_morning_briefing(root: str | Path | None = None, write: bool = True
         "generated_at": _now(),
         "non_authoritative": True,
         "sections": {
+            "summary": {
+                "completed_work_count": len(work["completed_work"]),
+                "failed_or_blocked_work_count": len(work["failed_or_blocked_work"]),
+                "pending_decision_count": len(work["pending_approvals"]),
+                "outstanding_recall_count": len(outstanding_recalls),
+                "warning_count": len(warnings),
+                "source_artifact_count": len(artifacts),
+            },
+            "accomplishments": work["completed_work"],
             "completed_work": work["completed_work"],
+            "failures": work["failed_or_blocked_work"],
             "failed_or_blocked_work": work["failed_or_blocked_work"],
+            "pending_decisions": work["pending_approvals"],
             "pending_approvals": work["pending_approvals"],
             "outstanding_recalls": outstanding_recalls,
             "mailbox_summary": mailbox_counts,
@@ -158,6 +219,8 @@ def generate_morning_briefing(root: str | Path | None = None, write: bool = True
                 "daily_board_integration_present": artifacts["daily_board_integration"].get("present"),
                 "parking_lot_highlights": _first_lines(artifacts["parking_lot"].get("data") or "", 3),
             },
+            "worker_runtime": worker_runtime,
+            "mission_status": mission_status,
             "validation_warnings": {
                 "local_validation_summary": validation_counts,
                 "notification_router_summary": router_counts,
@@ -168,7 +231,7 @@ def generate_morning_briefing(root: str | Path | None = None, write: bool = True
         },
         "source_artifacts": {key: {"present": value["present"], "path": value["path"]} for key, value in artifacts.items()},
         "warnings": warnings,
-        "constraints": {"notifies_steward": False, "authoritative_record": False},
+        "constraints": {"notifies_steward": False, "executes_work": False, "authoritative_record": False},
     }
     if write:
         _write_outputs(root, briefing)
@@ -187,9 +250,10 @@ def _write_outputs(root: Path, briefing: dict[str, Any]) -> None:
 def format_morning_briefing(briefing: dict[str, Any]) -> str:
     s = briefing.get("sections", {})
     lines = ["# Morning Briefing", "", f"Generated at: {briefing.get('generated_at')}", "", "Non-authoritative operational summary.", ""]
+    lines += ["## Summary", f"- {s.get('summary') or {}}", ""]
     labels = [
-        ("Completed work", "completed_work"), ("Failed or blocked work", "failed_or_blocked_work"),
-        ("Pending approvals", "pending_approvals"), ("Outstanding recalls", "outstanding_recalls"),
+        ("Accomplishments", "accomplishments"), ("Failures", "failures"),
+        ("Pending decisions", "pending_decisions"), ("Outstanding recalls", "outstanding_recalls"),
     ]
     for title, key in labels:
         lines += [f"## {title}"]
@@ -198,6 +262,8 @@ def format_morning_briefing(briefing: dict[str, Any]) -> str:
         lines.append("")
     lines += ["## Mailbox summary", f"- {s.get('mailbox_summary') or 'No mailbox summary available.'}", ""]
     lines += ["## Board changes"] + [f"- {x}" for x in (s.get("board_changes", {}).get("parking_lot_highlights") or ["No board highlights available."])] + [""]
-    lines += ["## Validation warnings"] + [f"- {w.get('type')}: {w.get('path') or w.get('artifact')}" for w in s.get("validation_warnings", {}).get("artifact_warnings", [])] + [""]
+    lines += ["## Worker runtime", f"- {s.get('worker_runtime', {}).get('summary') or 'No worker runtime summary available.'}", ""]
+    lines += ["## Mission status", f"- {s.get('mission_status', {}).get('counts') or 'No mission status available.'}", ""]
+    lines += ["## Warnings"] + ([f"- {w.get('type')}: {w.get('path') or w.get('artifact')}" for w in s.get("validation_warnings", {}).get("artifact_warnings", [])] or ["- None identified."]) + [""]
     lines += ["## Recommended next actions"] + [f"- {x}" for x in s.get("recommended_next_actions", [])] + ["", f"Estimated review time: {s.get('estimated_review_time')}", ""]
     return "\n".join(lines)

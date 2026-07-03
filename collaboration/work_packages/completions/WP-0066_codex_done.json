@@ -1,0 +1,28 @@
+{
+  "work_package_id": "WP-0066",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T23:26:05Z",
+  "branch": "work",
+  "merge_class": "Class A",
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending_make_pr_tool",
+  "ready_for_ca_review": true,
+  "summary": "Implemented the Overnight Operations and Morning Briefing coordinator by extending Morning Briefing to aggregate completions, failures, pending decisions, recalls, validation warnings, notifications, worker runtime, mission status, and source artifact availability without executing work or notifying external services.",
+  "files_changed": [
+    "src/estate/core/morning_briefing.py",
+    "tests/test_morning_briefing.py",
+    "collaboration/work_packages/completions/WP-0066_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_morning_briefing.py",
+    "PYTHONPATH=src pytest -q tests/test_morning_briefing.py tests/test_worker_runtime_monitor.py tests/test_mission_control_workspace.py",
+    "PYTHONPATH=src pytest -q",
+    "git diff --check",
+    "python -m json.tool collaboration/work_packages/completions/WP-0066_codex_done.json >/dev/null"
+  ],
+  "known_limitations": [
+    "The coordinator is local-first and evidence-only; it summarizes existing artifacts and does not execute overnight work automatically.",
+    "Missing optional artifacts are represented as warnings and source availability gaps rather than fabricated events.",
+    "The Morning Briefing remains non-authoritative and links back to source artifacts for review."
+  ]
+}
