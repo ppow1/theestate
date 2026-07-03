@@ -1,0 +1,25 @@
+{
+  "work_package_id": "WP-0058",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T12:20:00+00:00",
+  "branch": "work",
+  "pull_request_url": "pending_make_pr_tool",
+  "summary": "Added a read-only Steward Recall Operations view to the Estate Operations Center, including recall lifecycle summaries from existing recall artifacts, active recall status-bar count, source links, missing-artifact handling, and coverage for no recalls, active, delivered, failed, acknowledged, and unknown acknowledgement states.",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0058_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py::test_steward_recall_operations_view_renders_recall_lifecycle_states tests/test_steward_command_center.py::test_steward_recall_operations_view_handles_no_recalls_and_missing_artifacts",
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py tests/test_decision_queue.py tests/test_morning_briefing.py",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "known_limitations": [
+    "The recall operations view is read-only and does not send, approve, escalate, or acknowledge recalls.",
+    "The view summarizes only existing local artifacts and shows missing sources where artifacts have not yet been produced.",
+    "No ledger or devlog entries were modified, per work package constraints."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}

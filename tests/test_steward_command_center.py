@@ -214,6 +214,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
         "Parking Lot",
         "Work Packages",
         "Mailboxes",
+        "Recalls",
         "Validation",
         "Search",
         "Settings",
@@ -223,6 +224,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "id='office-navigation'" in html
     assert "data-tab='settings'" in html
     assert "id='workspace-search'" in html
+    assert "id='workspace-recalls'" in html
     assert "id='workspace-about'" in html
     assert "Global Search and Command Palette" in html
     assert "Theme <select disabled>" in html
@@ -463,3 +465,48 @@ def test_expansion_roadmap_workspace_missing_state_is_clear(tmp_path):
 
     assert payload["panels"]["expansion_roadmap"]["available"] is False
     assert "Expansion roadmap source artifacts are not available yet." in html
+
+
+def test_steward_recall_operations_view_renders_recall_lifecycle_states(tmp_path):
+    write_json(tmp_path, "runtime/notifications/notification_router_report.json", {
+        "notifications": [
+            {"id": "recall-active", "class": "recall", "summary": "Active recall", "reason": "security", "requested_by": "worker.ca3", "originating_worker": "ca3", "action": "prepare_recall_delivery", "eligible_for_immediate_delivery": True, "timestamp": "2026-07-03T10:00:00+00:00"},
+            {"id": "ordinary-note", "class": "informational", "summary": "Ordinary notification"},
+        ]
+    })
+    write_json(tmp_path, "runtime/audit/recall_audit_log.json", {
+        "records": [
+            {"record_id": "recall-delivered", "recall_reason": "operational", "requested_by": "alfred", "delivery_result": "sent", "acknowledgement_state": "pending", "timestamp": "2026-07-03T11:00:00+00:00"},
+            {"record_id": "recall-failed", "recall_reason": "constitutional", "delivery_result": "failed", "acknowledgement_state": "pending", "timestamp": "2026-07-03T12:00:00+00:00"},
+            {"record_id": "recall-acked", "recall_reason": "architectural", "delivery_result": "sent", "acknowledgement_state": "acknowledged", "timestamp": "2026-07-03T13:00:00+00:00"},
+            {"record_id": "recall-unknown-ack", "recall_reason": "security", "delivery_result": "sent", "timestamp": "2026-07-03T14:00:00+00:00"},
+        ]
+    })
+    write_json(tmp_path, "runtime/notifications/gotify_delivery_report.json", {"status": "sent", "generated_at": "2026-07-03T11:01:00+00:00", "payload": {"message": "Recall Steward. reason=operational; requested_by=alfred; action=prepare_recall_delivery"}})
+    write_json(tmp_path, "runtime/briefings/morning_briefing.json", {"sections": {"outstanding_recalls": [{"record_id": "recall-delivered", "recall_reason": "operational", "acknowledgement_state": "pending"}]}})
+
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+    recall_panel = payload["panels"]["steward_recall_operations"]
+
+    assert recall_panel["data"]["summary"]["active_recall_count"] == 5
+    assert payload["status_bar"]["active_recall_count"] == 5
+    assert "Steward Recall Operations" in html
+    assert "Active recall" in html
+    assert "Ordinary notification" not in html
+    assert "delivery_failed" in html
+    assert "acknowledged" in html
+    assert "unknown" in html
+    assert "does not send, approve, escalate, or acknowledge recalls" in html
+
+
+def test_steward_recall_operations_view_handles_no_recalls_and_missing_artifacts(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    recall_panel = payload["panels"]["steward_recall_operations"]
+    assert recall_panel["data"]["summary"]["recall_count"] == 0
+    assert recall_panel["data"]["summary"]["active_recall_count"] == 0
+    assert payload["status_bar"]["active_recall_count"] == 0
+    assert "No recall requests were found in available local artifacts." in html
+    assert "Missing recall artifact" in html

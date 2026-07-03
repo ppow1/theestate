@@ -30,6 +30,7 @@ OFFICE_NAVIGATION = [
     {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
     {"id": "work-packages", "label": "Work Packages", "panel": "work_package_pipeline", "tab": "work-packages"},
     {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_operations_center", "tab": "mailboxes"},
+    {"id": "recalls", "label": "Recalls", "panel": "steward_recall_operations", "tab": "recalls"},
     {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
     {"id": "search", "label": "Search", "panel": "search", "tab": "search"},
     {"id": "settings", "label": "Settings", "panel": "settings", "tab": "settings"},
@@ -46,6 +47,7 @@ OFFICE_TABS = [
     {"id": "parking", "label": "Parking Lot"},
     {"id": "work-packages", "label": "Work Packages"},
     {"id": "mailboxes", "label": "Mailboxes"},
+    {"id": "recalls", "label": "Recalls"},
     {"id": "validation", "label": "Validation"},
     {"id": "search", "label": "Search"},
     {"id": "settings", "label": "Settings"},
@@ -63,6 +65,10 @@ ARTIFACTS = {
     "check_updates": ["runtime/updates/check_updates_latest.json", "operations/updates/check_updates_latest.md"],
     "worker_inbox_summary": ["collaboration/status/worker_inbox_summary.json"],
     "recall_audit": ["runtime/audit/recall_audit_log.json", "operations/audit/recall_audit_log_summary.md"],
+    "notification_router": ["runtime/notifications/notification_router_report.json"],
+    "gotify_delivery": ["runtime/notifications/gotify_delivery_report.json"],
+    "notification_center": ["runtime/notifications/notification_center_workspace.json", "operations/notifications/notification_center_workspace.md"],
+    "recall_decision_model": ["docs/operations/Steward_Recall_Decision_Model_v1.md", "data/policy/steward_recall_reasons.json"],
     "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
 }
 
@@ -419,6 +425,7 @@ def _build_status_bar(root, panels, generated_at):
     pending = _pending_decision_count(panels.get("steward_decision_queue", {}))
     mailbox_count = _count_mailboxes(root)
     mailbox_ops_summary = (((panels.get("mailbox_operations_center") or {}).get("data") or {}).get("summary") or {})
+    recall_ops_summary = (((panels.get("steward_recall_operations") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
     health = ((panels.get("validation_health_dashboard") or {}).get("data") or {})
@@ -433,6 +440,7 @@ def _build_status_bar(root, panels, generated_at):
         "mailbox_open_count": mailbox_ops_summary.get("open_message_count"),
         "mailbox_ack_required_count": mailbox_ops_summary.get("ack_required_count"),
         "mailbox_warning_count": mailbox_ops_summary.get("warning_count"),
+        "active_recall_count": recall_ops_summary.get("active_recall_count"),
         "active_workers": active_workers,
         "version": "Operations Center v1 / Status Console v1",
         "verbosity": "normal",
@@ -718,6 +726,141 @@ def _expansion_roadmap_artifact(root):
     available = any(src.get("available") for src in sources.values()) or bool(pending_architecture)
     return {"available": available, "path": "operations/boards/roadmap.md; data/registry/missions.json; Architecture/ADR", "kind": "expansion_roadmap_workspace", "placeholder": None if available else "Expansion roadmap source artifacts are not available yet.", "data": {"current_horizon": current_horizon, "items": items, "upcoming_epics": [i for i in items if i["status"] in {"planned", "proposed"}][:12], "pending_architecture_decisions": pending_architecture, "planned_not_active": [i for i in items if i["status"] in {"planned", "proposed"}], "future_work_package_candidates": parking_items, "sources": sources}}
 
+
+def _recall_identity(*parts):
+    for part in parts:
+        if part not in (None, ""):
+            return str(part)
+    return "recall"
+
+
+def _recall_ack_state(value):
+    if value in (None, ""):
+        return "unknown"
+    return str(value).lower()
+
+
+def _recall_stage(ack_state, delivery_result, decision_state):
+    ack = str(ack_state or "unknown").lower()
+    delivery = str(delivery_result or "unknown").lower()
+    decision = str(decision_state or "pending").lower()
+    if ack in {"acknowledged", "complete", "completed", "resolved", "not_required"}:
+        return "acknowledged"
+    if delivery in {"failed", "error", "transport_failure"}:
+        return "delivery_failed"
+    if delivery in {"sent", "delivered", "dry_run", "warning"}:
+        return "delivered_pending_ack"
+    if decision in {"approved", "eligible", "prepare_recall_delivery", "pending", "queued"}:
+        return "active_request"
+    return "unknown"
+
+
+def _recall_active(stage, ack_state):
+    return stage in {"active_request", "delivered_pending_ack", "delivery_failed", "unknown"} and str(ack_state or "unknown").lower() not in {"acknowledged", "complete", "completed", "resolved", "not_required"}
+
+
+def _merge_recall(items, key, update):
+    item = items.setdefault(key, {
+        "recall_id": key,
+        "reason": "unknown",
+        "requested_by": "unknown",
+        "originating_worker": "unknown",
+        "alfred_decision_state": "pending/unknown",
+        "transport_used": "unknown",
+        "delivery_result": "unknown",
+        "acknowledgement_state": "unknown",
+        "timestamp": "unknown",
+        "source_artifacts": [],
+    })
+    for field, value in update.items():
+        if field == "source_artifacts":
+            for source in value or []:
+                if source and source not in item["source_artifacts"]:
+                    item["source_artifacts"].append(source)
+        elif value not in (None, "", "unknown") or item.get(field) in (None, "", "unknown", "pending/unknown"):
+            item[field] = value
+    item["acknowledgement_state"] = _recall_ack_state(item.get("acknowledgement_state"))
+    item["lifecycle_stage"] = _recall_stage(item.get("acknowledgement_state"), item.get("delivery_result"), item.get("alfred_decision_state"))
+    item["active"] = _recall_active(item["lifecycle_stage"], item.get("acknowledgement_state"))
+
+
+def _build_steward_recall_operations(root):
+    audit = _read_artifact(root, ARTIFACTS["recall_audit"])
+    router = _read_artifact(root, ARTIFACTS["notification_router"])
+    gotify = _read_artifact(root, ARTIFACTS["gotify_delivery"])
+    center = _read_artifact(root, ARTIFACTS["notification_center"])
+    morning = _read_artifact(root, ARTIFACTS["morning_briefing"])
+    decision_model = _read_artifact(root, ARTIFACTS["recall_decision_model"])
+    sources = {"recall_audit": audit, "notification_router": router, "gotify_delivery": gotify, "notification_center": center, "morning_briefing": morning, "recall_decision_model": decision_model}
+    recalls = {}
+
+    if isinstance(audit.get("data"), dict):
+        for record in audit["data"].get("records", []) or []:
+            if not isinstance(record, dict):
+                continue
+            key = _recall_identity(record.get("record_id"), record.get("notification_id"), record.get("id"))
+            _merge_recall(recalls, key, {
+                "reason": record.get("recall_reason") or record.get("reason"),
+                "requested_by": record.get("requested_by") or record.get("source") or record.get("originating_worker"),
+                "originating_worker": record.get("originating_worker") or record.get("source") or record.get("requested_by"),
+                "alfred_decision_state": record.get("alfred_decision_state") or record.get("decision_state") or "approved/recorded",
+                "transport_used": record.get("transport") or record.get("transport_used"),
+                "delivery_result": record.get("delivery_result") or record.get("delivery_status"),
+                "acknowledgement_state": record.get("acknowledgement_state"),
+                "timestamp": record.get("timestamp") or record.get("created_at") or record.get("recorded_at"),
+                "source_artifacts": [audit.get("path")],
+            })
+
+    if isinstance(router.get("data"), dict):
+        for note in router["data"].get("notifications", []) or []:
+            if not isinstance(note, dict) or note.get("class") != "recall":
+                continue
+            key = _recall_identity(note.get("id"), note.get("notification_id"), note.get("summary"))
+            _merge_recall(recalls, key, {
+                "reason": note.get("reason") or (note.get("audit") or {}).get("primary_recall_reason"),
+                "requested_by": note.get("requested_by"),
+                "originating_worker": note.get("originating_worker") or note.get("requested_by"),
+                "alfred_decision_state": note.get("action") or ("eligible" if note.get("eligible_for_immediate_delivery") else "queued"),
+                "timestamp": note.get("timestamp") or note.get("created_at"),
+                "source_artifacts": [router.get("path")],
+            })
+
+    if isinstance(gotify.get("data"), dict):
+        data = gotify["data"]
+        payload = data.get("payload") if isinstance(data.get("payload"), dict) else {}
+        key = _recall_identity(data.get("notification_id"), data.get("recall_id"), payload.get("message"), "gotify_delivery")
+        _merge_recall(recalls, key, {
+            "reason": data.get("reason") or payload.get("message"),
+            "transport_used": "gotify",
+            "delivery_result": data.get("status") or ("delivered" if data.get("ok") else "failed"),
+            "timestamp": data.get("generated_at"),
+            "source_artifacts": [gotify.get("path")],
+        })
+
+    if isinstance(morning.get("data"), dict):
+        sections = morning["data"].get("sections") if isinstance(morning["data"].get("sections"), dict) else {}
+        for recall in sections.get("outstanding_recalls", []) or []:
+            if not isinstance(recall, dict):
+                continue
+            key = _recall_identity(recall.get("record_id"), recall.get("id"), recall.get("recall_reason"))
+            _merge_recall(recalls, key, {
+                "reason": recall.get("recall_reason") or recall.get("reason"),
+                "acknowledgement_state": recall.get("acknowledgement_state"),
+                "source_artifacts": [morning.get("path")],
+            })
+
+    data = center.get("data") if isinstance(center.get("data"), dict) else {}
+    for recall in (data.get("recalls") or data.get("recall_requests") or []):
+        if isinstance(recall, dict):
+            key = _recall_identity(recall.get("record_id"), recall.get("id"), recall.get("notification_id"))
+            _merge_recall(recalls, key, {**recall, "reason": recall.get("reason") or recall.get("recall_reason"), "source_artifacts": [center.get("path")]})
+
+    recall_list = sorted(recalls.values(), key=lambda item: str(item.get("timestamp") or ""), reverse=True)
+    active_count = sum(1 for item in recall_list if item.get("active"))
+    missing_sources = [name for name, artifact in sources.items() if not artifact.get("available")]
+    available = True
+    return {"available": available, "path": "runtime/audit/recall_audit_log.json; runtime/notifications/notification_router_report.json", "kind": "steward_recall_operations", "placeholder": None, "data": {"summary": {"recall_count": len(recall_list), "active_recall_count": active_count, "missing_source_count": len(missing_sources)}, "recalls": recall_list, "missing_sources": missing_sources, "sources": {name: _source_status(artifact) for name, artifact in sources.items()}, "constraints": {"does_not_send_recalls": True, "does_not_approve_recalls": True, "does_not_bypass_alfred": True}}}
+
 def generate_command_center(root=None, write=True):
     root = _root(root)
     resident_cards = build_resident_cards(root)
@@ -728,6 +871,7 @@ def generate_command_center(root=None, write=True):
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
+        "steward_recall_operations": _build_steward_recall_operations(root),
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
@@ -1102,6 +1246,42 @@ def _expansion_roadmap_html(artifact):
     out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ".</p></div>")
     return "".join(out)
 
+def _steward_recall_operations_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    summary = data.get("summary") or {}
+    recalls = data.get("recalls") or []
+    out = ["<div class='steward-recall-operations'>"]
+    out.append("<p>This view is reserved for Steward Recall operations and is separate from ordinary notifications. It summarizes existing artifacts only; it does not send, approve, escalate, or acknowledge recalls.</p>")
+    cards = [("Total recalls", summary.get("recall_count")), ("Active recalls", summary.get("active_recall_count")), ("Missing sources", summary.get("missing_source_count"))]
+    out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value if value is not None else 'missing'))}</span></span>" for label, value in cards) + "</div>")
+    if not recalls:
+        out.append("<p class='placeholder'>No recall requests were found in available local artifacts.</p>")
+    else:
+        out.append("<table><thead><tr><th>Recall</th><th>Reason</th><th>Requested by / origin</th><th>Alfred state</th><th>Transport</th><th>Delivery</th><th>Acknowledgement</th><th>Lifecycle</th><th>Timestamp</th><th>Sources</th></tr></thead><tbody>")
+        for recall in recalls[:25]:
+            sources = "<br>".join(_artifact_link(src) for src in recall.get("source_artifacts") or []) or "not available"
+            lifecycle = html.escape(str(recall.get("lifecycle_stage") or "unknown"))
+            out.append("<tr>"
+                       f"<td>{html.escape(str(recall.get('recall_id') or 'recall'))}</td>"
+                       f"<td>{html.escape(str(recall.get('reason') or 'unknown'))}</td>"
+                       f"<td>{html.escape(str(recall.get('requested_by') or 'unknown'))}<br><span class='source'>{html.escape(str(recall.get('originating_worker') or 'unknown'))}</span></td>"
+                       f"<td>{html.escape(str(recall.get('alfred_decision_state') or 'pending/unknown'))}</td>"
+                       f"<td>{html.escape(str(recall.get('transport_used') or 'unknown'))}</td>"
+                       f"<td>{html.escape(str(recall.get('delivery_result') or 'unknown'))}</td>"
+                       f"<td>{html.escape(str(recall.get('acknowledgement_state') or 'unknown'))}</td>"
+                       f"<td><span class='health-badge {lifecycle}'>{lifecycle}</span></td>"
+                       f"<td>{html.escape(str(recall.get('timestamp') or 'unknown'))}</td>"
+                       f"<td>{sources}</td>"
+                       "</tr>")
+        out.append("</tbody></table>")
+    if data.get("missing_sources"):
+        out.append(f"<p class='placeholder'>Missing recall artifact(s): {html.escape(', '.join(data.get('missing_sources')))}</p>")
+    sources = data.get("sources") or {}
+    out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ". Alfred remains the recall authority path; this panel is read-only.</p></div>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -1130,6 +1310,7 @@ def _status_bar_html(status):
         ("Mail open", status.get("mailbox_open_count")),
         ("Mail ack", status.get("mailbox_ack_required_count")),
         ("Mail warn", status.get("mailbox_warning_count")),
+        ("Active recalls", status.get("active_recall_count")),
         ("Workers", status.get("active_workers")),
         ("Verbosity", status.get("verbosity")),
         ("Version", status.get("version")),
@@ -1268,6 +1449,7 @@ def render_command_center_html(payload):
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
         ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
+        ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
         ("settings", "Settings", _settings_html(p.get("settings", {}))),
@@ -1277,7 +1459,7 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 function activateOfficeTab(id){
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
