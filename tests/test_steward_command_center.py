@@ -237,3 +237,51 @@ def test_command_center_tab_switch_script_and_collapsible_navigation_are_rendere
     assert "role='tabpanel' hidden" in html
     assert 'id="activity-console"' in html
     assert 'id="status-bar"' in html
+
+
+def test_mailbox_operations_center_summarizes_open_ack_steward_and_warnings(tmp_path):
+    seed_inputs(tmp_path)
+    write_json(tmp_path, "data/registry/personnel.json", [
+        {"employee_id": 1, "display_name": "Steward", "mailbox_id": 1, "resident_id": "RES-000002"},
+        {"employee_id": 6, "display_name": "Helen", "mailbox_id": 6, "resident_id": "RES-000003"},
+    ])
+    write_json(tmp_path, "data/registry/mailboxes.json", [
+        {"mailbox_id": 10004, "mailbox_type": "office", "display_name": "Human Resources Office", "owning_office": "Human Resources"},
+    ])
+    write_json(tmp_path, "collaboration/mailboxes/index.json", {"messages": [
+        {"message_id": "m-open", "title": "Open HR note", "destination_mailbox_id": 10004, "status": "open", "requires_ack": False, "path": "collaboration/messages/m-open.json"},
+        {"message_id": "m-ack", "title": "Helen acknowledgement", "destination_mailbox_id": 6, "status": "open", "requires_ack": True, "ack_status": "pending", "path": "collaboration/messages/m-ack.json"},
+        {"message_id": "m-steward", "title": "Steward action", "destination": "office.steward", "destination_mailbox_id": 1, "status": "open", "requires_ack": True, "path": "collaboration/messages/m-steward.json"},
+        {"message_id": "m-warning", "title": "Ambiguous route", "destination": "queue", "destination_mailbox_id": None, "status": "open", "requires_ack": True, "warning": "unresolved destination: queue", "path": "collaboration/messages/m-warning.json"},
+    ]})
+    write_json(tmp_path, "runtime/mailboxes/synchronization_duty_latest.json", {"generated_at": "2026-07-03T00:00:00Z", "summary": {"warning_count": 0}})
+
+    payload = generate_command_center(tmp_path, write=False)
+    center = payload["panels"]["mailbox_operations_center"]["data"]
+    html = render_command_center_html(payload)
+
+    assert center["summary"]["open_message_count"] == 4
+    assert center["summary"]["ack_required_count"] == 3
+    assert center["summary"]["waiting_on_steward_count"] == 1
+    assert center["summary"]["warning_count"] == 1
+    assert center["summary"]["last_mailbox_synchronization_time"] == "2026-07-03T00:00:00Z"
+    assert "Mailbox Operations Center" in html
+    assert "Show summarized messages" in html
+    assert "Acknowledgement-required messages" in html
+    assert "unresolved destination: queue" in html
+    assert "does not mark mail read or acknowledged" in html
+
+
+def test_mailbox_operations_center_handles_empty_and_missing_artifacts(tmp_path):
+    seed_inputs(tmp_path)
+    write_json(tmp_path, "collaboration/mailboxes/index.json", {"messages": []})
+    (tmp_path / "runtime/mailboxes/synchronization_duty_latest.json").unlink()
+
+    payload = generate_command_center(tmp_path, write=False)
+    center = payload["panels"]["mailbox_operations_center"]["data"]
+    html = render_command_center_html(payload)
+
+    assert center["summary"]["message_count"] == 0
+    assert "No mailbox messages were found" in html
+    assert "Missing supporting mailbox artifact" in html
+    assert "mailbox_synchronization" in center["missing_sources"]

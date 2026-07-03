@@ -1,0 +1,25 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T01:07:14Z",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0051_codex_done.json"
+  ],
+  "known_limitations": [
+    "The Mailbox Operations Center is read-only and advisory; it summarizes existing artifacts and does not mark messages read or acknowledged.",
+    "Unread counts are derived from open/unresolved message state because no separate safe read-state authority exists in the current mailbox artifacts.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Added a read-only Mailbox Operations Center tab to the Office of the Steward that summarizes mailbox index, mailbox synchronization, Check for Updates, Communication Bus, worker inbox, personnel, and mailbox registry artifacts; surfaces open/unread, acknowledgement-required, Steward-waiting, unresolved destination warning, and last synchronization counts; and keeps details collapsed by default with status bar mailbox counts preserved.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py",
+    "PYTHONPATH=src pytest -q",
+    "git diff --check"
+  ],
+  "work_package_id": "WP-0051"
+}

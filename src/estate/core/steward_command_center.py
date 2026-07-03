@@ -27,7 +27,7 @@ OFFICE_NAVIGATION = [
     {"id": "expansion-roadmap", "label": "Expansion Roadmap", "panel": "expansion_roadmap", "tab": "roadmap"},
     {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
     {"id": "work-packages", "label": "Work Packages", "panel": "work_package_pipeline", "tab": "work-packages"},
-    {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_summary", "tab": "mailboxes"},
+    {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_operations_center", "tab": "mailboxes"},
     {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
     {"id": "search", "label": "Search", "panel": "search", "tab": "search"},
     {"id": "settings", "label": "Settings", "panel": "settings", "tab": "settings"},
@@ -58,6 +58,8 @@ ARTIFACTS = {
     "capability_lifecycle": ["runtime/capabilities/capability_lifecycle_report.json", "operations/capabilities/capability_lifecycle_report.md"],
     "dependency_graph": ["runtime/dependencies/dependency_graph.json", "operations/dependencies/dependency_graph.md"],
     "mailbox_sync": ["runtime/mailboxes/synchronization_duty_latest.json", "operations/mailboxes/synchronization_duty.md", "collaboration/status/worker_inbox_summary.json"],
+    "check_updates": ["runtime/updates/check_updates_latest.json", "operations/updates/check_updates_latest.md"],
+    "worker_inbox_summary": ["collaboration/status/worker_inbox_summary.json"],
     "recall_audit": ["runtime/audit/recall_audit_log.json", "operations/audit/recall_audit_log_summary.md"],
     "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
 }
@@ -125,6 +127,122 @@ def _count_mailboxes(root):
     if isinstance(data, dict) and isinstance(data.get("mailboxes"), list):
         return len(data["mailboxes"])
     return None
+
+
+def _mailbox_label_maps(root):
+    personnel = _read_artifact(root, ["data/registry/personnel.json"])
+    mailboxes = _read_artifact(root, ["data/registry/mailboxes.json"])
+    labels = {}
+    kinds = {}
+    if personnel.get("available") and isinstance(personnel.get("data"), list):
+        for person in personnel["data"]:
+            mailbox_id = person.get("mailbox_id")
+            if mailbox_id is not None:
+                labels[int(mailbox_id)] = person.get("display_name") or person.get("current_title") or f"mailbox.{mailbox_id}"
+                kinds[int(mailbox_id)] = "resident/worker"
+    if mailboxes.get("available") and isinstance(mailboxes.get("data"), list):
+        for box in mailboxes["data"]:
+            mailbox_id = box.get("mailbox_id")
+            if mailbox_id is not None:
+                labels.setdefault(int(mailbox_id), box.get("display_name") or f"mailbox.{mailbox_id}")
+                kinds[int(mailbox_id)] = box.get("mailbox_type") or "office"
+    return labels, kinds
+
+
+def _is_open_message(message):
+    status = str(message.get("status") or "open").lower()
+    ack = str(message.get("ack_status") or "").lower()
+    return status not in {"closed", "done", "archived"} and ack not in {"acknowledged", "resolved"}
+
+
+def _message_summary(message):
+    return {
+        "message_id": message.get("message_id") or message.get("id") or "unknown",
+        "title": message.get("title") or ((message.get("payload") or {}).get("title") if isinstance(message.get("payload"), dict) else None) or "Untitled message",
+        "path": message.get("path") or message.get("source_path"),
+        "created_at": message.get("created_at"),
+        "status": message.get("status") or "open",
+        "requires_ack": bool(message.get("requires_ack")),
+        "ack_status": message.get("ack_status"),
+        "priority": message.get("priority") or "normal",
+        "source": message.get("source") or message.get("created_by"),
+        "destination": message.get("destination") or (f"mailbox.{message.get('destination_mailbox_id')}" if message.get("destination_mailbox_id") is not None else "unresolved"),
+        "warning": message.get("warning"),
+    }
+
+
+def _mailbox_operations_center_artifact(root):
+    index_artifact = _read_artifact(root, ARTIFACTS["mailbox_summary"])
+    sync_artifact = _read_artifact(root, ARTIFACTS["mailbox_sync"])
+    updates_artifact = _read_artifact(root, ARTIFACTS["check_updates"])
+    worker_artifact = _read_artifact(root, ARTIFACTS["worker_inbox_summary"])
+    labels, kinds = _mailbox_label_maps(root)
+    messages = []
+    if index_artifact.get("available") and isinstance(index_artifact.get("data"), dict):
+        messages = index_artifact["data"].get("messages") or []
+    by_mailbox = {}
+    warnings = []
+    open_messages = []
+    ack_required = []
+    steward_waiting = []
+    for message in messages:
+        if not isinstance(message, dict):
+            continue
+        mailbox_id = message.get("destination_mailbox_id")
+        if mailbox_id is None:
+            key = "unresolved"
+            label = "Unresolved destination"
+            kind = "warning"
+        else:
+            key = str(mailbox_id)
+            label = labels.get(int(mailbox_id), f"mailbox.{mailbox_id}")
+            kind = kinds.get(int(mailbox_id), "mailbox")
+        bucket = by_mailbox.setdefault(key, {"mailbox_id": mailbox_id, "label": label, "kind": kind, "message_count": 0, "open_count": 0, "ack_required_count": 0, "waiting_on_steward_count": 0, "messages": []})
+        summary = _message_summary(message)
+        bucket["message_count"] += 1
+        bucket["messages"].append(summary)
+        if _is_open_message(message):
+            bucket["open_count"] += 1
+            open_messages.append(summary)
+        if message.get("requires_ack") and str(message.get("ack_status") or "pending").lower() not in {"acknowledged", "resolved"}:
+            bucket["ack_required_count"] += 1
+            ack_required.append(summary)
+        destination_text = str(message.get("destination") or "").lower()
+        if mailbox_id == 1 or "steward" in destination_text or "founder" in destination_text:
+            bucket["waiting_on_steward_count"] += 1
+            steward_waiting.append(summary)
+        if message.get("warning") or mailbox_id is None:
+            warnings.append(summary)
+    sync_data = sync_artifact.get("data") if isinstance(sync_artifact.get("data"), dict) else {}
+    sync_summary = sync_data.get("summary") if isinstance(sync_data.get("summary"), dict) else {}
+    last_sync = sync_data.get("generated_at") or sync_summary.get("last_sync_time") or sync_summary.get("last_mailbox_synchronization_time") or (_artifact_mtime(root, sync_artifact.get("path")).isoformat(timespec="seconds") if _artifact_mtime(root, sync_artifact.get("path")) else None)
+    data = {
+        "summary": {
+            "message_count": len(messages),
+            "open_message_count": len(open_messages),
+            "ack_required_count": len(ack_required),
+            "waiting_on_steward_count": len(steward_waiting),
+            "warning_count": len(warnings),
+            "mailbox_count": len(by_mailbox),
+            "last_mailbox_synchronization_time": last_sync,
+        },
+        "by_mailbox": sorted(by_mailbox.values(), key=lambda item: (str(item.get("kind")), str(item.get("label")))),
+        "open_messages": open_messages,
+        "ack_required_messages": ack_required,
+        "steward_waiting_messages": steward_waiting,
+        "destination_warnings": warnings,
+        "sources": {
+            "mailbox_index": index_artifact.get("path"),
+            "mailbox_synchronization": sync_artifact.get("path"),
+            "check_updates": updates_artifact.get("path"),
+            "communication_bus": "collaboration/messages/*.json",
+            "worker_inbox_summary": worker_artifact.get("path"),
+            "personnel_registry": "data/registry/personnel.json",
+            "mailbox_registry": "data/registry/mailboxes.json",
+        },
+        "missing_sources": [name for name, artifact in {"mailbox_index": index_artifact, "mailbox_synchronization": sync_artifact, "check_updates": updates_artifact, "worker_inbox_summary": worker_artifact}.items() if not artifact.get("available")],
+    }
+    return {"available": index_artifact.get("available", False), "path": index_artifact.get("path") or "collaboration/mailboxes/index.json", "kind": "mailbox_operations_center", "data": data, "placeholder": index_artifact.get("placeholder")}
 
 
 def _pending_decision_count(decision_artifact):
@@ -426,6 +544,7 @@ def generate_command_center(root=None, write=True):
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
+        "mailbox_operations_center": _mailbox_operations_center_artifact(root),
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _read_artifact(root, ["operations/boards/roadmap.md"]),
@@ -583,6 +702,65 @@ def _validation_health_html(artifact):
     out.append("</tbody></table><p class='source'>Generated dashboard is advisory and links to source reports; it does not replace validation logic.</p>")
     return "".join(out)
 
+
+def _mailbox_message_list(messages, empty_text):
+    if not messages:
+        return f"<p class='placeholder'>{html.escape(empty_text)}</p>"
+    rows = []
+    for message in messages[:12]:
+        title = html.escape(str(message.get("title") or "Untitled message"))
+        meta = html.escape(" · ".join(str(v) for v in [message.get("priority"), message.get("status"), message.get("created_at")] if v))
+        path = html.escape(str(message.get("path") or "missing source path"))
+        ack = "ack required" if message.get("requires_ack") else "no ack"
+        warning = f"<br><span class='mailbox-warning'>{html.escape(str(message.get('warning')))}</span>" if message.get("warning") else ""
+        rows.append(f"<li><strong>{title}</strong><br><span class='source'>{meta} · {html.escape(ack)}</span>{warning}<br><span class='source'>Source: {path}</span></li>")
+    return f"<ul>{''.join(rows)}</ul>"
+
+
+def _mailbox_operations_center_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    summary = data.get("summary") or {}
+    cards = [
+        ("Messages", summary.get("message_count")),
+        ("Open", summary.get("open_message_count")),
+        ("Ack required", summary.get("ack_required_count")),
+        ("Waiting on Steward", summary.get("waiting_on_steward_count")),
+        ("Warnings", summary.get("warning_count")),
+        ("Last sync", summary.get("last_mailbox_synchronization_time") or "not available"),
+    ]
+    out = ["<div class='mailbox-operations-center'><h3>Mailbox Operations Center</h3>", "<div class='mailbox-kpis'>"]
+    for label, value in cards:
+        out.append(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value if value is not None else 'missing'))}</span></span>")
+    out.append("</div><h3>Mailbox summary by resident / office / worker</h3>")
+    mailboxes = data.get("by_mailbox") or []
+    if not mailboxes:
+        out.append("<p class='placeholder'>No mailbox messages were found in the current artifacts.</p>")
+    else:
+        out.append("<table><thead><tr><th>Mailbox</th><th>Type</th><th>Messages</th><th>Open</th><th>Ack required</th><th>Waiting on Steward</th><th>Details</th></tr></thead><tbody>")
+        for box in mailboxes:
+            details = _mailbox_message_list(box.get("messages") or [], "No messages in this mailbox.")
+            out.append("<tr>"
+                       f"<td>{html.escape(str(box.get('label') or 'Unknown mailbox'))}</td>"
+                       f"<td>{html.escape(str(box.get('kind') or 'mailbox'))}</td>"
+                       f"<td>{html.escape(str(box.get('message_count') or 0))}</td>"
+                       f"<td>{html.escape(str(box.get('open_count') or 0))}</td>"
+                       f"<td>{html.escape(str(box.get('ack_required_count') or 0))}</td>"
+                       f"<td>{html.escape(str(box.get('waiting_on_steward_count') or 0))}</td>"
+                       f"<td><details><summary>Show summarized messages</summary>{details}</details></td>"
+                       "</tr>")
+        out.append("</tbody></table>")
+    out.append("<h3>Unread / open messages</h3>" + _mailbox_message_list(data.get("open_messages") or [], "No open messages were found."))
+    out.append("<h3>Acknowledgement-required messages</h3>" + _mailbox_message_list(data.get("ack_required_messages") or [], "No acknowledgement-required messages were found."))
+    out.append("<h3>Messages waiting on the Steward</h3>" + _mailbox_message_list(data.get("steward_waiting_messages") or [], "No messages are currently addressed to or waiting on the Steward."))
+    out.append("<h3>Unresolved or ambiguous destination warnings</h3>" + _mailbox_message_list(data.get("destination_warnings") or [], "No unresolved destination warnings were found."))
+    if data.get("missing_sources"):
+        out.append(f"<p class='placeholder'>Missing supporting mailbox artifact(s): {html.escape(', '.join(data.get('missing_sources')))}</p>")
+    sources = data.get("sources") or {}
+    out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(str(k))}: {html.escape(str(v or 'not available'))}" for k, v in sources.items()) + ". This panel summarizes only; it does not mark mail read or acknowledged.</p></div>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -704,7 +882,7 @@ def render_command_center_html(payload):
         ("roadmap", "Expansion Roadmap", _artifact_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _artifact_html(p.get("parking_lot", {}))),
         ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
-        ("mailboxes", "Mailbox Summary", _artifact_html(p.get("mailbox_summary", {}))),
+        ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Search", _office_placeholder_html("Search", p.get("search", {}).get("placeholder", "Search workspace is not implemented yet."))),
         ("settings", "Settings", _office_placeholder_html("Settings", p.get("settings", {}).get("placeholder", "Settings workspace is not implemented yet."))),
@@ -714,7 +892,7 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 function activateOfficeTab(id){
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
