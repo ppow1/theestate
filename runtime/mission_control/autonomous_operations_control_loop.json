@@ -1,0 +1,8 @@
+{
+  "blocked_condition_count": 2,
+  "decision": "pause",
+  "generated_at": "2026-07-03T23:35:24Z",
+  "report": "operations/autonomy/autonomous_operations_control_loop.md",
+  "source": "autonomous_operations_control_loop",
+  "status": "paused_or_unknown"
+}
