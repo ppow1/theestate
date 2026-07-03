@@ -652,6 +652,71 @@ def _daily_board_workspace_artifact(root):
         },
     }
 
+
+def _first_markdown_heading(text, fallback):
+    for line in text.splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return fallback
+
+
+def _status_bucket(value):
+    state = str(value or "proposed").strip().lower()
+    if state in {"active", "in progress", "open", "claimed"}:
+        return "active"
+    if state in {"planned", "pending", "ready", "queued"}:
+        return "planned"
+    if state in {"completed", "complete", "done", "closed"}:
+        return "completed"
+    return "proposed"
+
+
+def _roadmap_row_item(row, source_path):
+    title = row.get("Capability") or row.get("Initiative") or row.get("Epic") or row.get("Mission") or "Roadmap item"
+    status = _status_bucket(row.get("Status"))
+    return {
+        "title": title,
+        "status": status,
+        "horizon": row.get("Current Milestone") or row.get("Target Milestone") or row.get("Horizon") or "Not specified",
+        "dependency_notes": row.get("Key Dependency") or row.get("Dependency") or row.get("Dependencies") or "None recorded",
+        "next_step": row.get("Future Initiative") or row.get("Next Action") or "Review source artifact.",
+        "source": source_path,
+    }
+
+
+def _expansion_roadmap_artifact(root):
+    roadmap = _read_artifact(root, ["operations/boards/roadmap.md"])
+    missions = _read_artifact(root, ["data/registry/missions.json"])
+    parking = _read_artifact(root, ["operations/boards/parking_lot.md"])
+    capabilities = _read_artifact(root, ARTIFACTS["capability_lifecycle"])
+    charter = _read_artifact(root, ["docs/operations/Autonomous_Estate_Operations_Charter_v1.md", "collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md"])
+    sources = {"roadmap": _source_status(roadmap), "mission_registry": _source_status(missions), "parking_lot": _source_status(parking), "capability_lifecycle": _source_status(capabilities), "autonomous_operations_charter": _source_status(charter)}
+    items = []
+    if roadmap.get("available"):
+        for row in _markdown_table(roadmap.get("text") or "", "Roadmap"):
+            items.append(_roadmap_row_item(row, roadmap.get("path")))
+    if missions.get("available") and isinstance(missions.get("data"), dict):
+        for mission in (missions["data"].get("missions") or []):
+            items.append({"title": mission.get("mission_title") or mission.get("mission_id") or "Mission", "status": _status_bucket(mission.get("status")), "horizon": mission.get("mission_type") or "mission registry", "dependency_notes": ", ".join(mission.get("related_work_packages") or []) or "None recorded", "next_step": mission.get("notes") or "Review mission registry entry.", "source": missions.get("path")})
+    parking_items = []
+    if parking.get("available"):
+        for row in _markdown_table(parking.get("text") or "", "Parking Lot Items"):
+            item = {"title": row.get("Idea") or row.get("Item") or "Parking Lot item", "status": "proposed", "horizon": row.get("Target Milestone") or "future review", "dependency_notes": row.get("Promotion Condition") or "Human review required before work package creation.", "next_step": "Eligible for future work package review only; not promoted automatically.", "source": parking.get("path")}
+            parking_items.append(item); items.append(item)
+    pending_architecture = []
+    for path in sorted((root / "Architecture" / "ADR").glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        rel = _rel(path, root)
+        title = _first_markdown_heading(text, path.stem)
+        status_match = re.search(r"(?im)^status:\s*(.+)$", text)
+        status = _status_bucket(status_match.group(1) if status_match else ("proposed" if "Proposal" in title else "planned"))
+        pending_architecture.append({"title": title, "status": status, "source": rel})
+    current_horizon = "Not available yet."
+    if roadmap.get("available"):
+        current_horizon = "Strategic roadmap active; daily commitments remain on the Daily Board."
+    available = any(src.get("available") for src in sources.values()) or bool(pending_architecture)
+    return {"available": available, "path": "operations/boards/roadmap.md; data/registry/missions.json; Architecture/ADR", "kind": "expansion_roadmap_workspace", "placeholder": None if available else "Expansion roadmap source artifacts are not available yet.", "data": {"current_horizon": current_horizon, "items": items, "upcoming_epics": [i for i in items if i["status"] in {"planned", "proposed"}][:12], "pending_architecture_decisions": pending_architecture, "planned_not_active": [i for i in items if i["status"] in {"planned", "proposed"}], "future_work_package_candidates": parking_items, "sources": sources}}
+
 def generate_command_center(root=None, write=True):
     root = _root(root)
     resident_cards = build_resident_cards(root)
@@ -664,7 +729,7 @@ def generate_command_center(root=None, write=True):
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
-        "expansion_roadmap": _read_artifact(root, ["operations/boards/roadmap.md"]),
+        "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
         "daily_board_workspace": _daily_board_workspace_artifact(root),
         "search": _placeholder_panel("search", "Search", "Institutional search workspace is reserved for a future interactive panel; use the local estate-search CLI until then."),
@@ -916,6 +981,38 @@ def _daily_board_workspace_html(artifact, parking_only=False):
     out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ".</p></div>")
     return "".join(out)
 
+
+def _expansion_roadmap_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    out = ["<div class='expansion-roadmap-workspace'>"]
+    out.append("<p>This workspace keeps expansion planning separate from Active Projects and the Daily Board. It is advisory and does not approve, commit, or promote future work.</p>")
+    out.append(f"<p><strong>Current roadmap horizon:</strong> {html.escape(str(data.get('current_horizon') or 'Not available yet.'))}</p>")
+    def roadmap_table(title, rows, empty):
+        buf = [f"<h3>{html.escape(title)}</h3>"]
+        if not rows:
+            buf.append(f"<p class='placeholder'>{html.escape(empty)}</p>")
+            return "".join(buf)
+        buf.append("<table><thead><tr><th>Item</th><th>Status</th><th>Horizon</th><th>Dependency notes</th><th>Next step</th><th>Source</th></tr></thead><tbody>")
+        for item in rows[:20]:
+            buf.append("<tr>" + f"<td>{html.escape(str(item.get('title') or 'Untitled'))}</td><td>{html.escape(str(item.get('status') or 'proposed'))}</td><td>{html.escape(str(item.get('horizon') or 'Not specified'))}</td><td>{html.escape(str(item.get('dependency_notes') or 'None recorded'))}</td><td>{html.escape(str(item.get('next_step') or 'Review source artifact.'))}</td><td>{_artifact_link(item.get('source'))}</td>" + "</tr>")
+        buf.append("</tbody></table>")
+        return "".join(buf)
+    out.append(roadmap_table("Roadmap items by evidence-backed state", data.get("items") or [], "No roadmap items were found in available artifacts."))
+    out.append(roadmap_table("Upcoming epics", data.get("upcoming_epics") or [], "No upcoming epics were found."))
+    out.append(roadmap_table("Planned but not active initiatives", data.get("planned_not_active") or [], "No planned but inactive initiatives were found."))
+    out.append(roadmap_table("Items eligible for future work packages", data.get("future_work_package_candidates") or [], "No future work package candidates were found."))
+    arch = data.get("pending_architecture_decisions") or []
+    out.append("<h3>Pending architecture decisions</h3>")
+    if arch:
+        out.append("<ul>" + "".join(f"<li>{html.escape(str(a.get('title')))} — {html.escape(str(a.get('status')))}<br><span class='source'>Source: {_artifact_link(a.get('source'))}</span></li>" for a in arch[:12]) + "</ul>")
+    else:
+        out.append("<p class='placeholder'>No pending architecture decision documents were found.</p>")
+    sources = data.get("sources") or {}
+    out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ".</p></div>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -1037,7 +1134,7 @@ def render_command_center_html(payload):
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
-        ("roadmap", "Expansion Roadmap", _artifact_html(p.get("expansion_roadmap", {}))),
+        ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
         ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
