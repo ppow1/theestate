@@ -196,3 +196,44 @@ def test_validation_health_dashboard_shows_pass_warning_fail_stale_and_missing_s
     assert "Capability has missing validation evidence." in html
     assert "runtime/dependencies/dependency_graph.json" in html
     assert "Review failing validation source reports" in html
+
+
+def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    labels = [item["label"] for item in payload["navigation"]["items"]]
+    assert labels == [
+        "Home",
+        "Alfred",
+        "Helen",
+        "Daily Board",
+        "Active Projects",
+        "Expansion Roadmap",
+        "Parking Lot",
+        "Work Packages",
+        "Mailboxes",
+        "Validation",
+        "Search",
+        "Settings",
+        "About",
+    ]
+    assert "id='workspace-tabs'" in html
+    assert "id='office-navigation'" in html
+    assert "data-tab='settings'" in html
+    assert "id='workspace-search'" in html
+    assert "id='workspace-about'" in html
+    assert "Institutional search workspace is reserved" in html
+    assert "Settings are reserved for local theme" in html
+
+
+def test_command_center_tab_switch_script_and_collapsible_navigation_are_rendered(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert "function activateOfficeTab" in html
+    assert "Office Navigation</summary>" in html
+    assert "role='tabpanel' hidden" in html
+    assert 'id="activity-console"' in html
+    assert 'id="status-bar"' in html
