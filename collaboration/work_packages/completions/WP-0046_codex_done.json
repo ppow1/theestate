@@ -1,0 +1,22 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:27:57Z",
+  "files_changed": [
+    "docs/operations/Estate_Operations_Center_UI_Principles_v1.md",
+    "collaboration/work_packages/completions/WP-0046_codex_done.json"
+  ],
+  "known_limitations": [
+    "This package intentionally produces the architectural specification only and does not build UI components.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Created the foundational Estate Operations Center UI architecture principles document covering local-first posture, shell layout, navigation, tabs, status bar, activity console, command palette, dynamic refresh, verbosity, settings, about inventory, voice adapter hooks, and progressive Visual Manifest alignment.",
+  "tests_run": [
+    "python -m json.tool collaboration/work_packages/completions/WP-0046_codex_done.json >/dev/null",
+    "git diff --check"
+  ],
+  "work_package_id": "WP-0046"
+}
