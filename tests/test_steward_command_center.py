@@ -208,6 +208,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
         "Home",
         "Alfred",
         "Helen",
+        "Resident Conversations",
         "Daily Board",
         "Active Projects",
         "Expansion Roadmap",
@@ -225,6 +226,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "data-tab='settings'" in html
     assert "id='workspace-search'" in html
     assert "id='workspace-recalls'" in html
+    assert "id='workspace-resident-conversations'" in html
     assert "id='workspace-about'" in html
     assert "Global Search and Command Palette" in html
     assert "Theme <select disabled>" in html
