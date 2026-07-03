@@ -393,3 +393,52 @@ def test_daily_board_workspace_empty_and_missing_states(tmp_path):
     missing_html = render_command_center_html(missing_payload)
     assert missing_payload["panels"]["daily_board_workspace"]["available"] is False
     assert "Daily Board and Parking Lot source artifacts are not available yet." in missing_html
+
+
+def test_expansion_roadmap_workspace_shows_states_sources_and_candidates(tmp_path):
+    seed_inputs(tmp_path)
+    (tmp_path / "operations/boards").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "operations/boards/roadmap.md").write_text("""# Strategic Roadmap
+
+## Roadmap
+| Capability | Current Milestone | Status | Key Dependency | Future Initiative |
+|---|---|---|---|---|
+| Proposed Wing | Exploration | Proposed | Steward signal | Research scope |
+| Planned Wing | Build runway | Planned | ADR needed | First epic |
+| Active Wing | v1 | Active | None | Stabilize |
+| Completed Wing | v0 | Completed | Done | Observe |
+""", encoding="utf-8")
+    write_json(tmp_path, "data/registry/missions.json", {"missions": [{"mission_id": "MISSION-9999", "mission_title": "Planned Mission", "status": "planned", "mission_type": "expansion", "related_work_packages": ["WP-9999"], "notes": "Needs staged epic review."}]})
+    (tmp_path / "operations/boards/parking_lot.md").write_text("""# Parking Lot
+
+## Parking Lot Items
+| ID | Idea | Category | Priority | Originator | Date Captured | Status | Target Milestone | Promotion Condition |
+|---|---|---|---|---|---|---|---|---|
+| PL-99 | Future candidate | Expansion | Medium | Steward | today | Captured | Later | Pattern repeats |
+""", encoding="utf-8")
+    (tmp_path / "Architecture/ADR").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "Architecture/ADR/ADR-9999-Proposal.md").write_text("# ADR-9999 Expansion Choice Proposal\n\nStatus: Proposed\n", encoding="utf-8")
+
+    payload = generate_command_center(tmp_path, write=False)
+    roadmap = payload["panels"]["expansion_roadmap"]
+    html = render_command_center_html(payload)
+    statuses = {item["title"]: item["status"] for item in roadmap["data"]["items"]}
+
+    assert roadmap["available"] is True
+    assert statuses["Proposed Wing"] == "proposed"
+    assert statuses["Planned Wing"] == "planned"
+    assert statuses["Active Wing"] == "active"
+    assert statuses["Completed Wing"] == "completed"
+    assert "Future candidate" in html
+    assert "ADR-9999 Expansion Choice Proposal" in html
+    assert "operations/boards/roadmap.md" in html
+    assert "data/registry/missions.json" in html
+    assert "does not approve, commit, or promote future work" in html
+
+
+def test_expansion_roadmap_workspace_missing_state_is_clear(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert payload["panels"]["expansion_roadmap"]["available"] is False
+    assert "Expansion roadmap source artifacts are not available yet." in html

@@ -1,0 +1,22 @@
+{
+  "work_package_id": "WP-0053",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:00:00Z",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "summary": "Added an Expansion Roadmap workspace to the Office of the Steward command center, keeping roadmap planning separate from Active Projects and Daily Board while surfacing evidence-backed states, upcoming epics, pending architecture decisions, planned inactive initiatives, future work package candidates, dependency notes, and source provenance.",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0053_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_steward_command_center.py -q"
+  ],
+  "known_limitations": [
+    "The workspace summarizes local artifacts only and does not create approvals, governance, or automatic work package promotion.",
+    "Roadmap extraction is intentionally conservative and relies on existing Markdown tables, mission registry entries, Parking Lot candidates, and ADR files where present."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
