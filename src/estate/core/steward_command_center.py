@@ -22,6 +22,11 @@ ARTIFACTS = {
     "mailbox_summary": ["runtime/collaboration/mailbox_index.json", "collaboration/mailboxes/index.json"],
     "work_package_pipeline": ["runtime/work_packages/assignment_queue.json", "operations/work_packages/assignment_queue.md"],
     "validation_status": ["runtime/validation/local_operational_validation_run.json", "operations/validation/local_operational_validation_run.md", "runtime/audit/latest.json"],
+    "capability_lifecycle": ["runtime/capabilities/capability_lifecycle_report.json", "operations/capabilities/capability_lifecycle_report.md"],
+    "dependency_graph": ["runtime/dependencies/dependency_graph.json", "operations/dependencies/dependency_graph.md"],
+    "mailbox_sync": ["runtime/mailboxes/synchronization_duty_latest.json", "operations/mailboxes/synchronization_duty.md", "collaboration/status/worker_inbox_summary.json"],
+    "recall_audit": ["runtime/audit/recall_audit_log.json", "operations/audit/recall_audit_log_summary.md"],
+    "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
 }
 
 
@@ -113,8 +118,119 @@ def _validation_label(validation_artifact):
     return "Validation artifact present"
 
 
+def _artifact_link(rel):
+    if not rel:
+        return "not yet produced"
+    return f'<a href="{html.escape(str(rel))}">{html.escape(str(rel))}</a>'
+
+
+def _artifact_mtime(root, rel):
+    if not rel:
+        return None
+    path = root / rel
+    if not path.exists():
+        return None
+    return datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)
+
+
+def _warning_text(item):
+    if isinstance(item, dict):
+        return item.get("message") or item.get("type") or json.dumps(item, sort_keys=True)
+    return str(item)
+
+
+def _artifact_health(root, key, label, *, stale_after_hours=48):
+    artifact = _read_artifact(root, ARTIFACTS[key])
+    state = "pass"
+    warnings = []
+    failures = []
+    blocked = []
+    if not artifact.get("available"):
+        state = "missing"
+        warnings.append(artifact.get("placeholder") or "Artifact is not available yet.")
+    data = artifact.get("data") if isinstance(artifact.get("data"), dict) else {}
+    if data:
+        summary = data.get("summary") if isinstance(data.get("summary"), dict) else {}
+        raw_warnings = data.get("warnings") or []
+        warnings.extend(_warning_text(w) for w in raw_warnings[:6])
+        failed = summary.get("failed_steps", summary.get("failed", 0))
+        if failed:
+            state = "fail"
+            failures.append(f"{failed} failure(s) reported.")
+        if summary.get("ok") is False:
+            state = "fail"
+            failures.append("Summary reports ok=false.")
+        stale_workers = summary.get("stale_worker_count", 0)
+        if stale_workers:
+            state = "warning" if state != "fail" else state
+            warnings.append(f"{stale_workers} stale worker heartbeat record(s).")
+        status_counts = summary.get("status_counts") if isinstance(summary.get("status_counts"), dict) else {}
+        if status_counts.get("blocked"):
+            state = "warning" if state != "fail" else state
+            blocked.append(f"{status_counts.get('blocked')} worker(s) blocked.")
+        if summary.get("warning_count") and state == "pass":
+            state = "warning"
+    mtime = _artifact_mtime(root, artifact.get("path"))
+    if mtime and (datetime.now(timezone.utc) - mtime).total_seconds() > stale_after_hours * 3600:
+        if state == "pass":
+            state = "warning"
+        warnings.append(f"Artifact may be stale; last modified {mtime.isoformat(timespec='seconds')}.")
+    return {
+        "label": label,
+        "state": state,
+        "path": artifact.get("path"),
+        "last_modified": mtime.isoformat(timespec="seconds") if mtime else None,
+        "warnings": warnings,
+        "failures": failures,
+        "blocked": blocked,
+    }
+
+
+def _build_validation_health_dashboard(root):
+    checks = [
+        _artifact_health(root, "validation_status", "Local operational validation"),
+        _artifact_health(root, "capability_lifecycle", "Capability lifecycle report"),
+        _artifact_health(root, "dependency_graph", "Dependency graph report"),
+        _artifact_health(root, "mailbox_sync", "Mailbox synchronization report"),
+        _artifact_health(root, "recall_audit", "Recall audit report"),
+        _artifact_health(root, "worker_heartbeat", "Worker heartbeat report", stale_after_hours=2),
+    ]
+    completions = _completion_records(root)
+    reviews = _review_records(root)
+    if not completions:
+        checks.append({"label": "Work package completion records", "state": "missing", "path": "collaboration/work_packages/completions", "last_modified": None, "warnings": ["No completion records found."], "failures": [], "blocked": []})
+    else:
+        unreviewed = [wp for wp, record in completions.items() if record.get("ready_for_ca_review") and not reviews.get(wp)]
+        checks.append({"label": "Work package completion/review records", "state": "warning" if unreviewed else "pass", "path": "collaboration/work_packages/completions", "last_modified": None, "warnings": [f"{len(unreviewed)} completion(s) ready for CA review without review record."] if unreviewed else [], "failures": [], "blocked": []})
+    states = [c["state"] for c in checks]
+    overall = "fail" if "fail" in states else ("warning" if any(s in states for s in ("warning", "missing")) else "pass")
+    last_success = None
+    for check in checks:
+        if check["label"] == "Local operational validation" and check["state"] == "pass":
+            last_success = check.get("last_modified")
+    if overall == "pass":
+        action = "Continue normal operations; no validation action is currently required."
+    elif "fail" in states:
+        action = "Review failing validation source reports before proceeding with dependent work."
+    else:
+        action = "Refresh stale or missing local artifacts, then rerun local operational validation."
+    return {
+        "available": True,
+        "path": "runtime/steward/command_center.html",
+        "kind": "validation_health",
+        "data": {
+            "overall_health": overall,
+            "last_successful_validation_time": last_success,
+            "recommended_next_action": action,
+            "checks": checks,
+            "current_warnings": [w for c in checks for w in c.get("warnings", [])],
+            "blocked_subsystems": [b for c in checks for b in c.get("blocked", [])],
+        },
+    }
+
+
 def _active_worker_count(root):
-    artifact = _read_artifact(root, ["runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"])
+    artifact = _read_artifact(root, ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"])
     if artifact.get("kind") == "json":
         data = artifact.get("data") or {}
         workers = data.get("workers") if isinstance(data, dict) else None
@@ -132,7 +248,9 @@ def _build_status_bar(root, panels, generated_at):
     mailbox_count = _count_mailboxes(root)
     active_workers = _active_worker_count(root)
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
-    estate_status = "Needs data" if missing else "Nominal"
+    health = ((panels.get("validation_health_dashboard") or {}).get("data") or {})
+    health_state = health.get("overall_health")
+    estate_status = "Needs data" if missing else ({"pass": "Nominal", "warning": "Warnings", "fail": "Failing", "missing": "Needs data"}.get(health_state) or "Nominal")
     return {
         "estate_status": estate_status,
         "last_refresh_time": generated_at,
@@ -143,6 +261,8 @@ def _build_status_bar(root, panels, generated_at):
         "version": "Operations Center v1 / Status Console v1",
         "verbosity": "normal",
         "missing_sources": missing,
+        "health_state": health_state,
+        "recommended_next_action": health.get("recommended_next_action"),
     }
 
 
@@ -276,6 +396,7 @@ def generate_command_center(root=None, write=True):
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
     }
+    panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
     payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
@@ -367,6 +488,30 @@ def _work_package_pipeline_html(artifact):
     out.append(f"<p class='source'>Source: {html.escape(artifact.get('path', ''))}; {html.escape(str(data.get('source') or 'local artifacts'))}</p></div>")
     return "".join(out)
 
+
+def _validation_health_html(artifact):
+    data = artifact.get("data") or {}
+    checks = data.get("checks") or []
+    badge = html.escape(str(data.get("overall_health") or "missing"))
+    out = [f"<div class='health-summary'><p><strong>Overall Estate health:</strong> <span class='health-badge {badge}'>{badge}</span></p>"]
+    out.append(f"<p><strong>Last successful validation:</strong> {html.escape(str(data.get('last_successful_validation_time') or 'Not available yet'))}</p>")
+    out.append(f"<p><strong>Recommended next action:</strong> {html.escape(str(data.get('recommended_next_action') or 'Review source reports.'))}</p></div>")
+    out.append("<table class='health-table'><thead><tr><th>Subsystem</th><th>State</th><th>Warnings</th><th>Failures / blocked</th><th>Source</th></tr></thead><tbody>")
+    for check in checks:
+        state = html.escape(str(check.get("state") or "missing"))
+        warnings = "<br>".join(html.escape(str(w)) for w in (check.get("warnings") or [])) or "None"
+        problems = "<br>".join(html.escape(str(v)) for v in ((check.get("failures") or []) + (check.get("blocked") or []))) or "None"
+        source = _artifact_link(check.get("path"))
+        out.append("<tr>"
+                   f"<td>{html.escape(str(check.get('label')))}</td>"
+                   f"<td><span class='health-badge {state}'>{state}</span></td>"
+                   f"<td>{warnings}</td>"
+                   f"<td>{problems}</td>"
+                   f"<td>{source}</td>"
+                   "</tr>")
+    out.append("</tbody></table><p class='source'>Generated dashboard is advisory and links to source reports; it does not replace validation logic.</p>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -389,6 +534,7 @@ def _status_bar_html(status):
         ("Estate", status.get("estate_status")),
         ("Refresh", status.get("last_refresh_time")),
         ("Validation", status.get("validation_state")),
+        ("Health", status.get("health_state")),
         ("Decisions", status.get("pending_decisions")),
         ("Mailbox", status.get("mailbox_count")),
         ("Workers", status.get("active_workers")),
@@ -455,6 +601,7 @@ def render_command_center_html(payload):
         _panel("Steward Decision Queue", _decision_queue_html(p.get("steward_decision_queue", {})), "ready" if p.get("steward_decision_queue", {}).get("available") else "placeholder"),
         _panel("Mailbox Summary", _artifact_html(p.get("mailbox_summary", {})), "ready" if p.get("mailbox_summary", {}).get("available") else "placeholder"),
         _panel("Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {})), "ready" if p.get("work_package_pipeline", {}).get("available") else "placeholder"),
+        _panel("Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})), "ready"),
         _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder"),
     ]
     status_bar = _status_bar_html(payload.get("status_bar", {}))
@@ -462,7 +609,7 @@ def render_command_center_html(payload):
     generated = html.escape(str(payload.get("generated_at")))
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
-        '<style>body{font-family:system-ui,sans-serif;margin:2rem 2rem 9rem;background:#f6f3ed;color:#241f1a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;box-shadow:0 1px 4px #0001}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing{background:#fff3cd;color:#6b4e16}</style></head>\n'
+        '<style>body{font-family:system-ui,sans-serif;margin:2rem 2rem 9rem;background:#f6f3ed;color:#241f1a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;box-shadow:0 1px 4px #0001}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}</style></head>\n'
         f'<body><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only skeleton. Generated: {generated}. This dashboard summarizes existing Estate artifacts and shows placeholders for missing capabilities.</p></header><main class="grid">{"".join(panels)}</main>{activity_console}{status_bar}{_refresh_script()}</body></html>\n'
     )
 
