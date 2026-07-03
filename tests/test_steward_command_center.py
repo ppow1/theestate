@@ -265,6 +265,9 @@ def test_mailbox_operations_center_summarizes_open_ack_steward_and_warnings(tmp_
     assert center["summary"]["waiting_on_steward_count"] == 1
     assert center["summary"]["warning_count"] == 1
     assert center["summary"]["last_mailbox_synchronization_time"] == "2026-07-03T00:00:00Z"
+    assert payload["status_bar"]["mailbox_open_count"] == 4
+    assert payload["status_bar"]["mailbox_ack_required_count"] == 3
+    assert payload["status_bar"]["mailbox_warning_count"] == 1
     assert "Mailbox Operations Center" in html
     assert "Show summarized messages" in html
     assert "Acknowledgement-required messages" in html
@@ -285,3 +288,27 @@ def test_mailbox_operations_center_handles_empty_and_missing_artifacts(tmp_path)
     assert "No mailbox messages were found" in html
     assert "Missing supporting mailbox artifact" in html
     assert "mailbox_synchronization" in center["missing_sources"]
+
+
+def test_mailbox_operations_center_can_fallback_to_communication_bus_messages(tmp_path):
+    seed_inputs(tmp_path)
+    (tmp_path / "collaboration/mailboxes/index.json").unlink()
+    write_json(tmp_path, "collaboration/messages/msg_bus_mail.json", {
+        "id": "msg_bus_mail",
+        "title": "Bus-only mailbox item",
+        "destination": "mailbox.6",
+        "status": "open",
+        "requires_ack": True,
+        "created_at": "2026-07-03T02:00:00+00:00",
+    })
+
+    payload = generate_command_center(tmp_path, write=False)
+    center = payload["panels"]["mailbox_operations_center"]
+    html = render_command_center_html(payload)
+
+    assert center["available"] is True
+    assert center["path"] == "collaboration/messages/*.json"
+    assert center["data"]["summary"]["message_count"] == 1
+    assert center["data"]["missing_sources"]
+    assert "Bus-only mailbox item" in html
+    assert "Missing supporting mailbox artifact(s): mailbox_index" in html

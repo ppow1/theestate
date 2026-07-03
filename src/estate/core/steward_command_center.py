@@ -16,6 +16,7 @@ from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_cards import build_resident_cards
 from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
+from estate.core.mailbox_index import generate_mailbox_index
 
 
 OFFICE_NAVIGATION = [
@@ -178,10 +179,28 @@ def _mailbox_operations_center_artifact(root):
     worker_artifact = _read_artifact(root, ARTIFACTS["worker_inbox_summary"])
     labels, kinds = _mailbox_label_maps(root)
     messages = []
+    warnings = []
+    communication_bus_used = False
     if index_artifact.get("available") and isinstance(index_artifact.get("data"), dict):
         messages = index_artifact["data"].get("messages") or []
+    elif (root / "collaboration" / "messages").exists():
+        try:
+            generated_index = generate_mailbox_index(root=root, write=False)
+            messages = generated_index.get("messages") or []
+            communication_bus_used = True
+        except Exception as exc:
+            for path in sorted((root / "collaboration" / "messages").glob("*.json")):
+                try:
+                    item = _read_json(path)
+                    if isinstance(item, dict):
+                        item = dict(item)
+                        item.setdefault("path", _rel(path, root))
+                        messages.append(item)
+                except Exception as message_exc:
+                    messages.append({"title": path.stem, "path": _rel(path, root), "warning": f"malformed message: {message_exc}"})
+            communication_bus_used = bool(messages)
+            warnings.append({"title": "Communication Bus resolver warning", "warning": f"Mailbox resolver unavailable; showing raw Communication Bus summaries: {exc}", "path": "collaboration/messages/*.json"})
     by_mailbox = {}
-    warnings = []
     open_messages = []
     ack_required = []
     steward_waiting = []
@@ -235,14 +254,15 @@ def _mailbox_operations_center_artifact(root):
             "mailbox_index": index_artifact.get("path"),
             "mailbox_synchronization": sync_artifact.get("path"),
             "check_updates": updates_artifact.get("path"),
-            "communication_bus": "collaboration/messages/*.json",
+            "communication_bus": "collaboration/messages/*.json" if communication_bus_used else "collaboration/messages/*.json",
             "worker_inbox_summary": worker_artifact.get("path"),
             "personnel_registry": "data/registry/personnel.json",
             "mailbox_registry": "data/registry/mailboxes.json",
         },
         "missing_sources": [name for name, artifact in {"mailbox_index": index_artifact, "mailbox_synchronization": sync_artifact, "check_updates": updates_artifact, "worker_inbox_summary": worker_artifact}.items() if not artifact.get("available")],
     }
-    return {"available": index_artifact.get("available", False), "path": index_artifact.get("path") or "collaboration/mailboxes/index.json", "kind": "mailbox_operations_center", "data": data, "placeholder": index_artifact.get("placeholder")}
+    available = bool(index_artifact.get("available") or communication_bus_used)
+    return {"available": available, "path": index_artifact.get("path") or ("collaboration/messages/*.json" if communication_bus_used else "collaboration/mailboxes/index.json"), "kind": "mailbox_operations_center", "data": data, "placeholder": index_artifact.get("placeholder")}
 
 
 def _pending_decision_count(decision_artifact):
@@ -397,6 +417,7 @@ def _build_status_bar(root, panels, generated_at):
     validation = panels.get("validation_status", {})
     pending = _pending_decision_count(panels.get("steward_decision_queue", {}))
     mailbox_count = _count_mailboxes(root)
+    mailbox_ops_summary = (((panels.get("mailbox_operations_center") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
     health = ((panels.get("validation_health_dashboard") or {}).get("data") or {})
@@ -408,6 +429,9 @@ def _build_status_bar(root, panels, generated_at):
         "validation_state": _validation_label(validation),
         "pending_decisions": pending,
         "mailbox_count": mailbox_count,
+        "mailbox_open_count": mailbox_ops_summary.get("open_message_count"),
+        "mailbox_ack_required_count": mailbox_ops_summary.get("ack_required_count"),
+        "mailbox_warning_count": mailbox_ops_summary.get("warning_count"),
         "active_workers": active_workers,
         "version": "Operations Center v1 / Status Console v1",
         "verbosity": "normal",
@@ -786,6 +810,9 @@ def _status_bar_html(status):
         ("Health", status.get("health_state")),
         ("Decisions", status.get("pending_decisions")),
         ("Mailbox", status.get("mailbox_count")),
+        ("Mail open", status.get("mailbox_open_count")),
+        ("Mail ack", status.get("mailbox_ack_required_count")),
+        ("Mail warn", status.get("mailbox_warning_count")),
         ("Workers", status.get("active_workers")),
         ("Verbosity", status.get("verbosity")),
         ("Version", status.get("version")),
