@@ -1,0 +1,24 @@
+{
+  "work_package_id": "WP-0063",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T22:40:00Z",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "summary": "Implemented the local-first autonomous work queue scheduler with Ready, Waiting, Blocked, Running, and Review queues, advisory next-work recommendation, worker availability awareness, Operations Center output, Activity Console event output, CLI access, and regression tests.",
+  "files_changed": [
+    "src/estate/core/autonomous_work_queue_scheduler.py",
+    "src/estate/cli/main.py",
+    "tests/test_autonomous_work_queue_scheduler.py",
+    "runtime/work_packages/autonomous_work_queue_scheduler.json",
+    "operations/work_packages/autonomous_work_queue_scheduler.md",
+    "runtime/activity_console/work_queue_scheduler.json",
+    "collaboration/work_packages/completions/WP-0063_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_autonomous_work_queue_scheduler.py -q",
+    "PYTHONPATH=src python -m estate.cli.main autonomous-work-queue-scheduler --json",
+    "PYTHONPATH=src pytest -q"
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
