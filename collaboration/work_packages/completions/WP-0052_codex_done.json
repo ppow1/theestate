@@ -1,0 +1,22 @@
+{
+  "work_package_id": "WP-0052",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:00:00Z",
+  "branch": "work",
+  "pull_request_url": "pending",
+  "summary": "Added a Daily Board and Parking Lot workspace to the Office of the Steward command center, preserving Daily Board and Parking Lot separation while surfacing priorities, active work, blockers, review items, promotion conditions, recommendations, and source provenance.",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0052_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_steward_command_center.py -q"
+  ],
+  "known_limitations": [
+    "The workspace summarizes Markdown table and bullet artifacts without introducing new governance or automatically promoting Parking Lot items.",
+    "Quiet refresh remains scoped to the existing command center status and activity console endpoint."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}

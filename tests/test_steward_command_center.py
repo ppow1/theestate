@@ -312,3 +312,84 @@ def test_mailbox_operations_center_can_fallback_to_communication_bus_messages(tm
     assert center["data"]["missing_sources"]
     assert "Bus-only mailbox item" in html
     assert "Missing supporting mailbox artifact(s): mailbox_index" in html
+
+
+def test_daily_board_workspace_renders_board_parking_lot_conditions_and_sources(tmp_path):
+    seed_inputs(tmp_path)
+    (tmp_path / "operations/boards").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "operations/boards/daily_board.md").write_text("""# Daily Task Board
+
+## Today
+| ID | Task | Owner | Status | Blocker | Review Required | Next Action |
+|---|---|---|---|---|---|---|
+| DT-1 | Ship dashboard | Alfred | Active | None | Yes | Review UI |
+
+## Waiting
+| ID | Item | Waiting On | Since | Next Check |
+|---|---|---|---|---|
+
+## Blocked
+| ID | Item | Blocker | Owner | Escalation Needed |
+|---|---|---|---|---|
+| BL-1 | Deploy | Missing review | Worker | No |
+
+## Review Required
+| ID | Item | Reviewer | Reason | Ready Since |
+|---|---|---|---|---|
+| RV-1 | Board | Steward | UX check | today |
+""", encoding="utf-8")
+    (tmp_path / "operations/boards/active_work.md").write_text("""# Active Work Board
+
+## Active Work
+| ID | Effort | Owner | Status | Current Milestone | Dependency | Next Action |
+|---|---|---|---|---|---|---|
+| AW-1 | Operations Center | Alfred | Active | v1 | None | Continue |
+""", encoding="utf-8")
+    (tmp_path / "operations/boards/parking_lot.md").write_text("""# Parking Lot
+
+## Parking Lot Items
+| ID | Idea | Category | Priority | Originator | Date Captured | Status | Target Milestone | Promotion Condition |
+|---|---|---|---|---|---|---|---|---|
+| PL-1 | Later idea | Automation | Strategic | Steward | today | Captured | Later | Three repeats |
+""", encoding="utf-8")
+    (tmp_path / "operations/boards/daily_board_integration.md").write_text("""# Daily Board Integration
+
+## Parking Lot Promotion Conditions
+- PL-1: Later idea — ready_for_review — Three repeats
+
+## Parking Lot Items Ready for Review
+- PL-1: Later idea
+
+## Recommended Next Actions
+- Human-review parking_lot.ready_for_review; do not auto-promote from this report.
+""", encoding="utf-8")
+
+    payload = generate_command_center(tmp_path, write=False)
+    workspace = payload["panels"]["daily_board_workspace"]
+    html = render_command_center_html(payload)
+
+    assert workspace["available"] is True
+    assert workspace["data"]["daily_priorities"][0]["Task"] == "Ship dashboard"
+    assert workspace["data"]["parking_lot_items"][0]["Promotion Condition"] == "Three repeats"
+    assert "This workspace keeps today’s Daily Board separate" in html
+    assert "not automatically promoted" in html
+    assert "PL-1: Later idea" in html
+    assert "operations/boards/parking_lot.md" in html
+
+
+def test_daily_board_workspace_empty_and_missing_states(tmp_path):
+    seed_inputs(tmp_path)
+    (tmp_path / "operations/boards").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "operations/boards/daily_board.md").write_text("# Daily Task Board\n", encoding="utf-8")
+    (tmp_path / "operations/boards/parking_lot.md").write_text("# Parking Lot\n", encoding="utf-8")
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+    assert "No current daily priorities were found in the Daily Board." in html
+    assert "No Parking Lot items were found." in html
+
+    empty_root = tmp_path / "empty"
+    empty_root.mkdir()
+    missing_payload = generate_command_center(empty_root, write=False)
+    missing_html = render_command_center_html(missing_payload)
+    assert missing_payload["panels"]["daily_board_workspace"]["available"] is False
+    assert "Daily Board and Parking Lot source artifacts are not available yet." in missing_html
