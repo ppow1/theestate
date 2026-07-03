@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:46:07Z",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0048_codex_done.json"
+  ],
+  "known_limitations": [
+    "The pipeline derives state from local assignment queue generation, completion records, review messages, launch queue documents, and validation artifacts; it does not create or modify governance state.",
+    "Copyable Codex commands are displayed for pending ready packages only and Codex submission remains manual.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Added a Work Package Pipeline view to the Operations Center that groups pending, active, blocked, review-ready, completed, and missing-data states, enriches rows with title, mode, owner, dependencies, next action, completion/review status, and keeps ready Codex commands copyable for Steward launch workflow.",
+  "tests_run": [
+    "pytest -q tests/test_steward_command_center.py",
+    "python -m json.tool collaboration/work_packages/completions/WP-0048_codex_done.json >/dev/null",
+    "git diff --check",
+    "pytest -q"
+  ],
+  "work_package_id": "WP-0048"
+}
