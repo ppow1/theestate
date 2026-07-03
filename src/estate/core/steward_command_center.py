@@ -76,6 +76,7 @@ ARTIFACTS = {
     "notification_center": ["runtime/notifications/notification_center_workspace.json", "operations/notifications/notification_center_workspace.md"],
     "recall_decision_model": ["docs/operations/Steward_Recall_Decision_Model_v1.md", "data/policy/steward_recall_reasons.json"],
     "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
+    "worker_runtime_monitor": ["runtime/workers/worker_runtime_monitor.json", "operations/workers/worker_runtime_monitor.md"],
 }
 
 
@@ -378,6 +379,7 @@ def _build_validation_health_dashboard(root):
         _artifact_health(root, "mailbox_sync", "Mailbox synchronization report"),
         _artifact_health(root, "recall_audit", "Recall audit report"),
         _artifact_health(root, "worker_heartbeat", "Worker heartbeat report", stale_after_hours=2),
+        _artifact_health(root, "worker_runtime_monitor", "Worker runtime monitor", stale_after_hours=2),
     ]
     completions = _completion_records(root)
     reviews = _review_records(root)
@@ -414,9 +416,12 @@ def _build_validation_health_dashboard(root):
 
 
 def _active_worker_count(root):
-    artifact = _read_artifact(root, ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"])
+    artifact = _read_artifact(root, ["runtime/workers/worker_runtime_monitor.json", "runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"])
     if artifact.get("kind") == "json":
         data = artifact.get("data") or {}
+        summary = data.get("summary") if isinstance(data, dict) else None
+        if isinstance(summary, dict) and isinstance(summary.get("active_worker_count"), int):
+            return summary.get("active_worker_count")
         workers = data.get("workers") if isinstance(data, dict) else None
         if isinstance(workers, list):
             return sum(1 for worker in workers if str(worker.get("status", "")).lower() == "active")
