@@ -1,0 +1,25 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:52:17Z",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0049_codex_done.json"
+  ],
+  "known_limitations": [
+    "The dashboard is advisory and links back to source reports; it does not replace existing validation logic or create new governance.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Added a Validation and Estate Health panel to the Steward Command Center that summarizes local validation, lifecycle, dependency, mailbox sync, recall audit, worker heartbeat, and work package completion/review artifacts with pass/warning/fail/missing/stale states, source links, recommended next action, and status bar health summary.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json > /tmp/command_center.json",
+    "python -m json.tool /tmp/command_center.json >/dev/null",
+    "PYTHONPATH=src pytest tests/test_local_operational_validation.py tests/test_worker_runtime_heartbeat.py tests/test_steward_command_center.py"
+  ],
+  "work_package_id": "WP-0049"
+}

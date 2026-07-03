@@ -29,6 +29,11 @@ def seed_inputs(root):
     (root / "operations/work_packages").mkdir(parents=True, exist_ok=True)
     (root / "operations/work_packages/assignment_queue.md").write_text("# Assignment Queue\n", encoding="utf-8")
     write_json(root, "runtime/audit/latest.json", {"summary": {"failed": 0}})
+    write_json(root, "runtime/capabilities/capability_lifecycle_report.json", {"summary": {"warning_count": 0}})
+    write_json(root, "runtime/dependencies/dependency_graph.json", {"summary": {"warning_count": 0}})
+    write_json(root, "runtime/mailboxes/synchronization_duty_latest.json", {"summary": {"warning_count": 0}})
+    write_json(root, "runtime/audit/recall_audit_log.json", {"summary": {"warning_count": 0}})
+    write_json(root, "runtime/workers/worker_runtime_heartbeat.json", {"summary": {"worker_count": 1, "stale_worker_count": 0, "status_counts": {"active": 1, "blocked": 0}, "warning_count": 0}, "workers": []})
 
 
 def test_command_center_renders_all_initial_panels(tmp_path):
@@ -36,7 +41,7 @@ def test_command_center_renders_all_initial_panels(tmp_path):
     payload = generate_command_center(tmp_path)
     html = render_command_center_html(payload)
 
-    for title in ["Alfred Resident Card", "Helen Resident Card", "Morning Briefing", "Steward Decision Queue", "Mailbox Summary", "Work Package Pipeline", "Validation Status"]:
+    for title in ["Alfred Resident Card", "Helen Resident Card", "Morning Briefing", "Steward Decision Queue", "Mailbox Summary", "Work Package Pipeline", "Validation and Estate Health", "Validation Status"]:
         assert title in html
     assert (tmp_path / "runtime/steward/command_center.html").exists()
 
@@ -91,11 +96,13 @@ def test_command_center_renders_status_bar_and_activity_console(tmp_path):
     html = render_command_center_html(payload)
 
     assert payload["status_bar"]["validation_state"] == "Validation passing"
+    assert payload["status_bar"]["health_state"] in {"pass", "warning"}
     assert payload["status_bar"]["mailbox_count"] == 3
     assert payload["activity_console"]["events"]
     assert 'id="status-bar"' in html
     assert "Estate" in html
     assert "Validation passing" in html
+    assert "Health" in html
     assert 'id="activity-console"' in html
     assert "Activity Console" in html
     assert "verbosity-selector" in html
@@ -160,3 +167,32 @@ def test_work_package_pipeline_groups_representative_states_and_copyable_command
     assert "Missing-data" in html
     assert "textarea readonly" in html
     assert "collaboration/work_packages/pending/WP-9001_SERIES_ready.md" in html
+
+
+def test_validation_health_dashboard_shows_pass_warning_fail_stale_and_missing_states(tmp_path):
+    seed_inputs(tmp_path)
+    write_json(tmp_path, "runtime/validation/local_operational_validation_run.json", {"summary": {"ok": True, "failed_steps": 0, "warning_count": 0}, "warnings": []})
+    write_json(tmp_path, "runtime/capabilities/capability_lifecycle_report.json", {"summary": {"warning_count": 1}, "warnings": [{"type": "lifecycle_gap", "message": "Capability has missing validation evidence."}]})
+    write_json(tmp_path, "runtime/dependencies/dependency_graph.json", {"summary": {"failed": 1}, "warnings": []})
+    write_json(tmp_path, "runtime/workers/worker_runtime_heartbeat.json", {"summary": {"worker_count": 2, "stale_worker_count": 1, "status_counts": {"active": 1, "blocked": 1}, "warning_count": 1}, "warnings": []})
+    # Leave mailbox synchronization missing and make recall audit stale.
+    (tmp_path / "runtime/mailboxes/synchronization_duty_latest.json").unlink()
+    import os, time
+    old = time.time() - 72 * 3600
+    os.utime(tmp_path / "runtime/audit/recall_audit_log.json", (old, old))
+
+    payload = generate_command_center(tmp_path, write=False)
+    health = payload["panels"]["validation_health_dashboard"]["data"]
+    html = render_command_center_html(payload)
+    states = {check["label"]: check["state"] for check in health["checks"]}
+
+    assert states["Local operational validation"] == "pass"
+    assert states["Capability lifecycle report"] == "warning"
+    assert states["Dependency graph report"] == "fail"
+    assert states["Mailbox synchronization report"] == "missing"
+    assert states["Recall audit report"] == "warning"
+    assert states["Worker heartbeat report"] == "warning"
+    assert health["overall_health"] == "fail"
+    assert "Capability has missing validation evidence." in html
+    assert "runtime/dependencies/dependency_graph.json" in html
+    assert "Review failing validation source reports" in html
