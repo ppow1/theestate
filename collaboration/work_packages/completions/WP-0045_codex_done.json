@@ -1,0 +1,34 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T23:55:16Z",
+  "files_changed": [
+    "src/estate/core/decision_queue.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "tests/test_decision_queue.py",
+    "tests/test_steward_command_center.py",
+    "operations/steward/decision_queue.md",
+    "collaboration/work_packages/completions/WP-0045_codex_done.json"
+  ],
+  "known_limitations": [
+    "Decision items are derived only from available local artifacts and are non-authoritative.",
+    "Generated output does not notify the Steward or approve any decision.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented the first local Steward Decision Queue panel, including JSON and Markdown generation, command center integration, CLI access, tests for empty/representative/missing-source scenarios, and current generated panel output.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_decision_queue.py tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m estate.cli.main decision-queue --json > /tmp/decision_queue.json",
+    "python -m json.tool /tmp/decision_queue.json >/dev/null",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json > /tmp/command_center.json",
+    "python -m json.tool /tmp/command_center.json >/dev/null",
+    "PYTHONPATH=src pytest -q tests/test_decision_queue.py tests/test_steward_command_center.py tests/test_steward_dashboard.py",
+    "PYTHONPATH=src pytest -q tests/test_codex_completion.py",
+    "git diff --check"
+  ],
+  "work_package_id": "WP-0045"
+}

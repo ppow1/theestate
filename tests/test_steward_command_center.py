@@ -47,7 +47,7 @@ def test_command_center_degrades_gracefully_when_artifacts_are_missing(tmp_path)
 
     assert payload["panels"]["alfred_resident_card"]["available"] is False
     assert "Supporting artifact is not available yet." in html
-    assert "Steward Decision Queue panel is reserved" in html
+    assert "No pending Steward decisions were found" in html
 
 
 def test_command_center_starts_local_http_server(tmp_path):
