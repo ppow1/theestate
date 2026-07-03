@@ -83,3 +83,50 @@ def test_command_center_cli_generates_json(tmp_path):
     payload = json.loads(result.stdout)
     assert payload["panels"]["alfred_resident_card"]["available"] is True
     assert (tmp_path / "runtime/steward/command_center.html").exists()
+
+
+def test_command_center_renders_status_bar_and_activity_console(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert payload["status_bar"]["validation_state"] == "Validation passing"
+    assert payload["status_bar"]["mailbox_count"] == 3
+    assert payload["activity_console"]["events"]
+    assert 'id="status-bar"' in html
+    assert "Estate" in html
+    assert "Validation passing" in html
+    assert 'id="activity-console"' in html
+    assert "Activity Console" in html
+    assert "verbosity-selector" in html
+    assert "Quiet" in html
+    assert "Normal" in html
+
+
+def test_activity_console_missing_data_state_is_visible(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert payload["status_bar"]["estate_status"] == "Needs data"
+    assert any(event["severity"] == "missing" for event in payload["activity_console"]["events"])
+    assert "missing" in html
+    assert "Supporting artifact is not available yet." in html
+
+
+def test_command_center_status_json_supports_quiet_refresh(tmp_path):
+    seed_inputs(tmp_path)
+    server = serve_command_center(host="127.0.0.1", port=0, root=tmp_path)
+    try:
+        host, port = server.server_address
+        import threading
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        response = urlopen(f"http://{host}:{port}/status.json", timeout=5)
+        payload = json.loads(response.read().decode("utf-8"))
+        assert response.status == 200
+        assert payload["status_bar"]["validation_state"] == "Validation passing"
+        assert 'id="status-bar"' in payload["status_bar_html"]
+        assert 'id="activity-console"' in payload["activity_console_html"]
+    finally:
+        server.shutdown()
+        server.server_close()
