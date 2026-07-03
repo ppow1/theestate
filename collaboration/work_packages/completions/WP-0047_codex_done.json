@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:35:41Z",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0047_codex_done.json"
+  ],
+  "known_limitations": [
+    "The first activity console uses local artifact polling and a /status.json endpoint rather than external notification transport or streaming.",
+    "The status bar and console are intentionally minimal HTML/CSS/JavaScript aligned with WP-0046 functional-first guidance.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented the first persistent Operations Center bottom status bar, collapsible activity console, quiet local refresh endpoint, basic verbosity selector, empty and missing-data states, and tests covering rendering, collapse markup, refresh JSON, and graceful degradation.",
+  "tests_run": [
+    "pytest -q tests/test_steward_command_center.py",
+    "python -m json.tool collaboration/work_packages/completions/WP-0047_codex_done.json >/dev/null",
+    "git diff --check",
+    "pytest -q"
+  ],
+  "work_package_id": "WP-0047"
+}
