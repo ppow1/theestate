@@ -24,6 +24,7 @@ from estate.core.paths import ESTATE_ROOT
 
 
 ALFRED_QUEUE_DISPLAY_NAME = "Alfred Routing Intake"
+ALFRED_QUEUE_ALIASES = {"alfred.queue", "alfred.routing"}
 WORKER_ALIASES = {
     "alfred.review": "worker.alfred_review",
 }
@@ -153,6 +154,12 @@ def resolve_personnel_identity(actor, root=None):
             return _result(actor, normalized, warnings=[f"employee_id {employee_id} is not in personnel registry"])
         return _employee_result(actor, normalized, employee, resident_aliases.get(_slug(employee.get("display_name"))))
 
+    if normalized in ALFRED_QUEUE_ALIASES:
+        alfred_mailbox = _find_alfred_mailbox(mailboxes)
+        if alfred_mailbox:
+            return _mailbox_result(actor, normalized, alfred_mailbox)
+        return _result(actor, normalized, warnings=["Alfred Routing Intake mailbox is missing"])
+
     if normalized.startswith("mailbox."):
         value = normalized.removeprefix("mailbox.")
         try:
@@ -194,11 +201,6 @@ def resolve_personnel_identity(actor, root=None):
 
     if normalized in resident_aliases:
         resident = resident_aliases[normalized]
-        if _slug(resident.get("name")) == "alfred":
-            alfred_mailbox = _find_alfred_mailbox(mailboxes)
-            if alfred_mailbox:
-                return _mailbox_result(actor, normalized, alfred_mailbox, resident=resident)
-            return _result(actor, normalized, resident=resident, warnings=["Alfred resident found but Alfred Routing Intake mailbox is missing"])
         linked = [entry for entry in personnel if entry.get("resident_id") == resident.get("id") or _slug(entry.get("display_name")) == _slug(resident.get("name"))]
         if len(linked) == 1:
             return _employee_result(actor, normalized, linked[0], resident)

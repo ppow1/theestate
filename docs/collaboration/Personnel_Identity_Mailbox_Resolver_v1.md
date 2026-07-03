@@ -12,9 +12,10 @@ The personnel identity resolver maps Estate addressing strings to canonical dest
 
 - `employee.<id>` and unique employee aliases derived from registry display names or current titles.
 - `mailbox.<id>` and unique functional mailbox aliases derived from registry display names or owning offices.
+- Explicit Alfred Routing Intake queue aliases `alfred.queue`, `alfred.routing`, and `mailbox.10100`; these resolve to mailbox 10100 without merging that queue into Alfred's personnel identity.
 - `office.<slug>` for unique personnel title/display-name office aliases such as `office.chief_architect_3` and `office.chief_architect_4`, or unique functional office mailbox aliases.
 - Known routing workers from the Alfred routing engine, including `worker.audit`, `worker.implementation`, and `alfred.review`.
-- Resident names when a conservative registry mapping exists. Helen resolves through her personnel registry entry. Alfred resolves to the registered Alfred Routing Intake mailbox.
+- Resident names when a conservative registry mapping exists. Helen resolves through her personnel registry entry. Alfred resolves through Employee ID 7 and preserves Resident ID `RES-000001`.
 
 ## Boundaries
 

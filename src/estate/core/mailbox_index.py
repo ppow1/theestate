@@ -146,6 +146,9 @@ def _mailbox_destination_aliases(personnel, functional_mailboxes):
             add(f"mailbox.{slug}", employee_id, mailbox_id)
             if entry.get("mailbox_type") == "office":
                 add(f"office.{slug}", employee_id, mailbox_id)
+        if entry.get("display_name") == "Alfred Routing Intake":
+            add("alfred.queue", employee_id, mailbox_id)
+            add("alfred.routing", employee_id, mailbox_id)
 
     for alias, mapped in LEGACY_DESTINATIONS.items():
         aliases[alias] = (mapped["employee_id"], mapped["mailbox_id"])

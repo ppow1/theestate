@@ -18,6 +18,7 @@ def registry_root(tmp_path):
         {"employee_id": 4, "display_name": "Chief Architect #3", "current_title": "Chief Architect #3", "current_office": "Office of the Chief Architect", "mailbox_id": 4},
         {"employee_id": 5, "display_name": "Chief Architect #4", "current_title": "Chief Architect #4", "current_office": "Office of the Chief Architect", "mailbox_id": 5},
         {"employee_id": 6, "display_name": "Helen", "current_title": "Manager of Human Resources", "current_office": "Human Resources", "mailbox_id": 6, "resident_id": "RES-000003"},
+        {"employee_id": 7, "display_name": "Alfred", "current_title": "Manager of Administration", "current_office": "Administration", "mailbox_id": 7, "resident_id": "RES-000001"},
     ])
     write_json(tmp_path / "data/registry/mailboxes.json", [
         {"mailbox_id": 10100, "mailbox_type": "queue", "display_name": "Alfred Routing Intake", "owning_office": "Chief of Staff", "responsible_employee_id": None},
@@ -45,7 +46,13 @@ def test_resident_and_worker_resolution(tmp_path):
     alfred = resolve_personnel_identity("alfred", root)
     helen = resolve_personnel_identity("helen", root)
     worker = resolve_personnel_identity("worker.implementation", root)
-    assert (alfred["resident_id"], alfred["canonical_destination"], alfred["mailbox_id"]) == ("RES-000001", "mailbox.10100", 10100)
+    assert (alfred["resident_id"], alfred["canonical_destination"], alfred["employee_id"], alfred["mailbox_id"]) == ("RES-000001", "mailbox.7", 7, 7)
+    queue = resolve_personnel_identity("alfred.queue", root)
+    routing = resolve_personnel_identity("alfred.routing", root)
+    mailbox = resolve_personnel_identity("mailbox.10100", root)
+    assert (queue["destination_type"], queue["employee_id"], queue["mailbox_id"]) == ("mailbox", None, 10100)
+    assert routing["mailbox_id"] == 10100
+    assert mailbox["mailbox_id"] == 10100
     assert (helen["resident_id"], helen["canonical_destination"], helen["employee_id"]) == ("RES-000003", "mailbox.6", 6)
     assert (worker["destination_type"], worker["canonical_destination"], worker["warnings"]) == ("worker", "worker.implementation", [])
 

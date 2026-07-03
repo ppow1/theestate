@@ -69,5 +69,16 @@
     "status": "active",
     "resident_id": "RES-000003",
     "notes": "Initial HR/personnel coordination identity. Clearance value is metadata only; no final HR authority or security policy is created by WP-0020."
+  },
+  {
+    "employee_id": 7,
+    "display_name": "Alfred",
+    "current_title": "Manager of Administration",
+    "current_office": "Administration",
+    "mailbox_id": 7,
+    "security_clearance": "metadata_only",
+    "status": "active",
+    "resident_id": "RES-000001",
+    "notes": "Personnel identity assigned by Steward authority. Personal mailbox remains distinct from Alfred Routing Intake mailbox 10100."
   }
 ]
