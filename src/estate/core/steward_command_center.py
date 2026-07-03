@@ -14,6 +14,7 @@ from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_cards import build_resident_cards
+from estate.core.resident_conversations import build_resident_conversations_workspace
 from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.mailbox_index import generate_mailbox_index
@@ -24,6 +25,7 @@ OFFICE_NAVIGATION = [
     {"id": "home", "label": "Home", "panel": "home", "tab": "home"},
     {"id": "alfred", "label": "Alfred", "panel": "alfred_resident_card", "tab": "alfred"},
     {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
+    {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
     {"id": "expansion-roadmap", "label": "Expansion Roadmap", "panel": "expansion_roadmap", "tab": "roadmap"},
@@ -41,6 +43,7 @@ OFFICE_TABS = [
     {"id": "home", "label": "Home"},
     {"id": "alfred", "label": "Alfred"},
     {"id": "helen", "label": "Helen"},
+    {"id": "resident-conversations", "label": "Resident Conversations"},
     {"id": "daily-board", "label": "Daily Board"},
     {"id": "projects", "label": "Projects"},
     {"id": "roadmap", "label": "Roadmap"},
@@ -871,6 +874,7 @@ def generate_command_center(root=None, write=True):
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
+        "resident_conversations_workspace": build_resident_conversations_workspace(root),
         "steward_recall_operations": _build_steward_recall_operations(root),
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
@@ -1033,6 +1037,65 @@ def _resident_html(card):
     rows.append(f"<dt>Needs Steward</dt><dd>{html.escape(str(card.get('needs_steward') or 'No'))}</dd>")
     rows.append(f"<dt>Resident Details</dt><dd>{html.escape(str(card.get('details_link') or 'Not available yet'))}</dd>")
     return f"<dl>{''.join(rows)}</dl>"
+
+
+def _resident_conversations_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    conversations = data.get("conversations") or []
+    selector = "".join(
+        f"<option>{html.escape(str(item))}</option>"
+        for item in data.get("resident_selection", [])
+    )
+    cards = []
+    for item in conversations:
+        mailbox = item.get("mailbox") or {}
+        mailbox_label = mailbox.get("display_name") or "Not available yet"
+        if mailbox.get("mailbox_id") is not None:
+            mailbox_label = f"{mailbox_label} ({mailbox.get('mailbox_id')})"
+        messages = item.get("recent_messages") or []
+        if messages:
+            message_rows = "".join(
+                "<tr>"
+                f"<td>{html.escape(str(message.get('title') or 'Untitled message'))}</td>"
+                f"<td>{html.escape(str(message.get('source') or 'Not available yet'))}</td>"
+                f"<td>{html.escape(str(message.get('destination') or 'Not available yet'))}</td>"
+                f"<td>{html.escape(str(message.get('status') or 'open'))}</td>"
+                f"<td>{html.escape(str(message.get('path') or 'Not available yet'))}</td>"
+                "</tr>"
+                for message in messages
+            )
+            message_html = f"<table><thead><tr><th>Message</th><th>Source</th><th>Destination</th><th>Status</th><th>Source artifact</th></tr></thead><tbody>{message_rows}</tbody></table>"
+        else:
+            message_html = "<p class='placeholder'>No conversation-related institutional messages are available for this resident yet.</p>"
+        source_rows = "".join(f"<li>{html.escape(str(source))}</li>" for source in item.get("source_artifacts") or [])
+        source_html = f"<ul>{source_rows}</ul>" if source_rows else "<p class='placeholder'>No linked source artifacts are available yet.</p>"
+        cards.append(
+            "<article class='resident-conversation-card'>"
+            f"<h3>{html.escape(str(item.get('resident_name') or 'Unknown resident'))}</h3>"
+            f"<p><strong>Role:</strong> {html.escape(str(item.get('role') or 'Not available yet'))}</p>"
+            f"<p><strong>Status:</strong> {html.escape(str(item.get('status') or 'Not available yet'))}</p>"
+            f"<p><strong>Mailbox summary:</strong> {html.escape(str(mailbox_label))}</p>"
+            f"<p class='placeholder'><strong>Conversation panel:</strong> {html.escape(str(item.get('conversation_placeholder') or 'Not available yet'))}</p>"
+            f"<p class='placeholder'><strong>Transcript / audit:</strong> {html.escape(str(item.get('transcript_audit_placeholder') or 'Not available yet'))}</p>"
+            "<h4>Recent institutional messages</h4>"
+            f"{message_html}"
+            "<h4>Linked source artifacts</h4>"
+            f"{source_html}"
+            "</article>"
+        )
+    warnings = "".join(f"<li>{html.escape(str(warning))}</li>" for warning in artifact.get("warnings") or [])
+    warning_html = f"<details><summary>Workspace warnings</summary><ul>{warnings}</ul></details>" if warnings else ""
+    return (
+        "<section class='resident-conversations'>"
+        f"<p class='source'>{html.escape(str(data.get('record_policy') or 'Conversation is an interface surface only.'))}</p>"
+        f"<label>Resident selection <select>{selector}</select></label>"
+        f"{''.join(cards)}"
+        f"{warning_html}"
+        f"<p class='source'>Sources: {html.escape(str(artifact.get('path') or 'local resident conversation workspace'))}</p>"
+        "</section>"
+    )
 
 
 
@@ -1443,6 +1506,7 @@ def render_command_center_html(payload):
         ("home", "Home", _home_workspace_html(payload)),
         ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
+        ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
@@ -1459,7 +1523,7 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 function activateOfficeTab(id){
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
