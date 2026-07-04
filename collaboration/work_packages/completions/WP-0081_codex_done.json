@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T13:19:52+00:00",
+  "files_changed": [
+    "collaboration/work_packages/completions/WP-0081_codex_done.json",
+    "operations/services/estate_service_catalog.md",
+    "src/estate/cli/main.py",
+    "src/estate/core/estate_service_catalog.py",
+    "tests/test_estate_service_catalog.py"
+  ],
+  "known_limitations": [
+    "The catalog is a read-only derived aggregation and does not promote registry metadata or replace authoritative service, capability, provider, command, validation, or readiness artifacts."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending_make_pr_tool",
+  "ready_for_ca_review": true,
+  "summary": "Implemented a read-only Estate Service Catalog aggregation with CLI generation, Operations Center-ready JSON/Markdown outputs, command alias mapping, metadata warnings, source-link checks, and tests.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_estate_service_catalog.py",
+    "PYTHONPATH=src python -m estate.cli.main estate-service-catalog --json > /tmp/estate_service_catalog.json",
+    "python -m json.tool /tmp/estate_service_catalog.json >/dev/null",
+    "PYTHONPATH=src pytest -q tests/test_estate_service_catalog.py tests/test_estate_capability_registry.py"
+  ],
+  "work_package_id": "WP-0081"
+}
