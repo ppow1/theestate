@@ -3,50 +3,50 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-04T17:14:36+00:00",
-      "duration_seconds": 0.254,
+      "completed_at": "2026-07-04T17:54:05+00:00",
+      "duration_seconds": 0.252,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-04T17:14:36+00:00",
+      "started_at": "2026-07-04T17:54:05+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T171436Z0000/command_01_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T175405Z0000/command_01_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0015 --json",
-      "completed_at": "2026-07-04T17:14:37+00:00",
-      "duration_seconds": 0.864,
+      "completed_at": "2026-07-04T17:54:06+00:00",
+      "duration_seconds": 0.871,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-04T17:14:36+00:00",
+      "started_at": "2026-07-04T17:54:05+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T171436Z0000/command_02_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T175405Z0000/command_02_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0027 --json",
-      "completed_at": "2026-07-04T17:14:38+00:00",
-      "duration_seconds": 0.97,
+      "completed_at": "2026-07-04T17:54:07+00:00",
+      "duration_seconds": 1.046,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-04T17:14:37+00:00",
+      "started_at": "2026-07-04T17:54:06+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T171436Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T175405Z0000/command_03_stdout.txt"
     },
     {
       "classification": "observational",
       "command": "python -m estate.cli.main validate-work-package --id WP-0085 --json",
-      "completed_at": "2026-07-04T17:14:39+00:00",
-      "duration_seconds": 0.776,
+      "completed_at": "2026-07-04T17:54:08+00:00",
+      "duration_seconds": 0.936,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-04T17:14:38+00:00",
+      "started_at": "2026-07-04T17:54:07+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T171436Z0000/command_04_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0103_2026-07-04T175405Z0000/command_04_stdout.txt"
     }
   ],
   "commands_run": [
@@ -63,42 +63,29 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-04T17:14:36+00:00",
+  "generated_at": "2026-07-04T17:54:05+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "10c6ae704cb00dff6026dc79164189a3ac2e3975",
+  "git_commit_before": "934d7fab040ac88f8612f70954ffc6d76b31e503",
   "production_readiness": {
-    "blocking_reasons": [
-      "Blocking known limitation: Historical packages with incomplete receipts are listed as blockers instead of repaired broadly.",
-      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
-    ],
+    "blocking_reasons": [],
     "coverage_status": "covered",
     "execution_status": "passed",
     "non_blocking_findings": [],
-    "production_ready": false,
-    "receipt_status": "incomplete",
-    "required_followups": [
-      "Blocking known limitation: Historical packages with incomplete receipts are listed as blockers instead of repaired broadly.",
-      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
-    ]
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
   },
-  "receipt_gaps": [
-    "pull_request_url_or_not_applicable_reason"
-  ],
+  "receipt_gaps": [],
   "receipt_validation": {
-    "blocking_reasons": [
-      "Blocking known limitation: Historical packages with incomplete receipts are listed as blockers instead of repaired broadly.",
-      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
-    ],
+    "blocking_reasons": [],
     "branch": "work",
     "completion_artifact_path": "collaboration/work_packages/completions/WP-0103_codex_done.json",
     "non_blocking_findings": [],
     "pr_metadata_status": "unavailable",
     "pull_request_url": null,
-    "receipt_gaps": [
-      "pull_request_url_or_not_applicable_reason"
-    ],
-    "receipt_status": "incomplete",
+    "receipt_gaps": [],
+    "receipt_status": "complete",
     "work_package_id": "WP-0103"
   },
   "recipe_id": "wp-0103-historical-validation-recipe-coverage",
@@ -106,7 +93,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 4 command(s).",
-  "validation_id": "WP-0103_2026-07-04T171436Z0000",
+  "validation_id": "WP-0103_2026-07-04T175405Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0103"

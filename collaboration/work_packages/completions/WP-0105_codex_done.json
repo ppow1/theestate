@@ -1,0 +1,78 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T17:52:05+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "tests/test_work_package_validation.py",
+    "tests/test_production_readiness_validation.py",
+    "collaboration/work_packages/completions/WP-0102_codex_done.json",
+    "collaboration/work_packages/completions/WP-0103_codex_done.json",
+    "collaboration/work_packages/completions/WP-0105_codex_done.json",
+    "operations/validation/reports/WP-0102_validation.md",
+    "operations/validation/reports/WP-0103_validation.md",
+    "operations/validation/reports/WP-0105_validation.md",
+    "runtime/validation/work_packages/WP-0102_validation.json",
+    "runtime/validation/work_packages/WP-0103_validation.json",
+    "runtime/validation/work_packages/WP-0105_validation.json",
+    "operations/validation/production_readiness_report.md",
+    "runtime/validation/production_readiness_report.json",
+    "operations/validation/validation_coverage_manifest.md",
+    "runtime/validation/validation_coverage_manifest.json"
+  ],
+  "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "production_readiness_status": "ready_for_subset_with_historical_blockers_preserved",
+  "pull_request_not_applicable_reason": "Pull request URL is not available from this local non-interactive Codex environment; branch committed locally for CA review.",
+  "ready_for_ca_review": true,
+  "remaining_blockers": [
+    "Production-readiness report still preserves unrelated historical blockers for incomplete or missing old receipts."
+  ],
+  "summary": [
+    "Added validation closure recipes for WP-0102 and WP-0105.",
+    "Repaired WP-0102 and WP-0103 completion receipt metadata so intentional scoped boundaries do not block production readiness.",
+    "Regenerated validation and production-readiness artifacts."
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py tests/test_codex_completion.py -q",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0101 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0102 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0103 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0080 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0081 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0085 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0105 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed"
+    }
+  ],
+  "work_package_id": "WP-0105",
+  "wp_0102_validation_status": "passed",
+  "wp_0103_validation_status": "passed",
+  "wp_0105_validation_status": "passed"
+}
