@@ -23,6 +23,7 @@ from estate.core.mission_control_workspace import build_mission_control_workspac
 from estate.core.steward_presence import generate_steward_presence_state
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
+from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 
 
 OFFICE_NAVIGATION = [
@@ -898,7 +899,8 @@ def generate_command_center(root=None, write=True):
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
     panels["operations_center_layout"] = _operations_center_layout_framework(panels, generated_at)
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"]}
+    workspace_profile = resolve_workspace_profile(root, available_panels={tab["id"] for tab in OFFICE_TABS})
+    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -944,7 +946,8 @@ def _operations_center_layout_framework(panels, generated_at):
                 "tab_order": [tab["id"] for tab in OFFICE_TABS],
             },
             "future_integration_points": ["Alfred", "TTS/STT", "Mission Control"],
-            "state_authority": "browser-local layout preferences only; operational records remain in existing local artifacts",
+            "workspace_profiles": {"enabled": True, "profiles_output": WORKSPACE_PROFILES_OUTPUT, "default_profile": "mission-control", "rapid_switching": "profile selector applies active tab, tab order, panel visibility, and activity console settings without page refresh"},
+            "state_authority": "browser-local layout preferences and local workspace profile artifacts only; operational records remain in existing local artifacts",
         },
     }
 
@@ -1640,13 +1643,16 @@ def render_command_center_html(payload):
         ("settings", "Settings", _settings_html(p.get("settings", {})) + _layout_framework_html(p.get("operations_center_layout", {}))),
         ("about", "About", _about_html(p.get("about", {}))),
     ]
-    workspace = "".join(_workspace_section(tab_id, label, body, active=(i == 0)) for i, (tab_id, label, body) in enumerate(tab_bodies))
+    selected_profile = (payload.get('workspace_profile') or {}).get('profile') or {}
+    active_tab = selected_profile.get('active_tab') or 'home'
+    workspace = "".join(_workspace_section(tab_id, label, body, active=(tab_id == active_tab)) for i, (tab_id, label, body) in enumerate(tab_bodies))
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
     css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
+const WORKSPACE_PROFILE = __PROFILE_JSON__;
 function readLayoutPreferences(){ try{return JSON.parse(localStorage.getItem(LAYOUT_PREF_KEY) || '{}');}catch(error){return {};} }
 function writeLayoutPreferences(update){ const next = {...readLayoutPreferences(), ...update}; localStorage.setItem(LAYOUT_PREF_KEY, JSON.stringify(next)); return next; }
 function activateOfficeTab(id, persist=true){
@@ -1654,7 +1660,8 @@ function activateOfficeTab(id, persist=true){
   document.querySelectorAll('[data-tab]').forEach(button => { const active = button.dataset.tab === id; if(button.classList.contains('workspace-tab')) button.setAttribute('aria-selected', active ? 'true' : 'false'); button.classList.toggle('active', active); });
   if(persist) writeLayoutPreferences({active_tab: id});
 }
-function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
+function applyWorkspaceProfile(profile){ if(!profile) return; if(profile.panel_arrangements && profile.panel_arrangements.activity_console_visible === false){ document.querySelector('#activity-console')?.setAttribute('hidden',''); } if(profile.active_tab) activateOfficeTab(profile.active_tab, false); }
+function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
 document.addEventListener('click', event => { const button = event.target.closest('[data-tab]'); if(button) activateOfficeTab(button.dataset.tab); });
 function renderGlobalPaletteResults(){
   const input = document.querySelector('#global-search-input');
@@ -1677,6 +1684,7 @@ document.addEventListener('input', event => { if(event.target && event.target.id
 document.addEventListener('keydown', event => { if(event.key === '/' && !event.target.matches('input, textarea')){ event.preventDefault(); activateOfficeTab('search'); setTimeout(() => document.querySelector('#global-search-input')?.focus(), 0); } });
 window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); });
 </script>"""
+    script = script.replace("__PROFILE_JSON__", json.dumps(payload.get("workspace_profile", {})))
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
