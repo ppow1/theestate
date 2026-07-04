@@ -13,17 +13,18 @@
       "status_reason": "Local evidence indicates Steward attention is needed."
     },
     {
-      "current_duty": "Maintain HR/personnel coordination awareness.",
-      "last_activity": "Resident presence model initialized for WP-0106.",
-      "last_heartbeat": "2026-07-04T00:00:00+00:00",
+      "current_duty": "Review local onboarding and personnel inputs and surface Steward attention needs.",
+      "last_activity": "runtime/helen/duty_state.json",
+      "last_heartbeat": "2026-07-04T20:58:05+00:00",
       "mailbox_id": 6,
+      "mailbox_path": "collaboration/mailboxes/6",
       "name": "Helen",
       "needs_steward": false,
-      "presence_state": "available",
+      "presence_state": "working",
       "resident_id": "RES-000003",
-      "status_reason": "Runtime presence is visible and informational only; no autonomous duty execution is active."
+      "status_reason": "Helen duty runner completed a bounded local onboarding/personnel operational summary."
     }
   ],
-  "updated_at": "2026-07-04T20:49:46+00:00",
+  "updated_at": "2026-07-04T20:58:05+00:00",
   "version": 1
 }

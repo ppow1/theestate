@@ -63,6 +63,7 @@ from estate.core.operations_center_settings import load_operations_center_settin
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.resident_presence import build_resident_presence, filter_resident, format_resident_presence
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
+from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -884,11 +885,24 @@ def cmd_alfred_duty(args):
         print(format_alfred_duty(payload))
 
 
+def cmd_helen_duty(args):
+    payload = run_helen_duty()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_helen_duty(payload))
+
+
 def cmd_resident_duty(args):
-    resident = getattr(args, "resident", None)
-    if resident and resident.lower() != "alfred":
-        raise SystemExit("Only Alfred duty is implemented by WP-0107.")
-    cmd_alfred_duty(args)
+    resident = (getattr(args, "resident", None) or "").lower()
+    if resident == "alfred":
+        cmd_alfred_duty(args)
+        return
+    if resident == "helen":
+        cmd_helen_duty(args)
+        return
+    raise SystemExit("Only Alfred and Helen duty runners are implemented.")
 
 
 def cmd_resident_presence(args):
@@ -1570,6 +1584,10 @@ def main():
     p = sub.add_parser("alfred-duty", help="Run Alfred local bounded duty runner")
     p.add_argument("--json", action="store_true", help="Print Alfred duty JSON")
     p.set_defaults(func=cmd_alfred_duty)
+
+    p = sub.add_parser("helen-duty", help="Run Helen local bounded duty runner")
+    p.add_argument("--json", action="store_true", help="Print Helen duty JSON")
+    p.set_defaults(func=cmd_helen_duty)
 
     p = sub.add_parser("resident-duty", help="Run resident duty runner where implemented")
     p.add_argument("--resident", required=True, help="Resident name")
