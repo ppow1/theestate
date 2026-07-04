@@ -819,7 +819,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0079_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0079_validation.json",
       "latest_validation_status": "passed_with_findings",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md",
       "production_readiness_status": "blocked",
       "receipt_status": "incomplete",
       "recipe_status": "registered",
@@ -959,21 +959,15 @@
       "work_package_id": "WP-0091"
     },
     {
-      "blockers": [
-        "Completion artifact is missing.",
-        "Execution status blocks readiness: no_recipe."
-      ],
-      "completion_artifact_path": null,
+      "blockers": [],
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0093_codex_done.json",
       "latest_validation_report_path": null,
       "latest_validation_status": "missing",
       "pending_file_path": "collaboration/work_packages/pending/WP-0093_SERIES_operations_center_settings_manager.md",
       "production_readiness_status": "blocked",
-      "receipt_status": "missing",
-      "recipe_status": "missing",
-      "required_followups": [
-        "Completion artifact is missing.",
-        "Execution status blocks readiness: no_recipe."
-      ],
+      "receipt_status": "complete",
+      "recipe_status": "registered",
+      "required_followups": [],
       "work_package_id": "WP-0093"
     },
     {
@@ -995,40 +989,16 @@
       "work_package_id": "WP-0094"
     },
     {
-      "blockers": [
-        "Completion artifact is missing.",
-        "Execution status blocks readiness: no_recipe."
-      ],
-      "completion_artifact_path": null,
+      "blockers": [],
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0096_codex_done.json",
       "latest_validation_report_path": null,
       "latest_validation_status": "missing",
       "pending_file_path": "collaboration/work_packages/pending/WP-0096_SERIES_operations_center_notification_center.md",
       "production_readiness_status": "blocked",
-      "receipt_status": "missing",
-      "recipe_status": "missing",
-      "required_followups": [
-        "Completion artifact is missing.",
-        "Execution status blocks readiness: no_recipe."
-      ],
+      "receipt_status": "complete",
+      "recipe_status": "registered",
+      "required_followups": [],
       "work_package_id": "WP-0096"
-    },
-    {
-      "blockers": [
-        "Completion artifact is missing.",
-        "Execution status blocks readiness: no_recipe."
-      ],
-      "completion_artifact_path": null,
-      "latest_validation_report_path": null,
-      "latest_validation_status": "missing",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0097_SERIES_operations_center_local_server_bootstrap.md",
-      "production_readiness_status": "blocked",
-      "receipt_status": "missing",
-      "recipe_status": "missing",
-      "required_followups": [
-        "Completion artifact is missing.",
-        "Execution status blocks readiness: no_recipe."
-      ],
-      "work_package_id": "WP-0097"
     },
     {
       "blockers": [
@@ -1083,6 +1053,18 @@
         "Execution status blocks readiness: no_recipe."
       ],
       "work_package_id": "WP-0100"
+    },
+    {
+      "blockers": [],
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0101_codex_done.json",
+      "latest_validation_report_path": null,
+      "latest_validation_status": "missing",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md",
+      "production_readiness_status": "blocked",
+      "receipt_status": "complete",
+      "recipe_status": "registered",
+      "required_followups": [],
+      "work_package_id": "WP-0101"
     },
     {
       "blockers": [
@@ -1216,6 +1198,24 @@
         "Execution status blocks readiness: no_recipe."
       ],
       "completion_artifact_path": null,
+      "latest_validation_report_path": null,
+      "latest_validation_status": "missing",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md",
+      "production_readiness_status": "blocked",
+      "receipt_status": "missing",
+      "recipe_status": "missing",
+      "required_followups": [
+        "Completion artifact is missing.",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "work_package_id": "WP-0112"
+    },
+    {
+      "blockers": [
+        "Completion artifact is missing.",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "completion_artifact_path": null,
       "latest_validation_report_path": "runtime/validation/work_packages/WP-9999_validation.json",
       "latest_validation_status": "no_recipe",
       "pending_file_path": null,
@@ -1233,9 +1233,9 @@
     "json": "runtime/validation/validation_coverage_manifest.json",
     "markdown": "operations/validation/validation_coverage_manifest.md"
   },
-  "generated_at": "2026-07-04T19:25:48+00:00",
+  "generated_at": "2026-07-04T19:55:02+00:00",
   "git_branch": "work",
-  "git_commit": "20ea5700311eedbb9c45e8cbd55244632efe503c",
+  "git_commit": "58b902464418f689561c76a4ef9378745a151d9f",
   "open_validation_observations": [
     {
       "expected_behavior": "If the Notification Center is discoverable as a workspace, the corresponding palette command should be available or the discrepancy should be explained.",
@@ -1280,7 +1280,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0020_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0020_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1541,15 +1541,15 @@
     },
     {
       "blockers": [],
-      "completion_artifact_path": "collaboration/work_packages/completions/WP-0101_codex_done.json",
-      "latest_validation_report_path": "runtime/validation/work_packages/WP-0101_validation.json",
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0097_codex_done.json",
+      "latest_validation_report_path": "runtime/validation/work_packages/WP-0097_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0097_SERIES_operations_center_local_server_bootstrap.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
       "required_followups": [],
-      "work_package_id": "WP-0101"
+      "work_package_id": "WP-0097"
     },
     {
       "blockers": [],
@@ -1568,7 +1568,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0103_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0103_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0103_SERIES_historical_validation_recipe_coverage_through_0085.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0103_SERIES_chief_architect_operating_manual.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1580,7 +1580,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0105_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0105_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6_template_path_repair.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1589,22 +1589,22 @@
     }
   ],
   "recent_validation_reports": [
-    "runtime/validation/work_packages/WP-0105_validation.json",
-    "runtime/validation/work_packages/WP-0085_validation.json",
-    "runtime/validation/work_packages/WP-0081_validation.json",
-    "runtime/validation/work_packages/WP-0080_validation.json",
-    "runtime/validation/work_packages/WP-0103_validation.json",
-    "runtime/validation/work_packages/WP-0027_validation.json",
+    "runtime/validation/work_packages/WP-0097_validation.json",
     "runtime/validation/work_packages/WP-0015_validation.json",
+    "runtime/validation/work_packages/WP-0103_validation.json",
+    "runtime/validation/work_packages/WP-0080_validation.json",
+    "runtime/validation/work_packages/WP-0092_validation.json",
+    "runtime/validation/work_packages/WP-0081_validation.json",
+    "runtime/validation/work_packages/WP-0085_validation.json",
     "runtime/validation/work_packages/WP-0102_validation.json",
-    "runtime/validation/work_packages/WP-0101_validation.json",
-    "runtime/validation/work_packages/WP-0020_validation.json"
+    "runtime/validation/work_packages/WP-0087_validation.json",
+    "runtime/validation/work_packages/WP-0027_validation.json"
   ],
   "recommended_next_action": "Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.",
-  "total_blocked": 70,
+  "total_blocked": 71,
   "total_incomplete_receipts": 51,
-  "total_missing_receipts": 15,
-  "total_missing_recipes": 57,
+  "total_missing_receipts": 13,
+  "total_missing_recipes": 55,
   "total_production_ready": 28,
-  "total_work_packages_scanned": 98
+  "total_work_packages_scanned": 99
 }

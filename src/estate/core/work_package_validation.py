@@ -355,6 +355,26 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0097": {
+        "recipe_id": "wp-0097-operations-center-local-server-bootstrap",
+        "title": "WP-0097 — Operations Center Local Server Bootstrap",
+        "description": "Validates local-first Operations Center server bootstrap, status inspection, settings loading, service health preflight, and safe shutdown behavior.",
+        "required_checks": ["Operations Center status command renders", "Bootstrap regression tests pass", "Start/status/stop command surfaces are registered", "Static entry point renders"],
+        "observational_checks": ["Production readiness report generates"],
+        "expected_artifacts": ["operations/validation/reports/WP-0097_validation.md", "runtime/validation/work_packages/WP-0097_validation.json", "collaboration/work_packages/completions/WP-0097_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe", "Bootstrap bypasses Steward authorization or executes work packages"],
+        "success_criteria": ["Required commands exit zero and recipe does not return no_recipe"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main operations-center status --json'),
+            _cmd('pytest -q tests/test_operations_center_bootstrap.py'),
+            _cmd('python -m estate.cli.main operations-center start --port 8877 --json && python -m estate.cli.main operations-center status --json && python -m estate.cli.main operations-center stop --json'),
+            _cmd('python -m estate.cli.main steward-command-center --json'),
+            _cmd('test -f runtime/steward/command_center.html && rg -q "Office of the Steward" runtime/steward/command_center.html'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0096": {
         "recipe_id": "wp-0096-operations-center-notification-center",
         "title": "WP-0096 — Operations Center Notification Center",

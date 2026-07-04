@@ -57,6 +57,7 @@ from estate.core.assignment_queue import generate_assignment_queue, format_assig
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
 from estate.core.autonomous_operations_audit import append_autonomous_operations_audit, format_autonomous_operations_audit
 from estate.core.steward_command_center import generate_command_center, serve_command_center
+from estate.core.operations_center_bootstrap import operations_center_start, operations_center_status, operations_center_stop, format_operations_center_bootstrap
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, save_workspace_profile
 from estate.core.operations_center_settings import load_operations_center_settings, save_operations_center_settings
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
@@ -871,6 +872,22 @@ def cmd_decision_queue(args):
         print(format_decision_queue_markdown(queue))
 
 
+
+def cmd_operations_center(args):
+    if args.action == "start":
+        payload = operations_center_start(host=args.host, port=args.port)
+    elif args.action == "status":
+        payload = operations_center_status()
+    elif args.action == "stop":
+        payload = operations_center_stop()
+    else:
+        raise SystemExit(f"Unsupported operations-center action: {args.action}")
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_operations_center_bootstrap(payload))
+
 def cmd_steward_command_center(args):
     if getattr(args, "serve", False):
         server = serve_command_center(host=args.host, port=args.port)
@@ -1521,6 +1538,14 @@ def main():
     p.add_argument("--quiet-refresh-seconds", type=int, help="Set quiet refresh interval")
     p.add_argument("--command-console-mode", choices=["inline", "collapsed"], help="Set command console mode")
     p.set_defaults(func=cmd_operations_center_settings)
+
+
+    p = sub.add_parser("operations-center", help="Start, inspect, or stop the local Operations Center server")
+    p.add_argument("action", choices=["start", "status", "stop"], help="Server lifecycle action")
+    p.add_argument("--json", action="store_true", help="Print bootstrap status JSON")
+    p.add_argument("--host", default="127.0.0.1", help="Local bind host for start")
+    p.add_argument("--port", type=int, default=8765, help="Local bind port for start/status URL")
+    p.set_defaults(func=cmd_operations_center)
 
     p = sub.add_parser("steward-command-center", help="Generate or serve the local Office of the Steward command center")
     p.add_argument("--json", action="store_true", help="Print command center payload JSON")
