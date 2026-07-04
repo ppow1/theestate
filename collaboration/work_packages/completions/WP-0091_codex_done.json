@@ -1,0 +1,39 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T13:12:38+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "tests/test_work_package_validation.py",
+    "operations/validation/reports/WP-0077_validation.md",
+    "operations/validation/reports/WP-0078_validation.md",
+    "operations/validation/reports/WP-0091_validation.md",
+    "runtime/validation/work_packages/WP-0077_validation.json",
+    "runtime/validation/work_packages/WP-0078_validation.json",
+    "runtime/validation/work_packages/WP-0091_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "collaboration/work_packages/completions/WP-0091_codex_done.json"
+  ],
+  "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "steward_next_validation_commands": [
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0077",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0078",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0091"
+  ],
+  "summary": "Expanded the work-package validation recipe registry for WP-0077, WP-0078, and WP-0091; added coverage tests; generated validation reports for all three recipes.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_work_package_validation.py",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0077",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0078",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0091"
+  ],
+  "validation_statuses_observed": {
+    "WP-0077": "passed",
+    "WP-0078": "passed",
+    "WP-0091": "passed"
+  },
+  "work_package_id": "WP-0091"
+}

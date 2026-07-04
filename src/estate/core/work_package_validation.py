@@ -184,6 +184,43 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main capability-help --json', required=False),
         ],
     },
+
+    "WP-0077": {
+        "recipe_id": "wp-0077-capability-dependency-visualization",
+        "title": "WP-0077 — Capability Dependency Visualization and Mission Control integration",
+        "description": "Validates the capability dependency visualization CLI and adjacent Mission Control / Steward Command Center integration surfaces.",
+        "required_checks": ["Capability dependency visualization renders", "Estate capability registry renders"],
+        "observational_checks": ["Steward Command Center renders", "Capability Dependency is discoverable in Estate search", "Capability Dependency is discoverable in global search"],
+        "expected_artifacts": ["operations/validation/reports/WP-0077_validation.md", "runtime/validation/work_packages/WP-0077_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main capability-dependency-visualization --json'),
+            _cmd('python -m estate.cli.main estate-capability-registry --json'),
+            _cmd('python -m estate.cli.main steward-command-center --json', required=False),
+            _cmd('python -m estate.cli.main estate-search "Capability Dependency" --json', required=False),
+            _cmd('python -m estate.cli.main global-search "Capability Dependency" --json', required=False),
+        ],
+    },
+    "WP-0078": {
+        "recipe_id": "wp-0078-capability-gap-report-planned-evidence",
+        "title": "WP-0078 — Capability Gap Report and planned-evidence handling refinement",
+        "description": "Validates Capability Gap Report generation and adjacent registry, dependency, Mission Control, and search evidence surfaces.",
+        "required_checks": ["Capability Gap Report renders", "Estate capability registry renders"],
+        "observational_checks": ["Capability dependency visualization renders", "Steward Command Center renders", "Capability Gap is discoverable in global search"],
+        "expected_artifacts": ["operations/validation/reports/WP-0078_validation.md", "runtime/validation/work_packages/WP-0078_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main capability-gap-report --json'),
+            _cmd('python -m estate.cli.main estate-capability-registry --json'),
+            _cmd('python -m estate.cli.main capability-dependency-visualization --json', required=False),
+            _cmd('python -m estate.cli.main steward-command-center --json', required=False),
+            _cmd('python -m estate.cli.main global-search "Capability Gap" --json', required=False),
+        ],
+    },
     "WP-0079": {
         "recipe_id": "wp-0079-validation-execution-engine-self-check",
         "title": "WP-0079 — Validation Project Continuation self-check",
@@ -213,6 +250,22 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         "commands": [
             _cmd('python -m estate.cli.main validate-work-package --id WP-0075 --json'),
             _cmd('python -m estate.cli.main validate-work-package --id WP-0076 --json'),
+        ],
+    },
+
+    "WP-0091": {
+        "recipe_id": "wp-0091-validation-recipe-expansion-0077-0078-self-check",
+        "title": "WP-0091 — Validation Continuation #4: Add validation recipes for WP-0077 and WP-0078",
+        "description": "Confirms WP-0077 and WP-0078 validation recipes are visible through the validation runner and executable.",
+        "required_checks": ["WP-0077 validation runner execution", "WP-0078 validation runner execution"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/reports/WP-0091_validation.md", "runtime/validation/work_packages/WP-0091_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0077 --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0078 --json'),
         ],
     },
 }

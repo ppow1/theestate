@@ -73,7 +73,7 @@ def test_markdown_json_required_fields_and_self_check_recipe(tmp_path):
 
 def test_recipe_expansion_registers_next_validation_recipes():
     existing = {"WP-0056", "WP-0057", "WP-0058", "WP-0059", "WP-0060", "WP-0074", "WP-0079"}
-    expanded = {"WP-0075", "WP-0076", "WP-0086"}
+    expanded = {"WP-0075", "WP-0076", "WP-0077", "WP-0078", "WP-0086", "WP-0091"}
     for work_package_id in existing | expanded:
         recipe = get_validation_recipe(work_package_id)
         assert recipe is not None
@@ -93,6 +93,29 @@ def test_wp_0075_and_wp_0076_execute_real_recipe_commands(tmp_path):
     assert wp_0076["command_results"]
     assert "operational-readiness-dashboard --json" in wp_0075["commands_run"][0]
     assert "estate-capability-registry --json" in wp_0076["commands_run"][0]
+
+
+def test_wp_0077_and_wp_0078_execute_real_recipe_commands(tmp_path):
+    init_git(tmp_path)
+    wp_0077 = validate_work_package("WP-0077", tmp_path)
+    wp_0078 = validate_work_package("WP-0078", tmp_path)
+
+    assert wp_0077["validation_status"] != "no_recipe"
+    assert wp_0078["validation_status"] != "no_recipe"
+    assert wp_0077["commands_run"]
+    assert wp_0078["commands_run"]
+    assert wp_0077["command_results"]
+    assert wp_0078["command_results"]
+    assert "capability-dependency-visualization --json" in wp_0077["commands_run"][0]
+    assert "capability-gap-report --json" in wp_0078["commands_run"][0]
+
+
+def test_wp_0091_self_check_recipe_targets_new_expanded_recipes():
+    recipe = get_validation_recipe("WP-0091")
+    assert recipe is not None
+    commands = recipe["commands"]
+    assert any("validate-work-package --id WP-0077 --json" in command["command"] for command in commands)
+    assert any("validate-work-package --id WP-0078 --json" in command["command"] for command in commands)
 
 
 def test_wp_0086_self_check_recipe_targets_expanded_recipes():

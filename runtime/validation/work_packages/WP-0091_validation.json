@@ -1,0 +1,52 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0077 --json",
+      "completed_at": "2026-07-04T13:12:19+00:00",
+      "duration_seconds": 2.144,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T13:12:17+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0091_2026-07-04T131217Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0078 --json",
+      "completed_at": "2026-07-04T13:12:21+00:00",
+      "duration_seconds": 2.017,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T13:12:19+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0091_2026-07-04T131217Z0000/command_02_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main validate-work-package --id WP-0077 --json",
+    "python -m estate.cli.main validate-work-package --id WP-0078 --json"
+  ],
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0091_validation.md",
+    "runtime/validation/work_packages/WP-0091_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T13:12:17+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "57901455045e8879e87d2e760dabdb805e729ac5",
+  "recipe_id": "wp-0091-validation-recipe-expansion-0077-0078-self-check",
+  "recipe_title": "WP-0091 \u2014 Validation Continuation #4: Add validation recipes for WP-0077 and WP-0078",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 2 command(s).",
+  "validation_id": "WP-0091_2026-07-04T131217Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0091"
+}
