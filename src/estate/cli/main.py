@@ -47,6 +47,7 @@ from estate.core.validation_observations import append_observation, load_observa
 from estate.core.validation_metrics_dashboard import generate_validation_metrics_dashboard, format_validation_metrics_summary
 from estate.core.validation_handoff_artifact_workflow import generate_validation_handoff_artifact_workflow, format_validation_handoff_summary
 from estate.core.work_package_validation import validate_work_package, format_validation_markdown
+from estate.core.production_readiness_validation import generate_production_readiness_report, format_production_readiness_markdown
 from estate.core.operational_readiness_dashboard import generate_operational_readiness_dashboard, format_operational_readiness_summary
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
@@ -866,6 +867,15 @@ def cmd_audit(args):
     if report["failed"] > 0:
         raise SystemExit(1)
 
+def cmd_validation_production_readiness(args):
+    import json
+    payload = generate_production_readiness_report()
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_production_readiness_markdown(payload))
+
+
 def cmd_validate_work_package(args):
     import json
     payload = validate_work_package(args.id)
@@ -1103,6 +1113,10 @@ def main():
     p.add_argument("--update-status", default=None, help="Update an existing observation to this status")
     p.set_defaults(func=cmd_validation_observations)
 
+
+    p = sub.add_parser("validation-production-readiness", help="Generate production readiness validation report")
+    p.add_argument("--json", action="store_true", help="Print production readiness report JSON")
+    p.set_defaults(func=cmd_validation_production_readiness)
 
     p = sub.add_parser("validate-work-package", help="Run a registered work-package validation recipe")
     p.add_argument("--id", required=True, help="Work package id, such as WP-0058")

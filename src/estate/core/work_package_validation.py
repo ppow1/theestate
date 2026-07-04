@@ -253,6 +253,23 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0095": {
+        "recipe_id": "wp-0095-production-readiness-validation-finalization",
+        "title": "WP-0095 — Validation Finalization: Production Readiness",
+        "description": "Confirms production-readiness validation loop and existing WP-0077/WP-0078 validation still execute.",
+        "required_checks": ["Production readiness report generation", "WP-0077 validation runner execution", "WP-0078 validation runner execution"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/reports/WP-0095_validation.md", "runtime/validation/work_packages/WP-0095_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main validation-production-readiness --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0077 --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0078 --json'),
+        ],
+    },
+
     "WP-0091": {
         "recipe_id": "wp-0091-validation-recipe-expansion-0077-0078-self-check",
         "title": "WP-0091 — Validation Continuation #4: Add validation recipes for WP-0077 and WP-0078",
@@ -340,6 +357,10 @@ def format_validation_markdown(payload: dict[str, Any]) -> str:
     lines += [f"- {f}" for f in payload.get("findings", [])] or ["- None."]
     lines += ["", "## Warnings"] + ([f"- {w}" for w in payload.get("warnings", [])] or ["- None."])
     lines += ["", "## Failures"] + ([f"- {f}" for f in payload.get("failures", [])] or ["- None."])
+    pr = payload.get("production_readiness") or {}
+    receipt = payload.get("receipt_validation") or {}
+    lines += ["", "## Receipt Validation", f"- Receipt status: {receipt.get('receipt_status', 'unknown')}", f"- Completion artifact: {receipt.get('completion_artifact_path') or 'missing'}", "- Receipt gaps: " + (", ".join(payload.get("receipt_gaps", [])) or "None")]
+    lines += ["", "## Production Readiness", f"- Production ready: {pr.get('production_ready', False)}", f"- Execution status: {pr.get('execution_status', payload.get('validation_status'))}", f"- Receipt status: {pr.get('receipt_status', 'unknown')}", "- Blocking reasons: " + ("; ".join(pr.get("blocking_reasons", [])) or "None"), "- Non-blocking findings: " + ("; ".join(pr.get("non_blocking_findings", [])) or "None")]
     lines += ["", "## Generated Artifacts"] + [f"- `{p}`" for p in payload.get("files_written", [])]
     lines += ["", "## Reviewer Recommendation", payload.get("reviewer_recommendation", "Review generated artifacts.")]
     return "\n".join(line for line in lines if line is not None)
@@ -392,6 +413,12 @@ def validate_work_package(work_package_id: str, root: str | Path | None = None, 
         "findings": findings,
         "reviewer_recommendation": "Chief Architect should review failures before approval." if failures else "Ready for Chief Architect validation artifact review.",
     }
+    from estate.core.production_readiness_validation import validate_receipt, calculate_production_readiness
+    receipt = validate_receipt(wp, base)
+    payload["receipt_validation"] = receipt
+    payload["completion_artifact_path"] = receipt.get("completion_artifact_path")
+    payload["receipt_gaps"] = receipt.get("receipt_gaps", [])
+    payload["production_readiness"] = calculate_production_readiness(status, receipt, "covered" if recipe else "no_recipe", findings)
     if write:
         md_rel = REPORTS_DIR / f"{wp}_validation.md"
         json_rel = RUNTIME_DIR / f"{wp}_validation.json"
