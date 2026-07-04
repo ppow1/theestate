@@ -1,13 +1,13 @@
 # Estate Operations Board
 
-Generated: 2026-07-01T22:12:17+00:00
+Generated: 2026-07-04T19:25:46+00:00
 
 ## Summary
 - Repository branch: work
-- Current commit: e5836a0a45def0dcc2cb25631a0bcc82f7866759
+- Current commit: 20ea5700311eedbb9c45e8cbd55244632efe503c
 - Overall status: warning
 - Missing artifact count: 4
-- Warning count: 10
+- Warning count: 4
 
 ## Collaboration
 - Open messages: unavailable
@@ -16,6 +16,11 @@ Generated: 2026-07-01T22:12:17+00:00
 - Routing errors: 0
 
 ## Workers
+- alfred.review: 1 message(s), 1 pending, 1 invalid
+- employee.4: 2 message(s), 2 pending, 0 invalid
+- office.chief_architect_2: 9 message(s), 9 pending, 0 invalid
+- office.chief_architect_3: 1 message(s), 1 pending, 0 invalid
+- office.chief_architect_4: 3 message(s), 3 pending, 0 invalid
 - worker.implementation: 1 message(s), 1 pending, 0 invalid
 
 ## Audit
@@ -26,13 +31,13 @@ Generated: 2026-07-01T22:12:17+00:00
 
 ## Capabilities
 - Capability count: 6
-- Lifecycle counts: {'missing': 6}
-- CAP-000001: RTX 4090 CUDA — status=Operational, lifecycle=missing
-- CAP-000002: Kokoro TTS — status=Operational, lifecycle=missing
-- CAP-000003: F5-TTS — status=Operational, lifecycle=missing
-- CAP-000004: ComfyUI — status=Installed, lifecycle=missing
-- CAP-000005: FFmpeg / FFplay — status=Operational, lifecycle=missing
-- CAP-000006: Whisper — status=Pending Install, lifecycle=missing
+- Lifecycle counts: {'Designed': 1, 'Implemented': 5}
+- CAP-000001: RTX 4090 CUDA — status=Operational, lifecycle=Implemented
+- CAP-000002: Kokoro TTS — status=Operational, lifecycle=Implemented
+- CAP-000003: F5-TTS — status=Operational, lifecycle=Implemented
+- CAP-000004: ComfyUI — status=Installed, lifecycle=Implemented
+- CAP-000005: FFmpeg / FFplay — status=Operational, lifecycle=Implemented
+- CAP-000006: Whisper — status=Pending Install, lifecycle=Designed
 
 ## Services and Residents
 - Services: 3
@@ -47,9 +52,3 @@ Generated: 2026-07-01T22:12:17+00:00
 - missing_optional_artifact: runtime/audit/latest.json — Optional input artifact is unavailable.
 - missing_optional_artifact: runtime/collaboration/worker_inboxes/*.json — Optional input artifact is unavailable.
 - missing_optional_artifact: collaboration/audit/results/*.json — Optional input artifact is unavailable.
-- missing_lifecycle_state: data/registry/capabilities.json — Capability CAP-000001 has no lifecycle_state field.
-- missing_lifecycle_state: data/registry/capabilities.json — Capability CAP-000002 has no lifecycle_state field.
-- missing_lifecycle_state: data/registry/capabilities.json — Capability CAP-000003 has no lifecycle_state field.
-- missing_lifecycle_state: data/registry/capabilities.json — Capability CAP-000004 has no lifecycle_state field.
-- missing_lifecycle_state: data/registry/capabilities.json — Capability CAP-000005 has no lifecycle_state field.
-- missing_lifecycle_state: data/registry/capabilities.json — Capability CAP-000006 has no lifecycle_state field.

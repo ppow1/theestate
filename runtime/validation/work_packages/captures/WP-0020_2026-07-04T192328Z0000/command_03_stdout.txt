@@ -1,0 +1,36 @@
+{
+  "checked_required_paths": [
+    "AI_HINTS.md",
+    "AI_START_HERE.md",
+    "docs/onboarding/visual_manifest.md",
+    "docs/governance/Estate_Orientation_Handbook.md",
+    "docs/governance/Estate_Manual.md",
+    "constitution/constitution.md",
+    "docs/collaboration/Worker_Runtime_Contract_v1.md",
+    "docs/collaboration/Instruction_Precedence_v1.md",
+    "docs/collaboration/Estate_Collaboration_Layer_v1.md",
+    "docs/collaboration/Branch_Management_Standard_v1.md",
+    "docs/collaboration/Local_Worker_Launch_Adapter_v1.md",
+    "docs/collaboration/Operations_Board_Client_v1.md",
+    "docs/governance/Capability_Lifecycle_States_v1.md",
+    "docs/operations/Operational_Validation_Reporting.md",
+    "docs/operations/Chief_Architect_Operating_Manual_v1.md",
+    "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md",
+    "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md",
+    "data/registry/personnel.json",
+    "data/registry/residents.json",
+    "data/registry/mailboxes.json",
+    "AI_HINTS.md",
+    "AI_START_HERE.md",
+    "docs/onboarding/visual_manifest.md",
+    "docs/collaboration/Worker_Runtime_Contract_v1.md",
+    "docs/collaboration/Instruction_Precedence_v1.md"
+  ],
+  "manifest_paths": [
+    "docs/onboarding/chief_architect_onboarding_manifest.json",
+    "docs/onboarding/worker_onboarding_manifest.json"
+  ],
+  "missing_manifests": [],
+  "missing_required_paths": [],
+  "ok": true
+}

@@ -103,3 +103,14 @@ def test_production_readiness_report_generation_for_wp_0102_and_wp_0103(tmp_path
     ready = {entry["work_package_id"] for entry in report["ready_for_chief_architect_production_readiness_acceptance"]}
     assert "WP-0102" in ready
     assert "WP-0103" in ready
+
+
+def test_wp_0020_receipt_complete_after_wp_0111_repair(tmp_path):
+    data = complete_receipt("WP-0020")
+    data["pull_request_not_applicable_reason"] = "Historical completion receipt repaired by WP-0111."
+    data.pop("pull_request_url")
+    data["validation_recipe_status"] = "registered_by_WP-0111_first_batch"
+    write_json(tmp_path, "collaboration/work_packages/completions/WP-0020_codex_done.json", data)
+    receipt = validate_receipt("WP-0020", tmp_path)
+    assert receipt["receipt_status"] == "complete"
+    assert receipt["receipt_gaps"] == []

@@ -85,6 +85,24 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main alfred-artifacts --json', required=False),
         ],
     },
+
+    "WP-0020": {
+        "recipe_id": "wp-0020-helen-hr-operational-onboarding",
+        "title": "WP-0020 — Helen HR Operational Onboarding",
+        "description": "Validates Helen's initial HR onboarding source artifacts and registry/mailbox resolution without granting additional authority.",
+        "required_checks": ["Helen onboarding artifacts exist", "Helen personnel identity resolves", "Onboarding manifests remain valid"],
+        "observational_checks": ["Helen HR onboarding is discoverable"],
+        "expected_artifacts": ["operations/validation/reports/WP-0020_validation.md", "runtime/validation/work_packages/WP-0020_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['docs/onboarding/Helen_HR_Operational_Onboarding.md','docs/operations/helen/operating_brief.md','residents/helen.md','data/registry/personnel.json','data/registry/mailboxes.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"from estate.core.personnel_identity import resolve_personnel_identity; r=resolve_personnel_identity('Helen'); assert r.get('resolved') and r.get('employee_id') == 6 and r.get('mailbox_id') == 6 and r.get('resident_id') == 'RES-000003', r\""),
+            _cmd('python -m estate.cli.main onboarding-manifest-check --json'),
+            _cmd('python -m estate.cli.main estate-search "Helen HR" --json', required=False),
+        ],
+    },
     "WP-0021": {
         "recipe_id": "wp-0021-personnel-identity-mailbox-resolver",
         "title": "WP-0021 — Personnel Identity + Mailbox Resolver",
