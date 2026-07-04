@@ -25,6 +25,7 @@ from estate.core.capability_dependency_visualization import generate_capability_
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
+from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
 
 
 OFFICE_NAVIGATION = [
@@ -903,8 +904,10 @@ def generate_command_center(root=None, write=True):
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
     panels["operations_center_layout"] = _operations_center_layout_framework(panels, generated_at)
-    workspace_profile = resolve_workspace_profile(root, available_panels={tab["id"] for tab in OFFICE_TABS})
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile}
+    settings_manager = load_operations_center_settings(root)
+    default_profile = settings_manager["settings"].get("workspace", {}).get("default_profile", "mission-control")
+    workspace_profile = resolve_workspace_profile(root, profile_name=default_profile, available_panels={tab["id"] for tab in OFFICE_TABS})
+    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -1002,23 +1005,34 @@ def _runtime_path(root, rel):
 
 
 def _settings_panel(root):
-    visible = [item["id"] for item in OFFICE_NAVIGATION]
-    tab_order = [tab["id"] for tab in OFFICE_TABS]
+    managed = load_operations_center_settings(root)
+    settings = managed["settings"]
+    workspace = settings.get("workspace", {})
+    operator = settings.get("operator_visibility", {})
+    refresh = settings.get("refresh", {})
     return {
         "available": True,
-        "path": "browser-local UI preferences",
+        "path": SETTINGS_OUTPUT,
         "kind": "settings",
         "data": {
-            "theme": {"value": "system", "options": ["light", "dark", "system"]},
-            "refresh_behavior": {"quiet_refresh_seconds": 30, "mode": "local artifact refresh"},
-            "visible_panels": {panel_id: True for panel_id in visible},
-            "tab_order": tab_order,
-            "pinned_views": ["home", "validation", "mailboxes"],
-            "global_verbosity": {"value": "standard", "options": ["brief", "standard", "detailed"]},
-            "per_topic_verbosity": {"operations": "standard", "validation": "detailed", "mailboxes": "standard"},
-            "per_resident_verbosity": {"Alfred": "standard", "Helen": "standard"},
-            "activity_console_visible": True,
-            "persistence": "local UI preferences only; no secrets, cloud settings, or account policy",
+            "settings_schema_version": settings.get("settings_schema_version"),
+            "ui_version": managed.get("ui_version"),
+            "theme": {"value": (settings.get("appearance") or {}).get("theme"), "options": ["light", "dark", "system"]},
+            "accent": (settings.get("appearance") or {}).get("accent"),
+            "default_workspace_profile": workspace.get("default_profile"),
+            "refresh_behavior": {"quiet_refresh_seconds": refresh.get("quiet_refresh_seconds"), "mode": refresh.get("mode")},
+            "visible_panels": workspace.get("visible_panels") or {},
+            "tab_order": [tab["id"] for tab in OFFICE_TABS],
+            "pinned_views": [workspace.get("default_active_tab") or "mission-control", "validation", "mailboxes"],
+            "global_verbosity": {"value": operator.get("global_verbosity"), "options": ["quiet", "normal", "detailed", "diagnostic"]},
+            "default_verbosity_profile": operator.get("default_verbosity_profile"),
+            "per_topic_verbosity": {"operations": operator.get("global_verbosity"), "validation": "detailed", "mailboxes": operator.get("global_verbosity")},
+            "per_resident_verbosity": {"Alfred": operator.get("global_verbosity"), "Helen": operator.get("global_verbosity")},
+            "activity_console_visible": workspace.get("bottom_activity_stream_visible"),
+            "status_bar_visible": workspace.get("status_bar_visible"),
+            "command_console": settings.get("command_console"),
+            "warnings": managed.get("warnings", []),
+            "persistence": "local-first Settings Manager; no secrets, cloud settings, or account policy",
         },
     }
 
@@ -1089,9 +1103,11 @@ def _about_panel(root):
     routing = _read_artifact(root, ["collaboration/routing_rules.json"])
     work_package_schema = _read_artifact(root, ["collaboration/templates/work_package_v1.md"])
     envelope_schema = _read_artifact(root, ["docs/collaboration/schemas/Canonical_Message_Envelope_v1.md", "collaboration/templates/message_envelope_v1.json"])
+    settings_manager = load_operations_center_settings(root)
     inventory = [
         {"component": "Estate", "version": _safe_version(package.get("data")), "status": "local repository available"},
         {"component": "Operations Center UI", "version": "Operations Center v1 / Settings & About inventory v1", "status": "available"},
+        {"component": "Operations Center Settings Manager", "version": settings_manager.get("ui_version", _unknown()), "status": "available", "path": settings_manager.get("path")},
         {"component": "Alfred", "version": "v1" if alfred.get("available") else _unknown(), "status": "available" if alfred.get("available") else _unknown()},
         {"component": "Helen", "version": "unknown/unavailable", "status": "available" if helen.get("available") else _unknown()},
         {"component": "Document registry/schema", "version": _safe_version(document_registry.get("data")), "status": "available" if document_registry.get("available") else _unknown()},
@@ -1610,18 +1626,23 @@ def _settings_html(artifact):
     tab_order = ", ".join(str(tab) for tab in data.get("tab_order") or [])
     pinned = ", ".join(str(tab) for tab in data.get("pinned_views") or [])
     refresh = data.get("refresh_behavior") or {}
+    warnings = data.get("warnings") or []
+    warning_rows = "".join(f"<li>{html.escape(str(w.get('setting') or w.get('type')))} — {html.escape(str(w.get('message')))}</li>" for w in warnings)
     return (
         "<div class='settings-surface'>"
         "<p class='source'>Local-first UI preferences. Controls are initial placeholders unless marked by the browser shell; no secrets or cloud settings are stored.</p>"
+        f"<p><strong>Settings version:</strong> {html.escape(str(data.get('settings_schema_version', 'unknown/unavailable')))} · <strong>UI config:</strong> {html.escape(str(data.get('ui_version', 'unknown/unavailable')))}</p>"
         f"<label>Theme <select disabled>{theme_options}</select></label>"
+        f"<p><strong>Accent:</strong> {html.escape(str(data.get('accent', 'unknown/unavailable')))} · <strong>Default workspace:</strong> {html.escape(str(data.get('default_workspace_profile', 'unknown/unavailable')))} · <strong>Default verbosity profile:</strong> {html.escape(str(data.get('default_verbosity_profile', 'unknown/unavailable')))}</p>"
         f"<label>Global verbosity <select disabled>{verbosity_options}</select></label>"
         f"<p><strong>Refresh behavior:</strong> quiet local refresh every {html.escape(str(refresh.get('quiet_refresh_seconds', 'unknown/unavailable')))} seconds.</p>"
-        f"<p><strong>Activity console visible:</strong> {html.escape(str(data.get('activity_console_visible', 'unknown/unavailable')))}</p>"
+        f"<p><strong>Activity console visible:</strong> {html.escape(str(data.get('activity_console_visible', 'unknown/unavailable')))} · <strong>Status bar visible:</strong> {html.escape(str(data.get('status_bar_visible', 'unknown/unavailable')))}</p>"
         f"<p><strong>Tab order:</strong> {html.escape(tab_order)}</p>"
         f"<p><strong>Pinned views:</strong> {html.escape(pinned)}</p>"
         f"<h3>Visible panels</h3><div class='settings-grid'>{panel_rows}</div>"
         f"<h3>Per-topic verbosity placeholders</h3><dl>{topic_rows}</dl>"
         f"<h3>Per-resident verbosity placeholders</h3><dl>{resident_rows}</dl>"
+        f"<h3>Safe-default warnings</h3><ul>{warning_rows or '<li>None</li>'}</ul>"
         f"<p class='source'>{html.escape(str(data.get('persistence')))}</p>"
         "</div>"
     )
