@@ -1,0 +1,64 @@
+{
+  "index_path": "runtime/search/institutional_search_index.json",
+  "match_count": 6,
+  "matches": [
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Helen HR Operational Onboarding Status: Initial operational onboarding Classification: Estate Internal Owner: Helen / Human Resources Registry identity: `RES-000003` in `residents/helen.md` and `data/registry/residents",
+      "path": "docs/onboarding/Helen_HR_Operational_Onboarding.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Helen HR Operational Onboarding"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": " Status: Operational Classification: Estate Internal Owner: Helen / AI HR Architectural Oversight: Chief Architect ## Purpose Every newly onboarded Estate worker shall review the visual artifacts below before reading pro",
+      "path": "docs/onboarding/visual_manifest.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Worker Visual Orientation Manifest v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "mplemented Classification: Estate Internal Owner: Steward / HR until Helen is onboarded ## Purpose This checklist records the current minimum steps for bringing an Estate participant online. ## Core Principle Identity is",
+      "path": "docs/operations/Onboarding_Checklist_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Onboarding Checklist v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Helen Operating Brief Status: Initial brief Classification: Estate Internal Office: Human Resources Resident profile: `residents/helen.md` Onboarding brief: `docs/onboarding/Helen_HR_Operational_Onboarding.md` ## Missi",
+      "path": "docs/operations/helen/operating_brief.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Helen Operating Brief"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "-07-02T17:48:18+00:00\", \"files_changed\": [ \"docs/onboarding/Helen_HR_Operational_Onboarding.md\", \"docs/operations/helen/operating_brief.md\", \"data/registry/personnel.json\", \"data/registry/mailboxes.json\", \"collaboration/",
+      "path": "collaboration/work_packages/completions/WP-0020_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0020_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding ## Codex Command Read `collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md` and do exactly what it says. ## Mode SERIES. Implement",
+      "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0020 \u2014 Helen HR Operational Onboarding"
+    }
+  ],
+  "query": "Helen HR",
+  "warnings": [
+    "missing runtime report pattern: runtime/capabilities/*.json"
+  ]
+}

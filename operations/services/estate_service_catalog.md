@@ -2,7 +2,7 @@
 
 Read-only aggregation. This report is not the source of truth and does not create a duplicate command registry.
 
-Generated: 2026-07-04T13:19:36+00:00
+Generated: 2026-07-04T19:25:44+00:00
 
 ## Summary
 - Services: 10

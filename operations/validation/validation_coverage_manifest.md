@@ -1,11 +1,11 @@
 # Validation Coverage Manifest
 
-Generated at: 2026-07-04T19:19:00+00:00
+Generated at: 2026-07-04T19:25:48+00:00
 
 ## Summary
-- total_work_packages_scanned: 97
-- total_production_ready: 26
-- total_blocked: 71
+- total_work_packages_scanned: 98
+- total_production_ready: 28
+- total_blocked: 70
 - total_missing_recipes: 57
 - total_missing_receipts: 15
 - total_incomplete_receipts: 51
@@ -17,7 +17,7 @@ Generated at: 2026-07-04T19:19:00+00:00
 - WP-0017 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 3
 - WP-0018 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0019 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
-- WP-0020 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0020 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-0021 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-0022 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0023 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
@@ -97,7 +97,7 @@ Generated at: 2026-07-04T19:19:00+00:00
 - WP-0098 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0099 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0100 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
-- WP-0101 — receipt: complete; recipe: registered; validation: missing; production: blocked; blockers: 0
+- WP-0101 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-0102 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-0103 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-0104 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
@@ -107,4 +107,5 @@ Generated at: 2026-07-04T19:19:00+00:00
 - WP-0108 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0109 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0110 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0111 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-9999 — receipt: missing; recipe: missing; validation: no_recipe; production: blocked; blockers: 2

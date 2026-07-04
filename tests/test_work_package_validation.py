@@ -225,3 +225,13 @@ def test_wp_0103_historical_recipe_registrations_preserved():
         assert recipe is not None
         assert recipe["commands"]
     assert get_validation_recipe("WP-0103")["recipe_id"] == "wp-0103-historical-validation-recipe-coverage"
+
+
+def test_wp_0020_helen_hr_onboarding_recipe_registered():
+    recipe = get_validation_recipe("WP-0020")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0020-helen-hr-operational-onboarding"
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("Helen_HR_Operational_Onboarding.md" in command for command in commands)
+    assert any("resolve_personnel_identity('Helen')" in command for command in commands)
+    assert any("onboarding-manifest-check --json" in command for command in commands)

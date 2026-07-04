@@ -1,10 +1,7 @@
 {
-  "work_package_id": "WP-0020",
-  "codex_status": "done",
-  "status": "done",
-  "completed_at": "2026-07-02T17:48:18+00:00",
   "branch": "work",
-  "pull_request_url": "pending",
+  "codex_status": "done",
+  "completed_at": "2026-07-02T17:48:18+00:00",
   "files_changed": [
     "docs/onboarding/Helen_HR_Operational_Onboarding.md",
     "docs/operations/helen/operating_brief.md",
@@ -12,18 +9,26 @@
     "data/registry/mailboxes.json",
     "collaboration/work_packages/completions/WP-0020_codex_done.json"
   ],
+  "known_limitations": [
+    "pull_request_url is pending until the PR is created by the repository host."
+  ],
+  "limitations": [
+    "pull_request_url is pending until the PR is created by the repository host."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "merge_class": "Class A documentation/integration after CA verification",
+  "production_readiness_repair": "WP-0111 added missing merge authority metadata and a focused validation recipe for already-existing Helen HR onboarding artifacts.",
+  "pull_request_not_applicable_reason": "Historical completion receipt repaired by WP-0111; original PR URL was not recorded in the receipt.",
+  "pull_request_url": "pending",
+  "pull_request_url_not_applicable_reason": "Historical completion receipt repaired by WP-0111; original PR URL was not recorded in the receipt.",
+  "ready_for_ca_review": true,
+  "status": "done",
+  "summary": "Added Helen's initial HR operational onboarding artifacts and integrated Helen/HR mailbox identities with the personnel and functional mailbox registries without creating final HR authority, clearance policy, lifecycle-state changes, or constitutional role changes.",
   "tests_run": [
     "PYTHONPATH=src python -m estate.cli.main onboarding-manifest-check --json",
     "PYTHONPATH=src pytest -q tests/test_onboarding_manifest.py tests/test_mailbox_index.py",
     "python -m json.tool data/registry/personnel.json >/dev/null && python -m json.tool data/registry/mailboxes.json >/dev/null && python -m json.tool collaboration/work_packages/completions/WP-0020_codex_done.json >/dev/null"
   ],
-  "limitations": [
-    "pull_request_url is pending until the PR is created by the repository host."
-  ],
-  "known_limitations": [
-    "pull_request_url is pending until the PR is created by the repository host."
-  ],
-  "ready_for_ca_review": true,
-  "merge_class": "Class A documentation/integration after CA verification",
-  "summary": "Added Helen's initial HR operational onboarding artifacts and integrated Helen/HR mailbox identities with the personnel and functional mailbox registries without creating final HR authority, clearance policy, lifecycle-state changes, or constitutional role changes."
+  "validation_recipe_status": "registered_by_WP-0111_first_batch",
+  "work_package_id": "WP-0020"
 }
