@@ -20,6 +20,7 @@ from estate.core.capability_lifecycle import generate_capability_lifecycle_repor
 from estate.core.estate_capability_registry import generate_estate_capability_registry, format_estate_capability_registry_summary
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization, format_capability_dependency_visualization_summary
 from estate.core.capability_gap_report import generate_capability_gap_report, format_capability_gap_summary
+from estate.core.estate_service_catalog import generate_estate_service_catalog, format_estate_service_catalog_summary
 from estate.core.operational_validation import generate_operational_validation_report, format_operational_validation_summary
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
 from estate.core.dependency_graph import generate_dependency_graph, format_dependency_graph_summary
@@ -566,6 +567,15 @@ def cmd_estate_capability_registry(args):
     else:
         print(format_estate_capability_registry_summary(registry))
 
+
+def cmd_estate_service_catalog(args):
+    catalog = generate_estate_service_catalog()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(catalog, indent=2, sort_keys=True))
+    else:
+        print(format_estate_service_catalog_summary(catalog))
+
 def cmd_operational_validation(args):
     report = generate_operational_validation_report()
     if getattr(args, "json", False):
@@ -1039,6 +1049,11 @@ def main():
     p = sub.add_parser("estate-capability-registry", help="Generate the read-only Estate capability registry aggregation")
     p.add_argument("--json", action="store_true", help="Generate Estate capability registry and print JSON")
     p.set_defaults(func=cmd_estate_capability_registry)
+
+
+    p = sub.add_parser("estate-service-catalog", help="Generate the read-only Estate service catalog aggregation")
+    p.add_argument("--json", action="store_true", help="Generate Estate service catalog and print JSON")
+    p.set_defaults(func=cmd_estate_service_catalog)
 
     p = sub.add_parser("capability-dependency-visualization", help="Generate capability dependency visualization for Mission Control")
     p.add_argument("--json", action="store_true", help="Generate capability dependency visualization and print JSON")
