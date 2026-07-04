@@ -91,10 +91,17 @@ def _name_key(value):
 
 
 def _has_implementation_evidence(cap):
-    refs = [r for r in cap.get("source_artifact_links", []) if r not in {"data/registry/capabilities.json"}]
     state = str(cap.get("lifecycle_state") or "").lower()
     status = str(cap.get("implementation_status") or "").lower()
-    return bool(refs) or state in {"implemented", "operationally validated", "institutionalized"} or status in {"installed", "operational"}
+    maturity = str(cap.get("maturity") or "").lower()
+    if state in {"implemented", "operationally validated", "institutionalized"}:
+        return True
+    if status in {"installed", "operational", "degraded", "blocked", "unavailable"}:
+        return True
+    if status.startswith("pending") or maturity == "planned" or state in {"designed", "planned"}:
+        return False
+    refs = [r for r in cap.get("source_artifact_links", []) if r not in {"data/registry/capabilities.json"}]
+    return bool(refs)
 
 
 def _has_validation_evidence(cap):
