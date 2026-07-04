@@ -1,8 +1,9 @@
 {
-  "generated_at": "2026-07-04T12:45:00+00:00",
-  "json_report": "runtime/validation/work_packages/WP-0086_validation.json",
-  "markdown_report": "operations/validation/reports/WP-0086_validation.md",
-  "validation_id": "WP-0086_2026-07-04T124500Z0000",
-  "validation_status": "passed",
-  "work_package_id": "WP-0086"
+  "generated_at": "2026-07-04T12:55:12+00:00",
+  "json_report": "runtime/validation/work_packages/WP-9999_validation.json",
+  "latest_validation_report_path": "operations/validation/reports/WP-9999_validation.md",
+  "markdown_report": "operations/validation/reports/WP-9999_validation.md",
+  "validation_id": "WP-9999_2026-07-04T125512Z0000",
+  "validation_status": "no_recipe",
+  "work_package_id": "WP-9999"
 }

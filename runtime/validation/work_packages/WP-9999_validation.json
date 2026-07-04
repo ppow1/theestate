@@ -8,16 +8,16 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-04T12:14:50+00:00",
+  "generated_at": "2026-07-04T12:55:12+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "26fd3e464f6d36a900ba8202b735237c05612408",
+  "git_commit_before": "204927fee8ff37c3b88424f6b539fdb63661c12f",
   "recipe_id": null,
   "recipe_title": null,
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 0 command(s).",
-  "validation_id": "WP-9999_2026-07-04T121450Z0000",
+  "validation_id": "WP-9999_2026-07-04T125512Z0000",
   "validation_status": "no_recipe",
   "warnings": [
     "No validation recipe is registered for WP-9999."

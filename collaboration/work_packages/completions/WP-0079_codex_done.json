@@ -1,7 +1,7 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T12:15:33+00:00",
+  "completed_at": "2026-07-04T12:55:17+00:00",
   "files_changed": [
     "src/estate/core/work_package_validation.py",
     "src/estate/cli/main.py",
@@ -24,7 +24,7 @@
   "merge_authority": "ca_verified_auto_merge_allowed",
   "pull_request_url": null,
   "ready_for_ca_review": true,
-  "summary": "Implemented and hardened the work-package validation runner/recipe engine, CLI and PowerShell command surfaces, structured Markdown/JSON artifacts, latest pointer updates, safe validation artifact commit wrapper, generated WP-0079 and no-recipe demonstration artifacts, and tests for recipe execution, no-recipe handling, command capture, required versus observational failures, artifact generation, latest pointer behavior, safe wrapper safeguards, and self-check coverage.",
+  "summary": "Implemented and verified the work-package validation runner/recipe engine with CLI and PowerShell command surfaces, structured Markdown/JSON artifacts, latest pointer metadata, safe validation-artifact commit wrapper, generated WP-0079 and no-recipe demonstration artifacts, and tests for recipe execution, no-recipe handling, command capture, required versus observational failures, artifact generation, latest pointer behavior, safe wrapper safeguards, and self-check coverage.",
   "tests_run": [
     "PYTHONPATH=src pytest -q tests/test_work_package_validation.py",
     "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_validation_handoff_artifact_workflow.py tests/test_validation_metrics_dashboard.py tests/test_validation_observations.py tests/test_operational_validation.py tests/test_local_operational_validation.py",
@@ -32,7 +32,9 @@
     "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-9999 --json > /tmp/wp9999_demo.json || true",
     "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0079 --json > /tmp/wp0079_demo_final.json",
     "python -m json.tool collaboration/work_packages/completions/WP-0079_codex_done.json >/dev/null",
-    "git diff --check"
+    "git diff --check",
+    "python -m json.tool /tmp/wp0079_demo.json >/dev/null",
+    "python -m json.tool /tmp/wp9999_demo.json >/dev/null"
   ],
   "work_package_id": "WP-0079"
 }
