@@ -897,7 +897,8 @@ def generate_command_center(root=None, write=True):
         panels["mission_control_workspace"]["data"]["capability_dependency_visualization"] = panels.get("capability_dependency_visualization")
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels)}
+    panels["operations_center_layout"] = _operations_center_layout_framework(panels, generated_at)
+    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"]}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -907,6 +908,45 @@ def generate_command_center(root=None, write=True):
     return payload
 
 
+
+
+def _operations_center_layout_framework(panels, generated_at):
+    regions = [
+        {"id": "top_navigation_tabs", "label": "Top navigation tabs", "role": "workspace_switcher", "selector": "#workspace-tabs", "dynamic_update": "tab activation updates visibility without page refresh"},
+        {"id": "left_navigation_panel", "label": "Collapsible left navigation", "role": "panel_index", "selector": "#office-navigation", "dynamic_update": "panel visibility preference is applied in browser-local state"},
+        {"id": "main_workspace", "label": "Main workspace", "role": "active_tab_content", "selector": "main.workspace", "dynamic_update": "workspace views are hidden/shown in place"},
+        {"id": "bottom_activity_stream", "label": "Dockable bottom activity stream", "role": "activity_console", "selector": "#activity-console", "dynamic_update": "quiet refresh replaces activity console from local JSON"},
+        {"id": "status_bar", "label": "Status bar", "role": "operational_status", "selector": "#status-bar", "dynamic_update": "quiet refresh replaces status bar from local JSON"},
+        {"id": "command_console", "label": "Command console", "role": "global_search_command_palette", "selector": "#global-search-input", "dynamic_update": "command results filter locally without refresh"},
+    ]
+    workspace_templates = [
+        {"id": tab["id"], "label": tab["label"], "panel_available": True, "version": "layout-framework-v1"}
+        for tab in OFFICE_TABS
+    ]
+    return {
+        "available": True,
+        "path": "runtime/steward/command_center.html; browser localStorage key estate.operations_center.layout.v1",
+        "kind": "operations_center_layout_framework",
+        "data": {
+            "version": "layout-framework-v1",
+            "generated_at": generated_at,
+            "local_only": True,
+            "layout_preference_key": "estate.operations_center.layout.v1",
+            "quiet_refresh_regions": ["status_bar", "bottom_activity_stream"],
+            "regions": regions,
+            "workspace_templates": workspace_templates,
+            "default_preferences": {
+                "active_tab": "home",
+                "navigation_collapsed": False,
+                "activity_console_dock": "bottom",
+                "activity_console_visible": True,
+                "visible_panels": {item["id"]: True for item in OFFICE_NAVIGATION},
+                "tab_order": [tab["id"] for tab in OFFICE_TABS],
+            },
+            "future_integration_points": ["Alfred", "TTS/STT", "Mission Control"],
+            "state_authority": "browser-local layout preferences only; operational records remain in existing local artifacts",
+        },
+    }
 
 def _placeholder_panel(panel_id, title, description, source="future Office package"):
     return {"available": False, "path": source, "kind": "placeholder", "panel_id": panel_id, "title": title, "placeholder": description}
@@ -1475,6 +1515,22 @@ async function refreshOperationsChrome(){
 window.addEventListener('load', () => window.setInterval(refreshOperationsChrome, 30000));
 </script>"""
 
+def _layout_framework_html(artifact):
+    data = artifact.get("data") or {}
+    region_rows = "".join(f"<tr><td>{html.escape(str(r.get('label')))}</td><td>{html.escape(str(r.get('role')))}</td><td>{html.escape(str(r.get('selector')))}</td><td>{html.escape(str(r.get('dynamic_update')))}</td></tr>" for r in data.get("regions") or [])
+    default_preferences = html.escape(json.dumps(data.get("default_preferences") or {}, indent=2, sort_keys=True))
+    futures = ", ".join(str(item) for item in data.get("future_integration_points") or [])
+    return (
+        "<section class='layout-framework' aria-label='Operations Center Layout Framework'>"
+        f"<p><strong>Version:</strong> {html.escape(str(data.get('version', 'unknown/unavailable')))} · <strong>Preference key:</strong> <code>{html.escape(str(data.get('layout_preference_key')))}</code></p>"
+        "<p>This framework defines modular regions for the Operations Center shell while preserving existing UI state ownership.</p>"
+        f"<table><thead><tr><th>Region</th><th>Role</th><th>Selector</th><th>Dynamic update behavior</th></tr></thead><tbody>{region_rows}</tbody></table>"
+        f"<h3>Default workspace preferences</h3><pre>{default_preferences}</pre>"
+        f"<p class='source'>State authority: {html.escape(str(data.get('state_authority')))}. Future integration points: {html.escape(futures)}.</p>"
+        "</section>"
+    )
+
+
 def _settings_html(artifact):
     data = artifact.get("data") or {}
     theme = data.get("theme") or {}
@@ -1581,7 +1637,7 @@ def render_command_center_html(payload):
         ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
-        ("settings", "Settings", _settings_html(p.get("settings", {}))),
+        ("settings", "Settings", _settings_html(p.get("settings", {})) + _layout_framework_html(p.get("operations_center_layout", {}))),
         ("about", "About", _about_html(p.get("about", {}))),
     ]
     workspace = "".join(_workspace_section(tab_id, label, body, active=(i == 0)) for i, (tab_id, label, body) in enumerate(tab_bodies))
@@ -1590,10 +1646,15 @@ def render_command_center_html(payload):
     generated = html.escape(str(payload.get("generated_at")))
     css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
-function activateOfficeTab(id){
+const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
+function readLayoutPreferences(){ try{return JSON.parse(localStorage.getItem(LAYOUT_PREF_KEY) || '{}');}catch(error){return {};} }
+function writeLayoutPreferences(update){ const next = {...readLayoutPreferences(), ...update}; localStorage.setItem(LAYOUT_PREF_KEY, JSON.stringify(next)); return next; }
+function activateOfficeTab(id, persist=true){
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
   document.querySelectorAll('[data-tab]').forEach(button => { const active = button.dataset.tab === id; if(button.classList.contains('workspace-tab')) button.setAttribute('aria-selected', active ? 'true' : 'false'); button.classList.toggle('active', active); });
+  if(persist) writeLayoutPreferences({active_tab: id});
 }
+function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
 document.addEventListener('click', event => { const button = event.target.closest('[data-tab]'); if(button) activateOfficeTab(button.dataset.tab); });
 function renderGlobalPaletteResults(){
   const input = document.querySelector('#global-search-input');
@@ -1614,7 +1675,7 @@ function renderGlobalPaletteResults(){
 }
 document.addEventListener('input', event => { if(event.target && event.target.id === 'global-search-input') renderGlobalPaletteResults(); });
 document.addEventListener('keydown', event => { if(event.key === '/' && !event.target.matches('input, textarea')){ event.preventDefault(); activateOfficeTab('search'); setTimeout(() => document.querySelector('#global-search-input')?.focus(), 0); } });
-window.addEventListener('load', renderGlobalPaletteResults);
+window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); });
 </script>"""
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
