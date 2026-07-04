@@ -1,0 +1,28 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T11:57:15Z",
+  "files_changed": [
+    "src/estate/core/estate_capability_registry.py",
+    "src/estate/cli/main.py",
+    "tests/test_estate_capability_registry.py",
+    "operations/capabilities/estate_capability_registry.md",
+    "collaboration/work_packages/completions/WP-0076_codex_done.json"
+  ],
+  "known_limitations": [
+    "The registry is a derived operational aggregation and intentionally does not create governance or replace authoritative source artifacts.",
+    "Search and Mission Control integration are supported by structured output and source links, but no new Mission Control UI wiring was added in this work package."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending",
+  "ready_for_ca_review": true,
+  "summary": "Implemented a read-only Estate Capability Registry that aggregates capability records, providers, services, lifecycle validation metadata, dependencies, validation status, missing metadata warnings, and source artifact links without changing authoritative registries.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_estate_capability_registry.py -q",
+    "PYTHONPATH=src python -m estate.cli.main estate-capability-registry --json >/tmp/estate_capability_registry.json",
+    "python -m json.tool collaboration/work_packages/completions/WP-0076_codex_done.json >/dev/null",
+    "git diff --check",
+    "PYTHONPATH=src pytest tests/test_estate_capability_registry.py tests/test_capability_lifecycle.py -q"
+  ],
+  "work_package_id": "WP-0076"
+}
