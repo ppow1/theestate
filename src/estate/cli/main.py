@@ -88,10 +88,20 @@ def cmd_list_residents(args):
     print_table(load_registry("residents"), ["id", "name", "department", "office"])
 
 def cmd_services(args):
-    print_table(list_services(), ["id", "name", "status", "owner", "resident"])
+    services = list_services()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(services, indent=2, sort_keys=True))
+    else:
+        print_table(services, ["id", "name", "status", "owner", "resident"])
 
 def cmd_capabilities(args):
-    print_table(list_capabilities(), ["id", "name", "category", "status", "location"])
+    capabilities = list_capabilities()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(capabilities, indent=2, sort_keys=True))
+    else:
+        print_table(capabilities, ["id", "name", "category", "status", "location"])
 
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
@@ -922,9 +932,11 @@ def main():
     p.set_defaults(func=cmd_list_residents)
 
     p = sub.add_parser("services")
+    p.add_argument("--json", action="store_true", help="Print registered services JSON")
     p.set_defaults(func=cmd_services)
 
     p = sub.add_parser("capabilities")
+    p.add_argument("--json", action="store_true", help="Print registered capabilities JSON")
     p.set_defaults(func=cmd_capabilities)
 
     p = sub.add_parser("providers")
@@ -1313,5 +1325,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 

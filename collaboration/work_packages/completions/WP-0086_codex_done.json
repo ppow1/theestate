@@ -1,0 +1,45 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T12:45:22+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/paths.py",
+    "operations/validation/scripts/validate_work_package.ps1",
+    "operations/validation/scripts/run_and_commit_validation.ps1",
+    "tests/test_work_package_validation.py",
+    "operations/validation/reports/WP-0075_validation.md",
+    "operations/validation/reports/WP-0076_validation.md",
+    "operations/validation/reports/WP-0086_validation.md",
+    "runtime/validation/work_packages/WP-0075_validation.json",
+    "runtime/validation/work_packages/WP-0076_validation.json",
+    "runtime/validation/work_packages/WP-0086_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "collaboration/work_packages/completions/WP-0086_codex_done.json"
+  ],
+  "known_limitations": [
+    "PowerShell was not installed in this Linux container, so the canonical PowerShell commands were demonstrated through the equivalent Python CLI invoked by the scripts."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "steward_next_validation_commands": [
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0075",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0076",
+    "./operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0086"
+  ],
+  "summary": "Expanded the work-package validation recipe registry for WP-0075, WP-0076, and WP-0086; added JSON support for capabilities/services CLI checks; preserved and cross-platform-hardened validation runner scripts; generated validation reports for the expanded recipes.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0075 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0076 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0086 --json"
+  ],
+  "validation_statuses_observed": {
+    "WP-0075": "passed",
+    "WP-0076": "passed",
+    "WP-0086": "passed"
+  },
+  "work_package_id": "WP-0086"
+}
