@@ -1,0 +1,80 @@
+{
+  "branch": "work",
+  "bypasses_command_authority": false,
+  "codex_status": "completed",
+  "completed_at": "2026-07-04T19:53:30+00:00",
+  "executes_work_packages_automatically": false,
+  "files_changed": [
+    "src/estate/core/operations_center_bootstrap.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_operations_center_bootstrap.py",
+    "operations/validation/reports/WP-0097_validation.md",
+    "collaboration/work_packages/completions/WP-0097_codex_done.json"
+  ],
+  "final_command_surfaces": [
+    "PYTHONPATH=src python -m estate.cli.main operations-center start --host 127.0.0.1 --port 8765",
+    "PYTHONPATH=src python -m estate.cli.main operations-center status --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-center stop --json",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --serve --host 127.0.0.1 --port 8765"
+  ],
+  "known_limitations": [
+    "The local server lifecycle uses a PID file under runtime/steward and is intended for a single local operator process, not multi-host orchestration.",
+    "The start command launches the existing Steward command center server as a local subprocess; if the Python environment cannot import the local package, startup reports unreachable and points operators to the log file.",
+    "Optional dashboard/source artifacts may be unavailable; the Operations Center reports those as degraded/missing rather than failing startup."
+  ],
+  "local_first": true,
+  "merge_authority": "Chief Architect / Steward repository governance; Codex does not approve or merge this work package.",
+  "production_readiness_command_status": {
+    "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "known_repository_wide_limitations": "Existing older work packages still have missing recipes or incomplete receipts unrelated to WP-0097.",
+    "status": "passed",
+    "wp_0097_status": "ready"
+  },
+  "pull_request_not_applicable_reason": "Pull request URL is not available from the local Codex execution environment before the PR is created.",
+  "pull_request_url_not_applicable_reason": "Pull request URL is not available from the local Codex execution environment before the PR is created.",
+  "pull_request_url_or_not_applicable_reason": "Pull request URL is not available from the local Codex execution environment before the PR is created.",
+  "ready_for_ca_review": true,
+  "stores_secrets": false,
+  "summary": [
+    "Implemented a local-first Operations Center server bootstrap command surface for start, status, and stop.",
+    "The bootstrap wraps the existing Steward command center implementation instead of creating a second Operations Center UI.",
+    "Startup loads local settings, runs service health preflight, generates the static command center entry point, reports degraded/missing optional components, and writes a local PID/log path.",
+    "Status and shutdown are local-only and preserve command authority: no work packages are executed, no secrets are stored, and Steward authorization/recall semantics are not bypassed.",
+    "Registered WP-0097 in the validation framework with required and observational checks."
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_operations_center_bootstrap.py",
+      "evidence": "2 passed",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center status --json",
+      "evidence": "Reported local-only status, settings path, host/port, PID/log paths, and authority constraints.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center start --port 8877 --json && PYTHONPATH=src python -m estate.cli.main operations-center status --json && PYTHONPATH=src python -m estate.cli.main operations-center stop --json",
+      "evidence": "Started a loopback server, confirmed status endpoint reachability, and stopped it safely.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0097 --json",
+      "evidence": "Validation recipe wp-0097-operations-center-local-server-bootstrap passed all required checks.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "evidence": "WP-0097 is marked ready in validation_coverage_manifest; repository-wide historical blockers remain for unrelated work packages.",
+      "status": "passed"
+    }
+  ],
+  "validation_recipe": {
+    "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0097 --json",
+    "last_observed_status": "passed",
+    "recipe_id": "wp-0097-operations-center-local-server-bootstrap",
+    "status": "registered"
+  },
+  "work_package_id": "WP-0097"
+}
