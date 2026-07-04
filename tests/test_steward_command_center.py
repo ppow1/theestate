@@ -266,6 +266,28 @@ def test_command_center_tab_switch_script_and_collapsible_navigation_are_rendere
     assert 'id="status-bar"' in html
 
 
+
+def test_operations_center_layout_framework_declares_regions_and_persistence(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    layout = payload["layout_framework"]
+    data = layout["data"]
+    region_ids = {region["id"] for region in data["regions"]}
+
+    assert layout["available"] is True
+    assert data["version"] == "layout-framework-v1"
+    assert data["layout_preference_key"] == "estate.operations_center.layout.v1"
+    assert {"top_navigation_tabs", "left_navigation_panel", "main_workspace", "bottom_activity_stream", "status_bar", "command_console"}.issubset(region_ids)
+    assert data["default_preferences"]["activity_console_dock"] == "bottom"
+    assert data["default_preferences"]["activity_console_visible"] is True
+    assert "Mission Control" in data["future_integration_points"]
+    assert "TTS/STT" in data["future_integration_points"]
+    assert "localStorage" in html
+    assert "LAYOUT_PREF_KEY" in html
+    assert "restoreLayoutPreferences" in html
+    assert "Operations Center Layout Framework" in html
+
 def test_mailbox_operations_center_summarizes_open_ack_steward_and_warnings(tmp_path):
     seed_inputs(tmp_path)
     write_json(tmp_path, "data/registry/personnel.json", [
