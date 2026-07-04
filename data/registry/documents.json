@@ -388,6 +388,18 @@
       "notes": "Machine-readable JSON Schema for Artifact Provenance Model records.",
       "superseded_paths": [],
       "resolved": true
+    },
+    {
+      "id": "DOC-CODEX-TASK-TEMPLATE-STANDARD",
+      "title": "Codex Task Template Standard v1",
+      "path": "docs/operations/Codex_Task_Template_Standard_v1.md",
+      "category": "operations/standard",
+      "status": "required",
+      "audience": "Codex workers, Chief Architect, and operators",
+      "source_of_truth": "canonical",
+      "notes": "Standard template for future Codex implementation work packages, completion receipts, and validation recipe obligations.",
+      "superseded_paths": [],
+      "resolved": true
     }
   ],
   "unresolved_documents": []

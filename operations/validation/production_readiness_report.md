@@ -1,16 +1,16 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-04T13:42:11+00:00
+- generated_at: 2026-07-04T17:03:30+00:00
 - git branch: work
-- git commit: 1aff2a3a6ed3e4e43c6ceb868270e676b16eca33
+- git commit: 9a3470c177d2439ba917bda598bf441965a094c2
 
 ## Totals
-- total_work_packages_scanned: 83
-- total_production_ready: 4
-- total_blocked: 79
-- total_missing_recipes: 69
-- total_missing_receipts: 12
-- total_incomplete_receipts: 48
+- total_work_packages_scanned: 88
+- total_production_ready: 5
+- total_blocked: 83
+- total_missing_recipes: 73
+- total_missing_receipts: 14
+- total_incomplete_receipts: 49
 
 ## Recommended Next Action
 Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.
@@ -83,8 +83,8 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0081: Execution status blocks readiness: no_recipe.
 - WP-0082: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
 - WP-0083: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0084: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
-- WP-0085: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- WP-0084: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
+- WP-0085: Execution status blocks readiness: no_recipe.
 - WP-0086: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
 - WP-0087: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0088: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
@@ -94,6 +94,10 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0093: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0094: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0096: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- WP-0097: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- WP-0098: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- WP-0099: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- WP-0100: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-9999: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 
 ## Ready for Chief Architect Production-Readiness Acceptance
@@ -101,14 +105,16 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0077
 - WP-0078
 - WP-0095
+- WP-0101
 
 ## Recent Validation Reports
+- `runtime/validation/work_packages/WP-0101_validation.json`
 - `runtime/validation/work_packages/WP-0078_validation.json`
 - `runtime/validation/work_packages/WP-0077_validation.json`
+- `runtime/validation/work_packages/WP-9999_validation.json`
+- `runtime/validation/work_packages/WP-0091_validation.json`
 - `runtime/validation/work_packages/WP-0095_validation.json`
 - `runtime/validation/work_packages/WP-0079_validation.json`
-- `runtime/validation/work_packages/WP-9999_validation.json`
-- `runtime/validation/work_packages/WP-0086_validation.json`
-- `runtime/validation/work_packages/WP-0091_validation.json`
-- `runtime/validation/work_packages/WP-0076_validation.json`
 - `runtime/validation/work_packages/WP-0075_validation.json`
+- `runtime/validation/work_packages/WP-0076_validation.json`
+- `runtime/validation/work_packages/WP-0086_validation.json`
