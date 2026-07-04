@@ -1,29 +1,29 @@
 {
-  "version": 1,
-  "updated_at": "2026-07-04T00:00:00+00:00",
-  "notes": "Local-first visible resident presence only; this artifact does not start autonomous duties or grant authority.",
   "residents": [
     {
-      "resident_id": "RES-000001",
-      "name": "Alfred",
-      "presence_state": "available",
-      "current_duty": "Coordinate Estate routing visibility and protect Steward attention.",
-      "last_heartbeat": "2026-07-04T00:00:00+00:00",
-      "last_activity": "Resident presence model initialized for WP-0106.",
+      "current_duty": "Review local Estate operational inputs and surface Steward attention needs.",
+      "last_activity": "runtime/alfred/duty_state.json",
+      "last_heartbeat": "2026-07-04T20:49:46+00:00",
       "mailbox_id": 7,
-      "needs_steward": false,
-      "status_reason": "Runtime presence is visible and informational only; no autonomous duty execution is active."
+      "mailbox_path": "collaboration/mailboxes/7",
+      "name": "Alfred",
+      "needs_steward": true,
+      "presence_state": "waiting_for_steward",
+      "resident_id": "RES-000001",
+      "status_reason": "Local evidence indicates Steward attention is needed."
     },
     {
-      "resident_id": "RES-000003",
-      "name": "Helen",
-      "presence_state": "available",
       "current_duty": "Maintain HR/personnel coordination awareness.",
-      "last_heartbeat": "2026-07-04T00:00:00+00:00",
       "last_activity": "Resident presence model initialized for WP-0106.",
+      "last_heartbeat": "2026-07-04T00:00:00+00:00",
       "mailbox_id": 6,
+      "name": "Helen",
       "needs_steward": false,
+      "presence_state": "available",
+      "resident_id": "RES-000003",
       "status_reason": "Runtime presence is visible and informational only; no autonomous duty execution is active."
     }
-  ]
+  ],
+  "updated_at": "2026-07-04T20:49:46+00:00",
+  "version": 1
 }
