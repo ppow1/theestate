@@ -375,6 +375,27 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0098": {
+        "recipe_id": "wp-0098-operations-center-launch-script",
+        "title": "WP-0098 — Operations Center Launch Script",
+        "description": "Validates the Steward-facing local PowerShell launcher, Estate root/dependency checks, settings loading, existing bootstrap usage, URL reporting, degraded optional component reporting, and safe shutdown guidance.",
+        "required_checks": ["Launch script exists", "Launch script uses existing Operations Center bootstrap", "Launch script regression tests pass", "Status/settings command surfaces render"],
+        "observational_checks": ["Production readiness report generates"],
+        "expected_artifacts": ["launch_operations_center.ps1", "operations/validation/reports/WP-0098_validation.md", "runtime/validation/work_packages/WP-0098_validation.json", "collaboration/work_packages/completions/WP-0098_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe", "Launcher bypasses local server bootstrap or changes command authority"],
+        "success_criteria": ["Required commands exit zero and recipe does not return no_recipe"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('test -f launch_operations_center.ps1 && rg -q "operations-center.*start" launch_operations_center.ps1 && rg -q "Safe shutdown" launch_operations_center.ps1'),
+            _cmd('pytest -q tests/test_operations_center_launch_script.py'),
+            _cmd('python -m estate.cli.main operations-center-settings --json'),
+            _cmd('python -m estate.cli.main operations-center status --json'),
+            _cmd('python -m estate.cli.main operations-center start --port 8878 --json && python -m estate.cli.main operations-center stop --json'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
+
     "WP-0096": {
         "recipe_id": "wp-0096-operations-center-notification-center",
         "title": "WP-0096 — Operations Center Notification Center",

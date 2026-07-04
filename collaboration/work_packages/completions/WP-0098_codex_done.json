@@ -1,0 +1,69 @@
+{
+  "authority_boundaries": {
+    "authority_bypass": false,
+    "automatic_work_package_execution": false,
+    "cloud_dependency": false,
+    "local_first_only": true,
+    "secret_storage": false
+  },
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T20:00:00+00:00",
+  "files_changed": [
+    "launch_operations_center.ps1",
+    "tests/test_operations_center_launch_script.py",
+    "src/estate/core/work_package_validation.py",
+    "operations/validation/reports/WP-0098_validation.md",
+    "runtime/validation/work_packages/WP-0098_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "collaboration/work_packages/completions/WP-0098_codex_done.json"
+  ],
+  "final_command_surfaces": [
+    ".\\launch_operations_center.ps1",
+    ".\\launch_operations_center.ps1 -StatusOnly",
+    ".\\launch_operations_center.ps1 -Stop",
+    ".\\launch_operations_center.ps1 -HostName 127.0.0.1 -Port 8765",
+    "PYTHONPATH=src python -m estate.cli.main operations-center start --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-center status --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-center stop --json"
+  ],
+  "known_limitations": [
+    "The launcher is a PowerShell operator entry point; Linux/macOS operators can use the existing Python CLI alternative: PYTHONPATH=src python -m estate.cli.main operations-center start --json.",
+    "Pull request URL is not known until a hosting provider creates the PR.",
+    "The launcher reports settings warnings and preflight degraded statuses but does not attempt to remediate optional components automatically."
+  ],
+  "merge_authority": "Chief Architect / Steward review required; Codex does not self-approve or merge.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward review required; Codex does not self-approve or merge.",
+  "production_readiness_command_status": {
+    "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "limitation": "Overall production readiness remains blocked by historical work packages outside WP-0098; WP-0098 validation recipe execution passed.",
+    "status": "passed"
+  },
+  "pull_request_not_applicable_reason": "Pull request URL is not available from the local non-interactive workspace at completion time.",
+  "pull_request_url_or_not_applicable_reason": "Pull request URL is not available from the local non-interactive workspace at completion time.",
+  "ready_for_ca_review": true,
+  "summary": [
+    "Added a Steward-facing PowerShell launch script for the Estate Operations Center that verifies the Estate root, checks Python availability, loads local settings, starts the existing operations-center bootstrap, prints the local URL, reports degraded optional components, and gives safe shutdown instructions.",
+    "Registered a WP-0098 validation recipe with required local-first checks and observational production-readiness compatibility.",
+    "Added regression tests for the launch script command surface, local-first authority boundaries, dependency checks, and existing bootstrap usage."
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_operations_center_launch_script.py tests/test_operations_center_bootstrap.py",
+      "observed": "4 passed",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0098 --json",
+      "observed": "validation_status=passed; production_readiness.production_ready=false only because the completion artifact did not exist yet during that pre-receipt validation run",
+      "status": "passed"
+    }
+  ],
+  "validation_recipe_status": {
+    "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0098 --json",
+    "recipe_id": "wp-0098-operations-center-launch-script",
+    "registered": true,
+    "status": "passed"
+  },
+  "work_package_id": "WP-0098"
+}

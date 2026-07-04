@@ -1,0 +1,126 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "test -f launch_operations_center.ps1 && rg -q \"operations-center.*start\" launch_operations_center.ps1 && rg -q \"Safe shutdown\" launch_operations_center.ps1",
+      "completed_at": "2026-07-04T20:00:02+00:00",
+      "duration_seconds": 0.035,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T20:00:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_operations_center_launch_script.py",
+      "completed_at": "2026-07-04T20:00:02+00:00",
+      "duration_seconds": 0.506,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T20:00:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0098_2026-07-04T200002Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operations-center-settings --json",
+      "completed_at": "2026-07-04T20:00:03+00:00",
+      "duration_seconds": 0.292,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T20:00:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0098_2026-07-04T200002Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operations-center status --json",
+      "completed_at": "2026-07-04T20:00:03+00:00",
+      "duration_seconds": 0.287,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T20:00:03+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0098_2026-07-04T200002Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operations-center start --port 8878 --json && python -m estate.cli.main operations-center stop --json",
+      "completed_at": "2026-07-04T20:00:05+00:00",
+      "duration_seconds": 2.442,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T20:00:03+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0098_2026-07-04T200002Z0000/command_05_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-04T20:00:06+00:00",
+      "duration_seconds": 0.359,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T20:00:05+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0098_2026-07-04T200002Z0000/command_06_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "test -f launch_operations_center.ps1 && rg -q \"operations-center.*start\" launch_operations_center.ps1 && rg -q \"Safe shutdown\" launch_operations_center.ps1",
+    "pytest -q tests/test_operations_center_launch_script.py",
+    "python -m estate.cli.main operations-center-settings --json",
+    "python -m estate.cli.main operations-center status --json",
+    "python -m estate.cli.main operations-center start --port 8878 --json && python -m estate.cli.main operations-center stop --json",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0098_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0098_validation.md",
+    "runtime/validation/work_packages/WP-0098_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T20:00:02+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "b4acc126fc871af3ec9dc38c5272c5de9d7bd727",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0098_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0098"
+  },
+  "recipe_id": "wp-0098-operations-center-launch-script",
+  "recipe_title": "WP-0098 \u2014 Operations Center Launch Script",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 5 command(s).",
+  "validation_id": "WP-0098_2026-07-04T200002Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0098"
+}

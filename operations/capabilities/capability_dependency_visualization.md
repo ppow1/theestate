@@ -2,7 +2,7 @@
 
 Read-only visualization for Mission Control and architectural review. This artifact is not a source of truth.
 
-Generated: 2026-07-04T12:30:26+00:00
+Generated: 2026-07-04T20:00:04+00:00
 
 ## Summary
 - Nodes: 6
