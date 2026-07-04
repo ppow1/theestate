@@ -160,3 +160,22 @@ def test_safe_wrapper_refuses_unrelated_changes_and_no_broad_staging():
     assert "git add ." not in script
     assert "git add -- $path" in script
     assert "git add -f -- $p" in script
+
+
+def test_wp_0102_and_wp_0105_recipes_registered():
+    wp_0102 = get_validation_recipe("WP-0102")
+    wp_0105 = get_validation_recipe("WP-0105")
+    assert wp_0102 is not None
+    assert wp_0102["recipe_id"] == "wp-0102-backlog-codex-template-retrofit-closure"
+    assert any("WP-0102 Template Retrofit Notice" in command["command"] for command in wp_0102["commands"])
+    assert wp_0105 is not None
+    assert wp_0105["recipe_id"] == "wp-0105-validation-closure-repair-0102-0103"
+    assert any("validate-work-package --id WP-0102 --json" in command["command"] for command in wp_0105["commands"])
+
+
+def test_wp_0103_historical_recipe_registrations_preserved():
+    for work_package_id in ("WP-0080", "WP-0081", "WP-0085", "WP-0103"):
+        recipe = get_validation_recipe(work_package_id)
+        assert recipe is not None
+        assert recipe["commands"]
+    assert get_validation_recipe("WP-0103")["recipe_id"] == "wp-0103-historical-validation-recipe-coverage"

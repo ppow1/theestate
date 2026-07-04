@@ -72,3 +72,34 @@ def test_manifest_and_report_generation_handle_legacy_artifacts(tmp_path):
 
 def test_wp_0095_recipe_registered():
     assert get_validation_recipe("WP-0095") is not None
+
+
+def test_wp_0102_receipt_complete_with_not_applicable_pull_request_metadata(tmp_path):
+    data = complete_receipt("WP-0102")
+    data.pop("pull_request_url")
+    data["pull_request_not_applicable_reason"] = "Local-only validation repair awaiting harness PR creation."
+    write_json(tmp_path, "collaboration/work_packages/completions/WP-0102_codex_done.json", data)
+    receipt = validate_receipt("WP-0102", tmp_path)
+    assert receipt["receipt_status"] == "complete"
+    assert receipt["receipt_gaps"] == []
+
+
+def test_wp_0103_non_blocking_scoped_boundary_receipt_complete(tmp_path):
+    data = complete_receipt("WP-0103")
+    data["known_limitations"] = []
+    data["non_blocking_known_limitations"] = ["WP-0086 and later pending backlog files were intentionally outside WP-0103 scope."]
+    write_json(tmp_path, "collaboration/work_packages/completions/WP-0103_codex_done.json", data)
+    receipt = validate_receipt("WP-0103", tmp_path)
+    readiness = calculate_production_readiness("passed", receipt)
+    assert receipt["receipt_status"] == "complete"
+    assert readiness["production_ready"] is True
+
+
+def test_production_readiness_report_generation_for_wp_0102_and_wp_0103(tmp_path):
+    for wp in ("WP-0102", "WP-0103"):
+        write_json(tmp_path, f"collaboration/work_packages/completions/{wp}_codex_done.json", complete_receipt(wp))
+        write_json(tmp_path, f"runtime/validation/work_packages/{wp}_validation.json", {"validation_status": "passed"})
+    report = generate_production_readiness_report(tmp_path, write=True)
+    ready = {entry["work_package_id"] for entry in report["ready_for_chief_architect_production_readiness_acceptance"]}
+    assert "WP-0102" in ready
+    assert "WP-0103" in ready

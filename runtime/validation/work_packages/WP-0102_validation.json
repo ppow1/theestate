@@ -1,0 +1,100 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "test -f docs/operations/Codex_Task_Template_Standard_v1.md && test -f collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md",
+      "completed_at": "2026-07-04T17:54:05+00:00",
+      "duration_seconds": 0.005,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T17:54:05+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "for id in 0086 0087 0088 0089 0091 0092 0093 0094 0095 0096 0097 0098 0099 0100; do rg -q \"WP-0102 Template Retrofit Notice\" collaboration/work_packages/pending/WP-${id}_*.md || exit 1; done",
+      "completed_at": "2026-07-04T17:54:05+00:00",
+      "duration_seconds": 0.112,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T17:54:05+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0102'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-04T17:54:05+00:00",
+      "duration_seconds": 0.069,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T17:54:05+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; allowed={'WP-0086','WP-0091','WP-0095'}; bad=[p.name for wp in targets for p in d.glob(f'{wp}_codex_done.json') if wp not in allowed]; assert not bad, bad\"",
+      "completed_at": "2026-07-04T17:54:05+00:00",
+      "duration_seconds": 0.053,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T17:54:05+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "test -f docs/operations/Codex_Task_Template_Standard_v1.md && test -f collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md",
+    "for id in 0086 0087 0088 0089 0091 0092 0093 0094 0095 0096 0097 0098 0099 0100; do rg -q \"WP-0102 Template Retrofit Notice\" collaboration/work_packages/pending/WP-${id}_*.md || exit 1; done",
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0102'); assert r['receipt_status']=='complete', r\"",
+    "python -c \"from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; allowed={'WP-0086','WP-0091','WP-0095'}; bad=[p.name for wp in targets for p in d.glob(f'{wp}_codex_done.json') if wp not in allowed]; assert not bad, bad\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0102_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0102_validation.md",
+    "runtime/validation/work_packages/WP-0102_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T17:54:05+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "934d7fab040ac88f8612f70954ffc6d76b31e503",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0102_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0102"
+  },
+  "recipe_id": "wp-0102-backlog-codex-template-retrofit-closure",
+  "recipe_title": "WP-0102 \u2014 Backlog Codex Template Retrofit Validation",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 0 command(s).",
+  "validation_id": "WP-0102_2026-07-04T175405Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0102"
+}

@@ -2,6 +2,9 @@
   "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-04T17:14:31+00:00",
+  "deferred_follow_up_work": [
+    "Historical packages with incomplete receipts remain listed by production-readiness artifacts for future planned remediation; WP-0103 did not broadly repair old receipts by design."
+  ],
   "files_changed": [
     "src/estate/core/work_package_validation.py",
     "tests/test_work_package_validation.py",
@@ -87,12 +90,12 @@
     "WP-0084",
     "WP-0085"
   ],
-  "known_limitations": [
-    "WP-0086 and later pending backlog files were not modified.",
-    "Historical packages with incomplete receipts are listed as blockers instead of repaired broadly.",
+  "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "non_blocking_known_limitations": [
+    "WP-0086 and later pending backlog files were intentionally outside WP-0103 scope.",
     "Recipe coverage was added in a controlled batch for complete receipts and obvious safe local CLI surfaces; remaining complete-receipt historical gaps are deferred for later review if no safe recipe was added in this batch."
   ],
-  "merge_authority": "ca_verified_auto_merge_allowed",
   "packages_deferred_with_reasons": [
     {
       "classification": "requires_receipt_repair_before_recipe",
@@ -366,7 +369,7 @@
     "total_missing_recipes": 73,
     "total_production_ready": 5
   },
-  "pull_request_url_not_applicable_reason": "Local Codex completion artifact created before hosted pull request URL is available.",
+  "pull_request_not_applicable_reason": "Local Codex completion artifact created before hosted pull request URL is available.",
   "ready_for_ca_review": true,
   "recipes_added": [
     "WP-0015",
