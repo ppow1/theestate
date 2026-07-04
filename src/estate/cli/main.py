@@ -36,6 +36,7 @@ from estate.core.morning_briefing import generate_morning_briefing, format_morni
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, format_worker_runtime_monitor
+from estate.core.validation_observations import append_observation, load_observations, update_observation_status, render_markdown_log
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
@@ -790,6 +791,31 @@ def cmd_audit(args):
     if report["failed"] > 0:
         raise SystemExit(1)
 
+def cmd_validation_observations(args):
+    import json
+    if getattr(args, "update_status", None):
+        record = update_observation_status(args.observation_id, args.update_status, linked_follow_up_work_package=getattr(args, "follow_up_wp", None))
+        payload = {"updated": record, "observations": load_observations()}
+    elif getattr(args, "observation_id", None):
+        record = append_observation({
+            "observation_id": args.observation_id,
+            "related_work_package": args.related_work_package,
+            "observed_behavior": args.observed_behavior,
+            "expected_behavior": args.expected_behavior,
+            "source_of_observation": args.source_of_observation,
+            "severity": args.severity,
+            "status": args.status,
+            "recommended_next_action": args.recommended_next_action,
+            "linked_follow_up_work_package": args.follow_up_wp,
+        })
+        payload = {"created": record, "observations": load_observations()}
+    else:
+        payload = {"observations": load_observations()}
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(render_markdown_log(payload["observations"]))
+
 def cmd_sync_ollama(args):
     created, ec_id = sync_ollama_providers()
     print(f"Logged {ec_id}")
@@ -905,6 +931,20 @@ def main():
     p = sub.add_parser("capability-lifecycle")
     p.add_argument("--json", action="store_true", help="Generate capability lifecycle report and print JSON")
     p.set_defaults(func=cmd_capability_lifecycle)
+
+    p = sub.add_parser("validation-observations", help="List, add, or update validation observations")
+    p.add_argument("--json", action="store_true", help="Print validation observations JSON")
+    p.add_argument("--observation-id", default=None, help="Observation id to create or update")
+    p.add_argument("--related-work-package", default=None, help="Related work package id")
+    p.add_argument("--observed-behavior", default="", help="Observed behavior to record")
+    p.add_argument("--expected-behavior", default=None, help="Expected behavior, if known")
+    p.add_argument("--source-of-observation", default="", help="Source of the observation")
+    p.add_argument("--severity", default="follow-up", help="Severity: info, follow-up, defect-candidate, confirmed-defect")
+    p.add_argument("--status", default="open", help="Initial status")
+    p.add_argument("--recommended-next-action", default="Review in a future validation pass.", help="Recommended next action")
+    p.add_argument("--follow-up-wp", default=None, help="Linked follow-up work package, if one exists")
+    p.add_argument("--update-status", default=None, help="Update an existing observation to this status")
+    p.set_defaults(func=cmd_validation_observations)
 
     p = sub.add_parser("operational-validation")
     p.add_argument("--json", action="store_true", help="Generate operational validation report and print JSON")
