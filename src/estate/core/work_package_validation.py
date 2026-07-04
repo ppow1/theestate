@@ -876,6 +876,34 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0110": {
+        "recipe_id": "wp-0110-resident-action-authority-boundary",
+        "title": "WP-0110 — Resident Action Authority Boundary",
+        "description": "Validates local resident authority checks, safe default denial, Alfred/Helen explicit boundaries, duty/conversation integration, audit storage, CLI JSON, and completion receipt without changing governance, validation, merge, personnel, or Steward authority.",
+        "required_checks": ["Authority CLI allows Alfred summarize", "Authority CLI denies Alfred execution", "Authority CLI allows Helen summarize", "Authority CLI denies Helen personnel modification", "Unknown action denied", "Resident authority tests pass", "Completion receipt exists"],
+        "observational_checks": ["Resident duty runners render", "Resident conversation help renders", "Operations Center command center renders", "Production readiness report generation"],
+        "expected_artifacts": ["src/estate/core/resident_authority.py", "tests/test_resident_authority.py", "runtime/residents/authority_decisions.jsonl", "collaboration/work_packages/completions/WP-0110_codex_done.json", "runtime/validation/work_packages/WP-0110_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Validation returns no_recipe", "Unknown actions are allowed silently", "Resident payload implies governance, validation, merge, personnel, Steward, or work-package execution authority"],
+        "success_criteria": ["Required commands exit zero", "Boundary decisions include reasons and source references", "Duty runners and conversations expose authority decisions", "Audit path is local"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json'),
+            _cmd('python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --json'),
+            _cmd('python -m estate.cli.main resident-authority check --resident Helen --action summarize --json'),
+            _cmd('python -m estate.cli.main resident-authority check --resident Helen --action modify-personnel --json'),
+            _cmd('python -m estate.cli.main resident-authority check --resident Alfred --action unknown-action --json'),
+            _cmd('python -m estate.cli.main resident-authority list --resident Alfred --json'),
+            _cmd('python -m pytest tests/test_resident_authority.py tests/test_alfred_duty.py tests/test_helen_duty.py tests/test_resident_conversation_sessions.py tests/test_resident_cards.py'),
+            _cmd("python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0110_codex_done.json').is_file()\""),
+            _cmd('python -m estate.cli.main resident-duty --resident Alfred --json', required=False),
+            _cmd('python -m estate.cli.main resident-duty --resident Helen --json', required=False),
+            _cmd('python -m estate.cli.main resident-conversation --help', required=False),
+            _cmd('python -m estate.cli.main steward-command-center --json', required=False),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0111": {
         "recipe_id": "wp-0111-first-batch-burn-down-self-validation",
         "title": "WP-0111 — First Production-Readiness Backlog Burn-Down Batch",

@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from estate.core.paths import ESTATE_ROOT
+from estate.core.resident_authority import check_authority
 
 SESSION_STORE = Path("runtime/resident_conversations/sessions")
 DEFAULT_PARTICIPANTS = [{"role": "operator", "label": "Local operator"}, {"role": "resident", "label": "Resident"}]
@@ -68,6 +69,7 @@ def create_session(
     operator_note: str | None = None,
     outcome: str = "informational",
     canonical_links: list[str] | None = None,
+    action: str | None = None,
 ) -> dict[str, Any]:
     root_path = _root(root)
     created_at = _now()
@@ -75,6 +77,7 @@ def create_session(
     base = created_at.replace(":", "").replace("+", "Z").replace("-", "").replace("T", "-")
     session_id = f"rcs-{safe_resident}-{base}"
     outcome_value = outcome if outcome in VALID_OUTCOMES else "informational"
+    authority_decision = check_authority(resident, action or outcome_value, source_refs=source_artifacts or [], root=root_path, audit=False)
     events = []
     if prompt:
         events.append({"type": "prompt", "role": participant_role, "timestamp": created_at, "content": prompt})
@@ -94,8 +97,8 @@ def create_session(
         "participants": [{"role": participant_role, "label": "Session operator"}, {"role": "resident", "label": str(resident)}],
         "source_artifacts": [str(item) for item in (source_artifacts or []) if item],
         "events": events,
-        "outcome": {"label": outcome_value, "canonical_artifact_links": [str(item) for item in (canonical_links or []) if item], "authoritative": False},
-        "authority_boundary": {"authoritative_record": False, "limitations": AUTHORITY_LIMITATIONS},
+        "outcome": {"label": outcome_value, "canonical_artifact_links": [str(item) for item in (canonical_links or []) if item], "authoritative": False, "authority_decision": authority_decision.get("decision"), "authority_classification": authority_decision.get("authority_classification")},
+        "authority_boundary": {"authoritative_record": False, "limitations": AUTHORITY_LIMITATIONS, "decision": authority_decision},
         "schema_notes": "Session transcript/audit record only; canonical decisions must live in linked Estate artifacts.",
     }
     out = _session_path(root_path, session_id)

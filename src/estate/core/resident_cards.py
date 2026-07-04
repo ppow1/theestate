@@ -12,6 +12,7 @@ from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_presence import build_resident_presence
+from estate.core.resident_authority import list_authority
 
 INITIAL_RESIDENT_NAMES = ("Alfred", "Helen")
 PLACEHOLDER = "Not available yet"
@@ -135,6 +136,8 @@ def build_resident_card(root, resident, *, personnel=None, mailboxes=None, runti
         "details_link": _resident_detail_path(root, resident) or PLACEHOLDER,
     }
     fields["needs_steward"] = "Yes" if _needs_steward(fields, warnings) else "No"
+    boundary = list_authority(name)["resident_boundaries"].get(_slug(name), {})
+    fields["authority_status"] = {"allowed": boundary.get("allowed", []), "approval_required": boundary.get("approval_required", []), "denied": boundary.get("denied", []), "audit_path": "runtime/residents/authority_decisions.jsonl"}
     fields["available"] = bool(resident.get("id"))
     fields["warnings"] = warnings
     return fields

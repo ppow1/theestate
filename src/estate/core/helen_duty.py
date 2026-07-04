@@ -14,6 +14,7 @@ from typing import Any
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_presence import RUNTIME_PATH, build_resident_presence
+from estate.core.resident_authority import check_authority
 
 DUTY_STATE_PATH = Path("runtime/helen/duty_state.json")
 AUDIT_LOG_PATH = Path("runtime/helen/duty_runs.jsonl")
@@ -189,6 +190,10 @@ def run_helen_duty(root: str | Path | None = None, *, write: bool = True) -> dic
         },
         "source_artifact_references": metas,
         "authority_limitations": AUTHORITY_LIMITATIONS,
+        "authority_boundary": {
+            "summarize": check_authority("Helen", "summarize", root=root, audit=False),
+            "execute_work_package": check_authority("Helen", "execute-work-package", root=root, audit=False),
+        },
         "runtime_artifacts": {"duty_state": str(DUTY_STATE_PATH), "audit_log": str(AUDIT_LOG_PATH), "operations_summary": str(OPERATIONS_SUMMARY_PATH), "presence": str(RUNTIME_PATH)},
     }
     if write:

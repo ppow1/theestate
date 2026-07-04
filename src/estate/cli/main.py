@@ -67,6 +67,7 @@ from estate.core.resident_presence import build_resident_presence, filter_reside
 from estate.core.resident_conversation_sessions import create_session, list_sessions, load_session, format_session_list
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
+from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def _repo_path(rel):
@@ -1152,6 +1153,22 @@ def cmd_validation_observations(args):
     else:
         print(render_markdown_log(payload["observations"]))
 
+
+def cmd_resident_authority(args):
+    import json
+    if args.action == "check":
+        if not args.resident or not args.resident_action:
+            raise SystemExit("resident-authority check requires --resident and --action")
+        payload = check_authority(args.resident, args.resident_action, target=args.target, source_refs=args.source_ref or [])
+    else:
+        payload = list_authority(resident=getattr(args, "resident", None))
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif args.action == "check":
+        print(format_authority_decision(payload))
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+
 def cmd_resident_conversation(args):
     import json
     if args.action == "start":
@@ -1683,6 +1700,16 @@ def main():
     p.add_argument("--resident", help="Filter by resident name or id")
     p.add_argument("--json", action="store_true", help="Print resident presence JSON")
     p.set_defaults(func=cmd_resident_presence)
+
+
+    p = sub.add_parser("resident-authority", help="Check or list resident action authority boundaries")
+    p.add_argument("action", choices=["check", "list"], help="Authority action")
+    p.add_argument("--resident", help="Resident name")
+    p.add_argument("--action", dest="resident_action", help="Requested resident action category")
+    p.add_argument("--target", help="Action target or artifact path")
+    p.add_argument("--source-ref", action="append", help="Additional source artifact reference")
+    p.add_argument("--json", action="store_true", help="Print resident authority JSON")
+    p.set_defaults(func=cmd_resident_authority)
 
     p = sub.add_parser("resident-conversation", help="Create and inspect local resident conversation session audit records")
     p.add_argument("action", choices=["start", "list", "show"], help="Conversation session action")
