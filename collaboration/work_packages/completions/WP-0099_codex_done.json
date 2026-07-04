@@ -1,0 +1,89 @@
+{
+  "work_package_id": "WP-0099",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T20:10:35+00:00",
+  "branch": "work",
+  "pull_request_url_not_applicable_reason": "Pull request URL is not available from the local non-interactive workspace at completion time.",
+  "pull_request_url_or_not_applicable_reason": "Pull request URL is not available from the local non-interactive workspace at completion time.",
+  "summary": [
+    "Created an Operations Center pre-handoff readiness checkpoint for Steward, Chief Architect #3, and Chief Architect #5 review.",
+    "Documented implemented Operations Center capabilities, degraded or incomplete runtime surfaces, validation status, post-WP-0100 continuation items, and handoff notes without adding UI features or governance structures.",
+    "Registered a WP-0099 validation recipe using local-first non-destructive checks for the checkpoint report, command surfaces, receipt, and production-readiness compatibility."
+  ],
+  "files_changed": [
+    "operations/readiness/operations_center_pre_handoff_readiness_check.md",
+    "src/estate/core/work_package_validation.py",
+    "operations/validation/reports/WP-0099_validation.md",
+    "runtime/validation/work_packages/WP-0099_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "collaboration/work_packages/completions/WP-0099_codex_done.json"
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+      "status": "passed",
+      "observed": "Regenerated the local Steward command center payload and HTML from repository-local artifacts."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center-profile --json --profile validation",
+      "status": "passed",
+      "observed": "Resolved the validation workspace profile with compatible layout-framework-v1 metadata."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center-settings --json",
+      "status": "passed",
+      "observed": "Loaded local Operations Center settings/defaults with stores_secrets=false."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center status --json",
+      "status": "passed",
+      "observed": "Reported local-only Operations Center status; server was not running on the default local endpoint."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-notification-center --json",
+      "status": "passed",
+      "observed": "Rendered read-only notification aggregation and exposed unavailable input artifacts."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0099 --json",
+      "status": "passed",
+      "observed": "validation_status=passed; receipt_status=complete after receipt metadata correction."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed",
+      "observed": "completed successfully after WP-0099 validation recipe and receipt were present."
+    }
+  ],
+  "known_limitations": [
+    "This package is a readiness checkpoint and does not claim whole-service Operationally Validated status for the Operations Center.",
+    "The default local Operations Center server was observed stopped during the checkpoint; start/stop behavior is covered by prior WP-0097/WP-0098 validation and the registered WP-0099 recipe checks status only.",
+    "Some runtime source artifacts were unavailable or degraded during review; those gaps are documented as handoff risks rather than expanded in this package.",
+    "Pull request URL is not known until a hosting provider creates the PR."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "Chief Architect / Steward review required; Codex does not self-approve or merge.",
+  "validation_recipe_status": {
+    "registered": true,
+    "recipe_id": "wp-0099-operations-center-pre-handoff-readiness-check",
+    "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0099 --json",
+    "status": "passed"
+  },
+  "production_readiness_command_status": {
+    "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "status": "passed_with_existing_backlog_blockers",
+    "observed": "command completed; WP-0099 appears in ready_for_chief_architect_production_readiness_acceptance; total_blocked=70; total_missing_recipes=53",
+    "limitation": "Overall production readiness remains blocked by historical work packages outside WP-0099; the WP-0099 validation recipe and receipt are complete."
+  },
+  "final_command_surfaces": [
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-center-profile --json --profile validation",
+    "PYTHONPATH=src python -m estate.cli.main operations-center-settings --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-center status --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-notification-center --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0099 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "pull_request_not_applicable_reason": "Pull request URL is not available from the local non-interactive workspace at completion time.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward review required; Codex does not self-approve or merge."
+}

@@ -396,6 +396,28 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
 
 
+
+    "WP-0099": {
+        "recipe_id": "wp-0099-operations-center-pre-handoff-readiness-check",
+        "title": "WP-0099 — Operations Center Pre-Handoff Readiness Check",
+        "description": "Validates the Operations Center pre-handoff readiness checkpoint document, local command surface evidence, completion receipt, and production-readiness compatibility without expanding UI scope or governance authority.",
+        "required_checks": ["Readiness checkpoint exists", "Readiness checkpoint references implemented and degraded capabilities", "Local Operations Center command surfaces render", "Completion receipt exists"],
+        "observational_checks": ["Production readiness report generates"],
+        "expected_artifacts": ["operations/readiness/operations_center_pre_handoff_readiness_check.md", "operations/validation/reports/WP-0099_validation.md", "runtime/validation/work_packages/WP-0099_validation.json", "collaboration/work_packages/completions/WP-0099_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe", "Readiness checkpoint claims unsupported Operationally Validated status"],
+        "success_criteria": ["Required commands exit zero and recipe does not return no_recipe"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('test -f operations/readiness/operations_center_pre_handoff_readiness_check.md && rg -q "Capability Checklist" operations/readiness/operations_center_pre_handoff_readiness_check.md && rg -q "Known Gaps" operations/readiness/operations_center_pre_handoff_readiness_check.md && rg -q "Handoff Notes for Chief Architect #5" operations/readiness/operations_center_pre_handoff_readiness_check.md'),
+            _cmd('rg -q "server was observed stopped|server not running" operations/readiness/operations_center_pre_handoff_readiness_check.md && rg -q "does not assert Operationally Validated" operations/readiness/operations_center_pre_handoff_readiness_check.md'),
+            _cmd('python -m estate.cli.main steward-command-center --json'),
+            _cmd('python -m estate.cli.main operations-center-settings --json'),
+            _cmd('python -m estate.cli.main operations-center status --json'),
+            _cmd('test -f collaboration/work_packages/completions/WP-0099_codex_done.json'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0096": {
         "recipe_id": "wp-0096-operations-center-notification-center",
         "title": "WP-0096 — Operations Center Notification Center",
