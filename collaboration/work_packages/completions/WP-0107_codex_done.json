@@ -1,0 +1,89 @@
+{
+  "branch": "work",
+  "codex_status": "implemented",
+  "completed_at": "2026-07-04T20:48:36+00:00",
+  "explicit_authority_limitations": [
+    "Alfred may summarize and route; Alfred may not authorize.",
+    "Alfred may identify decisions; Alfred may not make Steward decisions.",
+    "Alfred may surface validation blockers; Alfred may not declare production readiness without validation artifacts.",
+    "Alfred may point to work packages; Alfred may not execute them automatically.",
+    "Alfred duty runs are local operational views, not canonical Estate authority."
+  ],
+  "files_changed": [
+    "src/estate/core/alfred_duty.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_alfred_duty.py",
+    "runtime/residents/presence.json",
+    "operations/alfred/duty_summary.md",
+    "collaboration/work_packages/completions/WP-0107_codex_done.json"
+  ],
+  "final_alfred_duty_command_surface": [
+    "PYTHONPATH=src python -m estate.cli.main alfred-duty --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-duty --resident Alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Alfred --json"
+  ],
+  "known_limitations": [
+    "Alfred's duty runner is a bounded local operational summary and does not create autonomous external agency.",
+    "Optional local source artifacts may be missing; those are reported as missing/degraded source references instead of failing the run.",
+    "Downstream resident conversation sessions, action authorization, and service orchestration remain outside WP-0107 scope."
+  ],
+  "merge_authority": "Class A; no Alfred authority, Steward decision authority, mailbox authority, validation authority, merge authority, or automatic action semantics were changed.",
+  "production_readiness_command_status": "command completed; repository-wide readiness remains not accepted due to existing blocked/missing/incomplete work outside this package, while WP-0107 recipe is registered and passed",
+  "pull_request_url_not_applicable_reason": "Local Codex environment records PR metadata via make_pr after git commit; no remote URL is available before tool submission.",
+  "ready_for_ca_review": true,
+  "sample_alfred_duty_output": {
+    "authority_boundary": "Operational summary only; canonical authority remains with source artifacts and Steward-approved validation/governance processes.",
+    "duty_state": "waiting_for_steward",
+    "needs_steward": true,
+    "presence_state": "waiting_for_steward",
+    "source_artifact_reference_count": 10
+  },
+  "source_artifacts_inspected_by_duty_runner": [
+    "data/registry/residents.json",
+    "data/registry/personnel.json",
+    "data/registry/mailboxes.json",
+    "runtime/residents/presence.json",
+    "runtime/mailboxes/index.json",
+    "runtime/mailboxes/sync_duty.json",
+    "runtime/steward/decision_queue.json",
+    "runtime/operations_board.json",
+    "runtime/validation/production_readiness.json",
+    "runtime/work_packages/assignment_queue.json"
+  ],
+  "summary": "Implemented Alfred's local-first bounded duty runner, CLI command surfaces, resident presence updates, Operations Center Resident Card visibility via existing presence integration, audit/state artifacts, tests, and WP-0107 validation recipe registration without granting governance, validation, merge, notification, or autonomous work-package execution authority.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_cards.py",
+      "observed_output": "12 passed",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main alfred-duty --json",
+      "observed_output": "Rendered Alfred duty JSON with a locally evidenced duty_state (working or waiting_for_steward depending on current local decision-queue artifacts), presence integration, and source artifact references.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main resident-duty --resident Alfred --json",
+      "observed_output": "Rendered Alfred duty JSON through resident-duty alias.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Alfred --json",
+      "observed_output": "Rendered Alfred resident presence with autonomous_execution=false.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+      "observed_output": "validation_status=passed; recipe_id=wp-0107-alfred-online-duty-runner",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "observed_output": "Report generated; ready_for_chief_architect_production_readiness_acceptance=false with existing repository-wide blocked/missing/incomplete items.",
+      "status": "passed"
+    }
+  ],
+  "validation_recipe_status": "registered and passed via PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+  "work_package_id": "WP-0107"
+}
