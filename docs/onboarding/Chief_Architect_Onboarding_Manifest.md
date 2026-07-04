@@ -28,8 +28,9 @@ This is the canonical repository-relative onboarding manifest for Chief Architec
 | 12 | Yes | Chief Architect | `docs/collaboration/Operations_Board_Client_v1.md` | Operations board client interface. |
 | 13 | Yes | Chief Architect | `docs/governance/Capability_Lifecycle_States_v1.md` | Lifecycle states reference only; this manifest does not modify lifecycle states. |
 | 14 | Yes | Chief Architect | `docs/operations/Operational_Validation_Reporting.md` | Operational validation reporting standard. |
-| 15 | Yes | Chief Architect | `archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md` | Required institutional memory memorandum. |
-| 16 | Yes | Chief Architect | `archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md` | Required because the memorandum exists in the repository. |
+| 15 | Yes | Chief Architect | `docs/operations/Chief_Architect_Operating_Manual_v1.md` | Operating reference for the Office of Chief Architect. |
+| 16 | Yes | Chief Architect | `archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md` | Required institutional memory memorandum. |
+| 17 | Yes | Chief Architect | `archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md` | Required because the memorandum exists in the repository. |
 
 ## Visual Onboarding Entry Point
 

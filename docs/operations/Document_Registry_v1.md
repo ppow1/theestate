@@ -36,6 +36,7 @@ Stable registry for durable Estate document IDs. Current paths may move in futur
 | `DOC-GENERATED-ARTIFACT-POLICY` | Generated Artifact Policy | `docs/operations/Generated_Artifact_Policy_v1.md` | operations/policy | required | all personnel | canonical | Policy distinguishing generated artifacts from authoritative sources. | — |
 | `DOC-ARTIFACT-PROVENANCE-MODEL` | Artifact Provenance Model | `docs/operations/Artifact_Provenance_Model_v1.md` | operations/provenance | required | all personnel | canonical | Lightweight provenance model for artifact origin, state, review, validation, and supersession metadata. | — |
 | `DOC-ARTIFACT-PROVENANCE-SCHEMA` | Artifact Provenance Schema | `data/registry/artifact_provenance_schema.json` | operations/provenance | required | systems and workers | canonical_schema | Machine-readable JSON Schema for Artifact Provenance Model records. | — |
+| `DOC-CHIEF-ARCHITECT-OPERATING-MANUAL` | Chief Architect Operating Manual v1 | `docs/operations/Chief_Architect_Operating_Manual_v1.md` | operations/manual | required | Chief Architect and successors | canonical | Operating manual for the Office of Chief Architect, including methodology, boundaries, work package practice, validation interaction, and succession expectations. | — |
 
 ## Unresolved Documents
 
