@@ -1,0 +1,29 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T23:47:58Z",
+  "files_changed": [
+    "audit/autonomy/autonomous_operations_audit.jsonl",
+    "collaboration/work_packages/completions/WP-0068_codex_done.json",
+    "operations/autonomy/autonomous_operations_audit.md",
+    "src/estate/cli/main.py",
+    "src/estate/core/autonomous_operations_audit.py",
+    "tests/test_autonomous_operations_audit.py"
+  ],
+  "known_limitations": [
+    "The audit trail records current local evidence only; it does not regenerate upstream artifacts.",
+    "Missing or conflicting evidence is preserved in the audit record rather than inferred or corrected."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "merge_class": "Class A",
+  "pull_request_url": "pending_make_pr_tool",
+  "ready_for_ca_review": true,
+  "summary": "Implemented an append-only Autonomous Operations Audit Trail that records advisory autonomous-operation decisions, reasons, evidence paths, missing/conflicting evidence, blocked conditions, recommended next actions, and Steward authority requirements for Mission Control and Morning Briefing consumption.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_autonomous_operations_audit.py tests/test_autonomous_operations_control_loop.py",
+    "PYTHONPATH=src python -m estate.cli.main autonomous-operations-audit --json > /tmp/autonomy_audit.json",
+    "python -m json.tool /tmp/autonomy_audit.json >/dev/null",
+    "PYTHONPATH=src pytest -q tests/test_autonomous_operations_audit.py tests/test_autonomous_operations_control_loop.py tests/test_morning_briefing.py tests/test_steward_command_center.py"
+  ],
+  "work_package_id": "WP-0068"
+}
