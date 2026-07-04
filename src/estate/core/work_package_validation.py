@@ -285,6 +285,24 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main validate-work-package --id WP-0078 --json'),
         ],
     },
+
+    "WP-0101": {
+        "recipe_id": "wp-0101-codex-task-template-standard",
+        "title": "WP-0101 — Codex Task Template Standard",
+        "description": "Confirms the Codex task template standard exists, is registered, and is discoverable through local Estate search.",
+        "required_checks": ["Document registry includes the Codex task template standard", "Estate search discovers the Codex task template standard"],
+        "observational_checks": ["Production readiness report generation"],
+        "expected_artifacts": ["operations/validation/reports/WP-0101_validation.md", "runtime/validation/work_packages/WP-0101_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main document-registry --json'),
+            _cmd('python -m estate.cli.main estate-search "Codex Task Template" --json'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
 }
 
 

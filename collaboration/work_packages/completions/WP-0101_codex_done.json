@@ -1,0 +1,83 @@
+{
+  "work_package_id": "WP-0101",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T17:01:45Z",
+  "branch": "work",
+  "summary": [
+    "Created the durable Codex Task Template Standard v1 at docs/operations/Codex_Task_Template_Standard_v1.md.",
+    "Registered the standard in the Estate document registry for discovery.",
+    "Verified discoverability through document-registry and estate-search commands.",
+    "Did not retrofit pending work packages WP-0086 through WP-0100."
+  ],
+  "files_changed": [
+    "docs/operations/Codex_Task_Template_Standard_v1.md",
+    "data/registry/documents.json",
+    "src/estate/core/work_package_validation.py",
+    "runtime/search/institutional_search_index.json",
+    "operations/validation/production_readiness_report.md",
+    "operations/validation/validation_coverage_manifest.md",
+    "runtime/validation/production_readiness_report.json",
+    "runtime/validation/validation_coverage_manifest.json",
+    "collaboration/work_packages/completions/WP-0101_codex_done.json"
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main document-registry --json",
+      "status": "passed",
+      "observed": "Registry command returned the DOC-CODEX-TASK-TEMPLATE-STANDARD entry."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main estate-search \"Codex Task Template\" --json",
+      "status": "passed",
+      "observed": "Search returned docs/operations/Codex_Task_Template_Standard_v1.md among matches."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0101 --json",
+      "status": "passed",
+      "observed": "WP-0101 validation status passed; receipt status complete; production_ready true."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed_with_existing_blocks",
+      "observed": "Command completed; WP-0101 is ready, while overall report remains blocked by pre-existing unrelated work package gaps."
+    },
+    {
+      "command": "python -m pytest tests/test_document_registry.py tests/test_production_readiness_validation.py tests/test_codex_completion.py",
+      "status": "warning",
+      "observed": "Collection failed because PYTHONPATH was not set in this environment (ModuleNotFoundError: estate)."
+    },
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_document_registry.py tests/test_production_readiness_validation.py tests/test_codex_completion.py",
+      "status": "passed",
+      "observed": "17 passed."
+    }
+  ],
+  "known_limitations": [
+    "Production-readiness output remains blocked by pre-existing unrelated work packages with missing recipes or incomplete receipts."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "approved_template_standard_path": "docs/operations/Codex_Task_Template_Standard_v1.md",
+  "validation_recipe_status": {
+    "applicable": true,
+    "registered": true,
+    "recipe_id": "wp-0101-codex-task-template-standard",
+    "reason": "A local-first recipe was added to verify the documentation standard exists, is registered, and is discoverable."
+  },
+  "production_readiness_command_status": {
+    "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "status": "completed_wp0101_ready_existing_unrelated_blocks",
+    "artifacts": [
+      "operations/validation/production_readiness_report.md",
+      "runtime/validation/production_readiness_report.json",
+      "operations/validation/validation_coverage_manifest.md",
+      "runtime/validation/validation_coverage_manifest.json"
+    ]
+  },
+  "final_command_surfaces": [
+    "PYTHONPATH=src python -m estate.cli.main document-registry --json",
+    "PYTHONPATH=src python -m estate.cli.main estate-search \"Codex Task Template\" --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "pull_request_not_applicable_reason": "Pull request URL is not available from this local non-interactive Codex environment; branch committed locally for CA review."
+}

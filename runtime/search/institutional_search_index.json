@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-02T21:12:28+00:00",
+  "generated_at": "2026-07-04T17:03:29+00:00",
   "index_path": "runtime/search/institutional_search_index.json",
-  "record_count": 136,
+  "record_count": 314,
   "records": [
     {
       "artifact_type": "artifact",
@@ -164,6 +164,15 @@
       "policy_classification": "authoritative_source_artifact",
       "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
       "title": "Promotion_Workflow_v1.md"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Transport Adapter Evaluation v1 Status: Evaluation v1 Owner: Alfred / Chief of Staff Classification: Estate Internal Related model: `docs/collaboration/Communication_Bus_v1_Operational_Flow.md` ## 1. Purpose This docum",
+      "path": "docs/collaboration/Transport_Adapter_Evaluation_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Transport Adapter Evaluation v1"
     },
     {
       "artifact_type": "document",
@@ -384,6 +393,24 @@
     {
       "artifact_type": "document",
       "authoritative": true,
+      "excerpt": "# Artifact Provenance Model v1 Status: Active Model Owner: Chief Architect / Alfred Operations Classification: Estate Internal Introduced By: WP-0029 Date: 2026-07-02 ## Purpose The Artifact Provenance Model gives Estate",
+      "path": "docs/operations/Artifact_Provenance_Model_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Artifact Provenance Model v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Autonomous Estate Operations Charter v1 ## Purpose This charter defines the first operational boundary for allowing the Estate to continue delegated work while the Steward is away. It bridges existing collaboration arc",
+      "path": "docs/operations/Autonomous_Estate_Operations_Charter_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Autonomous Estate Operations Charter v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
       "excerpt": "# Capability Lifecycle Reporting Status: Operational Documentation Classification: Estate Internal ## Purpose Capability lifecycle reporting provides an operational validation layer over existing Estate capability regist",
       "path": "docs/operations/Capability_Lifecycle_Reporting.md",
       "policy_classification": "authoritative_source_artifact",
@@ -411,6 +438,15 @@
     {
       "artifact_type": "document",
       "authoritative": true,
+      "excerpt": "# Codex Completion Detection Strategy v1 ## Purpose This strategy defines how the Estate detects local Codex work-package completion before any GitHub merge occurs. It deliberately treats merged GitHub state as a downstr",
+      "path": "docs/operations/Codex_Completion_Detection_Strategy_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Codex Completion Detection Strategy v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
       "excerpt": "# Codex Handoff Generator v1 ## Purpose The Codex Handoff Generator lists pending Estate work packages and prints copy-ready Codex launch commands. The work package remains the source of truth; the generated command only",
       "path": "docs/operations/Codex_Handoff_Generator_v1.md",
       "policy_classification": "authoritative_source_artifact",
@@ -420,11 +456,65 @@
     {
       "artifact_type": "document",
       "authoritative": true,
+      "excerpt": "# Codex Task Template Standard v1 ## Purpose This standard defines the required structure for future Estate Codex implementation work packages. Its purpose is to ensure each package leaves enough implementation evidence,",
+      "path": "docs/operations/Codex_Task_Template_Standard_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Codex Task Template Standard v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Document Registry v1 Stable registry for durable Estate document IDs. Current paths may move in future, but IDs should remain stable. | Stable ID | Title | Current Path | Category | Status | Audience | Source of Truth ",
+      "path": "docs/operations/Document_Registry_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Document Registry v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Estate Operations Center UI Principles v1 Status: Draft Design Contract Classification: Estate Internal Owner: Steward / Operations Architectural Oversight: Chief Architect Work Package: WP-0046 ## 1. Purpose The Estat",
+      "path": "docs/operations/Estate_Operations_Center_UI_Principles_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Estate Operations Center UI Principles v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
       "excerpt": "# Generated Artifact Policy v1 Status: Active Policy Owner: Chief Architect / Alfred Operations Classification: Estate Internal Introduced By: WP-0026 Date: 2026-07-02 ## Purpose The Estate produces both authored institu",
       "path": "docs/operations/Generated_Artifact_Policy_v1.md",
       "policy_classification": "authoritative_source_artifact",
       "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
       "title": "Generated Artifact Policy v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Interaction Adapter Registry v1 ## Purpose The Interaction Adapter Registry is the Estate's local-first catalog for UI, voice, notification, conversation, command palette, and activity-console integration points. Its p",
+      "path": "docs/operations/Interaction_Adapter_Registry_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Interaction Adapter Registry v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Mission Control Workspace v1 Mission Control is the local-first overview layer for the Estate Operations Center. It assembles a read-only picture of operational readiness, work execution, communications, decisions, rec",
+      "path": "docs/operations/Mission_Control_Workspace_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Mission Control Workspace v1"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Mission Registry Standard v1 Status: Active Standard Owner: Chief Architect / Alfred Operations Classification: Estate Internal Introduced By: WP-0030 Date: 2026-07-02 ## Purpose The Mission Registry gives the Estate d",
+      "path": "docs/operations/Mission_Registry_Standard_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Mission Registry Standard v1"
     },
     {
       "artifact_type": "document",
@@ -461,6 +551,15 @@
       "policy_classification": "authoritative_source_artifact",
       "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
       "title": "Steward Dashboard Runtime View"
+    },
+    {
+      "artifact_type": "document",
+      "authoritative": true,
+      "excerpt": "# Steward Recall Decision Model v1 ## Purpose This decision model defines when Alfred should coordinate recall of the Steward instead of allowing autonomous Estate work to continue. It implements the Steward recall princ",
+      "path": "docs/operations/Steward_Recall_Decision_Model_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "Steward Recall Decision Model v1"
     },
     {
       "artifact_type": "document",
@@ -654,6 +753,24 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
+      "excerpt": "# Codex Parallel Launch Queue ## Queue Status - Status: ready for Steward review; no out-of-series Codex launch items are currently available. - Scope: pending work packages without completion records that are safe to la",
+      "path": "collaboration/work_packages/codex_parallel_queue.md",
+      "policy_classification": "unknown",
+      "source_of_truth_rule": "Unclassified; treat conservatively.",
+      "title": "Codex Parallel Launch Queue"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "# Codex Series Launch Queue ## Queue Status - Status: ready for Steward copy/paste launch. - Scope: pending SERIES work packages with no completion record. - Current ready queue length: 4 work packages. - Last refreshed:",
+      "path": "collaboration/work_packages/codex_series_queue.md",
+      "policy_classification": "unknown",
+      "source_of_truth_rule": "Unclassified; treat conservatively.",
+      "title": "Codex Series Launch Queue"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
       "excerpt": "{ \"work_package_id\": \"WP-0014\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T15:40:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Expanded mailbox destination resolution to cover registry-backed off",
       "path": "collaboration/work_packages/completions/WP-0014_codex_done.json",
       "policy_classification": "institutional_evidence",
@@ -767,6 +884,555 @@
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
       "title": "WP-0026_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:12:57+00:00\", \"files_changed\": [ \"src/estate/core/institutional_search.py\", \"src/estate/cli/main.py\", \"tests/test_institutional_search.py\", \"runt",
+      "path": "collaboration/work_packages/completions/WP-0027_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0027_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0028\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:17:25.370202+00:00\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created stable Estate document registry JSON, human-read",
+      "path": "collaboration/work_packages/completions/WP-0028_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0028_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0029\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:28:05.455403Z\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented the Artifact Provenance Model v1 documentati",
+      "path": "collaboration/work_packages/completions/WP-0029_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0029_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0030\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T00:00:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created Mission Registry Standard v1 and seeded the initial machine-",
+      "path": "collaboration/work_packages/completions/WP-0030_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0030_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0031\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:59:36Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created Transport Adapter Evaluation v1, preserving the Communicatio",
+      "path": "collaboration/work_packages/completions/WP-0031_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0031_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0032\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:15:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Documented a local Codex completion detection strategy that uses sta",
+      "path": "collaboration/work_packages/completions/WP-0032_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0032_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0033\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:33:59Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created the Autonomous Estate Operations Charter v1 defining purpose",
+      "path": "collaboration/work_packages/completions/WP-0033_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0033_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0034\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:37:52Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created Steward Recall Decision Model v1 and a machine-readable poli",
+      "path": "collaboration/work_packages/completions/WP-0034_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0034_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0035\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:42:30Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Implemented Notification Router v1 as a transport-independent classi",
+      "path": "collaboration/work_packages/completions/WP-0035_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0035_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0036\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:53:00Z\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented Gotify Adapter v1 as a bounded local-first transpor",
+      "path": "collaboration/work_packages/completions/WP-0036_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0036_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:03:47+00:00\", \"files_changed\": [ \"src/estate/core/recall_audit_log.py\", \"tests/test_recall_audit_log.py\", \"runtime/audit/recall_audit_log.json\", ",
+      "path": "collaboration/work_packages/completions/WP-0037_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0037_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:09:13+00:00\", \"files_changed\": [ \"src/estate/core/morning_briefing.py\", \"src/estate/cli/main.py\", \"tests/test_morning_briefing.py\", \"operations/b",
+      "path": "collaboration/work_packages/completions/WP-0038_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0038_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:13:57Z\", \"files_changed\": [ \"src/estate/core/worker_runtime_heartbeat.py\", \"src/estate/cli/main.py\", \"tests/test_worker_runtime_heartbeat.py\", \"r",
+      "path": "collaboration/work_packages/completions/WP-0039_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0039_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:19:20Z\", \"files_changed\": [ \"src/estate/core/assignment_queue.py\", \"src/estate/cli/main.py\", \"tests/test_assignment_queue.py\", \"runtime/work_pack",
+      "path": "collaboration/work_packages/completions/WP-0040_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0040_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:30:00Z\", \"files_changed\": [ \"collaboration/work_packages/codex_series_queue.md\", \"collaboration/work_packages/completions/WP-0041_codex_done.json",
+      "path": "collaboration/work_packages/completions/WP-0041_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0041_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:45:00Z\", \"files_changed\": [ \"collaboration/work_packages/codex_parallel_queue.md\", \"collaboration/work_packages/completions/WP-0042_codex_done.js",
+      "path": "collaboration/work_packages/completions/WP-0042_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0042_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:43:18Z\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"src/estate/cli/main.py\", \"tests/test_steward_command_center.py\", \"colla",
+      "path": "collaboration/work_packages/completions/WP-0043_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0043_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:49:32Z\", \"files_changed\": [ \"src/estate/core/resident_cards.py\", \"src/estate/core/steward_command_center.py\", \"tests/test_resident_cards.py\", \"te",
+      "path": "collaboration/work_packages/completions/WP-0044_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0044_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T23:55:16Z\", \"files_changed\": [ \"src/estate/core/decision_queue.py\", \"src/estate/core/steward_command_center.py\", \"src/estate/cli/main.py\", \"tests/te",
+      "path": "collaboration/work_packages/completions/WP-0045_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0045_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:27:57Z\", \"files_changed\": [ \"docs/operations/Estate_Operations_Center_UI_Principles_v1.md\", \"collaboration/work_packages/completions/WP-0046_code",
+      "path": "collaboration/work_packages/completions/WP-0046_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0046_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:35:41Z\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"collaboration/work_packages/com",
+      "path": "collaboration/work_packages/completions/WP-0047_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0047_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:46:07Z\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"collaboration/work_packages/com",
+      "path": "collaboration/work_packages/completions/WP-0048_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0048_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:52:17Z\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"collaboration/work_packages/com",
+      "path": "collaboration/work_packages/completions/WP-0049_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0049_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0050\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:57:31+00:00\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Implemented the Office navigation and tabbed layout shell with ",
+      "path": "collaboration/work_packages/completions/WP-0050_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0050_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T01:12:39Z\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"collaboration/work_packages/com",
+      "path": "collaboration/work_packages/completions/WP-0051_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0051_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0052\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Added a Daily Board and Parking Lot workspace to the Office of ",
+      "path": "collaboration/work_packages/completions/WP-0052_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0052_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0053\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Added an Expansion Roadmap workspace to the Office of the Stewa",
+      "path": "collaboration/work_packages/completions/WP-0053_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0053_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T11:05:22+00:00\", \"files_changed\": [ \"src/estate/cli/main.py\", \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"",
+      "path": "collaboration/work_packages/completions/WP-0054_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0054_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0055\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T11:10:21Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Added local-first Settings and About surfaces to the Office of the S",
+      "path": "collaboration/work_packages/completions/WP-0055_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0055_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T12:07:37+00:00\", \"files_changed\": [ \"src/estate/core/voice.py\", \"tests/test_voice_integration_framework.py\", \"collaboration/work_packages/completion",
+      "path": "collaboration/work_packages/completions/WP-0057_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0057_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0058\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T12:20:00+00:00\", \"branch\": \"work\", \"pull_request_url\": \"pending_make_pr_tool\", \"summary\": \"Added a read-only Steward Recall Operations v",
+      "path": "collaboration/work_packages/completions/WP-0058_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0058_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0059\", \"codex_status\": \"done\", \"ready_for_ca_review\": true, \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\"",
+      "path": "collaboration/work_packages/completions/WP-0059_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0059_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0060\", \"codex_status\": \"done\", \"ready_for_ca_review\": true, \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\"",
+      "path": "collaboration/work_packages/completions/WP-0060_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0060_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0061\", \"codex_status\": \"done\", \"ready_for_ca_review\": true, \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\"",
+      "path": "collaboration/work_packages/completions/WP-0061_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0061_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0062\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00+00:00\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented Alfred's Steward-assigned personnel identity a",
+      "path": "collaboration/work_packages/completions/WP-0062_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0062_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0063\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T22:40:00Z\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented the local-first autonomous work queue scheduler wit",
+      "path": "collaboration/work_packages/completions/WP-0063_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0063_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0064\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"summary\": \"Implemented an evidence-only Worker Runtime Monitor that reads worker heartbeat, assignment qu",
+      "path": "collaboration/work_packages/completions/WP-0064_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0064_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0065\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T23:12:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": \"pendin",
+      "path": "collaboration/work_packages/completions/WP-0065_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0065_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0066\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T23:26:05Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": \"pendin",
+      "path": "collaboration/work_packages/completions/WP-0066_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0066_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T23:35:24Z\", \"files_changed\": [ \"src/estate/core/autonomous_operations_control_loop.py\", \"tests/test_autonomous_operations_control_loop.py\", \"runtime",
+      "path": "collaboration/work_packages/completions/WP-0067_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0067_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T23:47:58Z\", \"files_changed\": [ \"audit/autonomy/autonomous_operations_audit.jsonl\", \"collaboration/work_packages/completions/WP-0068_codex_done.json\"",
+      "path": "collaboration/work_packages/completions/WP-0068_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0068_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:02:04+00:00\", \"files_changed\": [ \"src/estate/core/global_search_command_palette.py\", \"tests/test_global_search_command_palette.py\", \"collaboratio",
+      "path": "collaboration/work_packages/completions/WP-0069_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0069_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0070\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:00:00+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": \"p",
+      "path": "collaboration/work_packages/completions/WP-0070_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0070_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0071\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:00:00+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": nu",
+      "path": "collaboration/work_packages/completions/WP-0071_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0071_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0072\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:25:27+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": nu",
+      "path": "collaboration/work_packages/completions/WP-0072_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0072_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0074\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:40:01+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": nu",
+      "path": "collaboration/work_packages/completions/WP-0074_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0074_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0075\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T01:21:37Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": null, \"",
+      "path": "collaboration/work_packages/completions/WP-0075_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0075_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T12:23:08Z\", \"files_changed\": [ \"src/estate/core/estate_capability_registry.py\", \"src/estate/cli/main.py\", \"tests/test_estate_capability_registry.py\"",
+      "path": "collaboration/work_packages/completions/WP-0076_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0076_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T12:29:54+00:00\", \"files_changed\": [ \"src/estate/core/capability_dependency_visualization.py\", \"src/estate/core/mission_control_workspace.py\", \"src/e",
+      "path": "collaboration/work_packages/completions/WP-0077_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0077_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T12:50:02+00:00\", \"files_changed\": [ \"src/estate/core/capability_gap_report.py\", \"src/estate/core/mission_control_workspace.py\", \"src/estate/cli/main",
+      "path": "collaboration/work_packages/completions/WP-0078_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0078_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T12:55:17+00:00\", \"files_changed\": [ \"src/estate/core/work_package_validation.py\", \"src/estate/cli/main.py\", \"operations/validation/scripts/run_and_c",
+      "path": "collaboration/work_packages/completions/WP-0079_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0079_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T13:04:19+00:00\", \"files_changed\": [ \"collaboration/work_packages/completions/WP-0080_codex_done.json\", \"src/estate/cli/main.py\", \"src/estate/core/hr",
+      "path": "collaboration/work_packages/completions/WP-0080_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0080_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T13:19:52+00:00\", \"files_changed\": [ \"collaboration/work_packages/completions/WP-0081_codex_done.json\", \"operations/services/estate_service_catalog.m",
+      "path": "collaboration/work_packages/completions/WP-0081_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0081_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T13:24:37+00:00\", \"files_changed\": [ \"src/estate/core/service_dependency_matrix.py\", \"src/estate/cli/main.py\", \"tests/test_service_dependency_matrix.",
+      "path": "collaboration/work_packages/completions/WP-0082_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0082_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T14:19:05+00:00\", \"files_changed\": [ \"src/estate/core/service_health_registry.py\", \"src/estate/core/service_dependency_matrix.py\", \"src/estate/cli/ma",
+      "path": "collaboration/work_packages/completions/WP-0083_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0083_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T14:28:55+00:00\", \"files_changed\": [ \"collaboration/work_packages/completions/WP-0084_codex_done.json\", \"operations/services/service_status_board.md\"",
+      "path": "collaboration/work_packages/completions/WP-0084_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0084_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:00:00Z\", \"files_changed\": [ \"src/estate/core/operator_activity_stream.py\", \"src/estate/core/steward_command_center.py\", \"src/estate/cli/main.py\",",
+      "path": "collaboration/work_packages/completions/WP-0085_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0085_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T12:45:22+00:00\", \"files_changed\": [ \"src/estate/core/work_package_validation.py\", \"src/estate/cli/main.py\", \"src/estate/core/paths.py\", \"operations/",
+      "path": "collaboration/work_packages/completions/WP-0086_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0086_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T13:12:38+00:00\", \"files_changed\": [ \"src/estate/core/work_package_validation.py\", \"tests/test_work_package_validation.py\", \"operations/validation/re",
+      "path": "collaboration/work_packages/completions/WP-0091_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0091_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T13:41:26+00:00\", \"coverage_manifest_paths\": { \"json\": \"runtime/validation/validation_coverage_manifest.json\", \"markdown\": \"operations/validation/val",
+      "path": "collaboration/work_packages/completions/WP-0095_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0095_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"work_package_id\": \"WP-0101\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T17:01:45Z\", \"branch\": \"work\", \"summary\": [ \"Created the durable Codex Task Template Standard v1 at docs/operations/Codex_Task_Template_S",
+      "path": "collaboration/work_packages/completions/WP-0101_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0101_codex_done.json"
     },
     {
       "artifact_type": "work_package",
@@ -958,6 +1624,636 @@
       "title": "SERIES TASK WP-0031 \u2014 Transport Adapter Evaluation"
     },
     {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0032 \u2014 Codex Completion Detection Strategy ## Codex Command Read `collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md` and do exactly what it says. ## Mode SERIES. #",
+      "path": "collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0032 \u2014 Codex Completion Detection Strategy"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0033 \u2014 Autonomous Estate Operations Charter ## Codex Command Read `collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md` and do exactly what it says. ## Mode SERIES. Begins",
+      "path": "collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0033 \u2014 Autonomous Estate Operations Charter"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0034 \u2014 Steward Recall Decision Model ## Codex Command Read `collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md` and do exactly what it says. ## Mode SERIES. Depends on WP",
+      "path": "collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0034 \u2014 Steward Recall Decision Model"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0035 \u2014 Notification Router v1 ## Codex Command Read `collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md` and do exactly what it says. ## Mode SERIES. Depends on WP-0033 Autonomo",
+      "path": "collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0035 \u2014 Notification Router v1"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0036 \u2014 Gotify Adapter v1 ## Codex Command Read `collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md` and do exactly what it says. ## Mode SERIES. Depends on WP-0035 Notification Route",
+      "path": "collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0036 \u2014 Gotify Adapter v1"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0037 \u2014 Recall Audit Log v1 ## Codex Command Read `collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md` and do exactly what it says. ## Mode SERIES. Depends on WP-0034 Steward Recall",
+      "path": "collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0037 \u2014 Recall Audit Log v1"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0038 \u2014 Morning Briefing v1 ## Codex Command Read `collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md` and do exactly what it says. ## Mode SERIES. Depends on Alfred operational bri",
+      "path": "collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0038 \u2014 Morning Briefing v1"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0039 \u2014 Worker Runtime Heartbeat ## Codex Command Read `collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md` and do exactly what it says. ## Mode SERIES. Depends on Alfred opera",
+      "path": "collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0039 \u2014 Worker Runtime Heartbeat"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0040 \u2014 Assignment Queue v1 ## Codex Command Read `collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md` and do exactly what it says. ## Mode SERIES. ## Mission Create Assignment Queu",
+      "path": "collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0040 \u2014 Assignment Queue v1"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0041 \u2014 Steward Launch Queue Document ## Codex Command Read `collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md` and do exactly what it says. ## Mode SERIES. ## Mission Cr",
+      "path": "collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0041 \u2014 Steward Launch Queue Document"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0042 \u2014 Parallel Queue Document ## Codex Command Read `collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md` and do exactly what it says. ## Mode SERIES. ## Mission Create the rep",
+      "path": "collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0042 \u2014 Parallel Queue Document"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0043 \u2014 Steward Command Center Skeleton ## Codex Command Read `collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md` and do exactly what it says. ## Mission Create the fir",
+      "path": "collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0043 \u2014 Steward Command Center Skeleton"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0044 \u2014 Resident Card Framework ## Codex Command Read `collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md` and do exactly what it says. ## Mission Create the reusable Resident C",
+      "path": "collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0044 \u2014 Resident Card Framework"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0045 \u2014 Decision Queue Panel ## Codex Command Read `collaboration/work_packages/pending/WP-0045_SERIES_decision_queue_panel.md` and do exactly what it says. ## Mission Add the first Steward Decision Queue",
+      "path": "collaboration/work_packages/pending/WP-0045_SERIES_decision_queue_panel.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0045 \u2014 Decision Queue Panel"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0046 \u2014 Estate Operations Center UI Principles ## Codex Command Read `collaboration/work_packages/pending/WP-0046_SERIES_operations_center_ui_principles.md` and do exactly what it says. ## Mission Create ",
+      "path": "collaboration/work_packages/pending/WP-0046_SERIES_operations_center_ui_principles.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0046 \u2014 Estate Operations Center UI Principles"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0047 \u2014 Status Bar and Activity Console ## Codex Command Read `collaboration/work_packages/pending/WP-0047_SERIES_status_bar_activity_console.md` and do exactly what it says. ## Mission Implement the firs",
+      "path": "collaboration/work_packages/pending/WP-0047_SERIES_status_bar_activity_console.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0047 \u2014 Status Bar and Activity Console"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0048 \u2014 Work Package Pipeline View ## Codex Command Read `collaboration/work_packages/pending/WP-0048_SERIES_work_package_pipeline_view.md` and do exactly what it says. ## Mission Add the Work Package Pip",
+      "path": "collaboration/work_packages/pending/WP-0048_SERIES_work_package_pipeline_view.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0048 \u2014 Work Package Pipeline View"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0049 \u2014 Validation and Estate Health Dashboard ## Codex Command Read `collaboration/work_packages/pending/WP-0049_SERIES_validation_health_dashboard.md` and do exactly what it says. ## Mission Add the Val",
+      "path": "collaboration/work_packages/pending/WP-0049_SERIES_validation_health_dashboard.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0049 \u2014 Validation and Estate Health Dashboard"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0050 \u2014 Office Navigation and Layout Framework ## Codex Command Read `collaboration/work_packages/pending/WP-0050_SERIES_office_navigation_layout_framework.md` and do exactly what it says. ## Mission Impl",
+      "path": "collaboration/work_packages/pending/WP-0050_SERIES_office_navigation_layout_framework.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0050 \u2014 Office Navigation and Layout Framework"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0051 \u2014 Mailbox Operations Center ## Codex Command Read `collaboration/work_packages/pending/WP-0051_SERIES_mailbox_operations_center.md` and do exactly what it says. ## Mission Add the Mailbox Operations",
+      "path": "collaboration/work_packages/pending/WP-0051_SERIES_mailbox_operations_center.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0051 \u2014 Mailbox Operations Center"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0052 \u2014 Daily Board and Parking Lot Workspace ## Codex Command Read `collaboration/work_packages/pending/WP-0052_SERIES_daily_board_parking_lot_workspace.md` and do exactly what it says. ## Mission Add th",
+      "path": "collaboration/work_packages/pending/WP-0052_SERIES_daily_board_parking_lot_workspace.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0052 \u2014 Daily Board and Parking Lot Workspace"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0053 \u2014 Expansion Roadmap Workspace ## Codex Command Read `collaboration/work_packages/pending/WP-0053_SERIES_expansion_roadmap_workspace.md` and do exactly what it says. ## Mission Add the Expansion Road",
+      "path": "collaboration/work_packages/pending/WP-0053_SERIES_expansion_roadmap_workspace.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0053 \u2014 Expansion Roadmap Workspace"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0054 \u2014 Global Search and Command Palette ## Codex Command Read `collaboration/work_packages/pending/WP-0054_SERIES_global_search_command_palette.md` and do exactly what it says. ## Mission Implement the ",
+      "path": "collaboration/work_packages/pending/WP-0054_SERIES_global_search_command_palette.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0054 \u2014 Global Search and Command Palette"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0055 \u2014 Settings, About, and Version Inventory ## Codex Command Read `collaboration/work_packages/pending/WP-0055_SERIES_settings_about_version_inventory.md` and do exactly what it says. ## Mission Add th",
+      "path": "collaboration/work_packages/pending/WP-0055_SERIES_settings_about_version_inventory.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0055 \u2014 Settings, About, and Version Inventory"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0056 \u2014 Notification Center Workspace ## Codex Command Read `collaboration/work_packages/pending/WP-0056_SERIES_notification_center_workspace.md` and do exactly what it says. ## Mission Add the first Noti",
+      "path": "collaboration/work_packages/pending/WP-0056_SERIES_notification_center_workspace.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0056 \u2014 Notification Center Workspace"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0057 \u2014 Voice Integration Framework ## Codex Command Read `collaboration/work_packages/pending/WP-0057_SERIES_voice_integration_framework.md` and do exactly what it says. ## Mission Define and implement t",
+      "path": "collaboration/work_packages/pending/WP-0057_SERIES_voice_integration_framework.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0057 \u2014 Voice Integration Framework"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0058 \u2014 Steward Recall Operations View ## Codex Command Read `collaboration/work_packages/pending/WP-0058_SERIES_steward_recall_operations_view.md` and do exactly what it says. ## Mission Add the Steward ",
+      "path": "collaboration/work_packages/pending/WP-0058_SERIES_steward_recall_operations_view.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0058 \u2014 Steward Recall Operations View"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0059 \u2014 Resident Conversations Workspace ## Codex Command Read `collaboration/work_packages/pending/WP-0059_SERIES_resident_conversations_workspace.md` and do exactly what it says. ## Mission Add the Resi",
+      "path": "collaboration/work_packages/pending/WP-0059_SERIES_resident_conversations_workspace.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0059 \u2014 Resident Conversations Workspace"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0060 \u2014 Estate Interaction Services and Adapter Registry ## Codex Command Read `collaboration/work_packages/pending/WP-0060_SERIES_interaction_services_adapter_registry.md` and do exactly what it says. ##",
+      "path": "collaboration/work_packages/pending/WP-0060_SERIES_interaction_services_adapter_registry.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0060 \u2014 Estate Interaction Services and Adapter Registry"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0061 \u2014 Mission Control Workspace ## Codex Command Read `collaboration/work_packages/pending/WP-0061_SERIES_mission_control_workspace.md` and do exactly what it says. ## Mission Create the Mission Control",
+      "path": "collaboration/work_packages/pending/WP-0061_SERIES_mission_control_workspace.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0061 \u2014 Mission Control Workspace"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0063 \u2014 Autonomous Work Queue Scheduler ## Codex Command Read `collaboration/work_packages/pending/WP-0063_SERIES_autonomous_work_queue_scheduler.md` and do exactly what it says. ## Mission Implement the ",
+      "path": "collaboration/work_packages/pending/WP-0063_SERIES_autonomous_work_queue_scheduler.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0063 \u2014 Autonomous Work Queue Scheduler"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0064 \u2014 Worker Runtime Monitor ## Codex Command Read `collaboration/work_packages/pending/WP-0064_SERIES_worker_runtime_monitor.md` and do exactly what it says. ## Mission Implement the Worker Runtime Mon",
+      "path": "collaboration/work_packages/pending/WP-0064_SERIES_worker_runtime_monitor.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0064 \u2014 Worker Runtime Monitor"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0065 \u2014 Steward Presence and Recall State Machine ## Codex Command Read `collaboration/work_packages/pending/WP-0065_SERIES_steward_presence_recall_state_machine.md` and do exactly what it says. ## Missio",
+      "path": "collaboration/work_packages/pending/WP-0065_SERIES_steward_presence_recall_state_machine.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0065 \u2014 Steward Presence and Recall State Machine"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0066 \u2014 Overnight Operations and Morning Briefing Coordinator ## Codex Command Read `collaboration/work_packages/pending/WP-0066_SERIES_overnight_operations_morning_briefing_coordinator.md` and do exactly",
+      "path": "collaboration/work_packages/pending/WP-0066_SERIES_overnight_operations_morning_briefing_coordinator.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0066 \u2014 Overnight Operations and Morning Briefing Coordinator"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0067 \u2014 Autonomous Operations Control Loop ## Codex Command Read `collaboration/work_packages/pending/WP-0067_SERIES_autonomous_operations_control_loop.md` and do exactly what it says. ## Mission Create t",
+      "path": "collaboration/work_packages/pending/WP-0067_SERIES_autonomous_operations_control_loop.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0067 \u2014 Autonomous Operations Control Loop"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0068 \u2014 Autonomous Operations Audit Trail ## Codex Command Read `collaboration/work_packages/pending/WP-0068_SERIES_autonomous_operations_audit_trail.md` and do exactly what it says. ## Mission Create the",
+      "path": "collaboration/work_packages/pending/WP-0068_SERIES_autonomous_operations_audit_trail.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0068 \u2014 Autonomous Operations Audit Trail"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0069 \u2014 Notification Center Command Palette Integration Fix ## Codex Command Read `collaboration/work_packages/pending/WP-0069_SERIES_notification_center_command_palette_integration_fix.md` and do exactly",
+      "path": "collaboration/work_packages/pending/WP-0069_SERIES_notification_center_command_palette_integration_fix.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0069 \u2014 Notification Center Command Palette Integration Fix"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0070 \u2014 Validation Observation Log ## Codex Command Read `collaboration/work_packages/pending/WP-0070_SERIES_validation_observation_log.md` and do exactly what it says. ## Mission Create a lightweight Val",
+      "path": "collaboration/work_packages/pending/WP-0070_SERIES_validation_observation_log.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0070 \u2014 Validation Observation Log"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0071 \u2014 Validation Review Cadence ## Codex Command Read `collaboration/work_packages/pending/WP-0071_SERIES_validation_review_cadence.md` and do exactly what it says. ## Mission Create a lightweight Valid",
+      "path": "collaboration/work_packages/pending/WP-0071_SERIES_validation_review_cadence.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0071 \u2014 Validation Review Cadence"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0072 \u2014 Validation Metrics Dashboard ## Codex Command Read `collaboration/work_packages/pending/WP-0072_SERIES_validation_metrics_dashboard.md` and do exactly what it says. ## Mission Create a Validation ",
+      "path": "collaboration/work_packages/pending/WP-0072_SERIES_validation_metrics_dashboard.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0072 \u2014 Validation Metrics Dashboard"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0073 \u2014 Validation to Mission Control Integration ## Codex Command Read `collaboration/work_packages/pending/WP-0073_SERIES_validation_to_mission_control_integration.md` and do exactly what it says. ## Mi",
+      "path": "collaboration/work_packages/pending/WP-0073_SERIES_validation_to_mission_control_integration.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0073 \u2014 Validation to Mission Control Integration"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0074 \u2014 Validation Handoff Artifact Workflow ## Codex Command Read `collaboration/work_packages/pending/WP-0074_SERIES_validation_handoff_artifact_workflow.md` and do exactly what it says. ## Mode SERIES ",
+      "path": "collaboration/work_packages/pending/WP-0074_SERIES_validation_handoff_artifact_workflow.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0074 \u2014 Validation Handoff Artifact Workflow"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0075 \u2014 Operational Readiness Dashboard ## Codex Command Read `collaboration/work_packages/pending/WP-0075_SERIES_operational_readiness_dashboard.md` and do exactly what it says. ## Mission Create an Oper",
+      "path": "collaboration/work_packages/pending/WP-0075_SERIES_operational_readiness_dashboard.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0075 \u2014 Operational Readiness Dashboard"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0076 \u2014 Estate Capability Registry ## Codex Command Read `collaboration/work_packages/pending/WP-0076_SERIES_estate_capability_registry.md` and do exactly what it says. ## Mission Create an Estate Capabil",
+      "path": "collaboration/work_packages/pending/WP-0076_SERIES_estate_capability_registry.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0076 \u2014 Estate Capability Registry"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0077 \u2014 Capability Dependency Visualization ## Codex Command Read `collaboration/work_packages/pending/WP-0077_SERIES_capability_dependency_visualization.md` and do exactly what it says. ## Mission Create",
+      "path": "collaboration/work_packages/pending/WP-0077_SERIES_capability_dependency_visualization.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0077 \u2014 Capability Dependency Visualization"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0078 \u2014 Capability Gap Report ## Codex Command Read `collaboration/work_packages/pending/WP-0078_SERIES_capability_gap_report.md` and do exactly what it says. ## Mission Create a Capability Gap Report tha",
+      "path": "collaboration/work_packages/pending/WP-0078_SERIES_capability_gap_report.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0078 \u2014 Capability Gap Report"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0079 \u2014 Validation Execution Engine ## Codex Command Read `collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md` and do exactly what it says. ## Mode SERIES ## Mission Complet",
+      "path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0079 \u2014 Validation Execution Engine"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0079 \u2014 Validation Project Continuation ## Codex Command Read `collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md` and do exactly what it says. ## Mode SERIES ## Mission",
+      "path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0079 \u2014 Validation Project Continuation"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0080 \u2014 Helen Employee Onboarding Orchestrator ## Codex Command Read `collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md` and do exactly what it says. ## Mission ",
+      "path": "collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0080 \u2014 Helen Employee Onboarding Orchestrator"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0081 \u2014 Estate Service Catalog ## Codex Command Read `collaboration/work_packages/pending/WP-0081_SERIES_estate_service_catalog.md` and do exactly what it says. ## Mission Create an Estate Service Catalog",
+      "path": "collaboration/work_packages/pending/WP-0081_SERIES_estate_service_catalog.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0081 \u2014 Estate Service Catalog"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0082 \u2014 Service Dependency Matrix ## Codex Command Read `collaboration/work_packages/pending/WP-0082_SERIES_service_dependency_matrix.md` and do exactly what it says. ## Mission Create a Service Dependenc",
+      "path": "collaboration/work_packages/pending/WP-0082_SERIES_service_dependency_matrix.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0082 \u2014 Service Dependency Matrix"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0083 \u2014 Service Health Registry ## Codex Command Read `collaboration/work_packages/pending/WP-0083_SERIES_service_health_registry.md` and do exactly what it says. ## Mission Create a Service Health Regist",
+      "path": "collaboration/work_packages/pending/WP-0083_SERIES_service_health_registry.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0083 \u2014 Service Health Registry"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0084 \u2014 Operations Center Service Status Board ## Codex Command Read `collaboration/work_packages/pending/WP-0084_SERIES_operations_center_service_status_board.md` and do exactly what it says. ## Mission ",
+      "path": "collaboration/work_packages/pending/WP-0084_SERIES_operations_center_service_status_board.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0084 \u2014 Operations Center Service Status Board"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0085 \u2014 Operator Activity Stream ## Codex Command Read `collaboration/work_packages/pending/WP-0085_SERIES_operator_activity_stream.md` and do exactly what it says. ## Mission Implement an Operator Activi",
+      "path": "collaboration/work_packages/pending/WP-0085_SERIES_operator_activity_stream.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0085 \u2014 Operator Activity Stream"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0086 \u2014 Validation Continuation #3: Recipe Expansion ## Codex Command Read `collaboration/work_packages/pending/WP-0086_SERIES_validation_recipe_expansion.md` and do exactly what it says. ## Mode SERIES #",
+      "path": "collaboration/work_packages/pending/WP-0086_SERIES_validation_recipe_expansion.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0086 \u2014 Validation Continuation #3: Recipe Expansion"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0087 \u2014 Operator Verbosity and Filter Profiles ## Codex Command Read `collaboration/work_packages/pending/WP-0087_SERIES_operator_verbosity_and_filter_profiles.md` and do exactly what it says. ## Mission ",
+      "path": "collaboration/work_packages/pending/WP-0087_SERIES_operator_verbosity_and_filter_profiles.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0087 \u2014 Operator Verbosity and Filter Profiles"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0088 \u2014 Operations Center Layout Framework ## Codex Command Read `collaboration/work_packages/pending/WP-0088_SERIES_operations_center_layout_framework.md` and do exactly what it says. ## Mission Define t",
+      "path": "collaboration/work_packages/pending/WP-0088_SERIES_operations_center_layout_framework.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0088 \u2014 Operations Center Layout Framework"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0089 \u2014 Operations Center Workspace Profiles ## Codex Command Read `collaboration/work_packages/pending/WP-0089_SERIES_operations_center_workspace_profiles.md` and do exactly what it says. ## Mission Impl",
+      "path": "collaboration/work_packages/pending/WP-0089_SERIES_operations_center_workspace_profiles.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0089 \u2014 Operations Center Workspace Profiles"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0091 \u2014 Validation Continuation #4: Add Validation Recipes for WP-0077 and WP-0078 ## Codex Command Read `collaboration/work_packages/pending/WP-0091_SERIES_validation_recipe_expansion_0077_0078.md` and d",
+      "path": "collaboration/work_packages/pending/WP-0091_SERIES_validation_recipe_expansion_0077_0078.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0091 \u2014 Validation Continuation #4: Add Validation Recipes for WP-0077 and WP-0078"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0092 \u2014 Operations Center Help and About ## Codex Command Read `collaboration/work_packages/pending/WP-0092_SERIES_operations_center_help_and_about.md` and do exactly what it says. ## Mission Implement th",
+      "path": "collaboration/work_packages/pending/WP-0092_SERIES_operations_center_help_and_about.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0092 \u2014 Operations Center Help and About"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0093 \u2014 Operations Center Settings Manager ## Codex Command Read `collaboration/work_packages/pending/WP-0093_SERIES_operations_center_settings_manager.md` and do exactly what it says. ## Mission Implemen",
+      "path": "collaboration/work_packages/pending/WP-0093_SERIES_operations_center_settings_manager.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0093 \u2014 Operations Center Settings Manager"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0094 \u2014 Operations Center Status Bar ## Codex Command Read `collaboration/work_packages/pending/WP-0094_SERIES_operations_center_status_bar.md` and do exactly what it says. ## Mission Implement the Operat",
+      "path": "collaboration/work_packages/pending/WP-0094_SERIES_operations_center_status_bar.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0094 \u2014 Operations Center Status Bar"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0095 \u2014 Validation Finalization: Codex Receipts, Production Readiness Gate, and Coverage Manifest ## Codex Command Read `collaboration/work_packages/pending/WP-0095_SERIES_validation_finalization_producti",
+      "path": "collaboration/work_packages/pending/WP-0095_SERIES_validation_finalization_production_readiness.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0095 \u2014 Validation Finalization: Codex Receipts, Production Readiness Gate, and Coverage Manifest"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0096 \u2014 Operations Center Notification Center ## Codex Command Read `collaboration/work_packages/pending/WP-0096_SERIES_operations_center_notification_center.md` and do exactly what it says. ## Mission Im",
+      "path": "collaboration/work_packages/pending/WP-0096_SERIES_operations_center_notification_center.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0096 \u2014 Operations Center Notification Center"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0097 \u2014 Operations Center Local Server Bootstrap ## Codex Command Read `collaboration/work_packages/pending/WP-0097_SERIES_operations_center_local_server_bootstrap.md` and do exactly what it says. ## Miss",
+      "path": "collaboration/work_packages/pending/WP-0097_SERIES_operations_center_local_server_bootstrap.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0097 \u2014 Operations Center Local Server Bootstrap"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0098 \u2014 Operations Center Launch Script ## Codex Command Read `collaboration/work_packages/pending/WP-0098_SERIES_operations_center_launch_script.md` and do exactly what it says. ## Mission Create the Ste",
+      "path": "collaboration/work_packages/pending/WP-0098_SERIES_operations_center_launch_script.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0098 \u2014 Operations Center Launch Script"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0099 \u2014 Operations Center Pre-Handoff Readiness Check ## Codex Command Read `collaboration/work_packages/pending/WP-0099_SERIES_operations_center_pre_handoff_readiness_check.md` and do exactly what it say",
+      "path": "collaboration/work_packages/pending/WP-0099_SERIES_operations_center_pre_handoff_readiness_check.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0099 \u2014 Operations Center Pre-Handoff Readiness Check"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0100 \u2014 Chief Architect #3 Transition and Backlog Continuity ## Codex Command Read `collaboration/work_packages/pending/WP-0100_SERIES_chief_architect_3_transition_and_backlog_continuity.md` and do exactl",
+      "path": "collaboration/work_packages/pending/WP-0100_SERIES_chief_architect_3_transition_and_backlog_continuity.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0100 \u2014 Chief Architect #3 Transition and Backlog Continuity"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0101 \u2014 Codex Task Template Standard ## Codex Command Read `collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md` and do exactly what it says. ## Mode SERIES ## Mission Defin",
+      "path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0101 \u2014 Codex Task Template Standard"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0101 \u2014 Codex Task Template Update for Backlog Retrofit ## Codex Command Read `collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md` and do exactly what it",
+      "path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0101 \u2014 Codex Task Template Update for Backlog Retrofit"
+    },
+    {
       "artifact_type": "operation",
       "authoritative": false,
       "excerpt": "# Estate Operations Board Status: Active Owner: Alfred / Chief of Staff Classification: Estate Internal Introduced By: EC-000086 Date: 2026-06-30 ## Purpose The Estate Operations Board is the lightweight operational work",
@@ -974,6 +2270,24 @@
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Alfred Operational Briefing"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Autonomous Operations Audit Trail Append-only institutional history for autonomous-operation evaluations. Advisory only; does not execute work, send notifications, or alter Steward authority. ## Records ### autonomy-20",
+      "path": "operations/autonomy/autonomous_operations_audit.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Autonomous Operations Audit Trail"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Autonomous Operations Control Loop Generated: 2026-07-03T23:35:24Z Status: paused_or_unknown Decision: pause Reason: Control-loop evidence is missing, conflicting, failed, or has no ready work. Recommended next action:",
+      "path": "operations/autonomy/autonomous_operations_control_loop.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Autonomous Operations Control Loop"
     },
     {
       "artifact_type": "operation",
@@ -1050,6 +2364,42 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
+      "excerpt": "# Morning Briefing Generated at: 2026-07-02T23:08:59+00:00 Non-authoritative operational summary. ## Completed work - WP-0028: Created stable Estate document registry JSON, human-readable registry documentation, document",
+      "path": "operations/briefings/morning_briefing.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Morning Briefing"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Capability Dependency Visualization Read-only visualization for Mission Control and architectural review. This artifact is not a source of truth. Generated: 2026-07-04T12:30:26+00:00 ## Summary - Nodes: 6 - Capability ",
+      "path": "operations/capabilities/capability_dependency_visualization.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Capability Dependency Visualization"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Capability Gap Report Read-only report for Mission Control and roadmap planning. This artifact is not a source of truth and does not change capability status. Generated: 2026-07-04T12:49:54+00:00 ## Summary - Capabilit",
+      "path": "operations/capabilities/capability_gap_report.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Capability Gap Report"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Capability Registry Generated: 2026-07-04T12:22:41+00:00 Read-only aggregation. This report is not the source of truth. ## Summary - Capabilities: 6 - Providers: 6 - Services: 3 - Warnings: 1 ## Capabilities ###",
+      "path": "operations/capabilities/estate_capability_registry.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Estate Capability Registry"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
       "excerpt": "# Estate Capability Lifecycle Status Generated: 2026-07-02T21:04:16+00:00 This is an operational report generated from registries and evidence. It is not a governance source of truth. ## Summary - Capability count: 6 - I",
       "path": "operations/capabilities/lifecycle_status.md",
       "policy_classification": "generated_operational_projection",
@@ -1095,11 +2445,83 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
+      "excerpt": "# Operational Readiness Dashboard Generated: 2026-07-04T01:21:26Z Overall readiness status: blocked Recommended next operational action: Resolve blocking issues in the linked source artifacts before autonomous or steward",
+      "path": "operations/readiness/operational_readiness_dashboard.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Operational Readiness Dashboard"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Service Catalog Read-only aggregation. This report is not the source of truth and does not create a duplicate command registry. Generated: 2026-07-04T13:19:36+00:00 ## Summary - Services: 10 - Registry services:",
+      "path": "operations/services/estate_service_catalog.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Estate Service Catalog"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Service Dependency Matrix Read-only operational view. This document does not create a duplicate dependency registry and records only explicit source-backed service dependencies. Generated: 2026-07-04T13:24:33+00",
+      "path": "operations/services/service_dependency_matrix.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Estate Service Dependency Matrix"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Service Health Registry Read-only aggregation. This registry does not replace monitoring systems or become the source of truth for service health. Generated: 2026-07-04T14:18:57+00:00 ## Summary - Services: 10 -",
+      "path": "operations/services/service_health_registry.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Estate Service Health Registry"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Operations Center Service Status Board Read-only Operations Center view. This board aggregates existing artifacts and does not become the source of truth for service status. Generated: 2026-07-04T14:28:40+00:00 Refresh",
+      "path": "operations/services/service_status_board.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Operations Center Service Status Board"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
       "excerpt": "# Estate Steward Dashboard Generated: 2026-07-01T22:28:01+00:00 ## Current Operational Summary - Overall status: attention - Operations Board available: False - Operations Board markdown available: True - Warnings requir",
       "path": "operations/steward/dashboard.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Estate Steward Dashboard"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Steward Decision Queue Generated: 2026-07-02T23:56:06+00:00 Local-only, non-authoritative panel. It does not approve decisions or notify the Steward. ## Pending Decisions - **Example implementation routing message** (n",
+      "path": "operations/steward/decision_queue.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Steward Decision Queue"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Operator Activity Stream Read-only Operations Center event feed aggregated from existing artifacts; it does not become an event source. Generated: 2026-07-04T14:33:59+00:00 Refresh behavior: quiet_live_updates_from_loc",
+      "path": "operations/steward/operator_activity_stream.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Operator Activity Stream"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Steward Presence and Recall State Generated: 2026-07-03T23:10:32Z Current state: unknown Alfred guidance: treat_as_unknown_until_evidence_refresh This report is evidence-only. It does not track the Steward outside Esta",
+      "path": "operations/steward/steward_presence_state.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Steward Presence and Recall State"
     },
     {
       "artifact_type": "operation",
@@ -1156,6 +2578,168 @@
       "title": "Continuous Operational Validation Report"
     },
     {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Production Readiness Report - generated_at: 2026-07-04T17:02:41+00:00 - git branch: work - git commit: 9a3470c177d2439ba917bda598bf441965a094c2 ## Totals - total_work_packages_scanned: 88 - total_production_ready: 5 - ",
+      "path": "operations/validation/production_readiness_report.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Production Readiness Report"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0075 - Timestamp: 2026-07-04T12:45:00+00:00 - Work package ID: WP-0075 - Local branch: work - Git commit: 3503c5ceb56532a5f283894000e5d7207606dc84 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0075_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0075"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0076 - Timestamp: 2026-07-04T12:45:02+00:00 - Work package ID: WP-0076 - Local branch: work - Git commit: 3503c5ceb56532a5f283894000e5d7207606dc84 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0076_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0076"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0077 - Timestamp: 2026-07-04T13:12:17+00:00 - Work package ID: WP-0077 - Local branch: work - Git commit: 57901455045e8879e87d2e760dabdb805e729ac5 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0077_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0077"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0078 - Timestamp: 2026-07-04T13:12:19+00:00 - Work package ID: WP-0078 - Local branch: work - Git commit: 57901455045e8879e87d2e760dabdb805e729ac5 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0078_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0078"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0079 - Timestamp: 2026-07-04T12:55:10+00:00 - Work package ID: WP-0079 - Local branch: work - Git commit: 204927fee8ff37c3b88424f6b539fdb63661c12f - Validation status: passed_with_fi",
+      "path": "operations/validation/reports/WP-0079_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0079"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0086 - Timestamp: 2026-07-04T12:45:00+00:00 - Work package ID: WP-0086 - Local branch: work - Git commit: 3503c5ceb56532a5f283894000e5d7207606dc84 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0086_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0086"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0091 - Timestamp: 2026-07-04T13:12:17+00:00 - Work package ID: WP-0091 - Local branch: work - Git commit: 57901455045e8879e87d2e760dabdb805e729ac5 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0091_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0091"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0095 - Timestamp: 2026-07-04T13:41:34+00:00 - Work package ID: WP-0095 - Local branch: work - Git commit: 1aff2a3a6ed3e4e43c6ceb868270e676b16eca33 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0095_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0095"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0101 - Timestamp: 2026-07-04T17:02:38+00:00 - Work package ID: WP-0101 - Local branch: work - Git commit: 9a3470c177d2439ba917bda598bf441965a094c2 - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0101_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0101"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-9999 - Timestamp: 2026-07-04T12:55:12+00:00 - Work package ID: WP-9999 - Local branch: work - Git commit: 204927fee8ff37c3b88424f6b539fdb63661c12f - Validation status: no_recipe - Re",
+      "path": "operations/validation/reports/WP-9999_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-9999"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Validation Coverage Manifest Generated at: 2026-07-04T17:02:41+00:00 ## Summary - total_work_packages_scanned: 88 - total_production_ready: 5 - total_blocked: 83 - total_missing_recipes: 73 - total_missing_receipts: 14",
+      "path": "operations/validation/validation_coverage_manifest.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Validation Coverage Manifest"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Validation Handoff Artifact Workflow This handoff packet aggregates existing validation artifacts and does not alter validation results, observations, defects, or work package state. ## Summary - State: partial - Avail",
+      "path": "operations/validation/validation_handoff_artifact_workflow.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Validation Handoff Artifact Workflow"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Validation Metrics Dashboard Dashboard reads existing validation artifacts and does not alter or replace validation results. ## Summary - Total Validated Work Packages: 58 - Pass Count: 49 - Conditional Pass Count: 5 -",
+      "path": "operations/validation/validation_metrics_dashboard.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Validation Metrics Dashboard"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Estate Assignment Queue Generated: 2026-07-02T23:19:39Z ## Summary - Work packages: 33 - Blocked: 0 - Unassigned: 33 - Warnings: 33 ## Queue | Work Package | Mode | Owner | State | Dependencies | Blockers | Next Action",
+      "path": "operations/work_packages/assignment_queue.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Estate Assignment Queue"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Autonomous Work Queue Scheduler Generated: 2026-07-03T22:40:01Z This scheduler is advisory, local-first, and never launches Codex or bypasses Steward approvals. ## Summary - Ready Count: 5 - Waiting Count: 0 - Blocked ",
+      "path": "operations/work_packages/autonomous_work_queue_scheduler.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Autonomous Work Queue Scheduler"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Worker Runtime Heartbeat Generated: 2026-07-02T23:13:43Z This summary reflects local worker heartbeat evidence only. It does not run a scheduler, perform remote monitoring, or infer worker state without evidence. ## Su",
+      "path": "operations/workers/runtime_heartbeat.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Worker Runtime Heartbeat"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Worker Runtime Monitor Generated: 2026-07-03T22:57:18Z This monitor is advisory and evidence-only. It does not schedule work, launch workers, perform remote monitoring, or infer worker availability without source artif",
+      "path": "operations/workers/worker_runtime_monitor.md",
+      "policy_classification": "operational_artifact",
+      "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
+      "title": "Worker Runtime Monitor"
+    },
+    {
       "artifact_type": "institutional_memory",
       "authoritative": true,
       "excerpt": "# Estate Executive Summary - Recovered Origin Conversation Status: Reference Date Archived: 2026-06-30 Location: A:\\theestate\\archive\\institutional_memory Purpose: Preserve the recovered foundational Estate concepts, sta",
@@ -1199,6 +2783,24 @@
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "operational_validation_report.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"blocking_work_packages\": [ { \"blockers\": [ \"Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason\", \"Execution status blocks readiness: no_recipe.\" ], \"completion_artifact_path\": ",
+      "path": "runtime/validation/production_readiness_report.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "production_readiness_report.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"generated_at\": \"2026-07-04T17:02:41+00:00\", \"summary\": { \"total_blocked\": 83, \"total_incomplete_receipts\": 49, \"total_missing_receipts\": 14, \"total_missing_recipes\": 73, \"total_production_ready\": 5, \"total_work_packag",
+      "path": "runtime/validation/validation_coverage_manifest.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "validation_coverage_manifest.json"
     },
     {
       "artifact_type": "runtime_report",

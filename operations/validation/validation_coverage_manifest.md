@@ -1,14 +1,14 @@
 # Validation Coverage Manifest
 
-Generated at: 2026-07-04T13:42:11+00:00
+Generated at: 2026-07-04T17:03:30+00:00
 
 ## Summary
-- total_work_packages_scanned: 83
-- total_production_ready: 4
-- total_blocked: 79
-- total_missing_recipes: 69
-- total_missing_receipts: 12
-- total_incomplete_receipts: 48
+- total_work_packages_scanned: 88
+- total_production_ready: 5
+- total_blocked: 83
+- total_missing_recipes: 73
+- total_missing_receipts: 14
+- total_incomplete_receipts: 49
 
 ## Work Packages
 - WP-0014 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
@@ -81,8 +81,8 @@ Generated at: 2026-07-04T13:42:11+00:00
 - WP-0081 — receipt: complete; recipe: missing; validation: missing; production: blocked; blockers: 1
 - WP-0082 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0083 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
-- WP-0084 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
-- WP-0085 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0084 — receipt: incomplete; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0085 — receipt: complete; recipe: missing; validation: missing; production: blocked; blockers: 1
 - WP-0086 — receipt: incomplete; recipe: registered; validation: passed; production: blocked; blockers: 1
 - WP-0087 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0088 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
@@ -93,4 +93,9 @@ Generated at: 2026-07-04T13:42:11+00:00
 - WP-0094 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
 - WP-0095 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-0096 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0097 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0098 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0099 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0100 — receipt: missing; recipe: missing; validation: missing; production: blocked; blockers: 2
+- WP-0101 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
 - WP-9999 — receipt: missing; recipe: missing; validation: no_recipe; production: blocked; blockers: 2
