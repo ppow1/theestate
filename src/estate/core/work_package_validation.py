@@ -348,6 +348,14 @@ def validate_work_package(work_package_id: str, root: str | Path | None = None, 
         (base / json_rel).parent.mkdir(parents=True, exist_ok=True)
         (base / md_rel).write_text(format_validation_markdown(payload) + "\n", encoding="utf-8")
         (base / json_rel).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        latest = {"work_package_id": wp, "validation_id": validation_id, "generated_at": generated_at, "json_report": str(json_rel).replace("\\", "/"), "markdown_report": str(md_rel).replace("\\", "/"), "validation_status": status}
+        latest = {
+            "work_package_id": wp,
+            "validation_id": validation_id,
+            "generated_at": generated_at,
+            "latest_validation_report_path": str(md_rel).replace("\\", "/"),
+            "markdown_report": str(md_rel).replace("\\", "/"),
+            "json_report": str(json_rel).replace("\\", "/"),
+            "validation_status": status,
+        }
         (base / latest_rel).write_text(json.dumps(latest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return payload

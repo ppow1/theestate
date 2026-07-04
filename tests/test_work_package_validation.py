@@ -27,6 +27,9 @@ def test_known_work_package_recipe_execution_and_artifacts(tmp_path):
     assert "duration_seconds" in report["command_results"][0]
     latest = json.loads((tmp_path / "runtime/validation/work_packages/latest.json").read_text())
     assert latest["work_package_id"] == "WP-0079"
+    assert latest["latest_validation_report_path"] == "operations/validation/reports/WP-0079_validation.md"
+    assert latest["markdown_report"] == "operations/validation/reports/WP-0079_validation.md"
+    assert latest["json_report"] == "runtime/validation/work_packages/WP-0079_validation.json"
 
 
 def test_unknown_work_package_generates_no_recipe_report(tmp_path):
