@@ -144,7 +144,7 @@ An incoming Chief Architect should read canonical onboarding artifacts, prior me
 
 ## Onboarding Checklist
 
-1. Read `AI_HINTS.md` and `AI_START_HERE.md`.
+1. Read `AI_HINTS.md` and `AI_STARTS_HERE.md`.
 2. Follow `docs/onboarding/Chief_Architect_Onboarding_Manifest.md` and its JSON counterpart.
 3. Read `constitution/constitution.md`, `docs/governance/Estate_Manual.md`, and `docs/governance/Estate_Orientation_Handbook.md`.
 4. Review collaboration standards, especially instruction precedence, branch management, mailbox infrastructure, and worker runtime contract.
