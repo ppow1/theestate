@@ -21,6 +21,7 @@ from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.global_search_command_palette import build_global_palette
 from estate.core.mission_control_workspace import build_mission_control_workspace
 from estate.core.steward_presence import generate_steward_presence_state
+from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 
 
 OFFICE_NAVIGATION = [
@@ -67,6 +68,7 @@ ARTIFACTS = {
     "work_package_pipeline": ["runtime/work_packages/assignment_queue.json", "operations/work_packages/assignment_queue.md"],
     "validation_status": ["runtime/validation/local_operational_validation_run.json", "operations/validation/local_operational_validation_run.md", "runtime/audit/latest.json"],
     "capability_lifecycle": ["runtime/capabilities/capability_lifecycle_report.json", "operations/capabilities/capability_lifecycle_report.md"],
+    "capability_dependency_visualization": ["runtime/capabilities/capability_dependency_visualization.json", "operations/capabilities/capability_dependency_visualization.md"],
     "dependency_graph": ["runtime/dependencies/dependency_graph.json", "operations/dependencies/dependency_graph.md"],
     "mailbox_sync": ["runtime/mailboxes/synchronization_duty_latest.json", "operations/mailboxes/synchronization_duty.md", "collaboration/status/worker_inbox_summary.json"],
     "check_updates": ["runtime/updates/check_updates_latest.json", "operations/updates/check_updates_latest.md"],
@@ -882,6 +884,7 @@ def generate_command_center(root=None, write=True):
     resident_panels = {f"{str(card.get('name', '')).lower()}_resident_card": card for card in resident_cards["cards"]}
     panels = {
         **resident_panels,
+        "capability_dependency_visualization": {"available": True, "path": "runtime/capabilities/capability_dependency_visualization.json", "kind": "capability_dependency_visualization", "data": generate_capability_dependency_visualization(root, write=write)},
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "steward_decision_queue": _decision_queue_artifact(root),
@@ -899,6 +902,8 @@ def generate_command_center(root=None, write=True):
         "settings": _settings_panel(root),
         "about": _about_panel(root),
     }
+    if isinstance(panels.get("mission_control_workspace"), dict) and isinstance(panels["mission_control_workspace"].get("data"), dict):
+        panels["mission_control_workspace"]["data"]["capability_dependency_visualization"] = panels.get("capability_dependency_visualization")
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
     generated_at = _now()
     payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels)}
@@ -1359,6 +1364,41 @@ def _steward_recall_operations_html(artifact):
     out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ". Alfred remains the recall authority path; this panel is read-only.</p></div>")
     return "".join(out)
 
+
+def _capability_dependency_visualization_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    summary = data.get("summary") or {}
+    out = ["<div class='capability-dependency-visualization'>"]
+    out.append("<p>Read-only capability dependency view. It shows only explicit registry/dependency metadata and links nodes back to authoritative artifacts.</p>")
+    out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value))}</span></span>" for label, value in [("Nodes", summary.get("node_count", 0)), ("Edges", summary.get("edge_count", 0)), ("Warnings", summary.get("warning_count", 0))]) + "</div>")
+    nodes = data.get("nodes") or []
+    if nodes:
+        out.append("<table><thead><tr><th>Capability</th><th>Readiness</th><th>Implementation</th><th>Validation</th><th>Upstream</th><th>Downstream</th><th>Authoritative links</th></tr></thead><tbody>")
+        for node in nodes[:50]:
+            links = "<br>".join(_artifact_link(src) for src in node.get("source_artifact_links") or [node.get("authoritative_artifact")])
+            out.append("<tr>"
+                       f"<td>{html.escape(str(node.get('label') or node.get('id')))}<br><span class='source'>{html.escape(str(node.get('id')))}</span></td>"
+                       f"<td><span class='health-badge {html.escape(str(node.get('readiness') or 'unknown'))}'>{html.escape(str(node.get('readiness') or 'unknown'))}</span></td>"
+                       f"<td>{html.escape(str(node.get('implementation_status') or 'unknown'))}</td>"
+                       f"<td>{html.escape(str(node.get('validation_status') or 'unknown'))}</td>"
+                       f"<td>{html.escape(', '.join(node.get('upstream_dependencies') or []) or 'None explicitly recorded')}</td>"
+                       f"<td>{html.escape(', '.join(node.get('downstream_dependents') or []) or 'None explicitly recorded')}</td>"
+                       f"<td>{links or 'unresolved external reference'}</td>"
+                       "</tr>")
+        out.append("</tbody></table>")
+    else:
+        out.append("<p class='placeholder'>No capability nodes are available.</p>")
+    edges = data.get("edges") or []
+    out.append("<h3>Explicit relationships</h3>")
+    if edges:
+        out.append("<ul>" + "".join(f"<li><code>{html.escape(str(e.get('source')))}</code> → <code>{html.escape(str(e.get('target')))}</code> ({html.escape(str(e.get('dependency_type')))}), source {_artifact_link(e.get('source_artifact'))}</li>" for e in edges[:50]) + "</ul>")
+    else:
+        out.append("<p class='placeholder'>No explicit dependency relationships were found.</p>")
+    out.append("<p class='source'>Sources: " + html.escape(str(data.get("inputs", {}))) + ". This panel is read-only and does not modify governance or lifecycle state.</p></div>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -1531,7 +1571,7 @@ def _mission_control_html(panel):
             cards.append(f"<li class='{state}'><strong>{html.escape(str(source.get('name')))}</strong><br><span class='source'>{html.escape(str(source.get('path') or ''))}</span><br>{html.escape(str(source.get('state')))}</li>")
         lane_cards.append(f"<section class='panel'><h3>{html.escape(str(lane.get('title')))}</h3><ul>{''.join(cards)}</ul></section>")
     warnings = ''.join(f"<li>{html.escape(str(w.get('source')))}: {html.escape(str(w.get('message')))}</li>" for w in data.get("warnings", [])) if isinstance(data, dict) else ""
-    return _panel("Mission Control", f"<p>State: <strong>{html.escape(str(summary.get('state', 'unknown')))}</strong> · Ready sources: {html.escape(str(summary.get('ready_source_count', 0)))} / {html.escape(str(summary.get('source_count', 0)))}</p><p>{html.escape(str(summary.get('recommended_next_action', '')))}</p>{''.join(lane_cards)}<h3>Warnings</h3><ul>{warnings or '<li>No Mission Control source warnings.</li>'}</ul>", "ready" if panel.get("available") else "placeholder")
+    return _panel("Mission Control", f"<p>State: <strong>{html.escape(str(summary.get('state', 'unknown')))}</strong> · Ready sources: {html.escape(str(summary.get('ready_source_count', 0)))} / {html.escape(str(summary.get('source_count', 0)))}</p><p>{html.escape(str(summary.get('recommended_next_action', '')))}</p>{''.join(lane_cards)}<h3>Capability Dependencies</h3>{_capability_dependency_visualization_html(data.get('capability_dependency_visualization', {})) if isinstance(data, dict) and data.get('capability_dependency_visualization') else ''}<h3>Warnings</h3><ul>{warnings or '<li>No Mission Control source warnings.</li>'}</ul>", "ready" if panel.get("available") else "placeholder")
 
 def render_command_center_html(payload):
     p = payload.get("panels", {})
