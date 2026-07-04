@@ -336,6 +336,23 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
         ],
     },
+    "WP-0092": {
+        "recipe_id": "wp-0092-operations-center-help-and-about",
+        "title": "WP-0092 — Operations Center Help and About",
+        "description": "Validates Operations Center Help and About informational surfaces, command help, workspace/panel listings, source links, unavailable-feature handling, and production-readiness compatibility.",
+        "required_checks": ["Steward command center renders", "Help/About regression tests pass", "Help surface is discoverable in rendered HTML"],
+        "observational_checks": ["Production readiness report generates"],
+        "expected_artifacts": ["operations/validation/reports/WP-0092_validation.md", "runtime/validation/work_packages/WP-0092_validation.json", "collaboration/work_packages/completions/WP-0092_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe"],
+        "success_criteria": ["Required commands exit zero and recipe does not return no_recipe"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main steward-command-center --json'),
+            _cmd('pytest -q tests/test_steward_command_center.py'),
+            _cmd('test -f runtime/steward/command_center.html && rg -q "Operations Center Help" runtime/steward/command_center.html && rg -q "Command Console Help" runtime/steward/command_center.html && rg -q "Component / Version Inventory" runtime/steward/command_center.html'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
     "WP-0087": {
         "recipe_id": "wp-0087-operator-verbosity-filter-profiles",
         "title": "WP-0087 — Operator Verbosity and Filter Profiles",

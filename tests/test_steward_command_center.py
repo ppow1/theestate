@@ -220,6 +220,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
         "Validation",
         "Search",
         "Settings",
+        "Help",
         "About",
     ]
     assert "id='workspace-tabs'" in html
@@ -229,7 +230,9 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "id='workspace-search'" in html
     assert "id='workspace-recalls'" in html
     assert "id='workspace-resident-conversations'" in html
+    assert "id='workspace-help'" in html
     assert "id='workspace-about'" in html
+    assert "Operations Center Help" in html
     assert "Global Search and Command Palette" in html
     assert "Theme <select disabled>" in html
     assert "Per-topic verbosity placeholders" in html
@@ -254,6 +257,29 @@ def test_command_center_settings_and_about_inventory_handle_unknown_versions(tmp
     assert "runtime/steward/command_center.html" in html
     assert "unknown/unavailable" in html
 
+
+
+def test_operations_center_help_surface_lists_commands_docs_and_unavailable_features(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    help_panel = payload["panels"]["help"]
+    data = help_panel["data"]
+
+    assert help_panel["available"] is True
+    assert data["ui_version"] == "Operations Center v1 / Help and About surfaces v1"
+    assert data["active_workspace_profile"]
+    assert any(panel["id"] == "help" for panel in data["panels"])
+    assert any(workspace["id"] == "help" for workspace in data["workspaces"])
+    assert data["command_console_help"]["command_count"] > 0
+    assert any(command["command"] == "steward-command-center" for command in data["command_console_help"]["commands"])
+    assert any(doc["label"] == "WP-0092 validation report" and doc["available"] is False for doc in data["documentation_links"])
+    assert data["known_unavailable_features"]
+    assert "Command Console Help" in html
+    assert "Service Catalog and Validation Links" in html
+    assert "Local-first / Authority Boundary Notes" in html
+    assert "unknown/unavailable" in html
 
 def test_command_center_tab_switch_script_and_collapsible_navigation_are_rendered(tmp_path):
     payload = generate_command_center(tmp_path, write=False)

@@ -73,7 +73,7 @@ def test_markdown_json_required_fields_and_self_check_recipe(tmp_path):
 
 def test_recipe_expansion_registers_next_validation_recipes():
     existing = {"WP-0056", "WP-0057", "WP-0058", "WP-0059", "WP-0060", "WP-0074", "WP-0079"}
-    expanded = {"WP-0015", "WP-0019", "WP-0021", "WP-0027", "WP-0029", "WP-0036", "WP-0037", "WP-0038", "WP-0052", "WP-0053", "WP-0065", "WP-0066", "WP-0067", "WP-0068", "WP-0070", "WP-0075", "WP-0076", "WP-0077", "WP-0078", "WP-0080", "WP-0081", "WP-0085", "WP-0086", "WP-0091", "WP-0103"}
+    expanded = {"WP-0015", "WP-0019", "WP-0021", "WP-0027", "WP-0029", "WP-0036", "WP-0037", "WP-0038", "WP-0052", "WP-0053", "WP-0065", "WP-0066", "WP-0067", "WP-0068", "WP-0070", "WP-0075", "WP-0076", "WP-0077", "WP-0078", "WP-0080", "WP-0081", "WP-0085", "WP-0086", "WP-0091", "WP-0092", "WP-0103"}
     for work_package_id in existing | expanded:
         recipe = get_validation_recipe(work_package_id)
         assert recipe is not None
