@@ -173,6 +173,34 @@ def test_wp_0102_and_wp_0105_recipes_registered():
     assert any("validate-work-package --id WP-0102 --json" in command["command"] for command in wp_0105["commands"])
 
 
+
+
+def test_wp_0102_recipe_uses_canonical_template_paths():
+    recipe = get_validation_recipe("WP-0102")
+    assert recipe is not None
+    commands = [command["command"] for command in recipe["commands"]]
+    template_command = commands[0]
+    assert "python -c" in template_command
+    assert "docs/operations/Codex_Task_Template_Standard_v1.md" in template_command
+    assert "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md" in template_command
+    assert "test -f" not in template_command
+
+
+def test_wp_0102_template_path_command_validates_current_checkout():
+    recipe = get_validation_recipe("WP-0102")
+    assert recipe is not None
+    command = recipe["commands"][0]["command"]
+    result = subprocess.run(command, shell=True, text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
+
+
+def test_wp_0105_recipe_depends_on_wp_0102_validation_success():
+    recipe = get_validation_recipe("WP-0105")
+    assert recipe is not None
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("validate-work-package --id WP-0102 --json" in command for command in commands)
+    assert any("validation-production-readiness --json" in command for command in commands)
+
 def test_wp_0103_historical_recipe_registrations_preserved():
     for work_package_id in ("WP-0080", "WP-0081", "WP-0085", "WP-0103"):
         recipe = get_validation_recipe(work_package_id)

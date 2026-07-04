@@ -1,19 +1,14 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T17:52:05+00:00",
+  "completed_at": "2026-07-04T18:26:32+00:00",
   "files_changed": [
     "src/estate/core/work_package_validation.py",
     "tests/test_work_package_validation.py",
-    "tests/test_production_readiness_validation.py",
-    "collaboration/work_packages/completions/WP-0102_codex_done.json",
-    "collaboration/work_packages/completions/WP-0103_codex_done.json",
     "collaboration/work_packages/completions/WP-0105_codex_done.json",
     "operations/validation/reports/WP-0102_validation.md",
-    "operations/validation/reports/WP-0103_validation.md",
     "operations/validation/reports/WP-0105_validation.md",
     "runtime/validation/work_packages/WP-0102_validation.json",
-    "runtime/validation/work_packages/WP-0103_validation.json",
     "runtime/validation/work_packages/WP-0105_validation.json",
     "operations/validation/production_readiness_report.md",
     "runtime/validation/production_readiness_report.json",
@@ -22,22 +17,36 @@
   ],
   "known_limitations": [],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "non_blocking_known_limitations": [
+    "Production-readiness report still preserves unrelated historical blockers for incomplete or missing old receipts."
+  ],
   "production_readiness_status": "ready_for_subset_with_historical_blockers_preserved",
+  "production_readiness_totals_after_repair": {
+    "total_blocked": 67,
+    "total_incomplete_receipts": 51,
+    "total_missing_receipts": 13,
+    "total_missing_recipes": 55,
+    "total_production_ready": 26,
+    "total_work_packages_scanned": 93
+  },
   "pull_request_not_applicable_reason": "Pull request URL is not available from this local non-interactive Codex environment; branch committed locally for CA review.",
   "ready_for_ca_review": true,
   "remaining_blockers": [
     "Production-readiness report still preserves unrelated historical blockers for incomplete or missing old receipts."
   ],
   "summary": [
-    "Added validation closure recipes for WP-0102 and WP-0105.",
-    "Repaired WP-0102 and WP-0103 completion receipt metadata so intentional scoped boundaries do not block production readiness.",
-    "Regenerated validation and production-readiness artifacts."
+    "Continued WP-0105 validation repair by replacing the WP-0102 brittle shell template path check with a robust Python check for the canonical docs template and WP-0101 source package.",
+    "Kept the canonical Codex task template document at docs/operations/Codex_Task_Template_Standard_v1.md and the WP-0101 source package at collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md.",
+    "Updated the WP-0102 completion-safety check so later legitimate implementation receipts do not appear as WP-0102-created template retrofit completions.",
+    "Regenerated WP-0102/WP-0105 validation artifacts and production-readiness/coverage artifacts."
   ],
   "tests_run": [
     {
-      "command": "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py tests/test_codex_completion.py -q",
+      "command": "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
       "status": "passed"
-    },
+    }
+  ],
+  "validation_commands_run": [
     {
       "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0101 --json",
       "status": "passed"
@@ -48,6 +57,10 @@
     },
     {
       "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0103 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0105 --json",
       "status": "passed"
     },
     {
@@ -63,11 +76,11 @@
       "status": "passed"
     },
     {
-      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0105 --json",
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
       "status": "passed"
     },
     {
-      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "command": "PYTHONPATH=src python - <<'PY'\nfrom estate.core.production_readiness_validation import generate_validation_coverage_manifest\ngenerate_validation_coverage_manifest(write=True)\nPY",
       "status": "passed"
     }
   ],
