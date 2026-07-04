@@ -18,6 +18,8 @@ COMMANDS = [
     {"id": "navigate.daily-board", "title": "Navigate: Daily Board", "category": "navigation", "operation": "activate_tab", "target": "daily-board", "available": True},
     {"id": "navigate.parking-lot", "title": "Navigate: Parking Lot", "category": "navigation", "operation": "activate_tab", "target": "parking", "available": True},
     {"id": "navigate.mailboxes", "title": "Navigate: Mailboxes", "category": "navigation", "operation": "activate_tab", "target": "mailboxes", "available": True},
+    {"id": "notification-center", "title": "Open Notification Center", "category": "navigation", "operation": "activate_tab", "target": "recalls", "available": True},
+    {"id": "navigate.notification-center", "title": "Navigate: Notification Center", "category": "navigation", "operation": "activate_tab", "target": "recalls", "available": True},
     {"id": "navigate.residents", "title": "Navigate: Residents", "category": "navigation", "operation": "activate_tab", "target": "alfred", "available": True},
     {"id": "navigate.validation", "title": "Navigate: Validation", "category": "navigation", "operation": "activate_tab", "target": "validation", "available": True},
     {"id": "navigate.settings", "title": "Navigate: Settings", "category": "navigation", "operation": "activate_tab", "target": "settings", "available": True},

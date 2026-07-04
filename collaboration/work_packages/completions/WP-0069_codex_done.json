@@ -1,0 +1,31 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T00:02:04+00:00",
+  "files_changed": [
+    "src/estate/core/global_search_command_palette.py",
+    "tests/test_global_search_command_palette.py",
+    "collaboration/work_packages/completions/WP-0069_codex_done.json"
+  ],
+  "known_limitations": [
+    "Notification Center palette commands use the existing local activate_tab operation and route to the existing recalls workspace tab instead of introducing a new command system or redesigning the workspace.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Registered Notification Center command palette aliases so operators can open the existing Notification Center/recall workspace through the palette while preserving Global Search discovery, existing commands, and unavailable-command handling.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_global_search_command_palette.py tests/test_steward_command_center.py tests/test_codex_completion.py",
+    "PYTHONPATH=src python -m estate.cli.main global-search \"notification center\" --json > /tmp/wp0069_global_search.json",
+    "python -m json.tool /tmp/wp0069_global_search.json >/dev/null",
+    "PYTHONPATH=src python -m estate.cli.main palette-command notification-center --json > /tmp/wp0069_notification_command.json",
+    "python -m json.tool /tmp/wp0069_notification_command.json >/dev/null",
+    "PYTHONPATH=src python -m estate.cli.main palette-command navigate.validation --json > /tmp/wp0069_existing_command.json",
+    "python -m json.tool /tmp/wp0069_existing_command.json >/dev/null",
+    "PYTHONPATH=src python -m estate.cli.main palette-command command.ai-interpret --json > /tmp/wp0069_unavailable_command.json (expected exit 1)",
+    "python -m json.tool /tmp/wp0069_unavailable_command.json >/dev/null",
+    "PYTHONPATH=src pytest -q tests/test_codex_completion.py"
+  ],
+  "work_package_id": "WP-0069"
+}
