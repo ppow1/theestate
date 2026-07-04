@@ -23,6 +23,7 @@ from estate.core.mission_control_workspace import build_mission_control_workspac
 from estate.core.steward_presence import generate_steward_presence_state
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
+from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 
 
@@ -42,6 +43,7 @@ OFFICE_NAVIGATION = [
     {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
     {"id": "search", "label": "Search", "panel": "search", "tab": "search"},
     {"id": "settings", "label": "Settings", "panel": "settings", "tab": "settings"},
+    {"id": "help", "label": "Help", "panel": "help", "tab": "help"},
     {"id": "about", "label": "About", "panel": "about", "tab": "about"},
 ]
 
@@ -61,6 +63,7 @@ OFFICE_TABS = [
     {"id": "validation", "label": "Validation"},
     {"id": "search", "label": "Search"},
     {"id": "settings", "label": "Settings"},
+    {"id": "help", "label": "Help"},
     {"id": "about", "label": "About"},
 ]
 
@@ -892,6 +895,7 @@ def generate_command_center(root=None, write=True):
         "search": _global_search_panel(root),
         "steward_presence": {"available": True, "path": "runtime/steward/steward_presence_state.json", "kind": "json", "data": generate_steward_presence_state(root=root, write=False)},
         "settings": _settings_panel(root),
+        "help": _help_panel(root),
         "about": _about_panel(root),
     }
     if isinstance(panels.get("mission_control_workspace"), dict) and isinstance(panels["mission_control_workspace"].get("data"), dict):
@@ -1018,6 +1022,63 @@ def _settings_panel(root):
         },
     }
 
+
+
+def _doc_link(root, rel, label=None, summary=None):
+    path = root / rel
+    return {"label": label or rel, "path": rel, "available": path.exists(), "summary": summary or "Authoritative local document/artifact."}
+
+
+def _help_panel(root):
+    """Build an informational Operations Center help surface from existing registries."""
+    catalog = generate_estate_service_catalog(root=root, write=False)
+    profile = resolve_workspace_profile(root, available_panels={tab["id"] for tab in OFFICE_TABS})
+    command_records = []
+    for service in catalog.get("services", []):
+        for command in service.get("command_aliases") or []:
+            command_records.append({
+                "command": command,
+                "service": service.get("name"),
+                "status": "available" if service.get("operational_status") in {"implemented", "active", "operational"} else "unknown/unavailable",
+                "source_artifacts": service.get("source_artifact_links") or [],
+            })
+    if not command_records:
+        for surface in COMMAND_SURFACES:
+            for command in surface.get("commands") or []:
+                command_records.append({
+                    "command": command,
+                    "service": surface.get("service_name"),
+                    "status": "available" if (root / "src/estate/cli/main.py").exists() else "unknown/unavailable",
+                    "source_artifacts": surface.get("implementation_references") or [],
+                })
+    command_records = sorted(command_records, key=lambda item: (item.get("command") or "", item.get("service") or ""))
+    docs = [
+        _doc_link(root, "docs/operations/Mission_Control_Workspace_v1.md", "Mission Control Workspace", "Mission Control authoritative operations document."),
+        _doc_link(root, "docs/operations/Operations_Board_Runtime_Integration.md", "Operations Board Runtime Integration", "Operations board integration notes."),
+        _doc_link(root, "operations/services/estate_service_catalog.md", "Estate Service Catalog", "Service catalog generated report; source of links, not new authority."),
+        _doc_link(root, "operations/validation/reports/WP-0092_validation.md", "WP-0092 validation report", "Reusable validation output when generated."),
+        _doc_link(root, "runtime/validation/work_packages/WP-0092_validation.json", "WP-0092 validation JSON", "Machine-readable validation output when generated."),
+        _doc_link(root, "collaboration/work_packages/pending/WP-0092_SERIES_operations_center_help_and_about.md", "WP-0092 work package", "Implementation scope and requirements."),
+    ]
+    panels = [{"id": item["id"], "label": item["label"], "available": True, "source_panel": item.get("panel")} for item in OFFICE_NAVIGATION]
+    workspaces = [{"id": item["id"], "label": item["label"], "available": True} for item in OFFICE_TABS]
+    unavailable = []
+    unavailable.extend({"feature": doc["label"], "reason": f"Missing optional local artifact: {doc['path']}"} for doc in docs if not doc["available"])
+    if not command_records:
+        unavailable.append({"feature": "Command console help", "reason": "No service catalog command aliases were available."})
+    return {"available": True, "path": "local help aggregation from service catalog, layout framework, workspace profiles, and documentation registry", "kind": "operations_center_help", "data": {
+        "ui_version": "Operations Center v1 / Help and About surfaces v1",
+        "active_workspace_profile": profile.get("selected_profile"),
+        "workspace_profile": profile.get("profile"),
+        "panels": panels,
+        "workspaces": workspaces,
+        "command_console_help": {"summary": "Use Search as the command console. It filters registered local command aliases and reports unavailable commands without executing them.", "commands": command_records[:40], "command_count": len(command_records), "source": "Estate Service Catalog command aliases"},
+        "service_catalog_links": ["runtime/services/estate_service_catalog.json", "operations/services/estate_service_catalog.md"],
+        "validation_status_links": ["runtime/validation/work_packages/WP-0092_validation.json", "operations/validation/reports/WP-0092_validation.md", "runtime/validation/production_readiness.json"],
+        "documentation_links": docs,
+        "authority_notes": ["Informational surface only; existing local artifacts remain authoritative.", "Local-first operation; no network calls or governance changes.", "Missing optional artifacts are shown as unknown/unavailable instead of failing the UI."],
+        "known_unavailable_features": unavailable,
+    }}
 
 def _about_panel(root):
     package = _read_artifact(root, ["pyproject.toml", "package.json"])
@@ -1566,6 +1627,48 @@ def _settings_html(artifact):
     )
 
 
+
+def _help_html(artifact):
+    data = artifact.get("data") or {}
+    profile = data.get("workspace_profile") or {}
+    panels = data.get("panels") or []
+    workspaces = data.get("workspaces") or []
+    command_help = data.get("command_console_help") or {}
+    commands = command_help.get("commands") or []
+    docs = data.get("documentation_links") or []
+    unavailable = data.get("known_unavailable_features") or []
+    notes = data.get("authority_notes") or []
+    panel_rows = "".join(f"<tr><td>{html.escape(str(item.get('label')))}</td><td>{html.escape(str(item.get('id')))}</td><td>{html.escape('available' if item.get('available') else 'unknown/unavailable')}</td></tr>" for item in panels)
+    workspace_rows = "".join(f"<tr><td>{html.escape(str(item.get('label')))}</td><td>{html.escape(str(item.get('id')))}</td><td>{html.escape('available' if item.get('available') else 'unknown/unavailable')}</td></tr>" for item in workspaces)
+    command_rows = "".join(f"<tr><td><code>{html.escape(str(item.get('command')))}</code></td><td>{html.escape(str(item.get('service')))}</td><td>{html.escape(str(item.get('status')))}</td></tr>" for item in commands) or "<tr><td colspan='3'>unknown/unavailable</td></tr>"
+    doc_rows = "".join(f"<tr><td>{html.escape(str(item.get('label')))}</td><td>{html.escape(str(item.get('path')))}</td><td>{html.escape('available' if item.get('available') else 'unknown/unavailable')}</td><td>{html.escape(str(item.get('summary')))}</td></tr>" for item in docs)
+    unavailable_rows = "".join(f"<li><strong>{html.escape(str(item.get('feature')))}</strong>: {html.escape(str(item.get('reason')))}</li>" for item in unavailable) or "<li>No known unavailable help features from local artifacts.</li>"
+    note_rows = "".join(f"<li>{html.escape(str(note))}</li>" for note in notes)
+    service_links = ", ".join(data.get("service_catalog_links") or [])
+    validation_links = ", ".join(data.get("validation_status_links") or [])
+    return (
+        "<section class='operations-help' aria-label='Operations Center Help'>"
+        f"<p><strong>UI version:</strong> {html.escape(str(data.get('ui_version', 'unknown/unavailable')))}</p>"
+        f"<p><strong>Active workspace profile:</strong> {html.escape(str(data.get('active_workspace_profile') or 'unknown/unavailable'))}; active tab: {html.escape(str(profile.get('active_tab') or 'unknown/unavailable'))}</p>"
+        "<h3>Available panels</h3>"
+        f"<table><thead><tr><th>Panel</th><th>ID</th><th>Status</th></tr></thead><tbody>{panel_rows}</tbody></table>"
+        "<h3>Available workspaces</h3>"
+        f"<table><thead><tr><th>Workspace</th><th>ID</th><th>Status</th></tr></thead><tbody>{workspace_rows}</tbody></table>"
+        "<h3>Command Console Help</h3>"
+        f"<p>{html.escape(str(command_help.get('summary') or 'unknown/unavailable'))} Command aliases listed: {html.escape(str(command_help.get('command_count', 0)))}.</p>"
+        f"<table><thead><tr><th>Command</th><th>Service</th><th>Status</th></tr></thead><tbody>{command_rows}</tbody></table>"
+        "<h3>Service Catalog and Validation Links</h3>"
+        f"<p><strong>Service catalog:</strong> {html.escape(service_links)}</p><p><strong>Validation status:</strong> {html.escape(validation_links)}</p>"
+        "<h3>Documentation Links</h3>"
+        f"<table><thead><tr><th>Document</th><th>Path</th><th>Status</th><th>Summary</th></tr></thead><tbody>{doc_rows}</tbody></table>"
+        "<h3>Local-first / Authority Boundary Notes</h3>"
+        f"<ul>{note_rows}</ul>"
+        "<h3>Known Unavailable Features</h3>"
+        f"<ul>{unavailable_rows}</ul>"
+        f"<p class='source'>Source: {html.escape(str(artifact.get('path') or 'local help aggregation'))}</p>"
+        "</section>"
+    )
+
 def _about_html(artifact):
     data = artifact.get("data") or {}
     inventory = data.get("inventory") or []
@@ -1641,6 +1744,7 @@ def render_command_center_html(payload):
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
         ("settings", "Settings", _settings_html(p.get("settings", {})) + _layout_framework_html(p.get("operations_center_layout", {}))),
+        ("help", "Help", _help_html(p.get("help", {}))),
         ("about", "About", _about_html(p.get("about", {}))),
     ]
     selected_profile = (payload.get('workspace_profile') or {}).get('profile') or {}

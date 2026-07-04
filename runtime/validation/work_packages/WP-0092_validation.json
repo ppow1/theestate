@@ -1,0 +1,100 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main steward-command-center --json",
+      "completed_at": "2026-07-04T18:57:43+00:00",
+      "duration_seconds": 0.891,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T18:57:42+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0092_2026-07-04T185742Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_steward_command_center.py",
+      "completed_at": "2026-07-04T18:57:46+00:00",
+      "duration_seconds": 2.902,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T18:57:43+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0092_2026-07-04T185742Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "test -f runtime/steward/command_center.html && rg -q \"Operations Center Help\" runtime/steward/command_center.html && rg -q \"Command Console Help\" runtime/steward/command_center.html && rg -q \"Component / Version Inventory\" runtime/steward/command_center.html",
+      "completed_at": "2026-07-04T18:57:46+00:00",
+      "duration_seconds": 0.041,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T18:57:46+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-04T18:57:47+00:00",
+      "duration_seconds": 0.366,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T18:57:46+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0092_2026-07-04T185742Z0000/command_04_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main steward-command-center --json",
+    "pytest -q tests/test_steward_command_center.py",
+    "test -f runtime/steward/command_center.html && rg -q \"Operations Center Help\" runtime/steward/command_center.html && rg -q \"Command Console Help\" runtime/steward/command_center.html && rg -q \"Component / Version Inventory\" runtime/steward/command_center.html",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0092_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0092_validation.md",
+    "runtime/validation/work_packages/WP-0092_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T18:57:42+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "0b480333ee2a316e47df6dd643c47c431a8a4cff",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0092_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0092"
+  },
+  "recipe_id": "wp-0092-operations-center-help-and-about",
+  "recipe_title": "WP-0092 \u2014 Operations Center Help and About",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0092_2026-07-04T185742Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0092"
+}
