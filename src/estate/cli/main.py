@@ -25,6 +25,7 @@ from estate.core.service_dependency_matrix import generate_service_dependency_ma
 from estate.core.service_health_registry import generate_service_health_registry, format_service_health_registry_summary
 from estate.core.service_status_board import generate_service_status_board, format_service_status_board_summary
 from estate.core.operator_activity_stream import generate_operator_activity_stream, format_operator_activity_stream_summary
+from estate.core.operations_notification_center import generate_operations_notification_center, acknowledge_operations_notification, format_operations_notification_center_summary
 from estate.core.operational_validation import generate_operational_validation_report, format_operational_validation_summary
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
 from estate.core.dependency_graph import generate_dependency_graph, format_dependency_graph_summary
@@ -636,6 +637,23 @@ def cmd_operator_activity_stream(args):
         print(format_operator_activity_stream_summary(stream))
 
 
+def cmd_operations_notification_center(args):
+    if getattr(args, "acknowledge", None):
+        result = acknowledge_operations_notification(args.acknowledge)
+        if getattr(args, "json", False):
+            import json
+            print(json.dumps(result, indent=2, sort_keys=True))
+        else:
+            print(f"Locally acknowledged {args.acknowledge}; authoritative source events were not mutated.")
+        return
+    payload = generate_operations_notification_center(sources=getattr(args, "source", None), severities=getattr(args, "severity", None), acknowledged=getattr(args, "acknowledged", None), limit=getattr(args, "limit", 100))
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_operations_notification_center_summary(payload))
+
+
 def cmd_operations_center_profile(args):
     if getattr(args, "save_profile", None):
         payload = save_workspace_profile(name=args.save_profile, base_profile=args.profile, active_tab=args.active_tab)
@@ -1196,6 +1214,15 @@ def main():
     p.add_argument("--ui-theme", choices=["system", "light", "dark"], help="Future UI theme preference stored with saved profiles")
     p.add_argument("--limit", type=int, default=50, help="Maximum events to show")
     p.set_defaults(func=cmd_operator_activity_stream)
+
+    p = sub.add_parser("operations-notification-center", help="Generate the read-only Operations Center Notification Center")
+    p.add_argument("--json", action="store_true", help="Generate Notification Center and print JSON")
+    p.add_argument("--source", action="append", help="Limit to a source such as validation, workers, mailboxes, service_health")
+    p.add_argument("--severity", action="append", help="Limit to a severity such as error, warning, missing, info")
+    p.add_argument("--acknowledged", action="store_true", default=None, help="Show locally acknowledged notifications only")
+    p.add_argument("--acknowledge", help="Record a local-only acknowledgement for a notification id")
+    p.add_argument("--limit", type=int, default=100, help="Maximum notifications to show")
+    p.set_defaults(func=cmd_operations_notification_center)
 
     p = sub.add_parser("capability-dependency-visualization", help="Generate capability dependency visualization for Mission Control")
     p.add_argument("--json", action="store_true", help="Generate capability dependency visualization and print JSON")

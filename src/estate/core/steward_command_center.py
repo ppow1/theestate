@@ -23,6 +23,7 @@ from estate.core.mission_control_workspace import build_mission_control_workspac
 from estate.core.steward_presence import generate_steward_presence_state
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
+from estate.core.operations_notification_center import generate_operations_notification_center
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
@@ -41,6 +42,7 @@ OFFICE_NAVIGATION = [
     {"id": "work-packages", "label": "Work Packages", "panel": "work_package_pipeline", "tab": "work-packages"},
     {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_operations_center", "tab": "mailboxes"},
     {"id": "recalls", "label": "Recalls", "panel": "steward_recall_operations", "tab": "recalls"},
+    {"id": "notifications", "label": "Notifications", "panel": "operations_notification_center", "tab": "notifications"},
     {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
     {"id": "search", "label": "Search", "panel": "search", "tab": "search"},
     {"id": "settings", "label": "Settings", "panel": "settings", "tab": "settings"},
@@ -61,6 +63,7 @@ OFFICE_TABS = [
     {"id": "work-packages", "label": "Work Packages"},
     {"id": "mailboxes", "label": "Mailboxes"},
     {"id": "recalls", "label": "Recalls"},
+    {"id": "notifications", "label": "Notifications"},
     {"id": "validation", "label": "Validation"},
     {"id": "search", "label": "Search"},
     {"id": "settings", "label": "Settings"},
@@ -447,6 +450,7 @@ def _build_status_bar(root, panels, generated_at):
     mailbox_count = _count_mailboxes(root)
     mailbox_ops_summary = (((panels.get("mailbox_operations_center") or {}).get("data") or {}).get("summary") or {})
     recall_ops_summary = (((panels.get("steward_recall_operations") or {}).get("data") or {}).get("summary") or {})
+    notification_summary = (((panels.get("operations_notification_center") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
@@ -463,6 +467,8 @@ def _build_status_bar(root, panels, generated_at):
         "mailbox_ack_required_count": mailbox_ops_summary.get("ack_required_count"),
         "mailbox_warning_count": mailbox_ops_summary.get("warning_count"),
         "active_recall_count": recall_ops_summary.get("active_recall_count"),
+        "notification_count": notification_summary.get("filtered_notification_count"),
+        "notification_unavailable_source_count": notification_summary.get("unavailable_source_count"),
         "active_workers": active_workers,
         "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
@@ -888,6 +894,7 @@ def generate_command_center(root=None, write=True):
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
         "resident_conversations_workspace": build_resident_conversations_workspace(root),
         "steward_recall_operations": _build_steward_recall_operations(root),
+        "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
@@ -1539,6 +1546,7 @@ def _status_bar_html(status):
         ("Mail ack", status.get("mailbox_ack_required_count")),
         ("Mail warn", status.get("mailbox_warning_count")),
         ("Active recalls", status.get("active_recall_count")),
+        ("Notifications", status.get("notification_count")),
         ("Workers", status.get("active_workers")),
         ("Steward", status.get("steward_presence_state")),
         ("Verbosity", status.get("verbosity")),
@@ -1747,6 +1755,30 @@ def _mission_control_html(panel):
     warnings = ''.join(f"<li>{html.escape(str(w.get('source')))}: {html.escape(str(w.get('message')))}</li>" for w in data.get("warnings", [])) if isinstance(data, dict) else ""
     return _panel("Mission Control", f"<p>State: <strong>{html.escape(str(summary.get('state', 'unknown')))}</strong> · Ready sources: {html.escape(str(summary.get('ready_source_count', 0)))} / {html.escape(str(summary.get('source_count', 0)))}</p><p>{html.escape(str(summary.get('recommended_next_action', '')))}</p>{''.join(lane_cards)}<h3>Capability Dependencies</h3>{_capability_dependency_visualization_html(data.get('capability_dependency_visualization', {})) if isinstance(data, dict) and data.get('capability_dependency_visualization') else ''}<h3>Warnings</h3><ul>{warnings or '<li>No Mission Control source warnings.</li>'}</ul>", "ready" if panel.get("available") else "placeholder")
 
+
+def _operations_notification_center_html(panel):
+    if not panel.get("available"):
+        return _artifact_html(panel)
+    data = panel.get("data") or {}
+    summary = data.get("summary") or {}
+    rows = []
+    for note in data.get("notifications") or []:
+        link = (note.get("source_link") or {}).get("path")
+        rows.append("<tr>"
+                    f"<td><span class='severity {html.escape(str(note.get('severity')))}'>{html.escape(str(note.get('severity')))}</span></td>"
+                    f"<td>{html.escape(str(note.get('source')))}</td>"
+                    f"<td>{html.escape(str(note.get('title')))}<br><span class='source'>{html.escape(str(note.get('message')))}</span></td>"
+                    f"<td>{html.escape(str(note.get('state')))} / local ack={html.escape(str(note.get('locally_acknowledged')))}</td>"
+                    f"<td>{_artifact_link(link)}</td>"
+                    "</tr>")
+    if not rows:
+        rows.append('<tr><td colspan="5" class="placeholder">No notifications match the selected filters.</td></tr>')
+    body = "<p>Aggregator only; acknowledgements are local Notification Center state and do not mutate authoritative source events.</p>"
+    body += "<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value))}</span></span>" for label, value in [("Filtered", summary.get("filtered_notification_count", 0)), ("Total", summary.get("total_notification_count", 0)), ("Unavailable sources", summary.get("unavailable_source_count", 0)), ("Local acknowledgements", summary.get("locally_acknowledged_count", 0))]) + "</div>"
+    body += "<table><thead><tr><th>Severity</th><th>Source</th><th>Notification</th><th>State</th><th>Source artifact</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
+    body += f"<p class='source'>Quiet refresh: {html.escape(str(data.get('refresh_behavior')))}. Source: {html.escape(str(panel.get('path')))}</p>"
+    return _panel("Operations Center Notification Center", body, "ready")
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
@@ -1762,6 +1794,7 @@ def render_command_center_html(payload):
         ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
+        ("notifications", "Operations Center Notification Center", _operations_notification_center_html(p.get("operations_notification_center", {}))),
         ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
         ("settings", "Settings", _settings_html(p.get("settings", {})) + _layout_framework_html(p.get("operations_center_layout", {}))),
