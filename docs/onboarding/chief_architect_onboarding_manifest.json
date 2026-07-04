@@ -11,29 +11,173 @@
     "constitution/Estate_Constitution.md"
   ],
   "required_reading_order": [
-    {"order": 1, "title": "AI Hints", "path": "AI_HINTS.md", "required": true, "audience": "all workers", "notes": "Repository-specific working hints."},
-    {"order": 2, "title": "AI Start Here", "path": "AI_START_HERE.md", "required": true, "audience": "all workers", "notes": "Primary repository entry point."},
-    {"order": 3, "title": "Visual Manifest", "path": "docs/onboarding/visual_manifest.md", "required": true, "audience": "all workers", "notes": "Canonical visual onboarding entry point; do not guess individual image paths."},
-    {"order": 4, "title": "Estate Orientation Handbook", "path": "docs/governance/Estate_Orientation_Handbook.md", "required": true, "audience": "Chief Architect", "notes": "Governance orientation."},
-    {"order": 5, "title": "Estate Manual", "path": "docs/governance/Estate_Manual.md", "required": true, "audience": "Chief Architect", "notes": "Operating manual."},
-    {"order": 6, "title": "Estate Constitution", "path": "constitution/constitution.md", "required": true, "audience": "Chief Architect", "notes": "Canonical constitution path. Do not use constitution/Estate_Constitution.md."},
-    {"order": 7, "title": "Worker Runtime Contract v1", "path": "docs/collaboration/Worker_Runtime_Contract_v1.md", "required": true, "audience": "all workers", "notes": "Runtime expectations for workers."},
-    {"order": 8, "title": "Instruction Precedence v1", "path": "docs/collaboration/Instruction_Precedence_v1.md", "required": true, "audience": "all workers", "notes": "Instruction precedence rules."},
-    {"order": 9, "title": "Estate Collaboration Layer v1", "path": "docs/collaboration/Estate_Collaboration_Layer_v1.md", "required": true, "audience": "Chief Architect", "notes": "Collaboration layer architecture."},
-    {"order": 10, "title": "Branch Management Standard v1", "path": "docs/collaboration/Branch_Management_Standard_v1.md", "required": true, "audience": "Chief Architect", "notes": "Branch management expectations."},
-    {"order": 11, "title": "Local Worker Launch Adapter v1", "path": "docs/collaboration/Local_Worker_Launch_Adapter_v1.md", "required": true, "audience": "Chief Architect", "notes": "Local worker launch adapter."},
-    {"order": 12, "title": "Operations Board Client v1", "path": "docs/collaboration/Operations_Board_Client_v1.md", "required": true, "audience": "Chief Architect", "notes": "Operations board client interface."},
-    {"order": 13, "title": "Capability Lifecycle States v1", "path": "docs/governance/Capability_Lifecycle_States_v1.md", "required": true, "audience": "Chief Architect", "notes": "Lifecycle states reference only; this manifest does not modify lifecycle states."},
-    {"order": 14, "title": "Operational Validation Reporting", "path": "docs/operations/Operational_Validation_Reporting.md", "required": true, "audience": "Chief Architect", "notes": "Operational validation reporting standard."},
-    {"order": 15, "title": "Chief Architect #1 Final Memorandum", "path": "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md", "required": true, "audience": "Chief Architect", "notes": "Required institutional memory memorandum."},
-    {"order": 16, "title": "Chief Architect #2 Final Memorandum", "path": "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md", "required": true, "audience": "Chief Architect", "notes": "Required because the memorandum exists in the repository."}
+    {
+      "order": 1,
+      "title": "AI Hints",
+      "path": "AI_HINTS.md",
+      "required": true,
+      "audience": "all workers",
+      "notes": "Repository-specific working hints."
+    },
+    {
+      "order": 2,
+      "title": "AI Start Here",
+      "path": "AI_START_HERE.md",
+      "required": true,
+      "audience": "all workers",
+      "notes": "Primary repository entry point."
+    },
+    {
+      "order": 3,
+      "title": "Visual Manifest",
+      "path": "docs/onboarding/visual_manifest.md",
+      "required": true,
+      "audience": "all workers",
+      "notes": "Canonical visual onboarding entry point; do not guess individual image paths."
+    },
+    {
+      "order": 4,
+      "title": "Estate Orientation Handbook",
+      "path": "docs/governance/Estate_Orientation_Handbook.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Governance orientation."
+    },
+    {
+      "order": 5,
+      "title": "Estate Manual",
+      "path": "docs/governance/Estate_Manual.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Operating manual."
+    },
+    {
+      "order": 6,
+      "title": "Estate Constitution",
+      "path": "constitution/constitution.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Canonical constitution path. Do not use constitution/Estate_Constitution.md."
+    },
+    {
+      "order": 7,
+      "title": "Worker Runtime Contract v1",
+      "path": "docs/collaboration/Worker_Runtime_Contract_v1.md",
+      "required": true,
+      "audience": "all workers",
+      "notes": "Runtime expectations for workers."
+    },
+    {
+      "order": 8,
+      "title": "Instruction Precedence v1",
+      "path": "docs/collaboration/Instruction_Precedence_v1.md",
+      "required": true,
+      "audience": "all workers",
+      "notes": "Instruction precedence rules."
+    },
+    {
+      "order": 9,
+      "title": "Estate Collaboration Layer v1",
+      "path": "docs/collaboration/Estate_Collaboration_Layer_v1.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Collaboration layer architecture."
+    },
+    {
+      "order": 10,
+      "title": "Branch Management Standard v1",
+      "path": "docs/collaboration/Branch_Management_Standard_v1.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Branch management expectations."
+    },
+    {
+      "order": 11,
+      "title": "Local Worker Launch Adapter v1",
+      "path": "docs/collaboration/Local_Worker_Launch_Adapter_v1.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Local worker launch adapter."
+    },
+    {
+      "order": 12,
+      "title": "Operations Board Client v1",
+      "path": "docs/collaboration/Operations_Board_Client_v1.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Operations board client interface."
+    },
+    {
+      "order": 13,
+      "title": "Capability Lifecycle States v1",
+      "path": "docs/governance/Capability_Lifecycle_States_v1.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Lifecycle states reference only; this manifest does not modify lifecycle states."
+    },
+    {
+      "order": 14,
+      "title": "Operational Validation Reporting",
+      "path": "docs/operations/Operational_Validation_Reporting.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Operational validation reporting standard."
+    },
+    {
+      "order": 15,
+      "title": "Chief Architect Operating Manual v1",
+      "path": "docs/operations/Chief_Architect_Operating_Manual_v1.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Operating reference for the Office of Chief Architect."
+    },
+    {
+      "order": 16,
+      "title": "Chief Architect #1 Final Memorandum",
+      "path": "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_01_Final_Memorandum.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Required institutional memory memorandum."
+    },
+    {
+      "order": 17,
+      "title": "Chief Architect #2 Final Memorandum",
+      "path": "archive/institutional_memory/chief_architect_memoranda/Chief_Architect_02_Final_Memorandum.md",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Required because the memorandum exists in the repository."
+    }
   ],
   "registry_backed_items": [
-    {"title": "Personnel Registry", "path": "data/registry/personnel.json", "required": true, "audience": "Chief Architect", "notes": "Registry source for personnel data."},
-    {"title": "Residents Registry", "path": "data/registry/residents.json", "required": true, "audience": "Chief Architect", "notes": "Registry source for resident data."},
-    {"title": "Mailboxes Registry", "path": "data/registry/mailboxes.json", "required": true, "audience": "Chief Architect", "notes": "Registry source for mailbox routing data."}
+    {
+      "title": "Personnel Registry",
+      "path": "data/registry/personnel.json",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Registry source for personnel data."
+    },
+    {
+      "title": "Residents Registry",
+      "path": "data/registry/residents.json",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Registry source for resident data."
+    },
+    {
+      "title": "Mailboxes Registry",
+      "path": "data/registry/mailboxes.json",
+      "required": true,
+      "audience": "Chief Architect",
+      "notes": "Registry source for mailbox routing data."
+    }
   ],
   "unresolved_items": [
-    {"title": "Human-readable staff roster", "required": false, "audience": "Chief Architect", "status": "unresolved", "notes": "No canonical human-readable roster document was confirmed. Use registry-backed sources rather than inventing a roster path."}
+    {
+      "title": "Human-readable staff roster",
+      "required": false,
+      "audience": "Chief Architect",
+      "status": "unresolved",
+      "notes": "No canonical human-readable roster document was confirmed. Use registry-backed sources rather than inventing a roster path."
+    }
   ]
 }

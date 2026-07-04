@@ -1,0 +1,47 @@
+{
+  "work_package_id": "WP-0104",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T17:31:06+00:00",
+  "branch": "work",
+  "pull_request_url_not_applicable_reason": "Local Codex completion artifact created before hosted pull request URL is available.",
+  "summary": [
+    "Created Chief Architect Operating Manual v1 as a durable Office-level operating reference.",
+    "Registered the manual in the document registry and added it to Chief Architect onboarding manifests.",
+    "Recorded documentation-only validation recipe status as not applicable while verifying registry and search discoverability."
+  ],
+  "files_changed": [
+    "docs/operations/Chief_Architect_Operating_Manual_v1.md",
+    "docs/operations/Document_Registry_v1.md",
+    "data/registry/documents.json",
+    "docs/onboarding/Chief_Architect_Onboarding_Manifest.md",
+    "docs/onboarding/chief_architect_onboarding_manifest.json",
+    "collaboration/work_packages/completions/WP-0104_codex_done.json"
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main document-registry --json | rg 'DOC-CHIEF-ARCHITECT-OPERATING-MANUAL|Chief Architect Operating Manual'",
+      "status": "passed",
+      "observed": "Document registry output included the Chief Architect Operating Manual entry."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main estate-search \"Chief Architect Operating Manual\" --json",
+      "status": "passed",
+      "observed": "Estate search returned the manual as an authoritative document result."
+    }
+  ],
+  "known_limitations": [
+    "Documentation-only package; no reusable validation recipe was added because no runtime behavior or implementation command surface changed."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_review_required_before_merge",
+  "validation_recipe_status": {
+    "status": "not_applicable",
+    "rationale": "WP-0104 is a documentation-only manual and registry/onboarding update; no executable implementation surface was introduced."
+  },
+  "production_readiness_command_status": {
+    "status": "not_run",
+    "rationale": "No WP-0104 validation recipe is applicable for this documentation-only package; discoverability checks were run instead."
+  },
+  "final_command_surfaces": "No new Steward or Codex command surface introduced.",
+  "merge_class": "Class A"
+}

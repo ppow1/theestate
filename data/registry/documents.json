@@ -400,6 +400,18 @@
       "notes": "Standard template for future Codex implementation work packages, completion receipts, and validation recipe obligations.",
       "superseded_paths": [],
       "resolved": true
+    },
+    {
+      "id": "DOC-CHIEF-ARCHITECT-OPERATING-MANUAL",
+      "title": "Chief Architect Operating Manual v1",
+      "path": "docs/operations/Chief_Architect_Operating_Manual_v1.md",
+      "category": "operations/manual",
+      "status": "required",
+      "audience": "Chief Architect and successors",
+      "source_of_truth": "canonical",
+      "notes": "Operating manual for the Office of Chief Architect, including methodology, boundaries, work package practice, validation interaction, and succession expectations.",
+      "superseded_paths": [],
+      "resolved": true
     }
   ],
   "unresolved_documents": []
