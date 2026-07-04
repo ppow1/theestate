@@ -10,6 +10,7 @@ from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
+from estate.core.capability_gap_report import generate_capability_gap_report
 
 MISSION_SOURCES = {
     "command_center": "runtime/steward/command_center.html",
@@ -23,6 +24,7 @@ MISSION_SOURCES = {
     "notifications": "runtime/notifications/notification_center_workspace.json",
     "roadmap": "operations/boards/roadmap.md",
     "capability_dependencies": "runtime/capabilities/capability_dependency_visualization.json",
+    "capability_gap_report": "runtime/capabilities/capability_gap_report.json",
 }
 
 
@@ -40,6 +42,12 @@ def _read_json(path):
 
 def _source(root, name, rel):
     path = root / rel
+    if not path.exists() and name == "capability_gap_report":
+        try:
+            data = generate_capability_gap_report(root, write=False)
+            return {"name": name, "path": rel, "available": True, "state": "ready", "summary": data.get("summary", {})}
+        except Exception as exc:
+            return {"name": name, "path": rel, "available": False, "state": "warning", "summary": f"Capability gap report could not be generated: {exc}"}
     if not path.exists() and name == "capability_dependencies":
         try:
             data = generate_capability_dependency_visualization(root, write=False)
@@ -88,7 +96,7 @@ def build_mission_control_workspace(root=None, write=True):
                 "recommended_next_action": "Open source artifacts for decisions; regenerate missing runtime reports when needed.",
             },
             "lanes": [
-                {"lane_id": "operations", "title": "Operations", "sources": ["command_center", "validation", "roadmap", "capability_dependencies"]},
+                {"lane_id": "operations", "title": "Operations", "sources": ["command_center", "validation", "roadmap", "capability_dependencies", "capability_gap_report"]},
                 {"lane_id": "work", "title": "Work Execution", "sources": ["work_packages", "worker_runtime", "worker_heartbeat"]},
                 {"lane_id": "communications", "title": "Communications", "sources": ["mailboxes", "notifications", "decisions", "recalls"]},
             ],
