@@ -78,3 +78,58 @@ def test_operator_activity_stream_cli(tmp_path):
     payload = json.loads(result.stdout)
     assert payload["events"][0]["source"] == "validation"
     assert (tmp_path / "runtime/steward/operator_activity_stream.json").exists()
+
+
+def test_activity_stream_named_profile_persistence_and_source_verbosity(tmp_path):
+    seed(tmp_path)
+    saved = generate_operator_activity_stream(
+        tmp_path,
+        write=True,
+        sources=["workers"],
+        severities=["warning"],
+        verbosity="normal",
+        source_verbosity={"workers": "detailed"},
+        save_profile="worker-watch",
+        ui_theme="dark",
+    )
+    reloaded = generate_operator_activity_stream(tmp_path, write=False, profile="worker-watch")
+
+    assert saved["selected_profile"] == "worker-watch"
+    assert reloaded["filters"] == {"sources": ["workers"], "severities": ["warning"]}
+    assert reloaded["source_verbosity"] == {"workers": "detailed"}
+    assert reloaded["ui_preferences"] == {"theme": "dark"}
+    assert any("Worker heartbeat is stale" in event["message"] for event in reloaded["events"])
+    assert (tmp_path / "runtime/steward/operator_activity_profiles.json").exists()
+
+
+def test_operator_activity_stream_cli_saves_profile(tmp_path):
+    seed(tmp_path)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "estate.cli.main",
+            "operator-activity-stream",
+            "--json",
+            "--source",
+            "workers",
+            "--severity",
+            "warning",
+            "--source-verbosity",
+            "workers=detailed",
+            "--save-profile",
+            "worker-watch",
+            "--ui-theme",
+            "light",
+        ],
+        cwd=tmp_path,
+        env={"PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")},
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+    assert payload["selected_profile"] == "worker-watch"
+    assert payload["ui_preferences"]["theme"] == "light"
+    assert (tmp_path / "runtime/steward/operator_activity_profiles.json").exists()

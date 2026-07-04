@@ -1,0 +1,53 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T18:02:08+00:00",
+  "files_changed": [
+    "src/estate/core/operator_activity_stream.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_operator_activity_stream.py",
+    "operations/validation/reports/WP-0087_validation.md",
+    "runtime/validation/work_packages/WP-0087_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "operations/validation/production_readiness_report.md",
+    "runtime/validation/production_readiness_report.json",
+    "operations/validation/validation_coverage_manifest.md",
+    "runtime/validation/validation_coverage_manifest.json",
+    "collaboration/work_packages/completions/WP-0087_codex_done.json"
+  ],
+  "final_command_surfaces": [
+    "PYTHONPATH=src python -m estate.cli.main operator-activity-stream --json --profile <name>",
+    "PYTHONPATH=src python -m estate.cli.main operator-activity-stream --json --source workers --severity warning --source-verbosity workers=detailed --save-profile worker-watch --ui-theme dark",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0087 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "known_limitations": [
+    "Operator profiles are local JSON presentation preferences only; they do not modify event sources or logging infrastructure.",
+    "No hosted pull request URL is available from the local execution environment."
+  ],
+  "merge_authority": "Steward retains merge authority; this change does not approve or merge itself.",
+  "production_readiness_command_status": "passed_after_completion_receipt_creation",
+  "pull_request_url_not_applicable_reason": "PR will be created by repository tool after local commit; no hosted URL is available in this environment.",
+  "ready_for_ca_review": true,
+  "summary": "Implemented read-only Operator Activity Stream viewing profiles with persisted named profiles, global and per-source verbosity, source and severity filters, UI theme preference metadata, CLI profile save/load controls, tests, and a registered WP-0087 validation recipe.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_operator_activity_stream.py",
+      "evidence": "7 passed",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0087 --json",
+      "evidence": "Final run passed after completion receipt creation.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "evidence": "Command exited 0 after completion receipt creation.",
+      "status": "passed"
+    }
+  ],
+  "validation_recipe_status": "registered_for_WP-0087_in_src/estate/core/work_package_validation.py",
+  "work_package_id": "WP-0087"
+}
