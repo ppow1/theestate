@@ -1,0 +1,50 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T13:41:26+00:00",
+  "coverage_manifest_paths": {
+    "json": "runtime/validation/validation_coverage_manifest.json",
+    "markdown": "operations/validation/validation_coverage_manifest.md"
+  },
+  "files_changed": [
+    "src/estate/core/production_readiness_validation.py",
+    "src/estate/core/work_package_validation.py",
+    "src/estate/cli/main.py",
+    "operations/validation/scripts/validate_production_readiness.ps1",
+    "operations/validation/production_readiness_report.md",
+    "runtime/validation/production_readiness_report.json",
+    "operations/validation/validation_coverage_manifest.md",
+    "runtime/validation/validation_coverage_manifest.json",
+    "operations/validation/reports/WP-0095_validation.md",
+    "runtime/validation/work_packages/WP-0095_validation.json",
+    "tests/test_production_readiness_validation.py",
+    "collaboration/work_packages/completions/WP-0095_codex_done.json"
+  ],
+  "known_limitations": [
+    "Live GitHub PR metadata is intentionally not checked by the local-first validator; locally available completion metadata is audited instead."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "production_readiness_report_paths": {
+    "json": "runtime/validation/production_readiness_report.json",
+    "markdown": "operations/validation/production_readiness_report.md"
+  },
+  "pull_request_url": "pending: make_pr tool will record the pull request after local commit",
+  "python_cli_production_readiness_command": "python -m estate.cli.main validation-production-readiness --json",
+  "python_cli_wp0095_validation_command": "python -m estate.cli.main validate-work-package --id WP-0095 --json",
+  "ready_for_ca_review": true,
+  "steward_production_readiness_command": ".\\operations\\validation\\scripts\\validate_production_readiness.ps1",
+  "steward_wp0095_validation_command": ".\\operations\\validation\\scripts\\validate_work_package.ps1 -WorkPackageId WP-0095",
+  "summary": [
+    "Added local-first Codex receipt validation and production readiness calculation.",
+    "Added coverage manifest and production readiness report generation from repository artifacts.",
+    "Added validation-production-readiness CLI, PowerShell runner, and WP-0095 validation recipe."
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_production_readiness_validation.py tests/test_work_package_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0095 --json",
+    "pwsh -NoProfile -File operations/validation/scripts/validate_production_readiness.ps1"
+  ],
+  "work_package_id": "WP-0095",
+  "wp0095_validation_status": "passed"
+}
