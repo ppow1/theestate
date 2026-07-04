@@ -354,6 +354,25 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
         ],
     },
+
+    "WP-0096": {
+        "recipe_id": "wp-0096-operations-center-notification-center",
+        "title": "WP-0096 — Operations Center Notification Center",
+        "description": "Validates read-only aggregation from existing operational notification-like artifacts, missing-source handling, severity filtering, local-only acknowledgement behavior, Operations Center Status Bar embedding, Operator Activity Stream compatibility, and source-link integrity.",
+        "required_checks": ["Notification Center CLI renders", "Notification Center regression tests pass", "Steward command center embeds notification panel", "Rendered artifacts exist"],
+        "observational_checks": ["Production readiness report generates"],
+        "expected_artifacts": ["operations/validation/reports/WP-0096_validation.md", "runtime/validation/work_packages/WP-0096_validation.json", "collaboration/work_packages/completions/WP-0096_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe", "Notification Center mutates authoritative source events"],
+        "success_criteria": ["Required commands exit zero and recipe does not return no_recipe"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main operations-notification-center --json'),
+            _cmd('pytest -q tests/test_operations_notification_center.py'),
+            _cmd('python -m estate.cli.main steward-command-center --json'),
+            _cmd('test -f runtime/notifications/operations_notification_center.json && test -f operations/notifications/operations_notification_center.md && rg -q "Operations Center Notification Center" runtime/steward/command_center.html'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
     "WP-0093": {
         "recipe_id": "wp-0093-operations-center-settings-manager",
         "title": "WP-0093 — Operations Center Settings Manager",

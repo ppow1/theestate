@@ -217,6 +217,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
         "Work Packages",
         "Mailboxes",
         "Recalls",
+        "Notifications",
         "Validation",
         "Search",
         "Settings",
@@ -229,6 +230,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
     assert "id='workspace-mission-control'" in html
     assert "id='workspace-search'" in html
     assert "id='workspace-recalls'" in html
+    assert "id='workspace-notifications'" in html
     assert "id='workspace-resident-conversations'" in html
     assert "id='workspace-help'" in html
     assert "id='workspace-about'" in html
