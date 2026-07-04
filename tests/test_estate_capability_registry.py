@@ -65,6 +65,29 @@ def test_dependency_display_and_authoritative_links_in_markdown(tmp_path):
     assert "not the source of truth" in markdown
 
 
+def test_operational_validation_metadata_used_when_lifecycle_report_absent(tmp_path):
+    write_json(tmp_path, "data/registry/capabilities.json", [{
+        "id": "CAP-1",
+        "name": "Capability",
+        "owner": "Subsystem",
+        "status": "Operational",
+        "lifecycle_state": "Implemented",
+    }])
+    write_json(tmp_path, "runtime/validation/operational_validation_report.json", {
+        "capabilities_reviewed": [{
+            "id": "CAP-1",
+            "validation_evidence_found": [{"type": "runtime", "source": "runtime/example.json"}],
+            "evidence_gaps": [],
+        }]
+    })
+
+    registry = generate_estate_capability_registry(tmp_path, write=False)
+
+    cap = registry["capabilities"][0]
+    assert cap["validation_status"] == "evidence_found"
+    assert "runtime/validation/operational_validation_report.json" in cap["source_artifact_links"]
+
+
 def test_estate_capability_registry_cli(tmp_path):
     write_json(tmp_path, "data/registry/capabilities.json", [{"id": "CAP-1", "name": "Capability", "owner": "Subsystem", "status": "Operational", "lifecycle_state": "Implemented"}])
 
