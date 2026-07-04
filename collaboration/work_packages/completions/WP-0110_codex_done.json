@@ -1,0 +1,207 @@
+{
+  "audit_storage_path": "runtime/residents/authority_decisions.jsonl",
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-04T22:32:00+00:00",
+  "demonstration_commands": {
+    "alfred_attempting_execute_work_package": "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --target WP-0110 --json",
+    "alfred_summarizing_operations_state": "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Alfred --action summarize --target operations/alfred/duty_summary.md --json",
+    "helen_attempting_modify_personnel_identity": "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Helen --action modify-personnel --target data/registry/personnel.json --json",
+    "helen_summarizing_onboarding_state": "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Helen --action summarize --target runtime/onboarding/status.json --json",
+    "unknown_action_category_handling": "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Alfred --action mystery-action --json"
+  },
+  "explicit_alfred_authority_boundaries": {
+    "allowed": [
+      "observe",
+      "summarize",
+      "search",
+      "draft",
+      "propose",
+      "route",
+      "request-steward-decision",
+      "update-resident-runtime-state"
+    ],
+    "denied": [
+      "run-validation-command",
+      "execute-work-package",
+      "approve-merge-work",
+      "modify-personnel-identity",
+      "modify-governance-artifact"
+    ],
+    "requires_escalation": [
+      "external-notification-network-action"
+    ],
+    "requires_steward_approval": [
+      "create-work-package-draft",
+      "send-mailbox-message-artifact"
+    ]
+  },
+  "explicit_helen_authority_boundaries": {
+    "allowed": [
+      "observe",
+      "summarize",
+      "search",
+      "draft",
+      "propose",
+      "route",
+      "request-steward-decision",
+      "update-resident-runtime-state"
+    ],
+    "denied": [
+      "run-validation-command",
+      "execute-work-package",
+      "approve-merge-work",
+      "modify-personnel-identity",
+      "modify-governance-artifact"
+    ],
+    "requires_escalation": [
+      "external-notification-network-action"
+    ],
+    "requires_steward_approval": [
+      "create-work-package-draft",
+      "send-mailbox-message-artifact"
+    ]
+  },
+  "files_changed": [
+    "src/estate/core/resident_authority.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/alfred_duty.py",
+    "src/estate/core/helen_duty.py",
+    "src/estate/core/resident_conversation_sessions.py",
+    "src/estate/core/resident_cards.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_authority.py"
+  ],
+  "final_resident_authority_command_surface": [
+    "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Helen --action modify-personnel --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-authority list --resident Alfred --json"
+  ],
+  "known_limitations": [
+    "Operations Center displays authority status through resident cards; broader downstream service orchestration may need future direct enforcement hooks."
+  ],
+  "merge_authority": "Class A; enforces existing resident authority boundaries and grants no governance, validation, merge, personnel, Steward, or execution authority.",
+  "production_readiness_command_status": "completed; ready_for_chief_architect_production_readiness_acceptance=[{'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0015_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0015_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0015'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0019_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0019_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0019'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0020_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0020_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0020'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0021_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0021_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0021'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0027_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0027_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0027_SERIES_institutional_search_v1.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0027'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0029_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0029_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0029'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0036_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0036_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0036'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0037_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0037_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0037'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0038_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0038_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0038'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0052_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0052_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0052_SERIES_daily_board_parking_lot_workspace.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0052'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0053_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0053_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0053_SERIES_expansion_roadmap_workspace.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0053'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0065_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0065_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0065_SERIES_steward_presence_recall_state_machine.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0065'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0066_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0066_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0066_SERIES_overnight_operations_morning_briefing_coordinator.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0066'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0067_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0067_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0067_SERIES_autonomous_operations_control_loop.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0067'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0068_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0068_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0068_SERIES_autonomous_operations_audit_trail.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0068'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0070_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0070_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0070_SERIES_validation_observation_log.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0070'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0076_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0076_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0076_SERIES_estate_capability_registry.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0076'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0077_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0077_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0077_SERIES_capability_dependency_visualization.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0077'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0078_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0078_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0078_SERIES_capability_gap_report.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0078'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0080_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0080_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0080'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0081_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0081_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0081_SERIES_estate_service_catalog.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0081'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0085_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0085_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0085_SERIES_operator_activity_stream.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0085'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0092_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0092_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0092_SERIES_operations_center_help_and_about.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0092'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0095_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0095_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0095_SERIES_validation_finalization_production_readiness.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0095'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0098_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0098_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0098_SERIES_operations_center_launch_script.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0098'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0099_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0099_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0099_SERIES_operations_center_pre_handoff_readiness_check.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0099'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0102_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0102_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0102_SERIES_backlog_codex_template_retrofit.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0102'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0103_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0103_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0103_SERIES_historical_validation_recipe_coverage_through_0085.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0103'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0105_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0105_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0105_SERIES_validation_closure_repair_0102_0103.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0105'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0108_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0108_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0108'}, {'blockers': [], 'completion_artifact_path': 'collaboration/work_packages/completions/WP-0111_codex_done.json', 'latest_validation_report_path': 'runtime/validation/work_packages/WP-0111_validation.json', 'latest_validation_status': 'passed', 'pending_file_path': 'collaboration/work_packages/pending/WP-0111_SERIES_production_readiness_backlog_burn_down_and_helen_path.md', 'production_readiness_status': 'ready', 'receipt_status': 'complete', 'recipe_status': 'registered', 'required_followups': [], 'work_package_id': 'WP-0111'}]",
+  "pull_request_url_not_applicable_reason": "Pull request will be created by make_pr tool after commit; URL unavailable in local environment.",
+  "ready_for_ca_review": true,
+  "sample_authority_check_json": {
+    "alfred_execute_work_package": {
+      "allowed": false,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "execution",
+      "checked_at": "2026-07-04T22:31:46+00:00",
+      "decision": "denied",
+      "kind": "resident_authority_decision",
+      "normalized_action": "execute-work-package",
+      "reason": "Residents do not execute work packages automatically.",
+      "requested_action": "execute-work-package",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Alfred",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": "WP-0110",
+      "version": 1
+    },
+    "alfred_summarize": {
+      "allowed": true,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "non_authoritative",
+      "checked_at": "2026-07-04T22:31:45+00:00",
+      "decision": "allowed",
+      "kind": "resident_authority_decision",
+      "normalized_action": "summarize",
+      "reason": "Summaries are non-authoritative operational views.",
+      "requested_action": "summarize",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Alfred",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": "operations/alfred/duty_summary.md",
+      "version": 1
+    },
+    "helen_modify_personnel": {
+      "allowed": false,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "personnel_authority",
+      "checked_at": "2026-07-04T22:31:48+00:00",
+      "decision": "denied",
+      "kind": "resident_authority_decision",
+      "normalized_action": "modify-personnel-identity",
+      "reason": "Residents cannot create, terminate, or modify personnel identities by default.",
+      "requested_action": "modify-personnel",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Helen",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": "data/registry/personnel.json",
+      "version": 1
+    },
+    "helen_summarize": {
+      "allowed": true,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "non_authoritative",
+      "checked_at": "2026-07-04T22:31:47+00:00",
+      "decision": "allowed",
+      "kind": "resident_authority_decision",
+      "normalized_action": "summarize",
+      "reason": "Summaries are non-authoritative operational views.",
+      "requested_action": "summarize",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Helen",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": "runtime/onboarding/status.json",
+      "version": 1
+    },
+    "unknown_action": {
+      "allowed": false,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "unknown_action",
+      "checked_at": "2026-07-04T22:31:49+00:00",
+      "decision": "denied",
+      "kind": "resident_authority_decision",
+      "normalized_action": "mystery-action",
+      "reason": "Unknown action category 'mystery-action'; safe default denies resident action.",
+      "requested_action": "mystery-action",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Alfred",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": null,
+      "version": 1
+    }
+  },
+  "summary": [
+    "Added resident authority boundary module with explicit action categories and safe default denial.",
+    "Added resident-authority CLI check/list commands with local JSON audit records.",
+    "Integrated boundary decisions into Alfred/Helen duty payloads, conversation sessions, and resident cards.",
+    "Registered WP-0110 validation recipe and tests."
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_resident_authority.py tests/test_alfred_duty.py tests/test_helen_duty.py tests/test_resident_conversation_sessions.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0110 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "validation_recipe_status": "registered and validate-work-package completed with validation_status=passed",
+  "work_package_id": "WP-0110"
+}
