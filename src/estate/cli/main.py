@@ -39,6 +39,7 @@ from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, 
 from estate.core.validation_observations import append_observation, load_observations, update_observation_status, render_markdown_log
 from estate.core.validation_metrics_dashboard import generate_validation_metrics_dashboard, format_validation_metrics_summary
 from estate.core.validation_handoff_artifact_workflow import generate_validation_handoff_artifact_workflow, format_validation_handoff_summary
+from estate.core.operational_readiness_dashboard import generate_operational_readiness_dashboard, format_operational_readiness_summary
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
@@ -802,6 +803,15 @@ def cmd_validation_metrics_dashboard(args):
         print(format_validation_metrics_summary(payload))
 
 
+def cmd_operational_readiness_dashboard(args):
+    payload = generate_operational_readiness_dashboard()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_operational_readiness_summary(payload))
+
+
 def cmd_validation_handoff_artifact_workflow(args):
     payload = generate_validation_handoff_artifact_workflow()
     if getattr(args, "json", False):
@@ -969,6 +979,10 @@ def main():
     p = sub.add_parser("validation-metrics-dashboard", help="Generate Validation Metrics Dashboard")
     p.add_argument("--json", action="store_true", help="Print validation metrics dashboard JSON")
     p.set_defaults(func=cmd_validation_metrics_dashboard)
+
+    p = sub.add_parser("operational-readiness-dashboard", help="Generate Operational Readiness Dashboard")
+    p.add_argument("--json", action="store_true", help="Print operational readiness dashboard JSON")
+    p.set_defaults(func=cmd_operational_readiness_dashboard)
 
     p = sub.add_parser("validation-handoff-artifact-workflow", help="Generate Validation Handoff Artifact Workflow packet")
     p.add_argument("--json", action="store_true", help="Print validation handoff workflow JSON")
