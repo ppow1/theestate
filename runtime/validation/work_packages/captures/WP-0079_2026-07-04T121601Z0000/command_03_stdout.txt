@@ -1,0 +1,6 @@
+{
+  "command_id": "steward-recall",
+  "message": "Command is not registered.",
+  "ok": false,
+  "status": "unavailable"
+}

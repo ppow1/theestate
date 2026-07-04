@@ -1,11 +1,10 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T11:28:47+00:00",
+  "completed_at": "2026-07-04T12:15:33+00:00",
   "files_changed": [
     "src/estate/core/work_package_validation.py",
     "src/estate/cli/main.py",
-    "operations/validation/scripts/validate_work_package.ps1",
     "operations/validation/scripts/run_and_commit_validation.ps1",
     "tests/test_work_package_validation.py",
     "operations/validation/reports/WP-0079_validation.md",
@@ -13,21 +12,27 @@
     "operations/validation/reports/WP-9999_validation.md",
     "runtime/validation/work_packages/WP-9999_validation.json",
     "runtime/validation/work_packages/latest.json",
+    "runtime/validation/work_packages/captures/<WP-0079 validation stdout captures>",
     "collaboration/work_packages/completions/WP-0079_codex_done.json"
   ],
-  "final_steward_command": "./operations/validation/scripts/run_and_commit_validation.ps1 -WorkPackageId WP-0058",
+  "final Steward validation command": ".\\operations\\validation\\scripts\\validate_work_package.ps1 -WorkPackageId WP-0058",
   "known_limitations": [
-    "PowerShell wrapper was statically covered in tests because pwsh is not installed in this Linux container.",
-    "run_and_commit_validation.ps1 only stages documented validation report, latest pointer, and capture artifacts for the selected work package."
+    "pull_request_url is null until the PR is created by the make_pr tool.",
+    "Validation recipes are intentionally lightweight starter recipes and do not approve work packages or change validation authority.",
+    "The safe wrapper commits and pushes only when explicitly invoked; the base validator never commits or pushes."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
   "pull_request_url": null,
   "ready_for_ca_review": true,
-  "summary": "Implemented a work-package validation execution engine with registered recipes, Markdown/JSON artifact output, latest pointer updates, CLI support, PowerShell runner scripts, and guarded run-and-commit behavior.",
+  "summary": "Implemented and hardened the work-package validation runner/recipe engine, CLI and PowerShell command surfaces, structured Markdown/JSON artifacts, latest pointer updates, safe validation artifact commit wrapper, generated WP-0079 and no-recipe demonstration artifacts, and tests for recipe execution, no-recipe handling, command capture, required versus observational failures, artifact generation, latest pointer behavior, safe wrapper safeguards, and self-check coverage.",
   "tests_run": [
-    "PYTHONPATH=src pytest tests/test_work_package_validation.py",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0079 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-9999 --json"
+    "PYTHONPATH=src pytest -q tests/test_work_package_validation.py",
+    "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_validation_handoff_artifact_workflow.py tests/test_validation_metrics_dashboard.py tests/test_validation_observations.py tests/test_operational_validation.py tests/test_local_operational_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0079 --json > /tmp/wp0079_demo.json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-9999 --json > /tmp/wp9999_demo.json || true",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0079 --json > /tmp/wp0079_demo_final.json",
+    "python -m json.tool collaboration/work_packages/completions/WP-0079_codex_done.json >/dev/null",
+    "git diff --check"
   ],
   "work_package_id": "WP-0079"
 }

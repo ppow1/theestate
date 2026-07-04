@@ -75,3 +75,4 @@ def test_safe_wrapper_refuses_unrelated_changes_and_no_broad_staging():
     assert "Refusing to stage non-validation artifacts" in script
     assert "git add ." not in script
     assert "git add -- $path" in script
+    assert "git add -f -- $p" in script

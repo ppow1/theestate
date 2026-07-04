@@ -812,6 +812,8 @@ def cmd_validate_work_package(args):
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
         print(format_validation_markdown(payload))
+    if payload.get("validation_status") in {"failed", "no_recipe"}:
+        raise SystemExit(1)
 
 def cmd_validation_metrics_dashboard(args):
     payload = generate_validation_metrics_dashboard()

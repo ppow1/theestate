@@ -42,8 +42,10 @@ def _git(root: Path, *args: str) -> str | None:
 
 
 def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None = None) -> dict[str, Any]:
+    classification = "required" if required else "observational"
     return {
         "command": text,
+        "classification": classification,
         "required": required,
         "continue_on_failure": (not required) if continue_on_failure is None else continue_on_failure,
     }
@@ -52,7 +54,13 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     "WP-0056": {
         "recipe_id": "wp-0056-notification-center-workspace",
+        "title": "WP-0056 — Notification Center Workspace",
         "description": "Notification Center Workspace validation.",
+        "required_checks": ["Steward command center renders", "Notification Center is discoverable"],
+        "observational_checks": ["Palette command availability"],
+        "expected_artifacts": ["operations/validation/reports/WP-0056_validation.md", "runtime/validation/work_packages/WP-0056_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main steward-command-center --json'),
@@ -62,7 +70,13 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
     "WP-0057": {
         "recipe_id": "wp-0057-voice-integration-framework",
+        "title": "WP-0057 — Voice Integration Framework",
         "description": "Voice Integration Framework validation.",
+        "required_checks": ["Steward command center renders", "Assignment queue renders"],
+        "observational_checks": ["Voice Integration search result"],
+        "expected_artifacts": ["operations/validation/reports/WP-0057_validation.md", "runtime/validation/work_packages/WP-0057_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main steward-command-center --json'),
@@ -72,7 +86,13 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
     "WP-0058": {
         "recipe_id": "wp-0058-steward-recall-operations-view",
+        "title": "WP-0058 — Steward Recall Operations View",
         "description": "Steward Recall Operations View validation.",
+        "required_checks": ["Steward command center renders", "Steward Recall is discoverable"],
+        "observational_checks": ["Palette command availability"],
+        "expected_artifacts": ["operations/validation/reports/WP-0058_validation.md", "runtime/validation/work_packages/WP-0058_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main steward-command-center --json'),
@@ -82,7 +102,13 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
     "WP-0059": {
         "recipe_id": "wp-0059-resident-conversations-workspace",
+        "title": "WP-0059 — Resident Conversations Workspace",
         "description": "Resident Conversations Workspace validation.",
+        "required_checks": ["Steward command center renders", "Resident Conversations is discoverable"],
+        "observational_checks": ["Palette command availability"],
+        "expected_artifacts": ["operations/validation/reports/WP-0059_validation.md", "runtime/validation/work_packages/WP-0059_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main steward-command-center --json'),
@@ -92,7 +118,13 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
     "WP-0060": {
         "recipe_id": "wp-0060-estate-interaction-services-adapter-registry",
+        "title": "WP-0060 — Estate Interaction Services and Adapter Registry",
         "description": "Estate Interaction Services and Adapter Registry validation.",
+        "required_checks": ["Steward command center renders", "Assignment queue renders", "Interaction Services Adapter Registry is discoverable"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/reports/WP-0060_validation.md", "runtime/validation/work_packages/WP-0060_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main steward-command-center --json'),
@@ -102,7 +134,13 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
     "WP-0074": {
         "recipe_id": "wp-0074-validation-handoff-artifact-workflow",
+        "title": "WP-0074 — Validation Handoff Artifact Workflow",
         "description": "Validation handoff artifact workflow validation.",
+        "required_checks": ["Handoff workflow renders", "Observations render", "Metrics dashboard renders"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/reports/WP-0074_validation.md", "runtime/validation/work_packages/WP-0074_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main validation-handoff-artifact-workflow --json'),
@@ -112,7 +150,13 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
     "WP-0079": {
         "recipe_id": "wp-0079-validation-execution-engine-self-check",
+        "title": "WP-0079 — Validation Project Continuation self-check",
         "description": "Validation Execution Engine self-check.",
+        "required_checks": ["Validation observations render", "Notification Center palette command renders"],
+        "observational_checks": ["Steward Recall palette command renders"],
+        "expected_artifacts": ["operations/validation/reports/WP-0079_validation.md", "runtime/validation/work_packages/WP-0079_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
             _cmd('python -m estate.cli.main validation-observations --json'),
@@ -153,12 +197,14 @@ def _run_command(root: Path, validation_id: str, index: int, spec: dict[str, Any
     except OSError as exc:
         exit_code, stdout, stderr = 127, "", str(exc)
     completed = datetime.now(timezone.utc)
-    status = "passed" if exit_code == 0 else ("failed" if spec.get("required", True) else "finding")
+    classification = str(spec.get("classification") or ("required" if spec.get("required", True) else "observational"))
+    status = "passed" if exit_code == 0 else ("failed" if classification == "required" else "finding")
     stdout_path = _write_capture(root, validation_id, index, "stdout", stdout)
     stderr_path = _write_capture(root, validation_id, index, "stderr", stderr)
     result = {
         "command": command,
-        "required": bool(spec.get("required", True)),
+        "classification": classification,
+        "required": classification == "required",
         "started_at": started.isoformat(timespec="seconds"),
         "completed_at": completed.isoformat(timespec="seconds"),
         "duration_seconds": round((completed - started).total_seconds(), 3),
@@ -180,7 +226,8 @@ def format_validation_markdown(payload: dict[str, Any]) -> str:
         f"- Local branch: {payload.get('git_branch') or 'unknown'}",
         f"- Git commit: {payload.get('git_commit_before') or 'unknown'}",
         f"- Validation status: {payload['validation_status']}",
-        f"- Recipe used: {payload.get('recipe_id') or 'none'}", "",
+        f"- Recipe used: {payload.get('recipe_id') or 'none'}",
+        f"- Recipe title: {payload.get('recipe_title') or 'none'}", "",
         "## Commands Run",
     ]
     for row in payload.get("command_results", []):
@@ -215,9 +262,10 @@ def validate_work_package(work_package_id: str, root: str | Path | None = None, 
             results.append(result)
             if result["exit_code"] != 0:
                 msg = f"Command failed: {result['command']} (exit {result['exit_code']})"
-                if spec.get("required", True): failures.append(msg)
+                classification = result.get("classification", "required")
+                if classification == "required": failures.append(msg)
                 else: findings.append(msg)
-                if spec.get("required", True) and not spec.get("continue_on_failure", recipe.get("continue_on_failure", False)):
+                if result.get("classification") == "required" and not spec.get("continue_on_failure", recipe.get("continue_on_failure", False)):
                     break
         status = "failed" if failures else ("passed_with_findings" if findings or warnings else "passed")
     payload: dict[str, Any] = {
@@ -229,6 +277,7 @@ def validate_work_package(work_package_id: str, root: str | Path | None = None, 
         "git_commit_after": None,
         "validation_status": status,
         "recipe_id": recipe_id,
+        "recipe_title": recipe.get("title") if recipe else None,
         "commands_run": [r["command"] for r in results],
         "command_results": results,
         "stdout_summary": f"Captured stdout for {sum(1 for r in results if r.get('stdout_path'))} command(s).",

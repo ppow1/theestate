@@ -1,37 +1,40 @@
 {
   "command_results": [
     {
+      "classification": "required",
       "command": "python -m estate.cli.main validation-observations --json",
-      "completed_at": "2026-07-04T11:29:30+00:00",
-      "duration_seconds": 0.39,
+      "completed_at": "2026-07-04T12:16:01+00:00",
+      "duration_seconds": 0.324,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-04T11:29:30+00:00",
+      "started_at": "2026-07-04T12:16:01+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0079_2026-07-04T112930Z0000/command_01_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0079_2026-07-04T121601Z0000/command_01_stdout.txt"
     },
     {
+      "classification": "required",
       "command": "python -m estate.cli.main palette-command notification-center --json",
-      "completed_at": "2026-07-04T11:29:30+00:00",
-      "duration_seconds": 0.357,
+      "completed_at": "2026-07-04T12:16:02+00:00",
+      "duration_seconds": 0.298,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-04T11:29:30+00:00",
+      "started_at": "2026-07-04T12:16:01+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0079_2026-07-04T112930Z0000/command_02_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0079_2026-07-04T121601Z0000/command_02_stdout.txt"
     },
     {
+      "classification": "observational",
       "command": "python -m estate.cli.main palette-command steward-recall --json",
-      "completed_at": "2026-07-04T11:29:31+00:00",
-      "duration_seconds": 0.363,
+      "completed_at": "2026-07-04T12:16:02+00:00",
+      "duration_seconds": 0.296,
       "exit_code": 1,
       "required": false,
-      "started_at": "2026-07-04T11:29:30+00:00",
+      "started_at": "2026-07-04T12:16:02+00:00",
       "status": "finding",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0079_2026-07-04T112930Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0079_2026-07-04T121601Z0000/command_03_stdout.txt"
     }
   ],
   "commands_run": [
@@ -48,15 +51,16 @@
   "findings": [
     "Command failed: python -m estate.cli.main palette-command steward-recall --json (exit 1)"
   ],
-  "generated_at": "2026-07-04T11:29:30+00:00",
+  "generated_at": "2026-07-04T12:16:01+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "7d1fe99858b64749b765a07edf3aa819f3a0ff7c",
+  "git_commit_before": "26fd3e464f6d36a900ba8202b735237c05612408",
   "recipe_id": "wp-0079-validation-execution-engine-self-check",
+  "recipe_title": "WP-0079 \u2014 Validation Project Continuation self-check",
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 3 command(s).",
-  "validation_id": "WP-0079_2026-07-04T112930Z0000",
+  "validation_id": "WP-0079_2026-07-04T121601Z0000",
   "validation_status": "passed_with_findings",
   "warnings": [],
   "work_package_id": "WP-0079"

@@ -36,9 +36,9 @@ try {
 
     foreach ($path in $allowed) { if (Test-Path $path) { git add -- $path } }
     if (Test-Path "runtime/validation/work_packages/captures") {
-        git status --porcelain=v1 -- "runtime/validation/work_packages/captures" | ForEach-Object {
-            $p = $_.Substring(3) -replace '\\','/'
-            if ($p.StartsWith($capturePrefix)) { git add -- $p }
+        Get-ChildItem -Path "runtime/validation/work_packages/captures" -Recurse -File | ForEach-Object {
+            $p = $_.FullName.Substring($RepoRoot.Path.Length + 1) -replace '\\','/'
+            if ($p.StartsWith($capturePrefix)) { git add -f -- $p }
         }
     }
 
