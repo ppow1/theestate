@@ -1,0 +1,91 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operational-readiness-dashboard --json",
+      "completed_at": "2026-07-04T12:45:00+00:00",
+      "duration_seconds": 0.275,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T12:45:00+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0075_2026-07-04T124500Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main operational-validation --json",
+      "completed_at": "2026-07-04T12:45:00+00:00",
+      "duration_seconds": 0.343,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:00+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0075_2026-07-04T124500Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main estate-health --json",
+      "completed_at": "2026-07-04T12:45:01+00:00",
+      "duration_seconds": 0.315,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:00+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0075_2026-07-04T124500Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main service-readiness --json",
+      "completed_at": "2026-07-04T12:45:01+00:00",
+      "duration_seconds": 0.294,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:01+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0075_2026-07-04T124500Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-metrics-dashboard --json",
+      "completed_at": "2026-07-04T12:45:01+00:00",
+      "duration_seconds": 0.281,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:01+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0075_2026-07-04T124500Z0000/command_05_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main operational-readiness-dashboard --json",
+    "python -m estate.cli.main operational-validation --json",
+    "python -m estate.cli.main estate-health --json",
+    "python -m estate.cli.main service-readiness --json",
+    "python -m estate.cli.main validation-metrics-dashboard --json"
+  ],
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0075_validation.md",
+    "runtime/validation/work_packages/WP-0075_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T12:45:00+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "3503c5ceb56532a5f283894000e5d7207606dc84",
+  "recipe_id": "wp-0075-operational-readiness-dashboard",
+  "recipe_title": "WP-0075 \u2014 Operational Readiness Dashboard",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 5 command(s).",
+  "validation_id": "WP-0075_2026-07-04T124500Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0075"
+}

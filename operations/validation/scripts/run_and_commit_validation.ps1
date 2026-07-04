@@ -4,7 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..\..")
+$RepoRoot = Resolve-Path (Join-Path (Join-Path (Join-Path $PSScriptRoot "..") "..") "..")
 Push-Location $RepoRoot
 try {
     $SafeId = ($WorkPackageId.ToUpper() -replace '[^A-Z0-9_-]', '_')

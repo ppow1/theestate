@@ -1,0 +1,91 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main estate-capability-registry --json",
+      "completed_at": "2026-07-04T12:45:02+00:00",
+      "duration_seconds": 0.287,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T12:45:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0076_2026-07-04T124502Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main capabilities --json",
+      "completed_at": "2026-07-04T12:45:02+00:00",
+      "duration_seconds": 0.258,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0076_2026-07-04T124502Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main services --json",
+      "completed_at": "2026-07-04T12:45:02+00:00",
+      "duration_seconds": 0.243,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0076_2026-07-04T124502Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main capability-lifecycle --json",
+      "completed_at": "2026-07-04T12:45:03+00:00",
+      "duration_seconds": 0.288,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0076_2026-07-04T124502Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main capability-help --json",
+      "completed_at": "2026-07-04T12:45:03+00:00",
+      "duration_seconds": 0.284,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T12:45:03+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0076_2026-07-04T124502Z0000/command_05_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main estate-capability-registry --json",
+    "python -m estate.cli.main capabilities --json",
+    "python -m estate.cli.main services --json",
+    "python -m estate.cli.main capability-lifecycle --json",
+    "python -m estate.cli.main capability-help --json"
+  ],
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0076_validation.md",
+    "runtime/validation/work_packages/WP-0076_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T12:45:02+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "3503c5ceb56532a5f283894000e5d7207606dc84",
+  "recipe_id": "wp-0076-estate-capability-registry",
+  "recipe_title": "WP-0076 \u2014 Estate Capability Registry",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 5 command(s).",
+  "validation_id": "WP-0076_2026-07-04T124502Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0076"
+}
