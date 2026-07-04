@@ -1162,8 +1162,9 @@ def _panel(title, body, status="placeholder"):
 def _resident_html(card):
     if not card.get("available"):
         return f'<p class="placeholder">Resident record is not available yet.</p><p class="source">Details: {html.escape(str(card.get("details_link", "Not available yet")))}</p>'
-    fields = ["name", "role", "operational_status", "current_duty"]
-    rows = [f"<dt>{html.escape(field.replace('_', ' ').title())}</dt><dd>{html.escape(str(card.get(field) or ''))}</dd>" for field in fields]
+    fields = ["name", "role", "operational_status", "presence_state", "current_duty"]
+    rows = [f"<dt>{html.escape(field.replace('_', ' ').title())}</dt><dd>{html.escape(str(card.get(field) or 'Not available yet'))}</dd>" for field in fields]
+    rows.append(f"<dt>Runtime Boundary</dt><dd>{html.escape('Visible presence only; autonomous execution is not active' if card.get('visible_presence_only') else 'Not available yet')}</dd>")
     mailbox = card.get("mailbox") or {}
     mailbox_label = mailbox.get("display_name") or "Not available yet"
     if mailbox.get("mailbox_id") is not None:

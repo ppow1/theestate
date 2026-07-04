@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
+from estate.core.resident_presence import build_resident_presence
 
 INITIAL_RESIDENT_NAMES = ("Alfred", "Helen")
 PLACEHOLDER = "Not available yet"
@@ -147,9 +148,27 @@ def build_resident_cards(root=None, names=INITIAL_RESIDENT_NAMES):
     personnel = _read_registry(root, "personnel", warnings)
     mailboxes = _read_registry(root, "mailboxes", warnings)
     runtime = _read_json(root / "runtime" / "residents" / "status.json", warnings) or {}
+    presence = build_resident_presence(root, tuple(names))
+    presence_by_name = {_slug(item.get("name")): item for item in presence.get("residents", [])}
     by_name = {_slug(r.get("name")): r for r in residents if isinstance(r, dict)}
     cards = []
     for name in names:
         resident = by_name.get(_slug(name), {"name": name})
-        cards.append(build_resident_card(root, resident, personnel=personnel, mailboxes=mailboxes, runtime=runtime))
+        card = build_resident_card(root, resident, personnel=personnel, mailboxes=mailboxes, runtime=runtime)
+        item = presence_by_name.get(_slug(name), {})
+        if item:
+            card["presence_state"] = item.get("presence_state")
+            card["heartbeat_stale"] = item.get("heartbeat_stale")
+            card["visible_presence_only"] = item.get("visible_presence_only")
+            card["autonomous_execution"] = item.get("autonomous_execution")
+            card["status_reason"] = item.get("status_reason")
+            if item.get("current_duty"):
+                card["current_duty"] = item.get("current_duty")
+            if item.get("mailbox_id") is not None:
+                card["mailbox"] = {"mailbox_id": item.get("mailbox_id"), "display_name": item.get("mailbox_path") or card.get("mailbox", {}).get("display_name"), "source": "resident_presence"}
+            if item.get("last_activity") or item.get("last_heartbeat"):
+                card["last_activity"] = {"summary": item.get("last_activity") or item.get("status_reason"), "timestamp": item.get("last_heartbeat")}
+            if item.get("needs_steward"):
+                card["needs_steward"] = "Yes"
+        cards.append(card)
     return {"version": 1, "generated_at": _now(), "cards": cards, "warnings": warnings}
