@@ -1,0 +1,33 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T11:28:47+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "src/estate/cli/main.py",
+    "operations/validation/scripts/validate_work_package.ps1",
+    "operations/validation/scripts/run_and_commit_validation.ps1",
+    "tests/test_work_package_validation.py",
+    "operations/validation/reports/WP-0079_validation.md",
+    "runtime/validation/work_packages/WP-0079_validation.json",
+    "operations/validation/reports/WP-9999_validation.md",
+    "runtime/validation/work_packages/WP-9999_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "collaboration/work_packages/completions/WP-0079_codex_done.json"
+  ],
+  "final_steward_command": "./operations/validation/scripts/run_and_commit_validation.ps1 -WorkPackageId WP-0058",
+  "known_limitations": [
+    "PowerShell wrapper was statically covered in tests because pwsh is not installed in this Linux container.",
+    "run_and_commit_validation.ps1 only stages documented validation report, latest pointer, and capture artifacts for the selected work package."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented a work-package validation execution engine with registered recipes, Markdown/JSON artifact output, latest pointer updates, CLI support, PowerShell runner scripts, and guarded run-and-commit behavior.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0079 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-9999 --json"
+  ],
+  "work_package_id": "WP-0079"
+}
