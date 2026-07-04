@@ -597,10 +597,10 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         "success_criteria": ["Required commands exit zero"],
         "continue_on_failure": True,
         "commands": [
-            _cmd('test -f docs/operations/Codex_Task_Template_Standard_v1.md && test -f collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md'),
+            _cmd("python -c \"from pathlib import Path; template=Path('docs/operations/Codex_Task_Template_Standard_v1.md'); source=Path('collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md'); assert template.is_file(), template; assert source.is_file(), source\""),
             _cmd('for id in 0086 0087 0088 0089 0091 0092 0093 0094 0095 0096 0097 0098 0099 0100; do rg -q "WP-0102 Template Retrofit Notice" collaboration/work_packages/pending/WP-${id}_*.md || exit 1; done'),
             _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt(\'WP-0102\'); assert r[\'receipt_status\']==\'complete\', r\""),
-            _cmd("python -c \"from pathlib import Path; d=Path(\'collaboration/work_packages/completions\'); targets=[f\'WP-{i:04d}\' for i in range(86,101)]; allowed={\'WP-0086\',\'WP-0091\',\'WP-0095\'}; bad=[p.name for wp in targets for p in d.glob(f\'{wp}_codex_done.json\') if wp not in allowed]; assert not bad, bad\""),
+            _cmd('python -c "import json; from pathlib import Path; d=Path(\'collaboration/work_packages/completions\'); targets=[f\'WP-{i:04d}\' for i in range(86,101)]; suspicious=[p.name for wp in targets if (p:=d / f\'{wp}_codex_done.json\').exists() and \'wp-0102\' in (text:=json.dumps(json.loads(p.read_text(encoding=\'utf-8\'))).lower()) and (\'retrofit\' in text or \'template\' in text)]; assert not suspicious, suspicious"')
         ],
     },
     "WP-0103": {

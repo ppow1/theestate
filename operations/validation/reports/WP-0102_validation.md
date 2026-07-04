@@ -1,18 +1,18 @@
 # Work Package Validation Report — WP-0102
 
-- Timestamp: 2026-07-04T17:54:05+00:00
+- Timestamp: 2026-07-04T18:27:06+00:00
 - Work package ID: WP-0102
 - Local branch: work
-- Git commit: 934d7fab040ac88f8612f70954ffc6d76b31e503
+- Git commit: fa3db0abb57cf74759477b7bd6d7908f01690188
 - Validation status: passed
 - Recipe used: wp-0102-backlog-codex-template-retrofit-closure
 - Recipe title: WP-0102 — Backlog Codex Template Retrofit Validation
 
 ## Commands Run
-- `test -f docs/operations/Codex_Task_Template_Standard_v1.md && test -f collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md` — passed (exit 0, 0.005s)
-- `for id in 0086 0087 0088 0089 0091 0092 0093 0094 0095 0096 0097 0098 0099 0100; do rg -q "WP-0102 Template Retrofit Notice" collaboration/work_packages/pending/WP-${id}_*.md || exit 1; done` — passed (exit 0, 0.112s)
-- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0102'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.069s)
-- `python -c "from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; allowed={'WP-0086','WP-0091','WP-0095'}; bad=[p.name for wp in targets for p in d.glob(f'{wp}_codex_done.json') if wp not in allowed]; assert not bad, bad"` — passed (exit 0, 0.053s)
+- `python -c "from pathlib import Path; template=Path('docs/operations/Codex_Task_Template_Standard_v1.md'); source=Path('collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md'); assert template.is_file(), template; assert source.is_file(), source"` — passed (exit 0, 0.077s)
+- `for id in 0086 0087 0088 0089 0091 0092 0093 0094 0095 0096 0097 0098 0099 0100; do rg -q "WP-0102 Template Retrofit Notice" collaboration/work_packages/pending/WP-${id}_*.md || exit 1; done` — passed (exit 0, 0.186s)
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0102'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.11s)
+- `python -c "import json; from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; suspicious=[p.name for wp in targets if (p:=d / f'{wp}_codex_done.json').exists() and 'wp-0102' in (text:=json.dumps(json.loads(p.read_text(encoding='utf-8'))).lower()) and ('retrofit' in text or 'template' in text)]; assert not suspicious, suspicious"` — passed (exit 0, 0.08s)
 
 ## Findings
 - None.
