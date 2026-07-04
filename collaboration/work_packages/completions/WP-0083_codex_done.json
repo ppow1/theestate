@@ -1,7 +1,7 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T13:32:10+00:00",
+  "completed_at": "2026-07-04T14:19:05+00:00",
   "files_changed": [
     "src/estate/core/service_health_registry.py",
     "src/estate/core/service_dependency_matrix.py",
@@ -23,10 +23,9 @@
   "ready_for_ca_review": true,
   "summary": "Implemented a read-only Estate Service Health Registry aggregating catalog and dependency matrix data into health, availability, validation, dependency-health, last-known update, and authoritative source-link views for Mission Control, the Operations Center, and Alfred. Added CLI access, generated Markdown output, source-link integrity checks, graceful unavailable-source handling, and tests for healthy, degraded, unavailable, unknown, and missing-metadata states.",
   "tests_run": [
-    "PYTHONPATH=src pytest -q tests/test_service_health_registry.py",
+    "PYTHONPATH=src pytest -q tests/test_service_health_registry.py tests/test_service_dependency_matrix.py tests/test_estate_service_catalog.py",
     "PYTHONPATH=src python -m estate.cli.main service-health-registry --json > /tmp/service_health_registry.json",
     "python -m json.tool /tmp/service_health_registry.json >/dev/null",
-    "PYTHONPATH=src pytest -q tests/test_service_health_registry.py tests/test_service_dependency_matrix.py tests/test_estate_service_catalog.py",
     "git diff --check"
   ],
   "work_package_id": "WP-0083"
