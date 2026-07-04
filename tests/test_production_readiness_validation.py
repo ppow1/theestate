@@ -114,3 +114,9 @@ def test_wp_0020_receipt_complete_after_wp_0111_repair(tmp_path):
     receipt = validate_receipt("WP-0020", tmp_path)
     assert receipt["receipt_status"] == "complete"
     assert receipt["receipt_gaps"] == []
+
+
+def test_wp_0111_completion_receipt_complete_after_self_validation_repair():
+    receipt = validate_receipt("WP-0111")
+    assert receipt["receipt_status"] == "complete"
+    assert receipt["receipt_gaps"] == []

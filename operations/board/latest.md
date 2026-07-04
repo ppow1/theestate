@@ -1,10 +1,10 @@
 # Estate Operations Board
 
-Generated: 2026-07-04T19:25:46+00:00
+Generated: 2026-07-04T22:25:43+00:00
 
 ## Summary
 - Repository branch: work
-- Current commit: 20ea5700311eedbb9c45e8cbd55244632efe503c
+- Current commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5
 - Overall status: warning
 - Missing artifact count: 4
 - Warning count: 4

@@ -1,0 +1,24 @@
+{
+  "work_package_id": "WP-0113",
+  "generated_at": "2026-07-04T22:25:24+00:00",
+  "production_readiness_totals_after_wp0111_repair": {
+    "total_work_packages_scanned": 100,
+    "total_production_ready": 32,
+    "total_blocked": 68,
+    "total_missing_recipes": 48,
+    "total_missing_receipts": 6,
+    "total_incomplete_receipts": 52
+  },
+  "helen_path_status_after_wp0020_readiness": "WP-0020 Helen HR Operational Onboarding is production-ready; Helen is onboarded for HR artifacts/identity but is not yet fully online as a resident duty runner.",
+  "recommended_sequence": [
+    "WP-0106 Resident Runtime Presence Model",
+    "WP-0110 Resident Action Authority Boundary before or alongside WP-0106",
+    "WP-0107 Alfred Online Duty Runner",
+    "WP-0108 Helen Online Duty Runner",
+    "WP-0109 Resident Conversation Session and Audit Trail"
+  ],
+  "why_wp0106_before_wp0108": "WP-0108 needs a shared resident presence/status substrate so Helen online state is visible, auditable, and bounded before duty-runner behavior is added.",
+  "wp0110_timing": "Implement WP-0110 before or alongside WP-0106 so action authority limits are explicit before resident online/duty surfaces expand.",
+  "pending_implementation_statement": "WP-0107, WP-0108, and WP-0109 remain implementation packages, not validation-only repairs; WP-0106 and WP-0110 also remain pending implementation work.",
+  "recommended_next_work_package_command": "Read collaboration/work_packages/pending/WP-0106_SERIES_resident_runtime_presence_model.md and implement it, coordinating WP-0110 authority-boundary review before or alongside the WP-0106 implementation."
+}
