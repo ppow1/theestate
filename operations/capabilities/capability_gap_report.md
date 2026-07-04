@@ -2,19 +2,20 @@
 
 Read-only report for Mission Control and roadmap planning. This artifact is not a source of truth and does not change capability status.
 
-Generated: 2026-07-04T12:37:57+00:00
+Generated: 2026-07-04T12:49:54+00:00
 
 ## Summary
 - Capabilities Reviewed: 6
-- Planned Only Count: 8
+- Planned Only Count: 9
 - Implemented Unvalidated Count: 0
 - Operational Count: 4
 - Degraded Count: 1
 - Dependency Blocked Count: 0
-- Future Candidate Count: 80
+- Future Candidate Count: 83
 - Missing Input Count: 2
 
 ## Planned Capabilities Without Implementation Evidence
+- **Whisper** — planned_without_implementation_evidence. Sources: `data/registry/capabilities.json`, `A:\AI`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `observations/ai_environment_2026-06-29_23-47-42.json`, `runtime/validation/operational_validation_report.json`
 - **Governance** — roadmap_planned_without_capability_registry_record. Sources: `operations/boards/roadmap.md`
 - **Collaboration Layer** — roadmap_planned_without_capability_registry_record. Sources: `operations/boards/roadmap.md`
 - **Operations Board** — roadmap_planned_without_capability_registry_record. Sources: `operations/boards/roadmap.md`
@@ -120,6 +121,9 @@ Generated: 2026-07-04T12:37:57+00:00
 - **Operations Center Service Status Board** — pending work package describes capability or capability-adjacent work. Sources: `collaboration/work_packages/pending/WP-0084_SERIES_operations_center_service_status_board.md`
 - **Operator Activity Stream** — pending work package describes capability or capability-adjacent work. Sources: `collaboration/work_packages/pending/WP-0085_SERIES_operator_activity_stream.md`
 - **Validation Recipe Expansion** — pending work package describes capability or capability-adjacent work. Sources: `collaboration/work_packages/pending/WP-0086_SERIES_validation_recipe_expansion.md`
+- **Operator Verbosity And Filter Profiles** — pending work package describes capability or capability-adjacent work. Sources: `collaboration/work_packages/pending/WP-0087_SERIES_operator_verbosity_and_filter_profiles.md`
+- **Operations Center Layout Framework** — pending work package describes capability or capability-adjacent work. Sources: `collaboration/work_packages/pending/WP-0088_SERIES_operations_center_layout_framework.md`
+- **Operations Center Workspace Profiles** — pending work package describes capability or capability-adjacent work. Sources: `collaboration/work_packages/pending/WP-0089_SERIES_operations_center_workspace_profiles.md`
 
 ## Observations Not Confirmed Defects
 - **RTX 4090 CUDA** — dependency visualization includes unresolved or external references. Sources: `data/registry/capabilities.json`, `Local AI Workstation`, `A:\AI`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `README.md`, `runtime/validation/operational_validation_report.json`

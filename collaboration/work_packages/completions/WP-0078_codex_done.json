@@ -1,7 +1,7 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T12:38:09+00:00",
+  "completed_at": "2026-07-04T12:50:02+00:00",
   "files_changed": [
     "src/estate/core/capability_gap_report.py",
     "src/estate/core/mission_control_workspace.py",
@@ -12,6 +12,7 @@
   ],
   "known_limitations": [
     "The report is read-only and does not change capability status, create governance, or create work packages.",
+    "Pending-install or designed capabilities are reported as planned-only even when they carry location or documentation references; those references are not promoted into implementation evidence.",
     "Planned capability gaps are drawn only from explicit roadmap and registry evidence; no prose-only capability inference is promoted to implementation evidence.",
     "Missing runtime Mission Control and validation metrics JSON artifacts are reported as missing-data states when only Markdown artifacts are available.",
     "No ledger or devlog files were modified."
@@ -20,7 +21,7 @@
   "merge_class": "Class A",
   "pull_request_url": "pending_make_pr_tool",
   "ready_for_ca_review": true,
-  "summary": "Implemented a read-only Capability Gap Report that compares planned, implemented, validated, operational, degraded, dependency-blocked, future-candidate, observation, defect, and missing-data states from existing Estate artifacts without changing governance or lifecycle status.",
+  "summary": "Implemented and refreshed a read-only Capability Gap Report that keeps planned-only capabilities separate from implementation evidence, including pending-install registry records, while comparing planned, implemented, validated, operational, degraded, dependency-blocked, future-candidate, observation, defect, and missing-data states from existing Estate artifacts.",
   "tests_run": [
     "PYTHONPATH=src pytest -q tests/test_capability_gap_report.py tests/test_capability_dependency_visualization.py tests/test_mission_control_workspace.py",
     "PYTHONPATH=src python -m estate.cli.main capability-gap-report --json > /tmp/capgap.json",
