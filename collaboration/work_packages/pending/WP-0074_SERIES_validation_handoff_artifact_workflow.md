@@ -48,21 +48,21 @@ Add:
 - `operations/validation/reports/`
 - `runtime/validation/work_packages/`
 
-Implement a reusable PowerShell validation runner capable of validating a single work package by ID.
+Implement a reusable validation runner capable of validating a single work package by ID.
 
-Suggested command surface:
+Suggested command surfaces:
 
 - `operations/validation/scripts/validate_work_package.ps1 -WorkPackageId WP-0058`
+- `python -m estate.cli.main validate-work-package --id WP-0058 --json`
 
 The runner should:
 
-- pull current local state only if safe or clearly document that pull must happen before execution
 - run configured validation commands for the requested work package
 - capture stdout, stderr, exit codes, timestamps, and command metadata
 - write a Markdown report
 - write a JSON report
 - update a latest validation pointer
-- optionally stage/commit/push generated validation artifacts when explicitly requested
+- optionally stage, commit, and push generated validation artifacts when explicitly requested by a wrapper
 
 Add a safe convenience wrapper such as:
 
@@ -72,15 +72,15 @@ This wrapper may:
 
 - run `git pull`
 - run the validation
-- stage only the expected validation report artifacts
+- stage only expected validation report artifacts
 - commit with a clear message
 - push
 
 The wrapper must fail safely if the working tree contains unrelated changes.
 
-## Required Behavior
+## Required Local Steward Command Pattern
 
-The validation workflow must support this local Steward command pattern:
+The validation workflow must support this short local command pattern:
 
 ```powershell
 CLS
@@ -89,17 +89,17 @@ git pull
 .\operations\validation\scripts\run_and_commit_validation.ps1 -WorkPackageId WP-0058
 ```
 
-After the command completes, the repo should contain reviewable artifacts such as:
+After the command completes, the repository should contain reviewable artifacts such as:
 
 - `operations/validation/reports/WP-0058_validation.md`
 - `runtime/validation/work_packages/WP-0058_validation.json`
 - `runtime/validation/work_packages/latest.json`
 
-The Markdown report should be human-readable.
+The Markdown report must be human-readable.
 
-The JSON report should be machine-readable.
+The JSON report must be machine-readable.
 
-## Required Report Fields
+## Required JSON Report Fields
 
 The JSON report must include:
 
@@ -118,6 +118,18 @@ The JSON report must include:
 - warnings
 - failures
 - reviewer_recommendation
+
+Each command result must include:
+
+- command
+- started_at
+- completed_at
+- exit_code
+- stdout_path or stdout_excerpt
+- stderr_path or stderr_excerpt
+- status
+
+## Required Markdown Report Sections
 
 The Markdown report must include:
 
@@ -138,7 +150,7 @@ The Markdown report must include:
 
 Add a simple local registry for known work package validation command sets.
 
-A lightweight JSON or Python mapping is acceptable.
+A lightweight JSON file, Python mapping, or other simple local registry is acceptable.
 
 It should allow future work packages to declare validation steps without rewriting the runner.
 
@@ -150,7 +162,25 @@ Initial validation entries should include at least:
 - WP-0059
 - WP-0060
 
-If a work package has no registered validation recipe, the runner should still produce a report stating that no recipe exists, not crash.
+If a work package has no registered validation recipe, the runner must still produce a report stating that no recipe exists. It must not crash.
+
+## Initial Recipe Expectations
+
+The first recipes do not need to prove every functional edge case. They should prove that the workflow can execute real Estate validation commands and record results.
+
+Initial recipes may include commands such as:
+
+- `python -m estate.cli.main steward-command-center --json`
+- `python -m estate.cli.main assignment-queue --json`
+- `python -m estate.cli.main global-search "Notification Center" --json`
+- `python -m estate.cli.main global-search "Steward Recall" --json`
+- `python -m estate.cli.main global-search "Resident Conversations" --json`
+- `python -m estate.cli.main global-search "Interaction Services Adapter Registry" --json`
+- `python -m estate.cli.main palette-command notification-center --json`
+- `python -m estate.cli.main palette-command steward-recall --json`
+- `python -m estate.cli.main palette-command resident-conversations --json`
+
+Recipes should tolerate missing optional command surfaces where the work package contract did not explicitly require them, but the report must record those as findings.
 
 ## Safety Requirements
 
@@ -170,7 +200,7 @@ Do not edit `estate_ledger/ledger.md` or `development/devlog.md`.
 
 ## Git Behavior
 
-The base runner should not automatically push.
+The base runner must not automatically push.
 
 The commit wrapper may push only if:
 
@@ -182,6 +212,8 @@ The commit wrapper may push only if:
 Suggested commit message:
 
 `Validate WP-0058`
+
+The wrapper must refuse to continue when unrelated modified, staged, untracked, or deleted files are present.
 
 ## CLI Integration
 
