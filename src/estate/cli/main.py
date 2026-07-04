@@ -30,6 +30,7 @@ from estate.core.check_updates import generate_check_updates, format_check_updat
 from estate.core.mailbox_sync_duty import generate_mailbox_sync_duty, format_mailbox_sync_duty
 from estate.core.local_operational_validation import generate_local_operational_validation_run, format_local_operational_validation_summary
 from estate.core.onboarding_manifest import check_onboarding_manifests, format_onboarding_manifest_check
+from estate.core.hr_onboarding import run_employee_onboarding, format_onboarding_result
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.institutional_search import search_institutional_index, format_search_report
 from estate.core.global_search_command_palette import search_global_palette, execute_registered_command, format_palette_report
@@ -621,6 +622,26 @@ def cmd_onboarding_manifest_check(args):
     if not report["ok"]:
         raise SystemExit(1)
 
+
+
+def cmd_hr_onboard(args):
+    result = run_employee_onboarding(
+        name=args.name,
+        department=args.department,
+        office=args.office,
+        role=args.role,
+        classification=args.classification,
+        package_type=args.package_type,
+        steward_authorization=args.steward_authorization,
+        dry_run=args.dry_run,
+    )
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_onboarding_result(result))
+    if not result.get("ok"):
+        raise SystemExit(1)
 
 def cmd_work_package_handoffs(args):
     handoffs = list_pending_handoffs()
@@ -1221,6 +1242,31 @@ def main():
     p = sub.add_parser("onboarding-manifest-check")
     p.add_argument("--json", action="store_true", help="Validate onboarding manifest required paths and print JSON")
     p.set_defaults(func=cmd_onboarding_manifest_check)
+
+
+    p = sub.add_parser("hr-onboard", help="Run Helen HR employee onboarding orchestration")
+    p.add_argument("--name", required=True)
+    p.add_argument("--department", required=True)
+    p.add_argument("--office", required=True)
+    p.add_argument("--role", required=True)
+    p.add_argument("--classification", required=True)
+    p.add_argument("--package-type", default="worker", choices=["worker", "chief_architect", "standard"])
+    p.add_argument("--steward-authorization", required=True, help="Steward authorization evidence or reference")
+    p.add_argument("--dry-run", action="store_true", help="Validate and report without writing artifacts")
+    p.add_argument("--json", action="store_true", help="Print onboarding result JSON")
+    p.set_defaults(func=cmd_hr_onboard)
+
+    p = sub.add_parser("helen-onboard", help="Alias for Helen HR employee onboarding orchestration")
+    p.add_argument("--name", required=True)
+    p.add_argument("--department", required=True)
+    p.add_argument("--office", required=True)
+    p.add_argument("--role", required=True)
+    p.add_argument("--classification", required=True)
+    p.add_argument("--package-type", default="worker", choices=["worker", "chief_architect", "standard"])
+    p.add_argument("--steward-authorization", required=True, help="Steward authorization evidence or reference")
+    p.add_argument("--dry-run", action="store_true", help="Validate and report without writing artifacts")
+    p.add_argument("--json", action="store_true", help="Print onboarding result JSON")
+    p.set_defaults(func=cmd_hr_onboard)
 
     p = sub.add_parser("work-package-handoffs", help="List pending work packages and copy-ready Codex launch commands")
     p.set_defaults(func=cmd_work_package_handoffs)

@@ -1,0 +1,25 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T13:04:19+00:00",
+  "files_changed": [
+    "collaboration/work_packages/completions/WP-0080_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/hr_onboarding.py",
+    "tests/test_hr_onboarding.py"
+  ],
+  "known_limitations": [
+    "The orchestrator requires explicit Steward authorization evidence input and only writes local repository artifacts; it does not alter constitutional or governance authority."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending_make_pr_tool",
+  "ready_for_ca_review": true,
+  "summary": "Implemented Helen HR employee onboarding orchestration with CLI aliases, registry/mailbox/packet/index/resolver workflow, safe failure modes, audit artifacts, and tests.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_hr_onboarding.py",
+    "PYTHONPATH=src pytest -q tests/test_hr_onboarding.py tests/test_mailbox_index.py tests/test_personnel_identity.py tests/test_onboarding_manifest.py tests/test_codex_completion.py",
+    "PYTHONPATH=src python -m estate.cli.main hr-onboard --name Test --department Engineering --office Implementation --role Worker --classification metadata_only --package-type worker --steward-authorization AUTH --dry-run --json > /tmp/hr_onboard.json",
+    "python -m json.tool /tmp/hr_onboard.json >/dev/null"
+  ],
+  "work_package_id": "WP-0080"
+}
