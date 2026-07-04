@@ -1,0 +1,91 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main capability-dependency-visualization --json",
+      "completed_at": "2026-07-04T13:12:17+00:00",
+      "duration_seconds": 0.267,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T13:12:17+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0077_2026-07-04T131217Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main estate-capability-registry --json",
+      "completed_at": "2026-07-04T13:12:18+00:00",
+      "duration_seconds": 0.246,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T13:12:17+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0077_2026-07-04T131217Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main steward-command-center --json",
+      "completed_at": "2026-07-04T13:12:18+00:00",
+      "duration_seconds": 0.604,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T13:12:18+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0077_2026-07-04T131217Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main estate-search \"Capability Dependency\" --json",
+      "completed_at": "2026-07-04T13:12:19+00:00",
+      "duration_seconds": 0.368,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T13:12:18+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0077_2026-07-04T131217Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main global-search \"Capability Dependency\" --json",
+      "completed_at": "2026-07-04T13:12:19+00:00",
+      "duration_seconds": 0.381,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T13:12:19+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0077_2026-07-04T131217Z0000/command_05_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main capability-dependency-visualization --json",
+    "python -m estate.cli.main estate-capability-registry --json",
+    "python -m estate.cli.main steward-command-center --json",
+    "python -m estate.cli.main estate-search \"Capability Dependency\" --json",
+    "python -m estate.cli.main global-search \"Capability Dependency\" --json"
+  ],
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0077_validation.md",
+    "runtime/validation/work_packages/WP-0077_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T13:12:17+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "57901455045e8879e87d2e760dabdb805e729ac5",
+  "recipe_id": "wp-0077-capability-dependency-visualization",
+  "recipe_title": "WP-0077 \u2014 Capability Dependency Visualization and Mission Control integration",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 5 command(s).",
+  "validation_id": "WP-0077_2026-07-04T131217Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0077"
+}
