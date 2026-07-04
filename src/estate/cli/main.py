@@ -56,6 +56,7 @@ from estate.core.assignment_queue import generate_assignment_queue, format_assig
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
 from estate.core.autonomous_operations_audit import append_autonomous_operations_audit, format_autonomous_operations_audit
 from estate.core.steward_command_center import generate_command_center, serve_command_center
+from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, save_workspace_profile
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -634,6 +635,20 @@ def cmd_operator_activity_stream(args):
         print(format_operator_activity_stream_summary(stream))
 
 
+def cmd_operations_center_profile(args):
+    if getattr(args, "save_profile", None):
+        payload = save_workspace_profile(name=args.save_profile, base_profile=args.profile, active_tab=args.active_tab)
+    else:
+        payload = resolve_workspace_profile(profile_name=args.profile)
+    if args.json:
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        profile = payload.get("profile", {})
+        print(f"Operations Center workspace profile: {payload.get('selected_profile')}")
+        print(f"Active tab: {profile.get('active_tab')}")
+        print(f"Tabs: {', '.join(profile.get('tab_order', []))}")
+
 def cmd_operational_validation(args):
     report = generate_operational_validation_report()
     if getattr(args, "json", False):
@@ -1133,6 +1148,14 @@ def main():
     p = sub.add_parser("service-status-board", help="Generate the Operations Center service status board")
     p.add_argument("--json", action="store_true", help="Generate service status board and print JSON")
     p.set_defaults(func=cmd_service_status_board)
+
+
+    p = sub.add_parser("operations-center-profile", help="Resolve or save an Operations Center workspace profile")
+    p.add_argument("--json", action="store_true", help="Print resolved workspace profile JSON")
+    p.add_argument("--profile", default="mission-control", help="Named workspace profile to load")
+    p.add_argument("--save-profile", help="Persist a local profile derived from --profile")
+    p.add_argument("--active-tab", help="Active tab for a saved profile")
+    p.set_defaults(func=cmd_operations_center_profile)
 
     p = sub.add_parser("operator-activity-stream", help="Generate the read-only Operator Activity Stream")
     p.add_argument("--json", action="store_true", help="Generate Operator Activity Stream and print JSON")
