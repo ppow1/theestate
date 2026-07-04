@@ -12,6 +12,8 @@ from estate.core.paths import ESTATE_ROOT
 
 JSON_OUTPUT = "runtime/steward/operator_activity_stream.json"
 MARKDOWN_OUTPUT = "operations/steward/operator_activity_stream.md"
+PROFILES_OUTPUT = "runtime/steward/operator_activity_profiles.json"
+DEFAULT_PROFILE_NAME = "default"
 VERBOSITY_LEVELS = ["quiet", "normal", "detailed", "diagnostic"]
 SEVERITY_ORDER = {"error": 0, "warning": 1, "missing": 1, "info": 2, "debug": 3}
 SOURCE_ARTIFACTS = {
@@ -109,21 +111,100 @@ def _collect_events(root):
     return events, inputs
 
 
-def _filter_events(events, sources=None, severities=None, verbosity="normal"):
+def _valid_verbosity(value):
+    return value if value in VERBOSITY_LEVELS else "normal"
+
+
+def _default_profiles():
+    return {
+        DEFAULT_PROFILE_NAME: {
+            "name": DEFAULT_PROFILE_NAME,
+            "description": "Concise operational summaries for routine Mission Control use.",
+            "verbosity": "normal",
+            "source_verbosity": {},
+            "sources": [],
+            "severities": [],
+            "ui": {"theme": "system"},
+        }
+    }
+
+
+def load_operator_activity_profiles(root=None):
+    root = _root(root)
+    path = root / PROFILES_OUTPUT
+    profiles = _default_profiles()
+    if path.exists():
+        try:
+            data = _read_json(path)
+            stored = data.get("profiles", data) if isinstance(data, dict) else {}
+            if isinstance(stored, dict):
+                profiles.update({name: profile for name, profile in stored.items() if isinstance(profile, dict)})
+        except Exception:
+            pass
+    return profiles
+
+
+def save_operator_activity_profile(root=None, *, name=DEFAULT_PROFILE_NAME, sources=None, severities=None, verbosity="normal", source_verbosity=None, ui_theme="system", description=None):
+    root = _root(root)
+    profiles = load_operator_activity_profiles(root)
+    profile = {
+        "name": name,
+        "description": description or f"Saved Operator Activity Stream profile: {name}.",
+        "verbosity": _valid_verbosity(verbosity),
+        "source_verbosity": {k: _valid_verbosity(v) for k, v in (source_verbosity or {}).items()},
+        "sources": list(sources or []),
+        "severities": list(severities or []),
+        "ui": {"theme": ui_theme if ui_theme in {"system", "light", "dark"} else "system"},
+        "updated_at": _now(),
+    }
+    profiles[name] = profile
+    (root / "runtime/steward").mkdir(parents=True, exist_ok=True)
+    (root / PROFILES_OUTPUT).write_text(json.dumps({"version": 1, "profiles": profiles}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return profile
+
+
+def _resolve_profile(root, profile_name, sources, severities, verbosity, source_verbosity, ui_theme):
+    profiles = load_operator_activity_profiles(root)
+    selected = profiles.get(profile_name or DEFAULT_PROFILE_NAME, profiles[DEFAULT_PROFILE_NAME])
+    return {
+        "name": selected.get("name", profile_name or DEFAULT_PROFILE_NAME),
+        "verbosity": _valid_verbosity(verbosity or selected.get("verbosity", "normal")),
+        "source_verbosity": {**(selected.get("source_verbosity") or {}), **(source_verbosity or {})},
+        "sources": list(sources if sources is not None else selected.get("sources", [])),
+        "severities": list(severities if severities is not None else selected.get("severities", [])),
+        "ui": {"theme": ui_theme or (selected.get("ui") or {}).get("theme", "system")},
+        "available_profiles": sorted(profiles),
+    }
+
+
+def _filter_events(events, sources=None, severities=None, verbosity="normal", source_verbosity=None):
     src = set(sources or [])
     sev = set(severities or [])
-    max_rank = VERBOSITY_LEVELS.index(verbosity if verbosity in VERBOSITY_LEVELS else "normal")
-    allowed_verbosity = set(VERBOSITY_LEVELS[: max_rank + 1])
-    filtered = [e for e in events if (not src or e["source"] in src) and (not sev or e["severity"] in sev) and e.get("verbosity", "normal") in allowed_verbosity]
+    source_verbosity = source_verbosity or {}
+    filtered = []
+    for event in events:
+        if src and event["source"] not in src:
+            continue
+        if sev and event["severity"] not in sev:
+            continue
+        event_verbosity = event.get("verbosity", "normal")
+        effective = _valid_verbosity(source_verbosity.get(event["source"], verbosity))
+        allowed = set(VERBOSITY_LEVELS[: VERBOSITY_LEVELS.index(effective) + 1])
+        if event_verbosity in allowed:
+            filtered.append(event)
     return sorted(filtered, key=lambda e: str(e.get("timestamp") or ""), reverse=True)
 
 
-def generate_operator_activity_stream(root=None, write=True, sources=None, severities=None, verbosity="normal", limit=50):
+def generate_operator_activity_stream(root=None, write=True, sources=None, severities=None, verbosity=None, limit=50, profile=DEFAULT_PROFILE_NAME, save_profile=None, source_verbosity=None, ui_theme=None):
     root = _root(root)
+    resolved = _resolve_profile(root, profile, sources, severities, verbosity, source_verbosity, ui_theme)
+    if save_profile:
+        save_operator_activity_profile(root, name=save_profile, sources=resolved["sources"], severities=resolved["severities"], verbosity=resolved["verbosity"], source_verbosity=resolved["source_verbosity"], ui_theme=resolved["ui"]["theme"])
+        resolved = _resolve_profile(root, save_profile, None, None, None, None, None)
     events, inputs = _collect_events(root)
-    filtered = _filter_events(events, sources=sources, severities=severities, verbosity=verbosity)[:limit]
+    filtered = _filter_events(events, sources=resolved["sources"], severities=resolved["severities"], verbosity=resolved["verbosity"], source_verbosity=resolved["source_verbosity"])[:limit]
     summary = {"total_event_count": len(events), "filtered_event_count": len(filtered), "source_count": len(SOURCE_ARTIFACTS), "warning_count": sum(1 for e in filtered if e["severity"] in {"warning", "missing"}), "error_count": sum(1 for e in filtered if e["severity"] == "error")}
-    payload = {"version": 1, "generated_at": _now(), "authority": "read_only_operator_activity_stream_not_source_of_truth", "refresh_behavior": "quiet_live_updates_from_local_artifact_refresh", "verbosity_levels": VERBOSITY_LEVELS, "selected_verbosity": verbosity, "filters": {"sources": sources or [], "severities": severities or []}, "available_sources": sorted(SOURCE_ARTIFACTS), "empty_state": "No activity matches the selected filters." if not filtered else None, "inputs": inputs, "summary": summary, "events": filtered, "operations_center_integration": {"dockable_bottom_status_panel_ready": True, "read_only": True, "json_output": JSON_OUTPUT, "markdown_output": MARKDOWN_OUTPUT}}
+    payload = {"version": 2, "generated_at": _now(), "authority": "read_only_operator_activity_stream_not_source_of_truth", "refresh_behavior": "quiet_live_updates_from_local_artifact_refresh", "verbosity_levels": VERBOSITY_LEVELS, "selected_profile": resolved["name"], "selected_verbosity": resolved["verbosity"], "source_verbosity": resolved["source_verbosity"], "filters": {"sources": resolved["sources"], "severities": resolved["severities"]}, "available_sources": sorted(SOURCE_ARTIFACTS), "available_profiles": resolved["available_profiles"], "ui_preferences": resolved["ui"], "empty_state": "No activity matches the selected filters." if not filtered else None, "inputs": inputs, "summary": summary, "events": filtered, "operations_center_integration": {"dockable_bottom_status_panel_ready": True, "read_only": True, "json_output": JSON_OUTPUT, "markdown_output": MARKDOWN_OUTPUT, "profiles_output": PROFILES_OUTPUT, "future_light_dark_ui_settings_ready": True}}
     if write:
         (root / "runtime/steward").mkdir(parents=True, exist_ok=True)
         (root / JSON_OUTPUT).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")

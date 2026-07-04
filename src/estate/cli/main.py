@@ -606,8 +606,27 @@ def cmd_service_status_board(args):
         print(format_service_status_board_summary(board))
 
 
+def _parse_source_verbosity(items):
+    parsed = {}
+    for item in items or []:
+        if "=" not in item:
+            continue
+        source, verbosity = item.split("=", 1)
+        parsed[source.strip()] = verbosity.strip()
+    return parsed
+
+
 def cmd_operator_activity_stream(args):
-    stream = generate_operator_activity_stream(sources=getattr(args, "source", None), severities=getattr(args, "severity", None), verbosity=getattr(args, "verbosity", "normal"), limit=getattr(args, "limit", 50))
+    stream = generate_operator_activity_stream(
+        sources=getattr(args, "source", None),
+        severities=getattr(args, "severity", None),
+        verbosity=getattr(args, "verbosity", None),
+        limit=getattr(args, "limit", 50),
+        profile=getattr(args, "profile", "default"),
+        save_profile=getattr(args, "save_profile", None),
+        source_verbosity=_parse_source_verbosity(getattr(args, "source_verbosity", None)),
+        ui_theme=getattr(args, "ui_theme", None),
+    )
     if getattr(args, "json", False):
         import json
         print(json.dumps(stream, indent=2, sort_keys=True))
@@ -1119,7 +1138,11 @@ def main():
     p.add_argument("--json", action="store_true", help="Generate Operator Activity Stream and print JSON")
     p.add_argument("--source", action="append", help="Limit to a source such as validation, workers, mailboxes, service_health")
     p.add_argument("--severity", action="append", help="Limit to a severity such as error, warning, missing, info")
-    p.add_argument("--verbosity", default="normal", choices=["quiet", "normal", "detailed", "diagnostic"], help="Verbosity level")
+    p.add_argument("--verbosity", choices=["quiet", "normal", "detailed", "diagnostic"], help="Global verbosity level")
+    p.add_argument("--profile", default="default", help="Named viewing profile to load")
+    p.add_argument("--save-profile", help="Persist the selected filters and verbosity as this named profile")
+    p.add_argument("--source-verbosity", action="append", help="Per-source verbosity override, for example workers=detailed")
+    p.add_argument("--ui-theme", choices=["system", "light", "dark"], help="Future UI theme preference stored with saved profiles")
     p.add_argument("--limit", type=int, default=50, help="Maximum events to show")
     p.set_defaults(func=cmd_operator_activity_stream)
 

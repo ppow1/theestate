@@ -300,6 +300,23 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         "continue_on_failure": True,
         "commands": [_cmd('python -m estate.cli.main operator-activity-stream --json'), _cmd('python -m estate.cli.main service-status-board --json'), _cmd('python -m estate.cli.main operations-board --json', required=False)],
     },
+    "WP-0087": {
+        "recipe_id": "wp-0087-operator-verbosity-filter-profiles",
+        "title": "WP-0087 — Operator Verbosity and Filter Profiles",
+        "description": "Validates Operator Activity Stream profile persistence, per-source verbosity, severity filtering, and production-readiness compatibility.",
+        "required_checks": ["Operator activity stream profile saves", "Saved profile reloads", "Operator stream tests pass"],
+        "observational_checks": ["Production readiness report generates"],
+        "expected_artifacts": ["operations/validation/reports/WP-0087_validation.md", "runtime/validation/work_packages/WP-0087_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero and recipe does not return no_recipe"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main operator-activity-stream --json --source workers --severity warning --source-verbosity workers=detailed --save-profile worker-watch --ui-theme dark'),
+            _cmd('python -m estate.cli.main operator-activity-stream --json --profile worker-watch'),
+            _cmd('pytest -q tests/test_operator_activity_stream.py'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
     "WP-0056": {
         "recipe_id": "wp-0056-notification-center-workspace",
         "title": "WP-0056 — Notification Center Workspace",

@@ -1,0 +1,110 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operator-activity-stream --json --source workers --severity warning --source-verbosity workers=detailed --save-profile worker-watch --ui-theme dark",
+      "completed_at": "2026-07-04T18:02:29+00:00",
+      "duration_seconds": 0.277,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T18:02:29+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0087_2026-07-04T180229Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operator-activity-stream --json --profile worker-watch",
+      "completed_at": "2026-07-04T18:02:29+00:00",
+      "duration_seconds": 0.28,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T18:02:29+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0087_2026-07-04T180229Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_operator_activity_stream.py",
+      "completed_at": "2026-07-04T18:02:30+00:00",
+      "duration_seconds": 1.057,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T18:02:29+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0087_2026-07-04T180229Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-04T18:02:31+00:00",
+      "duration_seconds": 0.354,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T18:02:30+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0087_2026-07-04T180229Z0000/command_04_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main operator-activity-stream --json --source workers --severity warning --source-verbosity workers=detailed --save-profile worker-watch --ui-theme dark",
+    "python -m estate.cli.main operator-activity-stream --json --profile worker-watch",
+    "pytest -q tests/test_operator_activity_stream.py",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0087_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0087_validation.md",
+    "runtime/validation/work_packages/WP-0087_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T18:02:29+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "7031e7f97cadfa792d6fc60e176091a1e3d3da94",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": false,
+    "receipt_status": "incomplete",
+    "required_followups": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ]
+  },
+  "receipt_gaps": [
+    "pull_request_url_or_not_applicable_reason"
+  ],
+  "receipt_validation": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0087_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [
+      "pull_request_url_or_not_applicable_reason"
+    ],
+    "receipt_status": "incomplete",
+    "work_package_id": "WP-0087"
+  },
+  "recipe_id": "wp-0087-operator-verbosity-filter-profiles",
+  "recipe_title": "WP-0087 \u2014 Operator Verbosity and Filter Profiles",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 4 command(s).",
+  "validation_id": "WP-0087_2026-07-04T180229Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0087"
+}
