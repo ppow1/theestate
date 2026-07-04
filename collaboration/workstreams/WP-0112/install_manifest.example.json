@@ -1,0 +1,16 @@
+{
+  "work_package_id": "WP-6001",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": ["collaboration/workstreams/WP-6001/prototype.py"],
+  "intended_final_install_paths": ["src/estate/core/example_runtime_module.py"],
+  "files_expected_to_be_modified_during_install": ["src/estate/core/example_runtime_module.py", "tests/test_example_runtime_module.py"],
+  "manual_install_steps": ["Review staged artifact", "Apply install patch", "Run validation commands"],
+  "automated_install_steps": [],
+  "validation_commands": ["PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-6001 --json"],
+  "rollback_notes": "Revert the install commit or restore the listed final install paths from the pre-install revision.",
+  "dependency_assumptions": ["Assigned number is within WP-6000 through WP-6999 temporary worker block"],
+  "conflict_risks": [{"path": "src/estate/core/example_runtime_module.py", "risk": "low", "reason": "new isolated runtime module"}],
+  "generated_artifacts_to_ignore_or_review": ["runtime/validation/work_packages/WP-6001_validation.json"],
+  "authority_and_review_requirements": ["Chief Architect review required before active runtime install"],
+  "staged_work_is_installed": false
+}

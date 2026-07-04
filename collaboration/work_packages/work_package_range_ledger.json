@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "source_of_truth": "local-first deterministic allocation blocks; do not use live GitHub search as the real-time allocator",
+  "updated_by_work_package": "WP-0112",
+  "ranges": [
+    {"start": "WP-0001", "end": "WP-0999", "owner": "Legacy and current sequential Estate backlog", "purpose": "Existing backlog and transition-era packages", "status": "active"},
+    {"start": "WP-1000", "end": "WP-1999", "owner": "Steward and active Chief Architect planning", "purpose": "Primary planning block", "status": "reserved"},
+    {"start": "WP-2000", "end": "WP-2999", "owner": "Chief Architect #4 validation stream", "purpose": "Validation and install-readiness packages", "status": "reserved"},
+    {"start": "WP-3000", "end": "WP-3999", "owner": "Chief Architect #5 continuation stream", "purpose": "Continuation and architecture follow-through", "status": "reserved"},
+    {"start": "WP-4000", "end": "WP-5999", "owner": "Resident runtime implementation streams", "purpose": "Parallel implementation packages", "status": "reserved"},
+    {"start": "WP-6000", "end": "WP-6999", "owner": "Third-party or temporary parallel Codex workers", "purpose": "Temporary externally assigned workstreams", "status": "reserved"},
+    {"start": "WP-7000", "end": "WP-7999", "owner": "Emergency repair and hotfix planning", "purpose": "Urgent repairs", "status": "reserved"},
+    {"start": "WP-8000", "end": "WP-8999", "owner": "Future parking and reserved experiments", "purpose": "Parked future concepts", "status": "reserved"},
+    {"start": "WP-9000", "end": "WP-9999", "owner": "Steward reassignment reserve", "purpose": "Reserve for Steward-directed reallocations", "status": "reserved"}
+  ]
+}

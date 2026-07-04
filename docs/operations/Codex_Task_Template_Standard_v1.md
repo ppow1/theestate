@@ -159,3 +159,7 @@ State the merge class and escalation triggers. Escalate if implementation change
 ## Discoverability
 
 This standard is registered in the Estate document registry as `DOC-CODEX-TASK-TEMPLATE-STANDARD` and is discoverable through local document-registry and Estate search commands.
+
+## Parallel Workstream Compatibility Addendum
+
+For work packages authored after WP-0112, the template is extended by `docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md` when a package is intended to run in parallel. Parallel packages must add sections for `Workstream Mode`, `Conflict Surface`, `Staged Paths`, `Install Manifest`, `Install Readiness Criteria`, `Parallel-Safe Packages`, and `Required Install Handoff` without weakening completion receipts, validation recipes, generated artifact handling, demonstration requirements, or production-readiness requirements.

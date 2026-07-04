@@ -1,4 +1,6 @@
 import argparse
+import json
+from pathlib import Path
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
@@ -66,6 +68,41 @@ from estate.core.resident_conversation_sessions import create_session, list_sess
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
+
+def _repo_path(rel):
+    return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
+
+def cmd_work_package_ranges(args):
+    path = _repo_path("collaboration/work_packages/work_package_range_ledger.json")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        for row in payload.get("ranges", []):
+            print(f"{row.get('start')}..{row.get('end')} | {row.get('owner')} | {row.get('status')}")
+
+def cmd_workstream(args):
+    manifest = _repo_path(f"collaboration/workstreams/{args.id}/install_manifest.json")
+    example = _repo_path(f"collaboration/workstreams/{args.id}/install_manifest.example.json")
+    path = manifest if manifest.exists() else example
+    if args.action == "inspect":
+        if not path.exists():
+            payload = {"work_package_id": args.id, "manifest_status": "missing", "expected_path": str(manifest.relative_to(_repo_path('.'))).replace('\\','/')}
+        else:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["manifest_status"] = "found"
+            payload["manifest_path"] = str(path.relative_to(_repo_path('.'))).replace('\\','/')
+    else:
+        required = ["work_package_id", "workstream_mode", "staged_artifact_paths", "intended_final_install_paths", "files_expected_to_be_modified_during_install", "validation_commands", "rollback_notes", "dependency_assumptions", "conflict_risks", "authority_and_review_requirements", "staged_work_is_installed"]
+        payload = {"work_package_id": args.id, "manifest_path": None, "validation_status": "failed", "missing_fields": required}
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            missing = [key for key in required if key not in data]
+            payload = {"work_package_id": args.id, "manifest_path": str(path.relative_to(_repo_path('.'))).replace('\\','/'), "validation_status": "passed" if not missing and data.get("staged_work_is_installed") is False else "failed", "missing_fields": missing, "staged_work_is_installed": data.get("staged_work_is_installed")}
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(payload)
 
 def print_table(items, fields):
     if not items:
@@ -1341,6 +1378,17 @@ def main():
     p.add_argument("--update-status", default=None, help="Update an existing observation to this status")
     p.set_defaults(func=cmd_validation_observations)
 
+
+
+    p = sub.add_parser("work-package-ranges", help="Inspect local-first work package range allocations")
+    p.add_argument("--json", action="store_true", help="Print range ledger JSON")
+    p.set_defaults(func=cmd_work_package_ranges)
+
+    p = sub.add_parser("workstream", help="Inspect or validate a staged workstream install manifest")
+    p.add_argument("action", choices=["inspect", "validate"], help="Workstream action")
+    p.add_argument("--id", required=True, help="Work package id, such as WP-0112")
+    p.add_argument("--json", action="store_true", help="Print JSON output")
+    p.set_defaults(func=cmd_workstream)
 
     p = sub.add_parser("validation-production-readiness", help="Generate production readiness validation report")
     p.add_argument("--json", action="store_true", help="Print production readiness report JSON")
