@@ -87,5 +87,10 @@
   ],
   "ready_for_ca_review": true,
   "merge_authority": "ca_verified_auto_merge_allowed",
-  "pull_request_not_applicable_reason": "Pull request URL will be assigned by repository hosting after make_pr is called for this committed branch."
+  "pull_request_not_applicable_reason": "Pull request URL will be assigned by repository hosting after make_pr is called for this committed branch.",
+  "summary": [
+    "Validated WP-0020 as the first Helen-path production-readiness burn-down package.",
+    "Produced first-batch burn-down reports and left WP-0106 through WP-0110 as pending implementation work.",
+    "Revalidated WP-0102 and WP-0105 baseline readiness during the WP-0111 batch."
+  ]
 }

@@ -235,3 +235,37 @@ def test_wp_0020_helen_hr_onboarding_recipe_registered():
     assert any("Helen_HR_Operational_Onboarding.md" in command for command in commands)
     assert any("resolve_personnel_identity('Helen')" in command for command in commands)
     assert any("onboarding-manifest-check --json" in command for command in commands)
+
+
+def test_wp_0111_recipe_registered_and_self_validating():
+    recipe = get_validation_recipe("WP-0111")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0111-first-batch-burn-down-self-validation"
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("WP-0111_first_batch_report.md" in command for command in commands)
+    assert any("WP-0111_first_batch_report.json" in command for command in commands)
+    assert any("validate-work-package --id WP-0020 --json" in command for command in commands)
+    assert any("validate_receipt('WP-0111')" in command for command in commands)
+
+
+def test_wp_0111_recipe_uses_cross_platform_python_checks():
+    recipe = get_validation_recipe("WP-0111")
+    assert recipe is not None
+    local_checks = [command["command"] for command in recipe["commands"] if "WP-0111_first_batch_report" in command["command"] or "validate_receipt('WP-0111')" in command["command"]]
+    assert local_checks
+    for command in local_checks:
+        assert command.startswith("python -c ")
+        assert "for id in" not in command
+        assert " do " not in command
+        assert "test -f" not in command
+        assert "rg -q" not in command
+
+
+def test_wp_0111_report_artifacts_identify_wp_0020_first_batch():
+    md = open("operations/validation/backlog_burn_down/WP-0111_first_batch_report.md", encoding="utf-8").read()
+    data = json.load(open("runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json", encoding="utf-8"))
+    assert data["selected_batch_package_ids"] == ["WP-0020"]
+    pending = {item["work_package_id"] for item in data["packages_discovered_as_genuinely_pending_unimplemented"]}
+    assert {"WP-0106", "WP-0107", "WP-0108", "WP-0109", "WP-0110"} <= pending
+    assert "WP-0020" in md
+    assert "pending/unimplemented" in md

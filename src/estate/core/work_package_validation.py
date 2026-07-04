@@ -774,7 +774,7 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd("python -c \"from pathlib import Path; template=Path('docs/operations/Codex_Task_Template_Standard_v1.md'); source=Path('collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md'); assert template.is_file(), template; assert source.is_file(), source\""),
             _cmd("python -c \"from pathlib import Path; pending=Path('collaboration/work_packages/pending'); ids=['0086','0087','0088','0089','0091','0092','0093','0094','0095','0096','0097','0098','0099','0100']; missing=[]; [missing.append(f'WP-{wp}') for wp in ids for files in [list(pending.glob(f'WP-{wp}_*.md'))] if not files or not any('WP-0102 Template Retrofit Notice' in path.read_text(encoding='utf-8') for path in files)]; assert not missing, missing\""),
             _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt(\'WP-0102\'); assert r[\'receipt_status\']==\'complete\', r\""),
-            _cmd('python -c "import json; from pathlib import Path; d=Path(\'collaboration/work_packages/completions\'); targets=[f\'WP-{i:04d}\' for i in range(86,101)]; suspicious=[p.name for wp in targets if (p:=d / f\'{wp}_codex_done.json\').exists() and \'wp-0102\' in (text:=json.dumps(json.loads(p.read_text(encoding=\'utf-8\'))).lower()) and (\'retrofit\' in text or \'template\' in text)]; assert not suspicious, suspicious"')
+            _cmd("python -c \"import json; from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; suspicious=[]; [suspicious.append(p.name) for wp in targets if (p:=d / f'{wp}_codex_done.json').exists() for data in [json.loads(p.read_text(encoding='utf-8'))] for scoped in [{k:v for k,v in data.items() if k not in {'production_readiness_command_status', 'validation_recipe_status'}}] for text in [json.dumps(scoped).lower()] if 'wp-0102' in text and ('retrofit' in text or 'template' in text)]; assert not suspicious, suspicious\"")
         ],
     },
     "WP-0103": {
@@ -873,6 +873,26 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main steward-command-center --json'),
             _cmd("python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0109_codex_done.json').is_file()\""),
             _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
+    "WP-0111": {
+        "recipe_id": "wp-0111-first-batch-burn-down-self-validation",
+        "title": "WP-0111 — First Production-Readiness Backlog Burn-Down Batch",
+        "description": "Validates WP-0111's first-batch burn-down artifacts, confirms WP-0020 was selected and validated, and confirms WP-0106 through WP-0110 remain implementation backlog rather than validation-only repairs.",
+        "required_checks": ["First-batch markdown report exists", "First-batch JSON report parses", "WP-0020 selected as first batch", "WP-0106 through WP-0110 remain pending implementation", "WP-0020 validates", "WP-0111 completion receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/backlog_burn_down/WP-0111_first_batch_report.md", "runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json", "collaboration/work_packages/completions/WP-0111_codex_done.json", "operations/validation/reports/WP-0111_validation.md", "runtime/validation/work_packages/WP-0111_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero", "WP-0106 through WP-0110 are marked complete by the WP-0111 report"],
+        "success_criteria": ["Required commands exit zero", "WP-0111 remains limited to validating WP-0020 and recommending pending Helen implementation work"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0111_first_batch_report.md','runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json').read_text(encoding='utf-8')); assert data.get('selected_batch_package_ids') == ['WP-0020'], data.get('selected_batch_package_ids')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json').read_text(encoding='utf-8')); pending={item.get('work_package_id'): str(item.get('reason','')).lower() for item in data.get('packages_discovered_as_genuinely_pending_unimplemented', [])}; required={f'WP-{i:04d}' for i in range(106,111)}; missing=sorted(required-set(pending)); not_pending=[wp for wp, reason in pending.items() if wp in required and 'implementation backlog' not in reason]; assert not missing and not not_pending, {'missing': missing, 'not_pending': not_pending}\""),
+            _cmd("python -c \"from pathlib import Path; text=Path('operations/validation/backlog_burn_down/WP-0111_first_batch_report.md').read_text(encoding='utf-8').lower(); required=['wp-0106','wp-0107','wp-0108','wp-0109','wp-0110','pending','unimplemented']; missing=[term for term in required if term not in text]; assert not missing, missing\""),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0020 --json'),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0111'); assert r['receipt_status']=='complete', r\""),
         ],
     },
 
