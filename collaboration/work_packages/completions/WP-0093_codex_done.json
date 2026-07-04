@@ -1,0 +1,58 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T19:36:00+00:00",
+  "files_changed": [
+    "src/estate/core/operations_center_settings.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_operations_center_settings.py",
+    "operations/validation/reports/WP-0093_validation.md",
+    "collaboration/work_packages/completions/WP-0093_codex_done.json"
+  ],
+  "final_command_surfaces": [
+    "PYTHONPATH=src python -m estate.cli.main operations-center-settings --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-center-settings --theme dark --default-workspace-profile validation --json",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0093 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "known_limitations": [
+    "Settings are intentionally local-first and do not synchronize to cloud or remote operator accounts.",
+    "The web settings controls remain rendered as disabled informational controls in the static Steward command center shell; settings are changed through local JSON/CLI surfaces.",
+    "Production readiness was expected to remain blocked until this completion receipt existed; rerun production-readiness after receipt creation for updated status."
+  ],
+  "merge_authority": "Chief Architect review required; Codex has no merge authority.",
+  "production_readiness_command_status": "observational command passed inside WP-0093 validation; repository-wide readiness may still include unrelated historical blockers.",
+  "pull_request_not_applicable_reason": "Local Codex environment records PR metadata after commit via make_pr tool; no remote pull request URL is available before that step.",
+  "pull_request_url_not_applicable_reason": "Local Codex environment records PR metadata after commit via make_pr tool; no remote pull request URL is available before that step.",
+  "pull_request_url_or_not_applicable_reason": "Local Codex environment records PR metadata after commit via make_pr tool; no remote pull request URL is available before that step.",
+  "ready_for_ca_review": true,
+  "summary": [
+    "Implemented a local-first, version-aware Operations Center Settings Manager with documented defaults, safe invalid-setting fallback, missing-file handling, local persistence, and no secret/cloud dependency.",
+    "Added an operations-center-settings CLI surface for inspecting and updating Steward-facing UI preferences including appearance, default workspace profile, verbosity profile, refresh behavior, and command console mode.",
+    "Integrated effective settings into the Steward command center settings panel, workspace profile selection, and About component inventory.",
+    "Registered and ran the WP-0093 validation recipe with required and observational checks."
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_operations_center_settings.py tests/test_steward_command_center.py tests/test_operations_center_workspace_profiles.py",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center-settings --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json > /tmp/command_center.json && test -f runtime/steward/command_center.html && rg -q \"operations-center-settings-v1\" runtime/steward/command_center.html",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0093 --json",
+      "status": "passed"
+    }
+  ],
+  "validation_recipe_status": "registered_and_passed",
+  "work_package_id": "WP-0093"
+}

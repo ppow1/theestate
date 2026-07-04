@@ -57,6 +57,7 @@ from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work
 from estate.core.autonomous_operations_audit import append_autonomous_operations_audit, format_autonomous_operations_audit
 from estate.core.steward_command_center import generate_command_center, serve_command_center
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, save_workspace_profile
+from estate.core.operations_center_settings import load_operations_center_settings, save_operations_center_settings
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
@@ -816,6 +817,33 @@ def cmd_autonomous_operations_audit(args):
         print(format_autonomous_operations_audit())
 
 
+def cmd_operations_center_settings(args):
+    updates = {
+        "appearance__theme": getattr(args, "theme", None),
+        "appearance__accent": getattr(args, "accent", None),
+        "workspace__default_profile": getattr(args, "default_workspace_profile", None),
+        "operator_visibility__default_verbosity_profile": getattr(args, "default_verbosity_profile", None),
+        "operator_visibility__global_verbosity": getattr(args, "global_verbosity", None),
+        "refresh__mode": getattr(args, "refresh_mode", None),
+        "refresh__quiet_refresh_seconds": getattr(args, "quiet_refresh_seconds", None),
+        "command_console__mode": getattr(args, "command_console_mode", None),
+    }
+    if any(value is not None for value in updates.values()):
+        payload = save_operations_center_settings(**updates)
+    else:
+        payload = load_operations_center_settings()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        settings = payload.get("settings", {})
+        print("Operations Center Settings Manager")
+        print(f"Version: {payload.get('ui_version')} schema={payload.get('version')}")
+        print(f"Theme: {(settings.get('appearance') or {}).get('theme')}")
+        print(f"Default workspace: {(settings.get('workspace') or {}).get('default_profile')}")
+        print(f"Default verbosity profile: {(settings.get('operator_visibility') or {}).get('default_verbosity_profile')}")
+        print(f"Warnings: {len(payload.get('warnings') or [])}")
+
 def cmd_decision_queue(args):
     queue = generate_decision_queue()
     if getattr(args, "json", False):
@@ -1453,6 +1481,19 @@ def main():
     p = sub.add_parser("decision-queue", help="Generate the local Steward Decision Queue panel")
     p.add_argument("--json", action="store_true", help="Print decision queue JSON")
     p.set_defaults(func=cmd_decision_queue)
+
+
+    p = sub.add_parser("operations-center-settings", help="Inspect or update local Operations Center UI settings")
+    p.add_argument("--json", action="store_true", help="Print Settings Manager JSON")
+    p.add_argument("--theme", choices=["light", "dark", "system"], help="Set appearance theme")
+    p.add_argument("--accent", choices=["estate-gold", "blue", "green", "neutral"], help="Set accent theme")
+    p.add_argument("--default-workspace-profile", help="Set default workspace profile")
+    p.add_argument("--default-verbosity-profile", help="Set default operator verbosity profile")
+    p.add_argument("--global-verbosity", choices=["quiet", "normal", "detailed", "diagnostic"], help="Set global operator verbosity")
+    p.add_argument("--refresh-mode", choices=["quiet", "manual"], help="Set refresh mode")
+    p.add_argument("--quiet-refresh-seconds", type=int, help="Set quiet refresh interval")
+    p.add_argument("--command-console-mode", choices=["inline", "collapsed"], help="Set command console mode")
+    p.set_defaults(func=cmd_operations_center_settings)
 
     p = sub.add_parser("steward-command-center", help="Generate or serve the local Office of the Steward command center")
     p.add_argument("--json", action="store_true", help="Print command center payload JSON")
