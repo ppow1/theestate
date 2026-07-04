@@ -22,6 +22,7 @@ from estate.core.global_search_command_palette import build_global_palette
 from estate.core.mission_control_workspace import build_mission_control_workspace
 from estate.core.steward_presence import generate_steward_presence_state
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
+from estate.core.operator_activity_stream import generate_operator_activity_stream
 
 
 OFFICE_NAVIGATION = [
@@ -472,22 +473,12 @@ def _event(ts, source, topic, severity, message):
 
 
 def _build_activity_console(root, panels, generated_at):
+    stream = generate_operator_activity_stream(root=root, write=False, verbosity="normal", limit=25)
     events = [_event(generated_at, "steward.command_center", "refresh", "info", "Operations Center data refreshed quietly from local artifacts.")]
-    for name, artifact in panels.items():
-        source = artifact.get("path") or name if isinstance(artifact, dict) else name
-        if isinstance(artifact, dict) and not artifact.get("available"):
-            events.append(_event(generated_at, source, name, "missing", artifact.get("placeholder") or "Data source is not available yet."))
-    completions_dir = root / "collaboration" / "work_packages" / "completions"
-    if completions_dir.exists():
-        for path in sorted(completions_dir.glob("*_codex_done.json"), key=lambda p: p.stat().st_mtime, reverse=True)[:5]:
-            try:
-                data = _read_json(path)
-                events.append(_event(data.get("completed_at") or generated_at, _rel(path, root), data.get("work_package_id") or "work_package", "info", data.get("summary") or "Work package completion recorded."))
-            except Exception as exc:
-                events.append(_event(generated_at, _rel(path, root), "completion", "warning", f"Completion record could not be read: {exc}"))
+    events.extend({"timestamp": e.get("timestamp"), "source": e.get("source"), "topic": e.get("topic"), "severity": e.get("severity"), "message": e.get("message"), "link": e.get("link")} for e in stream.get("events", []))
     if len(events) == 1:
-        events.append(_event(generated_at, "local artifacts", "empty", "info", "No recent operational activity records were found."))
-    return {"collapsed_by_default": True, "verbosity_options": ["quiet", "normal", "detailed", "diagnostic"], "selected_verbosity": "normal", "events": events[:25]}
+        events.append(_event(generated_at, "local artifacts", "empty", "info", stream.get("empty_state") or "No recent operational activity records were found."))
+    return {"collapsed_by_default": True, "verbosity_options": stream.get("verbosity_levels", ["quiet", "normal", "detailed", "diagnostic"]), "selected_verbosity": stream.get("selected_verbosity", "normal"), "filters": stream.get("filters", {}), "available_sources": stream.get("available_sources", []), "events": events[:25]}
 
 
 def _completion_records(root):

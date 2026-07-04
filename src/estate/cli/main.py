@@ -24,6 +24,7 @@ from estate.core.estate_service_catalog import generate_estate_service_catalog, 
 from estate.core.service_dependency_matrix import generate_service_dependency_matrix, format_service_dependency_matrix_summary
 from estate.core.service_health_registry import generate_service_health_registry, format_service_health_registry_summary
 from estate.core.service_status_board import generate_service_status_board, format_service_status_board_summary
+from estate.core.operator_activity_stream import generate_operator_activity_stream, format_operator_activity_stream_summary
 from estate.core.operational_validation import generate_operational_validation_report, format_operational_validation_summary
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
 from estate.core.dependency_graph import generate_dependency_graph, format_dependency_graph_summary
@@ -605,6 +606,15 @@ def cmd_service_status_board(args):
         print(format_service_status_board_summary(board))
 
 
+def cmd_operator_activity_stream(args):
+    stream = generate_operator_activity_stream(sources=getattr(args, "source", None), severities=getattr(args, "severity", None), verbosity=getattr(args, "verbosity", "normal"), limit=getattr(args, "limit", 50))
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(stream, indent=2, sort_keys=True))
+    else:
+        print(format_operator_activity_stream_summary(stream))
+
+
 def cmd_operational_validation(args):
     report = generate_operational_validation_report()
     if getattr(args, "json", False):
@@ -1104,6 +1114,14 @@ def main():
     p = sub.add_parser("service-status-board", help="Generate the Operations Center service status board")
     p.add_argument("--json", action="store_true", help="Generate service status board and print JSON")
     p.set_defaults(func=cmd_service_status_board)
+
+    p = sub.add_parser("operator-activity-stream", help="Generate the read-only Operator Activity Stream")
+    p.add_argument("--json", action="store_true", help="Generate Operator Activity Stream and print JSON")
+    p.add_argument("--source", action="append", help="Limit to a source such as validation, workers, mailboxes, service_health")
+    p.add_argument("--severity", action="append", help="Limit to a severity such as error, warning, missing, info")
+    p.add_argument("--verbosity", default="normal", choices=["quiet", "normal", "detailed", "diagnostic"], help="Verbosity level")
+    p.add_argument("--limit", type=int, default=50, help="Maximum events to show")
+    p.set_defaults(func=cmd_operator_activity_stream)
 
     p = sub.add_parser("capability-dependency-visualization", help="Generate capability dependency visualization for Mission Control")
     p.add_argument("--json", action="store_true", help="Generate capability dependency visualization and print JSON")
