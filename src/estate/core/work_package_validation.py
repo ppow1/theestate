@@ -53,6 +53,27 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0112": {
+        "recipe_id": "wp-0112-parallel-workstream-standard",
+        "title": "WP-0112 — Parallel Workstream Isolation and Install Handoff Standard",
+        "description": "Validates the durable parallel workstream standard, transition boundary, install manifest example, and local-first number allocation ledger.",
+        "required_checks": ["Parallel standard document exists", "Transition boundary is explicit", "Install manifest example is parseable", "Number allocation ledger is parseable", "Completion receipt exists"],
+        "observational_checks": ["Production readiness command remains locally executable"],
+        "expected_artifacts": ["docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md", "collaboration/work_packages/work_package_range_ledger.json", "collaboration/workstreams/WP-0112/install_manifest.example.json", "operations/validation/reports/WP-0112_validation.md", "runtime/validation/work_packages/WP-0112_validation.json", "collaboration/work_packages/completions/WP-0112_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; p=Path('docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md'); t=p.read_text(); required=['SERIES','PARALLEL-STAGED','PARALLEL-INDEPENDENT','INSTALL-HANDOFF','WP-0097 through WP-0111','GitHub search','collaboration/workstreams/WP-XXXX/install_manifest.json']; missing=[x for x in required if x not in t]; missing += ['staged work is not installed work'] if 'staged work is not installed work' not in t.lower() else []; assert p.is_file() and not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/work_package_range_ledger.json').read_text()); assert data['ranges'] and 'GitHub search' in data['source_of_truth']; assert any(r['start']=='WP-6000' for r in data['ranges'])\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/workstreams/WP-0112/install_manifest.example.json').read_text()); assert data['workstream_mode']=='PARALLEL-STAGED'; assert data['staged_work_is_installed'] is False; assert data['validation_commands']\""),
+            _cmd("python -c \"from pathlib import Path; t=Path('docs/operations/Codex_Task_Template_Standard_v1.md').read_text(); required=['Parallel Workstream Compatibility Addendum','Workstream Mode','Conflict Surface','Install Manifest','Required Install Handoff']; missing=[x for x in required if x not in t]; assert not missing, missing\""),
+            _cmd('python -m estate.cli.main workstream validate --id WP-0112 --json'),
+            _cmd('python -m estate.cli.main work-package-ranges --json'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0015": {
         "recipe_id": "wp-0015-message-acknowledgement-reply-flow",
         "title": "WP-0015 — Message Acknowledgement + Reply Flow",

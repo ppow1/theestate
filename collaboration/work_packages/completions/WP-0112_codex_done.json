@@ -1,0 +1,65 @@
+{
+  "branch": "work",
+  "cli_command_surface": [
+    "PYTHONPATH=src python -m estate.cli.main workstream inspect --id WP-XXXX --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-XXXX --json",
+    "PYTHONPATH=src python -m estate.cli.main work-package-ranges --json"
+  ],
+  "codex_status": "completed",
+  "completed_at": "2026-07-04T21:52:00+00:00",
+  "deferred_ledger_rationale": null,
+  "files_changed": [
+    "docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md",
+    "docs/operations/Codex_Task_Template_Standard_v1.md",
+    "collaboration/work_packages/work_package_range_ledger.json",
+    "collaboration/workstreams/WP-0112/install_manifest.example.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0112_codex_done.json"
+  ],
+  "final_standard_document_path": "docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md",
+  "install_manifest_path": "collaboration/workstreams/WP-0112/install_manifest.example.json",
+  "known_limitations": [
+    "Production readiness for the broader repository may remain blocked by older work packages with missing receipts or recipes; this is outside WP-0112 scope.",
+    "CLI workstream validation checks manifest shape only and does not install staged work."
+  ],
+  "merge_authority": "Chief Architect / Steward review required; Codex does not grant merge authority.",
+  "production_readiness_command_status": "passed_with_expected_repository_wide_blockers_from_older_or_unrelated_packages",
+  "pull_request_not_applicable_reason": "Local make_pr tool records PR metadata after commit; no live PR URL is available in this environment.",
+  "pull_request_url_not_applicable_reason": "Local make_pr tool records PR metadata after commit; no live PR URL is available in this environment.",
+  "range_ledger_path": "collaboration/work_packages/work_package_range_ledger.json",
+  "ready_for_ca_review": true,
+  "summary": [
+    "Created the Parallel Workstream Isolation and Install Handoff Standard v1.",
+    "Defined transition boundary for WP-0097 through WP-0111 and prospective rules after WP-0112.",
+    "Created local-first work package range ledger and example staged install manifest.",
+    "Added CLI inspection surfaces for workstream manifests and allocation ranges.",
+    "Registered WP-0112 validation recipe."
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main work-package-ranges --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0112 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0112 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed_with_expected_repository_wide_blockers"
+    },
+    {
+      "command": "python -m py_compile src/estate/cli/main.py src/estate/core/work_package_validation.py",
+      "status": "passed"
+    }
+  ],
+  "transition_boundary_decision": "WP-0097 through WP-0111 remain governed by authored SERIES instructions unless explicitly retrofitted; WP-0112 applies prospectively.",
+  "validation_recipe_status": "registered",
+  "work_package_id": "WP-0112",
+  "work_package_numbering_allocation_decision": "Use deterministic local-first allocation blocks; GitHub search is not the real-time allocator."
+}
