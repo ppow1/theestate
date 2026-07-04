@@ -1,15 +1,15 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-04T18:57:48+00:00
+- generated_at: 2026-07-04T19:06:29+00:00
 - git branch: work
-- git commit: 0b480333ee2a316e47df6dd643c47c431a8a4cff
+- git commit: fce46732e6676bf3cde127c5a87cc83e10fd4446
 
 ## Totals
-- total_work_packages_scanned: 96
-- total_production_ready: 26
+- total_work_packages_scanned: 97
+- total_production_ready: 27
 - total_blocked: 70
-- total_missing_recipes: 56
-- total_missing_receipts: 14
+- total_missing_recipes: 57
+- total_missing_receipts: 15
 - total_incomplete_receipts: 51
 
 ## Recommended Next Action
@@ -49,8 +49,8 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0054: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
 - WP-0055: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
 - WP-0056: Completion artifact is missing.
-- WP-0057:
-- WP-0058:
+- WP-0057: 
+- WP-0058: 
 - WP-0059: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
 - WP-0060: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
 - WP-0061: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
@@ -69,7 +69,7 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0084: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
 - WP-0086: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
 - WP-0087: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0088:
+- WP-0088: 
 - WP-0089: Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages.
 - WP-0091: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
 - WP-0093: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
@@ -79,12 +79,12 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0098: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0099: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0100: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
-- WP-0101:
 - WP-0104: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
 - WP-0106: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0107: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0108: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0109: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- WP-0110: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-9999: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 
 ## Ready for Chief Architect Production-Readiness Acceptance
@@ -111,18 +111,19 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0085
 - WP-0092
 - WP-0095
+- WP-0101
 - WP-0102
 - WP-0103
 - WP-0105
 
 ## Recent Validation Reports
-- `runtime/validation/work_packages/WP-0092_validation.json`
-- `runtime/validation/work_packages/WP-0038_validation.json`
-- `runtime/validation/work_packages/WP-0015_validation.json`
-- `runtime/validation/work_packages/WP-0037_validation.json`
-- `runtime/validation/work_packages/WP-0080_validation.json`
-- `runtime/validation/work_packages/WP-0019_validation.json`
-- `runtime/validation/work_packages/WP-0087_validation.json`
-- `runtime/validation/work_packages/WP-0036_validation.json`
-- `runtime/validation/work_packages/WP-0027_validation.json`
+- `runtime/validation/work_packages/WP-0105_validation.json`
 - `runtime/validation/work_packages/WP-0085_validation.json`
+- `runtime/validation/work_packages/WP-0081_validation.json`
+- `runtime/validation/work_packages/WP-0080_validation.json`
+- `runtime/validation/work_packages/WP-0103_validation.json`
+- `runtime/validation/work_packages/WP-0027_validation.json`
+- `runtime/validation/work_packages/WP-0015_validation.json`
+- `runtime/validation/work_packages/WP-0102_validation.json`
+- `runtime/validation/work_packages/WP-0101_validation.json`
+- `runtime/validation/work_packages/WP-0092_validation.json`
