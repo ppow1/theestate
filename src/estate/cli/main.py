@@ -39,6 +39,7 @@ from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, 
 from estate.core.validation_observations import append_observation, load_observations, update_observation_status, render_markdown_log
 from estate.core.validation_metrics_dashboard import generate_validation_metrics_dashboard, format_validation_metrics_summary
 from estate.core.validation_handoff_artifact_workflow import generate_validation_handoff_artifact_workflow, format_validation_handoff_summary
+from estate.core.work_package_validation import validate_work_package, format_validation_markdown
 from estate.core.operational_readiness_dashboard import generate_operational_readiness_dashboard, format_operational_readiness_summary
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
@@ -794,6 +795,14 @@ def cmd_audit(args):
     if report["failed"] > 0:
         raise SystemExit(1)
 
+def cmd_validate_work_package(args):
+    import json
+    payload = validate_work_package(args.id)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_validation_markdown(payload))
+
 def cmd_validation_metrics_dashboard(args):
     payload = generate_validation_metrics_dashboard()
     if getattr(args, "json", False):
@@ -975,6 +984,12 @@ def main():
     p.add_argument("--follow-up-wp", default=None, help="Linked follow-up work package, if one exists")
     p.add_argument("--update-status", default=None, help="Update an existing observation to this status")
     p.set_defaults(func=cmd_validation_observations)
+
+
+    p = sub.add_parser("validate-work-package", help="Run a registered work-package validation recipe")
+    p.add_argument("--id", required=True, help="Work package id, such as WP-0058")
+    p.add_argument("--json", action="store_true", help="Print validation report JSON")
+    p.set_defaults(func=cmd_validate_work_package)
 
     p = sub.add_parser("validation-metrics-dashboard", help="Generate Validation Metrics Dashboard")
     p.add_argument("--json", action="store_true", help="Print validation metrics dashboard JSON")
