@@ -101,8 +101,9 @@ def generate_service_dependency_matrix(root=None, write=True):
             continue
         found = False
         for field in DEPENDENCY_FIELDS:
-            for dep in _as_refs(svc.get(field)):
+            if field in svc:
                 found = True
+            for dep in _as_refs(svc.get(field)):
                 explicit_dependencies[sid].append(dep)
                 dependency_sources[sid].append({"field": field, "target": dep, "source_artifact": SERVICE_REGISTRY})
                 if dep.lower() not in service_ids_by_token:
