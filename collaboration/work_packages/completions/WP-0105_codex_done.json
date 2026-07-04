@@ -1,11 +1,10 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T18:26:32+00:00",
+  "completed_at": "2026-07-04T19:04:26+00:00",
   "files_changed": [
     "src/estate/core/work_package_validation.py",
     "tests/test_work_package_validation.py",
-    "collaboration/work_packages/completions/WP-0105_codex_done.json",
     "operations/validation/reports/WP-0102_validation.md",
     "operations/validation/reports/WP-0105_validation.md",
     "runtime/validation/work_packages/WP-0102_validation.json",
@@ -13,32 +12,27 @@
     "operations/validation/production_readiness_report.md",
     "runtime/validation/production_readiness_report.json",
     "operations/validation/validation_coverage_manifest.md",
-    "runtime/validation/validation_coverage_manifest.json"
+    "runtime/validation/validation_coverage_manifest.json",
+    "collaboration/work_packages/completions/WP-0105_codex_done.json"
   ],
-  "known_limitations": [],
+  "known_limitations": [
+    "Production-readiness report still preserves unrelated historical readiness gaps for incomplete or missing older receipts."
+  ],
   "merge_authority": "ca_verified_auto_merge_allowed",
-  "non_blocking_known_limitations": [
-    "Production-readiness report still preserves unrelated historical blockers for incomplete or missing old receipts."
-  ],
-  "production_readiness_status": "ready_for_subset_with_historical_blockers_preserved",
   "production_readiness_totals_after_repair": {
-    "total_blocked": 67,
+    "total_blocked": 70,
     "total_incomplete_receipts": 51,
-    "total_missing_receipts": 13,
-    "total_missing_recipes": 55,
-    "total_production_ready": 26,
-    "total_work_packages_scanned": 93
+    "total_missing_receipts": 15,
+    "total_missing_recipes": 57,
+    "total_production_ready": 27,
+    "total_work_packages_scanned": 97
   },
-  "pull_request_not_applicable_reason": "Pull request URL is not available from this local non-interactive Codex environment; branch committed locally for CA review.",
+  "pull_request_not_applicable_reason": "Pull request URL is assigned by the hosting system after this local repair branch is committed and the PR metadata is recorded via make_pr.",
   "ready_for_ca_review": true,
-  "remaining_blockers": [
-    "Production-readiness report still preserves unrelated historical blockers for incomplete or missing old receipts."
-  ],
   "summary": [
-    "Continued WP-0105 validation repair by replacing the WP-0102 brittle shell template path check with a robust Python check for the canonical docs template and WP-0101 source package.",
-    "Kept the canonical Codex task template document at docs/operations/Codex_Task_Template_Standard_v1.md and the WP-0101 source package at collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md.",
-    "Updated the WP-0102 completion-safety check so later legitimate implementation receipts do not appear as WP-0102-created template retrofit completions.",
-    "Regenerated WP-0102/WP-0105 validation artifacts and production-readiness/coverage artifacts."
+    "Repaired the remaining WP-0102 validation failure by replacing the Bash-style retrofit notice loop with a cross-platform local Python check.",
+    "Confirmed the canonical Codex task template document path is docs/operations/Codex_Task_Template_Standard_v1.md and the WP-0101 source artifact path is collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md.",
+    "Regenerated WP-0102 and WP-0105 validation artifacts plus production-readiness and validation-coverage artifacts."
   ],
   "tests_run": [
     {
@@ -78,14 +72,9 @@
     {
       "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
       "status": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python - <<'PY'\nfrom estate.core.production_readiness_validation import generate_validation_coverage_manifest\ngenerate_validation_coverage_manifest(write=True)\nPY",
-      "status": "passed"
     }
   ],
   "work_package_id": "WP-0105",
   "wp_0102_validation_status": "passed",
-  "wp_0103_validation_status": "passed",
   "wp_0105_validation_status": "passed"
 }

@@ -194,6 +194,24 @@ def test_wp_0102_template_path_command_validates_current_checkout():
     assert result.returncode == 0, result.stderr
 
 
+def test_wp_0102_retrofit_notice_command_is_cross_platform_python():
+    recipe = get_validation_recipe("WP-0102")
+    assert recipe is not None
+    commands = [command["command"] for command in recipe["commands"]]
+    notice_command = next(command for command in commands if "WP-0102 Template Retrofit Notice" in command)
+    assert notice_command.startswith("python -c ")
+    assert "for id in" not in notice_command
+    assert " do " not in notice_command
+    assert "rg -q" not in notice_command
+
+
+def test_wp_0102_retrofit_notice_command_validates_current_checkout():
+    recipe = get_validation_recipe("WP-0102")
+    assert recipe is not None
+    command = next(command["command"] for command in recipe["commands"] if "WP-0102 Template Retrofit Notice" in command["command"])
+    result = subprocess.run(command, shell=True, text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr or result.stdout
+
 def test_wp_0105_recipe_depends_on_wp_0102_validation_success():
     recipe = get_validation_recipe("WP-0105")
     assert recipe is not None
