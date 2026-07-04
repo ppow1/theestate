@@ -2,7 +2,7 @@
 
 ## Codex Command
 
-Read `collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6_template_path_repair.md` and do exactly what it says.
+Read collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6_template_path_repair.md and do exactly what it says.
 
 ## Mode
 
