@@ -11,6 +11,7 @@ from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_cards import PLACEHOLDER, build_resident_card
+from estate.core.resident_conversation_sessions import session_summaries_for_workspace
 
 DEFAULT_RESIDENT_NAMES = ("Alfred", "Helen")
 
@@ -128,6 +129,11 @@ def _conversation_for(root, resident, card, messages):
         if message.get("path"):
             sources.append(message["path"])
         sources.extend(message.get("source_artifacts") or [])
+    sessions = session_summaries_for_workspace(root, resident=card.get("name") or resident.get("name"))
+    for session in sessions:
+        if session.get("path"):
+            sources.append(session["path"])
+        sources.extend(session.get("source_artifacts") or [])
     return {
         "resident_id": resident.get("id"),
         "resident_name": card.get("name") or resident.get("name") or PLACEHOLDER,
@@ -136,6 +142,7 @@ def _conversation_for(root, resident, card, messages):
         "available": bool(card.get("available")),
         "mailbox": card.get("mailbox") or {"mailbox_id": None, "display_name": PLACEHOLDER, "source": None},
         "recent_messages": related,
+        "recent_sessions": sessions,
         "conversation_placeholder": "Local conversation surface placeholder. Draft interaction can be displayed here, but durable actions must link to institutional artifacts.",
         "transcript_audit_placeholder": "No authoritative voice/chat transcript is recorded by this workspace. Future transcripts must be promoted into audit, message, work-package, or artifact records before becoming institutional records.",
         "source_artifacts": sorted({str(source) for source in sources if source}),
