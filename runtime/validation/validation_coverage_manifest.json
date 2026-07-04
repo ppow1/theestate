@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-04T19:06:29+00:00",
+  "generated_at": "2026-07-04T19:19:00+00:00",
   "summary": {
-    "total_blocked": 70,
+    "total_blocked": 71,
     "total_incomplete_receipts": 51,
     "total_missing_receipts": 15,
     "total_missing_recipes": 57,
-    "total_production_ready": 27,
+    "total_production_ready": 26,
     "total_work_packages_scanned": 97
   },
   "work_packages": [
@@ -1062,7 +1062,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0079_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0079_validation.json",
       "latest_validation_status": "passed_with_findings",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md",
       "production_readiness_status": "blocked",
       "receipt_status": "incomplete",
       "recipe_status": "registered",
@@ -1390,10 +1390,10 @@
     {
       "blockers": [],
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0101_codex_done.json",
-      "latest_validation_report_path": "runtime/validation/work_packages/WP-0101_validation.json",
-      "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md",
-      "production_readiness_status": "ready",
+      "latest_validation_report_path": null,
+      "latest_validation_status": "missing",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md",
+      "production_readiness_status": "blocked",
       "receipt_status": "complete",
       "recipe_status": "registered",
       "required_followups": [],
@@ -1416,7 +1416,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0103_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0103_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0103_SERIES_chief_architect_operating_manual.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0103_SERIES_historical_validation_recipe_coverage_through_0085.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",

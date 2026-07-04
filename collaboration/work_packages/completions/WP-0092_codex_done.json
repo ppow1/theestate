@@ -1,7 +1,7 @@
 {
   "branch": "work",
   "codex_status": "done",
-  "completed_at": "2026-07-04T00:00:00+00:00",
+  "completed_at": "2026-07-04T19:19:00+00:00",
   "files_changed": [
     "src/estate/core/steward_command_center.py",
     "src/estate/core/work_package_validation.py",
@@ -28,7 +28,7 @@
   ],
   "merge_authority": "Steward/CA review required; Codex does not merge or approve.",
   "production_readiness_command_status": {
-    "blocking_work_package_count": 70,
+    "blocking_work_package_count": 71,
     "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
     "status": "completed_with_existing_blockers"
   },
@@ -39,13 +39,13 @@
   "summary": "Implemented local-first Operations Center Help and enhanced About coverage with UI version, active workspace profile, panel/workspace listings, command console help, service catalog links, validation and documentation links, authority boundary notes, and unavailable-feature handling. Registered and ran the WP-0092 validation recipe.",
   "tests_run": [
     {
-      "command": "pytest -q tests/test_steward_command_center.py tests/test_work_package_validation.py",
-      "observed": "40 passed",
+      "command": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+      "observed": "Rendered Operations Center command center JSON and regenerated local HTML.",
       "status": "passed"
     },
     {
-      "command": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
-      "observed": "Rendered command center JSON and local HTML.",
+      "command": "pytest -q tests/test_steward_command_center.py tests/test_work_package_validation.py",
+      "observed": "42 passed",
       "status": "passed"
     },
     {
@@ -55,7 +55,7 @@
     },
     {
       "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
-      "observed": "Production readiness report generated with 70 blocking work packages recorded.",
+      "observed": "Production readiness report generated; WP-0092 is ready, with 71 pre-existing blocking work packages outside WP-0092 recorded.",
       "status": "completed_with_existing_blockers"
     }
   ],
