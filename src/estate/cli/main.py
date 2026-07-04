@@ -19,6 +19,7 @@ from estate.core.daily_board_integration import generate_daily_board_integration
 from estate.core.capability_lifecycle import generate_capability_lifecycle_report, format_capability_lifecycle_summary
 from estate.core.estate_capability_registry import generate_estate_capability_registry, format_estate_capability_registry_summary
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization, format_capability_dependency_visualization_summary
+from estate.core.capability_gap_report import generate_capability_gap_report, format_capability_gap_summary
 from estate.core.operational_validation import generate_operational_validation_report, format_operational_validation_summary
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
 from estate.core.dependency_graph import generate_dependency_graph, format_dependency_graph_summary
@@ -825,6 +826,15 @@ def cmd_capability_dependency_visualization(args):
     else:
         print(format_capability_dependency_visualization_summary(payload))
 
+def cmd_capability_gap_report(args):
+    payload = generate_capability_gap_report()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_capability_gap_summary(payload))
+
+
 def cmd_validation_metrics_dashboard(args):
     payload = generate_validation_metrics_dashboard()
     if getattr(args, "json", False):
@@ -1000,6 +1010,10 @@ def main():
     p = sub.add_parser("capability-dependency-visualization", help="Generate capability dependency visualization for Mission Control")
     p.add_argument("--json", action="store_true", help="Generate capability dependency visualization and print JSON")
     p.set_defaults(func=cmd_capability_dependency_visualization)
+
+    p = sub.add_parser("capability-gap-report", help="Generate the read-only capability gap report")
+    p.add_argument("--json", action="store_true", help="Generate capability gap report and print JSON")
+    p.set_defaults(func=cmd_capability_gap_report)
 
     p = sub.add_parser("validation-observations", help="List, add, or update validation observations")
     p.add_argument("--json", action="store_true", help="Print validation observations JSON")
