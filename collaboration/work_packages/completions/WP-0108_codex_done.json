@@ -1,0 +1,107 @@
+{
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-04T20:57:33+00:00",
+  "explicit_authority_limitations": [
+    "Helen may summarize onboarding/personnel operational state; Helen may not authorize personnel changes.",
+    "Helen may identify onboarding blockers; Helen may not complete onboarding by assertion.",
+    "Helen may surface HR-related artifacts; Helen may not create HR governance.",
+    "Helen may point to work packages; Helen may not execute them automatically.",
+    "Helen duty runs are local operational views, not canonical Estate authority."
+  ],
+  "files_changed": [
+    "src/estate/core/helen_duty.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_helen_duty.py",
+    "runtime/helen/duty_state.json",
+    "runtime/helen/duty_runs.jsonl",
+    "operations/helen/duty_summary.md",
+    "runtime/residents/presence.json",
+    "collaboration/work_packages/completions/WP-0108_codex_done.json"
+  ],
+  "final_helen_duty_command_surface": [
+    "PYTHONPATH=src python -m estate.cli.main helen-duty --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-duty --resident Helen --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Helen --json"
+  ],
+  "known_limitations": [
+    "Helen is not autonomous and has no personnel authorization, HR governance, validation, merge, notification, or work-package execution authority.",
+    "Full production readiness may remain dependent on downstream resident conversation session, action authorization, or service orchestration work."
+  ],
+  "merge_authority": "Class A; no Helen authority, personnel authority, Steward decision authority, mailbox authority, validation authority, or automatic action semantics were changed.",
+  "production_readiness_command_status": "passed with exit 0; WP-0108 ready, repository-wide report still lists pre-existing blocked/incomplete/missing receipt counts unrelated to WP-0108",
+  "pull_request_not_applicable_reason": "Pull request URL is not available from the local non-interactive repository environment before PR creation.",
+  "ready_for_ca_review": true,
+  "sample_helen_duty_json": {
+    "duty_state": "working",
+    "needs_steward": false,
+    "presence_state": "working",
+    "resident": "Helen",
+    "source_artifact_references": [
+      {
+        "exists": true,
+        "name": "resident_registry",
+        "path": "data/registry/residents.json",
+        "required": true,
+        "status": "available"
+      },
+      {
+        "exists": true,
+        "name": "personnel_registry",
+        "path": "data/registry/personnel.json",
+        "required": true,
+        "status": "available"
+      },
+      {
+        "exists": true,
+        "name": "mailbox_registry",
+        "path": "data/registry/mailboxes.json",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "exists": true,
+        "name": "resident_presence",
+        "path": "runtime/residents/presence.json",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "exists": false,
+        "name": "mailbox_index",
+        "path": "runtime/mailboxes/index.json",
+        "required": false,
+        "status": "missing"
+      }
+    ]
+  },
+  "source_artifacts_inspected_by_the_duty_runner": [
+    "data/registry/residents.json",
+    "data/registry/personnel.json",
+    "data/registry/mailboxes.json",
+    "runtime/residents/presence.json",
+    "runtime/mailboxes/index.json",
+    "runtime/mailboxes/synchronization_duty.json",
+    "data/onboarding/manifest.json",
+    "runtime/onboarding/status.json",
+    "collaboration/messages/msg_ca2_20260701_0003_ca4_onboarding_packet.md",
+    "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+    "collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md",
+    "runtime/residents/cards.json"
+  ],
+  "summary": [
+    "Implemented Helen local bounded HR/onboarding duty runner.",
+    "Added Helen CLI surfaces and resident-duty alias.",
+    "Registered WP-0108 validation recipe and tests."
+  ],
+  "tests_run": [
+    "PYTHONPATH=src python -m pytest tests/test_helen_duty.py tests/test_resident_presence.py tests/test_resident_cards.py",
+    "PYTHONPATH=src python -m estate.cli.main helen-duty --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-duty --resident Helen --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Helen --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0108 --json (pre-receipt run failed only because receipt did not exist yet)"
+  ],
+  "validation_recipe_status": "registered and passed; WP-0108 production_readiness true in validate-work-package output",
+  "work_package_id": "WP-0108"
+}

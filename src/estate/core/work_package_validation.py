@@ -815,6 +815,27 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0108": {
+        "recipe_id": "wp-0108-helen-online-duty-runner",
+        "title": "WP-0108 — Helen Online Duty Runner",
+        "description": "Validates Helen's local bounded HR/onboarding duty runner, visible resident presence integration, source artifact references, graceful degradation, command surfaces, completion receipt, and production-readiness compatibility without changing personnel, HR governance, validation, merge, or Steward authority.",
+        "required_checks": ["Helen duty JSON renders", "Resident duty alias renders", "Helen presence JSON renders", "Helen duty tests pass", "Completion receipt exists"],
+        "observational_checks": ["Office command center JSON renders", "Production readiness report generation"],
+        "expected_artifacts": ["src/estate/core/helen_duty.py", "runtime/helen/duty_state.json", "runtime/residents/presence.json", "collaboration/work_packages/completions/WP-0108_codex_done.json", "runtime/validation/work_packages/WP-0108_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Validation returns no_recipe", "Duty payload implies personnel authorization, HR governance, validation, merge, notification, or work-package execution authority"],
+        "success_criteria": ["Required commands exit zero", "Duty payload records source artifacts and authority limitations", "Resident presence marks autonomous_execution false"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main helen-duty --json'),
+            _cmd('python -m estate.cli.main resident-duty --resident Helen --json'),
+            _cmd('python -m estate.cli.main resident-presence --resident Helen --json'),
+            _cmd('python -m pytest tests/test_helen_duty.py tests/test_resident_presence.py tests/test_resident_cards.py'),
+            _cmd("python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0108_codex_done.json').is_file()\""),
+            _cmd('python -m estate.cli.main steward-command-center --json', required=False),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0105": {
         "recipe_id": "wp-0105-validation-closure-repair-0102-0103",
         "title": "WP-0105 — Validation Closure Repair for WP-0102 and WP-0103",
