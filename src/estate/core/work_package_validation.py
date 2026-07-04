@@ -773,6 +773,26 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main validate-work-package --id WP-0085 --json', required=False),
         ],
     },
+    "WP-0106": {
+        "recipe_id": "wp-0106-resident-runtime-presence-model",
+        "title": "WP-0106 — Resident Runtime Presence Model",
+        "description": "Validates local resident presence inspection, resident-card integration, stale/missing behavior tests, completion receipt, and production-readiness compatibility without granting resident authority or autonomous execution.",
+        "required_checks": ["Resident presence JSON renders", "Alfred presence JSON renders", "Resident presence tests pass", "Completion receipt exists"],
+        "observational_checks": ["Office command center JSON renders", "Production readiness report generation"],
+        "expected_artifacts": ["src/estate/core/resident_presence.py", "runtime/residents/presence.json", "collaboration/work_packages/completions/WP-0106_codex_done.json", "runtime/validation/work_packages/WP-0106_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Validation returns no_recipe", "Presence implies autonomous execution authority"],
+        "success_criteria": ["Required commands exit zero", "Presence payload marks autonomous_execution false"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main resident-presence --json'),
+            _cmd('python -m estate.cli.main resident-presence --resident Alfred --json'),
+            _cmd('python -m pytest tests/test_resident_presence.py tests/test_resident_cards.py tests/test_steward_command_center.py'),
+            _cmd("python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0106_codex_done.json').is_file()\""),
+            _cmd('python -m estate.cli.main steward-command-center --json', required=False),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0105": {
         "recipe_id": "wp-0105-validation-closure-repair-0102-0103",
         "title": "WP-0105 — Validation Closure Repair for WP-0102 and WP-0103",

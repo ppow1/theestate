@@ -61,6 +61,7 @@ from estate.core.operations_center_bootstrap import operations_center_start, ope
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, save_workspace_profile
 from estate.core.operations_center_settings import load_operations_center_settings, save_operations_center_settings
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
+from estate.core.resident_presence import build_resident_presence, filter_resident, format_resident_presence
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def print_table(items, fields):
@@ -873,6 +874,15 @@ def cmd_decision_queue(args):
 
 
 
+def cmd_resident_presence(args):
+    payload = filter_resident(build_resident_presence(), getattr(args, "resident", None))
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_resident_presence(payload))
+
+
 def cmd_operations_center(args):
     if args.action == "start":
         payload = operations_center_start(host=args.host, port=args.port)
@@ -1539,6 +1549,11 @@ def main():
     p.add_argument("--command-console-mode", choices=["inline", "collapsed"], help="Set command console mode")
     p.set_defaults(func=cmd_operations_center_settings)
 
+
+    p = sub.add_parser("resident-presence", help="Inspect local resident runtime presence")
+    p.add_argument("--resident", help="Filter by resident name or id")
+    p.add_argument("--json", action="store_true", help="Print resident presence JSON")
+    p.set_defaults(func=cmd_resident_presence)
 
     p = sub.add_parser("operations-center", help="Start, inspect, or stop the local Operations Center server")
     p.add_argument("action", choices=["start", "status", "stop"], help="Server lifecycle action")

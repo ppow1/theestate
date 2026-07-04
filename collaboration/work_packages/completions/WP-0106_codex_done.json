@@ -1,0 +1,64 @@
+{
+  "authority_and_safety": {
+    "autonomous_execution_added": false,
+    "cloud_dependency_added": false,
+    "new_authority_granted": false,
+    "secrets_stored": false
+  },
+  "changed_files": [
+    "src/estate/core/resident_presence.py",
+    "runtime/residents/presence.json",
+    "src/estate/core/resident_cards.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_presence.py",
+    "collaboration/work_packages/completions/WP-0106_codex_done.json"
+  ],
+  "completed_at": "2026-07-04T20:25:00+00:00",
+  "completed_by": "Codex",
+  "demonstration": {
+    "commands": [
+      "PYTHONPATH=src python -m estate.cli.main resident-presence --json",
+      "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Alfred --json"
+    ],
+    "observed_output_summary": "Alfred and Helen render as available local resident presence records sourced from runtime/residents/presence.json and registries; payload states visible_presence_only=true and autonomous_execution=false."
+  },
+  "known_limitations": [
+    "Presence is informational and local-first only; it does not implement autonomous Alfred or Helen duty execution.",
+    "Heartbeat values are read from local runtime artifacts and become degraded when stale, but this package does not run a heartbeat writer daemon."
+  ],
+  "merge_class": "Class A",
+  "production_readiness_command_status": "passed_json_generated",
+  "ready_for_ca_review": true,
+  "summary": "Implemented a local-first resident runtime presence model for Alfred and Helen, integrated it with resident cards and the Office of the Steward command center, added CLI inspection, tests, and validation recipe registration.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_resident_presence.py tests/test_resident_cards.py tests/test_steward_command_center.py",
+      "observed_output": "31 passed",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main resident-presence --json",
+      "observed_output": "Rendered Alfred and Helen resident presence JSON with autonomous_execution=false.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Alfred --json",
+      "observed_output": "Rendered filtered Alfred resident presence JSON.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
+      "observed_output": "validation_status=passed; recipe_id=wp-0106-resident-runtime-presence-model",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "observed_output": "JSON report generated successfully",
+      "status": "passed"
+    }
+  ],
+  "validation_recipe_status": "registered_and_passed",
+  "work_package_id": "WP-0106"
+}
