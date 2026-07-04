@@ -1207,6 +1207,21 @@ def _resident_conversations_html(artifact):
             message_html = f"<table><thead><tr><th>Message</th><th>Source</th><th>Destination</th><th>Status</th><th>Source artifact</th></tr></thead><tbody>{message_rows}</tbody></table>"
         else:
             message_html = "<p class='placeholder'>No conversation-related institutional messages are available for this resident yet.</p>"
+        sessions = item.get("recent_sessions") or []
+        if sessions:
+            session_rows = "".join(
+                "<tr>"
+                f"<td>{html.escape(str(session.get('session_id') or 'unknown'))}</td>"
+                f"<td>{html.escape(str(session.get('status') or 'unknown'))}</td>"
+                f"<td>{html.escape(str(session.get('outcome_label') or 'informational'))}</td>"
+                f"<td>{html.escape(str(session.get('authority_label') or 'non-authoritative conversation session'))}</td>"
+                f"<td>{html.escape(str(session.get('path') or 'Not available yet'))}</td>"
+                "</tr>"
+                for session in sessions
+            )
+            session_html = f"<table><thead><tr><th>Session</th><th>Status</th><th>Outcome</th><th>Authority</th><th>Audit artifact</th></tr></thead><tbody>{session_rows}</tbody></table>"
+        else:
+            session_html = "<p class='placeholder'>No local resident conversation sessions are recorded yet.</p>"
         source_rows = "".join(f"<li>{html.escape(str(source))}</li>" for source in item.get("source_artifacts") or [])
         source_html = f"<ul>{source_rows}</ul>" if source_rows else "<p class='placeholder'>No linked source artifacts are available yet.</p>"
         cards.append(
@@ -1217,6 +1232,8 @@ def _resident_conversations_html(artifact):
             f"<p><strong>Mailbox summary:</strong> {html.escape(str(mailbox_label))}</p>"
             f"<p class='placeholder'><strong>Conversation panel:</strong> {html.escape(str(item.get('conversation_placeholder') or 'Not available yet'))}</p>"
             f"<p class='placeholder'><strong>Transcript / audit:</strong> {html.escape(str(item.get('transcript_audit_placeholder') or 'Not available yet'))}</p>"
+            "<h4>Local conversation sessions</h4>"
+            f"{session_html}"
             "<h4>Recent institutional messages</h4>"
             f"{message_html}"
             "<h4>Linked source artifacts</h4>"

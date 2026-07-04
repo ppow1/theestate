@@ -1,0 +1,70 @@
+{
+  "work_package_id": "WP-0109",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T21:36:30+00:00",
+  "branch": "work",
+  "pull_request_url_not_applicable_reason": "Pull request will be created by repository automation after local commit; no remote PR URL is available inside this environment.",
+  "summary": [
+    "Implemented local file-backed resident conversation sessions under runtime/resident_conversations/sessions.",
+    "Added resident-conversation CLI start/list/show JSON surfaces.",
+    "Integrated non-authoritative session summaries into the Resident Conversations workspace and Steward Command Center rendering.",
+    "Registered the WP-0109 validation recipe and added tests for sessions, summaries, CLI JSON, source references, graceful missing data, and authority labels."
+  ],
+  "files_changed": [
+    "src/estate/core/resident_conversation_sessions.py",
+    "src/estate/core/resident_conversations.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "src/estate/cli/main.py",
+    "tests/test_resident_conversation_sessions.py",
+    "collaboration/work_packages/completions/WP-0109_codex_done.json"
+  ],
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_conversations.py",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main resident-conversation start --resident Alfred --source-artifact collaboration/work_packages/pending/WP-0109_SERIES_resident_conversation_session_and_audit_trail.md --source-artifact operations/alfred/operational_briefing.md --prompt 'Summarize resident conversation audit needs for WP-0109.' --response 'Informational session only; route durable outcomes to canonical artifacts.' --outcome work_package_candidate --canonical-link collaboration/work_packages/pending/WP-0109_SERIES_resident_conversation_session_and_audit_trail.md --json",
+      "status": "passed",
+      "observed_session_id": "rcs-alfred-20260704-213551Z0000"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main resident-conversation list --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0109 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed_with_unrelated_historical_blockers",
+      "wp_0109_status": "ready"
+    }
+  ],
+  "known_limitations": [
+    "Conversation records are intentionally non-authoritative and do not grant resident action authority.",
+    "Resident Action Authority Boundary enforcement is limited to explicit labels and limitations in this package, as scoped.",
+    "No cloud chat, identity, or external API integration is included."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "Class A; no governance, validation, merge, personnel, Steward, or automatic work-package execution authority changed.",
+  "validation_recipe_status": "registered_wp_0109_non_no_recipe",
+  "production_readiness_command_status": "passed; WP-0109 is production_ready=true in report, while overall report lists unrelated historical package blockers",
+  "final_resident_conversation_command_surface": [
+    "PYTHONPATH=src python -m estate.cli.main resident-conversation start --resident Alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-conversation list --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-conversation show --session SESSION_ID --json"
+  ],
+  "session_audit_storage_path": "runtime/resident_conversations/sessions/*.json",
+  "explicit_authority_limitations": [
+    "Conversation is an interface surface, not an authoritative record by itself.",
+    "Do not infer Steward approval from resident conversation.",
+    "Do not infer validation success from resident conversation.",
+    "Do not execute work packages automatically from conversation.",
+    "Important outcomes must link to canonical follow-up artifacts before becoming institutional source-of-truth."
+  ],
+  "pull_request_url_or_not_applicable_reason": "Pull request will be created by repository automation after local commit; no remote PR URL is available inside this environment.",
+  "pull_request_not_applicable_reason": "Pull request will be created by repository automation after local commit; no remote PR URL is available inside this environment."
+}

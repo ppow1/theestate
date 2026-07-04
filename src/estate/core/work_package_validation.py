@@ -836,6 +836,25 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0109": {
+        "recipe_id": "wp-0109-resident-conversation-session-audit-trail",
+        "title": "WP-0109 — Resident Conversation Session and Audit Trail",
+        "description": "Validates local file-backed resident conversation sessions, CLI JSON surfaces, workspace summaries, source artifact references, and explicit non-authoritative authority labels.",
+        "required_checks": ["Resident conversation help renders", "Resident conversation tests pass", "Workspace renders", "Completion receipt exists"],
+        "observational_checks": ["Production readiness report generation"],
+        "expected_artifacts": ["src/estate/core/resident_conversation_sessions.py", "src/estate/core/resident_conversations.py", "runtime/resident_conversations/sessions", "collaboration/work_packages/completions/WP-0109_codex_done.json", "runtime/validation/work_packages/WP-0109_validation.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Validation returns no_recipe", "Conversation session implies governance, validation, merge, Steward, HR, or work-package execution authority"],
+        "success_criteria": ["Required commands exit zero", "Session summaries expose non-authoritative labels", "Workspace consumes session summaries when available"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -m estate.cli.main resident-conversation --help'),
+            _cmd('python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_conversations.py'),
+            _cmd('python -m estate.cli.main steward-command-center --json'),
+            _cmd("python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0109_codex_done.json').is_file()\""),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
     "WP-0105": {
         "recipe_id": "wp-0105-validation-closure-repair-0102-0103",
         "title": "WP-0105 — Validation Closure Repair for WP-0102 and WP-0103",

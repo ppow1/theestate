@@ -62,6 +62,7 @@ from estate.core.operations_center_workspace_profiles import resolve_workspace_p
 from estate.core.operations_center_settings import load_operations_center_settings, save_operations_center_settings
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.resident_presence import build_resident_presence, filter_resident, format_resident_presence
+from estate.core.resident_conversation_sessions import create_session, list_sessions, load_session, format_session_list
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
@@ -1114,6 +1115,42 @@ def cmd_validation_observations(args):
     else:
         print(render_markdown_log(payload["observations"]))
 
+def cmd_resident_conversation(args):
+    import json
+    if args.action == "start":
+        if not args.resident:
+            raise SystemExit("resident-conversation start requires --resident")
+        payload = create_session(
+            resident=args.resident,
+            participant_role=args.participant_role,
+            status=args.status,
+            source_artifacts=args.source_artifact or [],
+            prompt=args.prompt,
+            response=args.response,
+            operator_note=args.operator_note,
+            outcome=args.outcome,
+            canonical_links=args.canonical_link or [],
+        )
+    elif args.action == "list":
+        payload = list_sessions(resident=getattr(args, "resident", None))
+    else:
+        if not args.session:
+            raise SystemExit("resident-conversation show requires --session")
+        payload = load_session(args.session)
+        if payload is None:
+            payload = {"error": "session_not_found", "session_id": args.session}
+            if getattr(args, "json", False):
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(f"Session not found: {args.session}")
+            raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif args.action == "list":
+        print(format_session_list(payload))
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+
 def cmd_sync_ollama(args):
     created, ec_id = sync_ollama_providers()
     print(f"Logged {ec_id}")
@@ -1599,6 +1636,21 @@ def main():
     p.add_argument("--json", action="store_true", help="Print resident presence JSON")
     p.set_defaults(func=cmd_resident_presence)
 
+    p = sub.add_parser("resident-conversation", help="Create and inspect local resident conversation session audit records")
+    p.add_argument("action", choices=["start", "list", "show"], help="Conversation session action")
+    p.add_argument("--resident", help="Resident name for start/list")
+    p.add_argument("--session", help="Session id for show")
+    p.add_argument("--participant-role", default="operator", help="Participant role for a started session")
+    p.add_argument("--status", default="open", help="Session status")
+    p.add_argument("--source-artifact", action="append", help="Source artifact reference used during the session")
+    p.add_argument("--prompt", help="Prompt or operator question to record")
+    p.add_argument("--response", help="Resident response to record")
+    p.add_argument("--operator-note", help="Operator note or session event to record")
+    p.add_argument("--outcome", default="informational", choices=["informational", "needs_steward", "work_package_candidate", "decision_candidate", "validation_follow_up", "no_action"], help="Non-authoritative session outcome label")
+    p.add_argument("--canonical-link", action="append", help="Canonical follow-up artifact link")
+    p.add_argument("--json", action="store_true", help="Print resident conversation JSON")
+    p.set_defaults(func=cmd_resident_conversation)
+
     p = sub.add_parser("operations-center", help="Start, inspect, or stop the local Operations Center server")
     p.add_argument("action", choices=["start", "status", "stop"], help="Server lifecycle action")
     p.add_argument("--json", action="store_true", help="Print bootstrap status JSON")
@@ -1656,4 +1708,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
