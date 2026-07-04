@@ -1,0 +1,422 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-04T17:14:31+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "tests/test_work_package_validation.py",
+    "operations/validation/validation_coverage_manifest.md",
+    "runtime/validation/validation_coverage_manifest.json",
+    "operations/validation/production_readiness_report.md",
+    "runtime/validation/production_readiness_report.json",
+    "operations/validation/reports/*.md",
+    "runtime/validation/work_packages/*.json",
+    "collaboration/work_packages/completions/WP-0103_codex_done.json"
+  ],
+  "historical_work_packages_scanned": [
+    "WP-0014",
+    "WP-0015",
+    "WP-0016",
+    "WP-0017",
+    "WP-0018",
+    "WP-0019",
+    "WP-0020",
+    "WP-0021",
+    "WP-0022",
+    "WP-0023",
+    "WP-0024",
+    "WP-0025",
+    "WP-0026",
+    "WP-0027",
+    "WP-0028",
+    "WP-0029",
+    "WP-0030",
+    "WP-0031",
+    "WP-0032",
+    "WP-0033",
+    "WP-0034",
+    "WP-0035",
+    "WP-0036",
+    "WP-0037",
+    "WP-0038",
+    "WP-0039",
+    "WP-0040",
+    "WP-0041",
+    "WP-0042",
+    "WP-0043",
+    "WP-0044",
+    "WP-0045",
+    "WP-0046",
+    "WP-0047",
+    "WP-0048",
+    "WP-0049",
+    "WP-0050",
+    "WP-0051",
+    "WP-0052",
+    "WP-0053",
+    "WP-0054",
+    "WP-0055",
+    "WP-0056",
+    "WP-0057",
+    "WP-0058",
+    "WP-0059",
+    "WP-0060",
+    "WP-0061",
+    "WP-0062",
+    "WP-0063",
+    "WP-0064",
+    "WP-0065",
+    "WP-0066",
+    "WP-0067",
+    "WP-0068",
+    "WP-0069",
+    "WP-0070",
+    "WP-0071",
+    "WP-0072",
+    "WP-0073",
+    "WP-0074",
+    "WP-0075",
+    "WP-0076",
+    "WP-0077",
+    "WP-0078",
+    "WP-0079",
+    "WP-0080",
+    "WP-0081",
+    "WP-0082",
+    "WP-0083",
+    "WP-0084",
+    "WP-0085"
+  ],
+  "known_limitations": [
+    "WP-0086 and later pending backlog files were not modified.",
+    "Historical packages with incomplete receipts are listed as blockers instead of repaired broadly.",
+    "Recipe coverage was added in a controlled batch for complete receipts and obvious safe local CLI surfaces; remaining complete-receipt historical gaps are deferred for later review if no safe recipe was added in this batch."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "packages_deferred_with_reasons": [
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0014"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0016"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0017"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0018"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0020"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0022"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0023"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0024"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0025"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0026"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0028"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0030"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0031"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0032"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0033"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0034"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0035"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0039"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0040"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0041"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0042"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0043"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0044"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0045"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0046"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0047"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0048"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0049"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0050"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0051"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0054"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0055"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0061"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0062"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0063"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0064"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0069"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0071"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0072"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0073"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0082"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0083"
+    },
+    {
+      "classification": "requires_receipt_repair_before_recipe",
+      "reason": "requires receipt repair before recipe",
+      "work_package_id": "WP-0084"
+    }
+  ],
+  "packages_still_blocked_by_receipt_gaps": [
+    "WP-0014",
+    "WP-0016",
+    "WP-0017",
+    "WP-0018",
+    "WP-0020",
+    "WP-0022",
+    "WP-0023",
+    "WP-0024",
+    "WP-0025",
+    "WP-0026",
+    "WP-0028",
+    "WP-0030",
+    "WP-0031",
+    "WP-0032",
+    "WP-0033",
+    "WP-0034",
+    "WP-0035",
+    "WP-0039",
+    "WP-0040",
+    "WP-0041",
+    "WP-0042",
+    "WP-0043",
+    "WP-0044",
+    "WP-0045",
+    "WP-0046",
+    "WP-0047",
+    "WP-0048",
+    "WP-0049",
+    "WP-0050",
+    "WP-0051",
+    "WP-0054",
+    "WP-0055",
+    "WP-0061",
+    "WP-0062",
+    "WP-0063",
+    "WP-0064",
+    "WP-0069",
+    "WP-0071",
+    "WP-0072",
+    "WP-0073",
+    "WP-0082",
+    "WP-0083",
+    "WP-0084"
+  ],
+  "production_readiness_command_status": {
+    "exit_code": 0,
+    "total_missing_recipes": 56,
+    "total_production_ready": 22,
+    "total_work_packages_scanned": 90
+  },
+  "production_readiness_status_before": {
+    "source": "runtime/validation/validation_coverage_manifest.json before WP-0103 changes",
+    "total_missing_recipes": 73,
+    "total_production_ready": 5
+  },
+  "pull_request_url_not_applicable_reason": "Local Codex completion artifact created before hosted pull request URL is available.",
+  "ready_for_ca_review": true,
+  "recipes_added": [
+    "WP-0015",
+    "WP-0019",
+    "WP-0021",
+    "WP-0027",
+    "WP-0029",
+    "WP-0036",
+    "WP-0037",
+    "WP-0038",
+    "WP-0052",
+    "WP-0053",
+    "WP-0065",
+    "WP-0066",
+    "WP-0067",
+    "WP-0068",
+    "WP-0070",
+    "WP-0080",
+    "WP-0081",
+    "WP-0085",
+    "WP-0103"
+  ],
+  "summary": [
+    "Assessed historical completed/merged work packages through WP-0085 from the WP-0095 validation manifest and repository artifacts.",
+    "Added safe local validation recipes for complete-receipt historical work packages with obvious read-only CLI validation surfaces.",
+    "Regenerated production-readiness and coverage manifest artifacts and recorded representative validation reports."
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0103 --json",
+    "Representative validations for WP-0015, WP-0027, WP-0081, WP-0085 and all newly covered historical recipes"
+  ],
+  "work_package_id": "WP-0103",
+  "work_packages_already_covered": [
+    "WP-0056",
+    "WP-0057",
+    "WP-0058",
+    "WP-0059",
+    "WP-0060",
+    "WP-0074",
+    "WP-0075",
+    "WP-0076",
+    "WP-0077",
+    "WP-0078",
+    "WP-0079"
+  ],
+  "wp_0103_validation_status": {
+    "exit_code": 0,
+    "recipe_id": "wp-0103-historical-validation-recipe-coverage",
+    "validation_status": "passed"
+  }
+}

@@ -73,7 +73,7 @@ def test_markdown_json_required_fields_and_self_check_recipe(tmp_path):
 
 def test_recipe_expansion_registers_next_validation_recipes():
     existing = {"WP-0056", "WP-0057", "WP-0058", "WP-0059", "WP-0060", "WP-0074", "WP-0079"}
-    expanded = {"WP-0075", "WP-0076", "WP-0077", "WP-0078", "WP-0086", "WP-0091"}
+    expanded = {"WP-0015", "WP-0019", "WP-0021", "WP-0027", "WP-0029", "WP-0036", "WP-0037", "WP-0038", "WP-0052", "WP-0053", "WP-0065", "WP-0066", "WP-0067", "WP-0068", "WP-0070", "WP-0075", "WP-0076", "WP-0077", "WP-0078", "WP-0080", "WP-0081", "WP-0085", "WP-0086", "WP-0091", "WP-0103"}
     for work_package_id in existing | expanded:
         recipe = get_validation_recipe(work_package_id)
         assert recipe is not None
@@ -108,6 +108,32 @@ def test_wp_0077_and_wp_0078_execute_real_recipe_commands(tmp_path):
     assert wp_0078["command_results"]
     assert "capability-dependency-visualization --json" in wp_0077["commands_run"][0]
     assert "capability-gap-report --json" in wp_0078["commands_run"][0]
+
+
+def test_historical_complete_receipt_recipes_execute_representative_commands(tmp_path):
+    init_git(tmp_path)
+    wp_0015 = validate_work_package("WP-0015", tmp_path)
+    wp_0027 = validate_work_package("WP-0027", tmp_path)
+    wp_0081 = validate_work_package("WP-0081", tmp_path)
+
+    for payload in (wp_0015, wp_0027, wp_0081):
+        assert payload["validation_status"] != "no_recipe"
+        assert payload["recipe_id"]
+        assert payload["commands_run"]
+        assert payload["command_results"]
+
+    assert "message-ack --help" in wp_0015["commands_run"][0]
+    assert "estate-search" in wp_0027["commands_run"][0]
+    assert "estate-service-catalog --json" in wp_0081["commands_run"][0]
+
+
+def test_wp_0103_self_check_recipe_targets_historical_coverage():
+    recipe = get_validation_recipe("WP-0103")
+    assert recipe is not None
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("validation-production-readiness --json" in command for command in commands)
+    assert any("validate-work-package --id WP-0015 --json" in command for command in commands)
+    assert any("validate-work-package --id WP-0027 --json" in command for command in commands)
 
 
 def test_wp_0091_self_check_recipe_targets_new_expanded_recipes():

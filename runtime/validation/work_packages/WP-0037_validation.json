@@ -1,0 +1,91 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main audit-summary --json",
+      "completed_at": "2026-07-04T17:13:03+00:00",
+      "duration_seconds": 0.186,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T17:13:02+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0037_2026-07-04T171302Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main audit --help",
+      "completed_at": "2026-07-04T17:13:03+00:00",
+      "duration_seconds": 0.178,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-04T17:13:03+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0037_2026-07-04T171302Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main global-search \"Recall Audit\" --json",
+      "completed_at": "2026-07-04T17:13:03+00:00",
+      "duration_seconds": 0.282,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-04T17:13:03+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0037_2026-07-04T171302Z0000/command_03_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main audit-summary --json",
+    "python -m estate.cli.main audit --help",
+    "python -m estate.cli.main global-search \"Recall Audit\" --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0037_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0037_validation.md",
+    "runtime/validation/work_packages/WP-0037_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-04T17:13:02+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "10c6ae704cb00dff6026dc79164189a3ac2e3975",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0037_codex_done.json",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "pr_metadata_status": "available",
+    "pull_request_url": "pending",
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0037"
+  },
+  "recipe_id": "wp-0037-recall-audit-log-v1",
+  "recipe_title": "WP-0037 \u2014 Recall Audit Log v1",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0037_2026-07-04T171302Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0037"
+}
