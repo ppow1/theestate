@@ -17,7 +17,7 @@ INPUT_ARTIFACTS = [
     "data/registry/providers.json",
     "data/registry/services.json",
     "runtime/capabilities/capability_lifecycle_report.json",
-    "runtime/operations/operational_validation_report.json",
+    "runtime/validation/operational_validation_report.json",
     "runtime/operations/operations_board.json",
     "docs/operations/Capability_Lifecycle_Reporting.md",
     "docs/operations/Operational_Validation_Reporting.md",
@@ -78,14 +78,24 @@ def _list(value):
     return [value]
 
 
-def _status_from_validation(capability_id, lifecycle_by_id):
+def _status_from_validation(capability_id, lifecycle_by_id, operational_by_id):
     cap = lifecycle_by_id.get(capability_id, {})
     warnings = cap.get("warnings") or []
-    if not cap:
-        return {"status": "unknown", "source": None, "warnings": []}
-    if cap.get("valid_lifecycle_state") and not warnings:
-        return {"status": "valid", "source": "runtime/capabilities/capability_lifecycle_report.json", "warnings": []}
-    return {"status": "warnings", "source": "runtime/capabilities/capability_lifecycle_report.json", "warnings": warnings}
+    if cap:
+        if cap.get("valid_lifecycle_state") and not warnings:
+            return {"status": "valid", "source": "runtime/capabilities/capability_lifecycle_report.json", "warnings": []}
+        return {"status": "warnings", "source": "runtime/capabilities/capability_lifecycle_report.json", "warnings": warnings}
+
+    operational = operational_by_id.get(capability_id, {})
+    if operational:
+        gaps = operational.get("evidence_gaps") or []
+        if gaps:
+            return {"status": "evidence_gaps", "source": "runtime/validation/operational_validation_report.json", "warnings": gaps}
+        if operational.get("validation_evidence_found"):
+            return {"status": "evidence_found", "source": "runtime/validation/operational_validation_report.json", "warnings": []}
+        return {"status": "reviewed", "source": "runtime/validation/operational_validation_report.json", "warnings": []}
+
+    return {"status": "unknown", "source": None, "warnings": []}
 
 
 def generate_estate_capability_registry(root=None, write=True):
@@ -108,6 +118,13 @@ def generate_estate_capability_registry(root=None, write=True):
     services = _as_list(artifacts.get("data/registry/services.json"))
     lifecycle_caps = _as_list(artifacts.get("runtime/capabilities/capability_lifecycle_report.json"))
     lifecycle_by_id = {c.get("id"): c for c in lifecycle_caps if isinstance(c, dict)}
+    operational_report = artifacts.get("runtime/validation/operational_validation_report.json")
+    operational_caps = _as_list(
+        operational_report.get("capabilities_reviewed")
+        if isinstance(operational_report, dict)
+        else operational_report
+    )
+    operational_by_id = {c.get("id"): c for c in operational_caps if isinstance(c, dict)}
     providers_by_cap = defaultdict(list)
     for provider in providers:
         if isinstance(provider, dict):
@@ -140,7 +157,7 @@ def generate_estate_capability_registry(root=None, write=True):
             }
             for p in providers_by_cap.get(cap_id, [])
         ]
-        validation = _status_from_validation(cap_id, lifecycle_by_id)
+        validation = _status_from_validation(cap_id, lifecycle_by_id, operational_by_id)
         source_links = []
         for src in ["data/registry/capabilities.json"] + _list(_first(raw, ("implementation_references", "implementation", "root", "location"))) + _list(_first(raw, ("evidence_references", "evidence", "documentation"))):
             if src and src not in source_links:
