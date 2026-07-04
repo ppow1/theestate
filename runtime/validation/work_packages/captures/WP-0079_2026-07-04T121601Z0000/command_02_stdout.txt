@@ -1,0 +1,9 @@
+{
+  "cli": null,
+  "command_id": "notification-center",
+  "message": "Command is registered; execute through the existing operation handler.",
+  "ok": true,
+  "operation": "activate_tab",
+  "status": "ready",
+  "target": "recalls"
+}
