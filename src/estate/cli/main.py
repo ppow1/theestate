@@ -21,6 +21,7 @@ from estate.core.estate_capability_registry import generate_estate_capability_re
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization, format_capability_dependency_visualization_summary
 from estate.core.capability_gap_report import generate_capability_gap_report, format_capability_gap_summary
 from estate.core.estate_service_catalog import generate_estate_service_catalog, format_estate_service_catalog_summary
+from estate.core.service_dependency_matrix import generate_service_dependency_matrix, format_service_dependency_matrix_summary
 from estate.core.operational_validation import generate_operational_validation_report, format_operational_validation_summary
 from estate.core.steward_dashboard import generate_steward_dashboard, format_steward_dashboard_summary
 from estate.core.dependency_graph import generate_dependency_graph, format_dependency_graph_summary
@@ -576,6 +577,14 @@ def cmd_estate_service_catalog(args):
     else:
         print(format_estate_service_catalog_summary(catalog))
 
+def cmd_service_dependency_matrix(args):
+    matrix = generate_service_dependency_matrix()
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(matrix, indent=2, sort_keys=True))
+    else:
+        print(format_service_dependency_matrix_summary(matrix))
+
 def cmd_operational_validation(args):
     report = generate_operational_validation_report()
     if getattr(args, "json", False):
@@ -1054,6 +1063,10 @@ def main():
     p = sub.add_parser("estate-service-catalog", help="Generate the read-only Estate service catalog aggregation")
     p.add_argument("--json", action="store_true", help="Generate Estate service catalog and print JSON")
     p.set_defaults(func=cmd_estate_service_catalog)
+
+    p = sub.add_parser("service-dependency-matrix", help="Generate the read-only service dependency matrix")
+    p.add_argument("--json", action="store_true", help="Generate service dependency matrix and print JSON")
+    p.set_defaults(func=cmd_service_dependency_matrix)
 
     p = sub.add_parser("capability-dependency-visualization", help="Generate capability dependency visualization for Mission Control")
     p.add_argument("--json", action="store_true", help="Generate capability dependency visualization and print JSON")
