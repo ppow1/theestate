@@ -1,19 +1,19 @@
 # Work Package Validation Report — WP-0109
 
-- Timestamp: 2026-07-05T00:01:51+00:00
+- Timestamp: 2026-07-05T02:41:19+00:00
 - Work package ID: WP-0109
 - Local branch: work
-- Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb
+- Git commit: e245beacfc189c7ae66807a2b28974ef9a8f694f
 - Validation status: passed
 - Recipe used: wp-0109-resident-conversation-session-audit-trail
 - Recipe title: WP-0109 — Resident Conversation Session and Audit Trail
 
 ## Commands Run
-- `python -m estate.cli.main resident-conversation --help` — passed (exit 0, 0.42s)
-- `python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_conversations.py` — passed (exit 0, 1.798s)
-- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.215s)
-- `python -c "from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0109_codex_done.json').is_file()"` — passed (exit 0, 0.094s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.572s)
+- `python -m estate.cli.main resident-conversation --help` — passed (exit 0, 0.363s)
+- `python -c "import sys; sys.path.insert(0, 'src'); import pytest; raise SystemExit(pytest.main(['tests/test_resident_conversation_sessions.py', 'tests/test_resident_conversations.py']))"` — passed (exit 0, 1.613s)
+- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.282s)
+- `python -c "from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0109_codex_done.json').is_file()"` — passed (exit 0, 0.088s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.528s)
 
 ## Findings
 - None.

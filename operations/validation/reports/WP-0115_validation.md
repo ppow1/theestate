@@ -1,23 +1,23 @@
 # Work Package Validation Report — WP-0115
 
-- Timestamp: 2026-07-05T01:36:26+00:00
+- Timestamp: 2026-07-05T02:43:45+00:00
 - Work package ID: WP-0115
 - Local branch: work
-- Git commit: 49d4a6c9c4d736219de0c743c938df984c46e366
+- Git commit: e245beacfc189c7ae66807a2b28974ef9a8f694f
 - Validation status: passed
 - Recipe used: wp-0115-historical-validation-recipe-bootstrap-sweep
 - Recipe title: WP-0115 — Historical Validation Recipe Bootstrap Sweep
 
 ## Commands Run
-- `python -c "from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.md','runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"` — passed (exit 0, 0.066s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json').read_text(encoding='utf-8')); assert data.get('production_readiness_totals_before') and data.get('production_readiness_totals_after'), data.keys(); assert data.get('packages_considered'), data; assert all(x.get('reason') for x in data.get('packages_skipped', [])), data.get('packages_skipped')"` — passed (exit 0, 0.066s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json').read_text(encoding='utf-8')); deny={'WP-0016','WP-0017','WP-0018','WP-0056','WP-0073','WP-0094','WP-0106','WP-0107','WP-9999'}; completed=set(data.get('packages_selected_for_recipe_generation', [])) | set(data.get('packages_successfully_validated', [])); assert not (deny & completed), sorted(deny & completed)"` — passed (exit 0, 0.066s)
-- `python -m estate.cli.main validate-work-package --id WP-0102 --json` — passed (exit 0, 0.586s)
-- `python -m estate.cli.main validate-work-package --id WP-0105 --json` — passed (exit 0, 10.415s)
-- `python -m estate.cli.main validate-work-package --id WP-0111 --json` — passed (exit 0, 1.764s)
-- `python -m estate.cli.main validate-work-package --id WP-0114 --json` — passed (exit 0, 14.23s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.357s)
-- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0115'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.091s)
+- `python -c "from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.md','runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"` — passed (exit 0, 0.101s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json').read_text(encoding='utf-8')); assert data.get('production_readiness_totals_before') and data.get('production_readiness_totals_after'), data.keys(); assert data.get('packages_considered'), data; assert all(x.get('reason') for x in data.get('packages_skipped', [])), data.get('packages_skipped')"` — passed (exit 0, 0.116s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json').read_text(encoding='utf-8')); deny={'WP-0016','WP-0017','WP-0018','WP-0056','WP-0073','WP-0094','WP-0106','WP-0107','WP-9999'}; completed=set(data.get('packages_selected_for_recipe_generation', [])) | set(data.get('packages_successfully_validated', [])); assert not (deny & completed), sorted(deny & completed)"` — passed (exit 0, 0.11s)
+- `python -m estate.cli.main validate-work-package --id WP-0102 --json` — passed (exit 0, 0.951s)
+- `python -m estate.cli.main validate-work-package --id WP-0105 --json` — passed (exit 0, 15.68s)
+- `python -m estate.cli.main validate-work-package --id WP-0111 --json` — passed (exit 0, 2.867s)
+- `python -m estate.cli.main validate-work-package --id WP-0114 --json` — passed (exit 0, 20.923s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.528s)
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0115'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.135s)
 
 ## Findings
 - None.

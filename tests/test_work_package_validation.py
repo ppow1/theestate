@@ -341,3 +341,21 @@ def test_wp_0117_recipe_repairs_pytest_import_path_and_self_validates():
         pytest_commands = [command for command in repair_commands if "pytest.main" in command]
         assert pytest_commands
         assert all("sys.path.insert(0, 'src')" in command for command in pytest_commands)
+
+
+def test_wp_0118_recipe_repairs_all_resident_runtime_pytest_import_paths_and_self_validates():
+    recipe = get_validation_recipe("WP-0118")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0118-resident-runtime-pytest-validation-failure-repair"
+    commands = [command["command"] for command in recipe["commands"]]
+    for work_package_id in ["WP-0106", "WP-0107", "WP-0108", "WP-0109", "WP-0110", "WP-0116", "WP-0117"]:
+        assert any(f"validate-work-package --id {work_package_id}" in command for command in commands)
+    assert any("WP-0118_resident_runtime_pytest_failure_repair_report.json" in command for command in commands)
+
+    for work_package_id in ["WP-0106", "WP-0107", "WP-0108", "WP-0109", "WP-0110"]:
+        repair_recipe = get_validation_recipe(work_package_id)
+        assert repair_recipe is not None
+        repair_commands = [command["command"] for command in repair_recipe["commands"]]
+        pytest_commands = [command for command in repair_commands if "pytest.main" in command]
+        assert pytest_commands
+        assert all("sys.path.insert(0, 'src')" in command for command in pytest_commands)
