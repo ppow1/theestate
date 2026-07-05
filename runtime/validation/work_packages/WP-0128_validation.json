@@ -3,11 +3,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; md=Path('operations/residents/alfred/WP-0128_alfred_local_llm_response_path_report.md'); js=Path('runtime/residents/alfred/WP-0128_alfred_local_llm_response_path_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); required=['local_model_discovery_mechanism','selected_alfred_model_policy','provider_endpoint','prompt_construction_summary','context_packet_summary','fallback_behavior','ui_mode_transparency_changes','example_role_prompt_and_response','example_mode_prompt_and_response','tests_run','validation_commands_run']; missing=[k for k in required if not data.get(k)]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T21:36:28+00:00",
-      "duration_seconds": 0.075,
+      "completed_at": "2026-07-05T22:08:54+00:00",
+      "duration_seconds": 0.095,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:28+00:00",
+      "started_at": "2026-07-05T22:08:54+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -15,11 +15,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; t=Path('src/estate/core/resident_interaction.py').read_text(encoding='utf-8'); required=['class LocalOllamaAdapter','api/tags','qwen3:8b','_alfred_prompt','_context_packet','adapter.generate','_fallback_response','fallback_reason']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T21:36:28+00:00",
-      "duration_seconds": 0.071,
+      "completed_at": "2026-07-05T22:08:54+00:00",
+      "duration_seconds": 0.079,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:28+00:00",
+      "started_at": "2026-07-05T22:08:54+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -27,11 +27,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; t=Path('tests/test_resident_interaction.py').read_text(encoding='utf-8'); required=['Good afternoon Alfred, define your role for me.','Alfred, are you running from JSON files or an LLM right now?','MockOllamaAdapter','fallback_used']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T21:36:28+00:00",
-      "duration_seconds": 0.075,
+      "completed_at": "2026-07-05T22:08:54+00:00",
+      "duration_seconds": 0.082,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:28+00:00",
+      "started_at": "2026-07-05T22:08:54+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -39,11 +39,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; t=Path('src/estate/core/steward_command_center.py').read_text(encoding='utf-8'); assert 'Mode:' in t and 'llmSourceLine' in t and 'provider' in t and 'model' in t\"",
-      "completed_at": "2026-07-05T21:36:28+00:00",
-      "duration_seconds": 0.075,
+      "completed_at": "2026-07-05T22:08:54+00:00",
+      "duration_seconds": 0.087,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:28+00:00",
+      "started_at": "2026-07-05T22:08:54+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -51,62 +51,26 @@
     {
       "classification": "required",
       "command": "python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
-      "completed_at": "2026-07-05T21:36:32+00:00",
-      "duration_seconds": 3.591,
+      "completed_at": "2026-07-05T22:08:58+00:00",
+      "duration_seconds": 4.249,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:28+00:00",
+      "started_at": "2026-07-05T22:08:54+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0128_2026-07-05T213628Z0000/command_05_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0128_2026-07-05T220854Z0000/command_05_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0126 --json",
-      "completed_at": "2026-07-05T21:36:34+00:00",
-      "duration_seconds": 1.998,
-      "exit_code": 0,
+      "completed_at": "2026-07-05T22:08:59+00:00",
+      "duration_seconds": 1.225,
+      "exit_code": 1,
       "required": true,
-      "started_at": "2026-07-05T21:36:32+00:00",
-      "status": "passed",
+      "started_at": "2026-07-05T22:08:58+00:00",
+      "status": "failed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0128_2026-07-05T213628Z0000/command_06_stdout.txt"
-    },
-    {
-      "classification": "required",
-      "command": "python -m estate.cli.main validate-work-package --id WP-0127 --json",
-      "completed_at": "2026-07-05T21:36:38+00:00",
-      "duration_seconds": 3.814,
-      "exit_code": 0,
-      "required": true,
-      "started_at": "2026-07-05T21:36:34+00:00",
-      "status": "passed",
-      "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0128_2026-07-05T213628Z0000/command_07_stdout.txt"
-    },
-    {
-      "classification": "required",
-      "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T21:36:38+00:00",
-      "duration_seconds": 0.426,
-      "exit_code": 0,
-      "required": true,
-      "started_at": "2026-07-05T21:36:38+00:00",
-      "status": "passed",
-      "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0128_2026-07-05T213628Z0000/command_08_stdout.txt"
-    },
-    {
-      "classification": "required",
-      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0128'); assert r['receipt_status']=='complete', r\"",
-      "completed_at": "2026-07-05T21:36:38+00:00",
-      "duration_seconds": 0.102,
-      "exit_code": 0,
-      "required": true,
-      "started_at": "2026-07-05T21:36:38+00:00",
-      "status": "passed",
-      "stderr_excerpt": "",
-      "stdout_excerpt": ""
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0128_2026-07-05T220854Z0000/command_06_stdout.txt"
     }
   ],
   "commands_run": [
@@ -115,31 +79,34 @@
     "python -c \"from pathlib import Path; t=Path('tests/test_resident_interaction.py').read_text(encoding='utf-8'); required=['Good afternoon Alfred, define your role for me.','Alfred, are you running from JSON files or an LLM right now?','MockOllamaAdapter','fallback_used']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
     "python -c \"from pathlib import Path; t=Path('src/estate/core/steward_command_center.py').read_text(encoding='utf-8'); assert 'Mode:' in t and 'llmSourceLine' in t and 'provider' in t and 'model' in t\"",
     "python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
-    "python -m estate.cli.main validate-work-package --id WP-0126 --json",
-    "python -m estate.cli.main validate-work-package --id WP-0127 --json",
-    "python -m estate.cli.main validation-production-readiness --json",
-    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0128'); assert r['receipt_status']=='complete', r\""
+    "python -m estate.cli.main validate-work-package --id WP-0126 --json"
   ],
   "completion_artifact_path": "collaboration/work_packages/completions/WP-0128_codex_done.json",
-  "failures": [],
+  "failures": [
+    "Command failed: python -m estate.cli.main validate-work-package --id WP-0126 --json (exit 1)"
+  ],
   "files_written": [
     "operations/validation/reports/WP-0128_validation.md",
     "runtime/validation/work_packages/WP-0128_validation.json",
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T21:36:28+00:00",
+  "generated_at": "2026-07-05T22:08:54+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "fcbd48a7e5b3c19462d878e5797afc1af925359c",
+  "git_commit_before": "5815f7deeccd7ff3491cc5870dd43d607c308553",
   "production_readiness": {
-    "blocking_reasons": [],
+    "blocking_reasons": [
+      "Execution status blocks readiness: failed."
+    ],
     "coverage_status": "covered",
-    "execution_status": "passed",
+    "execution_status": "failed",
     "non_blocking_findings": [],
-    "production_ready": true,
+    "production_ready": false,
     "receipt_status": "complete",
-    "required_followups": []
+    "required_followups": [
+      "Execution status blocks readiness: failed."
+    ]
   },
   "receipt_gaps": [],
   "receipt_validation": {
@@ -155,11 +122,11 @@
   },
   "recipe_id": "wp-0128-alfred-local-llm-response-path",
   "recipe_title": "WP-0128 \u2014 Alfred Local LLM Response Path Repair",
-  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "reviewer_recommendation": "Chief Architect should review failures before approval.",
   "stderr_summary": "Captured stderr for 0 command(s).",
-  "stdout_summary": "Captured stdout for 4 command(s).",
-  "validation_id": "WP-0128_2026-07-05T213628Z0000",
-  "validation_status": "passed",
+  "stdout_summary": "Captured stdout for 2 command(s).",
+  "validation_id": "WP-0128_2026-07-05T220854Z0000",
+  "validation_status": "failed",
   "warnings": [],
   "work_package_id": "WP-0128"
 }

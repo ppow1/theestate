@@ -1167,6 +1167,19 @@ def _alfred_chat_panel(root):
     }
 
 
+def _attachment_html(attachments):
+    if not attachments:
+        return ""
+    items = []
+    for a in attachments:
+        label = f"{a.get('kind','attachment')} {a.get('attachment_id','')} ({a.get('mime_type','unknown')}, {a.get('size_bytes',0)} bytes, vision={a.get('vision_status','unknown')})"
+        thumb = ""
+        if a.get("kind") == "image" and str(a.get("storage_path") or "").startswith("runtime/resident_interactions/attachments/"):
+            thumb = f"<br><img class='alfred-attachment-thumb' src='/{html.escape(str(a.get('storage_path')))}' alt='Local pasted image thumbnail' loading='lazy'>"
+        summary = f"<br><span>{html.escape(str(a.get('summary') or 'No local visual summary stored.'))}</span>" if a.get("summary") else ""
+        items.append(f"<li><code>{html.escape(label)}</code>{thumb}{summary}</li>")
+    return "<ul class='alfred-attachments'>" + "".join(items) + "</ul>"
+
 def _alfred_chat_html(panel):
     surface = panel.get("surface") or {}
     history = panel.get("history") or {}
@@ -1178,6 +1191,7 @@ def _alfred_chat_html(panel):
                 "<article class='alfred-chat-turn'>"
                 f"<p><strong>Steward:</strong> {html.escape(str(turn.get('user_message') or ''))}</p>"
                 f"<p><strong>Alfred:</strong> {html.escape(str(turn.get('resident_response') or ''))}</p>"
+                f"{_attachment_html(turn.get('attachments') or [])}"
                 f"<p class='source'>Mode: {html.escape(str((turn.get('llm') or {}).get('mode') or 'unknown'))} / provider: {html.escape(str((turn.get('llm') or {}).get('provider') or 'unknown'))} / model: {html.escape(str((turn.get('llm') or {}).get('model') or 'unknown'))} · Session {html.escape(str(session.get('session_id') or 'unknown'))} · {html.escape(str(turn.get('created_at') or 'unknown'))}</p>"
                 "</article>"
             )
@@ -1195,7 +1209,9 @@ def _alfred_chat_html(panel):
   </dl>
   <form id="alfred-chat-form" data-resident-chat="alfred">
     <label for="alfred-chat-input">Message Alfred</label>
-    <textarea id="alfred-chat-input" name="message" rows="3" placeholder="Alfred, what should I look at first?" required></textarea>
+    <textarea id="alfred-chat-input" name="message" rows="3" placeholder="Alfred, what do you notice in this screenshot?"></textarea>
+    <div id="alfred-paste-help" class="source">Paste screenshots/images or text snippets here. Attachments stay local under runtime/resident_interactions/attachments.</div>
+    <div id="alfred-pending-attachments" class="alfred-attachments" aria-live="polite"></div>
     <button id="alfred-chat-send" type="submit">Send to Alfred</button>
   </form>
   <div id="alfred-chat-response" role="status" aria-live="polite"></div>
@@ -1886,7 +1902,7 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.alfred-attachments{margin:.4rem 0;padding:.4rem;background:#fbf7ef;border:1px solid #eadcc8;border-radius:8px}.alfred-attachment-thumb{max-width:180px;max-height:120px;border:1px solid #d6cbbb;border-radius:6px;margin-top:.25rem}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
 const WORKSPACE_PROFILE = __PROFILE_JSON__;
@@ -1927,10 +1943,18 @@ async function loadAlfredHistory(){
     const response = await fetch('/api/residents/alfred/chat');
     const data = await response.json();
     const turns = (data.sessions || []).flatMap(session => (session.turns || []).map(turn => ({...turn, session_id: session.session_id}))).slice(-8).reverse();
-    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p><p class="source">${llmSourceLine(turn)} · Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
+    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p>${attachmentHtml(turn.attachments || [])}<p class="source">${llmSourceLine(turn)} · Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
     history.forEach(el => el.innerHTML = html);
   }catch(error){ history.forEach(el => el.innerHTML = '<p class="placeholder">Unable to reload Alfred history from the local endpoint.</p>'); }
 }
+
+let pendingAlfredAttachments = [];
+function attachmentHtml(list){ if(!list.length) return ''; return `<ul class="alfred-attachments">${list.map(a => { const safePath = String(a.storage_path || ''); const img = a.kind === 'image' && safePath.startsWith('runtime/resident_interactions/attachments/') ? `<br><img class="alfred-attachment-thumb" src="/${escapeHtml(safePath)}" alt="Local pasted image thumbnail" loading="lazy">` : ''; return `<li><code>${escapeHtml(a.kind || 'attachment')} ${escapeHtml(a.attachment_id || '')} (${escapeHtml(a.mime_type || 'unknown')}, ${escapeHtml(a.size_bytes || 0)} bytes, vision=${escapeHtml(a.vision_status || 'unknown')})</code>${img}</li>`; }).join('')}</ul>`; }
+function renderPendingAttachments(){ const el = document.querySelector('#alfred-pending-attachments'); if(!el) return; el.innerHTML = pendingAlfredAttachments.length ? '<strong>Pending local attachments</strong>' + pendingAlfredAttachments.map((a,i) => `<div><code>${escapeHtml(a.kind)} ${escapeHtml(a.original_filename || 'clipboard')}</code> <button type="button" data-remove-attachment="${i}">Remove</button></div>`).join('') : '<span class="source">No pending attachments.</span>'; }
+function blobToBase64(blob){ return new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1] || ''); reader.onerror = reject; reader.readAsDataURL(blob); }); }
+document.addEventListener('paste', async event => { const input = event.target && event.target.closest && event.target.closest('#alfred-chat-input'); if(!input) return; const items = Array.from((event.clipboardData && event.clipboardData.items) || []); for(const item of items){ if(item.type && item.type.startsWith('image/')){ event.preventDefault(); const file = item.getAsFile(); if(file){ pendingAlfredAttachments.push({kind:'image', source:'clipboard_paste', original_filename:file.name || 'clipboard-image.png', mime_type:file.type || 'image/png', data_base64: await blobToBase64(file)}); } } } const text = event.clipboardData && event.clipboardData.getData('text/plain'); if(text && text.length > 500){ pendingAlfredAttachments.push({kind:'text_snippet', source:'clipboard_paste', original_filename:'clipboard-text.txt', mime_type:'text/plain', text}); } renderPendingAttachments(); });
+document.addEventListener('click', event => { const btn = event.target.closest('[data-remove-attachment]'); if(btn){ pendingAlfredAttachments.splice(Number(btn.dataset.removeAttachment), 1); renderPendingAttachments(); } });
+
 function llmSourceLine(turn){ const llm = turn.llm || {}; const fallback = llm.fallback_reason ? ` / reason: ${escapeHtml(llm.fallback_reason)}` : ''; return `Mode: ${escapeHtml(llm.mode || 'unknown')} / provider: ${escapeHtml(llm.provider || 'unknown')} / model: ${escapeHtml(llm.model || 'unknown')}${fallback}`; }
 function escapeHtml(value){ return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 document.addEventListener('submit', async event => {
@@ -1940,13 +1964,14 @@ document.addEventListener('submit', async event => {
   const input = form.querySelector('#alfred-chat-input');
   const output = document.querySelectorAll('#alfred-chat-response');
   output.forEach(el => el.textContent = 'Alfred is reviewing local Estate context...');
-  const response = await fetch('/api/residents/alfred/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: input.value, action:'summarize'})});
+  const response = await fetch('/api/residents/alfred/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: input.value, action:'summarize', attachments: pendingAlfredAttachments})});
   const data = await response.json();
   output.forEach(el => { el.textContent = data.turn ? `${data.turn.resident_response}\n${llmSourceLine(data.turn)}` : (data.error || 'Alfred did not return a response.'); });
   input.value = '';
+  pendingAlfredAttachments = []; renderPendingAttachments();
   await loadAlfredHistory();
 });
-window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); loadAlfredHistory(); });
+window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); loadAlfredHistory(); renderPendingAttachments(); });
 </script>"""
     script = script.replace("__PROFILE_JSON__", json.dumps(payload.get("workspace_profile", {})))
     return (
@@ -1992,6 +2017,13 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
             if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
                 body = json.dumps(load_history(parts[2], root=root), indent=2, sort_keys=True).encode("utf-8")
                 self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
+            if parsed.path.startswith("/runtime/resident_interactions/attachments/"):
+                rel = parsed.path.lstrip("/")
+                path = (root / rel).resolve()
+                base = (root / "runtime/resident_interactions/attachments").resolve()
+                if str(path).startswith(str(base)) and path.is_file():
+                    data = path.read_bytes(); ctype = "image/png" if path.suffix.lower()==".png" else "image/jpeg" if path.suffix.lower() in {".jpg",".jpeg"} else "application/octet-stream"
+                    self.send_response(200); self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data); return
             self.send_error(404, "Command center only serves the local dashboard and local resident APIs.")
 
         def do_POST(self):
@@ -2002,7 +2034,7 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
             except Exception:
                 data = {}
             if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
-                payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root)
+                payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root, attachments=data.get("attachments") or [])
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "forget":
                 payload = forget_conversation(data.get("session_id") or "", turn_id=data.get("turn_id"), memory_status=data.get("memory_status") or "forgotten", reason=data.get("reason") or "Steward-directed redaction", root=root)
             else:
