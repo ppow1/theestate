@@ -1,0 +1,29 @@
+{
+  "id": "msg_helen_20260705_0001_ca5_hiring_onboarding_notice",
+  "version": 1,
+  "created_at": "2026-07-05T15:39:10+00:00",
+  "created_by": "Helen",
+  "from_employee_id": 6,
+  "from_mailbox_id": 6,
+  "source": "employee.6",
+  "destination": "office.chief_architect",
+  "destination_mailbox_id": 10001,
+  "classification": "Estate Internal",
+  "message_type": "hr_onboarding_notice",
+  "priority": "high",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Chief Architect #5 Hiring and Onboarding Notice",
+    "summary": "Helen records the institutional onboarding of Chief Architect #5 with Employee ID 8 and Mailbox ID 8.",
+    "identity_assignment": {
+      "employee_id": 8,
+      "display_name": "Chief Architect #5",
+      "mailbox_id": 8,
+      "role_title": "Chief Architect #5"
+    },
+    "onboarding_packet": "docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md",
+    "preservation_note": "Chief Architect #3 history is preserved; no prior Chief Architect artifact is erased or overwritten.",
+    "authority_boundary": "No authority beyond established Chief Architect role boundaries is granted by this notice."
+  }
+}

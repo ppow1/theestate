@@ -9,10 +9,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T15:12:33+00:00",
+  "generated_at": "2026-07-05T15:39:12+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "0738f8b7d2a90d65b173f4bbf94218de750d8a8b",
+  "git_commit_before": "97340a973988a132422a221c600ea05b921a8076",
   "production_readiness": {
     "blocking_reasons": [
       "Completion artifact is missing.",
@@ -49,7 +49,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 0 command(s).",
-  "validation_id": "WP-9999_2026-07-05T151233Z0000",
+  "validation_id": "WP-9999_2026-07-05T153912Z0000",
   "validation_status": "no_recipe",
   "warnings": [
     "No validation recipe is registered for WP-9999."
