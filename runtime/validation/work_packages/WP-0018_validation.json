@@ -1,0 +1,87 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0018'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-05T06:24:47+00:00",
+      "duration_seconds": 0.098,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:47+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; paths=['src/estate/core/work_package_handoff.py','docs/operations/Codex_Handoff_Generator_v1.md','tests/test_work_package_handoff.py']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
+      "completed_at": "2026-07-05T06:24:47+00:00",
+      "duration_seconds": 0.065,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:47+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_work_package_handoff.py",
+      "completed_at": "2026-07-05T06:24:48+00:00",
+      "duration_seconds": 1.031,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:47+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0018_2026-07-05T062447Z0000/command_03_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0018'); assert r['receipt_status']=='complete', r\"",
+    "python -c \"from pathlib import Path; paths=['src/estate/core/work_package_handoff.py','docs/operations/Codex_Handoff_Generator_v1.md','tests/test_work_package_handoff.py']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
+    "pytest -q tests/test_work_package_handoff.py"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0018_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0018_validation.md",
+    "runtime/validation/work_packages/WP-0018_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T06:24:47+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "1134484794b449a27a668e709eb2aab872929565",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0018_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0018"
+  },
+  "recipe_id": "wp-0018-codex-handoff-generator-historical-presence",
+  "recipe_title": "WP-0018 \u2014 Codex Handoff Generator historical artifact presence",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 1 command(s).",
+  "validation_id": "WP-0018_2026-07-05T062447Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0018"
+}

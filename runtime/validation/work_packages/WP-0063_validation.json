@@ -1,0 +1,91 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0063'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-05T06:24:56+00:00",
+      "duration_seconds": 0.103,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:56+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main autonomous-work-queue-scheduler --json",
+      "completed_at": "2026-07-05T06:24:57+00:00",
+      "duration_seconds": 0.376,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:56+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0063_2026-07-05T062456Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_autonomous_work_queue_scheduler.py",
+      "completed_at": "2026-07-05T06:24:57+00:00",
+      "duration_seconds": 0.48,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:57+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0063_2026-07-05T062456Z0000/command_03_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0063'); assert r['receipt_status']=='complete', r\"",
+    "python -m estate.cli.main autonomous-work-queue-scheduler --json",
+    "pytest -q tests/test_autonomous_work_queue_scheduler.py"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0063_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0063_validation.md",
+    "runtime/validation/work_packages/WP-0063_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T06:24:56+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "1134484794b449a27a668e709eb2aab872929565",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0063_codex_done.json",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "pr_metadata_status": "available",
+    "pull_request_url": "pending",
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0063"
+  },
+  "recipe_id": "wp-0063-autonomous-work-queue-scheduler-historical-smoke",
+  "recipe_title": "WP-0063 \u2014 Autonomous Work Queue Scheduler historical smoke validation",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 2 command(s).",
+  "validation_id": "WP-0063_2026-07-05T062456Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0063"
+}

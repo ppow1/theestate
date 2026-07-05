@@ -1,0 +1,30 @@
+{
+  "VO_0001_resolution": "closed_by_WP-0120_current_evidence_palette_command_notification_center_passes",
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:00:00Z",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/global_search_command_palette.py",
+    "src/estate/cli/main.py",
+    "tests/test_global_search_command_palette.py",
+    "tests/test_steward_command_center.py",
+    "operations/notifications/operations_notification_center.md",
+    "runtime/notifications/operations_notification_center.json"
+  ],
+  "known_limitations": [
+    "Notification Center workspace activation uses the existing local activate_tab operation and routes to the existing recalls/notifications workspace surface; it does not introduce network notification transport or mutate authoritative source events."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from current repository artifacts and later command-palette repair evidence.",
+  "pull_request_url_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from current repository artifacts and later command-palette repair evidence.",
+  "ready_for_ca_review": true,
+  "summary": "Implemented the local Notification Center workspace as an Operations Center/Steward Command Center surface with Global Search discovery and current command-palette availability through the notification-center command alias.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+    "PYTHONPATH=src python -m estate.cli.main global-search \"Notification Center\" --json",
+    "PYTHONPATH=src python -m estate.cli.main palette-command notification-center --json"
+  ],
+  "validation_recipe_status": "registered",
+  "work_package_id": "WP-0056"
+}

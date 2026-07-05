@@ -1,6 +1,7 @@
 {
   "branch": "work",
   "codex_status": "done",
+  "completed_at": "2026-07-02T00:00:00Z",
   "files_changed": [
     "src/estate/core/work_package_handoff.py",
     "src/estate/cli/main.py",
@@ -9,10 +10,12 @@
     "collaboration/work_packages/completions/WP-0018_codex_done.json"
   ],
   "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
   "pr_url": null,
   "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "ready_for_ca_review": true,
   "status": "codex_done",
+  "summary": "Implemented and documented the work package according to repository evidence.",
   "tests_run": [
     "PYTHONPATH=src pytest tests/test_work_package_handoff.py",
     "PYTHONPATH=src python -m estate.cli.main work-package-handoffs",

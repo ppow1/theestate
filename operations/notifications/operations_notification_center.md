@@ -2,11 +2,11 @@
 
 Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth.
 
-Generated: 2026-07-05T04:11:49+00:00
+Generated: 2026-07-05T06:30:00+00:00
 Refresh behavior: quiet_refresh_from_local_artifacts
 
 ## Summary
-- total_notification_count: 118
+- total_notification_count: 117
 - filtered_notification_count: 100
 - unavailable_source_count: 8
 - locally_acknowledged_count: 0
@@ -107,7 +107,7 @@ Refresh behavior: quiet_refresh_from_local_artifacts
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] mailboxes — Warning: Warning (unacknowledged; source: `collaboration/mailboxes/index.json`)
-- [warning] validation — VO-0001: Notification Center Workspace is discoverable via Global Search, but `palette-command notification-center` was reported unavailable. (open; source: `validation/observations/validation_observations.jsonl`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_status_board.json`)
 - [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_status_board.json`)
 - [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_status_board.json`)
 - [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_status_board.json`)

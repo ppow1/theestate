@@ -1,17 +1,17 @@
 # Work Package Validation Report — WP-0081
 
-- Timestamp: 2026-07-05T04:12:25+00:00
+- Timestamp: 2026-07-05T06:29:47+00:00
 - Work package ID: WP-0081
 - Local branch: work
-- Git commit: 04a1aeb147602b5a009a3abf42522f54517fd7b1
+- Git commit: 1134484794b449a27a668e709eb2aab872929565
 - Validation status: passed
 - Recipe used: wp-0081-estate-service-catalog
 - Recipe title: WP-0081 — Estate Service Catalog
 
 ## Commands Run
-- `python -m estate.cli.main estate-service-catalog --json` — passed (exit 0, 0.416s)
-- `python -m estate.cli.main services --json` — passed (exit 0, 0.423s)
-- `python -m estate.cli.main service-readiness --json` — passed (exit 0, 0.386s)
+- `python -m estate.cli.main estate-service-catalog --json` — passed (exit 0, 0.263s)
+- `python -m estate.cli.main services --json` — passed (exit 0, 0.277s)
+- `python -m estate.cli.main service-readiness --json` — passed (exit 0, 0.268s)
 
 ## Findings
 - None.

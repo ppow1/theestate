@@ -1,0 +1,201 @@
+{
+  "after_totals": {
+    "total_blocked": 4,
+    "total_incomplete_receipts": 2,
+    "total_missing_receipts": 2,
+    "total_missing_recipes": 4,
+    "total_production_ready": 102,
+    "total_work_packages_scanned": 106
+  },
+  "alfred_helen_runtime_path_status": {
+    "packages": [
+      "WP-0116",
+      "WP-0117",
+      "WP-0118",
+      "WP-0119"
+    ],
+    "ready": true
+  },
+  "before_totals": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 96,
+    "total_work_packages_scanned": 105
+  },
+  "branch": "work",
+  "classifications": {
+    "WP-0016": {
+      "classification": "residual_human_architecture_review_required",
+      "next_action": "Chief Architect must review ADR-0002 and either approve/complete receipt metadata or create a follow-on implementation package.",
+      "reason": "Architecture proposal receipt explicitly says implementation was not authorized and ready_for_codex_package is false; no CA approval artifact is present."
+    },
+    "WP-0017": {
+      "classification": "residual_human_architecture_review_required",
+      "next_action": "Chief Architect must resolve ADR-0003 open questions and approve the state-machine architecture or authorize implementation.",
+      "reason": "Architecture proposal includes open questions and implementation_authorized=false; no CA approval artifact is present."
+    },
+    "WP-0018": {
+      "classification": "repaired_production_ready",
+      "reason": "Receipt metadata normalized and conservative recipe validated existing handoff generator artifacts."
+    },
+    "WP-0040": {
+      "classification": "repaired_production_ready",
+      "reason": "Known limitation reclassified as non-blocking v1 scope limitation and conservative recipe validated assignment queue artifacts."
+    },
+    "WP-0056": {
+      "classification": "repaired_production_ready",
+      "reason": "Current command and discovery evidence supports a historical completion receipt; VO-0001 closed with evidence."
+    },
+    "WP-0063": {
+      "classification": "repaired_production_ready",
+      "reason": "Scheduler receipt was complete; conservative recipe added and passed."
+    },
+    "WP-0073": {
+      "classification": "residual_missing_completion_evidence",
+      "next_action": "Implement or locate historical evidence for full validation-to-Mission-Control integration, then create receipt and recipe.",
+      "reason": "Mission Control includes a validation source, but repository evidence does not unambiguously prove the full WP-0073 requirements for observations, conditional passes, confirmed defects, recent activity, and validation action were implemented as a package."
+    },
+    "WP-0089": {
+      "classification": "repaired_production_ready",
+      "reason": "Stale repository-wide known limitation removed; WP-0089 recipe and receipt remain valid."
+    },
+    "WP-0094": {
+      "classification": "residual_missing_completion_evidence",
+      "next_action": "Implement WP-0094 scope or provide unambiguous historical completion evidence, then create receipt and recipe.",
+      "reason": "Status bar features exist through other packages, but WP-0094 pending file explicitly says it remains pending and must not be treated as implemented by template retrofit."
+    }
+  },
+  "codex_status": "done",
+  "completed_at": "2026-07-05T00:00:00+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0018_codex_done.json",
+    "collaboration/work_packages/completions/WP-0040_codex_done.json",
+    "collaboration/work_packages/completions/WP-0056_codex_done.json",
+    "collaboration/work_packages/completions/WP-0089_codex_done.json",
+    "validation/observations/validation_observations.jsonl",
+    "operations/validation/backlog_burn_down/WP-0120_final_historical_exception_cleanup_report.md",
+    "runtime/validation/backlog_burn_down/WP-0120_final_historical_exception_cleanup_report.json",
+    "collaboration/work_packages/completions/WP-0120_codex_done.json"
+  ],
+  "initial_blockers": [
+    "WP-0016",
+    "WP-0017",
+    "WP-0018",
+    "WP-0040",
+    "WP-0056",
+    "WP-0063",
+    "WP-0073",
+    "WP-0089",
+    "WP-0094"
+  ],
+  "known_limitations": [
+    "WP-0016 and WP-0017 still require Chief Architect architectural review.",
+    "WP-0073 and WP-0094 still require implementation or unambiguous historical completion evidence."
+  ],
+  "known_limitations_resolved_or_preserved": {
+    "preserved": [
+      "WP-0056 local activate_tab routing limitation preserved as non-blocking.",
+      "WP-0016/WP-0017 human architecture review limitations preserved."
+    ],
+    "resolved": [
+      "WP-0040 dependency extraction limitation is non-blocking v1 scope.",
+      "WP-0089 stale repository-wide blocker limitation removed."
+    ]
+  },
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "packages_left_blocked": {
+    "WP-0016": {
+      "classification": "residual_human_architecture_review_required",
+      "next_action": "Chief Architect must review ADR-0002 and either approve/complete receipt metadata or create a follow-on implementation package.",
+      "reason": "Architecture proposal receipt explicitly says implementation was not authorized and ready_for_codex_package is false; no CA approval artifact is present."
+    },
+    "WP-0017": {
+      "classification": "residual_human_architecture_review_required",
+      "next_action": "Chief Architect must resolve ADR-0003 open questions and approve the state-machine architecture or authorize implementation.",
+      "reason": "Architecture proposal includes open questions and implementation_authorized=false; no CA approval artifact is present."
+    },
+    "WP-0073": {
+      "classification": "residual_missing_completion_evidence",
+      "next_action": "Implement or locate historical evidence for full validation-to-Mission-Control integration, then create receipt and recipe.",
+      "reason": "Mission Control includes a validation source, but repository evidence does not unambiguously prove the full WP-0073 requirements for observations, conditional passes, confirmed defects, recent activity, and validation action were implemented as a package."
+    },
+    "WP-0094": {
+      "classification": "residual_missing_completion_evidence",
+      "next_action": "Implement WP-0094 scope or provide unambiguous historical completion evidence, then create receipt and recipe.",
+      "reason": "Status bar features exist through other packages, but WP-0094 pending file explicitly says it remains pending and must not be treated as implemented by template retrofit."
+    }
+  },
+  "packages_made_production_ready": [
+    "WP-0018",
+    "WP-0040",
+    "WP-0056",
+    "WP-0063",
+    "WP-0089"
+  ],
+  "packages_repaired": [
+    "WP-0018",
+    "WP-0040",
+    "WP-0056",
+    "WP-0063",
+    "WP-0089"
+  ],
+  "production_readiness_totals_after": {
+    "total_blocked": 4,
+    "total_incomplete_receipts": 2,
+    "total_missing_receipts": 2,
+    "total_missing_recipes": 4,
+    "total_production_ready": 102,
+    "total_work_packages_scanned": 106
+  },
+  "production_readiness_totals_before": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 96,
+    "total_work_packages_scanned": 105
+  },
+  "pull_request_not_applicable_reason": "Pull request URL is not available until make_pr is recorded after commit.",
+  "pull_request_url_not_applicable_reason": "Pull request URL is not available until make_pr is recorded after commit.",
+  "ready_for_ca_review": true,
+  "remaining_production_readiness_blockers": [
+    "WP-0016",
+    "WP-0017",
+    "WP-0073",
+    "WP-0094"
+  ],
+  "summary": "Completed final historical exception cleanup by repairing safely evidenced historical blockers, preserving residual human/implementation exceptions, closing VO-0001 with current command evidence, and regenerating production-readiness artifacts.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0018 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0040 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0056 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0063 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0089 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0120 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0018 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0040 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0056 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0063 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0089 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0120 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "vo_0001": {
+    "evidence": [
+      "global-search Notification Center exited 0",
+      "palette-command notification-center exited 0 and returned ready activate_tab target recalls"
+    ],
+    "status": "closed"
+  },
+  "work_package_id": "WP-0120",
+  "wp_9999_quarantine_status": {
+    "promoted": false,
+    "status": "not_promoted"
+  }
+}
