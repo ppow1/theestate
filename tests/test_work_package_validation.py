@@ -359,3 +359,39 @@ def test_wp_0118_recipe_repairs_all_resident_runtime_pytest_import_paths_and_sel
         pytest_commands = [command for command in repair_commands if "pytest.main" in command]
         assert pytest_commands
         assert all("sys.path.insert(0, 'src')" in command for command in pytest_commands)
+
+
+def test_wp_0121_final_four_recipes_registered():
+    for work_package_id in ["WP-0016", "WP-0017", "WP-0073", "WP-0094", "WP-0121"]:
+        recipe = get_validation_recipe(work_package_id)
+        assert recipe is not None
+        assert recipe["commands"]
+
+
+def test_mission_control_validation_health_includes_wp0073_fields(tmp_path):
+    import json
+    from estate.core.mission_control_workspace import build_mission_control_workspace
+
+    (tmp_path / "runtime/validation/work_packages").mkdir(parents=True)
+    (tmp_path / "operations/validation").mkdir(parents=True)
+    (tmp_path / "collaboration/work_packages/completions").mkdir(parents=True)
+    (tmp_path / "validation/observations").mkdir(parents=True)
+    (tmp_path / "validation/observations/validation_observations.jsonl").write_text(json.dumps({"status":"open","severity":"observation"}) + "\n", encoding="utf-8")
+    (tmp_path / "runtime/validation/work_packages/latest.json").write_text(json.dumps({"work_package_id":"WP-TEST","validation_status":"passed","json_report":"runtime/validation/work_packages/WP-TEST_validation.json"}), encoding="utf-8")
+    payload = build_mission_control_workspace(tmp_path, write=False)
+    validation = payload["data"]["validation_health"]
+    assert validation["open_observations_count"] == 1
+    assert validation["confirmed_defects_count"] == 0
+    assert validation["conditional_pass_count"] == 0
+    assert validation["most_recent_validation_activity"]["work_package_id"] == "WP-TEST"
+    assert validation["artifact_links"]
+
+
+def test_operations_center_status_bar_exposes_wp0094_fields():
+    from estate.core.steward_command_center import generate_command_center
+    payload = generate_command_center(write=False)
+    status = payload["status_bar"]
+    required = {"estate_status", "validation_state", "active_workers", "active_recall_count", "pending_decisions", "health_state", "recommended_next_action"}
+    assert required <= set(status)
+    assert payload["layout_framework"]["data"]["quiet_refresh_regions"] == ["status_bar", "bottom_activity_stream"]
+    assert payload["activity_console"]["collapsed_by_default"] is True

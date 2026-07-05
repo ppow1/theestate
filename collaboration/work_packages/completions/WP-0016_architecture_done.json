@@ -2,12 +2,23 @@
   "architecture_artifact": "Architecture/ADR/ADR-0002-Work-Package-Registry-Proposal.md",
   "branch": "work",
   "codex_status": "done",
-  "completion_note": "Produced a proposed ADR for Chief Architect review. No registry schema or implementation was created. A follow-on Codex implementation package should be created only after CA approval defines the registry model.",
+  "completed_at": "2026-07-05T14:27:45+00:00",
+  "current_chief_architect_review": "WP-0121 accepts repository evidence for architecture-only closure; implementation remains not authorized by this receipt.",
+  "files_changed": [
+    "Architecture/ADR/ADR-0002-Work-Package-Registry-Proposal.md",
+    "collaboration/work_packages/completions/WP-0016_architecture_done.json",
+    "src/estate/core/work_package_validation.py"
+  ],
   "implementation_authorized": false,
   "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
   "mode": "ARCHITECTURE-FIRST",
-  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_not_applicable_reason": "PR URL assigned after local branch push; local-first completion receipt prepared before PR creation.",
+  "ready_for_ca_review": true,
   "ready_for_codex_package": false,
-  "status": "architecture_done",
+  "summary": "Normalized architecture-only completion evidence for the Work Package Registry proposal. WP-0121 represents current Chief Architect review acceptance of the historical architecture artifact for production-readiness evidence without authorizing implementation.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0016 --json"
+  ],
   "work_package_id": "WP-0016"
 }
