@@ -1,21 +1,21 @@
 # Work Package Validation Report — WP-0105
 
-- Timestamp: 2026-07-05T06:29:38+00:00
+- Timestamp: 2026-07-05T14:58:51+00:00
 - Work package ID: WP-0105
 - Local branch: work
-- Git commit: 1134484794b449a27a668e709eb2aab872929565
+- Git commit: 4303061ad25118cd7c7a9be7976af20af0773347
 - Validation status: passed
 - Recipe used: wp-0105-validation-closure-repair-0102-0103
 - Recipe title: WP-0105 — Validation Closure Repair for WP-0102 and WP-0103
 
 ## Commands Run
-- `python -m estate.cli.main validate-work-package --id WP-0101 --json` — passed (exit 0, 1.375s)
-- `python -m estate.cli.main validate-work-package --id WP-0102 --json` — passed (exit 0, 0.599s)
-- `python -m estate.cli.main validate-work-package --id WP-0103 --json` — passed (exit 0, 4.599s)
-- `python -m estate.cli.main validate-work-package --id WP-0080 --json` — passed (exit 0, 1.366s)
-- `python -m estate.cli.main validate-work-package --id WP-0081 --json` — passed (exit 0, 1.087s)
-- `python -m estate.cli.main validate-work-package --id WP-0085 --json` — passed (exit 0, 1.166s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.388s)
+- `python -m estate.cli.main validate-work-package --id WP-0101 --json` — passed (exit 0, 1.98s)
+- `python -m estate.cli.main validate-work-package --id WP-0102 --json` — passed (exit 0, 0.881s)
+- `python -m estate.cli.main validate-work-package --id WP-0103 --json` — passed (exit 0, 5.797s)
+- `python -m estate.cli.main validate-work-package --id WP-0080 --json` — passed (exit 0, 1.368s)
+- `python -m estate.cli.main validate-work-package --id WP-0081 --json` — passed (exit 0, 1.139s)
+- `python -m estate.cli.main validate-work-package --id WP-0085 --json` — passed (exit 0, 1.191s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.382s)
 
 ## Findings
 - None.

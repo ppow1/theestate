@@ -1,0 +1,64 @@
+{
+  "alfred_identity_status": "coherent: employee_id 7 maps to resident RES-000001 and active Alfred resident registry entry",
+  "branch": "work",
+  "codex_status": "done",
+  "commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main resident-presence --resident Alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main alfred-duty --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-duty --resident Alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-authority list --resident Alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --json",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json"
+  ],
+  "completed_at": "2026-07-05T15:00:23+00:00",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "operations/residents/alfred/WP-0122_alfred_operational_standup_report.md",
+    "runtime/residents/alfred/WP-0122_alfred_operational_standup_report.json",
+    "operations/validation/reports/WP-0122_validation.md",
+    "runtime/validation/work_packages/WP-0122_validation.json",
+    "collaboration/work_packages/completions/WP-0122_codex_done.json",
+    "runtime/residents/presence.json",
+    "runtime/alfred/duty_state.json",
+    "runtime/residents/authority_decisions.jsonl"
+  ],
+  "known_limitations": [
+    "Remote origin is not configured in this local checkout, so latest main sync could not be performed here.",
+    "Runtime presence references collaboration/mailboxes/7, but that path does not exist in the existing mailbox folder layout.",
+    "resident-card CLI command is unavailable; existing resident-presence and steward-command-center surfaces were used."
+  ],
+  "mailbox_status": "personnel/runtime mailbox id 7 confirmed; legacy intake mailbox.10100 confirmed; runtime folder path collaboration/mailboxes/7 remains absent",
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "operational_artifacts_created": [
+    "operations/residents/alfred/WP-0122_alfred_operational_standup_report.md",
+    "runtime/residents/alfred/WP-0122_alfred_operational_standup_report.json",
+    "runtime/residents/presence.json",
+    "runtime/alfred/duty_state.json",
+    "runtime/residents/authority_decisions.jsonl"
+  ],
+  "pull_request_not_applicable_reason": "PR metadata will be created after the required local commit via the make_pr tool.",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Chief Architect review WP-0122 evidence, then continue Alfred-assisted Helen onboarding through existing resident authority boundaries.",
+  "remaining_gaps": [
+    "Remote origin is not configured in this local checkout, so latest main sync could not be performed here.",
+    "Runtime mailbox path collaboration/mailboxes/7 is referenced by resident presence but is not present; collaboration/mailboxes uses padded mailbox folders and registry/intake artifacts.",
+    "resident-card CLI command is unavailable; visibility was confirmed through resident-presence and steward-command-center surfaces."
+  ],
+  "summary": "Stood up Alfred through existing resident presence, duty, authority, audit, and Operations Center surfaces; documented remaining mailbox/card surface gaps.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_cards.py tests/test_resident_authority.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0109 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0110 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0119 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0121 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0122 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0122"
+}
