@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json, os, re, shutil, subprocess
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,74 @@ CHAT_STORE = Path("runtime/resident_interactions/sessions")
 SURFACE_DIR = Path("operations/residents/surfaces")
 FORGET_AUDIT = Path("runtime/resident_interactions/forget_audit.jsonl")
 STANDARD_VERSION = "resident-api-standard-v1"
+
+
+OLLAMA_ENDPOINT = os.environ.get("ESTATE_OLLAMA_ENDPOINT", "http://127.0.0.1:11434").rstrip("/")
+PREFERRED_ALFRED_MODEL = os.environ.get("ESTATE_ALFRED_OLLAMA_MODEL", "qwen3:8b")
+
+class LocalOllamaAdapter:
+    """Small local-only Ollama provider boundary for resident chat."""
+
+    provider = "ollama"
+
+    def __init__(self, endpoint: str = OLLAMA_ENDPOINT, timeout: float = 12.0):
+        self.endpoint = endpoint.rstrip("/")
+        self.timeout = timeout
+
+    def discover_models(self) -> dict[str, Any]:
+        names: list[str] = []
+        source = f"{self.endpoint}/api/tags"
+        try:
+            with urllib.request.urlopen(f"{self.endpoint}/api/tags", timeout=min(self.timeout, 4.0)) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            for item in payload.get("models") or []:
+                name = item.get("name") or item.get("model")
+                if name:
+                    names.append(str(name))
+        except Exception as http_exc:
+            exe = shutil.which("ollama")
+            if not exe:
+                return {"available": False, "provider": self.provider, "endpoint": self.endpoint, "models": [], "discovery": f"Ollama unavailable locally: {http_exc}; ollama executable not found"}
+            try:
+                res = subprocess.run([exe, "list"], text=True, capture_output=True, timeout=4, check=False)
+                if res.returncode != 0:
+                    return {"available": False, "provider": self.provider, "endpoint": self.endpoint, "models": [], "discovery": f"ollama list failed: {res.stderr.strip() or http_exc}"}
+                source = "ollama list"
+                for line in res.stdout.splitlines()[1:]:
+                    parts = line.split()
+                    if parts:
+                        names.append(parts[0])
+            except Exception as cli_exc:
+                return {"available": False, "provider": self.provider, "endpoint": self.endpoint, "models": [], "discovery": f"Ollama probe failed locally: {cli_exc}"}
+        unique = list(dict.fromkeys(names))
+        return {"available": bool(unique), "provider": self.provider, "endpoint": self.endpoint, "models": unique, "model": unique[0] if unique else None, "discovery": f"local Ollama models discovered via {source}" if unique else f"no local Ollama models discovered via {source}"}
+
+    def select_model(self, resident: str, models: list[str]) -> str | None:
+        if _key(resident) == "alfred" and PREFERRED_ALFRED_MODEL in models:
+            return PREFERRED_ALFRED_MODEL
+        return models[0] if models else None
+
+    def generate(self, *, resident: str, prompt: str, model: str | None = None) -> dict[str, Any]:
+        discovery = self.discover_models()
+        if not discovery.get("available"):
+            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=model, endpoint=self.endpoint, fallback_used=True, fallback_reason=discovery.get("discovery"))}
+        selected = model or self.select_model(resident, discovery.get("models") or [])
+        if not selected:
+            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, endpoint=self.endpoint, fallback_used=True, fallback_reason="No usable local Ollama model selected")}
+        body = json.dumps({"model": selected, "prompt": prompt, "stream": False, "options": {"temperature": 0.2}}).encode("utf-8")
+        req = urllib.request.Request(f"{self.endpoint}/api/generate", data=body, headers={"Content-Type": "application/json"}, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            text = str(payload.get("response") or "").strip()
+            if not text:
+                raise RuntimeError("Ollama returned an empty response")
+            return {"ok": True, "text": text, "metadata": _llm_metadata("local_llm", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=False, fallback_reason=None)}
+        except Exception as exc:
+            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=True, fallback_reason=f"Local Ollama invocation failed: {exc}")}
+
+def _llm_metadata(mode: str, *, provider="none", model=None, endpoint=None, fallback_used=False, fallback_reason=None):
+    return {"mode": mode, "provider": provider or "none", "model": model, "endpoint": endpoint, "fallback_used": bool(fallback_used), "fallback_reason": fallback_reason}
 
 RESIDENT_PROFILES = {
     "alfred": {"resident_id":"alfred","resident_display_name":"Alfred","office":"Office of Operations","role":"Operational resident coordinator","implementation_version":"alfred-operations-implementation-v1"},
@@ -37,18 +106,13 @@ def _read_json(path):
     try: return json.loads(path.read_text(encoding="utf-8"))
     except Exception: return None
 
-def local_llm_status() -> dict[str, Any]:
-    exe = shutil.which("ollama")
-    status = {"intended_mode":"local_llm","available":False,"provider":"none","model":None,"discovery":"ollama executable not found; deterministic fallback available"}
-    if not exe: return status
-    status.update({"provider":"ollama","discovery":"ollama executable found; probing local models"})
-    try:
-        res = subprocess.run([exe,"list"], text=True, capture_output=True, timeout=2, check=False)
-        lines = [l.split() for l in res.stdout.splitlines()[1:] if l.strip()]
-        if res.returncode == 0 and lines:
-            status.update({"available":True,"model":lines[0][0],"discovery":"ollama local model discovered"})
-    except Exception as exc:
-        status["discovery"] = f"ollama probe failed locally: {exc}"
+def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
+    adapter = adapter or LocalOllamaAdapter()
+    status = adapter.discover_models()
+    models = status.get("models") or []
+    status.update({"intended_mode":"local_llm", "model": adapter.select_model("alfred", models) if models else None})
+    if not status.get("available"):
+        status.setdefault("discovery", "deterministic fallback available")
     return status
 
 def resident_surface(resident: str, root=None) -> dict[str, Any]:
@@ -76,6 +140,42 @@ def _artifact_hint(root: Path, rel: str) -> str | None:
         return rel
     line = next((ln.strip("# |") for ln in text.splitlines() if ln.strip()), rel)
     return f"{rel}: {line[:120]}"
+
+def _context_packet(root: Path, resident: str, session: dict[str, Any] | None = None) -> dict[str, Any]:
+    artifacts = []
+    for rel in (
+        "runtime/validation/production_readiness.json",
+        "runtime/validation/local_operational_validation_run.json",
+        "runtime/work_packages/assignment_queue.json",
+        "operations/residents/surfaces/alfred.json",
+        "operations/departments/engineering/cuemastery_execution_handoff.md",
+    ):
+        hint = _artifact_hint(root, rel)
+        artifacts.append({"path": rel, "available": bool(hint), "summary": hint or "unavailable"})
+    turns = []
+    for t in (session or {}).get("turns", [])[-4:]:
+        if t.get("memory_status", "active") == "active":
+            turns.append({"user": str(t.get("user_message") or "")[:240], "resident": str(t.get("resident_response") or "")[:240]})
+    pending = [str(p.relative_to(root)).replace('\\','/') for p in sorted((root/"collaboration/work_packages/pending").glob("WP-*.md"))[:8]] if (root/"collaboration/work_packages/pending").exists() else []
+    return {"artifacts": artifacts, "recent_history": turns, "pending_work_packages": pending}
+
+def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], context: dict[str, Any], llm_meta: dict[str, Any]) -> str:
+    caps = [c.get("id") for c in surface.get("capabilities", [])]
+    return "\n".join([
+        "You are Alfred, resident of the Estate, Office of Operations.",
+        "You are speaking with Pat, the Steward.",
+        "Answer the actual question asked. Do not repeat the same generic status summary unless the Steward asked for status.",
+        "Use local Estate context when relevant. Do not claim to have executed privileged actions.",
+        "If asked about your mode, explain whether this response is local_llm or deterministic_fallback based on metadata available to you.",
+        "If you do not know something, say what you can verify from local artifacts and what remains unknown.",
+        f"Resident metadata: {json.dumps({k: surface.get(k) for k in ['resident_id','resident_display_name','office','role','resident_api_standard_version','resident_implementation_version']}, sort_keys=True)}",
+        f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
+        f"Authority status for requested action: {json.dumps(auth, sort_keys=True)}",
+        f"Response metadata available to you: {json.dumps(llm_meta, sort_keys=True)}",
+        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:4000]}",
+        f"Steward message: {message}",
+        "Respond as Alfred in concise, direct prose.",
+    ])
 
 def _fallback_response(resident, message, surface, root: Path | None = None):
     if surface.get("resident_id") == "alfred":
@@ -105,14 +205,21 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     rootp = _root(root); surface = resident_surface(resident, rootp); sid = session_id or _next_session_id(rootp, resident)
     existing = _read_json(_session_path(rootp, sid)) or {"kind":"resident_interaction_session","session_id":sid,"resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"created_at":_now(),"turns":[],"memory_status":"active"}
     turn_no = len(existing.get("turns", [])) + 1
-    llm = local_llm_status(); mode = "local_llm" if llm.get("available") else "deterministic_fallback"
+    llm_status = local_llm_status()
     auth = check_authority(surface["resident_id"], action, root=rootp, audit=True)
     status = "within_responsibility" if auth.get("decision")==ALLOWED else ("requires_steward_authorization" if auth.get("decision")==REQUIRES_STEWARD else "blocked" if not auth.get("allowed") else "conversation_only")
-    response = _fallback_response(resident, user_message, surface, rootp)
-    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":_now(),"user_message":user_message,"resident_response":response,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py"],"llm":{"mode":mode,"provider":llm.get("provider","none"),"model":llm.get("model")},"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":{"action_requested": action not in {"summarize","observe","conversation"},"action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")},"memory_status":"active"}
+    auth_record = {"action_requested": action not in {"summarize","observe","conversation"},"action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")}
+    adapter = LocalOllamaAdapter()
+    base_meta = _llm_metadata("local_llm", provider="ollama", model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=False, fallback_reason=None)
+    context_packet = _context_packet(rootp, resident, existing)
+    prompt = _alfred_prompt(user_message, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message
+    generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=llm_status.get("model")) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable")}
+    llm_meta = generated.get("metadata") or base_meta
+    response = generated.get("text") if generated.get("ok") else _fallback_response(resident, user_message, surface, rootp)
+    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":_now(),"user_message":user_message,"resident_response":response,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
-    return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm}
+    return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}
 
 def load_history(resident=None, session_id=None, root=None, include_forgotten=False):
     rootp=_root(root); sessions=[]

@@ -1,18 +1,18 @@
 # Work Package Validation Report — WP-0020
 
-- Timestamp: 2026-07-05T19:15:04+00:00
+- Timestamp: 2026-07-05T21:33:56+00:00
 - Work package ID: WP-0020
 - Local branch: work
-- Git commit: 5cfda918b6b542b06113347e140fd436028f29f3
+- Git commit: fcbd48a7e5b3c19462d878e5797afc1af925359c
 - Validation status: passed
 - Recipe used: wp-0020-helen-hr-operational-onboarding
 - Recipe title: WP-0020 — Helen HR Operational Onboarding
 
 ## Commands Run
-- `python -c "from pathlib import Path; paths=['docs/onboarding/Helen_HR_Operational_Onboarding.md','docs/operations/helen/operating_brief.md','residents/helen.md','data/registry/personnel.json','data/registry/mailboxes.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"` — passed (exit 0, 0.068s)
-- `python -c "from estate.core.personnel_identity import resolve_personnel_identity; r=resolve_personnel_identity('Helen'); assert r.get('resolved') and r.get('employee_id') == 6 and r.get('mailbox_id') == 6 and r.get('resident_id') == 'RES-000003', r"` — passed (exit 0, 0.076s)
-- `python -m estate.cli.main onboarding-manifest-check --json` — passed (exit 0, 0.265s)
-- `python -m estate.cli.main estate-search "Helen HR" --json` — passed (exit 0, 0.488s)
+- `python -c "from pathlib import Path; paths=['docs/onboarding/Helen_HR_Operational_Onboarding.md','docs/operations/helen/operating_brief.md','residents/helen.md','data/registry/personnel.json','data/registry/mailboxes.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"` — passed (exit 0, 0.067s)
+- `python -c "from estate.core.personnel_identity import resolve_personnel_identity; r=resolve_personnel_identity('Helen'); assert r.get('resolved') and r.get('employee_id') == 6 and r.get('mailbox_id') == 6 and r.get('resident_id') == 'RES-000003', r"` — passed (exit 0, 0.072s)
+- `python -m estate.cli.main onboarding-manifest-check --json` — passed (exit 0, 0.301s)
+- `python -m estate.cli.main estate-search "Helen HR" --json` — passed (exit 0, 0.491s)
 
 ## Findings
 - None.

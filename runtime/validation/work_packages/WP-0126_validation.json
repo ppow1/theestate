@@ -3,11 +3,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; md=Path('operations/residents/WP-0126_resident_interaction_framework_report.md'); js=Path('runtime/residents/WP-0126_resident_interaction_framework_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); required=['local_llm_adapter_discovery_status','deterministic_fallback_status','conversation_persistence_path','forget_redaction_mechanism','authority_handling','resident_api_surface_inspection_path','resident_api_standard_versioning_mechanism','resident_implementation_versioning_mechanism','resident_api_surface_extension_mechanism','character_development_engineer_extensibility_example']; missing=[k for k in required if not data.get(k)]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.075,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.072,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -15,11 +15,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; paths=['docs/operations/residents/resident_interaction_template.md','docs/operations/residents/resident_api_surface_standard.md','docs/operations/residents/resident_implementation_profile_template.md','docs/operations/residents/resident_api_extension_proposal_template.md']; assert all(Path(p).is_file() for p in paths); text=Path(paths[-1]).read_text(encoding='utf-8'); assert 'character.mood_arc.evaluate' in text\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.068,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.071,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -27,11 +27,11 @@
     {
       "classification": "required",
       "command": "python -c \"from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface; import tempfile; root=tempfile.mkdtemp(); p=process_chat('alfred', 'WP-0126 validation prompt', root=root); assert p['turn']['resident_surface']['resident_api_standard_version']=='resident-api-standard-v1'; assert p['turn']['authority']['action_executed'] is False; h=load_history('alfred', session_id=p['session_id'], root=root); assert h['sessions'][0]['turns']; f=forget_conversation(p['session_id'], root=root); assert f['ok']; h2=load_history('alfred', session_id=p['session_id'], root=root); assert h2['sessions'][0]['turns']==[]; s=resident_surface('alfred'); assert s['resident_implementation_version']; assert any(c['id']=='character.mood_arc.evaluate' for c in s['capabilities'])\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.114,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.184,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -39,23 +39,23 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-interaction-surface --resident alfred --json",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.268,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.286,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0126_2026-07-05T191630Z0000/command_04_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0126_2026-07-05T213636Z0000/command_04_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; p=Path('runtime/validation/work_packages/WP-0122_validation.json'); assert p.is_file(); assert json.loads(p.read_text(encoding='utf-8')).get('validation_status') in {'passed','passed_with_findings'}\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.072,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.07,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -63,11 +63,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; p=Path('runtime/validation/work_packages/WP-0123_validation.json'); assert p.is_file(); assert json.loads(p.read_text(encoding='utf-8')).get('validation_status') in {'passed','passed_with_findings'}\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.071,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.072,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -75,11 +75,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; p=Path('runtime/validation/work_packages/WP-0124_validation.json'); assert p.is_file(); assert json.loads(p.read_text(encoding='utf-8')).get('validation_status') in {'passed','passed_with_findings'}\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
+      "completed_at": "2026-07-05T21:36:36+00:00",
       "duration_seconds": 0.073,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -87,11 +87,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; p=Path('runtime/validation/work_packages/WP-0125_validation.json'); assert p.is_file(); assert json.loads(p.read_text(encoding='utf-8')).get('validation_status') in {'passed','passed_with_findings'}\"",
-      "completed_at": "2026-07-05T19:16:30+00:00",
-      "duration_seconds": 0.073,
+      "completed_at": "2026-07-05T21:36:36+00:00",
+      "duration_seconds": 0.069,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -99,23 +99,23 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T19:16:31+00:00",
-      "duration_seconds": 0.391,
+      "completed_at": "2026-07-05T21:36:37+00:00",
+      "duration_seconds": 0.396,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:30+00:00",
+      "started_at": "2026-07-05T21:36:36+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0126_2026-07-05T191630Z0000/command_09_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0126_2026-07-05T213636Z0000/command_09_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0126'); assert r['receipt_status']=='complete', r\"",
-      "completed_at": "2026-07-05T19:16:31+00:00",
-      "duration_seconds": 0.095,
+      "completed_at": "2026-07-05T21:36:37+00:00",
+      "duration_seconds": 0.097,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:16:31+00:00",
+      "started_at": "2026-07-05T21:36:37+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -141,10 +141,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T19:16:30+00:00",
+  "generated_at": "2026-07-05T21:36:36+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "5cfda918b6b542b06113347e140fd436028f29f3",
+  "git_commit_before": "fcbd48a7e5b3c19462d878e5797afc1af925359c",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -171,7 +171,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 2 command(s).",
-  "validation_id": "WP-0126_2026-07-05T191630Z0000",
+  "validation_id": "WP-0126_2026-07-05T213636Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0126"

@@ -1,0 +1,57 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-05T21:34:43+00:00",
+  "estate_context_packet_summary": "Small deterministic packet includes validation/readiness, assignment queue, Alfred surface, Engineering/CueMastery handoff, pending package names, and recent active history.",
+  "example_mode_prompt_and_response": {
+    "prompt": "Alfred, are you running from JSON files or an LLM right now?",
+    "response": "Pat, this answer is being generated through local_llm with provider ollama and model qwen3:8b; JSON artifacts provide context, not the whole response."
+  },
+  "example_role_prompt_and_response": {
+    "prompt": "Good afternoon Alfred, define your role for me.",
+    "response": "Pat, my role is Alfred of the Office of Operations: I coordinate local Estate status, recommendations, and proposed next actions without executing privileged work."
+  },
+  "fallback_behavior": "Fallback remains deterministic and records provider/model/endpoint/fallback_reason when local Ollama is unavailable or fails.",
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_interaction.py",
+    "operations/residents/alfred/WP-0128_alfred_local_llm_response_path_report.md",
+    "runtime/residents/alfred/WP-0128_alfred_local_llm_response_path_report.json",
+    "collaboration/work_packages/completions/WP-0128_codex_done.json"
+  ],
+  "known_limitations": [
+    "Codex cannot reach local Ollama; final true local_llm smoke check must be run on the Steward Windows machine with Ollama running."
+  ],
+  "local_llm_adapter_provider_changes": "Added LocalOllamaAdapter with /api/tags and ollama list discovery plus /api/generate invocation.",
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "prompt_construction_summary": "Resident-aware Alfred prompt includes role/office, Steward identity, API/version/capabilities, authority status, local-first non-execution policy, bounded context, recent history, and current message.",
+  "pull_request_not_applicable_reason": "make_pr tool is called after git commit per Codex workflow; no external PR URL exists before that tool call.",
+  "pull_request_url_or_not_applicable_reason": "PR metadata will be recorded by make_pr after commit in this non-interactive Codex workflow.",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Run Steward local smoke checks and verify mode local_llm/provider ollama/model qwen3:8b in the UI/API.",
+  "selected_alfred_model_policy": "Prefer qwen3:8b for Alfred; otherwise first discovered local model.",
+  "steward_local_smoke_test_instructions": [
+    "PYTHONPATH=src python -m estate.cli.main resident-chat send --resident alfred --message \"Good afternoon Alfred, define your role for me.\" --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-chat send --resident alfred --message \"Alfred, are you running from JSON files or an LLM right now?\" --json"
+  ],
+  "summary": "Repaired Alfred resident chat to use local-only Ollama when available, with deterministic fallback only on unavailable/failing local model paths.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_resident_interaction.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_authority.py tests/test_resident_interaction.py tests/test_steward_command_center.py -q"
+  ],
+  "ui_api_mode_transparency": "API persists and returns llm metadata; Operations Center renders Mode/provider/model/reason source lines.",
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0123 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0126 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0127 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0128 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-interaction-surface --resident alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-chat send --resident alfred --message \"Good afternoon Alfred, define your role for me.\" --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-chat send --resident alfred --message \"Alfred, are you running from JSON files or an LLM right now?\" --json"
+  ],
+  "work_package_id": "WP-0128"
+}

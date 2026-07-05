@@ -3,11 +3,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; paths=['docs/onboarding/Helen_HR_Operational_Onboarding.md','docs/operations/helen/operating_brief.md','residents/helen.md','data/registry/personnel.json','data/registry/mailboxes.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T19:15:04+00:00",
-      "duration_seconds": 0.068,
+      "completed_at": "2026-07-05T21:33:56+00:00",
+      "duration_seconds": 0.067,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:15:04+00:00",
+      "started_at": "2026-07-05T21:33:56+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -15,11 +15,11 @@
     {
       "classification": "required",
       "command": "python -c \"from estate.core.personnel_identity import resolve_personnel_identity; r=resolve_personnel_identity('Helen'); assert r.get('resolved') and r.get('employee_id') == 6 and r.get('mailbox_id') == 6 and r.get('resident_id') == 'RES-000003', r\"",
-      "completed_at": "2026-07-05T19:15:04+00:00",
-      "duration_seconds": 0.076,
+      "completed_at": "2026-07-05T21:33:56+00:00",
+      "duration_seconds": 0.072,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:15:04+00:00",
+      "started_at": "2026-07-05T21:33:56+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -27,26 +27,26 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main onboarding-manifest-check --json",
-      "completed_at": "2026-07-05T19:15:04+00:00",
-      "duration_seconds": 0.265,
+      "completed_at": "2026-07-05T21:33:57+00:00",
+      "duration_seconds": 0.301,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T19:15:04+00:00",
+      "started_at": "2026-07-05T21:33:56+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0020_2026-07-05T191504Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0020_2026-07-05T213356Z0000/command_03_stdout.txt"
     },
     {
       "classification": "observational",
       "command": "python -m estate.cli.main estate-search \"Helen HR\" --json",
-      "completed_at": "2026-07-05T19:15:05+00:00",
-      "duration_seconds": 0.488,
+      "completed_at": "2026-07-05T21:33:57+00:00",
+      "duration_seconds": 0.491,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T19:15:04+00:00",
+      "started_at": "2026-07-05T21:33:57+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0020_2026-07-05T191504Z0000/command_04_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0020_2026-07-05T213356Z0000/command_04_stdout.txt"
     }
   ],
   "commands_run": [
@@ -63,10 +63,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T19:15:04+00:00",
+  "generated_at": "2026-07-05T21:33:56+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "5cfda918b6b542b06113347e140fd436028f29f3",
+  "git_commit_before": "fcbd48a7e5b3c19462d878e5797afc1af925359c",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -97,7 +97,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 2 command(s).",
-  "validation_id": "WP-0020_2026-07-05T191504Z0000",
+  "validation_id": "WP-0020_2026-07-05T213356Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0020"

@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-05T19:16:44Z
+Generated: 2026-07-05T21:36:35Z
 
 ## Summary
 
-- Work packages: 121
+- Work packages: 122
 - Blocked: 0
-- Unassigned: 121
-- Warnings: 121
+- Unassigned: 122
+- Warnings: 122
 
 ## Queue
 
@@ -134,6 +134,7 @@ Generated: 2026-07-05T19:16:44Z
 | [WP-0125](../../collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md and do exactly what it says. |
 | [WP-0126](../../collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md and do exactly what it says. |
 | [WP-0127](../../collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md and do exactly what it says. |
+| [WP-0128](../../collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md) | local_llm / provider: ollama / model: qwen3:8b | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md and do exactly what it says. |
 
 ## Warnings
 
@@ -257,4 +258,5 @@ Generated: 2026-07-05T19:16:44Z
 - missing_owner: WP-0125 has no explicit owner. (collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md)
 - missing_owner: WP-0126 has no explicit owner. (collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md)
 - missing_owner: WP-0127 has no explicit owner. (collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md)
+- missing_owner: WP-0128 has no explicit owner. (collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)

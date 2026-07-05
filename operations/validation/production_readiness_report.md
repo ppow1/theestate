@@ -1,12 +1,12 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T19:16:39+00:00
+- generated_at: 2026-07-05T21:36:38+00:00
 - git branch: work
-- git commit: 5cfda918b6b542b06113347e140fd436028f29f3
+- git commit: fcbd48a7e5b3c19462d878e5797afc1af925359c
 
 ## Totals
-- total_work_packages_scanned: 113
-- total_production_ready: 113
+- total_work_packages_scanned: 114
+- total_production_ready: 114
 - total_blocked: 0
 - total_missing_recipes: 0
 - total_missing_receipts: 0
@@ -123,11 +123,11 @@ Ready for Chief Architect production-readiness acceptance review.
 ## Recent Validation Reports
 - `runtime/validation/work_packages/WP-0127_validation.json`
 - `runtime/validation/work_packages/WP-0126_validation.json`
-- `runtime/validation/work_packages/WP-0125_validation.json`
-- `runtime/validation/work_packages/WP-0121_validation.json`
-- `runtime/validation/work_packages/WP-0124_validation.json`
+- `runtime/validation/work_packages/WP-0128_validation.json`
 - `runtime/validation/work_packages/WP-0123_validation.json`
 - `runtime/validation/work_packages/WP-0119_validation.json`
 - `runtime/validation/work_packages/WP-0110_validation.json`
 - `runtime/validation/work_packages/WP-0108_validation.json`
 - `runtime/validation/work_packages/WP-0080_validation.json`
+- `runtime/validation/work_packages/WP-0020_validation.json`
+- `runtime/validation/work_packages/WP-0121_validation.json`
