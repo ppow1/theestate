@@ -1,21 +1,21 @@
 # Work Package Validation Report — WP-0108
 
-- Timestamp: 2026-07-05T19:15:06+00:00
+- Timestamp: 2026-07-05T21:33:59+00:00
 - Work package ID: WP-0108
 - Local branch: work
-- Git commit: 5cfda918b6b542b06113347e140fd436028f29f3
+- Git commit: fcbd48a7e5b3c19462d878e5797afc1af925359c
 - Validation status: passed
 - Recipe used: wp-0108-helen-online-duty-runner
 - Recipe title: WP-0108 — Helen Online Duty Runner
 
 ## Commands Run
-- `python -m estate.cli.main helen-duty --json` — passed (exit 0, 0.277s)
-- `python -m estate.cli.main resident-duty --resident Helen --json` — passed (exit 0, 0.282s)
-- `python -m estate.cli.main resident-presence --resident Helen --json` — passed (exit 0, 0.289s)
-- `python -c "import sys; sys.path.insert(0, 'src'); import pytest; raise SystemExit(pytest.main(['tests/test_helen_duty.py', 'tests/test_resident_presence.py', 'tests/test_resident_cards.py']))"` — passed (exit 0, 0.884s)
+- `python -m estate.cli.main helen-duty --json` — passed (exit 0, 0.257s)
+- `python -m estate.cli.main resident-duty --resident Helen --json` — passed (exit 0, 0.271s)
+- `python -m estate.cli.main resident-presence --resident Helen --json` — passed (exit 0, 0.254s)
+- `python -c "import sys; sys.path.insert(0, 'src'); import pytest; raise SystemExit(pytest.main(['tests/test_helen_duty.py', 'tests/test_resident_presence.py', 'tests/test_resident_cards.py']))"` — passed (exit 0, 0.937s)
 - `python -c "from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0108_codex_done.json').is_file()"` — passed (exit 0, 0.065s)
-- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.014s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.393s)
+- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 0.976s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.376s)
 
 ## Findings
 - None.

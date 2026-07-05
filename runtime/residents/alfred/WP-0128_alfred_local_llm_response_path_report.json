@@ -1,0 +1,39 @@
+{
+  "codex_ollama_status": "unavailable: connection refused and ollama executable not found",
+  "context_packet_summary": "Bounded summaries for validation/readiness, assignment queue, Alfred surface, Engineering/CueMastery handoff, pending work packages, and recent active history.",
+  "current_git_commit": "fcbd48a7e5b3c19462d878e5797afc1af925359c",
+  "example_mode_prompt_and_response": {
+    "prompt": "Alfred, are you running from JSON files or an LLM right now?",
+    "response": "Pat, this answer is being generated through local_llm with provider ollama and model qwen3:8b; JSON artifacts provide context, not the whole response."
+  },
+  "example_role_prompt_and_response": {
+    "prompt": "Good afternoon Alfred, define your role for me.",
+    "response": "Pat, my role is Alfred of the Office of Operations: I coordinate local Estate status, recommendations, and proposed next actions without executing privileged work."
+  },
+  "fallback_behavior": "Fallback is deterministic and used only when discovery, model selection, or local generation fails; fallback metadata records reason.",
+  "known_limitations": [
+    "Codex container cannot reach Ollama; Steward local Windows smoke check required for real model response."
+  ],
+  "local_model_discovery_mechanism": "LocalOllamaAdapter probes http://127.0.0.1:11434/api/tags, then falls back to ollama list; no cloud API path exists.",
+  "prompt_construction_summary": "Prompt identifies Alfred, Pat the Steward, role/office, resident API/version/capabilities, authority status, local-first non-execution policy, bounded Estate context, recent safe history, and current Steward message.",
+  "provider_endpoint": "http://127.0.0.1:11434",
+  "recommended_next_action": "Run resident-chat smoke checks on the Steward machine with Ollama running.",
+  "selected_alfred_model_policy": "Prefer qwen3:8b for Alfred when discovered; otherwise use the first available local model.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_resident_interaction.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_authority.py tests/test_resident_interaction.py tests/test_steward_command_center.py -q"
+  ],
+  "ui_mode_transparency_changes": "API turn metadata includes llm mode/provider/model/endpoint/fallback fields; Operations Center history and live response render mode/provider/model/reason.",
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0123 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0126 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0127 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0128 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-interaction-surface --resident alfred --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-chat send --resident alfred --message \"Good afternoon Alfred, define your role for me.\" --json",
+    "PYTHONPATH=src python -m estate.cli.main resident-chat send --resident alfred --message \"Alfred, are you running from JSON files or an LLM right now?\" --json"
+  ],
+  "work_package_id": "WP-0128"
+}

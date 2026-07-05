@@ -1178,7 +1178,7 @@ def _alfred_chat_html(panel):
                 "<article class='alfred-chat-turn'>"
                 f"<p><strong>Steward:</strong> {html.escape(str(turn.get('user_message') or ''))}</p>"
                 f"<p><strong>Alfred:</strong> {html.escape(str(turn.get('resident_response') or ''))}</p>"
-                f"<p class='source'>Session {html.escape(str(session.get('session_id') or 'unknown'))} · {html.escape(str(turn.get('created_at') or 'unknown'))}</p>"
+                f"<p class='source'>Mode: {html.escape(str((turn.get('llm') or {}).get('mode') or 'unknown'))} / provider: {html.escape(str((turn.get('llm') or {}).get('provider') or 'unknown'))} / model: {html.escape(str((turn.get('llm') or {}).get('model') or 'unknown'))} · Session {html.escape(str(session.get('session_id') or 'unknown'))} · {html.escape(str(turn.get('created_at') or 'unknown'))}</p>"
                 "</article>"
             )
     history_html = "".join(turn_items) or "<p class='placeholder'>No prior Alfred chat turns are recorded yet. Send a message to create persisted Estate memory.</p>"
@@ -1927,10 +1927,11 @@ async function loadAlfredHistory(){
     const response = await fetch('/api/residents/alfred/chat');
     const data = await response.json();
     const turns = (data.sessions || []).flatMap(session => (session.turns || []).map(turn => ({...turn, session_id: session.session_id}))).slice(-8).reverse();
-    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p><p class="source">Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
+    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p><p class="source">${llmSourceLine(turn)} · Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
     history.forEach(el => el.innerHTML = html);
   }catch(error){ history.forEach(el => el.innerHTML = '<p class="placeholder">Unable to reload Alfred history from the local endpoint.</p>'); }
 }
+function llmSourceLine(turn){ const llm = turn.llm || {}; const fallback = llm.fallback_reason ? ` / reason: ${escapeHtml(llm.fallback_reason)}` : ''; return `Mode: ${escapeHtml(llm.mode || 'unknown')} / provider: ${escapeHtml(llm.provider || 'unknown')} / model: ${escapeHtml(llm.model || 'unknown')}${fallback}`; }
 function escapeHtml(value){ return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 document.addEventListener('submit', async event => {
   const form = event.target.closest('#alfred-chat-form');
@@ -1941,7 +1942,7 @@ document.addEventListener('submit', async event => {
   output.forEach(el => el.textContent = 'Alfred is reviewing local Estate context...');
   const response = await fetch('/api/residents/alfred/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: input.value, action:'summarize'})});
   const data = await response.json();
-  output.forEach(el => el.textContent = data.turn ? data.turn.resident_response : (data.error || 'Alfred did not return a response.'));
+  output.forEach(el => { el.textContent = data.turn ? `${data.turn.resident_response}\n${llmSourceLine(data.turn)}` : (data.error || 'Alfred did not return a response.'); });
   input.value = '';
   await loadAlfredHistory();
 });

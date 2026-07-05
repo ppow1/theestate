@@ -279,6 +279,30 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0128": {
+        "recipe_id": "wp-0128-alfred-local-llm-response-path",
+        "title": "WP-0128 — Alfred Local LLM Response Path Repair",
+        "description": "Validates Alfred's local Ollama adapter path, prompt/context construction, fallback metadata, UI mode transparency, distinct mocked local LLM answers, reports, dependent validations, and receipt.",
+        "required_checks": ["WP-0128 report exists", "JSON companion parses", "Local Ollama adapter exists", "Alfred qwen3 selection policy exists", "process_chat local LLM path exists", "Fallback remains available", "Role and mode tests exist", "Persisted LLM metadata exists", "UI/API mode transparency exists", "Production readiness executes", "Receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/residents/alfred/WP-0128_alfred_local_llm_response_path_report.md", "runtime/residents/alfred/WP-0128_alfred_local_llm_response_path_report.json", "collaboration/work_packages/completions/WP-0128_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Role and mode prompts return identical mocked local LLM responses"],
+        "success_criteria": ["Alfred uses local_llm when available and exposes mode/model metadata while preserving deterministic fallback"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "import json; from pathlib import Path; md=Path(\'operations/residents/alfred/WP-0128_alfred_local_llm_response_path_report.md\'); js=Path(\'runtime/residents/alfred/WP-0128_alfred_local_llm_response_path_report.json\'); assert md.is_file(); data=json.loads(js.read_text(encoding=\'utf-8\')); required=[\'local_model_discovery_mechanism\',\'selected_alfred_model_policy\',\'provider_endpoint\',\'prompt_construction_summary\',\'context_packet_summary\',\'fallback_behavior\',\'ui_mode_transparency_changes\',\'example_role_prompt_and_response\',\'example_mode_prompt_and_response\',\'tests_run\',\'validation_commands_run\']; missing=[k for k in required if not data.get(k)]; assert not missing, missing"'),
+            _cmd('python -c "from pathlib import Path; t=Path(\'src/estate/core/resident_interaction.py\').read_text(encoding=\'utf-8\'); required=[\'class LocalOllamaAdapter\',\'api/tags\',\'qwen3:8b\',\'_alfred_prompt\',\'_context_packet\',\'adapter.generate\',\'_fallback_response\',\'fallback_reason\']; missing=[x for x in required if x not in t]; assert not missing, missing"'),
+            _cmd('python -c "from pathlib import Path; t=Path(\'tests/test_resident_interaction.py\').read_text(encoding=\'utf-8\'); required=[\'Good afternoon Alfred, define your role for me.\',\'Alfred, are you running from JSON files or an LLM right now?\',\'MockOllamaAdapter\',\'fallback_used\']; missing=[x for x in required if x not in t]; assert not missing, missing"'),
+            _cmd("python -c \"from pathlib import Path; t=Path(\'src/estate/core/steward_command_center.py\').read_text(encoding=\'utf-8\'); assert \'Mode:\' in t and \'llmSourceLine\' in t and \'provider\' in t and \'model\' in t\""),
+            _cmd('python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0126 --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0127 --json'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json'),
+            _cmd('python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt(\'WP-0128\'); assert r[\'receipt_status\']==\'complete\', r"'),
+        ],
+    },
+
     "WP-0112": {
         "recipe_id": "wp-0112-parallel-workstream-standard",
         "title": "WP-0112 — Parallel Workstream Isolation and Install Handoff Standard",
