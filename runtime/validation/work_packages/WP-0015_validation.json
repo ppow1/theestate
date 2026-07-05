@@ -3,38 +3,38 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main message-ack --help",
-      "completed_at": "2026-07-05T00:57:59+00:00",
-      "duration_seconds": 0.262,
+      "completed_at": "2026-07-05T01:36:44+00:00",
+      "duration_seconds": 0.265,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T00:57:59+00:00",
+      "started_at": "2026-07-05T01:36:44+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0015_2026-07-05T005759Z0000/command_01_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0015_2026-07-05T013644Z0000/command_01_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main message-reply --help",
-      "completed_at": "2026-07-05T00:58:00+00:00",
-      "duration_seconds": 0.266,
+      "completed_at": "2026-07-05T01:36:44+00:00",
+      "duration_seconds": 0.257,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T00:57:59+00:00",
+      "started_at": "2026-07-05T01:36:44+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0015_2026-07-05T005759Z0000/command_02_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0015_2026-07-05T013644Z0000/command_02_stdout.txt"
     },
     {
       "classification": "observational",
       "command": "python -m estate.cli.main global-search \"Message Acknowledgement\" --json",
-      "completed_at": "2026-07-05T00:58:00+00:00",
-      "duration_seconds": 0.462,
+      "completed_at": "2026-07-05T01:36:45+00:00",
+      "duration_seconds": 0.449,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T00:58:00+00:00",
+      "started_at": "2026-07-05T01:36:44+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0015_2026-07-05T005759Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0015_2026-07-05T013644Z0000/command_03_stdout.txt"
     }
   ],
   "commands_run": [
@@ -50,10 +50,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T00:57:59+00:00",
+  "generated_at": "2026-07-05T01:36:44+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "cb8c46e4f3931f36de4eb20b11459ce70297a61d",
+  "git_commit_before": "49d4a6c9c4d736219de0c743c938df984c46e366",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -84,7 +84,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 3 command(s).",
-  "validation_id": "WP-0015_2026-07-05T005759Z0000",
+  "validation_id": "WP-0015_2026-07-05T013644Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0015"

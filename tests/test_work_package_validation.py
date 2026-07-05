@@ -323,3 +323,21 @@ def test_wp_0115_recipe_and_report_artifacts_registered_and_parse():
     assert report["production_readiness_totals_after"]
     assert report["packages_considered"]
     assert all(item.get("reason") for item in report["packages_skipped"])
+
+
+def test_wp_0117_recipe_repairs_pytest_import_path_and_self_validates():
+    recipe = get_validation_recipe("WP-0117")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0117-wp0106-wp0107-validation-failure-repair"
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("WP-0117_wp0106_wp0107_failure_repair_report.json" in command for command in commands)
+    assert any("validate-work-package --id WP-0106" in command for command in commands)
+    assert any("validate-work-package --id WP-0107" in command for command in commands)
+
+    for work_package_id in ["WP-0106", "WP-0107"]:
+        repair_recipe = get_validation_recipe(work_package_id)
+        assert repair_recipe is not None
+        repair_commands = [command["command"] for command in repair_recipe["commands"]]
+        pytest_commands = [command for command in repair_commands if "pytest.main" in command]
+        assert pytest_commands
+        assert all("sys.path.insert(0, 'src')" in command for command in pytest_commands)

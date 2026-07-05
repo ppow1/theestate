@@ -1,12 +1,12 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T00:58:10+00:00
+- generated_at: 2026-07-05T01:37:01+00:00
 - git branch: work
-- git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d
+- git commit: 49d4a6c9c4d736219de0c743c938df984c46e366
 
 ## Totals
-- total_work_packages_scanned: 102
-- total_production_ready: 93
+- total_work_packages_scanned: 103
+- total_production_ready: 94
 - total_blocked: 9
 - total_missing_recipes: 7
 - total_missing_receipts: 3
@@ -120,8 +120,10 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0114
 - WP-0115
 - WP-0116
+- WP-0117
 
 ## Recent Validation Reports
+- `runtime/validation/work_packages/WP-0117_validation.json`
 - `runtime/validation/work_packages/WP-0116_validation.json`
 - `runtime/validation/work_packages/WP-0115_validation.json`
 - `runtime/validation/work_packages/WP-0114_validation.json`
@@ -131,4 +133,3 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - `runtime/validation/work_packages/WP-0085_validation.json`
 - `runtime/validation/work_packages/WP-0081_validation.json`
 - `runtime/validation/work_packages/WP-0080_validation.json`
-- `runtime/validation/work_packages/WP-0103_validation.json`
