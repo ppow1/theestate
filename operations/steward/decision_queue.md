@@ -1,6 +1,6 @@
 # Steward Decision Queue
 
-Generated: 2026-07-05T15:18:45+00:00
+Generated: 2026-07-05T15:43:50+00:00
 
 Local-only, non-authoritative panel. It does not approve decisions or notify the Steward.
 
@@ -41,6 +41,7 @@ Local-only, non-authoritative panel. It does not approve decisions or notify the
 - **Draft Roadmap Rebaseline for CA4 Review** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Chief Architect #3. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json`
 - **CA4 Response: Check for Updates Review and Architectural Coordination** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Chief Architect #4. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/msg_ca4_20260701_0001_reply_to_ca3_mailbox_check.json`
 - **CA4 Response: Roadmap Rebaseline Review** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Chief Architect #4. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3.json`
+- **Chief Architect #5 Hiring and Onboarding Notice** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Helen. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/msg_helen_20260705_0001_ca5_hiring_onboarding_notice.json`
 
 ## Source Warnings
 - missing_source_artifact: runtime/briefings/morning_briefing.json

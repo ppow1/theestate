@@ -1,0 +1,18 @@
+{
+  "work_package_id": "WP-0124",
+  "kind": "hr_onboarding_action",
+  "created_at": "2026-07-05T15:39:10+00:00",
+  "performed_or_orchestrated_by": "Helen",
+  "helen_employee_id": 6,
+  "helen_mailbox_id": 6,
+  "subject": {
+    "employee_id": 8,
+    "display_name": "Chief Architect #5",
+    "mailbox_id": 8
+  },
+  "evidence": [
+    "docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md",
+    "collaboration/messages/msg_helen_20260705_0001_ca5_hiring_onboarding_notice.json"
+  ],
+  "authority_boundary": "Helen operationally owns/onboards through artifacts; personnel mutations remain reviewable under Estate governance."
+}

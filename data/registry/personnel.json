@@ -80,5 +80,15 @@
     "status": "active",
     "resident_id": "RES-000001",
     "notes": "Personnel identity assigned by Steward authority. Personal mailbox remains distinct from Alfred Routing Intake mailbox 10100."
+  },
+  {
+    "employee_id": 8,
+    "display_name": "Chief Architect #5",
+    "current_title": "Chief Architect #5",
+    "current_office": "Office of the Chief Architect",
+    "mailbox_id": 8,
+    "security_clearance": "metadata_only",
+    "status": "onboarding",
+    "notes": "Fifth historical identity in the Office of Chief Architect and intended active successor peer while preserving Chief Architect #3 history. Employee ID assigned through WP-0124 with Helen as HR/onboarding operational owner; authority remains within established Chief Architect role boundaries."
   }
 ]

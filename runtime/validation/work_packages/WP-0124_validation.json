@@ -1,0 +1,126 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; md=Path('operations/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.md'); js=Path('runtime/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.json'); packet=Path('docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); assert packet.is_file(); identity=data.get('chief_architect_5_identity_assignment',{}); mailbox=data.get('mailbox_assignment',{}); assert identity.get('employee_id') == 8 and identity.get('role_title') == 'Chief Architect #5'; assert mailbox.get('mailbox_id') == 8 and mailbox.get('mailbox_path') == 'collaboration/mailboxes/0008'; assert data.get('helen_performed_or_orchestrated_hire') is True; assert Path(data.get('communication_notice_path', '')).is_file(); assert Path(data.get('audit_runtime_record_path', '')).is_file()\"",
+      "completed_at": "2026-07-05T15:43:06+00:00",
+      "duration_seconds": 0.062,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T15:43:06+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; personnel=json.loads(Path('data/registry/personnel.json').read_text(encoding='utf-8')); ca5=[p for p in personnel if p.get('employee_id')==8 and p.get('display_name')=='Chief Architect #5' and p.get('mailbox_id')==8]; assert ca5; assert Path('collaboration/mailboxes/0008/inbox').is_dir(); assert Path('collaboration/mailboxes/0008/sent').is_dir(); assert Path('collaboration/mailboxes/0008/archive').is_dir()\"",
+      "completed_at": "2026-07-05T15:43:06+00:00",
+      "duration_seconds": 0.055,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T15:43:06+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0122 --json",
+      "completed_at": "2026-07-05T15:43:23+00:00",
+      "duration_seconds": 17.205,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T15:43:06+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0124_2026-07-05T154306Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0123 --json",
+      "completed_at": "2026-07-05T15:43:53+00:00",
+      "duration_seconds": 29.759,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T15:43:23+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0124_2026-07-05T154306Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-05T15:43:53+00:00",
+      "duration_seconds": 0.282,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T15:43:53+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0124_2026-07-05T154306Z0000/command_05_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0124'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-05T15:43:54+00:00",
+      "duration_seconds": 0.069,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T15:43:53+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "python -c \"import json; from pathlib import Path; md=Path('operations/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.md'); js=Path('runtime/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.json'); packet=Path('docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); assert packet.is_file(); identity=data.get('chief_architect_5_identity_assignment',{}); mailbox=data.get('mailbox_assignment',{}); assert identity.get('employee_id') == 8 and identity.get('role_title') == 'Chief Architect #5'; assert mailbox.get('mailbox_id') == 8 and mailbox.get('mailbox_path') == 'collaboration/mailboxes/0008'; assert data.get('helen_performed_or_orchestrated_hire') is True; assert Path(data.get('communication_notice_path', '')).is_file(); assert Path(data.get('audit_runtime_record_path', '')).is_file()\"",
+    "python -c \"import json; from pathlib import Path; personnel=json.loads(Path('data/registry/personnel.json').read_text(encoding='utf-8')); ca5=[p for p in personnel if p.get('employee_id')==8 and p.get('display_name')=='Chief Architect #5' and p.get('mailbox_id')==8]; assert ca5; assert Path('collaboration/mailboxes/0008/inbox').is_dir(); assert Path('collaboration/mailboxes/0008/sent').is_dir(); assert Path('collaboration/mailboxes/0008/archive').is_dir()\"",
+    "python -m estate.cli.main validate-work-package --id WP-0122 --json",
+    "python -m estate.cli.main validate-work-package --id WP-0123 --json",
+    "python -m estate.cli.main validation-production-readiness --json",
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0124'); assert r['receipt_status']=='complete', r\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0124_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0124_validation.md",
+    "runtime/validation/work_packages/WP-0124_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T15:43:06+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "97340a973988a132422a221c600ea05b921a8076",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0124_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0124"
+  },
+  "recipe_id": "wp-0124-helen-led-chief-architect-5-hiring-onboarding",
+  "recipe_title": "WP-0124 \u2014 Helen-Led Chief Architect #5 Hiring and Onboarding",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0124_2026-07-05T154306Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0124"
+}

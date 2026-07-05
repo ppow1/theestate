@@ -1,29 +1,29 @@
 # Work Package Validation Report — WP-0122
 
-- Timestamp: 2026-07-05T15:18:25+00:00
+- Timestamp: 2026-07-05T15:43:36+00:00
 - Work package ID: WP-0122
 - Local branch: work
-- Git commit: 0738f8b7d2a90d65b173f4bbf94218de750d8a8b
+- Git commit: 97340a973988a132422a221c600ea05b921a8076
 - Validation status: passed
 - Recipe used: wp-0122-alfred-operational-resident-runtime-standup
 - Recipe title: WP-0122 — Alfred Operational Resident Runtime Stand-Up
 
 ## Commands Run
-- `python -c "import json; from pathlib import Path; md=Path('operations/residents/alfred/WP-0122_alfred_operational_standup_report.md'); js=Path('runtime/residents/alfred/WP-0122_alfred_operational_standup_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); identity=data.get('alfred_identity_mapping',{}); mailbox=data.get('mailbox_mapping',{}); assert identity.get('employee_id') == 7 and identity.get('resident_id') == 'RES-000001'; assert mailbox.get('personnel_mailbox_id') == 7 and mailbox.get('legacy_intake_mailbox_reference',{}).get('mailbox_id') == 10100; assert data.get('authority_check_results',{}).get('summarize',{}).get('allowed') is True; assert data.get('authority_check_results',{}).get('execute_work_package',{}).get('allowed') is False; assert data.get('operations_center_visibility',{}).get('steward_command_center_generated') is True"` — passed (exit 0, 0.076s)
-- `python -m estate.cli.main resident-presence --resident Alfred --json` — passed (exit 0, 0.288s)
-- `python -m estate.cli.main alfred-duty --json` — passed (exit 0, 0.296s)
-- `python -m estate.cli.main resident-duty --resident Alfred --json` — passed (exit 0, 0.277s)
-- `python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json` — passed (exit 0, 0.285s)
-- `python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --json` — passed (exit 0, 0.292s)
-- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.161s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.489s)
-- `python -m estate.cli.main validate-work-package --id WP-0106 --json` — passed (exit 0, 5.284s)
-- `python -m estate.cli.main validate-work-package --id WP-0107 --json` — passed (exit 0, 3.213s)
-- `python -m estate.cli.main validate-work-package --id WP-0109 --json` — passed (exit 0, 3.211s)
-- `python -m estate.cli.main validate-work-package --id WP-0110 --json` — passed (exit 0, 6.216s)
-- `python -m estate.cli.main validate-work-package --id WP-0119 --json` — passed (exit 0, 1.601s)
-- `python -m estate.cli.main validate-work-package --id WP-0121 --json` — passed (exit 0, 0.907s)
-- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0122'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.1s)
+- `python -c "import json; from pathlib import Path; md=Path('operations/residents/alfred/WP-0122_alfred_operational_standup_report.md'); js=Path('runtime/residents/alfred/WP-0122_alfred_operational_standup_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); identity=data.get('alfred_identity_mapping',{}); mailbox=data.get('mailbox_mapping',{}); assert identity.get('employee_id') == 7 and identity.get('resident_id') == 'RES-000001'; assert mailbox.get('personnel_mailbox_id') == 7 and mailbox.get('legacy_intake_mailbox_reference',{}).get('mailbox_id') == 10100; assert data.get('authority_check_results',{}).get('summarize',{}).get('allowed') is True; assert data.get('authority_check_results',{}).get('execute_work_package',{}).get('allowed') is False; assert data.get('operations_center_visibility',{}).get('steward_command_center_generated') is True"` — passed (exit 0, 0.051s)
+- `python -m estate.cli.main resident-presence --resident Alfred --json` — passed (exit 0, 0.203s)
+- `python -m estate.cli.main alfred-duty --json` — passed (exit 0, 0.198s)
+- `python -m estate.cli.main resident-duty --resident Alfred --json` — passed (exit 0, 0.199s)
+- `python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json` — passed (exit 0, 0.197s)
+- `python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --json` — passed (exit 0, 0.194s)
+- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 0.678s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.281s)
+- `python -m estate.cli.main validate-work-package --id WP-0106 --json` — passed (exit 0, 4.006s)
+- `python -m estate.cli.main validate-work-package --id WP-0107 --json` — passed (exit 0, 2.272s)
+- `python -m estate.cli.main validate-work-package --id WP-0109 --json` — passed (exit 0, 2.27s)
+- `python -m estate.cli.main validate-work-package --id WP-0110 --json` — passed (exit 0, 4.655s)
+- `python -m estate.cli.main validate-work-package --id WP-0119 --json` — passed (exit 0, 1.122s)
+- `python -m estate.cli.main validate-work-package --id WP-0121 --json` — passed (exit 0, 0.676s)
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0122'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.069s)
 
 ## Findings
 - None.
