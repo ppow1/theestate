@@ -1,0 +1,11 @@
+{
+  "resident_id": "alfred",
+  "resident_display_name": "Alfred",
+  "resident_api_standard_version": "resident-api-standard-v1",
+  "resident_implementation_version": "alfred-operations-implementation-v1",
+  "capabilities": [
+    {"id":"conversation.respond","label":"Respond in conversation","description":"Generate local response to Steward input.","implementation_status":"implemented","backing":"estate.core.resident_interaction.process_chat","authority_category":"conversation_only","required_approval_level":"none","version_introduced":"resident-api-standard-v1","owning_office":"Office of Operations"},
+    {"id":"operations.route_work.propose","label":"Propose work routing","description":"Prepare routing recommendations without executing work packages.","implementation_status":"implemented","backing":"authority metadata only","authority_category":"proposed_action","required_approval_level":"steward_for_execution","version_introduced":"alfred-operations-implementation-v1","owning_office":"Office of Operations"},
+    {"id":"character.mood_arc.evaluate","label":"Evaluate character mood arc","description":"Future Character Development Engineer extension example; not implemented.","implementation_status":"planned","backing":"extension proposal required","authority_category":"behavior_extension","required_approval_level":"chief_architect_or_steward_review","version_introduced":"future-proposal","owning_office":"Office of Character Development"}
+  ]
+}
