@@ -3,11 +3,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0111_first_batch_report.md','runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T02:44:23+00:00",
-      "duration_seconds": 0.097,
+      "completed_at": "2026-07-05T04:12:29+00:00",
+      "duration_seconds": 0.09,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:44:23+00:00",
+      "started_at": "2026-07-05T04:12:29+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -15,11 +15,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json').read_text(encoding='utf-8')); assert data.get('selected_batch_package_ids') == ['WP-0020'], data.get('selected_batch_package_ids')\"",
-      "completed_at": "2026-07-05T02:44:23+00:00",
-      "duration_seconds": 0.107,
+      "completed_at": "2026-07-05T04:12:29+00:00",
+      "duration_seconds": 0.091,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:44:23+00:00",
+      "started_at": "2026-07-05T04:12:29+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -27,11 +27,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0111_first_batch_report.json').read_text(encoding='utf-8')); pending={item.get('work_package_id'): str(item.get('reason','')).lower() for item in data.get('packages_discovered_as_genuinely_pending_unimplemented', [])}; required={f'WP-{i:04d}' for i in range(106,111)}; missing=sorted(required-set(pending)); not_pending=[wp for wp, reason in pending.items() if wp in required and 'implementation backlog' not in reason]; assert not missing and not not_pending, {'missing': missing, 'not_pending': not_pending}\"",
-      "completed_at": "2026-07-05T02:44:23+00:00",
-      "duration_seconds": 0.094,
+      "completed_at": "2026-07-05T04:12:29+00:00",
+      "duration_seconds": 0.093,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:44:23+00:00",
+      "started_at": "2026-07-05T04:12:29+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -39,11 +39,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; text=Path('operations/validation/backlog_burn_down/WP-0111_first_batch_report.md').read_text(encoding='utf-8').lower(); required=['wp-0106','wp-0107','wp-0108','wp-0109','wp-0110','pending','unimplemented']; missing=[term for term in required if term not in text]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T02:44:23+00:00",
-      "duration_seconds": 0.098,
+      "completed_at": "2026-07-05T04:12:29+00:00",
+      "duration_seconds": 0.1,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:44:23+00:00",
+      "started_at": "2026-07-05T04:12:29+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -51,23 +51,23 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0020 --json",
-      "completed_at": "2026-07-05T02:44:25+00:00",
-      "duration_seconds": 1.601,
+      "completed_at": "2026-07-05T04:12:31+00:00",
+      "duration_seconds": 1.709,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:44:23+00:00",
+      "started_at": "2026-07-05T04:12:29+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0111_2026-07-05T024423Z0000/command_05_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0111_2026-07-05T041229Z0000/command_05_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0111'); assert r['receipt_status']=='complete', r\"",
-      "completed_at": "2026-07-05T02:44:25+00:00",
-      "duration_seconds": 0.128,
+      "completed_at": "2026-07-05T04:12:31+00:00",
+      "duration_seconds": 0.132,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:44:25+00:00",
+      "started_at": "2026-07-05T04:12:31+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -89,10 +89,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T02:44:23+00:00",
+  "generated_at": "2026-07-05T04:12:29+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "e245beacfc189c7ae66807a2b28974ef9a8f694f",
+  "git_commit_before": "04a1aeb147602b5a009a3abf42522f54517fd7b1",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -119,7 +119,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 1 command(s).",
-  "validation_id": "WP-0111_2026-07-05T024423Z0000",
+  "validation_id": "WP-0111_2026-07-05T041229Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0111"

@@ -1,6 +1,6 @@
 # Steward Decision Queue
 
-Generated: 2026-07-05T00:51:33+00:00
+Generated: 2026-07-05T04:11:49+00:00
 
 Local-only, non-authoritative panel. It does not approve decisions or notify the Steward.
 
@@ -23,6 +23,7 @@ Local-only, non-authoritative panel. It does not approve decisions or notify the
 - **CA4 Response: Check for Updates Review and Architectural Coordination** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Chief Architect #4. Action: Acknowledge or route the message.. Source: `runtime/alfred/operational_briefing.json`
 - **CA4 Response: Roadmap Rebaseline Review** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Chief Architect #4. Action: Acknowledge or route the message.. Source: `runtime/alfred/operational_briefing.json`
 - **Work Package WP-LEAP-001** (high, open) — Work package is in an open/blocking queue. Requested by: work_package. Action: Review blocker and decide the next local action.. Source: `collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md`
+- **SERIES TASK WP-0117 — Repair WP-0106/WP-0107 Validation Failures** (high, blocked) — `Execution status blocks readiness: failed.`; `Execution status blocks readiness: failed.` Requested by: work_package. Action: Review blocker and decide the next local action.. Source: `collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md`
 - **Example implementation routing message** (normal, pending) — Mailbox message requires acknowledgement. Requested by: Alfred. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/example_alfred_routing_engine_v1.json`
 - **Mailbox Infrastructure Validation Message** (normal, pending) — Mailbox message requires acknowledgement. Requested by: office.chief_architect_2. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/msg_ca2_20260701_0001_mailbox_index_validation.json`
 - **Message acknowledgement required** (normal, pending) — Mailbox message requires acknowledgement. Requested by: office.chief_architect_2. Action: Acknowledge the mailbox message or route it for follow-up.. Source: `collaboration/messages/msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3.json`

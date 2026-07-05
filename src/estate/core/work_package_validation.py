@@ -863,6 +863,34 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0119": {
+        "recipe_id": "wp-0119-windows-resident-runtime-test-stabilization",
+        "title": "WP-0119 — Windows Resident Runtime Test Stabilization",
+        "description": "Validates Windows-local resident runtime stabilization for command-center artifact generation and canonical duty runtime artifact paths.",
+        "required_checks": ["Repair markdown report exists", "Repair JSON report parses", "Failure causes are reported", "Repaired resident packages validate", "Production readiness executes", "WP-9999 remains not promoted", "Alfred/Helen path status is reported", "Completion receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.md", "runtime/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.json", "collaboration/work_packages/completions/WP-0119_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "WP-9999 is falsely promoted", "Any repaired resident runtime validation is not passed"],
+        "success_criteria": ["Required commands exit zero", "WP-0106 through WP-0110 and WP-0116 through WP-0118 validate successfully", "WP-9999 remains quarantined/not promoted"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; assert Path('operations/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.md').is_file()\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.json').read_text(encoding='utf-8')); required=['wp_0106_failure_cause','wp_0108_failure_cause','wp_0110_failure_cause']; missing=[k for k in required if not data.get(k)]; assert not missing, missing; validation_keys=['wp_0106_validation_result_after_repair','wp_0107_validation_result_after_repair','wp_0108_validation_result_after_repair','wp_0109_validation_result_after_repair','wp_0110_validation_result_after_repair','wp_0116_validation_result_after_repair','wp_0117_validation_result_after_repair','wp_0118_validation_result_after_repair']; assert all(data.get(k, {}).get('validation_status') == 'passed' for k in validation_keys); assert data.get('production_readiness_after'); assert data.get('wp_9999_quarantine_status') in {'quarantined_not_promoted','not_promoted'}; assert data.get('alfred_helen_runtime_path_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0106_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0107_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0108_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0109_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0110_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0116_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0117_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0118_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')\""),
+            _cmd("python -m estate.cli.main validation-production-readiness --json"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/production_readiness_report.json').read_text(encoding='utf-8')); assert all(item.get('work_package_id') != 'WP-9999' for key in ['blocking_work_packages', 'ready_for_chief_architect_production_readiness_acceptance'] for item in data.get(key, []))\""),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0119'); assert r['receipt_status']=='complete', r\""),
+        ],
+    },
+
     "WP-0106": {
         "recipe_id": "wp-0106-resident-runtime-presence-model",
         "title": "WP-0106 — Resident Runtime Presence Model",

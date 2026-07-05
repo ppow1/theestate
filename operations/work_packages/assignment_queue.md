@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-05T00:51:33Z
+Generated: 2026-07-05T04:11:49Z
 
 ## Summary
 
-- Work packages: 108
+- Work packages: 112
 - Blocked: 0
-- Unassigned: 108
-- Warnings: 108
+- Unassigned: 112
+- Warnings: 112
 
 ## Queue
 
@@ -22,7 +22,7 @@ Generated: 2026-07-05T00:51:33Z
 | [WP-0108](../../collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md` and do exactly what it says. |
 | [WP-0110](../../collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md` and do exactly what it says. |
 | [WP-0112](../../collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md` and do exactly what it says. |
-| [WP-0116](../../collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md) | SERIES | unassigned | pending | None | None | Read collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md and do exactly what it says. |
+| [WP-0119](../../collaboration/work_packages/pending/WP-0119_SERIES_windows_resident_runtime_test_stabilization.md) | SERIES | unassigned | pending | None | None | Read collaboration/work_packages/pending/WP-0119_SERIES_windows_resident_runtime_test_stabilization.md and do exactly what it says. |
 | [WP-LEAP-001](../../collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md) | UNKNOWN | unassigned | open | None | None | Review work package and execute the stated mission. |
 | [WP-0014](../../collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md) | SERIES | unassigned | completed | None | None | Review work package and execute the stated mission. |
 | [WP-0015](../../collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md) | SERIES | unassigned | completed | None | None | Review work package and execute the stated mission. |
@@ -121,6 +121,10 @@ Generated: 2026-07-05T00:51:33Z
 | [WP-0113](../../collaboration/work_packages/pending/WP-0113_SERIES_repair_wp0111_self_validation_and_select_helen_next_batch.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0113_SERIES_repair_wp0111_self_validation_and_select_helen_next_batch.md and do exactly what it says. |
 | [WP-0114](../../collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md and do exactly what it says. |
 | [WP-0115](../../collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md and do exactly what it says. |
+| [WP-0116](../../collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md and do exactly what it says. |
+| [WP-0116](../../collaboration/work_packages/pending/WP-0116_SERIES_sequential_pending_queue_batch_execution_standard.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0116_SERIES_sequential_pending_queue_batch_execution_standard.md and do exactly what it says. |
+| [WP-0117](../../collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md and do exactly what it says. |
+| [WP-0118](../../collaboration/work_packages/pending/WP-0118_SERIES_repair_resident_runtime_pytest_validation_failures.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0118_SERIES_repair_resident_runtime_pytest_validation_failures.md and do exactly what it says. |
 
 ## Warnings
 
@@ -231,4 +235,8 @@ Generated: 2026-07-05T00:51:33Z
 - missing_owner: WP-0114 has no explicit owner. (collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md)
 - missing_owner: WP-0115 has no explicit owner. (collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md)
 - missing_owner: WP-0116 has no explicit owner. (collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md)
+- missing_owner: WP-0116 has no explicit owner. (collaboration/work_packages/pending/WP-0116_SERIES_sequential_pending_queue_batch_execution_standard.md)
+- missing_owner: WP-0117 has no explicit owner. (collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md)
+- missing_owner: WP-0118 has no explicit owner. (collaboration/work_packages/pending/WP-0118_SERIES_repair_resident_runtime_pytest_validation_failures.md)
+- missing_owner: WP-0119 has no explicit owner. (collaboration/work_packages/pending/WP-0119_SERIES_windows_resident_runtime_test_stabilization.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)

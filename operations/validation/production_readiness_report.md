@@ -1,12 +1,12 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T02:44:54+00:00
+- generated_at: 2026-07-05T04:16:32+00:00
 - git branch: work
-- git commit: e245beacfc189c7ae66807a2b28974ef9a8f694f
+- git commit: 04a1aeb147602b5a009a3abf42522f54517fd7b1
 
 ## Totals
-- total_work_packages_scanned: 104
-- total_production_ready: 95
+- total_work_packages_scanned: 105
+- total_production_ready: 96
 - total_blocked: 9
 - total_missing_recipes: 7
 - total_missing_receipts: 3
@@ -122,15 +122,16 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0116
 - WP-0117
 - WP-0118
+- WP-0119
 
 ## Recent Validation Reports
+- `runtime/validation/work_packages/WP-0119_validation.json`
 - `runtime/validation/work_packages/WP-0118_validation.json`
-- `runtime/validation/work_packages/WP-0117_validation.json`
-- `runtime/validation/work_packages/WP-0116_validation.json`
-- `runtime/validation/work_packages/WP-0115_validation.json`
+- `runtime/validation/work_packages/WP-0103_validation.json`
+- `runtime/validation/work_packages/WP-0085_validation.json`
+- `runtime/validation/work_packages/WP-0027_validation.json`
+- `runtime/validation/work_packages/WP-0015_validation.json`
+- `runtime/validation/work_packages/WP-0102_validation.json`
+- `runtime/validation/work_packages/WP-0101_validation.json`
 - `runtime/validation/work_packages/WP-0114_validation.json`
 - `runtime/validation/work_packages/WP-0111_validation.json`
-- `runtime/validation/work_packages/WP-0020_validation.json`
-- `runtime/validation/work_packages/WP-0105_validation.json`
-- `runtime/validation/work_packages/WP-0085_validation.json`
-- `runtime/validation/work_packages/WP-0081_validation.json`
