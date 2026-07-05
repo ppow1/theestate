@@ -32,15 +32,19 @@ Known active/historical context:
 
 Before work begins:
 
-1. Sync to latest main.
-2. Confirm WP-0121 is merged or final-four blockers are resolved/classified.
-3. Confirm WP-0122 is merged and Alfred is operationally stood up.
-4. Confirm WP-0123 is merged and Helen is online as HR/onboarding resident.
-5. Confirm Helen readiness report states she is ready to hire/onboard Chief Architect #5.
-6. Confirm production-readiness validation runs.
-7. Confirm WP-9999 remains quarantined/not promoted.
+1. Confirm the checkout contains the merged prerequisite artifacts from WP-0121, WP-0122, and WP-0123.
+2. If an `origin` remote is configured, sync to latest main before making changes.
+3. If no `origin` remote is configured in the Codex checkout, record that as an execution-environment limitation and continue using the provided checkout state.
+4. Confirm WP-0121 is merged or final-four blockers are resolved/classified.
+5. Confirm WP-0122 is merged and Alfred is operationally stood up.
+6. Confirm WP-0123 is merged and Helen is online as HR/onboarding resident.
+7. Confirm Helen readiness report states she is ready to hire/onboard Chief Architect #5, or explicitly records the precise runtime limitation that requires a manual HR/onboarding artifact path.
+8. Confirm production-readiness validation runs.
+9. Confirm WP-9999 remains quarantined/not promoted.
 
-If any precondition fails, stop and report exact blockers.
+If any substantive Estate precondition fails, stop and report exact blockers.
+
+A missing `origin` remote in Codex is not a substantive Estate blocker by itself when the provided checkout already contains the merged prerequisite artifacts.
 
 ## Scope
 
@@ -122,6 +126,7 @@ The report must include:
 
 - current git commit
 - precondition status
+- origin remote availability and any sync limitation
 - Helen readiness status
 - whether Helen performed/orchestrated the hire
 - Chief Architect #5 identity assignment
@@ -210,6 +215,7 @@ It must include:
 - artifacts created/updated
 - tests run
 - validation commands run
+- origin remote/sync status
 - remaining gaps
 - recommended next action
 - `ready_for_ca_review = true`
