@@ -1,6 +1,7 @@
 {
   "command_results": [],
   "commands_run": [],
+  "completion_artifact_path": null,
   "failures": [],
   "files_written": [
     "operations/validation/reports/WP-9999_validation.md",
@@ -8,16 +9,47 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-04T12:55:12+00:00",
+  "generated_at": "2026-07-05T15:12:33+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "204927fee8ff37c3b88424f6b539fdb63661c12f",
+  "git_commit_before": "0738f8b7d2a90d65b173f4bbf94218de750d8a8b",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Completion artifact is missing.",
+      "Execution status blocks readiness: no_recipe."
+    ],
+    "coverage_status": "no_recipe",
+    "execution_status": "no_recipe",
+    "non_blocking_findings": [],
+    "production_ready": false,
+    "receipt_status": "missing",
+    "required_followups": [
+      "Completion artifact is missing.",
+      "Execution status blocks readiness: no_recipe."
+    ]
+  },
+  "receipt_gaps": [
+    "completion_artifact"
+  ],
+  "receipt_validation": {
+    "blocking_reasons": [
+      "Completion artifact is missing."
+    ],
+    "completion_artifact_path": null,
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "receipt_gaps": [
+      "completion_artifact"
+    ],
+    "receipt_status": "missing",
+    "work_package_id": "WP-9999"
+  },
   "recipe_id": null,
   "recipe_title": null,
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 0 command(s).",
-  "validation_id": "WP-9999_2026-07-04T125512Z0000",
+  "validation_id": "WP-9999_2026-07-05T151233Z0000",
   "validation_status": "no_recipe",
   "warnings": [
     "No validation recipe is registered for WP-9999."

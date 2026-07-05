@@ -1,22 +1,21 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T15:05:21+00:00
+- generated_at: 2026-07-05T15:18:55+00:00
 - git branch: work
-- git commit: 4303061ad25118cd7c7a9be7976af20af0773347
+- git commit: 0738f8b7d2a90d65b173f4bbf94218de750d8a8b
 
 ## Totals
 - total_work_packages_scanned: 111
-- total_production_ready: 108
-- total_blocked: 3
-- total_missing_recipes: 3
-- total_missing_receipts: 3
+- total_production_ready: 109
+- total_blocked: 2
+- total_missing_recipes: 2
+- total_missing_receipts: 2
 - total_incomplete_receipts: 0
 
 ## Recommended Next Action
 Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.
 
 ## Blocking Work Packages
-- WP-0123: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0124: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0125: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 
@@ -123,13 +122,13 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0114
 
 ## Recent Validation Reports
+- `runtime/validation/work_packages/WP-0123_validation.json`
+- `runtime/validation/work_packages/WP-0122_validation.json`
+- `runtime/validation/work_packages/WP-0121_validation.json`
 - `runtime/validation/work_packages/WP-0119_validation.json`
 - `runtime/validation/work_packages/WP-0110_validation.json`
 - `runtime/validation/work_packages/WP-0109_validation.json`
 - `runtime/validation/work_packages/WP-0107_validation.json`
 - `runtime/validation/work_packages/WP-0106_validation.json`
-- `runtime/validation/work_packages/WP-0122_validation.json`
-- `runtime/validation/work_packages/WP-0121_validation.json`
-- `runtime/validation/work_packages/WP-0118_validation.json`
-- `runtime/validation/work_packages/WP-0117_validation.json`
-- `runtime/validation/work_packages/WP-0116_validation.json`
+- `runtime/validation/work_packages/WP-0108_validation.json`
+- `runtime/validation/work_packages/WP-0080_validation.json`

@@ -1,0 +1,492 @@
+{
+  "work_package_id": "WP-0123",
+  "generated_at": "2026-07-05T15:14:09+00:00",
+  "git_commit": "0738f8b7d2a90d65b173f4bbf94218de750d8a8b",
+  "branch": "work",
+  "precondition_status": {
+    "sync_latest_main": "blocked: no origin remote is configured in this local checkout",
+    "WP-0121": "passed",
+    "production_readiness_regenerated": "passed",
+    "WP-0122": "passed",
+    "alfred_runtime_checks": "passed",
+    "helen_related_packages": "validated where requested; WP-0106/WP-0109 covered by WP-0122; WP-0020/WP-0080/WP-0108/WP-0110/WP-0119 executed below",
+    "WP-9999": "quarantined/no_recipe not promoted"
+  },
+  "onboarding_path": {
+    "path": "manual_onboarding_with_alfred_readiness_inspection",
+    "alfred_performed_or_assisted": false,
+    "manual_reason": "Alfred runtime surfaces are informational/bounded. Authority checks deny execute-work-package and personnel identity modification, so Alfred cannot perform Helen onboarding or create/modify personnel artifacts under current boundaries."
+  },
+  "helen_identity_mapping": {
+    "mailbox_id": 6,
+    "mailbox_path": "collaboration/mailboxes/6",
+    "name": "Helen",
+    "resident_id": "RES-000003",
+    "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+    "source_artifacts": [
+      "data/registry/residents.json",
+      "data/registry/personnel.json"
+    ]
+  },
+  "mailbox_mapping": {
+    "mailbox_id": 6,
+    "mailbox_path": "collaboration/mailboxes/6",
+    "personnel_mailbox_id": 6,
+    "resident_id": "RES-000003"
+  },
+  "hr_onboarding_role_mapping": {
+    "office": "Human Resources",
+    "title": "Manager of Human Resources",
+    "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+    "capability_visible": true,
+    "source_artifacts": [
+      "data/registry/personnel.json",
+      "data/registry/residents.json",
+      "runtime/helen/duty_state.json"
+    ]
+  },
+  "presence_results": {
+    "authority_statement": "Resident presence is informational and does not grant authority to act.",
+    "generated_at": "2026-07-05T15:13:01+00:00",
+    "residents": [
+      {
+        "autonomous_execution": false,
+        "current_duty": "Review local onboarding and personnel inputs and surface Steward attention needs.",
+        "display_name": "Helen",
+        "heartbeat_stale": false,
+        "last_activity": "runtime/helen/duty_state.json",
+        "last_heartbeat": "2026-07-05T15:12:25+00:00",
+        "mailbox_id": 6,
+        "mailbox_path": "collaboration/mailboxes/6",
+        "name": "Helen",
+        "needs_steward": false,
+        "office": "Human Resources",
+        "presence_state": "working",
+        "resident_id": "RES-000003",
+        "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+        "source_artifacts": [
+          "data/registry/residents.json",
+          "data/registry/personnel.json",
+          "runtime/residents/presence.json",
+          "data/objects/RES-000003.json"
+        ],
+        "status_reason": "Helen duty runner completed a bounded local onboarding/personnel operational summary.",
+        "visible_presence_only": true
+      }
+    ],
+    "runtime_artifact": "runtime/residents/presence.json",
+    "version": 1,
+    "warnings": []
+  },
+  "duty_results": {
+    "authority_boundary": {
+      "execute_work_package": {
+        "allowed": false,
+        "audit_path": "runtime/residents/authority_decisions.jsonl",
+        "authority_classification": "execution",
+        "checked_at": "2026-07-05T15:13:02+00:00",
+        "decision": "denied",
+        "kind": "resident_authority_decision",
+        "normalized_action": "execute-work-package",
+        "reason": "Residents do not execute work packages automatically.",
+        "requested_action": "execute-work-package",
+        "requires_escalation": false,
+        "requires_steward_approval": false,
+        "resident": "Helen",
+        "source_artifact_references": [
+          "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+          "src/estate/core/resident_authority.py"
+        ],
+        "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+        "target": null,
+        "version": 1
+      },
+      "summarize": {
+        "allowed": true,
+        "audit_path": "runtime/residents/authority_decisions.jsonl",
+        "authority_classification": "non_authoritative",
+        "checked_at": "2026-07-05T15:13:02+00:00",
+        "decision": "allowed",
+        "kind": "resident_authority_decision",
+        "normalized_action": "summarize",
+        "reason": "Summaries are non-authoritative operational views.",
+        "requested_action": "summarize",
+        "requires_escalation": false,
+        "requires_steward_approval": false,
+        "resident": "Helen",
+        "source_artifact_references": [
+          "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+          "src/estate/core/resident_authority.py"
+        ],
+        "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+        "target": null,
+        "version": 1
+      }
+    },
+    "authority_limitations": [
+      "Helen may summarize onboarding/personnel operational state; Helen may not authorize personnel changes.",
+      "Helen may identify onboarding blockers; Helen may not complete onboarding by assertion.",
+      "Helen may surface HR-related artifacts; Helen may not create HR governance.",
+      "Helen may point to work packages; Helen may not execute them automatically.",
+      "Helen duty runs are local operational views, not canonical Estate authority."
+    ],
+    "duty_state": "working",
+    "duty_summary": {
+      "headline": "Helen duty runner completed a bounded local onboarding/personnel operational summary.",
+      "informational_findings": [
+        {
+          "message": "Personnel registry is available with 8 visible record(s).",
+          "path": "data/registry/personnel.json",
+          "severity": "info",
+          "type": "personnel_registry"
+        },
+        {
+          "message": "Mailbox Sync Duty artifact is available for bounded HR/onboarding awareness.",
+          "path": "runtime/mailboxes/synchronization_duty.json",
+          "severity": "info",
+          "type": "mailbox_sync_duty"
+        },
+        {
+          "message": "Chief Architect Onboarding Packet artifact is available for bounded HR/onboarding awareness.",
+          "path": "collaboration/messages/msg_ca2_20260701_0003_ca4_onboarding_packet.md",
+          "severity": "info",
+          "type": "chief_architect_onboarding_packet"
+        },
+        {
+          "message": "Helen Hr Work Package artifact is available for bounded HR/onboarding awareness.",
+          "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+          "severity": "info",
+          "type": "helen_hr_work_package"
+        },
+        {
+          "message": "Helen Onboarding Work Package artifact is available for bounded HR/onboarding awareness.",
+          "path": "collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md",
+          "severity": "info",
+          "type": "helen_onboarding_work_package"
+        }
+      ],
+      "needs_steward": false,
+      "source_of_truth_boundary": "Operational summary only; canonical personnel/onboarding authority remains with source artifacts and explicitly approved Steward/governance processes.",
+      "steward_attention_items": []
+    },
+    "generated_at": "2026-07-05T15:13:02+00:00",
+    "identity": {
+      "mailbox_id": 6,
+      "mailbox_path": "collaboration/mailboxes/6",
+      "name": "Helen",
+      "resident_id": "RES-000003",
+      "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+      "source_artifacts": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json"
+      ]
+    },
+    "presence": {
+      "autonomous_execution": false,
+      "current_duty": "Review local onboarding and personnel inputs and surface Steward attention needs.",
+      "display_name": "Helen",
+      "heartbeat_stale": false,
+      "last_activity": "runtime/helen/duty_state.json",
+      "last_heartbeat": "2026-07-05T15:13:02+00:00",
+      "mailbox_id": 6,
+      "mailbox_path": "collaboration/mailboxes/6",
+      "name": "Helen",
+      "needs_steward": false,
+      "office": "Human Resources",
+      "presence_state": "working",
+      "resident_id": "RES-000003",
+      "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+      "source_artifacts": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/presence.json",
+        "data/objects/RES-000003.json"
+      ],
+      "status_reason": "Helen duty runner completed a bounded local onboarding/personnel operational summary.",
+      "visible_presence_only": true
+    },
+    "resident": "Helen",
+    "runtime_artifacts": {
+      "audit_log": "runtime/helen/duty_runs.jsonl",
+      "duty_state": "runtime/helen/duty_state.json",
+      "operations_summary": "operations/helen/duty_summary.md",
+      "presence": "runtime/residents/presence.json"
+    },
+    "source_artifact_references": [
+      {
+        "exists": true,
+        "name": "resident_registry",
+        "path": "data/registry/residents.json",
+        "required": true,
+        "status": "available"
+      },
+      {
+        "exists": true,
+        "name": "personnel_registry",
+        "path": "data/registry/personnel.json",
+        "required": true,
+        "status": "available"
+      },
+      {
+        "exists": true,
+        "name": "mailbox_registry",
+        "path": "data/registry/mailboxes.json",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "exists": true,
+        "name": "resident_presence",
+        "path": "runtime/residents/presence.json",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "exists": false,
+        "name": "mailbox_index",
+        "path": "runtime/mailboxes/index.json",
+        "required": false,
+        "status": "missing"
+      },
+      {
+        "exists": true,
+        "name": "mailbox_sync_duty",
+        "path": "runtime/mailboxes/synchronization_duty.json",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "exists": false,
+        "name": "onboarding_manifest",
+        "path": "data/onboarding/manifest.json",
+        "required": false,
+        "status": "missing"
+      },
+      {
+        "exists": false,
+        "name": "onboarding_status",
+        "path": "runtime/onboarding/status.json",
+        "required": false,
+        "status": "missing"
+      },
+      {
+        "bytes": 733,
+        "content_type": "text",
+        "exists": true,
+        "name": "chief_architect_onboarding_packet",
+        "path": "collaboration/messages/msg_ca2_20260701_0003_ca4_onboarding_packet.md",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "bytes": 1543,
+        "content_type": "text",
+        "exists": true,
+        "name": "helen_hr_work_package",
+        "path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "bytes": 4023,
+        "content_type": "text",
+        "exists": true,
+        "name": "helen_onboarding_work_package",
+        "path": "collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md",
+        "required": false,
+        "status": "available"
+      },
+      {
+        "exists": false,
+        "name": "resident_cards",
+        "path": "runtime/residents/cards.json",
+        "required": false,
+        "status": "missing"
+      }
+    ],
+    "version": 1
+  },
+  "authority_results": {
+    "list": {
+      "action_categories": {
+        "approve-merge-work": {
+          "classification": "merge_authority",
+          "default": "denied",
+          "reason": "Approval and merge authority remain outside resident authority."
+        },
+        "create-work-package-draft": {
+          "classification": "draft",
+          "default": "requires_steward_approval",
+          "reason": "Work-package drafts must remain non-authoritative until reviewed."
+        },
+        "draft": {
+          "classification": "proposal",
+          "default": "allowed",
+          "reason": "Drafts may be prepared but are not approvals."
+        },
+        "execute-work-package": {
+          "classification": "execution",
+          "default": "denied",
+          "reason": "Residents do not execute work packages automatically."
+        },
+        "external-notification-network-action": {
+          "classification": "external_action",
+          "default": "requires_escalation",
+          "reason": "External or network actions require explicit escalation/approval."
+        },
+        "modify-governance-artifact": {
+          "classification": "governance_authority",
+          "default": "denied",
+          "reason": "Residents cannot modify governance authority by default."
+        },
+        "modify-personnel-identity": {
+          "classification": "personnel_authority",
+          "default": "denied",
+          "reason": "Residents cannot create, terminate, or modify personnel identities by default."
+        },
+        "observe": {
+          "classification": "non_authoritative",
+          "default": "allowed",
+          "reason": "Observation is read-only local awareness."
+        },
+        "propose": {
+          "classification": "proposal",
+          "default": "allowed",
+          "reason": "Proposals require later canonical Steward action to become authoritative."
+        },
+        "request-steward-decision": {
+          "classification": "steward_request",
+          "default": "allowed",
+          "reason": "Residents may request Steward attention without deciding for the Steward."
+        },
+        "route": {
+          "classification": "non_authoritative",
+          "default": "allowed",
+          "reason": "Routing local attention does not decide or execute."
+        },
+        "run-validation-command": {
+          "classification": "validation",
+          "default": "denied",
+          "reason": "Residents may surface validation needs but cannot claim validation authority."
+        },
+        "search": {
+          "classification": "non_authoritative",
+          "default": "allowed",
+          "reason": "Local search is informational only."
+        },
+        "send-mailbox-message-artifact": {
+          "classification": "routing",
+          "default": "requires_steward_approval",
+          "reason": "Message artifacts can affect workflows and require Steward approval unless separately delegated."
+        },
+        "summarize": {
+          "classification": "non_authoritative",
+          "default": "allowed",
+          "reason": "Summaries are non-authoritative operational views."
+        },
+        "update-resident-runtime-state": {
+          "classification": "runtime",
+          "default": "allowed",
+          "reason": "Bounded duty runners may update resident runtime presence/state."
+        }
+      },
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "default_unknown_action": "denied",
+      "generated_at": "2026-07-05T15:13:06+00:00",
+      "kind": "resident_authority_boundary",
+      "resident_boundaries": {
+        "helen": {
+          "allowed": [
+            "observe",
+            "summarize",
+            "search",
+            "draft",
+            "propose",
+            "route",
+            "request-steward-decision",
+            "update-resident-runtime-state"
+          ],
+          "approval_required": [
+            "create-work-package-draft",
+            "send-mailbox-message-artifact"
+          ],
+          "denied": [
+            "run-validation-command",
+            "execute-work-package",
+            "approve-merge-work",
+            "modify-personnel-identity",
+            "modify-governance-artifact"
+          ],
+          "escalation_required": [
+            "external-notification-network-action"
+          ],
+          "resident": "Helen"
+        }
+      },
+      "source_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "version": 1
+    },
+    "summarize": {
+      "allowed": true,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "non_authoritative",
+      "checked_at": "2026-07-05T15:13:08+00:00",
+      "decision": "allowed",
+      "kind": "resident_authority_decision",
+      "normalized_action": "summarize",
+      "reason": "Summaries are non-authoritative operational views.",
+      "requested_action": "summarize",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Helen",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": null,
+      "version": 1
+    },
+    "modify_personnel": {
+      "allowed": false,
+      "audit_path": "runtime/residents/authority_decisions.jsonl",
+      "authority_classification": "personnel_authority",
+      "checked_at": "2026-07-05T15:13:10+00:00",
+      "decision": "denied",
+      "kind": "resident_authority_decision",
+      "normalized_action": "modify-personnel-identity",
+      "reason": "Residents cannot create, terminate, or modify personnel identities by default.",
+      "requested_action": "modify-personnel",
+      "requires_escalation": false,
+      "requires_steward_approval": false,
+      "resident": "Helen",
+      "source_artifact_references": [
+        "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+        "src/estate/core/resident_authority.py"
+      ],
+      "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",
+      "target": null,
+      "version": 1
+    }
+  },
+  "audit_runtime_artifacts_created_or_updated": [
+    "runtime/helen/duty_state.json",
+    "runtime/helen/duty_runs.jsonl",
+    "runtime/residents/presence.json",
+    "runtime/residents/authority_decisions.jsonl",
+    "operations/helen/duty_summary.md"
+  ],
+  "operations_center_visibility": {
+    "steward_command_center_generated": true,
+    "generated_at": "2026-07-05T15:13:12+00:00",
+    "resident_command_center_available": true
+  },
+  "ready_to_hire_onboard_chief_architect_5": true,
+  "remaining_gaps": [
+    "Helen can summarize and prepare onboarding operational views, but resident authority still denies autonomous personnel identity modification and work-package execution. Steward/CA approval remains required for authoritative hires."
+  ],
+  "recommended_next_action": "Use Helen as the HR/onboarding operational owner for CA5 preparation, with Steward/Chief Architect approval for any personnel identity changes."
+}
