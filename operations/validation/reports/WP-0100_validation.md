@@ -1,20 +1,22 @@
 # Work Package Validation Report — WP-0100
 
-- Timestamp: 2026-07-04T20:16:51+00:00
+- Timestamp: 2026-07-05T00:22:17+00:00
 - Work package ID: WP-0100
 - Local branch: work
-- Git commit: f99e9932249ec9fa051c18d8bdece986a9aa394f
-- Validation status: no_recipe
-- Recipe used: none
-- Recipe title: none
+- Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef
+- Validation status: passed
+- Recipe used: wp-0100-historical-receipt-artifact-presence
+- Recipe title: WP-0100 — Historical receipt and artifact presence
 
 ## Commands Run
-- None.
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0100'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.104s)
+- `python -c "import json; from pathlib import Path; receipt=Path('collaboration/work_packages/completions/WP-0100_codex_done.json'); data=json.loads(receipt.read_text(encoding='utf-8')); files=data.get('files_changed') or []; assert files, 'receipt has no files_changed'; missing=[p for p in files if not Path(p).is_file()]; assert not missing, missing"` — passed (exit 0, 0.077s)
+
 ## Findings
 - None.
 
 ## Warnings
-- No validation recipe is registered for WP-0100.
+- None.
 
 ## Failures
 - None.
@@ -25,10 +27,10 @@
 - Receipt gaps: None
 
 ## Production Readiness
-- Production ready: False
-- Execution status: no_recipe
+- Production ready: True
+- Execution status: passed
 - Receipt status: complete
-- Blocking reasons: Execution status blocks readiness: no_recipe.
+- Blocking reasons: None
 - Non-blocking findings: None
 
 ## Generated Artifacts
