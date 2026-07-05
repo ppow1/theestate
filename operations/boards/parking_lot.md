@@ -3,7 +3,7 @@
 Status: Active
 Owner: Alfred / Chief of Staff
 Classification: Estate Internal
-Updated: 2026-07-01
+Updated: 2026-07-05
 
 ## Purpose
 
@@ -61,6 +61,10 @@ Each item should include:
 | PL-0012 | Treat onboarding as an institutional capability driven by a canonical onboarding manifest that serves as the configuration for repeatable onboarding rather than documentation; include ordered entries with purpose, required status, canonical path, and lifecycle state while keeping meaning in the referenced documents | Institutional Onboarding | High | Chief Architect #4 / Steward | 2026-07-02 | Captured | HR onboarding implementation | Alfred and Helen onboarding workflow is being formalized |
 
 | PL-0013 | Transition work package range allocation from current Chief Architect occupants to the persistent Office of Chief Architect once office/occupant separation is mature; current operations may assign ranges directly to active occupants until the institution is ready for office-owned allocation | Institutional Architecture | Normal | Chief Architect #4 / Steward | 2026-07-03 | Captured | Office/occupant governance evolution | The Office model is mature enough that range ownership should survive occupant succession without administrative reassignment |
+| PL-0014 | External Worker Telemetry Adapter: create a monitoring and feedback mechanism for external AI workers, initially Codex, so the Estate can detect assignment acceptance, start, progress, completion, failure, stalls, and return execution state to Alfred and Helen; investigate official APIs first and consider browser automation or UI observation only if no cleaner integration is available | Worker Runtime / External Integration | High | Pat / Steward | 2026-07-05 | Captured | External worker supervision phase | Required before Alfred and Helen can reliably supervise Codex or other external coding workers as institutional workers |
+| PL-0015 | Work Package Duration Estimation: estimate likely execution time before assigning a work package to Codex or another coding worker, using historical work package outcomes, complexity, dependency count, implementation size, and worker performance history; improve estimates as actual completion data accumulates | Planning / Scheduling | Normal | Pat / Steward | 2026-07-05 | Captured | Worker planning and scheduling phase | External worker telemetry and enough historical completion data exist to produce useful estimates |
+| PL-0016 | Parallel Worker Orchestration: coordinate multiple AI coding workers simultaneously rather than serially, including work allocation, dependency management, progress monitoring, merge coordination, and workload balancing across local and external workers | Operations / Worker Coordination | High | Pat / Steward | 2026-07-05 | Captured | Multi-worker engineering phase | Worker runtime and telemetry are mature enough to manage concurrent coding assignments safely |
+| PL-0017 | Office Snapshot Export: add a one-click Office Snapshot button to the Office of the Steward that exports the current page/interface into a portable review package containing rendered HTML, CSS, JavaScript, visible panels, navigation structure, active workspace, DOM state, UI metadata, and future screenshot/runtime artifact support for drag-and-drop AI-assisted UI review | Developer Experience / UI Tooling | High | Pat / Steward | 2026-07-05 | Captured | Office UI development phase | Office UI work continues to require high-bandwidth architectural review and shared visual/state context across AI collaborators |
 
 ## Review Guidance
 
