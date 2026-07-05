@@ -12,7 +12,7 @@ SERIES
 
 Create the reusable resident interaction framework required for Alfred, Helen, Ingrid, Chief Architect #5, and future Estate resident offices to be directly interactable from the local Office of the Steward / Operations Center UI.
 
-This package must establish the shared pattern for resident chat interaction, local LLM routing, conversation persistence, authority handling, Steward-controlled forgetting, and inspectable resident capability surfaces before Alfred's specific UI front door is implemented in WP-0127.
+This package must establish the shared pattern for resident chat interaction, local LLM routing, conversation persistence, authority handling, Steward-controlled forgetting, versioned resident API standards, versioned resident API implementations, and extensible resident capability surfaces before Alfred's specific UI front door is implemented in WP-0127.
 
 This is implementation work. Do not produce only documents.
 
@@ -22,9 +22,9 @@ The Operations Center currently exposes a large amount of institutional state, b
 
 The Estate has residents. The Steward must be able to interact with them.
 
-Alfred is the immediate priority, but the Estate will also need interaction points for Helen, Ingrid, Chief Architect #5, and the Office of Character Development. Building Alfred as a one-off would create duplication and inconsistent governance.
+Alfred is the immediate priority, but the Estate will also need interaction points for Helen, Ingrid, Chief Architect #5, the Character Development Engineer, and the Office of Character Development. Building Alfred as a one-off would create duplication and inconsistent governance.
 
-Each resident's role, responsibilities, accessible tools, allowed actions, and interaction surface will change over time. The interaction framework must therefore expose what each resident can currently do and how that capability surface can be expanded through Estate artifacts.
+Each resident's role, responsibilities, accessible tools, allowed actions, personality/character behaviors, and interaction surface will change over time. The interaction framework must therefore expose what each resident can currently do, what version of the resident API standard they conform to, what version of that resident's implementation is currently active, and how the surface can be extended or changed through Estate-governed artifacts.
 
 The Estate needs a reusable resident interaction substrate first.
 
@@ -40,7 +40,9 @@ The target interaction model is:
 Operations Center UI
   -> resident chat endpoint
   -> resident interaction layer
-  -> resident capability/API surface resolver
+  -> resident API/surface resolver
+  -> resident API standard version
+  -> resident implementation version
   -> local LLM adapter where available
   -> Estate context retrieval
   -> resident authority check
@@ -60,8 +62,10 @@ Operations Center UI
 8. The UI must distinguish conversation, recommendation, proposed action, authorized action, and completed institutional event.
 9. All resident interaction must remain local-first unless a future work package explicitly authorizes otherwise.
 10. Do not introduce cloud LLM/API dependencies.
-11. Each resident's interaction/API surface must be inspectable by command or endpoint.
-12. Expanding a resident's interaction/API surface must be artifact-driven and documented, not buried in code-only changes.
+11. Each resident's API/surface must be inspectable by command or endpoint.
+12. Each resident must report both the resident API standard version and the resident-specific implementation version currently active.
+13. Expanding a resident's API/surface must be artifact-driven, versioned, and reviewable.
+14. A qualified resident or office, such as the Character Development Engineer, must be able to propose resident API/surface extensions through an Estate-defined extension path rather than by manually editing hidden implementation code.
 
 ## TSR Interpretation
 
@@ -74,7 +78,9 @@ For this work package, TSR means the Estate has a pattern for resident interacti
 - conversation history can be reloaded;
 - the Steward can mark a conversation as forgotten/redacted according to policy;
 - the resident's authority boundary is available to the interaction layer;
-- the resident's current interaction/API surface can be printed or inspected.
+- the resident's current API/surface can be printed or inspected;
+- the resident's API standard version and resident implementation version can be printed or inspected;
+- a supported extension path exists for adding or changing resident capabilities over time.
 
 This does not require unrelated always-on daemons beyond the local Operations Center server lifetime.
 
@@ -105,10 +111,13 @@ In scope:
 6. Add deterministic fallback mode for test/offline operation if no local LLM adapter is available.
 7. Add resident authority checks or authority metadata hooks to the interaction flow.
 8. Define generic local API conventions for resident interaction endpoints.
-9. Add an inspectable resident interaction/capability surface that prints what each resident can currently do and how the surface can be expanded.
-10. Add a resident interaction template that future residents can reuse.
-11. Add tests proving the interaction substrate can handle at least an Alfred-style resident conversation request.
-12. Add validation recipe and completion receipt for WP-0126.
+9. Add an inspectable resident API/surface model that prints what each resident can currently do, what version of the API standard they use, what implementation version they are running, and how the surface can be expanded.
+10. Add a versioned resident API standard artifact/template.
+11. Add a versioned resident implementation profile artifact/template.
+12. Add a resident API extension/proposal mechanism that can represent new capabilities such as character mood arcs, interaction style changes, new local tools, or new actions.
+13. Add a resident interaction template that future residents can reuse.
+14. Add tests proving the interaction substrate can handle at least an Alfred-style resident conversation request.
+15. Add validation recipe and completion receipt for WP-0126.
 
 Out of scope:
 
@@ -120,6 +129,7 @@ Out of scope:
 - External Codex telemetry.
 - Full command palette implementation.
 - Rebuilding the entire Operations Center UI.
+- Fully implementing Character Development Engineer behavior. WP-0126 must only create the extension mechanism that later enables that office to propose resident API/surface changes.
 
 ## Required Resident Conversation Turn Model
 
@@ -142,7 +152,8 @@ Implement or document and validate a machine-readable structure equivalent to:
     "model": "model name if known"
   },
   "resident_surface": {
-    "surface_version": "resident-specific version or profile id",
+    "resident_api_standard_version": "resident-api-standard-v1",
+    "resident_implementation_version": "alfred-implementation-v1",
     "allowed_capabilities": ["capability ids or action ids"],
     "surface_reference": "artifact path or registry id"
   },
@@ -158,7 +169,58 @@ Implement or document and validate a machine-readable structure equivalent to:
 
 The exact schema may differ if existing Estate conventions already define the shape, but the resulting artifacts must preserve the same concepts.
 
-## Resident Capability / API Surface Introspection Requirement
+## Resident API Standard and Implementation Versioning Requirement
+
+Each resident must have two version concepts:
+
+1. **Resident API Standard Version** — the common Estate-level interaction/API contract the resident conforms to.
+2. **Resident Implementation Version** — the resident-specific version currently running for that resident.
+
+Example:
+
+```text
+Helen may conform to resident-api-standard-v1 while running helen-hr-implementation-v2.
+Ingrid may conform to resident-api-standard-v1 while running ingrid-security-implementation-v1.
+Alfred may later conform to resident-api-standard-v2 while running alfred-operations-implementation-v4.
+```
+
+The framework must make those versions visible through the resident surface inspection command or endpoint.
+
+The framework must also make version changes reviewable through Estate artifacts and validation. Do not bury version changes only in code constants.
+
+## Resident API / Surface Extension Requirement
+
+The framework must support controlled expansion of what a resident can do.
+
+This is different from simple introspection. Introspection answers what exists now. Extension defines how new capabilities are proposed, represented, reviewed, validated, and made available.
+
+Minimum acceptable implementation:
+
+- a resident API/surface artifact or registry shape that lists available capabilities/actions for a resident;
+- each capability/action records id, label, description, implementation status, backing function/command/endpoint if implemented, authority category, required approval level, version introduced, and owning office/resident;
+- a resident implementation profile artifact that can be updated when the resident changes;
+- a documented extension proposal artifact shape that a future resident or office can produce when proposing additions;
+- a command or function that prints the current resident surface and explains where extensions are defined;
+- validation that extension records include version and authority fields;
+- no hidden one-off UI-only resident capabilities.
+
+The Character Development Engineer use case must be explicitly supported by the model. For example, the model must be able to represent a future capability such as:
+
+```text
+character.mood_arc.evaluate
+```
+
+or a future resident behavior field such as:
+
+```text
+interaction_profile.mood_arc
+```
+
+without requiring the UI architecture to be rewritten.
+
+WP-0126 does not need to implement mood arcs. It must ensure that such resident behavior/API extensions can be represented cleanly later.
+
+## Resident Capability / API Surface Inspection Requirement
 
 The framework must include a way to inspect each resident's current interaction/API surface.
 
@@ -167,7 +229,7 @@ This is required because every resident's role and capabilities will evolve. Alf
 Minimum acceptable implementation:
 
 - a CLI command, local endpoint, or both that prints a resident's current interaction/API surface;
-- output includes resident id/name, office/role, available chat actions, callable local endpoints or command actions, authority category for each action, required approval level, backing artifact/registry reference, and notes on how the surface is extended;
+- output includes resident id/name, office/role, resident API standard version, resident implementation version, available chat actions, callable local endpoints or command actions, authority category for each action, required approval level, backing artifact/registry reference, and notes on how the surface is extended;
 - output includes whether each capability is currently implemented, planned, blocked, or requires authorization;
 - output is machine-readable with a human-readable formatter where possible;
 - adding or changing a resident capability should be possible by updating an Estate artifact/registry/template and associated implementation hook, not by scattering hidden one-off logic throughout the UI;
@@ -280,11 +342,19 @@ Create or update a reusable resident interaction template at the nearest canonic
 
 or a more appropriate existing directory.
 
-Create or update a resident interaction surface artifact/template at the nearest canonical location, such as:
+Create or update a resident API/surface standard/template at the nearest canonical location, such as:
 
-`docs/operations/residents/resident_interaction_surface_template.md`
+`docs/operations/residents/resident_api_surface_standard.md`
 
 or a registry/schema path if an existing canonical registry is found.
+
+Create or update a resident implementation profile template at the nearest canonical location, such as:
+
+`docs/operations/residents/resident_implementation_profile_template.md`
+
+Create or update a resident API/surface extension proposal template at the nearest canonical location, such as:
+
+`docs/operations/residents/resident_api_extension_proposal_template.md`
 
 The report must include:
 
@@ -295,8 +365,11 @@ The report must include:
 - conversation persistence path
 - forget/redaction mechanism
 - authority handling
-- resident interaction/API surface inspection mechanism
-- resident surface extension mechanism
+- resident API/surface inspection mechanism
+- resident API standard versioning mechanism
+- resident implementation versioning mechanism
+- resident API/surface extension mechanism
+- Character Development Engineer extensibility example
 - API/server endpoints or internal handlers added
 - residents this pattern is intended to support
 - tests run
@@ -316,9 +389,13 @@ Add or update tests for:
 6. Authority metadata is attached to the turn.
 7. The interaction layer does not claim unauthorized execution.
 8. Generic resident interaction template/report exists.
-9. Resident interaction/API surface can be printed or inspected for Alfred.
+9. Resident API/surface can be printed or inspected for Alfred.
 10. Surface inspection output explains how the resident surface can be extended.
 11. The surface model can represent future residents with different responsibilities.
+12. Resident API standard version is reported.
+13. Resident implementation version is reported.
+14. A resident API/surface extension proposal template exists.
+15. The model can represent a future Character Development Engineer extension such as mood arc behavior without implementing that behavior yet.
 
 Run:
 
@@ -358,9 +435,14 @@ Update or create as applicable:
 - resident conversation turn persistence
 - conversation forget/redaction mechanism
 - generic resident interaction API/server handler conventions
-- resident interaction/API surface inspection command or endpoint
-- resident surface extension mechanism/template
+- resident API/surface inspection command or endpoint
+- resident API standard versioning mechanism
+- resident implementation versioning mechanism
+- resident API/surface extension mechanism/template
 - resident interaction template
+- resident API/surface standard/template
+- resident implementation profile template
+- resident API extension proposal template
 - WP-0126 report Markdown and JSON
 - validation recipe registration for WP-0126
 - validation reports/runtime JSON for WP-0126
@@ -374,15 +456,20 @@ Add a recipe for WP-0126 that verifies:
 - resident interaction framework report exists
 - JSON companion parses
 - resident interaction template exists
-- resident interaction/API surface template or registry exists
+- resident API/surface standard or registry exists
+- resident implementation profile template exists
+- resident API extension proposal template exists
 - interaction layer can process an Alfred-style prompt
 - conversation turn persistence is present
 - forget/redaction mechanism is present
 - local LLM adapter/discovery status is reported
 - deterministic fallback status is reported
 - authority metadata is attached to interaction records
-- resident interaction/API surface inspection is available for Alfred
+- resident API/surface inspection is available for Alfred
+- resident API standard version is reported
+- resident implementation version is reported
 - surface extension mechanism is documented
+- Character Development Engineer extensibility example is represented
 - WP-0122, WP-0123, WP-0124, and WP-0125 remain passing
 - production-readiness validation executes successfully
 - WP-0126 receipt is complete
@@ -408,9 +495,12 @@ It must include:
 - conversation persistence path
 - forget/redaction mechanism
 - authority handling
-- resident interaction/API surface inspection path
-- resident surface extension mechanism
+- resident API/surface inspection path
+- resident API standard versioning mechanism
+- resident implementation versioning mechanism
+- resident API/surface extension mechanism
 - resident interaction template path
+- resident API extension proposal template path
 - tests run
 - validation commands run
 - known limitations
@@ -420,8 +510,8 @@ It must include:
 
 ## Acceptance Criteria
 
-WP-0126 is complete when the Estate has a reusable, tested resident interaction framework that can support Alfred and future residents through local-first UI chat, local LLM routing, persisted institutional conversation memory, Steward-controlled forgetting/redaction, authority-aware interaction boundaries, and inspectable/extensible resident interaction/API surfaces.
+WP-0126 is complete when the Estate has a reusable, tested resident interaction framework that can support Alfred and future residents through local-first UI chat, local LLM routing, persisted institutional conversation memory, Steward-controlled forgetting/redaction, authority-aware interaction boundaries, versioned resident API standards, versioned resident implementations, and controlled extension of resident API/capability surfaces.
 
 ## Merge Class
 
-Class A. Escalate only if implementation requires changing Steward authority, resident authority, server exposure/security policy, memory/redaction policy, or production-readiness semantics.
+Class A. Escalate only if implementation requires changing Steward authority, resident authority, server exposure/security policy, memory/redaction policy, resident API governance, or production-readiness semantics.
