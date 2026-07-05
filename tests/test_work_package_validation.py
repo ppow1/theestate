@@ -289,3 +289,37 @@ def test_wp_0113_generated_recipe_registered():
     commands = [command["command"] for command in recipe["commands"]]
     assert any("WP-0113_helen_next_batch_recommendation.json" in command for command in commands)
     assert any("wp-0106" in command.lower() and "wp-0110" in command.lower() for command in commands)
+
+
+def test_wp_0115_bootstrap_recipes_registered_and_guarded():
+    representative = ["WP-0014", "WP-0022", "WP-0084", "WP-0104"]
+    for work_package_id in representative:
+        recipe = get_validation_recipe(work_package_id)
+        assert recipe is not None
+        assert recipe["recipe_id"].endswith("historical-receipt-artifact-presence")
+        commands = [command["command"] for command in recipe["commands"]]
+        assert all(command.startswith("python -c ") for command in commands)
+        assert all("test -f" not in command and " do " not in command for command in commands)
+
+    for skipped in ["WP-0016", "WP-0017", "WP-0018", "WP-0056", "WP-0073", "WP-0094", "WP-0106", "WP-0107", "WP-9999"]:
+        recipe = get_validation_recipe(skipped)
+        if recipe is not None:
+            assert not recipe["recipe_id"].endswith("historical-receipt-artifact-presence")
+
+
+def test_wp_0115_recipe_and_report_artifacts_registered_and_parse():
+    recipe = get_validation_recipe("WP-0115")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0115-historical-validation-recipe-bootstrap-sweep"
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("validation-production-readiness --json" in command for command in commands)
+    assert any("validate-work-package --id WP-0114 --json" in command for command in commands)
+
+    from pathlib import Path
+    report_path = Path("runtime/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.json")
+    assert Path("operations/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.md").is_file()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["production_readiness_totals_before"]
+    assert report["production_readiness_totals_after"]
+    assert report["packages_considered"]
+    assert all(item.get("reason") for item in report["packages_skipped"])
