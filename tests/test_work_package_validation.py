@@ -269,3 +269,23 @@ def test_wp_0111_report_artifacts_identify_wp_0020_first_batch():
     assert {"WP-0106", "WP-0107", "WP-0108", "WP-0109", "WP-0110"} <= pending
     assert "WP-0020" in md
     assert "pending/unimplemented" in md
+
+
+def test_wp_0114_recipe_registered_and_self_validation_targets():
+    recipe = get_validation_recipe("WP-0114")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0114-historical-production-readiness-sweep"
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("WP-0114_historical_sweep_report.json" in command for command in commands)
+    assert any("validation-production-readiness" in command for command in commands)
+    assert any("WP-0102" in command for command in commands)
+    assert any("validate_receipt('WP-0114')" in command for command in commands)
+
+
+def test_wp_0113_generated_recipe_registered():
+    recipe = get_validation_recipe("WP-0113")
+    assert recipe is not None
+    assert recipe["recipe_id"] == "wp-0113-helen-next-batch-recommendation"
+    commands = [command["command"] for command in recipe["commands"]]
+    assert any("WP-0113_helen_next_batch_recommendation.json" in command for command in commands)
+    assert any("wp-0106" in command.lower() and "wp-0110" in command.lower() for command in commands)

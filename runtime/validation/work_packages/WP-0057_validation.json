@@ -1,0 +1,91 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main steward-command-center --json",
+      "completed_at": "2026-07-05T00:00:28+00:00",
+      "duration_seconds": 1.218,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:26+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0057_2026-07-05T000026Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main assignment-queue --json",
+      "completed_at": "2026-07-05T00:00:28+00:00",
+      "duration_seconds": 0.55,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:28+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0057_2026-07-05T000026Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main global-search \"Voice Integration\" --json",
+      "completed_at": "2026-07-05T00:00:29+00:00",
+      "duration_seconds": 0.652,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-05T00:00:28+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0057_2026-07-05T000026Z0000/command_03_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main steward-command-center --json",
+    "python -m estate.cli.main assignment-queue --json",
+    "python -m estate.cli.main global-search \"Voice Integration\" --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0057_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0057_validation.md",
+    "runtime/validation/work_packages/WP-0057_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T00:00:26+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "51e0b5912c9ca6293eea2f0f767531bc8b660fdb",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0057_codex_done.json",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "pr_metadata_status": "available",
+    "pull_request_url": "pending_make_pr_tool",
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0057"
+  },
+  "recipe_id": "wp-0057-voice-integration-framework",
+  "recipe_title": "WP-0057 \u2014 Voice Integration Framework",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0057_2026-07-05T000026Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0057"
+}

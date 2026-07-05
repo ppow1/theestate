@@ -1,0 +1,119 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operations-center-profile --json --profile validation",
+      "completed_at": "2026-07-05T00:00:54+00:00",
+      "duration_seconds": 0.387,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:53+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0089_2026-07-05T000053Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main operations-center-profile --json --profile active-projects --save-profile active-review --active-tab work-packages",
+      "completed_at": "2026-07-05T00:00:54+00:00",
+      "duration_seconds": 0.382,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:54+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0089_2026-07-05T000053Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_operations_center_workspace_profiles.py",
+      "completed_at": "2026-07-05T00:00:55+00:00",
+      "duration_seconds": 0.849,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:54+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0089_2026-07-05T000053Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main steward-command-center --json",
+      "completed_at": "2026-07-05T00:00:56+00:00",
+      "duration_seconds": 1.373,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:55+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0089_2026-07-05T000053Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-05T00:00:57+00:00",
+      "duration_seconds": 0.619,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-05T00:00:56+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0089_2026-07-05T000053Z0000/command_05_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main operations-center-profile --json --profile validation",
+    "python -m estate.cli.main operations-center-profile --json --profile active-projects --save-profile active-review --active-tab work-packages",
+    "pytest -q tests/test_operations_center_workspace_profiles.py",
+    "python -m estate.cli.main steward-command-center --json",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0089_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0089_validation.md",
+    "runtime/validation/work_packages/WP-0089_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T00:00:53+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "51e0b5912c9ca6293eea2f0f767531bc8b660fdb",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages."
+    ],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": false,
+    "receipt_status": "complete",
+    "required_followups": [
+      "Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages."
+    ]
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [
+      "Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages."
+    ],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0089_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0089"
+  },
+  "recipe_id": "wp-0089-operations-center-workspace-profiles",
+  "recipe_title": "WP-0089 \u2014 Operations Center Workspace Profiles",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 5 command(s).",
+  "validation_id": "WP-0089_2026-07-05T000053Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0089"
+}

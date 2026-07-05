@@ -17,6 +17,7 @@
     "pull_request_url is null until the PR is created."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented the first local Steward Decision Queue panel, including JSON and Markdown generation, command center integration, CLI access, tests for empty/representative/missing-source scenarios, and current generated panel output.",

@@ -1,10 +1,7 @@
 {
-  "work_package_id": "WP-0035",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T22:42:30Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Implemented Notification Router v1 as a transport-independent classification layer for recall and informational Estate events, added CLI/report generation, and covered required routing behavior with tests.",
   "files_changed": [
     "src/estate/core/notification_router.py",
     "src/estate/cli/main.py",
@@ -12,14 +9,18 @@
     "runtime/notifications/notification_router_report.json",
     "collaboration/work_packages/completions/WP-0035_codex_done.json"
   ],
-  "tests_run": [
-    "PYTHONPATH=src pytest tests/test_notification_router.py",
-    "PYTHONPATH=src python -m estate.cli.main notification-router --json"
-  ],
   "known_limitations": [
     "Notification Router v1 classifies events and writes reports only; it intentionally implements no transport adapter and contacts no external services.",
     "The default CLI report does not fabricate recall events when no structured input events are provided."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Implemented Notification Router v1 as a transport-independent classification layer for recall and informational Estate events, added CLI/report generation, and covered required routing behavior with tests.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_notification_router.py",
+    "PYTHONPATH=src python -m estate.cli.main notification-router --json"
+  ],
+  "work_package_id": "WP-0035"
 }

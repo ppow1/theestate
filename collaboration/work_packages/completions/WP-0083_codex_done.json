@@ -19,6 +19,7 @@
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
   "merge_class": "Class A",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented a read-only Estate Service Health Registry aggregating catalog and dependency matrix data into health, availability, validation, dependency-health, last-known update, and authoritative source-link views for Mission Control, the Operations Center, and Alfred. Added CLI access, generated Markdown output, source-link integrity checks, graceful unavailable-source handling, and tests for healthy, degraded, unavailable, unknown, and missing-metadata states.",

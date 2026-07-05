@@ -30,6 +30,7 @@
   ],
   "merge_authority": "Class A; no Alfred authority, Steward decision authority, mailbox authority, validation authority, merge authority, or automatic action semantics were changed.",
   "production_readiness_command_status": "command completed; repository-wide readiness remains not accepted due to existing blocked/missing/incomplete work outside this package, while WP-0107 recipe is registered and passed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url_not_applicable_reason": "Local Codex environment records PR metadata via make_pr after git commit; no remote URL is available before tool submission.",
   "ready_for_ca_review": true,
   "sample_alfred_duty_output": {

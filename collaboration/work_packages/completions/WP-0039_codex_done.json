@@ -17,6 +17,7 @@
     "pull_request_url is null until the PR is created."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented Worker Runtime Heartbeat service with local heartbeat recording, stale-heartbeat detection without state inference, blocked-state validation, runtime JSON output, operational Markdown summary, CLI commands, tests, and generated current runtime artifacts.",

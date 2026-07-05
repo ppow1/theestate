@@ -5,6 +5,7 @@
     "new_authority_granted": false,
     "secrets_stored": false
   },
+  "branch": "work",
   "changed_files": [
     "src/estate/core/resident_presence.py",
     "runtime/residents/presence.json",
@@ -15,6 +16,7 @@
     "tests/test_resident_presence.py",
     "collaboration/work_packages/completions/WP-0106_codex_done.json"
   ],
+  "codex_status": "done",
   "completed_at": "2026-07-04T20:25:00+00:00",
   "completed_by": "Codex",
   "demonstration": {
@@ -30,6 +32,7 @@
   ],
   "merge_class": "Class A",
   "production_readiness_command_status": "passed_json_generated",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "ready_for_ca_review": true,
   "summary": "Implemented a local-first resident runtime presence model for Alfred and Helen, integrated it with resident cards and the Office of the Steward command center, added CLI inspection, tests, and validation recipe registration.",
   "tests_run": [

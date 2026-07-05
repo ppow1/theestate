@@ -1,0 +1,97 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validation-handoff-artifact-workflow --json",
+      "completed_at": "2026-07-05T00:00:42+00:00",
+      "duration_seconds": 0.381,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:42+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0074_2026-07-05T000042Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validation-observations --json",
+      "completed_at": "2026-07-05T00:00:42+00:00",
+      "duration_seconds": 0.382,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:42+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0074_2026-07-05T000042Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validation-metrics-dashboard --json",
+      "completed_at": "2026-07-05T00:00:43+00:00",
+      "duration_seconds": 0.399,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:00:42+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0074_2026-07-05T000042Z0000/command_03_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main validation-handoff-artifact-workflow --json",
+    "python -m estate.cli.main validation-observations --json",
+    "python -m estate.cli.main validation-metrics-dashboard --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0074_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0074_validation.md",
+    "runtime/validation/work_packages/WP-0074_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T00:00:42+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "51e0b5912c9ca6293eea2f0f767531bc8b660fdb",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": false,
+    "receipt_status": "incomplete",
+    "required_followups": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ]
+  },
+  "receipt_gaps": [
+    "pull_request_url_or_not_applicable_reason"
+  ],
+  "receipt_validation": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0074_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [
+      "pull_request_url_or_not_applicable_reason"
+    ],
+    "receipt_status": "incomplete",
+    "work_package_id": "WP-0074"
+  },
+  "recipe_id": "wp-0074-validation-handoff-artifact-workflow",
+  "recipe_title": "WP-0074 \u2014 Validation Handoff Artifact Workflow",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0074_2026-07-05T000042Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0074"
+}

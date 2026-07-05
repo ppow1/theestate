@@ -1,10 +1,7 @@
 {
-  "work_package_id": "WP-0028",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T21:17:25.370202+00:00",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Created stable Estate document registry JSON, human-readable registry documentation, document-registry CLI output, and validation tests.",
   "files_changed": [
     "data/registry/documents.json",
     "docs/operations/Document_Registry_v1.md",
@@ -13,14 +10,18 @@
     "tests/test_document_registry.py",
     "collaboration/work_packages/completions/WP-0028_codex_done.json"
   ],
+  "known_limitations": [
+    "pull_request_url is null because the PR URL is not available until after PR creation."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Created stable Estate document registry JSON, human-readable registry documentation, document-registry CLI output, and validation tests.",
   "tests_run": [
     "PYTHONPATH=src pytest tests/test_document_registry.py",
     "PYTHONPATH=src python -m estate.cli.main document-registry --json",
     "python -m json.tool data/registry/documents.json"
   ],
-  "known_limitations": [
-    "pull_request_url is null because the PR URL is not available until after PR creation."
-  ],
-  "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "work_package_id": "WP-0028"
 }

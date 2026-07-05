@@ -1,16 +1,10 @@
 {
-  "work_package_id": "WP-0031",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T21:59:36Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Created Transport Adapter Evaluation v1, preserving the Communication Bus as the institutional messaging model while evaluating GitHub repository files, local filesystem/local broker, Gmail/email, Gotify, Q Mastery/MPT-style mailbox connectors, and a future Codex task status adapter. Included a recommendation matrix, near-term transport priorities, and a future-work note for Codex task status integration.",
   "files_changed": [
     "docs/collaboration/Transport_Adapter_Evaluation_v1.md",
     "collaboration/work_packages/completions/WP-0031_codex_done.json"
-  ],
-  "tests_run": [
-    "Documentation review only; verified referenced repository paths exist with find/sed shell checks."
   ],
   "known_limitations": [
     "No transports were implemented.",
@@ -18,6 +12,13 @@
     "No external services were called.",
     "Codex task status integration remains future work until approved API/runtime access exists."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Created Transport Adapter Evaluation v1, preserving the Communication Bus as the institutional messaging model while evaluating GitHub repository files, local filesystem/local broker, Gmail/email, Gotify, Q Mastery/MPT-style mailbox connectors, and a future Codex task status adapter. Included a recommendation matrix, near-term transport priorities, and a future-work note for Codex task status integration.",
+  "tests_run": [
+    "Documentation review only; verified referenced repository paths exist with find/sed shell checks."
+  ],
+  "work_package_id": "WP-0031"
 }

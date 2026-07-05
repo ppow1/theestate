@@ -1,24 +1,25 @@
 {
-  "work_package_id": "WP-0034",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T22:37:52Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Created Steward Recall Decision Model v1 and a machine-readable policy file defining approved recall reasons, non-recall events, required evidence, audit fields, Alfred's coordinator role, worker recall requests, and constraints preserving Steward authority.",
   "files_changed": [
     "docs/operations/Steward_Recall_Decision_Model_v1.md",
     "data/policy/steward_recall_reasons.json",
     "collaboration/work_packages/completions/WP-0034_codex_done.json"
-  ],
-  "tests_run": [
-    "python -m json.tool data/policy/steward_recall_reasons.json",
-    "python -m json.tool collaboration/work_packages/completions/WP-0034_codex_done.json"
   ],
   "known_limitations": [
     "This package is documentation and policy only; it does not implement notification transport.",
     "This package does not create final security clearance policy.",
     "The model preserves Steward constitutional authority and limits Alfred to coordinator behavior under approved policy."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Created Steward Recall Decision Model v1 and a machine-readable policy file defining approved recall reasons, non-recall events, required evidence, audit fields, Alfred's coordinator role, worker recall requests, and constraints preserving Steward authority.",
+  "tests_run": [
+    "python -m json.tool data/policy/steward_recall_reasons.json",
+    "python -m json.tool collaboration/work_packages/completions/WP-0034_codex_done.json"
+  ],
+  "work_package_id": "WP-0034"
 }

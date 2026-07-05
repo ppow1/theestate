@@ -14,6 +14,7 @@
     "pull_request_url is null until the PR is created."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Added a local Office of the Steward command center skeleton that renders resident cards, operational report panels, placeholders for missing capabilities, a generated HTML dashboard, a local HTTP server entry point, CLI access, and tests for rendering, graceful degradation, server startup, and CLI JSON generation.",
