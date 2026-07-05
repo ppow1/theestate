@@ -1,10 +1,7 @@
 {
-  "work_package_id": "WP-0089",
+  "branch": "work",
   "codex_status": "completed",
   "completed_at": "2026-07-04T18:40:00+00:00",
-  "branch": "work",
-  "pull_request_url_not_applicable_reason": "Pull request URL is not available in this local execution environment; make_pr metadata is recorded separately.",
-  "summary": "Implemented local, version-aware Operations Center workspace profiles with task-focused defaults, profile persistence/resolution, layout compatibility metadata, unavailable-panel handling, operator activity profile integration, Steward command center embedding, CLI save/load surface, regression tests, and a registered WP-0089 validation recipe.",
   "files_changed": [
     "src/estate/core/operations_center_workspace_profiles.py",
     "src/estate/core/steward_command_center.py",
@@ -14,38 +11,6 @@
     "operations/validation/reports/WP-0089_validation.md",
     "collaboration/work_packages/completions/WP-0089_codex_done.json"
   ],
-  "tests_run": [
-    {
-      "command": "PYTHONPATH=src pytest -q tests/test_operations_center_workspace_profiles.py tests/test_steward_command_center.py tests/test_operator_activity_stream.py",
-      "status": "passed",
-      "observed": "33 passed in 3.10s"
-    },
-    {
-      "command": "PYTHONPATH=src python -m estate.cli.main operations-center-profile --json --profile validation",
-      "status": "passed",
-      "observed": "Resolved the Validation workspace profile with layout-framework-v1 compatibility metadata."
-    },
-    {
-      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0089 --json",
-      "status": "passed",
-      "observed": "validation_status=passed; recipe_id=wp-0089-operations-center-workspace-profiles. Initial run reported missing completion artifact until this receipt was created."
-    },
-    {
-      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
-      "status": "passed_with_existing_repository_blockers",
-      "observed": "Command exited 0 and generated a report; repository-wide readiness remains blocked by unrelated older missing/incomplete receipts and missing recipes outside WP-0089."
-    }
-  ],
-  "known_limitations": [
-    "Workspace profiles are local JSON/browser-local layout preferences and do not modify governance records or operational source artifacts.",
-    "Future user-customized layout editing is represented by the save/load profile API and CLI surface; advanced drag/drop UI editing remains future work.",
-    "Production-readiness command still reports unrelated repository-wide blockers for older work packages."
-  ],
-  "ready_for_ca_review": true,
-  "merge_authority": "Chief Architect review required; Codex does not grant merge approval.",
-  "validation_recipe_status": "registered_and_passed",
-  "validation_recipe_id": "wp-0089-operations-center-workspace-profiles",
-  "production_readiness_command_status": "command_passed_with_unrelated_repository_blockers",
   "final_command_surfaces": [
     "PYTHONPATH=src python -m estate.cli.main operations-center-profile --json --profile <name>",
     "PYTHONPATH=src python -m estate.cli.main operations-center-profile --json --profile active-projects --save-profile active-review --active-tab work-packages",
@@ -53,6 +18,40 @@
     "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0089 --json",
     "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
   ],
+  "known_limitations": [
+    "Workspace profiles are local JSON/browser-local layout preferences and do not modify governance records or operational source artifacts.",
+    "Future user-customized layout editing is represented by the save/load profile API and CLI surface; advanced drag/drop UI editing remains future work."
+  ],
+  "merge_authority": "Chief Architect review required; Codex does not grant merge approval.",
+  "production_readiness_command_status": "stale_repository_wide_limitation_removed_by_WP-0120; current unrelated blockers are separately tracked at repository level and do not block WP-0089 implementation readiness",
+  "pull_request_not_applicable_reason": "Pull request URL is not available in this local execution environment; make_pr metadata is recorded separately.",
+  "pull_request_url_not_applicable_reason": "Pull request URL is not available in this local execution environment; make_pr metadata is recorded separately.",
   "pull_request_url_or_not_applicable_reason": "Pull request URL is not available in this local execution environment; make_pr metadata is recorded separately.",
-  "pull_request_not_applicable_reason": "Pull request URL is not available in this local execution environment; make_pr metadata is recorded separately."
+  "ready_for_ca_review": true,
+  "summary": "Implemented local, version-aware Operations Center workspace profiles with task-focused defaults, profile persistence/resolution, layout compatibility metadata, unavailable-panel handling, operator activity profile integration, Steward command center embedding, CLI save/load surface, regression tests, and a registered WP-0089 validation recipe.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_operations_center_workspace_profiles.py tests/test_steward_command_center.py tests/test_operator_activity_stream.py",
+      "observed": "33 passed in 3.10s",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main operations-center-profile --json --profile validation",
+      "observed": "Resolved the Validation workspace profile with layout-framework-v1 compatibility metadata.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0089 --json",
+      "observed": "validation_status=passed; recipe_id=wp-0089-operations-center-workspace-profiles. Initial run reported missing completion artifact until this receipt was created.",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "observed": "Command exited 0 and generated a report; repository-wide readiness remains blocked by unrelated older missing/incomplete receipts and missing recipes outside WP-0089.",
+      "status": "passed_with_existing_repository_blockers"
+    }
+  ],
+  "validation_recipe_id": "wp-0089-operations-center-workspace-profiles",
+  "validation_recipe_status": "registered_and_passed",
+  "work_package_id": "WP-0089"
 }

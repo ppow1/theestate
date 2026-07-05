@@ -1,0 +1,97 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main steward-command-center --json",
+      "completed_at": "2026-07-05T06:24:54+00:00",
+      "duration_seconds": 0.914,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:53+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0056_2026-07-05T062453Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main global-search \"Notification Center\" --json",
+      "completed_at": "2026-07-05T06:24:54+00:00",
+      "duration_seconds": 0.463,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T06:24:54+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0056_2026-07-05T062453Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main palette-command notification-center --json",
+      "completed_at": "2026-07-05T06:24:55+00:00",
+      "duration_seconds": 0.266,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-05T06:24:54+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0056_2026-07-05T062453Z0000/command_03_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -m estate.cli.main steward-command-center --json",
+    "python -m estate.cli.main global-search \"Notification Center\" --json",
+    "python -m estate.cli.main palette-command notification-center --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0056_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0056_validation.md",
+    "runtime/validation/work_packages/WP-0056_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T06:24:53+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "1134484794b449a27a668e709eb2aab872929565",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": false,
+    "receipt_status": "incomplete",
+    "required_followups": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ]
+  },
+  "receipt_gaps": [
+    "pull_request_url_or_not_applicable_reason"
+  ],
+  "receipt_validation": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason"
+    ],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0056_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [
+      "pull_request_url_or_not_applicable_reason"
+    ],
+    "receipt_status": "incomplete",
+    "work_package_id": "WP-0056"
+  },
+  "recipe_id": "wp-0056-notification-center-workspace",
+  "recipe_title": "WP-0056 \u2014 Notification Center Workspace",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0056_2026-07-05T062453Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0056"
+}

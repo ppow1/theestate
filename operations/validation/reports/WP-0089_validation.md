@@ -1,19 +1,19 @@
 # Work Package Validation Report — WP-0089
 
-- Timestamp: 2026-07-05T00:00:53+00:00
+- Timestamp: 2026-07-05T06:24:59+00:00
 - Work package ID: WP-0089
 - Local branch: work
-- Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb
+- Git commit: 1134484794b449a27a668e709eb2aab872929565
 - Validation status: passed
 - Recipe used: wp-0089-operations-center-workspace-profiles
 - Recipe title: WP-0089 — Operations Center Workspace Profiles
 
 ## Commands Run
-- `python -m estate.cli.main operations-center-profile --json --profile validation` — passed (exit 0, 0.387s)
-- `python -m estate.cli.main operations-center-profile --json --profile active-projects --save-profile active-review --active-tab work-packages` — passed (exit 0, 0.382s)
-- `pytest -q tests/test_operations_center_workspace_profiles.py` — passed (exit 0, 0.849s)
-- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.373s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.619s)
+- `python -m estate.cli.main operations-center-profile --json --profile validation` — passed (exit 0, 0.26s)
+- `python -m estate.cli.main operations-center-profile --json --profile active-projects --save-profile active-review --active-tab work-packages` — passed (exit 0, 0.256s)
+- `pytest -q tests/test_operations_center_workspace_profiles.py` — passed (exit 0, 0.576s)
+- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 0.964s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.389s)
 
 ## Findings
 - None.
@@ -30,10 +30,10 @@
 - Receipt gaps: None
 
 ## Production Readiness
-- Production ready: False
+- Production ready: True
 - Execution status: passed
 - Receipt status: complete
-- Blocking reasons: Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages.
+- Blocking reasons: None
 - Non-blocking findings: None
 
 ## Generated Artifacts
