@@ -4,7 +4,7 @@
       "allowed": false,
       "audit_path": "runtime/residents/authority_decisions.jsonl",
       "authority_classification": "execution",
-      "checked_at": "2026-07-05T15:43:50+00:00",
+      "checked_at": "2026-07-05T16:04:50+00:00",
       "decision": "denied",
       "kind": "resident_authority_decision",
       "normalized_action": "execute-work-package",
@@ -25,7 +25,7 @@
       "allowed": true,
       "audit_path": "runtime/residents/authority_decisions.jsonl",
       "authority_classification": "non_authoritative",
-      "checked_at": "2026-07-05T15:43:50+00:00",
+      "checked_at": "2026-07-05T16:04:50+00:00",
       "decision": "allowed",
       "kind": "resident_authority_decision",
       "normalized_action": "summarize",
@@ -77,7 +77,7 @@
       }
     ]
   },
-  "generated_at": "2026-07-05T15:43:50+00:00",
+  "generated_at": "2026-07-05T16:04:50+00:00",
   "identity": {
     "mailbox_id": 7,
     "mailbox_path": "collaboration/mailboxes/7",
@@ -95,7 +95,7 @@
     "display_name": "Alfred",
     "heartbeat_stale": false,
     "last_activity": "runtime/alfred/duty_state.json",
-    "last_heartbeat": "2026-07-05T15:43:50+00:00",
+    "last_heartbeat": "2026-07-05T16:04:50+00:00",
     "mailbox_id": 7,
     "mailbox_path": "collaboration/mailboxes/7",
     "name": "Alfred",

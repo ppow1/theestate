@@ -1,0 +1,18 @@
+{
+  "current_work_package": "WP-0125",
+  "department": "Estate Engineering Department",
+  "local_execution_first": true,
+  "primary_objective": "CueMastery",
+  "recommended_next_action": "Open a CueMastery repository/build discovery work package under the Engineering Department, then request Chief Architect review of the discovery results.",
+  "runtime_relationships": {
+    "alfred_runtime": "authorized operational routing/summaries/duty support only",
+    "chief_architects": "architecture review/challenge/acceptance guidance",
+    "codex": "local execution mechanism, not governance authority",
+    "helen_hr": "hiring/onboarding/personnel workflows",
+    "steward": "final institutional authority retained",
+    "validation": "delivery gate and evidence system"
+  },
+  "status": "established",
+  "validation_required": true,
+  "work_package_discipline": true
+}

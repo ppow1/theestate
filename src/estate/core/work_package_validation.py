@@ -212,6 +212,28 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0125": {
+        "recipe_id": "wp-0125-engineering-department-establishment",
+        "title": "WP-0125 — Estate Engineering Department for CueMastery Execution",
+        "description": "Self-validates Engineering Department charter, operating guide, CueMastery handoff, establishment reports, prerequisite status reporting, production-readiness execution, and receipt completeness.",
+        "required_checks": ["Engineering charter exists", "Operating guide exists", "CueMastery handoff exists", "Reports exist and parse", "CueMastery is primary objective", "Work-package and validation discipline are stated", "Immediate CueMastery next steps are present", "Production readiness executes", "Alfred/Helen and prerequisite statuses are reported", "Receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/departments/engineering/engineering_department_charter.md", "operations/departments/engineering/engineering_department_operating_guide.md", "operations/departments/engineering/cuemastery_execution_handoff.md", "operations/departments/engineering/WP-0125_engineering_department_establishment_report.md", "runtime/departments/engineering/WP-0125_engineering_department_establishment_report.json", "runtime/departments/engineering/WP-0125_engineering_department_status.json", "collaboration/work_packages/completions/WP-0125_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Authority or resident status reporting is absent", "WP-9999 is falsely promoted"],
+        "success_criteria": ["Required commands exit zero", "Engineering Department is represented by durable artifacts", "Dependent package statuses are reported", "Receipt is complete"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "import json; from pathlib import Path; charter=Path(\'operations/departments/engineering/engineering_department_charter.md\'); guide=Path(\'operations/departments/engineering/engineering_department_operating_guide.md\'); handoff=Path(\'operations/departments/engineering/cuemastery_execution_handoff.md\'); report=Path(\'operations/departments/engineering/WP-0125_engineering_department_establishment_report.md\'); status=Path(\'runtime/departments/engineering/WP-0125_engineering_department_status.json\'); data=json.loads(Path(\'runtime/departments/engineering/WP-0125_engineering_department_establishment_report.json\').read_text(encoding=\'utf-8\')); assert charter.is_file() and guide.is_file() and handoff.is_file() and report.is_file() and status.is_file(); ct=charter.read_text(encoding=\'utf-8\').lower(); gt=guide.read_text(encoding=\'utf-8\').lower(); ht=handoff.read_text(encoding=\'utf-8\').lower(); assert \'cuemastery\' in ct and \'initial primary objective\' in ct; assert \'work package\' in gt and \'validation\' in gt; assert \'immediate engineering discovery steps\' in ht and \'cuemastery\' in ht; assert data.get(\'alfred_helen_status\') and data.get(\'precondition_status\'); assert all(k in data.get(\'precondition_status\', {}) for k in [\'WP-0121\',\'WP-0122\',\'WP-0123\',\'WP-0124\']); assert data.get(\'wp_9999_status\',{}).get(\'promoted\') is False"'),
+            _cmd("python -m estate.cli.main validation-production-readiness --json"),
+            _cmd("python -m estate.cli.main validate-work-package --id WP-0121 --json"),
+            _cmd("python -m estate.cli.main validate-work-package --id WP-0122 --json"),
+            _cmd("python -m estate.cli.main validate-work-package --id WP-0123 --json"),
+            _cmd("python -m estate.cli.main validate-work-package --id WP-0124 --json"),
+            _cmd('python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt(\'WP-0125\'); assert r[\'receipt_status\']==\'complete\', r"'),
+        ],
+    },
+
     "WP-0112": {
         "recipe_id": "wp-0112-parallel-workstream-standard",
         "title": "WP-0112 — Parallel Workstream Isolation and Install Handoff Standard",

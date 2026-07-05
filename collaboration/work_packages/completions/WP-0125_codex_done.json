@@ -1,0 +1,33 @@
+{
+  "work_package_id": "WP-0125",
+  "codex_status": "done",
+  "completed_at": "2026-07-05T00:00:00+00:00",
+  "branch": "work",
+  "summary": "Established the Estate Engineering Department as the local execution unit for CueMastery and Estate-maintained systems, with charter, operating guide, CueMastery handoff, runtime status, validation recipe, and establishment reports.",
+  "files_changed": [
+    "operations/departments/engineering/engineering_department_charter.md",
+    "operations/departments/engineering/engineering_department_operating_guide.md",
+    "operations/departments/engineering/cuemastery_execution_handoff.md",
+    "operations/departments/engineering/WP-0125_engineering_department_establishment_report.md",
+    "runtime/departments/engineering/WP-0125_engineering_department_establishment_report.json",
+    "runtime/departments/engineering/WP-0125_engineering_department_status.json",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0125_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0121 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0122 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0123 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0124 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0125 --json"
+  ],
+  "known_limitations": [
+    "No origin remote is configured in this checkout, so remote sync could not be performed; execution continued from provided checkout state.",
+    "Chief Architect #5 remains documented as in onboarding/pending CA review status per WP-0124 evidence."
+  ],
+  "ready_for_ca_review": true,
+  "pull_request_not_applicable_reason": "Local Codex delivery records PR metadata through the make_pr tool after commit; no live PR URL is available inside the repository receipt.",
+  "merge_authority_equivalent": "Chief Architect review and Steward-governed merge authorization required."
+}
