@@ -1,4 +1,4 @@
-# SERIES TASK WP-0126 — Alfred TSR Chat Front Door
+# SERIES TASK WP-0126 — Resident Interaction Framework and Local LLM Governance
 
 ## Codex Command
 
@@ -10,35 +10,67 @@ SERIES
 
 ## Mission
 
-Make Alfred directly interactable from the Office of the Steward / Operations Center UI.
+Create the reusable resident interaction framework required for Alfred, Helen, Ingrid, Chief Architect #5, and future Estate resident offices to be directly interactable from the local Office of the Steward / Operations Center UI.
 
-Alfred has been stood up as a first-class Estate resident, but he is still effectively command-initiated. That is not sufficient. Alfred must become the Steward's first point of contact with the Estate: always available while the local Operations Center is running, reachable from the UI, and capable of accepting typed requests through a chat-style interface.
+This package must establish the shared pattern for resident chat interaction, local LLM routing, conversation persistence, authority handling, and Steward-controlled forgetting before Alfred's specific UI front door is implemented in WP-0127.
 
-This package is not a documentation exercise. It must add working interaction.
+This is implementation work. Do not produce only documents.
 
 ## Problem Statement
 
-The Operations Center currently exposes a large amount of useful institutional state, but it provides almost no interaction.
+The Operations Center currently exposes a large amount of institutional state, but it provides almost no interaction.
 
-The Estate has state.
+The Estate has residents. The Steward must be able to interact with them.
 
-It does not yet have enough behavior.
+Alfred is the immediate priority, but the Estate will also need interaction points for Helen, Ingrid, Chief Architect #5, and the Office of Character Development. Building Alfred as a one-off would create duplication and inconsistent governance.
 
-Alfred is supposed to be critical to the Estate and should function like a local resident assistant: a practical TSR-style presence in the Office, not merely a CLI command whose output can be displayed after the fact.
+The Estate needs a reusable resident interaction substrate first.
 
-The Steward must be able to open the server-based UI and talk to Alfred.
+## Required Design Position
+
+Local LLM capacity already exists and should be planned into the implementation.
+
+Do not treat deterministic artifact summaries as the primary Alfred/resident interaction model unless local LLM discovery fails. Deterministic, artifact-driven response generation is allowed only as a fallback or test mode.
+
+The target interaction model is:
+
+```text
+Operations Center UI
+  -> resident chat endpoint
+  -> resident interaction layer
+  -> local LLM adapter where available
+  -> Estate context retrieval
+  -> resident authority check
+  -> response
+  -> persisted resident conversation turn
+```
+
+## Resident Interaction Principles
+
+1. Residents are institutional participants, not disposable chat widgets.
+2. Conversations are institutional memory, not browser/DOM state.
+3. The Steward may instruct a resident to forget a conversation when appropriate.
+4. Resident authority is not zero-authority. Each resident has an office with responsibilities.
+5. Residents may act within their assigned responsibilities and authority boundaries.
+6. Expanded responsibility must be represented in Estate artifacts, not hidden in UI code.
+7. Actions outside a resident's authority require Steward authorization or escalation.
+8. The UI must distinguish conversation, recommendation, proposed action, authorized action, and completed institutional event.
+9. All resident interaction must remain local-first unless a future work package explicitly authorizes otherwise.
+10. Do not introduce cloud LLM/API dependencies.
 
 ## TSR Interpretation
 
-For this work package, TSR means:
+For this work package, TSR means the Estate has a pattern for resident interaction while the local Operations Center is running:
 
-- Alfred is available for interaction for as long as the local Operations Center server is running.
-- Alfred can accept user input from the UI without requiring the Steward to open a terminal and run a CLI command manually.
-- Alfred can produce a response visible in the UI.
-- Alfred conversation turns are persisted as Estate artifacts.
-- Alfred's availability is visible from the Office front door.
+- a resident can be reached from the UI without manually invoking a terminal command;
+- a resident can accept typed input;
+- a resident can produce a visible response;
+- conversation turns are persisted as Estate artifacts;
+- conversation history can be reloaded;
+- the Steward can mark a conversation as forgotten/redacted according to policy;
+- the resident's authority boundary is available to the interaction layer.
 
-This does not require background daemon autonomy beyond the running local server. Do not introduce unrelated always-on services, cloud dependencies, secret stores, or external APIs.
+This does not require unrelated always-on daemons beyond the local Operations Center server lifetime.
 
 ## Preconditions
 
@@ -48,143 +80,197 @@ Before work begins:
 2. Confirm WP-0123 is merged and Helen is online.
 3. Confirm WP-0124 is merged and Chief Architect #5 is onboarded.
 4. Confirm WP-0125 is merged and the Engineering Department exists.
-5. Confirm production-readiness validation runs.
-6. Confirm the Operations Center / Steward Command Center server starts locally or identify the current server startup defect.
+5. Inspect existing resident conversation/session artifacts.
+6. Inspect existing Alfred, Helen, resident authority, resident presence, and local Operations Center server code.
+7. Confirm production-readiness validation runs.
 
-If server startup fails because of an existing bug, repair the smallest safe local-first server defect required to make Alfred chat accessible.
+If a precondition fails, stop and report exact blockers.
 
 ## Scope
 
 In scope:
 
-1. Add a visible Alfred chat panel to the Office of the Steward / Operations Center UI.
-2. Make Alfred the front-door interaction point from the Home or Alfred tab.
-3. Add a local HTTP endpoint for submitting Alfred chat prompts from the UI.
-4. Add a local HTTP endpoint or page refresh mechanism for reading Alfred conversation history.
-5. Persist Alfred conversation turns using existing resident conversation/session artifacts where possible.
-6. Route submitted prompts through the existing Alfred task/request/conversation machinery where possible.
-7. Return a useful Alfred response in the UI.
-8. Make the interface local-only and explicit about authority boundaries.
-9. Ensure Alfred cannot silently execute work packages or bypass Steward authorization through chat.
-10. Record every chat interaction as an Estate artifact or resident conversation turn.
+1. Create a reusable resident interaction service/layer for local UI chat requests.
+2. Define and implement a reusable resident chat turn schema.
+3. Persist resident conversation sessions and turns using existing resident conversation artifacts where possible.
+4. Add a Steward-controlled forget/redact mechanism for resident conversation sessions or turns.
+5. Add local LLM adapter discovery/routing hooks suitable for local Ollama or other existing local model capacity.
+6. Add deterministic fallback mode for test/offline operation if no local LLM adapter is available.
+7. Add resident authority checks or authority metadata hooks to the interaction flow.
+8. Define generic local API conventions for resident interaction endpoints.
+9. Add a resident interaction template that future residents can reuse.
+10. Add tests proving the interaction substrate can handle at least an Alfred-style resident conversation request.
 11. Add validation recipe and completion receipt for WP-0126.
 
 Out of scope:
 
-- Full natural-language autonomous execution.
-- External LLM/API integration unless already present and explicitly local-first.
-- Cloud chat services.
-- Long-running background worker orchestration beyond the local Operations Center server lifetime.
-- Giving Alfred authority to execute, merge, delete, or modify institutional artifacts without existing authorization rules.
-- Building the full command palette.
-- Building external Codex telemetry.
-- Rebuilding the whole UI.
+- Building Alfred's final UI chat panel. That is WP-0127.
+- Building Helen/Ingrid/Chief Architect #5 full chat UIs.
+- Giving any resident new authority without existing or explicit artifact-backed responsibility.
+- Executing work packages from chat without authorization.
+- Cloud LLM/API integration.
+- External Codex telemetry.
+- Full command palette implementation.
+- Rebuilding the entire Operations Center UI.
 
-## Required User Experience
+## Required Resident Conversation Turn Model
 
-When the Steward opens the Operations Center UI:
+Implement or document and validate a machine-readable structure equivalent to:
 
-1. Alfred must be visible as an available resident/front-door assistant.
-2. There must be a text input area for typing to Alfred.
-3. There must be a submit/send action.
-4. Alfred must return a visible response.
-5. Prior conversation turns must be visible or reloadable.
-6. The UI must make clear that Alfred chat is local-first and does not bypass Steward authorization.
-
-Minimum acceptable interaction:
-
-```text
-Steward: Alfred, what should I look at first?
-Alfred: Current Estate status: [...]. Recommended next action: [...].
+```json
+{
+  "session_id": "resident_steward_YYYYMMDD_NNN",
+  "turn_id": "turn_0001",
+  "resident_id": "alfred",
+  "resident_display_name": "Alfred",
+  "participant_role": "Steward",
+  "created_at": "ISO-8601 timestamp",
+  "user_message": "...",
+  "resident_response": "...",
+  "context_used": ["artifact/path.json"],
+  "llm": {
+    "mode": "local_llm|deterministic_fallback",
+    "provider": "ollama|other|none",
+    "model": "model name if known"
+  },
+  "authority": {
+    "action_requested": false,
+    "action_executed": false,
+    "authority_status": "conversation_only|within_responsibility|requires_steward_authorization|blocked",
+    "authority_reference": "artifact path or rule id if available"
+  },
+  "memory_status": "active|forgotten|redacted"
+}
 ```
 
-The response may be deterministic and artifact-driven at first. It does not need to be a full LLM conversation if no local model is wired yet. It must still be useful and must be generated through a real code path, not a static placeholder.
+The exact schema may differ if existing Estate conventions already define the shape, but the resulting artifacts must preserve the same concepts.
 
-## Implementation Guidance
+## Forget / Redaction Requirement
+
+The Steward must have a way to tell the Estate to forget or redact a resident conversation.
+
+Minimum acceptable implementation:
+
+- mark a session or turn as `forgotten` or `redacted`;
+- preserve a minimal audit fact that a forget/redaction action occurred;
+- remove or suppress the original conversation content from normal UI/history views;
+- do not silently destroy institutional auditability without recording that a Steward forget/redaction action happened.
+
+This does not need to be exposed as a polished UI button in WP-0126 if the command/API path exists and is tested. WP-0127 may expose Alfred-specific UI affordances.
+
+## Local LLM Requirement
+
+The Estate already has local model capacity available in the Steward's environment.
+
+WP-0126 must therefore plan and implement the resident interaction layer around local LLM use, not around LLM avoidance.
+
+Requirements:
+
+1. Detect or provide an adapter boundary for local model providers, preferably through existing discovery/provider artifacts if available.
+2. Keep model execution local-first.
+3. Do not require an OpenAI, cloud, or paid API call.
+4. If no local model provider is reachable in Codex's environment, implement and test deterministic fallback mode while documenting the missing local provider as an environment limitation.
+5. Make local LLM mode the intended production mode for Alfred and future resident interactions.
+
+## Authority Model Requirement
+
+Residents have offices and responsibilities.
+
+The interaction framework must not assume every resident is forbidden from acting. It must instead distinguish:
+
+- conversation only;
+- recommendation;
+- proposed action requiring approval;
+- action within resident responsibility;
+- blocked action outside authority;
+- escalated action requiring Steward or Chief Architect approval.
+
+For Alfred, the framework must anticipate future responsibilities such as:
+
+- spinning up workers;
+- routing work;
+- accessing approved local drive locations;
+- monitoring operational state;
+- preparing work packages;
+- coordinating with Helen and Engineering.
+
+Do not grant those powers in this package unless existing authority artifacts already allow them. Build the framework so the powers can be represented cleanly later.
+
+## API / Server Guidance
 
 Prefer extending existing modules:
 
-- `src/estate/core/steward_command_center.py`
-- `src/estate/core/alfred.py`
 - `src/estate/core/resident_conversation_sessions.py`
-- existing resident conversation artifacts
-- existing Alfred request/task functions
+- `src/estate/core/resident_authority.py`
+- `src/estate/core/alfred.py`
+- `src/estate/core/steward_command_center.py`
+- Operations Center server bootstrap/handler code
 
-Add the smallest necessary server handler support to accept local POST requests from the Office UI.
-
-If `SimpleHTTPRequestHandler` is currently only serving static files, extend it carefully or add a local-only request handler for Alfred chat endpoints.
-
-Suggested local endpoints:
+Suggested generic local endpoint conventions:
 
 ```text
-GET  /api/alfred/chat
-POST /api/alfred/chat
+GET  /api/residents/{resident_id}/chat
+POST /api/residents/{resident_id}/chat
+POST /api/residents/{resident_id}/forget
 ```
 
-or the nearest convention that fits the current server code.
+Endpoint names may differ if a better existing convention is found, but the report must document the chosen paths.
 
-The endpoint should reject non-loopback exposure assumptions. Preserve local-only behavior.
-
-## Alfred Response Rules
-
-Initial Alfred responses may be deterministic and artifact-driven.
-
-At minimum, Alfred should be able to respond to prompts by summarizing:
-
-- current production-readiness status
-- current resident status
-- pending work packages
-- recent activity
-- known next actions
-- requested artifact search or command suggestions if available
-
-If the prompt cannot be handled, Alfred should say what he can currently do and recommend a concrete next action.
-
-Do not fake a general AI model.
+All endpoints must remain local-first and must not open remote network exposure beyond existing server behavior.
 
 ## Required Artifacts
 
 Create:
 
-`operations/residents/alfred/WP-0126_alfred_chat_front_door_report.md`
+`operations/residents/WP-0126_resident_interaction_framework_report.md`
 
 Create machine-readable companion:
 
-`runtime/residents/alfred/WP-0126_alfred_chat_front_door_report.json`
+`runtime/residents/WP-0126_resident_interaction_framework_report.json`
+
+Create or update a reusable resident interaction template at the nearest canonical location, such as:
+
+`docs/operations/residents/resident_interaction_template.md`
+
+or a more appropriate existing directory.
 
 The report must include:
 
 - current git commit
-- server startup status
-- endpoint paths added
-- UI panels/components changed
+- resident interaction architecture implemented
+- local LLM adapter/discovery status
+- deterministic fallback status
 - conversation persistence path
-- example prompt and response
-- authority boundaries
+- forget/redaction mechanism
+- authority handling
+- API/server endpoints or internal handlers added
+- residents this pattern is intended to support
 - tests run
 - validation commands run
 - known limitations
-- recommended next action
+- recommended next action, expected to be WP-0127 Alfred UI/chat implementation
 
 ## Required Tests
 
 Add or update tests for:
 
-1. Alfred chat endpoint exists or server handler can process a local Alfred chat request.
-2. A submitted prompt produces a response.
+1. Resident interaction service accepts an Alfred-style prompt.
+2. A response is generated through local LLM mode if available or deterministic fallback if not.
 3. Conversation turn is persisted.
-4. Alfred chat does not claim authority to execute work packages without authorization.
-5. Command Center / Operations Center HTML includes Alfred chat input and send action.
-6. Existing Alfred duty/presence tests remain passing.
+4. Conversation history can be reloaded.
+5. Steward forget/redaction changes memory status and suppresses content from normal history.
+6. Authority metadata is attached to the turn.
+7. The interaction layer does not claim unauthorized execution.
+8. Generic resident interaction template/report exists.
 
 Run:
 
 ```bash
 PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q
-PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_conversation_sessions.py
+PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_authority.py
 ```
 
-If an exact listed test file does not exist, use the closest existing resident conversation/server/UI test file and document the substitution.
+If exact files do not exist, use the closest existing resident conversation/authority tests and document substitutions.
 
 ## Required Validation Commands
 
@@ -199,24 +285,18 @@ PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0126 --js
 PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json
 ```
 
-Also run or document equivalent local smoke checks:
-
-```bash
-PYTHONPATH=src python -m estate.cli.main steward-command-center
-PYTHONPATH=src python -m estate.cli.main operations-center status --json
-PYTHONPATH=src python -m estate.cli.main operations-center start --host 127.0.0.1 --port 8765 --json
-```
-
-If `operations-center start` still fails due to the known local wrapper defect, either repair it as part of this package or document why direct `steward-command-center --serve` is the supported temporary startup path.
-
 ## Required Outputs
 
 Update or create as applicable:
 
-- Alfred chat/front-door UI changes
-- local server endpoint changes
-- conversation persistence artifacts
-- Alfred front-door report Markdown and JSON
+- reusable resident interaction service/layer
+- local LLM adapter boundary or discovery hook
+- deterministic fallback mode
+- resident conversation turn persistence
+- conversation forget/redaction mechanism
+- generic resident interaction API/server handler conventions
+- resident interaction template
+- WP-0126 report Markdown and JSON
 - validation recipe registration for WP-0126
 - validation reports/runtime JSON for WP-0126
 - regenerated production-readiness and coverage artifacts
@@ -226,14 +306,15 @@ Update or create as applicable:
 
 Add a recipe for WP-0126 that verifies:
 
-- Alfred chat/front-door report exists
+- resident interaction framework report exists
 - JSON companion parses
-- Operations Center / Steward Command Center HTML contains an Alfred chat input
-- HTML contains a send/submit action for Alfred
-- local Alfred chat endpoint or equivalent interaction path exists
-- an example Alfred prompt/response is recorded
-- conversation persistence path is recorded
-- authority boundaries are explicitly reported
+- resident interaction template exists
+- interaction layer can process an Alfred-style prompt
+- conversation turn persistence is present
+- forget/redaction mechanism is present
+- local LLM adapter/discovery status is reported
+- deterministic fallback status is reported
+- authority metadata is attached to interaction records
 - WP-0122, WP-0123, WP-0124, and WP-0125 remain passing
 - production-readiness validation executes successfully
 - WP-0126 receipt is complete
@@ -253,14 +334,15 @@ It must include:
 - `completed_at`
 - `branch`
 - `summary`
-- UI changes made
-- server endpoints added
+- resident interaction framework changes
+- local LLM adapter/discovery status
+- deterministic fallback status
 - conversation persistence path
-- example prompt/response
+- forget/redaction mechanism
+- authority handling
+- resident interaction template path
 - tests run
 - validation commands run
-- server startup status
-- authority boundaries
 - known limitations
 - recommended next action
 - `ready_for_ca_review = true`
@@ -268,8 +350,8 @@ It must include:
 
 ## Acceptance Criteria
 
-WP-0126 is complete when the Steward can open the local Operations Center / Office UI and type to Alfred through a visible chat interface, Alfred returns a useful response, and the interaction is persisted as Estate resident conversation evidence without bypassing authority boundaries.
+WP-0126 is complete when the Estate has a reusable, tested resident interaction framework that can support Alfred and future residents through local-first UI chat, local LLM routing, persisted institutional conversation memory, Steward-controlled forgetting/redaction, and authority-aware interaction boundaries.
 
 ## Merge Class
 
-Class A. Escalate only if implementation requires changing Steward authority, Alfred authority, resident authority, server exposure/security policy, or production-readiness semantics.
+Class A. Escalate only if implementation requires changing Steward authority, resident authority, server exposure/security policy, memory/redaction policy, or production-readiness semantics.
