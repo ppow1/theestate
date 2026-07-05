@@ -258,6 +258,27 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0127": {
+        "recipe_id": "wp-0127-alfred-operations-center-chat",
+        "title": "WP-0127 — Alfred Operations Center Chat Implementation",
+        "description": "Validates Alfred's Operations Center front-door chat UI, local resident interaction endpoint wiring, conversation persistence, version reporting, authority/memory messaging, prerequisite framework status, and completion receipt.",
+        "required_checks": ["Reports exist", "JSON companion parses", "Operations Center HTML contains Alfred chat input", "Operations Center HTML contains Alfred send control", "Alfred chat endpoint accepts prompt", "Conversation persists", "Surface versions reported", "Authority and memory behavior reported", "WP-0126 remains passing", "Production readiness executes", "Receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/residents/alfred/WP-0127_alfred_operations_center_chat_report.md", "runtime/residents/alfred/WP-0127_alfred_operations_center_chat_report.json", "collaboration/work_packages/completions/WP-0127_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Alfred chat claims privileged execution authority"],
+        "success_criteria": ["Alfred Operations Center chat validates through the WP-0126 resident interaction framework"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "import json; from pathlib import Path; md=Path(\'operations/residents/alfred/WP-0127_alfred_operations_center_chat_report.md\'); js=Path(\'runtime/residents/alfred/WP-0127_alfred_operations_center_chat_report.json\'); assert md.is_file(); data=json.loads(js.read_text(encoding=\'utf-8\')); required=[\'wp_0126_framework_status\',\'alfred_ui_surfaces_changed\',\'endpoint_paths_used\',\'alfred_resident_api_standard_version\',\'alfred_resident_implementation_version\',\'conversation_persistence_path\',\'example_prompt_and_response\',\'authority_and_memory_behavior_shown_to_steward\',\'server_startup_status\']; missing=[k for k in required if not data.get(k)]; assert not missing, missing"'),
+            _cmd('python -c "from estate.core.steward_command_center import generate_command_center, render_command_center_html; html=render_command_center_html(generate_command_center(write=False)); assert \'id=\\\"alfred-chat-input\\\"\' in html; assert \'id=\\\"alfred-chat-send\\\"\' in html; assert \'/api/residents/alfred/surface\' in html"'),
+            _cmd('python -c "from estate.core.resident_interaction import process_chat, load_history, resident_surface; import tempfile; root=tempfile.mkdtemp(); p=process_chat(\'alfred\', \'Alfred, what should I look at first?\', root=root); assert p[\'ok\']; assert p[\'turn\'][\'authority\'][\'action_executed\'] is False; h=load_history(\'alfred\', session_id=p[\'session_id\'], root=root); assert h[\'sessions\'][0][\'turns\']; s=resident_surface(\'alfred\', root=root); assert s[\'resident_api_standard_version\']==\'resident-api-standard-v1\'; assert s[\'resident_implementation_version\']==\'alfred-operations-implementation-v1\'"'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0126 --json'),
+            _cmd('python -m estate.cli.main validation-production-readiness --json'),
+            _cmd('python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt(\'WP-0127\'); assert r[\'receipt_status\']==\'complete\', r"'),
+        ],
+    },
+
     "WP-0112": {
         "recipe_id": "wp-0112-parallel-workstream-standard",
         "title": "WP-0112 — Parallel Workstream Isolation and Install Handoff Standard",

@@ -564,3 +564,45 @@ def test_steward_recall_operations_view_handles_no_recalls_and_missing_artifacts
     assert payload["status_bar"]["active_recall_count"] == 0
     assert "No recall requests were found in available local artifacts." in html
     assert "Missing recall artifact" in html
+
+
+def test_alfred_chat_ui_and_surface_versions_are_visible(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert 'id="alfred-chat-input"' in html
+    assert 'id="alfred-chat-send"' in html
+    assert '/api/residents/alfred/surface' in html
+    assert payload["panels"]["alfred_chat"]["surface"]["resident_api_standard_version"] == "resident-api-standard-v1"
+    assert payload["panels"]["alfred_chat"]["surface"]["resident_implementation_version"] == "alfred-operations-implementation-v1"
+
+
+def test_alfred_chat_endpoint_persists_history_and_refuses_execution_claims(tmp_path):
+    seed_inputs(tmp_path)
+    server = serve_command_center(host="127.0.0.1", port=0, root=tmp_path)
+    try:
+        import threading
+        from urllib.request import Request, urlopen
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        host, port = server.server_address
+        request = Request(
+            f"http://{host}:{port}/api/residents/alfred/chat",
+            data=json.dumps({"message": "Alfred, what should I look at first?"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        payload = json.loads(urlopen(request, timeout=5).read().decode("utf-8"))
+        assert payload["ok"] is True
+        assert payload["turn"]["resident_surface"]["resident_api_standard_version"] == "resident-api-standard-v1"
+        assert payload["turn"]["resident_surface"]["resident_implementation_version"] == "alfred-operations-implementation-v1"
+        assert payload["turn"]["authority"]["action_executed"] is False
+        assert "Recommended next action" in payload["turn"]["resident_response"]
+        assert (tmp_path / payload["session_path"]).is_file()
+
+        history = json.loads(urlopen(f"http://{host}:{port}/api/residents/alfred/chat", timeout=5).read().decode("utf-8"))
+        assert history["sessions"][0]["turns"][0]["user_message"] == "Alfred, what should I look at first?"
+    finally:
+        server.shutdown()
+        server.server_close()

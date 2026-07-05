@@ -66,7 +66,39 @@ def _next_session_id(root, resident):
 
 def _session_path(root, sid): return root/CHAT_STORE/f"{_safe(sid)}.json"
 
-def _fallback_response(resident, message, surface):
+def _artifact_hint(root: Path, rel: str) -> str | None:
+    path = root / rel
+    if not path.exists():
+        return None
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace").strip()
+    except Exception:
+        return rel
+    line = next((ln.strip("# |") for ln in text.splitlines() if ln.strip()), rel)
+    return f"{rel}: {line[:120]}"
+
+def _fallback_response(resident, message, surface, root: Path | None = None):
+    if surface.get("resident_id") == "alfred":
+        hints = []
+        if root is not None:
+            for rel in (
+                "runtime/validation/production_readiness.json",
+                "runtime/validation/local_operational_validation_run.json",
+                "operations/boards/active_work.md",
+                "operations/boards/daily_board.md",
+                "operations/work_packages/assignment_queue.md",
+                "operations/departments/engineering/cuemastery_execution_handoff.md",
+            ):
+                hint = _artifact_hint(root, rel)
+                if hint:
+                    hints.append(hint)
+        context = "; ".join(hints[:3]) if hints else "local Estate context is available through validation, work-package, resident, and Operations Center artifacts as they are generated."
+        return (
+            "Good morning, Pat. Current Estate status: " + context + " "
+            "Recommended next action: review the validation/production-readiness signal first, then the pending work-package queue and Engineering/CueMastery handoff if present. "
+            "I can summarize, recommend, and propose actions from local artifacts through the resident interaction framework, but I will not execute privileged actions or claim Steward authorization from this chat. "
+            f"Prompt received: {message[:180]}"
+        )
     return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {message[:180]}"
 
 def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None) -> dict[str, Any]:
@@ -76,7 +108,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     llm = local_llm_status(); mode = "local_llm" if llm.get("available") else "deterministic_fallback"
     auth = check_authority(surface["resident_id"], action, root=rootp, audit=True)
     status = "within_responsibility" if auth.get("decision")==ALLOWED else ("requires_steward_authorization" if auth.get("decision")==REQUIRES_STEWARD else "blocked" if not auth.get("allowed") else "conversation_only")
-    response = _fallback_response(resident, user_message, surface)
+    response = _fallback_response(resident, user_message, surface, rootp)
     turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":_now(),"user_message":user_message,"resident_response":response,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py"],"llm":{"mode":mode,"provider":llm.get("provider","none"),"model":llm.get("model")},"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":{"action_requested": action not in {"summarize","observe","conversation"},"action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")},"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")

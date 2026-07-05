@@ -907,6 +907,7 @@ def generate_command_center(root=None, write=True):
         "settings": _settings_panel(root),
         "help": _help_panel(root),
         "about": _about_panel(root),
+        "alfred_chat": _alfred_chat_panel(root),
     }
     if isinstance(panels.get("mission_control_workspace"), dict) and isinstance(panels["mission_control_workspace"].get("data"), dict):
         panels["mission_control_workspace"]["data"]["capability_dependency_visualization"] = panels.get("capability_dependency_visualization")
@@ -1145,10 +1146,68 @@ def _global_search_html(artifact):
 </section>"""
 
 
+
+def _alfred_chat_panel(root):
+    surface = resident_surface("alfred", root=root)
+    history = load_history("alfred", root=root)
+    return {
+        "available": True,
+        "kind": "alfred_operations_center_chat",
+        "path": "runtime/resident_interactions/sessions",
+        "surface": surface,
+        "history": history,
+        "endpoints": {
+            "history": "/api/residents/alfred/chat",
+            "send": "/api/residents/alfred/chat",
+            "surface": "/api/residents/alfred/surface",
+        },
+        "authority_message": "Alfred may summarize, recommend, and propose next actions from local Estate artifacts; Alfred will not execute privileged actions or claim Steward authorization from chat.",
+        "memory_message": "Conversation turns are persisted locally through the WP-0126 resident interaction framework and can be reloaded from runtime/resident_interactions/sessions. Steward-directed forget/redaction remains available through the resident API.",
+        "local_first_message": "Local-first operation: local LLM is used when available through the WP-0126 adapter path; deterministic fallback is used when no local model is available.",
+    }
+
+
+def _alfred_chat_html(panel):
+    surface = panel.get("surface") or {}
+    history = panel.get("history") or {}
+    sessions = history.get("sessions") or []
+    turn_items = []
+    for session in sessions[-5:]:
+        for turn in (session.get("turns") or [])[-3:]:
+            turn_items.append(
+                "<article class='alfred-chat-turn'>"
+                f"<p><strong>Steward:</strong> {html.escape(str(turn.get('user_message') or ''))}</p>"
+                f"<p><strong>Alfred:</strong> {html.escape(str(turn.get('resident_response') or ''))}</p>"
+                f"<p class='source'>Session {html.escape(str(session.get('session_id') or 'unknown'))} · {html.escape(str(turn.get('created_at') or 'unknown'))}</p>"
+                "</article>"
+            )
+    history_html = "".join(turn_items) or "<p class='placeholder'>No prior Alfred chat turns are recorded yet. Send a message to create persisted Estate memory.</p>"
+    return f"""
+<section class="alfred-chat" aria-label="Alfred Operations Center chat">
+  <h3>Chat with Alfred</h3>
+  <p>{html.escape(str(panel.get('authority_message') or ''))}</p>
+  <p class="source">{html.escape(str(panel.get('memory_message') or ''))}</p>
+  <p class="source">{html.escape(str(panel.get('local_first_message') or ''))}</p>
+  <dl>
+    <dt>Resident API standard</dt><dd>{html.escape(str(surface.get('resident_api_standard_version') or 'unknown'))}</dd>
+    <dt>Alfred implementation</dt><dd>{html.escape(str(surface.get('resident_implementation_version') or 'unknown'))}</dd>
+    <dt>Surface endpoint</dt><dd><code>/api/residents/alfred/surface</code></dd>
+  </dl>
+  <form id="alfred-chat-form" data-resident-chat="alfred">
+    <label for="alfred-chat-input">Message Alfred</label>
+    <textarea id="alfred-chat-input" name="message" rows="3" placeholder="Alfred, what should I look at first?" required></textarea>
+    <button id="alfred-chat-send" type="submit">Send to Alfred</button>
+  </form>
+  <div id="alfred-chat-response" role="status" aria-live="polite"></div>
+  <h4>Recent Alfred conversation history</h4>
+  <div id="alfred-chat-history">{history_html}</div>
+</section>"""
+
 def _home_workspace_html(payload):
     status = payload.get("status_bar", {})
     return "".join([
         "<p>The Office shell is active. Use the left navigation or workspace tabs to switch between operational areas without crowding every panel onto one screen.</p>",
+        _panel("Alfred Front Door", _alfred_chat_html(payload.get("panels", {}).get("alfred_chat", {})), "ready"),
         _panel("Steward Decision Queue", _decision_queue_html(payload.get("panels", {}).get("steward_decision_queue", {})), "ready"),
         "<ul>",
         f"<li>Estate status: {html.escape(str(status.get('estate_status') or 'unknown'))}</li>",
@@ -1804,7 +1863,7 @@ def render_command_center_html(payload):
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
         ("mission-control", "Mission Control Workspace", _mission_control_html(p.get("mission_control_workspace", {}))),
-        ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {}))),
+        ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {})) + _alfred_chat_html(p.get("alfred_chat", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
@@ -1827,7 +1886,7 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
 const WORKSPACE_PROFILE = __PROFILE_JSON__;
@@ -1860,7 +1919,33 @@ function renderGlobalPaletteResults(){
 }
 document.addEventListener('input', event => { if(event.target && event.target.id === 'global-search-input') renderGlobalPaletteResults(); });
 document.addEventListener('keydown', event => { if(event.key === '/' && !event.target.matches('input, textarea')){ event.preventDefault(); activateOfficeTab('search'); setTimeout(() => document.querySelector('#global-search-input')?.focus(), 0); } });
-window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); });
+
+async function loadAlfredHistory(){
+  const history = document.querySelectorAll('#alfred-chat-history');
+  if(!history.length) return;
+  try{
+    const response = await fetch('/api/residents/alfred/chat');
+    const data = await response.json();
+    const turns = (data.sessions || []).flatMap(session => (session.turns || []).map(turn => ({...turn, session_id: session.session_id}))).slice(-8).reverse();
+    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p><p class="source">Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
+    history.forEach(el => el.innerHTML = html);
+  }catch(error){ history.forEach(el => el.innerHTML = '<p class="placeholder">Unable to reload Alfred history from the local endpoint.</p>'); }
+}
+function escapeHtml(value){ return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+document.addEventListener('submit', async event => {
+  const form = event.target.closest('#alfred-chat-form');
+  if(!form) return;
+  event.preventDefault();
+  const input = form.querySelector('#alfred-chat-input');
+  const output = document.querySelectorAll('#alfred-chat-response');
+  output.forEach(el => el.textContent = 'Alfred is reviewing local Estate context...');
+  const response = await fetch('/api/residents/alfred/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: input.value, action:'summarize'})});
+  const data = await response.json();
+  output.forEach(el => el.textContent = data.turn ? data.turn.resident_response : (data.error || 'Alfred did not return a response.'));
+  input.value = '';
+  await loadAlfredHistory();
+});
+window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); loadAlfredHistory(); });
 </script>"""
     script = script.replace("__PROFILE_JSON__", json.dumps(payload.get("workspace_profile", {})))
     return (
