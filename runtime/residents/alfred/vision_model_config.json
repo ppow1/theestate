@@ -1,0 +1,7 @@
+{
+  "provider": "ollama",
+  "endpoint": "http://127.0.0.1:11434",
+  "preferred_model": "llama3.2-vision:11b",
+  "fallback_behavior": "vision_unavailable",
+  "cloud_allowed": false
+}

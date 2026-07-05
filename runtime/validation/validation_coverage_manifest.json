@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-05T22:11:48+00:00",
+  "generated_at": "2026-07-05T23:46:20+00:00",
   "summary": {
     "total_blocked": 4,
     "total_incomplete_receipts": 0,
     "total_missing_receipts": 0,
     "total_missing_recipes": 0,
-    "total_production_ready": 111,
-    "total_work_packages_scanned": 115
+    "total_production_ready": 112,
+    "total_work_packages_scanned": 116
   },
   "work_packages": [
     {
@@ -86,7 +86,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0020_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0020_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -794,7 +794,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0079_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0079_validation.json",
       "latest_validation_status": "passed_with_findings",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1094,7 +1094,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0105_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0105_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6_template_path_repair.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1400,6 +1400,18 @@
       "recipe_status": "registered",
       "required_followups": [],
       "work_package_id": "WP-0129"
+    },
+    {
+      "blockers": [],
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0130_codex_done.json",
+      "latest_validation_report_path": "runtime/validation/work_packages/WP-0130_validation.json",
+      "latest_validation_status": "passed",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md",
+      "production_readiness_status": "ready",
+      "receipt_status": "complete",
+      "recipe_status": "registered",
+      "required_followups": [],
+      "work_package_id": "WP-0130"
     }
   ]
 }

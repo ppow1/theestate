@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-05T22:08:51Z
+Generated: 2026-07-05T23:45:13Z
 
 ## Summary
 
-- Work packages: 123
+- Work packages: 124
 - Blocked: 0
-- Unassigned: 123
-- Warnings: 123
+- Unassigned: 124
+- Warnings: 124
 
 ## Queue
 
@@ -19,7 +19,6 @@ Generated: 2026-07-05T22:08:51Z
 | [WP-0108](../../collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md` and do exactly what it says. |
 | [WP-0110](../../collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md` and do exactly what it says. |
 | [WP-0112](../../collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md` and do exactly what it says. |
-| [WP-0129](../../collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md) | SERIES | unassigned | pending | None | None | Read collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md and do exactly what it says. |
 | [WP-LEAP-001](../../collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md) | UNKNOWN | unassigned | open | None | None | Review work package and execute the stated mission. |
 | [WP-0014](../../collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md) | SERIES | unassigned | completed | None | None | Review work package and execute the stated mission. |
 | [WP-0015](../../collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md) | SERIES | unassigned | completed | None | None | Review work package and execute the stated mission. |
@@ -136,6 +135,8 @@ Generated: 2026-07-05T22:08:51Z
 | [WP-0126](../../collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md and do exactly what it says. |
 | [WP-0127](../../collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md and do exactly what it says. |
 | [WP-0128](../../collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md) | local_llm / provider: ollama / model: qwen3:8b | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md and do exactly what it says. |
+| [WP-0129](../../collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md and do exactly what it says. |
+| [WP-0130](../../collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md and do exactly what it says. |
 
 ## Warnings
 
@@ -261,4 +262,5 @@ Generated: 2026-07-05T22:08:51Z
 - missing_owner: WP-0127 has no explicit owner. (collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md)
 - missing_owner: WP-0128 has no explicit owner. (collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md)
 - missing_owner: WP-0129 has no explicit owner. (collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md)
+- missing_owner: WP-0130 has no explicit owner. (collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)

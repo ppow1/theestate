@@ -1,0 +1,38 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-05T23:50:00+00:00",
+  "detected_models": [],
+  "detected_vision_capable_models": [],
+  "fallback_behavior": "vision_unavailable",
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_interaction.py",
+    "runtime/residents/alfred/vision_model_config.json",
+    "operations/residents/alfred/WP-0130_local_vision_model_enablement_report.md",
+    "runtime/residents/alfred/WP-0130_local_vision_model_enablement_report.json",
+    "collaboration/work_packages/completions/WP-0130_codex_done.json"
+  ],
+  "known_limitations": [
+    "No local Ollama vision-capable model was detected in this container.",
+    "The Estate does not install models automatically."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "PR will be created with make_pr after the local git commit as required by the Codex handoff.",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Steward may install a local vision model with: ollama pull llama3.2-vision:11b, then run the documented smoke test.",
+  "selected_model": null,
+  "summary": "Enabled local-first Ollama vision model configuration, detection, mocked processing tests, Alfred image-summary integration, truthful unavailable fallback, and WP-0130 validation/report artifacts.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0129 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0130 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "vision_config_path": "runtime/residents/alfred/vision_model_config.json",
+  "work_package_id": "WP-0130"
+}

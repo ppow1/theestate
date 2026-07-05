@@ -323,6 +323,27 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0130": {
+        "recipe_id": "wp-0130-local-vision-model-enablement",
+        "title": "WP-0130 — Local Vision Model Enablement for Resident Images",
+        "description": "Validates local-only Ollama vision model configuration, detection, Alfred image summary integration, truthful fallback, reports, and completion receipt.",
+        "required_checks": ["Vision config exists", "Reports exist", "JSON companion parses", "Vision detection helpers exist", "No cloud guarantee exists", "Attachment vision metadata exists", "Alfred summary tests exist", "Receipt is complete"],
+        "observational_checks": ["Steward local smoke test documented"],
+        "expected_artifacts": ["runtime/residents/alfred/vision_model_config.json", "operations/residents/alfred/WP-0130_local_vision_model_enablement_report.md", "runtime/residents/alfred/WP-0130_local_vision_model_enablement_report.json", "collaboration/work_packages/completions/WP-0130_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Cloud vision is enabled", "Alfred fakes visual inspection when no local vision model is available"],
+        "success_criteria": ["Configured local Ollama vision models are preferred when present and image attachments record processed or unavailable vision status truthfully"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"import json; from pathlib import Path; cfg=json.loads(Path('runtime/residents/alfred/vision_model_config.json').read_text()); assert cfg['provider']=='ollama'; assert cfg['cloud_allowed'] is False; assert cfg['fallback_behavior']=='vision_unavailable'\""),
+            _cmd("python -c \"import json; from pathlib import Path; md=Path('operations/residents/alfred/WP-0130_local_vision_model_enablement_report.md'); js=Path('runtime/residents/alfred/WP-0130_local_vision_model_enablement_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); required=['current_git_commit','detected_ollama_models','detected_vision_capable_models','selected_vision_model','configuration_path','adapter_behavior','example_image_prompt','fallback_behavior','tests_run','validation_commands_run','known_limitations','recommended_steward_install_command']; missing=[k for k in required if k not in data]; assert not missing, missing\""),
+            _cmd("python -c \"from pathlib import Path; t=Path('src/estate/core/resident_interaction.py').read_text(encoding='utf-8'); required=['VISION_CONFIG_PATH','load_vision_config','is_vision_capable_model','api/show','cloud_allowed','vision_capable_models','Local image summaries']; missing=[x for x in required if x not in t]; assert not missing, missing\""),
+            _cmd("python -c \"from pathlib import Path; t=Path('tests/test_resident_interaction.py').read_text(encoding='utf-8'); required=['test_wp0130_vision_capable_model_detection','test_wp0130_configured_vision_model_preference_and_no_cloud','test_wp0130_alfred_uses_vision_summary','test_wp0130_attachment_metadata_records_unavailable']; missing=[x for x in required if x not in t]; assert not missing, missing\""),
+            _cmd('python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q'),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0130'); assert r['receipt_status']=='complete', r\""),
+        ],
+    },
+
+
     "WP-0112": {
         "recipe_id": "wp-0112-parallel-workstream-standard",
         "title": "WP-0112 — Parallel Workstream Isolation and Install Handoff Standard",

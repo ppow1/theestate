@@ -151,3 +151,45 @@ def test_vision_unavailable_fallback_is_truthful(tmp_path):
     att = payload["turn"]["attachments"][0]
     assert att["vision_status"] == "unavailable"
     assert "cannot" in payload["turn"]["resident_response"] or "no local vision" in payload["turn"]["resident_response"] or "no local vision-capable" in payload["turn"]["resident_response"]
+
+
+def test_wp0130_vision_capable_model_detection_from_name_and_metadata():
+    from estate.core.resident_interaction import is_vision_capable_model
+    assert is_vision_capable_model("llava:latest") is True
+    assert is_vision_capable_model("custom-local", {"details": {"families": ["llama", "clip"]}, "modelfile": "mmproj"}) is True
+    assert is_vision_capable_model("qwen3:8b", {"details": {"families": ["llama"]}}) is False
+
+
+class MultiVisionOllamaAdapter:
+    provider = "ollama"
+    endpoint = "http://127.0.0.1:11434"
+    timeout = 1.0
+    def discover_models(self):
+        return {"available": True, "provider": "ollama", "endpoint": self.endpoint, "models": ["llava:latest", "llama3.2-vision:11b", "qwen3:8b"]}
+
+
+def test_wp0130_configured_vision_model_preference_and_no_cloud(tmp_path):
+    from estate.core.resident_interaction import LocalVisionAdapter
+    cfg = {"provider":"ollama","endpoint":"http://127.0.0.1:11434","preferred_model":"llama3.2-vision:11b","fallback_behavior":"vision_unavailable","cloud_allowed":True,"config_path":"runtime/residents/alfred/vision_model_config.json"}
+    status = LocalVisionAdapter(ollama=MultiVisionOllamaAdapter(), config=cfg).discover_models()
+    assert status["model"] == "llama3.2-vision:11b"
+    assert status["cloud_allowed"] is False
+    assert status["vision_capable_models"] == ["llava:latest", "llama3.2-vision:11b"]
+
+
+def test_wp0130_alfred_uses_vision_summary_in_image_question_response(tmp_path):
+    import base64
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\nmock").decode("ascii")
+    payload = process_chat("alfred", "what do you see?", root=tmp_path, attachments=[{"kind":"image","mime_type":"image/png","data_base64":png}], vision_adapter=MockVisionAdapter())
+    assert "A mocked screenshot summary." in payload["turn"]["resident_response"]
+    assert payload["turn"]["attachments"][0]["vision_provider"] == "ollama"
+
+
+def test_wp0130_attachment_metadata_records_unavailable_when_no_model(tmp_path):
+    import base64
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\nmock").decode("ascii")
+    payload = process_chat("alfred", "inspect unavailable", root=tmp_path, attachments=[{"kind":"image","mime_type":"image/png","data_base64":png}], vision_adapter=NoVisionAdapter())
+    att = payload["turn"]["attachments"][0]
+    assert att["vision_status"] == "unavailable"
+    assert att["vision_provider"] == "none"
+    assert att["summary"] is None
