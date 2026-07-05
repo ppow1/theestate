@@ -12,6 +12,7 @@ from estate.core.resident_authority import check_authority, list_authority, ALLO
 
 CHAT_STORE = Path("runtime/resident_interactions/sessions")
 ATTACHMENT_STORE = Path("runtime/resident_interactions/attachments")
+VISION_CONFIG_PATH = Path("runtime/residents/alfred/vision_model_config.json")
 SURFACE_DIR = Path("operations/residents/surfaces")
 FORGET_AUDIT = Path("runtime/resident_interactions/forget_audit.jsonl")
 STANDARD_VERSION = "resident-api-standard-v1"
@@ -85,18 +86,62 @@ class LocalOllamaAdapter:
 IMAGE_MIME_EXT = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif"}
 VISION_MODEL_HINTS = ("llava", "bakllava", "moondream", "minicpm-v", "qwen2-vl", "qwen2.5vl", "qwen-vl", "vision")
 
+def _default_vision_config() -> dict[str, Any]:
+    return {"provider":"ollama","endpoint":OLLAMA_ENDPOINT,"preferred_model":"llama3.2-vision:11b","fallback_behavior":"vision_unavailable","cloud_allowed":False}
+
+def load_vision_config(root: Path | None = None) -> dict[str, Any]:
+    base = _root(root) if root is not None else Path.cwd()
+    cfg = _default_vision_config()
+    path = base / VISION_CONFIG_PATH
+    data = _read_json(path) if path.exists() else None
+    if isinstance(data, dict):
+        cfg.update({k: data.get(k) for k in cfg if k in data})
+    cfg["config_path"] = str(VISION_CONFIG_PATH)
+    cfg["cloud_allowed"] = False
+    return cfg
+
+def _model_metadata_indicates_vision(model: dict[str, Any]) -> bool:
+    text = json.dumps(model, sort_keys=True).lower()
+    return any(token in text for token in ("vision", "clip", "projector", "mmproj", "image", "llava"))
+
+def is_vision_capable_model(name: str, metadata: dict[str, Any] | None = None) -> bool:
+    lname = str(name or "").lower()
+    return any(h in lname for h in VISION_MODEL_HINTS) or (isinstance(metadata, dict) and _model_metadata_indicates_vision(metadata))
+
 class LocalVisionAdapter:
     """Local-only multimodal boundary; never calls cloud vision APIs."""
 
     provider = "ollama"
 
-    def __init__(self, ollama: LocalOllamaAdapter | None = None):
-        self.ollama = ollama or LocalOllamaAdapter()
+    def __init__(self, ollama: LocalOllamaAdapter | None = None, root: Path | None = None, config: dict[str, Any] | None = None):
+        self.config = config or load_vision_config(root)
+        endpoint = str(self.config.get("endpoint") or OLLAMA_ENDPOINT)
+        self.ollama = ollama or LocalOllamaAdapter(endpoint=endpoint)
+
+    def _show_model(self, name: str) -> dict[str, Any] | None:
+        body = json.dumps({"name": name}).encode("utf-8")
+        req = urllib.request.Request(f"{self.ollama.endpoint}/api/show", data=body, headers={"Content-Type":"application/json"}, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=min(self.ollama.timeout, 4.0)) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            return payload if isinstance(payload, dict) else None
+        except Exception:
+            return None
 
     def discover_models(self) -> dict[str, Any]:
         status = self.ollama.discover_models()
-        models = [m for m in (status.get("models") or []) if any(h in m.lower() for h in VISION_MODEL_HINTS)]
-        return {**status, "available": bool(models), "models": models, "model": models[0] if models else None, "vision_capable": bool(models), "discovery": ("local vision-capable Ollama models discovered" if models else "no local vision-capable model discovered")}
+        detected = status.get("models") or []
+        metadata_by_model = {}
+        models = []
+        for m in detected:
+            meta = self._show_model(m)
+            if meta:
+                metadata_by_model[m] = meta
+            if is_vision_capable_model(m, meta):
+                models.append(m)
+        preferred = self.config.get("preferred_model")
+        selected = preferred if preferred in models else (models[0] if models else None)
+        return {**status, "available": bool(models), "detected_models": detected, "models": models, "vision_capable_models": models, "model": selected, "preferred_model": preferred, "configuration_path": self.config.get("config_path"), "cloud_allowed": False, "vision_capable": bool(models), "model_metadata": metadata_by_model, "discovery": ("local vision-capable Ollama models discovered" if models else "no local vision-capable model discovered")}
 
     def summarize_image(self, *, image_path: Path, prompt: str = "Describe the pasted image for a resident conversation.", model: str | None = None) -> dict[str, Any]:
         status = self.discover_models()
@@ -144,7 +189,7 @@ def create_attachment(root: Path, resident: str, sid: str, item: dict[str, Any],
         path = folder / f"{aid}_{filename}"
         path.write_bytes(raw)
         summary = None; vstatus = "not_attempted"; vprovider = "none"; vmodel = None
-        vision = (vision_adapter or LocalVisionAdapter()).summarize_image(image_path=path, prompt=str(item.get("prompt") or "Describe this pasted resident conversation image."))
+        vision = (vision_adapter or LocalVisionAdapter(root=root)).summarize_image(image_path=path, prompt=str(item.get("prompt") or "Describe this pasted resident conversation image."))
         vstatus = vision.get("status") or ("processed" if vision.get("ok") else "unavailable")
         vprovider = vision.get("provider") or "none"; vmodel = vision.get("model"); summary = vision.get("summary")
     elif kind == "text_snippet":

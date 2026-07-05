@@ -1,0 +1,40 @@
+{
+  "adapter_behavior": "LocalVisionAdapter loads Alfred's local vision config, discovers Ollama tags, checks known vision model names and /api/show metadata for image capability, prefers the configured model when installed, sends images only to the configured local Ollama endpoint, and returns processed/failed/unavailable status for attachment metadata.",
+  "configuration": {
+    "cloud_allowed": false,
+    "endpoint": "http://127.0.0.1:11434",
+    "fallback_behavior": "vision_unavailable",
+    "preferred_model": "llama3.2-vision:11b",
+    "provider": "ollama"
+  },
+  "configuration_path": "runtime/residents/alfred/vision_model_config.json",
+  "current_git_commit": "6d7b81700833f437ac66e8c0c38d170554017fa9",
+  "detected_ollama_models": [],
+  "detected_vision_capable_models": [],
+  "example_image_prompt": "Describe this pasted resident conversation image.",
+  "example_mocked_vision_result": {
+    "summary": "A mocked screenshot summary.",
+    "vision_model": "llava:latest",
+    "vision_provider": "ollama",
+    "vision_status": "processed"
+  },
+  "fallback_behavior": "When no compatible local vision model exists, the image remains in runtime/resident_interactions/attachments, attachment metadata records vision_status=unavailable with provider none, and Alfred truthfully states that local visual inspection is unavailable.",
+  "known_limitations": [
+    "No local Ollama vision-capable model was detected in this container during implementation.",
+    "Ollama /api/show metadata probing is best-effort and falls back to model-name hints when metadata is unavailable.",
+    "The Estate does not install or start Ollama models automatically."
+  ],
+  "recommended_steward_install_command": "ollama pull llama3.2-vision:11b",
+  "selected_vision_model": null,
+  "steward_local_smoke_test": "Install or confirm a local Ollama vision model -> restart Operations Center -> paste screenshot into Alfred chat -> ask what Alfred sees -> verify mode remains local and attachment vision_status is processed.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0129 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0130 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0130"
+}
