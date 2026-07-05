@@ -1,0 +1,117 @@
+{
+  "commit_checked_before_repair": "e245beacfc189c7ae66807a2b28974ef9a8f694f",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "tests/test_work_package_validation.py",
+    "operations/validation/backlog_burn_down/WP-0118_resident_runtime_pytest_failure_repair_report.md",
+    "runtime/validation/backlog_burn_down/WP-0118_resident_runtime_pytest_failure_repair_report.json",
+    "collaboration/work_packages/completions/WP-0118_codex_done.json"
+  ],
+  "generated_at": "2026-07-05T02:33:16.680823Z",
+  "helen_alfred_path_status": "WP-0106 through WP-0110 validate successfully with self-contained pytest import paths; Alfred and Helen CLI smoke paths remain passing.",
+  "production_readiness_totals_after_wp_0118": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 95,
+    "total_work_packages_scanned": 104
+  },
+  "production_readiness_totals_before_wp_0118": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 94,
+    "total_work_packages_scanned": 103
+  },
+  "recommended_next_action": "Chief Architect review of WP-0118 repair evidence and remaining unrelated historical blockers.",
+  "remaining_production_readiness_blockers": [
+    "WP-0016",
+    "WP-0017",
+    "WP-0018",
+    "WP-0040",
+    "WP-0056",
+    "WP-0063",
+    "WP-0073",
+    "WP-0089",
+    "WP-0094"
+  ],
+  "repair_classification_by_package": {
+    "WP-0106": "validation_recipe_import_path_repair",
+    "WP-0107": "validation_recipe_import_path_repair",
+    "WP-0108": "validation_recipe_import_path_repair",
+    "WP-0109": "validation_recipe_import_path_repair",
+    "WP-0110": "validation_recipe_import_path_repair"
+  },
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_presence.py tests/test_resident_cards.py tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_cards.py",
+    "PYTHONPATH=src python -m pytest tests/test_helen_duty.py tests/test_resident_presence.py tests/test_resident_cards.py",
+    "PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_conversations.py",
+    "PYTHONPATH=src python -m pytest tests/test_resident_authority.py tests/test_alfred_duty.py tests/test_helen_duty.py tests/test_resident_conversation_sessions.py tests/test_resident_cards.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0108 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0109 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0110 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0116 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0117 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0102 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0105 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0111 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0114 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0115 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "why_wp_0117_failed": "WP-0117 self-validation calls WP-0106 and WP-0107; it failed while those resident runtime pytest validation recipes still failed in clean import environments.",
+  "wp_0106_failure_cause": "The pytest validation command did not make the src-layout package importable when run from a clean subprocess without ambient PYTHONPATH, so test collection failed with ModuleNotFoundError: No module named 'estate'. CLI smoke checks passed because the CLI runner was invoked with a context where estate was already importable.",
+  "wp_0106_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0106_2026-07-05T022853Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0107_failure_cause": "The pytest validation command did not make the src-layout package importable when run from a clean subprocess without ambient PYTHONPATH, so test collection failed with ModuleNotFoundError: No module named 'estate'. CLI smoke checks passed because the CLI runner was invoked with a context where estate was already importable.",
+  "wp_0107_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0107_2026-07-05T022900Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0108_failure_cause": "The pytest validation command did not make the src-layout package importable when run from a clean subprocess without ambient PYTHONPATH, so test collection failed with ModuleNotFoundError: No module named 'estate'. CLI smoke checks passed because the CLI runner was invoked with a context where estate was already importable.",
+  "wp_0108_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0108_2026-07-05T022658Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0109_failure_cause": "The pytest validation command did not make the src-layout package importable when run from a clean subprocess without ambient PYTHONPATH, so test collection failed with ModuleNotFoundError: No module named 'estate'. CLI smoke checks passed because the CLI runner was invoked with a context where estate was already importable.",
+  "wp_0109_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0109_2026-07-05T022708Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0110_failure_cause": "The pytest validation command did not make the src-layout package importable when run from a clean subprocess without ambient PYTHONPATH, so test collection failed with ModuleNotFoundError: No module named 'estate'. CLI smoke checks passed because the CLI runner was invoked with a context where estate was already importable.",
+  "wp_0110_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0110_2026-07-05T022713Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0116_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0116_2026-07-05T022904Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0117_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0117_2026-07-05T022852Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0118_validation_result": {
+    "production_ready": true,
+    "validation_id": "WP-0118_2026-07-05T024103Z0000",
+    "validation_status": "passed"
+  },
+  "wp_9999_quarantine_status": "quarantined_not_promoted"
+}
