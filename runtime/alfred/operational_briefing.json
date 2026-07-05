@@ -107,6 +107,606 @@
       "id": "WP-0029",
       "path": "collaboration/work_packages/pending/WP-0029_SERIES_artifact_provenance_model.md",
       "title": "SERIES TASK WP-0029 \u2014 Artifact Provenance Model"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md and do exactly what it says.",
+      "id": "WP-0030",
+      "path": "collaboration/work_packages/pending/WP-0030_SERIES_mission_registry_numbering_standard.md",
+      "title": "SERIES TASK WP-0030 \u2014 Mission Registry and Mission Numbering Standard"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md and do exactly what it says.",
+      "id": "WP-0031",
+      "path": "collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md",
+      "title": "SERIES TASK WP-0031 \u2014 Transport Adapter Evaluation"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md and do exactly what it says.",
+      "id": "WP-0032",
+      "path": "collaboration/work_packages/pending/WP-0032_SERIES_codex_completion_detection_strategy.md",
+      "title": "SERIES TASK WP-0032 \u2014 Codex Completion Detection Strategy"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md and do exactly what it says.",
+      "id": "WP-0033",
+      "path": "collaboration/work_packages/pending/WP-0033_SERIES_autonomous_operations_charter.md",
+      "title": "SERIES TASK WP-0033 \u2014 Autonomous Estate Operations Charter"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md and do exactly what it says.",
+      "id": "WP-0034",
+      "path": "collaboration/work_packages/pending/WP-0034_SERIES_steward_recall_decision_model.md",
+      "title": "SERIES TASK WP-0034 \u2014 Steward Recall Decision Model"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md and do exactly what it says.",
+      "id": "WP-0035",
+      "path": "collaboration/work_packages/pending/WP-0035_SERIES_notification_router_v1.md",
+      "title": "SERIES TASK WP-0035 \u2014 Notification Router v1"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md and do exactly what it says.",
+      "id": "WP-0036",
+      "path": "collaboration/work_packages/pending/WP-0036_SERIES_gotify_adapter_v1.md",
+      "title": "SERIES TASK WP-0036 \u2014 Gotify Adapter v1"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md and do exactly what it says.",
+      "id": "WP-0037",
+      "path": "collaboration/work_packages/pending/WP-0037_SERIES_recall_audit_log_v1.md",
+      "title": "SERIES TASK WP-0037 \u2014 Recall Audit Log v1"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md and do exactly what it says.",
+      "id": "WP-0038",
+      "path": "collaboration/work_packages/pending/WP-0038_SERIES_morning_briefing_v1.md",
+      "title": "SERIES TASK WP-0038 \u2014 Morning Briefing v1"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md and do exactly what it says.",
+      "id": "WP-0039",
+      "path": "collaboration/work_packages/pending/WP-0039_SERIES_worker_runtime_heartbeat.md",
+      "title": "SERIES TASK WP-0039 \u2014 Worker Runtime Heartbeat"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md and do exactly what it says.",
+      "id": "WP-0040",
+      "path": "collaboration/work_packages/pending/WP-0040_SERIES_assignment_queue_v1.md",
+      "title": "SERIES TASK WP-0040 \u2014 Assignment Queue v1"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md and do exactly what it says.",
+      "id": "WP-0041",
+      "path": "collaboration/work_packages/pending/WP-0041_SERIES_steward_launch_queue_document.md",
+      "title": "SERIES TASK WP-0041 \u2014 Steward Launch Queue Document"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md and do exactly what it says.",
+      "id": "WP-0042",
+      "path": "collaboration/work_packages/pending/WP-0042_SERIES_parallel_queue_document.md",
+      "title": "SERIES TASK WP-0042 \u2014 Parallel Queue Document"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md and do exactly what it says.",
+      "id": "WP-0043",
+      "path": "collaboration/work_packages/pending/WP-0043_SERIES_steward_command_center_skeleton.md",
+      "title": "SERIES TASK WP-0043 \u2014 Steward Command Center Skeleton"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md and do exactly what it says.",
+      "id": "WP-0044",
+      "path": "collaboration/work_packages/pending/WP-0044_SERIES_resident_card_framework.md",
+      "title": "SERIES TASK WP-0044 \u2014 Resident Card Framework"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0045_SERIES_decision_queue_panel.md and do exactly what it says.",
+      "id": "WP-0045",
+      "path": "collaboration/work_packages/pending/WP-0045_SERIES_decision_queue_panel.md",
+      "title": "SERIES TASK WP-0045 \u2014 Decision Queue Panel"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0046_SERIES_operations_center_ui_principles.md and do exactly what it says.",
+      "id": "WP-0046",
+      "path": "collaboration/work_packages/pending/WP-0046_SERIES_operations_center_ui_principles.md",
+      "title": "SERIES TASK WP-0046 \u2014 Estate Operations Center UI Principles"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0047_SERIES_status_bar_activity_console.md and do exactly what it says.",
+      "id": "WP-0047",
+      "path": "collaboration/work_packages/pending/WP-0047_SERIES_status_bar_activity_console.md",
+      "title": "SERIES TASK WP-0047 \u2014 Status Bar and Activity Console"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0048_SERIES_work_package_pipeline_view.md and do exactly what it says.",
+      "id": "WP-0048",
+      "path": "collaboration/work_packages/pending/WP-0048_SERIES_work_package_pipeline_view.md",
+      "title": "SERIES TASK WP-0048 \u2014 Work Package Pipeline View"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0049_SERIES_validation_health_dashboard.md and do exactly what it says.",
+      "id": "WP-0049",
+      "path": "collaboration/work_packages/pending/WP-0049_SERIES_validation_health_dashboard.md",
+      "title": "SERIES TASK WP-0049 \u2014 Validation and Estate Health Dashboard"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0050_SERIES_office_navigation_layout_framework.md and do exactly what it says.",
+      "id": "WP-0050",
+      "path": "collaboration/work_packages/pending/WP-0050_SERIES_office_navigation_layout_framework.md",
+      "title": "SERIES TASK WP-0050 \u2014 Office Navigation and Layout Framework"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0051_SERIES_mailbox_operations_center.md and do exactly what it says.",
+      "id": "WP-0051",
+      "path": "collaboration/work_packages/pending/WP-0051_SERIES_mailbox_operations_center.md",
+      "title": "SERIES TASK WP-0051 \u2014 Mailbox Operations Center"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0052_SERIES_daily_board_parking_lot_workspace.md and do exactly what it says.",
+      "id": "WP-0052",
+      "path": "collaboration/work_packages/pending/WP-0052_SERIES_daily_board_parking_lot_workspace.md",
+      "title": "SERIES TASK WP-0052 \u2014 Daily Board and Parking Lot Workspace"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0053_SERIES_expansion_roadmap_workspace.md and do exactly what it says.",
+      "id": "WP-0053",
+      "path": "collaboration/work_packages/pending/WP-0053_SERIES_expansion_roadmap_workspace.md",
+      "title": "SERIES TASK WP-0053 \u2014 Expansion Roadmap Workspace"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0054_SERIES_global_search_command_palette.md and do exactly what it says.",
+      "id": "WP-0054",
+      "path": "collaboration/work_packages/pending/WP-0054_SERIES_global_search_command_palette.md",
+      "title": "SERIES TASK WP-0054 \u2014 Global Search and Command Palette"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0055_SERIES_settings_about_version_inventory.md and do exactly what it says.",
+      "id": "WP-0055",
+      "path": "collaboration/work_packages/pending/WP-0055_SERIES_settings_about_version_inventory.md",
+      "title": "SERIES TASK WP-0055 \u2014 Settings, About, and Version Inventory"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0056_SERIES_notification_center_workspace.md and do exactly what it says.",
+      "id": "WP-0056",
+      "path": "collaboration/work_packages/pending/WP-0056_SERIES_notification_center_workspace.md",
+      "title": "SERIES TASK WP-0056 \u2014 Notification Center Workspace"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0057_SERIES_voice_integration_framework.md and do exactly what it says.",
+      "id": "WP-0057",
+      "path": "collaboration/work_packages/pending/WP-0057_SERIES_voice_integration_framework.md",
+      "title": "SERIES TASK WP-0057 \u2014 Voice Integration Framework"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0058_SERIES_steward_recall_operations_view.md and do exactly what it says.",
+      "id": "WP-0058",
+      "path": "collaboration/work_packages/pending/WP-0058_SERIES_steward_recall_operations_view.md",
+      "title": "SERIES TASK WP-0058 \u2014 Steward Recall Operations View"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0059_SERIES_resident_conversations_workspace.md and do exactly what it says.",
+      "id": "WP-0059",
+      "path": "collaboration/work_packages/pending/WP-0059_SERIES_resident_conversations_workspace.md",
+      "title": "SERIES TASK WP-0059 \u2014 Resident Conversations Workspace"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0060_SERIES_interaction_services_adapter_registry.md and do exactly what it says.",
+      "id": "WP-0060",
+      "path": "collaboration/work_packages/pending/WP-0060_SERIES_interaction_services_adapter_registry.md",
+      "title": "SERIES TASK WP-0060 \u2014 Estate Interaction Services and Adapter Registry"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0061_SERIES_mission_control_workspace.md and do exactly what it says.",
+      "id": "WP-0061",
+      "path": "collaboration/work_packages/pending/WP-0061_SERIES_mission_control_workspace.md",
+      "title": "SERIES TASK WP-0061 \u2014 Mission Control Workspace"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0063_SERIES_autonomous_work_queue_scheduler.md and do exactly what it says.",
+      "id": "WP-0063",
+      "path": "collaboration/work_packages/pending/WP-0063_SERIES_autonomous_work_queue_scheduler.md",
+      "title": "SERIES TASK WP-0063 \u2014 Autonomous Work Queue Scheduler"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0064_SERIES_worker_runtime_monitor.md and do exactly what it says.",
+      "id": "WP-0064",
+      "path": "collaboration/work_packages/pending/WP-0064_SERIES_worker_runtime_monitor.md",
+      "title": "SERIES TASK WP-0064 \u2014 Worker Runtime Monitor"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0065_SERIES_steward_presence_recall_state_machine.md and do exactly what it says.",
+      "id": "WP-0065",
+      "path": "collaboration/work_packages/pending/WP-0065_SERIES_steward_presence_recall_state_machine.md",
+      "title": "SERIES TASK WP-0065 \u2014 Steward Presence and Recall State Machine"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0066_SERIES_overnight_operations_morning_briefing_coordinator.md and do exactly what it says.",
+      "id": "WP-0066",
+      "path": "collaboration/work_packages/pending/WP-0066_SERIES_overnight_operations_morning_briefing_coordinator.md",
+      "title": "SERIES TASK WP-0066 \u2014 Overnight Operations and Morning Briefing Coordinator"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0067_SERIES_autonomous_operations_control_loop.md and do exactly what it says.",
+      "id": "WP-0067",
+      "path": "collaboration/work_packages/pending/WP-0067_SERIES_autonomous_operations_control_loop.md",
+      "title": "SERIES TASK WP-0067 \u2014 Autonomous Operations Control Loop"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0068_SERIES_autonomous_operations_audit_trail.md and do exactly what it says.",
+      "id": "WP-0068",
+      "path": "collaboration/work_packages/pending/WP-0068_SERIES_autonomous_operations_audit_trail.md",
+      "title": "SERIES TASK WP-0068 \u2014 Autonomous Operations Audit Trail"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0069_SERIES_notification_center_command_palette_integration_fix.md and do exactly what it says.",
+      "id": "WP-0069",
+      "path": "collaboration/work_packages/pending/WP-0069_SERIES_notification_center_command_palette_integration_fix.md",
+      "title": "SERIES TASK WP-0069 \u2014 Notification Center Command Palette Integration Fix"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0070_SERIES_validation_observation_log.md and do exactly what it says.",
+      "id": "WP-0070",
+      "path": "collaboration/work_packages/pending/WP-0070_SERIES_validation_observation_log.md",
+      "title": "SERIES TASK WP-0070 \u2014 Validation Observation Log"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0071_SERIES_validation_review_cadence.md and do exactly what it says.",
+      "id": "WP-0071",
+      "path": "collaboration/work_packages/pending/WP-0071_SERIES_validation_review_cadence.md",
+      "title": "SERIES TASK WP-0071 \u2014 Validation Review Cadence"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0072_SERIES_validation_metrics_dashboard.md and do exactly what it says.",
+      "id": "WP-0072",
+      "path": "collaboration/work_packages/pending/WP-0072_SERIES_validation_metrics_dashboard.md",
+      "title": "SERIES TASK WP-0072 \u2014 Validation Metrics Dashboard"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0073_SERIES_validation_to_mission_control_integration.md and do exactly what it says.",
+      "id": "WP-0073",
+      "path": "collaboration/work_packages/pending/WP-0073_SERIES_validation_to_mission_control_integration.md",
+      "title": "SERIES TASK WP-0073 \u2014 Validation to Mission Control Integration"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0074_SERIES_validation_handoff_artifact_workflow.md and do exactly what it says.",
+      "id": "WP-0074",
+      "path": "collaboration/work_packages/pending/WP-0074_SERIES_validation_handoff_artifact_workflow.md",
+      "title": "SERIES TASK WP-0074 \u2014 Validation Handoff Artifact Workflow"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0075_SERIES_operational_readiness_dashboard.md and do exactly what it says.",
+      "id": "WP-0075",
+      "path": "collaboration/work_packages/pending/WP-0075_SERIES_operational_readiness_dashboard.md",
+      "title": "SERIES TASK WP-0075 \u2014 Operational Readiness Dashboard"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0076_SERIES_estate_capability_registry.md and do exactly what it says.",
+      "id": "WP-0076",
+      "path": "collaboration/work_packages/pending/WP-0076_SERIES_estate_capability_registry.md",
+      "title": "SERIES TASK WP-0076 \u2014 Estate Capability Registry"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0077_SERIES_capability_dependency_visualization.md and do exactly what it says.",
+      "id": "WP-0077",
+      "path": "collaboration/work_packages/pending/WP-0077_SERIES_capability_dependency_visualization.md",
+      "title": "SERIES TASK WP-0077 \u2014 Capability Dependency Visualization"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0078_SERIES_capability_gap_report.md and do exactly what it says.",
+      "id": "WP-0078",
+      "path": "collaboration/work_packages/pending/WP-0078_SERIES_capability_gap_report.md",
+      "title": "SERIES TASK WP-0078 \u2014 Capability Gap Report"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md and do exactly what it says.",
+      "id": "WP-0079",
+      "path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md",
+      "title": "SERIES TASK WP-0079 \u2014 Validation Execution Engine"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md and do exactly what it says.",
+      "id": "WP-0079",
+      "path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md",
+      "title": "SERIES TASK WP-0079 \u2014 Validation Project Continuation"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md and do exactly what it says.",
+      "id": "WP-0080",
+      "path": "collaboration/work_packages/pending/WP-0080_SERIES_helen_employee_onboarding_orchestrator.md",
+      "title": "SERIES TASK WP-0080 \u2014 Helen Employee Onboarding Orchestrator"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0081_SERIES_estate_service_catalog.md and do exactly what it says.",
+      "id": "WP-0081",
+      "path": "collaboration/work_packages/pending/WP-0081_SERIES_estate_service_catalog.md",
+      "title": "SERIES TASK WP-0081 \u2014 Estate Service Catalog"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0082_SERIES_service_dependency_matrix.md and do exactly what it says.",
+      "id": "WP-0082",
+      "path": "collaboration/work_packages/pending/WP-0082_SERIES_service_dependency_matrix.md",
+      "title": "SERIES TASK WP-0082 \u2014 Service Dependency Matrix"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0083_SERIES_service_health_registry.md and do exactly what it says.",
+      "id": "WP-0083",
+      "path": "collaboration/work_packages/pending/WP-0083_SERIES_service_health_registry.md",
+      "title": "SERIES TASK WP-0083 \u2014 Service Health Registry"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0084_SERIES_operations_center_service_status_board.md and do exactly what it says.",
+      "id": "WP-0084",
+      "path": "collaboration/work_packages/pending/WP-0084_SERIES_operations_center_service_status_board.md",
+      "title": "SERIES TASK WP-0084 \u2014 Operations Center Service Status Board"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0085_SERIES_operator_activity_stream.md and do exactly what it says.",
+      "id": "WP-0085",
+      "path": "collaboration/work_packages/pending/WP-0085_SERIES_operator_activity_stream.md",
+      "title": "SERIES TASK WP-0085 \u2014 Operator Activity Stream"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0086_SERIES_validation_recipe_expansion.md and do exactly what it says.",
+      "id": "WP-0086",
+      "path": "collaboration/work_packages/pending/WP-0086_SERIES_validation_recipe_expansion.md",
+      "title": "SERIES TASK WP-0086 \u2014 Validation Continuation #3: Recipe Expansion"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0087_SERIES_operator_verbosity_and_filter_profiles.md and do exactly what it says.",
+      "id": "WP-0087",
+      "path": "collaboration/work_packages/pending/WP-0087_SERIES_operator_verbosity_and_filter_profiles.md",
+      "title": "SERIES TASK WP-0087 \u2014 Operator Verbosity and Filter Profiles"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0088_SERIES_operations_center_layout_framework.md and do exactly what it says.",
+      "id": "WP-0088",
+      "path": "collaboration/work_packages/pending/WP-0088_SERIES_operations_center_layout_framework.md",
+      "title": "SERIES TASK WP-0088 \u2014 Operations Center Layout Framework"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0089_SERIES_operations_center_workspace_profiles.md and do exactly what it says.",
+      "id": "WP-0089",
+      "path": "collaboration/work_packages/pending/WP-0089_SERIES_operations_center_workspace_profiles.md",
+      "title": "SERIES TASK WP-0089 \u2014 Operations Center Workspace Profiles"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0091_SERIES_validation_recipe_expansion_0077_0078.md and do exactly what it says.",
+      "id": "WP-0091",
+      "path": "collaboration/work_packages/pending/WP-0091_SERIES_validation_recipe_expansion_0077_0078.md",
+      "title": "SERIES TASK WP-0091 \u2014 Validation Continuation #4: Add Validation Recipes for WP-0077 and WP-0078"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0092_SERIES_operations_center_help_and_about.md and do exactly what it says.",
+      "id": "WP-0092",
+      "path": "collaboration/work_packages/pending/WP-0092_SERIES_operations_center_help_and_about.md",
+      "title": "SERIES TASK WP-0092 \u2014 Operations Center Help and About"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0093_SERIES_operations_center_settings_manager.md and do exactly what it says.",
+      "id": "WP-0093",
+      "path": "collaboration/work_packages/pending/WP-0093_SERIES_operations_center_settings_manager.md",
+      "title": "SERIES TASK WP-0093 \u2014 Operations Center Settings Manager"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0094_SERIES_operations_center_status_bar.md and do exactly what it says.",
+      "id": "WP-0094",
+      "path": "collaboration/work_packages/pending/WP-0094_SERIES_operations_center_status_bar.md",
+      "title": "SERIES TASK WP-0094 \u2014 Operations Center Status Bar"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0095_SERIES_validation_finalization_production_readiness.md and do exactly what it says.",
+      "id": "WP-0095",
+      "path": "collaboration/work_packages/pending/WP-0095_SERIES_validation_finalization_production_readiness.md",
+      "title": "SERIES TASK WP-0095 \u2014 Validation Finalization: Codex Receipts, Production Readiness Gate, and Coverage Manifest"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0096_SERIES_operations_center_notification_center.md and do exactly what it says.",
+      "id": "WP-0096",
+      "path": "collaboration/work_packages/pending/WP-0096_SERIES_operations_center_notification_center.md",
+      "title": "SERIES TASK WP-0096 \u2014 Operations Center Notification Center"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0097_SERIES_operations_center_local_server_bootstrap.md and do exactly what it says.",
+      "id": "WP-0097",
+      "path": "collaboration/work_packages/pending/WP-0097_SERIES_operations_center_local_server_bootstrap.md",
+      "title": "SERIES TASK WP-0097 \u2014 Operations Center Local Server Bootstrap"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0098_SERIES_operations_center_launch_script.md and do exactly what it says.",
+      "id": "WP-0098",
+      "path": "collaboration/work_packages/pending/WP-0098_SERIES_operations_center_launch_script.md",
+      "title": "SERIES TASK WP-0098 \u2014 Operations Center Launch Script"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0099_SERIES_operations_center_pre_handoff_readiness_check.md and do exactly what it says.",
+      "id": "WP-0099",
+      "path": "collaboration/work_packages/pending/WP-0099_SERIES_operations_center_pre_handoff_readiness_check.md",
+      "title": "SERIES TASK WP-0099 \u2014 Operations Center Pre-Handoff Readiness Check"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0100_SERIES_chief_architect_3_transition_and_backlog_continuity.md and do exactly what it says.",
+      "id": "WP-0100",
+      "path": "collaboration/work_packages/pending/WP-0100_SERIES_chief_architect_3_transition_and_backlog_continuity.md",
+      "title": "SERIES TASK WP-0100 \u2014 Chief Architect #3 Transition and Backlog Continuity"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md and do exactly what it says.",
+      "id": "WP-0101",
+      "path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md",
+      "title": "SERIES TASK WP-0101 \u2014 Codex Task Template Standard"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md and do exactly what it says.",
+      "id": "WP-0101",
+      "path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md",
+      "title": "SERIES TASK WP-0101 \u2014 Codex Task Template Update for Backlog Retrofit"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0102_SERIES_backlog_codex_template_retrofit.md and do exactly what it says.",
+      "id": "WP-0102",
+      "path": "collaboration/work_packages/pending/WP-0102_SERIES_backlog_codex_template_retrofit.md",
+      "title": "SERIES TASK WP-0102 \u2014 Backlog Codex Template Retrofit"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0103_SERIES_chief_architect_operating_manual.md and do exactly what it says.",
+      "id": "WP-0103",
+      "path": "collaboration/work_packages/pending/WP-0103_SERIES_chief_architect_operating_manual.md",
+      "title": "SERIES TASK WP-0103 \u2014 Chief Architect Operating Manual"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0103_SERIES_historical_validation_recipe_coverage_through_0085.md and do exactly what it says.",
+      "id": "WP-0103",
+      "path": "collaboration/work_packages/pending/WP-0103_SERIES_historical_validation_recipe_coverage_through_0085.md",
+      "title": "SERIES TASK WP-0103 \u2014 Historical Validation Recipe Coverage Through WP-0085"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0104_SERIES_create_chief_architect_operating_manual.md and do exactly what it says.",
+      "id": "WP-0104",
+      "path": "collaboration/work_packages/pending/WP-0104_SERIES_create_chief_architect_operating_manual.md",
+      "title": "SERIES TASK WP-0104 \u2014 Create Chief Architect Operating Manual"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0105_SERIES_validation_closure_repair_0102_0103.md and do exactly what it says.",
+      "id": "WP-0105",
+      "path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_closure_repair_0102_0103.md",
+      "title": "SERIES TASK WP-0105 \u2014 Validation Closure Repair for WP-0102 and WP-0103"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6.md and do exactly what it says.",
+      "id": "WP-0105",
+      "path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6.md",
+      "title": "SERIES TASK WP-0105 \u2014 Validation Continuation #6"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6_template_path_repair.md and do exactly what it says.",
+      "id": "WP-0105",
+      "path": "collaboration/work_packages/pending/WP-0105_SERIES_validation_continuation_6_template_path_repair.md",
+      "title": "SERIES TASK WP-0105 \u2014 Validation Continuation #6: Template Path Repair"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0106_SERIES_resident_runtime_presence_model.md and do exactly what it says.",
+      "id": "WP-0106",
+      "path": "collaboration/work_packages/pending/WP-0106_SERIES_resident_runtime_presence_model.md",
+      "title": "SERIES TASK WP-0106 \u2014 Resident Runtime Presence Model"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0107_SERIES_alfred_online_duty_runner.md and do exactly what it says.",
+      "id": "WP-0107",
+      "path": "collaboration/work_packages/pending/WP-0107_SERIES_alfred_online_duty_runner.md",
+      "title": "SERIES TASK WP-0107 \u2014 Alfred Online Duty Runner"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md and do exactly what it says.",
+      "id": "WP-0108",
+      "path": "collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md",
+      "title": "SERIES TASK WP-0108 \u2014 Helen Online Duty Runner"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0109_SERIES_resident_conversation_session_and_audit_trail.md and do exactly what it says.",
+      "id": "WP-0109",
+      "path": "collaboration/work_packages/pending/WP-0109_SERIES_resident_conversation_session_and_audit_trail.md",
+      "title": "SERIES TASK WP-0109 \u2014 Resident Conversation Session and Audit Trail"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md and do exactly what it says.",
+      "id": "WP-0110",
+      "path": "collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md",
+      "title": "SERIES TASK WP-0110 \u2014 Resident Action Authority Boundary"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0111_SERIES_production_readiness_backlog_burn_down_and_helen_path.md and do exactly what it says.",
+      "id": "WP-0111",
+      "path": "collaboration/work_packages/pending/WP-0111_SERIES_production_readiness_backlog_burn_down_and_helen_path.md",
+      "title": "SERIES TASK WP-0111 \u2014 Production-Readiness Backlog Burn-Down and Helen Online Path"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md and do exactly what it says.",
+      "id": "WP-0112",
+      "path": "collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md",
+      "title": "SERIES TASK WP-0112 \u2014 Parallel Workstream Isolation and Install Handoff"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0113_SERIES_repair_wp0111_self_validation_and_select_helen_next_batch.md and do exactly what it says.",
+      "id": "WP-0113",
+      "path": "collaboration/work_packages/pending/WP-0113_SERIES_repair_wp0111_self_validation_and_select_helen_next_batch.md",
+      "title": "SERIES TASK WP-0113 \u2014 Repair WP-0111 Self-Validation and Select Helen Next Batch"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md and do exactly what it says.",
+      "id": "WP-0114",
+      "path": "collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md",
+      "title": "SERIES TASK WP-0114 \u2014 Historical Production-Readiness Sweep"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md and do exactly what it says.",
+      "id": "WP-0115",
+      "path": "collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md",
+      "title": "SERIES TASK WP-0115 \u2014 Historical Validation Recipe Bootstrap Sweep"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md and do exactly what it says.",
+      "id": "WP-0116",
+      "path": "collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md",
+      "title": "SERIES TASK WP-0116 \u2014 Final Production-Readiness Exception Closure"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0116_SERIES_sequential_pending_queue_batch_execution_standard.md and do exactly what it says.",
+      "id": "WP-0116",
+      "path": "collaboration/work_packages/pending/WP-0116_SERIES_sequential_pending_queue_batch_execution_standard.md",
+      "title": "SERIES TASK WP-0116 \u2014 Sequential Pending Queue Batch Execution Standard"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md and do exactly what it says.",
+      "id": "WP-0117",
+      "path": "collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md",
+      "title": "SERIES TASK WP-0117 \u2014 Repair WP-0106/WP-0107 Validation Failures"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0118_SERIES_repair_resident_runtime_pytest_validation_failures.md and do exactly what it says.",
+      "id": "WP-0118",
+      "path": "collaboration/work_packages/pending/WP-0118_SERIES_repair_resident_runtime_pytest_validation_failures.md",
+      "title": "SERIES TASK WP-0118 \u2014 Repair Resident Runtime Pytest Validation Failures"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0119_SERIES_windows_resident_runtime_test_stabilization.md and do exactly what it says.",
+      "id": "WP-0119",
+      "path": "collaboration/work_packages/pending/WP-0119_SERIES_windows_resident_runtime_test_stabilization.md",
+      "title": "SERIES TASK WP-0119 \u2014 Windows Resident Runtime Test Stabilization"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0120_SERIES_final_historical_exception_cleanup.md and do exactly what it says.",
+      "id": "WP-0120",
+      "path": "collaboration/work_packages/pending/WP-0120_SERIES_final_historical_exception_cleanup.md",
+      "title": "SERIES TASK WP-0120 \u2014 Final Historical Exception Cleanup"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0121_SERIES_resolve_final_four_production_readiness_blockers.md and do exactly what it says.",
+      "id": "WP-0121",
+      "path": "collaboration/work_packages/pending/WP-0121_SERIES_resolve_final_four_production_readiness_blockers.md",
+      "title": "SERIES TASK WP-0121 \u2014 Resolve Final Four Production-Readiness Blockers"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md and do exactly what it says.",
+      "id": "WP-0122",
+      "path": "collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md",
+      "title": "SERIES TASK WP-0122 \u2014 Stand Up Alfred as Operational Resident Runtime"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0123_SERIES_bring_helen_online_via_alfred_or_manual_onboarding.md and do exactly what it says.",
+      "id": "WP-0123",
+      "path": "collaboration/work_packages/pending/WP-0123_SERIES_bring_helen_online_via_alfred_or_manual_onboarding.md",
+      "title": "SERIES TASK WP-0123 \u2014 Bring Helen Online Through Alfred or Manual HR Onboarding"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md and do exactly what it says.",
+      "id": "WP-0124",
+      "path": "collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md",
+      "title": "SERIES TASK WP-0124 \u2014 Helen-Led Chief Architect #5 Hiring and Onboarding"
+    },
+    {
+      "codex_ready_command": "Read /workspace/theestate/collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md and do exactly what it says.",
+      "id": "WP-0125",
+      "path": "collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md",
+      "title": "SERIES TASK WP-0125 \u2014 Establish Estate Engineering Department for Queue Mastery Execution"
     }
   ],
   "blocked_work": [],
@@ -431,7 +1031,7 @@
     "Read /workspace/theestate/collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md and do exactly what it says.",
     "Read /workspace/theestate/collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md and do exactly what it says."
   ],
-  "created_at": "2026-07-02T21:04:16",
+  "created_at": "2026-07-05T14:57:16",
   "latest_jobs": [],
   "messages_requiring_acknowledgement": [
     {
@@ -759,13 +1359,6 @@
   ],
   "parking_lot_items_recently_relevant": [
     {
-      "category": "Institutional Architecture",
-      "id": "PL-0008",
-      "idea": "Chief Architect final memorandum standard for retiring architects to leave lessons learned, mistakes, surviving principles, and guidance",
-      "priority": "Normal",
-      "status": "Captured"
-    },
-    {
       "category": "Institutional Memory",
       "id": "PL-0009",
       "idea": "Eleanor and Marie knowledge architecture with spider-based indexing of A drive and GitHub into a searchable tag-based institutional knowledge base",
@@ -792,6 +1385,13 @@
       "idea": "Treat onboarding as an institutional capability driven by a canonical onboarding manifest that serves as the configuration for repeatable onboarding rather than documentation; include ordered entries with purpose, required status, canonical path, and lifecycle state while keeping meaning in the referenced documents",
       "priority": "High",
       "status": "Captured"
+    },
+    {
+      "category": "Institutional Architecture",
+      "id": "PL-0013",
+      "idea": "Transition work package range allocation from current Chief Architect occupants to the persistent Office of Chief Architect once office/occupant separation is mature; current operations may assign ranges directly to active occupants until the institution is ready for office-owned allocation",
+      "priority": "Normal",
+      "status": "Captured"
     }
   ],
   "queued_requests": [],
@@ -802,7 +1402,7 @@
     "Promote validation candidates into CA review when operational evidence is sufficient."
   ],
   "source_artifacts": {
-    "capability_lifecycle_report_available": true,
+    "capability_lifecycle_report_available": false,
     "dependency_graph_available": true,
     "operations_board_available": false,
     "steward_dashboard_available": false,
@@ -831,12 +1431,12 @@
     "capabilities": 13,
     "jobs": 0,
     "messages_requiring_acknowledgement": 17,
-    "pending_work_packages": 18,
+    "pending_work_packages": 118,
     "queued_requests": 0,
     "ready": true,
     "services_available": 0,
     "validation_candidates": 5,
-    "warnings": 2
+    "warnings": 3
   },
   "validation_candidates": [
     {
@@ -874,6 +1474,11 @@
     },
     {
       "path": "runtime/steward/dashboard.json",
+      "required": false,
+      "type": "missing_artifact"
+    },
+    {
+      "path": "runtime/capabilities/capability_lifecycle_report.json",
       "required": false,
       "type": "missing_artifact"
     }

@@ -1,27 +1,27 @@
 # Work Package Validation Report — WP-0119
 
-- Timestamp: 2026-07-05T14:35:00+00:00
+- Timestamp: 2026-07-05T15:05:19+00:00
 - Work package ID: WP-0119
 - Local branch: work
-- Git commit: fa121c908ce7e9c3ae43fab6963f547abb8c22cd
+- Git commit: 4303061ad25118cd7c7a9be7976af20af0773347
 - Validation status: passed
 - Recipe used: wp-0119-windows-resident-runtime-test-stabilization
 - Recipe title: WP-0119 — Windows Resident Runtime Test Stabilization
 
 ## Commands Run
-- `python -c "from pathlib import Path; assert Path('operations/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.md').is_file()"` — passed (exit 0, 0.068s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.json').read_text(encoding='utf-8')); required=['wp_0106_failure_cause','wp_0108_failure_cause','wp_0110_failure_cause']; missing=[k for k in required if not data.get(k)]; assert not missing, missing; validation_keys=['wp_0106_validation_result_after_repair','wp_0107_validation_result_after_repair','wp_0108_validation_result_after_repair','wp_0109_validation_result_after_repair','wp_0110_validation_result_after_repair','wp_0116_validation_result_after_repair','wp_0117_validation_result_after_repair','wp_0118_validation_result_after_repair']; assert all(data.get(k, {}).get('validation_status') == 'passed' for k in validation_keys); assert data.get('production_readiness_after'); assert data.get('wp_9999_quarantine_status') in {'quarantined_not_promoted','not_promoted'}; assert data.get('alfred_helen_runtime_path_status')"` — passed (exit 0, 0.071s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0106_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.097s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0107_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.069s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0108_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.072s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0109_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.097s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0110_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.067s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0116_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.074s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0117_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.078s)
-- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0118_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.083s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.426s)
+- `python -c "from pathlib import Path; assert Path('operations/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.md').is_file()"` — passed (exit 0, 0.076s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0119_windows_resident_runtime_test_stabilization_report.json').read_text(encoding='utf-8')); required=['wp_0106_failure_cause','wp_0108_failure_cause','wp_0110_failure_cause']; missing=[k for k in required if not data.get(k)]; assert not missing, missing; validation_keys=['wp_0106_validation_result_after_repair','wp_0107_validation_result_after_repair','wp_0108_validation_result_after_repair','wp_0109_validation_result_after_repair','wp_0110_validation_result_after_repair','wp_0116_validation_result_after_repair','wp_0117_validation_result_after_repair','wp_0118_validation_result_after_repair']; assert all(data.get(k, {}).get('validation_status') == 'passed' for k in validation_keys); assert data.get('production_readiness_after'); assert data.get('wp_9999_quarantine_status') in {'quarantined_not_promoted','not_promoted'}; assert data.get('alfred_helen_runtime_path_status')"` — passed (exit 0, 0.081s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0106_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.075s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0107_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.071s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0108_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.075s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0109_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.075s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0110_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.074s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0116_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.072s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0117_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.071s)
+- `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/work_packages/WP-0118_validation.json').read_text(encoding='utf-8')); assert data.get('validation_status') == 'passed', data.get('validation_status')"` — passed (exit 0, 0.074s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.415s)
 - `python -c "import json; from pathlib import Path; data=json.loads(Path('runtime/validation/production_readiness_report.json').read_text(encoding='utf-8')); assert all(item.get('work_package_id') != 'WP-9999' for key in ['blocking_work_packages', 'ready_for_chief_architect_production_readiness_acceptance'] for item in data.get(key, []))"` — passed (exit 0, 0.08s)
-- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0119'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.114s)
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0119'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.105s)
 
 ## Findings
 - None.

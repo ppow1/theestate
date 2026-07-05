@@ -1,18 +1,18 @@
 # Work Package Validation Report — WP-0102
 
-- Timestamp: 2026-07-05T06:29:55+00:00
+- Timestamp: 2026-07-05T14:58:54+00:00
 - Work package ID: WP-0102
 - Local branch: work
-- Git commit: 1134484794b449a27a668e709eb2aab872929565
+- Git commit: 4303061ad25118cd7c7a9be7976af20af0773347
 - Validation status: passed
 - Recipe used: wp-0102-backlog-codex-template-retrofit-closure
 - Recipe title: WP-0102 — Backlog Codex Template Retrofit Validation
 
 ## Commands Run
-- `python -c "from pathlib import Path; template=Path('docs/operations/Codex_Task_Template_Standard_v1.md'); source=Path('collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md'); assert template.is_file(), template; assert source.is_file(), source"` — passed (exit 0, 0.094s)
-- `python -c "from pathlib import Path; pending=Path('collaboration/work_packages/pending'); ids=['0086','0087','0088','0089','0091','0092','0093','0094','0095','0096','0097','0098','0099','0100']; missing=[]; [missing.append(f'WP-{wp}') for wp in ids for files in [list(pending.glob(f'WP-{wp}_*.md'))] if not files or not any('WP-0102 Template Retrofit Notice' in path.read_text(encoding='utf-8') for path in files)]; assert not missing, missing"` — passed (exit 0, 0.104s)
-- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0102'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.142s)
-- `python -c "import json; from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; suspicious=[]; [suspicious.append(p.name) for wp in targets if (p:=d / f'{wp}_codex_done.json').exists() for data in [json.loads(p.read_text(encoding='utf-8'))] for scoped in [{k:v for k,v in data.items() if k not in {'production_readiness_command_status', 'validation_recipe_status'}}] for text in [json.dumps(scoped).lower()] if 'wp-0102' in text and ('retrofit' in text or 'template' in text)]; assert not suspicious, suspicious"` — passed (exit 0, 0.09s)
+- `python -c "from pathlib import Path; template=Path('docs/operations/Codex_Task_Template_Standard_v1.md'); source=Path('collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md'); assert template.is_file(), template; assert source.is_file(), source"` — passed (exit 0, 0.097s)
+- `python -c "from pathlib import Path; pending=Path('collaboration/work_packages/pending'); ids=['0086','0087','0088','0089','0091','0092','0093','0094','0095','0096','0097','0098','0099','0100']; missing=[]; [missing.append(f'WP-{wp}') for wp in ids for files in [list(pending.glob(f'WP-{wp}_*.md'))] if not files or not any('WP-0102 Template Retrofit Notice' in path.read_text(encoding='utf-8') for path in files)]; assert not missing, missing"` — passed (exit 0, 0.112s)
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0102'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.153s)
+- `python -c "import json; from pathlib import Path; d=Path('collaboration/work_packages/completions'); targets=[f'WP-{i:04d}' for i in range(86,101)]; suspicious=[]; [suspicious.append(p.name) for wp in targets if (p:=d / f'{wp}_codex_done.json').exists() for data in [json.loads(p.read_text(encoding='utf-8'))] for scoped in [{k:v for k,v in data.items() if k not in {'production_readiness_command_status', 'validation_recipe_status'}}] for text in [json.dumps(scoped).lower()] if 'wp-0102' in text and ('retrofit' in text or 'template' in text)]; assert not suspicious, suspicious"` — passed (exit 0, 0.095s)
 
 ## Findings
 - None.

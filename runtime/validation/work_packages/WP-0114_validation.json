@@ -3,11 +3,11 @@
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0114_historical_sweep_report.md','runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T06:29:23+00:00",
-      "duration_seconds": 0.069,
+      "completed_at": "2026-07-05T14:58:49+00:00",
+      "duration_seconds": 0.078,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:23+00:00",
+      "started_at": "2026-07-05T14:58:49+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -15,11 +15,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json').read_text(encoding='utf-8')); assert data.get('production_readiness_totals_before') and data.get('production_readiness_totals_after'), data.keys()\"",
-      "completed_at": "2026-07-05T06:29:23+00:00",
-      "duration_seconds": 0.068,
+      "completed_at": "2026-07-05T14:58:50+00:00",
+      "duration_seconds": 0.088,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:23+00:00",
+      "started_at": "2026-07-05T14:58:49+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -27,11 +27,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json').read_text(encoding='utf-8')); count=len(data.get('packages_scanned', []))+len(data.get('packages_repaired_by_recipe_addition', []))+len(data.get('packages_repaired_by_receipt_normalization', [])); assert count > 0, data\"",
-      "completed_at": "2026-07-05T06:29:23+00:00",
-      "duration_seconds": 0.07,
+      "completed_at": "2026-07-05T14:58:50+00:00",
+      "duration_seconds": 0.112,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:23+00:00",
+      "started_at": "2026-07-05T14:58:50+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -39,11 +39,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json').read_text(encoding='utf-8')); completed=set(data.get('packages_repaired_by_receipt_creation', [])); pending={f'WP-{i:04d}' for i in range(106,111)}; assert not (completed & pending), sorted(completed & pending)\"",
-      "completed_at": "2026-07-05T06:29:23+00:00",
-      "duration_seconds": 0.071,
+      "completed_at": "2026-07-05T14:58:50+00:00",
+      "duration_seconds": 0.113,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:23+00:00",
+      "started_at": "2026-07-05T14:58:50+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -51,59 +51,59 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T06:29:24+00:00",
-      "duration_seconds": 0.382,
+      "completed_at": "2026-07-05T14:58:50+00:00",
+      "duration_seconds": 0.571,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:23+00:00",
+      "started_at": "2026-07-05T14:58:50+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T062923Z0000/command_05_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T145849Z0000/command_05_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0102 --json",
-      "completed_at": "2026-07-05T06:29:24+00:00",
-      "duration_seconds": 0.602,
+      "completed_at": "2026-07-05T14:58:51+00:00",
+      "duration_seconds": 0.876,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:24+00:00",
+      "started_at": "2026-07-05T14:58:50+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T062923Z0000/command_06_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T145849Z0000/command_06_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0105 --json",
-      "completed_at": "2026-07-05T06:29:35+00:00",
-      "duration_seconds": 10.807,
+      "completed_at": "2026-07-05T14:59:04+00:00",
+      "duration_seconds": 13.055,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:24+00:00",
+      "started_at": "2026-07-05T14:58:51+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T062923Z0000/command_07_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T145849Z0000/command_07_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0111 --json",
-      "completed_at": "2026-07-05T06:29:37+00:00",
-      "duration_seconds": 1.771,
+      "completed_at": "2026-07-05T14:59:06+00:00",
+      "duration_seconds": 1.909,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:35+00:00",
+      "started_at": "2026-07-05T14:59:04+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T062923Z0000/command_08_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0114_2026-07-05T145849Z0000/command_08_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0114'); assert r['receipt_status']=='complete', r\"",
-      "completed_at": "2026-07-05T06:29:37+00:00",
-      "duration_seconds": 0.096,
+      "completed_at": "2026-07-05T14:59:06+00:00",
+      "duration_seconds": 0.104,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T06:29:37+00:00",
+      "started_at": "2026-07-05T14:59:06+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -128,10 +128,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T06:29:23+00:00",
+  "generated_at": "2026-07-05T14:58:49+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "1134484794b449a27a668e709eb2aab872929565",
+  "git_commit_before": "4303061ad25118cd7c7a9be7976af20af0773347",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -158,7 +158,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 4 command(s).",
-  "validation_id": "WP-0114_2026-07-05T062923Z0000",
+  "validation_id": "WP-0114_2026-07-05T145849Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0114"

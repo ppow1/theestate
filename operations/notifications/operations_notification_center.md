@@ -2,13 +2,13 @@
 
 Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth.
 
-Generated: 2026-07-05T06:30:00+00:00
+Generated: 2026-07-05T15:05:18+00:00
 Refresh behavior: quiet_refresh_from_local_artifacts
 
 ## Summary
 - total_notification_count: 117
 - filtered_notification_count: 100
-- unavailable_source_count: 8
+- unavailable_source_count: 7
 - locally_acknowledged_count: 0
 - severity_counts: {'critical': 0, 'error': 0, 'warning': 100, 'missing': 0, 'info': 0, 'debug': 0}
 
