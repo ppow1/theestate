@@ -1,0 +1,74 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.mission_control_workspace import build_mission_control_workspace; p=build_mission_control_workspace(write=False); v=p['data']['validation_health']; required=['overall_validation_status','open_observations_count','confirmed_defects_count','conditional_pass_count','most_recent_validation_activity','artifact_links','recommended_next_validation_action']; missing=[k for k in required if k not in v]; assert not missing, missing; assert 'source' in v.get('source_of_truth_boundary','').lower()\"",
+      "completed_at": "2026-07-05T14:32:43+00:00",
+      "duration_seconds": 0.151,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T14:32:43+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0073'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-05T14:32:43+00:00",
+      "duration_seconds": 0.102,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T14:32:43+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "python -c \"from estate.core.mission_control_workspace import build_mission_control_workspace; p=build_mission_control_workspace(write=False); v=p['data']['validation_health']; required=['overall_validation_status','open_observations_count','confirmed_defects_count','conditional_pass_count','most_recent_validation_activity','artifact_links','recommended_next_validation_action']; missing=[k for k in required if k not in v]; assert not missing, missing; assert 'source' in v.get('source_of_truth_boundary','').lower()\"",
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0073'); assert r['receipt_status']=='complete', r\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0073_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0073_validation.md",
+    "runtime/validation/work_packages/WP-0073_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T14:32:43+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "fa121c908ce7e9c3ae43fab6963f547abb8c22cd",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0073_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0073"
+  },
+  "recipe_id": "wp-0073-validation-to-mission-control-integration",
+  "recipe_title": "WP-0073 \u2014 Validation to Mission Control Integration",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 0 command(s).",
+  "validation_id": "WP-0073_2026-07-05T143243Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0073"
+}

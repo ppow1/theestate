@@ -1,0 +1,22 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-05T14:27:45+00:00",
+  "files_changed": [
+    "src/estate/core/mission_control_workspace.py",
+    "tests/test_work_package_validation.py",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0073_codex_done.json"
+  ],
+  "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "production_readiness_command_status": "pending final WP-0121 readiness regeneration",
+  "pull_request_not_applicable_reason": "PR URL assigned after local branch push; local-first completion receipt prepared before PR creation.",
+  "ready_for_ca_review": true,
+  "summary": "Integrated validation health into Mission Control as read-only aggregation from validation metrics and latest validation artifacts, including status, observations, confirmed defects, conditional passes, recent activity, artifact links, and recommended next validation action.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0073 --json"
+  ],
+  "validation_recipe_status": "registered",
+  "work_package_id": "WP-0073"
+}

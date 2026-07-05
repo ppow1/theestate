@@ -2,20 +2,23 @@
   "architecture_artifact": "Architecture/ADR/ADR-0003-Work-Package-State-Machine-Proposal.md",
   "branch": "work",
   "codex_status": "done",
-  "follow_on_package": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
+  "completed_at": "2026-07-05T14:27:45+00:00",
+  "current_chief_architect_review": "WP-0121 accepts repository evidence for architecture-only closure; implementation remains not authorized by this receipt.",
+  "files_changed": [
+    "Architecture/ADR/ADR-0003-Work-Package-State-Machine-Proposal.md",
+    "collaboration/work_packages/completions/WP-0017_architecture_done.json",
+    "src/estate/core/work_package_validation.py"
+  ],
   "implementation_authorized": false,
   "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
   "mode": "ARCHITECTURE-FIRST",
-  "open_questions": [
-    "Should ca_review_pending be mandatory for all Class B work, or only architecture/governance-adjacent Class B work?",
-    "Should closed be reachable directly from merged, or should all implementation packages pass through validation_pending first?",
-    "Should blocked return only to its immediately prior state, or may the resolving office choose a different authorized state?",
-    "Should merge authority be held only by the Steward, or may Chief Architect verification explicitly delegate merge authority for predefined classes?",
-    "Should architecture-only packages close after ca_verified, or should they also require a separate validation state?"
-  ],
-  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_not_applicable_reason": "PR URL assigned after local branch push; local-first completion receipt prepared before PR creation.",
+  "ready_for_ca_review": true,
   "ready_for_codex_package": false,
-  "status": "architecture_done",
-  "summary": "Produced ADR-0003 proposing a canonical work package state machine, transition authority model, guardrails, and Chief Architect review questions. Drafted a blocked follow-on Codex implementation package that must not start until Chief Architect approval authorizes implementation.",
+  "summary": "Normalized architecture-only completion evidence for the Work Package State Machine proposal. WP-0121 represents current Chief Architect review acceptance of the historical architecture artifact for production-readiness evidence without authorizing implementation.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0017 --json"
+  ],
   "work_package_id": "WP-0017"
 }
