@@ -1,88 +1,70 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-04T22:25:46+00:00
+- generated_at: 2026-07-05T00:06:52+00:00
 - git branch: work
-- git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5
+- git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb
 
 ## Totals
-- total_work_packages_scanned: 100
-- total_production_ready: 32
-- total_blocked: 68
-- total_missing_recipes: 48
-- total_missing_receipts: 5
-- total_incomplete_receipts: 53
+- total_work_packages_scanned: 101
+- total_production_ready: 51
+- total_blocked: 50
+- total_missing_recipes: 46
+- total_missing_receipts: 4
+- total_incomplete_receipts: 5
 
 ## Recommended Next Action
 Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.
 
 ## Blocking Work Packages
-- WP-0014: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0016: ready_for_ca_review is not true.; Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, codex_status, completed_at, branch, summary, files_changed, tests_run, known_limitations, ready_for_ca_review; Execution status blocks readiness: no_recipe.
-- WP-0017: ready_for_ca_review is not true.; Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, codex_status, completed_at, branch, files_changed, tests_run, known_limitations, ready_for_ca_review; Execution status blocks readiness: no_recipe.
-- WP-0018: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, work_package_id, codex_status, completed_at, branch, summary, known_limitations; Execution status blocks readiness: no_recipe.
-- WP-0022: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0023: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0024: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0025: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0026: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0028: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0030: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0031: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0032: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0033: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0034: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0035: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0039: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0040: Blocking known limitation: Dependency and blocker extraction is limited to explicit fields and labelled Markdown sections.; Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0041: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0042: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0043: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0044: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0045: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0046: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0047: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0048: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0049: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0050: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0051: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0054: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0055: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
+- WP-0014: Execution status blocks readiness: no_recipe.
+- WP-0016: ready_for_ca_review is not true.; Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, summary, files_changed, tests_run, ready_for_ca_review; Execution status blocks readiness: no_recipe.
+- WP-0017: ready_for_ca_review is not true.; Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, files_changed, tests_run, ready_for_ca_review; Execution status blocks readiness: no_recipe.
+- WP-0018: Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, summary; Execution status blocks readiness: no_recipe.
+- WP-0022: Execution status blocks readiness: no_recipe.
+- WP-0023: Execution status blocks readiness: no_recipe.
+- WP-0024: Execution status blocks readiness: no_recipe.
+- WP-0025: Execution status blocks readiness: no_recipe.
+- WP-0026: Execution status blocks readiness: no_recipe.
+- WP-0028: Execution status blocks readiness: no_recipe.
+- WP-0030: Execution status blocks readiness: no_recipe.
+- WP-0031: Execution status blocks readiness: no_recipe.
+- WP-0032: Execution status blocks readiness: no_recipe.
+- WP-0033: Execution status blocks readiness: no_recipe.
+- WP-0034: Execution status blocks readiness: no_recipe.
+- WP-0035: Execution status blocks readiness: no_recipe.
+- WP-0039: Execution status blocks readiness: no_recipe.
+- WP-0040: Blocking known limitation: Dependency and blocker extraction is limited to explicit fields and labelled Markdown sections.; Execution status blocks readiness: no_recipe.
+- WP-0041: Execution status blocks readiness: no_recipe.
+- WP-0042: Execution status blocks readiness: no_recipe.
+- WP-0043: Execution status blocks readiness: no_recipe.
+- WP-0044: Execution status blocks readiness: no_recipe.
+- WP-0045: Execution status blocks readiness: no_recipe.
+- WP-0046: Execution status blocks readiness: no_recipe.
+- WP-0047: Execution status blocks readiness: no_recipe.
+- WP-0048: Execution status blocks readiness: no_recipe.
+- WP-0049: Execution status blocks readiness: no_recipe.
+- WP-0050: Execution status blocks readiness: no_recipe.
+- WP-0051: Execution status blocks readiness: no_recipe.
+- WP-0054: Execution status blocks readiness: no_recipe.
+- WP-0055: Execution status blocks readiness: no_recipe.
 - WP-0056: Completion artifact is missing.
-- WP-0057: 
-- WP-0058: 
-- WP-0059: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0060: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0061: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0062: Completion artifact is missing required metadata: known_limitations; Execution status blocks readiness: no_recipe.
-- WP-0063: Completion artifact is missing required metadata: known_limitations; Execution status blocks readiness: no_recipe.
-- WP-0064: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0069: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0071: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0072: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
+- WP-0061: Execution status blocks readiness: no_recipe.
+- WP-0062: Execution status blocks readiness: no_recipe.
+- WP-0063: Execution status blocks readiness: no_recipe.
+- WP-0064: Execution status blocks readiness: no_recipe.
+- WP-0069: Execution status blocks readiness: no_recipe.
+- WP-0071: Execution status blocks readiness: no_recipe.
+- WP-0072: Execution status blocks readiness: no_recipe.
 - WP-0073: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
-- WP-0074: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0075: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0079: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0082: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0083: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0084: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0086: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0087: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0088: 
+- WP-0082: Execution status blocks readiness: no_recipe.
+- WP-0083: Execution status blocks readiness: no_recipe.
+- WP-0084: Execution status blocks readiness: no_recipe.
 - WP-0089: Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages.
-- WP-0091: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason
-- WP-0093: 
 - WP-0094: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
-- WP-0096: 
-- WP-0097: 
 - WP-0100: Execution status blocks readiness: no_recipe.
-- WP-0104: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason; Execution status blocks readiness: no_recipe.
-- WP-0106: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, codex_status, branch, files_changed
-- WP-0107: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, codex_status_done
-- WP-0109: 
-- WP-0110: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
-- WP-0112: 
-- WP-0113: Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, files_changed; Execution status blocks readiness: no_recipe.
+- WP-0104: Execution status blocks readiness: no_recipe.
+- WP-0106: Completion artifact is missing required metadata: merge_authority_or_equivalent, files_changed
+- WP-0107: Completion artifact is missing required metadata: codex_status_done; Execution status blocks readiness: failed.
 - WP-9999: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 
 ## Ready for Chief Architect Production-Readiness Acceptance
@@ -97,19 +79,33 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0038
 - WP-0052
 - WP-0053
+- WP-0057
+- WP-0058
+- WP-0059
+- WP-0060
 - WP-0065
 - WP-0066
 - WP-0067
 - WP-0068
 - WP-0070
+- WP-0074
+- WP-0075
 - WP-0076
 - WP-0077
 - WP-0078
+- WP-0079
 - WP-0080
 - WP-0081
 - WP-0085
+- WP-0086
+- WP-0087
+- WP-0088
+- WP-0091
 - WP-0092
+- WP-0093
 - WP-0095
+- WP-0096
+- WP-0097
 - WP-0098
 - WP-0099
 - WP-0101
@@ -117,9 +113,15 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0103
 - WP-0105
 - WP-0108
+- WP-0109
+- WP-0110
 - WP-0111
+- WP-0112
+- WP-0113
+- WP-0114
 
 ## Recent Validation Reports
+- `runtime/validation/work_packages/WP-0114_validation.json`
 - `runtime/validation/work_packages/WP-0111_validation.json`
 - `runtime/validation/work_packages/WP-0020_validation.json`
 - `runtime/validation/work_packages/WP-0105_validation.json`
@@ -129,4 +131,3 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - `runtime/validation/work_packages/WP-0103_validation.json`
 - `runtime/validation/work_packages/WP-0027_validation.json`
 - `runtime/validation/work_packages/WP-0015_validation.json`
-- `runtime/validation/work_packages/WP-0102_validation.json`

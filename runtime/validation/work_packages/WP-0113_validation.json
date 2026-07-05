@@ -1,0 +1,113 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.md','runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
+      "completed_at": "2026-07-05T00:03:13+00:00",
+      "duration_seconds": 0.11,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:03:12+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json').read_text(encoding='utf-8')); text=json.dumps(data).lower(); required=['wp-0106','wp-0107','wp-0108','wp-0109','wp-0110']; missing=[wp for wp in required if wp.lower() not in text]; assert not missing, missing\"",
+      "completed_at": "2026-07-05T00:03:13+00:00",
+      "duration_seconds": 0.117,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:03:13+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json').read_text(encoding='utf-8')); completed=set(data.get('packages_newly_production_ready', [])) | set(data.get('packages_repaired', [])); pending={f'WP-{i:04d}' for i in range(106,111)}; assert not (completed & pending), sorted(completed & pending)\"",
+      "completed_at": "2026-07-05T00:03:13+00:00",
+      "duration_seconds": 0.115,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:03:13+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0113'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-05T00:03:13+00:00",
+      "duration_seconds": 0.14,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:03:13+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-05T00:03:13+00:00",
+      "duration_seconds": 0.572,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-05T00:03:13+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0113_2026-07-05T000312Z0000/command_05_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.md','runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
+    "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json').read_text(encoding='utf-8')); text=json.dumps(data).lower(); required=['wp-0106','wp-0107','wp-0108','wp-0109','wp-0110']; missing=[wp for wp in required if wp.lower() not in text]; assert not missing, missing\"",
+    "python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json').read_text(encoding='utf-8')); completed=set(data.get('packages_newly_production_ready', [])) | set(data.get('packages_repaired', [])); pending={f'WP-{i:04d}' for i in range(106,111)}; assert not (completed & pending), sorted(completed & pending)\"",
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0113'); assert r['receipt_status']=='complete', r\"",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0113_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0113_validation.md",
+    "runtime/validation/work_packages/WP-0113_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T00:03:12+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "51e0b5912c9ca6293eea2f0f767531bc8b660fdb",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0113_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0113"
+  },
+  "recipe_id": "wp-0113-helen-next-batch-recommendation",
+  "recipe_title": "WP-0113 \u2014 Helen Next-Batch Recommendation",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 1 command(s).",
+  "validation_id": "WP-0113_2026-07-05T000312Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0113"
+}

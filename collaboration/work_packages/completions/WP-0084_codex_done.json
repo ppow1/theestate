@@ -17,6 +17,7 @@
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
   "merge_class": "Class A",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented the Operations Center Service Status Board as a read-only aggregation of the Estate Service Catalog, Service Dependency Matrix, and Service Health Registry. The board exposes healthy, degraded, blocked, unavailable, and unknown states with readiness, validation, dependency summaries, quiet-refresh metadata, and drill-down/source artifact links for Alfred and future Operations Center UI use.",

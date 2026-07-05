@@ -1,10 +1,7 @@
 {
-  "work_package_id": "WP-0014",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T15:40:00Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Expanded mailbox destination resolution to cover registry-backed office, employee, mailbox, worker, and direct mailbox ID destination forms; regenerated mailbox and worker inbox summaries; added CA4 summary coverage and tests.",
   "files_changed": [
     "collaboration/mailboxes/index.json",
     "collaboration/status/event_summary.json",
@@ -15,15 +12,19 @@
     "src/estate/core/mailbox_index.py",
     "tests/test_mailbox_index.py"
   ],
+  "known_limitations": [
+    "Worker destinations are treated as valid operational destinations without numeric mailbox IDs in the mailbox index."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Expanded mailbox destination resolution to cover registry-backed office, employee, mailbox, worker, and direct mailbox ID destination forms; regenerated mailbox and worker inbox summaries; added CA4 summary coverage and tests.",
   "tests_run": [
     "PYTHONPATH=src pytest -q tests/test_mailbox_index.py",
     "PYTHONPATH=src python -m estate.cli.main worker-inboxes --json",
     "PYTHONPATH=src python -m estate.cli.main mailbox-index --json",
     "PYTHONPATH=src pytest -q"
   ],
-  "known_limitations": [
-    "Worker destinations are treated as valid operational destinations without numeric mailbox IDs in the mailbox index."
-  ],
-  "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "work_package_id": "WP-0014"
 }

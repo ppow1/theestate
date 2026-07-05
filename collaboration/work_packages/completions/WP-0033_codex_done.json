@@ -1,22 +1,23 @@
 {
-  "work_package_id": "WP-0033",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T22:33:59Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Created the Autonomous Estate Operations Charter v1 defining purpose, governing principle, scope, non-goals, execution boundaries, Alfred coordination, Steward recall, morning briefing, audit expectations, Communication Bus/work-package relationships, and a staged implementation plan for follow-on autonomous operations packages.",
   "files_changed": [
     "docs/operations/Autonomous_Estate_Operations_Charter_v1.md",
     "collaboration/work_packages/completions/WP-0033_codex_done.json"
-  ],
-  "tests_run": [
-    "python - <<'PY' ... referenced path existence validation ... PY",
-    "python -m json.tool collaboration/work_packages/completions/WP-0033_codex_done.json"
   ],
   "known_limitations": [
     "This package is documentation-only and does not implement notification transport.",
     "The charter explicitly preserves Steward constitutional authority and does not give Alfred artificial intelligence decision authority."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Created the Autonomous Estate Operations Charter v1 defining purpose, governing principle, scope, non-goals, execution boundaries, Alfred coordination, Steward recall, morning briefing, audit expectations, Communication Bus/work-package relationships, and a staged implementation plan for follow-on autonomous operations packages.",
+  "tests_run": [
+    "python - <<'PY' ... referenced path existence validation ... PY",
+    "python -m json.tool collaboration/work_packages/completions/WP-0033_codex_done.json"
+  ],
+  "work_package_id": "WP-0033"
 }

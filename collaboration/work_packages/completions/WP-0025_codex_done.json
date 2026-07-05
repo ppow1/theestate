@@ -28,6 +28,7 @@
     "The runner invokes existing generators and reports their warnings; it does not make generated projections authoritative or mutate lifecycle/governance source-of-truth records."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented estate-validate-local runner that coordinates operational projection generators, writes JSON/Markdown validation reports, captures warnings and failed sub-steps, and verifies ledger/devlog remain unchanged.",

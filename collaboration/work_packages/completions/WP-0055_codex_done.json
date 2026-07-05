@@ -1,21 +1,22 @@
 {
-  "work_package_id": "WP-0055",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-03T11:10:21Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Added local-first Settings and About surfaces to the Office of the Steward command center, including initial UI preference controls, component/version inventory, graceful unknown version handling, and local runtime path reporting.",
   "files_changed": [
     "src/estate/core/steward_command_center.py",
     "tests/test_steward_command_center.py",
     "collaboration/work_packages/completions/WP-0055_codex_done.json"
   ],
-  "tests_run": [
-    "pytest tests/test_steward_command_center.py tests/test_codex_completion.py"
-  ],
   "known_limitations": [
     "Settings are local UI preference placeholders and are not persisted to a settings store yet."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Added local-first Settings and About surfaces to the Office of the Steward command center, including initial UI preference controls, component/version inventory, graceful unknown version handling, and local runtime path reporting.",
+  "tests_run": [
+    "pytest tests/test_steward_command_center.py tests/test_codex_completion.py"
+  ],
+  "work_package_id": "WP-0055"
 }

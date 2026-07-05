@@ -1,27 +1,27 @@
 # Work Package Validation Report — WP-0110
 
-- Timestamp: 2026-07-04T22:32:57+00:00
+- Timestamp: 2026-07-05T00:01:57+00:00
 - Work package ID: WP-0110
 - Local branch: work
-- Git commit: a1169cb1d866452a9d2e82544eb4f7d8272fbc37
+- Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb
 - Validation status: passed
 - Recipe used: wp-0110-resident-action-authority-boundary
 - Recipe title: WP-0110 — Resident Action Authority Boundary
 
 ## Commands Run
-- `python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json` — passed (exit 0, 0.29s)
-- `python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --json` — passed (exit 0, 0.286s)
-- `python -m estate.cli.main resident-authority check --resident Helen --action summarize --json` — passed (exit 0, 0.281s)
-- `python -m estate.cli.main resident-authority check --resident Helen --action modify-personnel --json` — passed (exit 0, 0.282s)
-- `python -m estate.cli.main resident-authority check --resident Alfred --action unknown-action --json` — passed (exit 0, 0.287s)
-- `python -m estate.cli.main resident-authority list --resident Alfred --json` — passed (exit 0, 0.281s)
-- `python -m pytest tests/test_resident_authority.py tests/test_alfred_duty.py tests/test_helen_duty.py tests/test_resident_conversation_sessions.py tests/test_resident_cards.py` — passed (exit 0, 1.769s)
-- `python -c "from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0110_codex_done.json').is_file()"` — passed (exit 0, 0.069s)
-- `python -m estate.cli.main resident-duty --resident Alfred --json` — passed (exit 0, 0.3s)
-- `python -m estate.cli.main resident-duty --resident Helen --json` — passed (exit 0, 0.277s)
-- `python -m estate.cli.main resident-conversation --help` — passed (exit 0, 0.28s)
-- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 0.859s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.382s)
+- `python -m estate.cli.main resident-authority check --resident Alfred --action summarize --json` — passed (exit 0, 0.428s)
+- `python -m estate.cli.main resident-authority check --resident Alfred --action execute-work-package --json` — passed (exit 0, 0.466s)
+- `python -m estate.cli.main resident-authority check --resident Helen --action summarize --json` — passed (exit 0, 0.439s)
+- `python -m estate.cli.main resident-authority check --resident Helen --action modify-personnel --json` — passed (exit 0, 0.413s)
+- `python -m estate.cli.main resident-authority check --resident Alfred --action unknown-action --json` — passed (exit 0, 0.43s)
+- `python -m estate.cli.main resident-authority list --resident Alfred --json` — passed (exit 0, 0.401s)
+- `python -m pytest tests/test_resident_authority.py tests/test_alfred_duty.py tests/test_helen_duty.py tests/test_resident_conversation_sessions.py tests/test_resident_cards.py` — passed (exit 0, 2.458s)
+- `python -c "from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0110_codex_done.json').is_file()"` — passed (exit 0, 0.098s)
+- `python -m estate.cli.main resident-duty --resident Alfred --json` — passed (exit 0, 0.385s)
+- `python -m estate.cli.main resident-duty --resident Helen --json` — passed (exit 0, 0.389s)
+- `python -m estate.cli.main resident-conversation --help` — passed (exit 0, 0.392s)
+- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.233s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.536s)
 
 ## Findings
 - None.

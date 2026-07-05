@@ -1,23 +1,24 @@
 {
-  "work_package_id": "WP-0030",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T00:00:00Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Created Mission Registry Standard v1 and seeded the initial machine-readable Estate Mission Registry with conservative mission IDs, status values, ownership notes, related work packages, documents, artifacts, and non-final Steward authorization notes.",
   "files_changed": [
     "docs/operations/Mission_Registry_Standard_v1.md",
     "data/registry/missions.json",
     "collaboration/work_packages/completions/WP-0030_codex_done.json"
-  ],
-  "tests_run": [
-    "python - <<'PY'\nimport json, re\nfrom pathlib import Path\np=Path('data/registry/missions.json')\ndata=json.loads(p.read_text())\nids=[m['mission_id'] for m in data['missions']]\nassert len(ids)==len(set(ids)), ids\nassert all(re.fullmatch(r'MISSION-\\d{4}', i) for i in ids), ids\nfor m in data['missions']:\n    assert all(isinstance(x, str) for x in m['related_work_packages'])\n    for wp in m['related_work_packages']:\n        assert re.fullmatch(r'WP-\\d{4}|WP-[A-Z]+-\\d{3}|collaboration/work_packages/.+', wp), wp\n    assert m['steward_authorization'] not in {'final', 'approved', 'steward_approved'}\nprint('mission registry validation passed')\nPY"
   ],
   "known_limitations": [
     "Initial mission entries are conservative registry seeds, not new governance authority.",
     "Autonomous Estate Operations and Steward Recall Planning is marked proposed because current evidence is pending work package intent rather than approved charter authority.",
     "pull_request_url is null until a remote pull request is created outside this local commit workflow."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Created Mission Registry Standard v1 and seeded the initial machine-readable Estate Mission Registry with conservative mission IDs, status values, ownership notes, related work packages, documents, artifacts, and non-final Steward authorization notes.",
+  "tests_run": [
+    "python - <<'PY'\nimport json, re\nfrom pathlib import Path\np=Path('data/registry/missions.json')\ndata=json.loads(p.read_text())\nids=[m['mission_id'] for m in data['missions']]\nassert len(ids)==len(set(ids)), ids\nassert all(re.fullmatch(r'MISSION-\\d{4}', i) for i in ids), ids\nfor m in data['missions']:\n    assert all(isinstance(x, str) for x in m['related_work_packages'])\n    for wp in m['related_work_packages']:\n        assert re.fullmatch(r'WP-\\d{4}|WP-[A-Z]+-\\d{3}|collaboration/work_packages/.+', wp), wp\n    assert m['steward_authorization'] not in {'final', 'approved', 'steward_approved'}\nprint('mission registry validation passed')\nPY"
+  ],
+  "work_package_id": "WP-0030"
 }

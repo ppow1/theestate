@@ -11,6 +11,7 @@
     "pull_request_url is null until the PR is created."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Created the repository-resident Steward Launch Queue document listing pending SERIES work packages without completion records, and added the WP-0041 completion signal.",

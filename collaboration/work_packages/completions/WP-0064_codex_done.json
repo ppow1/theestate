@@ -1,9 +1,7 @@
 {
-  "work_package_id": "WP-0064",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-03T00:00:00Z",
-  "branch": "work",
-  "summary": "Implemented an evidence-only Worker Runtime Monitor that reads worker heartbeat, assignment queue, completion-adjacent runtime, validation, mailbox synchronization, and worker inbox artifacts where available; emits JSON and Markdown worker status reports; exposes active worker count through the Operations Center status bar; and includes tests for active, idle, blocked, stale, offline, missing-artifact, and empty-worker states.",
   "files_changed": [
     "src/estate/core/worker_runtime_monitor.py",
     "src/estate/cli/main.py",
@@ -12,18 +10,21 @@
     "operations/workers/worker_runtime_monitor.md",
     "collaboration/work_packages/completions/WP-0064_codex_done.json"
   ],
+  "known_limitations": [
+    "The monitor is advisory and evidence-only; it does not schedule, launch, or remotely monitor workers.",
+    "Optional source artifacts that are absent are reported as warnings rather than hard failures.",
+    "pull_request_url is null until the pull request is created."
+  ],
+  "merge_authority": "Class A",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Implemented an evidence-only Worker Runtime Monitor that reads worker heartbeat, assignment queue, completion-adjacent runtime, validation, mailbox synchronization, and worker inbox artifacts where available; emits JSON and Markdown worker status reports; exposes active worker count through the Operations Center status bar; and includes tests for active, idle, blocked, stale, offline, missing-artifact, and empty-worker states.",
   "tests_run": [
     "PYTHONPATH=src pytest tests/test_worker_runtime_monitor.py tests/test_worker_runtime_heartbeat.py tests/test_mission_control_workspace.py tests/test_steward_command_center.py",
     "PYTHONPATH=src python -m estate.cli.main worker-runtime-monitor --json > /tmp/worker_runtime_monitor.json",
     "python -m json.tool /tmp/worker_runtime_monitor.json >/dev/null",
     "PYTHONPATH=src python -m estate.cli.main worker-runtime-monitor >/tmp/worker_runtime_monitor.md"
   ],
-  "known_limitations": [
-    "The monitor is advisory and evidence-only; it does not schedule, launch, or remotely monitor workers.",
-    "Optional source artifacts that are absent are reported as warnings rather than hard failures.",
-    "pull_request_url is null until the pull request is created."
-  ],
-  "ready_for_ca_review": true,
-  "merge_authority": "Class A",
-  "pull_request_url": null
+  "work_package_id": "WP-0064"
 }

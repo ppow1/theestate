@@ -1,12 +1,7 @@
 {
-  "work_package_id": "WP-0059",
-  "codex_status": "done",
-  "ready_for_ca_review": true,
-  "completed_at": "2026-07-03T00:00:00Z",
   "branch": "work",
-  "merge_class": "Class A",
-  "merge_authority": "ca_verified_auto_merge_allowed",
-  "summary": "Added a local-first Resident Conversations workspace to the Office of the Steward command center. The workspace surfaces resident selection, role and mailbox summaries, recent institutional messages, linked source artifacts, and transcript/audit placeholders while preserving messages, work packages, artifacts, and audit records as institutional sources of truth.",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:00:00Z",
   "files_changed": [
     "src/estate/core/resident_conversations.py",
     "src/estate/core/steward_command_center.py",
@@ -14,14 +9,20 @@
     "tests/test_steward_command_center.py",
     "collaboration/work_packages/completions/WP-0059_codex_done.json"
   ],
-  "tests_run": [
-    "pytest -q tests/test_resident_conversations.py tests/test_resident_cards.py tests/test_steward_command_center.py",
-    "pytest -q"
-  ],
   "known_limitations": [
     "Conversation entry is a placeholder surface only; this package intentionally does not store chat transcripts or implement autonomous agents.",
     "Recent messages are derived from local Collaboration Bus message artifacts and simple resident/mailbox matching, not from a remote or live chat service.",
     "pull_request_url is null until the PR is created."
   ],
-  "pull_request_url": null
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "merge_class": "Class A",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Added a local-first Resident Conversations workspace to the Office of the Steward command center. The workspace surfaces resident selection, role and mailbox summaries, recent institutional messages, linked source artifacts, and transcript/audit placeholders while preserving messages, work packages, artifacts, and audit records as institutional sources of truth.",
+  "tests_run": [
+    "pytest -q tests/test_resident_conversations.py tests/test_resident_cards.py tests/test_steward_command_center.py",
+    "pytest -q"
+  ],
+  "work_package_id": "WP-0059"
 }

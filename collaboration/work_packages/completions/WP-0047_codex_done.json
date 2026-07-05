@@ -13,6 +13,7 @@
     "pull_request_url is null until the PR is created."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented the first persistent Operations Center bottom status bar, collapsible activity console, quiet local refresh endpoint, basic verbosity selector, empty and missing-data states, and tests covering rendering, collapse markup, refresh JSON, and graceful degradation.",

@@ -28,6 +28,7 @@
   ],
   "merge_authority": "Steward retains merge authority; this change does not approve or merge itself.",
   "production_readiness_command_status": "passed_after_completion_receipt_creation",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url_not_applicable_reason": "PR will be created by repository tool after local commit; no hosted URL is available in this environment.",
   "ready_for_ca_review": true,
   "summary": "Implemented read-only Operator Activity Stream viewing profiles with persisted named profiles, global and per-source verbosity, source and severity filters, UI theme preference metadata, CLI profile save/load controls, tests, and a registered WP-0087 validation recipe.",

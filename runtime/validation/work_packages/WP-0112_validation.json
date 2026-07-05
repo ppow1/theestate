@@ -1,0 +1,139 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; p=Path('docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md'); t=p.read_text(); required=['SERIES','PARALLEL-STAGED','PARALLEL-INDEPENDENT','INSTALL-HANDOFF','WP-0097 through WP-0111','GitHub search','collaboration/workstreams/WP-XXXX/install_manifest.json']; missing=[x for x in required if x not in t]; missing += ['staged work is not installed work'] if 'staged work is not installed work' not in t.lower() else []; assert p.is_file() and not missing, missing\"",
+      "completed_at": "2026-07-05T00:02:06+00:00",
+      "duration_seconds": 0.095,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:02:06+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/work_package_range_ledger.json').read_text()); assert data['ranges'] and 'GitHub search' in data['source_of_truth']; assert any(r['start']=='WP-6000' for r in data['ranges'])\"",
+      "completed_at": "2026-07-05T00:02:07+00:00",
+      "duration_seconds": 0.102,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:02:06+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/workstreams/WP-0112/install_manifest.example.json').read_text()); assert data['workstream_mode']=='PARALLEL-STAGED'; assert data['staged_work_is_installed'] is False; assert data['validation_commands']\"",
+      "completed_at": "2026-07-05T00:02:07+00:00",
+      "duration_seconds": 0.1,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:02:07+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; t=Path('docs/operations/Codex_Task_Template_Standard_v1.md').read_text(); required=['Parallel Workstream Compatibility Addendum','Workstream Mode','Conflict Surface','Install Manifest','Required Install Handoff']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
+      "completed_at": "2026-07-05T00:02:07+00:00",
+      "duration_seconds": 0.097,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:02:07+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main workstream validate --id WP-0112 --json",
+      "completed_at": "2026-07-05T00:02:07+00:00",
+      "duration_seconds": 0.389,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:02:07+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0112_2026-07-05T000206Z0000/command_05_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main work-package-ranges --json",
+      "completed_at": "2026-07-05T00:02:08+00:00",
+      "duration_seconds": 0.397,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T00:02:07+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0112_2026-07-05T000206Z0000/command_06_stdout.txt"
+    },
+    {
+      "classification": "observational",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-05T00:02:08+00:00",
+      "duration_seconds": 0.575,
+      "exit_code": 0,
+      "required": false,
+      "started_at": "2026-07-05T00:02:08+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0112_2026-07-05T000206Z0000/command_07_stdout.txt"
+    }
+  ],
+  "commands_run": [
+    "python -c \"from pathlib import Path; p=Path('docs/operations/Parallel_Workstream_Isolation_and_Install_Handoff_Standard_v1.md'); t=p.read_text(); required=['SERIES','PARALLEL-STAGED','PARALLEL-INDEPENDENT','INSTALL-HANDOFF','WP-0097 through WP-0111','GitHub search','collaboration/workstreams/WP-XXXX/install_manifest.json']; missing=[x for x in required if x not in t]; missing += ['staged work is not installed work'] if 'staged work is not installed work' not in t.lower() else []; assert p.is_file() and not missing, missing\"",
+    "python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/work_package_range_ledger.json').read_text()); assert data['ranges'] and 'GitHub search' in data['source_of_truth']; assert any(r['start']=='WP-6000' for r in data['ranges'])\"",
+    "python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/workstreams/WP-0112/install_manifest.example.json').read_text()); assert data['workstream_mode']=='PARALLEL-STAGED'; assert data['staged_work_is_installed'] is False; assert data['validation_commands']\"",
+    "python -c \"from pathlib import Path; t=Path('docs/operations/Codex_Task_Template_Standard_v1.md').read_text(); required=['Parallel Workstream Compatibility Addendum','Workstream Mode','Conflict Surface','Install Manifest','Required Install Handoff']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
+    "python -m estate.cli.main workstream validate --id WP-0112 --json",
+    "python -m estate.cli.main work-package-ranges --json",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0112_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0112_validation.md",
+    "runtime/validation/work_packages/WP-0112_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T00:02:06+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "51e0b5912c9ca6293eea2f0f767531bc8b660fdb",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0112_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0112"
+  },
+  "recipe_id": "wp-0112-parallel-workstream-standard",
+  "recipe_title": "WP-0112 \u2014 Parallel Workstream Isolation and Install Handoff Standard",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 3 command(s).",
+  "validation_id": "WP-0112_2026-07-05T000206Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0112"
+}

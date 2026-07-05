@@ -1,12 +1,7 @@
 {
-  "work_package_id": "WP-0060",
-  "codex_status": "done",
-  "ready_for_ca_review": true,
-  "completed_at": "2026-07-03T00:00:00Z",
   "branch": "work",
-  "merge_class": "Class A",
-  "merge_authority": "ca_verified_auto_merge_allowed",
-  "summary": "Created the first Estate Interaction Services and Adapter Registry with local-first adapter metadata, governance boundaries, documentation, helper loading/filtering APIs, and tests for loading, graceful missing-registry handling, duplicate ID rejection, and category filtering.",
+  "codex_status": "done",
+  "completed_at": "2026-07-03T00:00:00Z",
   "files_changed": [
     "data/registry/interaction_adapters.json",
     "docs/operations/Interaction_Adapter_Registry_v1.md",
@@ -14,16 +9,22 @@
     "tests/test_interaction_adapters.py",
     "collaboration/work_packages/completions/WP-0060_codex_done.json"
   ],
+  "known_limitations": [
+    "The registry describes adapters only; it intentionally does not implement external providers or store secrets.",
+    "Adapters remain optional unless a separate subsystem explicitly requires one.",
+    "pull_request_url is null until the PR is created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "merge_class": "Class A",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
+  "ready_for_ca_review": true,
+  "summary": "Created the first Estate Interaction Services and Adapter Registry with local-first adapter metadata, governance boundaries, documentation, helper loading/filtering APIs, and tests for loading, graceful missing-registry handling, duplicate ID rejection, and category filtering.",
   "tests_run": [
     "python -m json.tool data/registry/interaction_adapters.json >/tmp/interaction_adapters.json",
     "python -m json.tool collaboration/work_packages/completions/WP-0060_codex_done.json >/tmp/WP-0060_codex_done.json",
     "python - <<'PY'\nimport json\nfrom pathlib import Path\npayload=json.loads(Path('data/registry/interaction_adapters.json').read_text())\nids=[a['adapter_id'] for a in payload['adapters']]\nassert len(ids)==len(set(ids)), ids\nprint(f'{len(ids)} unique adapter IDs')\nPY",
     "PYTHONPATH=src pytest -q tests/test_interaction_adapters.py"
   ],
-  "known_limitations": [
-    "The registry describes adapters only; it intentionally does not implement external providers or store secrets.",
-    "Adapters remain optional unless a separate subsystem explicitly requires one.",
-    "pull_request_url is null until the PR is created."
-  ],
-  "pull_request_url": null
+  "work_package_id": "WP-0060"
 }

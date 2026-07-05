@@ -13,6 +13,7 @@
     "pull_request_url is null until the PR is created."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Added a Work Package Pipeline view to the Operations Center that groups pending, active, blocked, review-ready, completed, and missing-data states, enriches rows with title, mode, owner, dependencies, next action, completion/review status, and keeps ready Codex commands copyable for Steward launch workflow.",

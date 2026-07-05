@@ -22,6 +22,7 @@
     "The safe wrapper commits and pushes only when explicitly invoked; the base validator never commits or pushes."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
   "summary": "Implemented and verified the work-package validation runner/recipe engine with CLI and PowerShell command surfaces, structured Markdown/JSON artifacts, latest pointer metadata, safe validation-artifact commit wrapper, generated WP-0079 and no-recipe demonstration artifacts, and tests for recipe execution, no-recipe handling, command capture, required versus observational failures, artifact generation, latest pointer behavior, safe wrapper safeguards, and self-check coverage.",

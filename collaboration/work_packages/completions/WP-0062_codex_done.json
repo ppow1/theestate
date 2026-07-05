@@ -1,10 +1,7 @@
 {
-  "work_package_id": "WP-0062",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-03T00:00:00+00:00",
-  "branch": "work",
-  "pull_request_url": "pending",
-  "summary": "Implemented Alfred's Steward-assigned personnel identity as Employee ID 7 while preserving Resident ID RES-000001 and keeping Alfred Routing Intake mailbox 10100 as a distinct queue available through explicit aliases.",
   "files_changed": [
     "data/registry/personnel.json",
     "src/estate/core/personnel_identity.py",
@@ -15,12 +12,16 @@
     "docs/collaboration/Personnel_Identity_Mailbox_Resolver_v1.md",
     "collaboration/work_packages/completions/WP-0062_codex_done.json"
   ],
+  "known_limitations": [],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "pending",
+  "ready_for_ca_review": true,
+  "summary": "Implemented Alfred's Steward-assigned personnel identity as Employee ID 7 while preserving Resident ID RES-000001 and keeping Alfred Routing Intake mailbox 10100 as a distinct queue available through explicit aliases.",
   "tests_run": [
     "PYTHONPATH=src pytest tests/test_personnel_identity.py tests/test_check_updates.py -q",
     "PYTHONPATH=src python -m estate.cli.main mailbox-index --json",
     "PYTHONPATH=src python -m estate.cli.main check-updates --actor alfred --json",
     "PYTHONPATH=src pytest -q"
   ],
-  "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "work_package_id": "WP-0062"
 }

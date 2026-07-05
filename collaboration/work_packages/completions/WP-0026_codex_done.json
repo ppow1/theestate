@@ -1,22 +1,23 @@
 {
-  "work_package_id": "WP-0026",
+  "branch": "work",
   "codex_status": "done",
   "completed_at": "2026-07-02T21:08:06Z",
-  "branch": "work",
-  "pull_request_url": null,
-  "summary": "Added Generated Artifact Policy v1 documenting authoritative source artifacts, generated operational projections, local-only runtime artifacts, committed generated summaries, institutional evidence, dashboards, regeneration expectations, review expectations, and non-source-of-truth rules. Added an Operations Board README reference to the policy.",
   "files_changed": [
     "docs/operations/Generated_Artifact_Policy_v1.md",
     "operations/README.md",
     "collaboration/work_packages/completions/WP-0026_codex_done.json"
   ],
-  "tests_run": [
-    "Documentation review: verified referenced paths against repository structure and existing operations/collaboration docs."
-  ],
   "known_limitations": [
     "No code was added, so no automated tests were required.",
     "pull_request_url is null until the pull request is created by the repository workflow."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "pull_request_url": null,
   "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed"
+  "summary": "Added Generated Artifact Policy v1 documenting authoritative source artifacts, generated operational projections, local-only runtime artifacts, committed generated summaries, institutional evidence, dashboards, regeneration expectations, review expectations, and non-source-of-truth rules. Added an Operations Board README reference to the policy.",
+  "tests_run": [
+    "Documentation review: verified referenced paths against repository structure and existing operations/collaboration docs."
+  ],
+  "work_package_id": "WP-0026"
 }

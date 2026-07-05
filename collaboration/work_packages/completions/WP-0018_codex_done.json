@@ -1,7 +1,6 @@
 {
-  "work_package": "WP-0018",
-  "status": "codex_done",
-  "pr_url": null,
+  "branch": "work",
+  "codex_status": "done",
   "files_changed": [
     "src/estate/core/work_package_handoff.py",
     "src/estate/cli/main.py",
@@ -9,10 +8,16 @@
     "docs/operations/Codex_Handoff_Generator_v1.md",
     "collaboration/work_packages/completions/WP-0018_codex_done.json"
   ],
+  "known_limitations": [],
+  "pr_url": null,
+  "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
+  "ready_for_ca_review": true,
+  "status": "codex_done",
   "tests_run": [
     "PYTHONPATH=src pytest tests/test_work_package_handoff.py",
     "PYTHONPATH=src python -m estate.cli.main work-package-handoffs",
     "PYTHONPATH=src pytest"
   ],
-  "ready_for_ca_review": true
+  "work_package": "WP-0018",
+  "work_package_id": "WP-0018"
 }

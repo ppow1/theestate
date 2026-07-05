@@ -1,19 +1,19 @@
 # Work Package Validation Report — WP-0096
 
-- Timestamp: 2026-07-04T19:45:21+00:00
+- Timestamp: 2026-07-05T00:01:06+00:00
 - Work package ID: WP-0096
 - Local branch: work
-- Git commit: 417b8cb044c75ab789d99eb11ebb0ad2055bffd0
+- Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb
 - Validation status: passed
 - Recipe used: wp-0096-operations-center-notification-center
 - Recipe title: WP-0096 — Operations Center Notification Center
 
 ## Commands Run
-- `python -m estate.cli.main operations-notification-center --json` — passed (exit 0, 0.283s)
-- `pytest -q tests/test_operations_notification_center.py` — passed (exit 0, 0.81s)
-- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 0.782s)
-- `test -f runtime/notifications/operations_notification_center.json && test -f operations/notifications/operations_notification_center.md && rg -q "Operations Center Notification Center" runtime/steward/command_center.html` — passed (exit 0, 0.017s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.348s)
+- `python -m estate.cli.main operations-notification-center --json` — passed (exit 0, 0.434s)
+- `pytest -q tests/test_operations_notification_center.py` — passed (exit 0, 1.324s)
+- `python -m estate.cli.main steward-command-center --json` — passed (exit 0, 1.247s)
+- `test -f runtime/notifications/operations_notification_center.json && test -f operations/notifications/operations_notification_center.md && rg -q "Operations Center Notification Center" runtime/steward/command_center.html` — passed (exit 0, 0.024s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.554s)
 
 ## Findings
 - None.

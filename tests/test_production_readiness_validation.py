@@ -120,3 +120,27 @@ def test_wp_0111_completion_receipt_complete_after_self_validation_repair():
     receipt = validate_receipt("WP-0111")
     assert receipt["receipt_status"] == "complete"
     assert receipt["receipt_gaps"] == []
+
+
+def test_wp_0114_receipt_complete_and_pending_packages_not_falsely_repaired():
+    from pathlib import Path
+    import json
+
+    report = json.loads(Path("runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json").read_text(encoding="utf-8"))
+    pending = {f"WP-{i:04d}" for i in range(106, 111)}
+    falsely_completed = pending & set(report.get("packages_repaired_by_receipt_creation", []))
+    assert falsely_completed == set()
+    receipt = validate_receipt("WP-0114")
+    assert receipt["receipt_status"] == "complete"
+
+
+def test_wp_0114_report_generation_artifacts_exist():
+    from pathlib import Path
+    import json
+
+    markdown = Path("operations/validation/backlog_burn_down/WP-0114_historical_sweep_report.md")
+    payload = json.loads(Path("runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json").read_text(encoding="utf-8"))
+    assert markdown.is_file()
+    assert payload["production_readiness_totals_before"]
+    assert payload["production_readiness_totals_after"]
+    assert payload["packages_scanned"]

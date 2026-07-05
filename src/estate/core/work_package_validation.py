@@ -945,6 +945,48 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0113": {
+        "recipe_id": "wp-0113-helen-next-batch-recommendation",
+        "title": "WP-0113 — Helen Next-Batch Recommendation",
+        "description": "Validates the WP-0113 recommendation artifacts and confirms it did not falsely close the Helen implementation backlog.",
+        "required_checks": ["Recommendation markdown exists", "Recommendation JSON parses", "Helen backlog packages remain pending", "Completion receipt is complete"],
+        "observational_checks": ["Production-readiness report is locally executable"],
+        "expected_artifacts": ["operations/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.md", "runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json", "collaboration/work_packages/completions/WP-0113_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "WP-0106 through WP-0110 are falsely marked complete"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.md','runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json').read_text(encoding='utf-8')); text=json.dumps(data).lower(); required=['wp-0106','wp-0107','wp-0108','wp-0109','wp-0110']; missing=[wp for wp in required if wp.lower() not in text]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0113_helen_next_batch_recommendation.json').read_text(encoding='utf-8')); completed=set(data.get('packages_newly_production_ready', [])) | set(data.get('packages_repaired', [])); pending={f'WP-{i:04d}' for i in range(106,111)}; assert not (completed & pending), sorted(completed & pending)\""),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0113'); assert r['receipt_status']=='complete', r\""),
+            _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
+        ],
+    },
+
+    "WP-0114": {
+        "recipe_id": "wp-0114-historical-production-readiness-sweep",
+        "title": "WP-0114 — Historical Production-Readiness Sweep",
+        "description": "Validates the WP-0114 sweep reports, repaired-package validation evidence, pending-package safety checks, and completion receipt.",
+        "required_checks": ["Sweep reports exist", "Sweep JSON parses", "Before and after totals are present", "At least one package was classified or repaired", "Pending implementation packages were not falsely completed", "Production-readiness validation executes", "WP-0102/WP-0105/WP-0111 remain passing", "WP-0114 receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/validation/backlog_burn_down/WP-0114_historical_sweep_report.md", "runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json", "collaboration/work_packages/completions/WP-0114_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "A known pending implementation package is falsely marked complete"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['operations/validation/backlog_burn_down/WP-0114_historical_sweep_report.md','runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json').read_text(encoding='utf-8')); assert data.get('production_readiness_totals_before') and data.get('production_readiness_totals_after'), data.keys()\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json').read_text(encoding='utf-8')); count=len(data.get('packages_scanned', []))+len(data.get('packages_repaired_by_recipe_addition', []))+len(data.get('packages_repaired_by_receipt_normalization', [])); assert count > 0, data\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('runtime/validation/backlog_burn_down/WP-0114_historical_sweep_report.json').read_text(encoding='utf-8')); completed=set(data.get('packages_repaired_by_receipt_creation', [])); pending={f'WP-{i:04d}' for i in range(106,111)}; assert not (completed & pending), sorted(completed & pending)\""),
+            _cmd('python -m estate.cli.main validation-production-readiness --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0102 --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0105 --json'),
+            _cmd('python -m estate.cli.main validate-work-package --id WP-0111 --json'),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0114'); assert r['receipt_status']=='complete', r\""),
+        ],
+    },
+
 }
 
 
