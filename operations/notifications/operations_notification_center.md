@@ -2,15 +2,15 @@
 
 Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth.
 
-Generated: 2026-07-04T20:00:04+00:00
+Generated: 2026-07-05T00:51:33+00:00
 Refresh behavior: quiet_refresh_from_local_artifacts
 
 ## Summary
-- total_notification_count: 112
+- total_notification_count: 105
 - filtered_notification_count: 100
-- unavailable_source_count: 8
+- unavailable_source_count: 9
 - locally_acknowledged_count: 0
-- severity_counts: {'critical': 0, 'error': 0, 'warning': 100, 'missing': 0, 'info': 0, 'debug': 0}
+- severity_counts: {'critical': 0, 'error': 0, 'warning': 95, 'missing': 0, 'info': 5, 'debug': 0}
 
 ## Notifications
 - [warning] mailboxes — Example implementation routing message: Example implementation routing message (unacknowledged; source: `collaboration/messages/example_alfred_routing_engine_v1.json`)
@@ -108,8 +108,8 @@ Refresh behavior: quiet_refresh_from_local_artifacts
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] mailboxes — Warning: Warning (unacknowledged; source: `collaboration/mailboxes/index.json`)
 - [warning] validation — VO-0001: Notification Center Workspace is discoverable via Global Search, but `palette-command notification-center` was reported unavailable. (open; source: `validation/observations/validation_observations.jsonl`)
-- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
-- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
-- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
-- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
-- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
+- [info] completions — Completion/review-ready signal: WP-0039 (review_ready; source: `collaboration/work_packages/completions/WP-0039_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0040 (review_ready; source: `collaboration/work_packages/completions/WP-0040_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0059 (review_ready; source: `collaboration/work_packages/completions/WP-0059_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0049 (review_ready; source: `collaboration/work_packages/completions/WP-0049_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0054 (review_ready; source: `collaboration/work_packages/completions/WP-0054_codex_done.json`)

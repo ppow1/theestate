@@ -26,10 +26,21 @@
     ],
     "observed_output_summary": "Alfred and Helen render as available local resident presence records sourced from runtime/residents/presence.json and registries; payload states visible_presence_only=true and autonomous_execution=false."
   },
+  "files_changed": [
+    "src/estate/core/resident_presence.py",
+    "runtime/residents/presence.json",
+    "src/estate/core/resident_cards.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_presence.py",
+    "collaboration/work_packages/completions/WP-0106_codex_done.json"
+  ],
   "known_limitations": [
     "Presence is informational and local-first only; it does not implement autonomous Alfred or Helen duty execution.",
     "Heartbeat values are read from local runtime artifacts and become degraded when stale, but this package does not run a heartbeat writer daemon."
   ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
   "merge_class": "Class A",
   "production_readiness_command_status": "passed_json_generated",
   "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",

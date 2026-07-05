@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from estate.core.resident_cards import build_resident_cards
@@ -26,8 +27,8 @@ def seed(root):
 def test_alfred_and_helen_presence_render_from_runtime(tmp_path):
     seed(tmp_path)
     write_json(tmp_path, "runtime/residents/presence.json", {"residents": [
-        {"resident_id": "RES-000001", "name": "Alfred", "presence_state": "working", "current_duty": "Route messages", "last_heartbeat": "2026-07-04T00:00:00+00:00"},
-        {"resident_id": "RES-000003", "name": "Helen", "presence_state": "waiting_for_steward", "needs_steward": True, "last_heartbeat": "2026-07-04T00:00:00+00:00"},
+        {"resident_id": "RES-000001", "name": "Alfred", "presence_state": "working", "current_duty": "Route messages", "last_heartbeat": datetime.now(timezone.utc).isoformat(timespec="seconds")},
+        {"resident_id": "RES-000003", "name": "Helen", "presence_state": "waiting_for_steward", "needs_steward": True, "last_heartbeat": datetime.now(timezone.utc).isoformat(timespec="seconds")},
     ]})
     payload = build_resident_presence(tmp_path)
     by_name = {r["name"]: r for r in payload["residents"]}
@@ -58,7 +59,7 @@ def test_stale_heartbeat_is_detectable(tmp_path):
 def test_resident_cards_consume_presence_data(tmp_path):
     seed(tmp_path)
     write_json(tmp_path, "runtime/residents/presence.json", {"residents": [
-        {"resident_id": "RES-000001", "name": "Alfred", "presence_state": "working", "current_duty": "Inspect local presence", "last_heartbeat": "2026-07-04T00:00:00+00:00"}
+        {"resident_id": "RES-000001", "name": "Alfred", "presence_state": "working", "current_duty": "Inspect local presence", "last_heartbeat": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     ]})
     card = build_resident_cards(tmp_path, names=("Alfred",))["cards"][0]
     assert card["presence_state"] == "working"

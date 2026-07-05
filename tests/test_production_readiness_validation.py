@@ -144,3 +144,23 @@ def test_wp_0114_report_generation_artifacts_exist():
     assert payload["production_readiness_totals_before"]
     assert payload["production_readiness_totals_after"]
     assert payload["packages_scanned"]
+
+
+def test_wp0116_recipe_and_exception_report_contract():
+    import json
+    from pathlib import Path
+    from estate.core.work_package_validation import get_validation_recipe
+    from estate.core.production_readiness_validation import generate_production_readiness_report
+
+    assert get_validation_recipe("WP-0116") is not None
+    report_path = Path("runtime/validation/backlog_burn_down/WP-0116_final_exception_closure_report.json")
+    data = json.loads(report_path.read_text(encoding="utf-8"))
+    initial = {"WP-0016", "WP-0017", "WP-0018", "WP-0040", "WP-0056", "WP-0063", "WP-0073", "WP-0089", "WP-0094", "WP-0106", "WP-0107", "WP-9999"}
+    assert initial <= set(data["initial_blockers"])
+    assert "before_totals" in data and "after_totals" in data
+    assert "WP-0106" in data["package_statuses"]
+    assert "WP-0107" in data["package_statuses"]
+    assert data["package_statuses"]["WP-9999"]["production_readiness_status"] != "ready"
+    payload = generate_production_readiness_report(write=False)
+    scanned = {row["work_package_id"] for row in payload["blocking_work_packages"] + payload["ready_for_chief_architect_production_readiness_acceptance"]}
+    assert "WP-9999" not in scanned
