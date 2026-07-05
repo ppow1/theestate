@@ -1,0 +1,260 @@
+{
+  "branch": "work",
+  "classifications": {
+    "WP-0016": "requires human architectural review",
+    "WP-0017": "requires human architectural review",
+    "WP-0018": "requires human architectural review",
+    "WP-0040": "known limitation requiring explicit non-production exception",
+    "WP-0056": "missing implementation evidence",
+    "WP-0063": "missing implementation evidence",
+    "WP-0073": "missing implementation evidence",
+    "WP-0089": "known limitation requiring explicit non-production exception",
+    "WP-0094": "missing implementation evidence",
+    "WP-0106": "mechanically repairable receipt gap",
+    "WP-0107": "mechanically repairable receipt gap",
+    "WP-9999": "intentionally invalid placeholder/test artifact"
+  },
+  "codex_status": "done",
+  "completed_at": "2026-07-05T00:52:19+00:00",
+  "files_changed": [
+    "collaboration/work_packages/completions/WP-0106_codex_done.json",
+    "collaboration/work_packages/completions/WP-0107_codex_done.json",
+    "collaboration/work_packages/completions/WP-0116_codex_done.json",
+    "operations/alfred/duty_summary.md",
+    "operations/board/latest.md",
+    "operations/capabilities/capability_dependency_visualization.md",
+    "operations/notifications/operations_notification_center.md",
+    "operations/services/estate_service_catalog.md",
+    "operations/services/service_status_board.md",
+    "operations/steward/decision_queue.md",
+    "operations/steward/operator_activity_stream.md",
+    "operations/validation/backlog_burn_down/WP-0116_final_exception_closure_report.md",
+    "operations/validation/production_readiness_report.md",
+    "operations/validation/reports/WP-0015_validation.md",
+    "operations/validation/reports/WP-0020_validation.md",
+    "operations/validation/reports/WP-0027_validation.md",
+    "operations/validation/reports/WP-0080_validation.md",
+    "operations/validation/reports/WP-0081_validation.md",
+    "operations/validation/reports/WP-0085_validation.md",
+    "operations/validation/reports/WP-0101_validation.md",
+    "operations/validation/reports/WP-0102_validation.md",
+    "operations/validation/reports/WP-0103_validation.md",
+    "operations/validation/reports/WP-0105_validation.md",
+    "operations/validation/reports/WP-0106_validation.md",
+    "operations/validation/reports/WP-0107_validation.md",
+    "operations/validation/reports/WP-0111_validation.md",
+    "operations/validation/reports/WP-0114_validation.md",
+    "operations/validation/reports/WP-0115_validation.md",
+    "operations/validation/reports/WP-0116_validation.md",
+    "operations/validation/validation_coverage_manifest.md",
+    "operations/work_packages/assignment_queue.md",
+    "runtime/residents/presence.json",
+    "runtime/search/institutional_search_index.json",
+    "runtime/validation/backlog_burn_down/WP-0116_final_exception_closure_report.json",
+    "runtime/validation/production_readiness_report.json",
+    "runtime/validation/validation_coverage_manifest.json",
+    "runtime/validation/work_packages/WP-0015_validation.json",
+    "runtime/validation/work_packages/WP-0020_validation.json",
+    "runtime/validation/work_packages/WP-0027_validation.json",
+    "runtime/validation/work_packages/WP-0080_validation.json",
+    "runtime/validation/work_packages/WP-0081_validation.json",
+    "runtime/validation/work_packages/WP-0085_validation.json",
+    "runtime/validation/work_packages/WP-0101_validation.json",
+    "runtime/validation/work_packages/WP-0102_validation.json",
+    "runtime/validation/work_packages/WP-0103_validation.json",
+    "runtime/validation/work_packages/WP-0105_validation.json",
+    "runtime/validation/work_packages/WP-0106_validation.json",
+    "runtime/validation/work_packages/WP-0111_validation.json",
+    "runtime/validation/work_packages/WP-0114_validation.json",
+    "runtime/validation/work_packages/WP-0115_validation.json",
+    "runtime/validation/work_packages/WP-0116_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "runtime/work_packages/assignment_queue.json",
+    "src/estate/core/production_readiness_validation.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_production_readiness_validation.py",
+    "tests/test_resident_presence.py"
+  ],
+  "helen_path_status": {
+    "WP-0020": "ready",
+    "WP-0080": "ready",
+    "WP-0106": "ready",
+    "WP-0107": "ready",
+    "WP-0108": "ready",
+    "WP-0109": "ready",
+    "WP-0110": "ready",
+    "WP-0111": "ready",
+    "WP-0112": "ready",
+    "WP-0113": "ready",
+    "WP-0114": "ready",
+    "WP-0115": "ready"
+  },
+  "initial_blockers": [
+    "WP-0016",
+    "WP-0017",
+    "WP-0018",
+    "WP-0040",
+    "WP-0056",
+    "WP-0063",
+    "WP-0073",
+    "WP-0089",
+    "WP-0094",
+    "WP-0106",
+    "WP-0107",
+    "WP-9999"
+  ],
+  "known_limitations": [
+    "Residual exceptions remain only where evidence requires human architectural review or implementation; no fake completion evidence was created."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "open_validation_observations": [
+    {
+      "expected_behavior": "If the Notification Center is discoverable as a workspace, the corresponding palette command should be available or the discrepancy should be explained.",
+      "linked_follow_up_work_package": null,
+      "observation_id": "VO-0001",
+      "observed_behavior": "Notification Center Workspace is discoverable via Global Search, but `palette-command notification-center` was reported unavailable.",
+      "recommended_next_action": "Review during a future validation pass and convert to a work package only if confirmed as a defect.",
+      "related_work_package": "WP-0056",
+      "severity": "follow-up",
+      "source_of_observation": "WP-0070 seed observation referencing WP-0056 validation follow-up.",
+      "status": "open",
+      "timestamp": "2026-07-04T00:00:00+00:00"
+    }
+  ],
+  "packages_left_blocked_with_reasons": {
+    "WP-0016": {
+      "blockers": [
+        "ready_for_ca_review is not true.",
+        "Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, summary, files_changed, tests_run, ready_for_ca_review",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "requires human architectural review",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0017": {
+      "blockers": [
+        "ready_for_ca_review is not true.",
+        "Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, files_changed, tests_run, ready_for_ca_review",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "requires human architectural review",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0018": {
+      "blockers": [
+        "Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, summary",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "requires human architectural review",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0040": {
+      "blockers": [
+        "Blocking known limitation: Dependency and blocker extraction is limited to explicit fields and labelled Markdown sections.",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "known limitation requiring explicit non-production exception",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0056": {
+      "blockers": [
+        "Completion artifact is missing."
+      ],
+      "classification": "missing implementation evidence",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0063": {
+      "blockers": [
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "missing implementation evidence",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0073": {
+      "blockers": [
+        "Completion artifact is missing.",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "missing implementation evidence",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0089": {
+      "blockers": [
+        "Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages."
+      ],
+      "classification": "known limitation requiring explicit non-production exception",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0094": {
+      "blockers": [
+        "Completion artifact is missing.",
+        "Execution status blocks readiness: no_recipe."
+      ],
+      "classification": "missing implementation evidence",
+      "production_readiness_status": "blocked"
+    },
+    "WP-0106": {
+      "blockers": [],
+      "classification": "mechanically repairable receipt gap",
+      "production_readiness_status": "ready"
+    },
+    "WP-0107": {
+      "blockers": [],
+      "classification": "mechanically repairable receipt gap",
+      "production_readiness_status": "ready"
+    },
+    "WP-9999": {
+      "blockers": [
+        "Invalid placeholder/test residue has no pending work package or completion receipt; not production evidence."
+      ],
+      "classification": "intentionally invalid placeholder/test artifact",
+      "production_readiness_status": "intentionally_not_scanned"
+    }
+  },
+  "packages_newly_production_ready": [
+    "WP-0106",
+    "WP-0107"
+  ],
+  "packages_repaired": [
+    "WP-0106",
+    "WP-0107",
+    "WP-9999"
+  ],
+  "packages_validated": [
+    "WP-0106",
+    "WP-0107"
+  ],
+  "production_readiness_totals_after": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 93,
+    "total_work_packages_scanned": 102
+  },
+  "production_readiness_totals_before": {
+    "total_blocked": 12,
+    "total_incomplete_receipts": 5,
+    "total_missing_receipts": 4,
+    "total_missing_recipes": 8,
+    "total_production_ready": 90,
+    "total_work_packages_scanned": 102
+  },
+  "pull_request_not_applicable_reason": "Local Codex environment records PR metadata after commit via make_pr; no remote PR URL is available before tool submission.",
+  "ready_for_ca_review": true,
+  "summary": "Closed final production-readiness exception pass by normalizing WP-0106/WP-0107 receipt gaps, quarantining WP-9999 placeholder residue, registering WP-0116 validation, and reporting residual exceptions.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0116 --json",
+      "observed_output": "validation_status=passed",
+      "status": "passed"
+    }
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0116 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0116"
+}

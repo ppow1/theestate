@@ -1,17 +1,17 @@
 # Work Package Validation Report — WP-0027
 
-- Timestamp: 2026-07-05T00:26:21+00:00
+- Timestamp: 2026-07-05T00:58:00+00:00
 - Work package ID: WP-0027
 - Local branch: work
-- Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef
+- Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d
 - Validation status: passed
 - Recipe used: wp-0027-institutional-search-v1
 - Recipe title: WP-0027 — Institutional Search v1
 
 ## Commands Run
-- `python -m estate.cli.main estate-search "Institutional Search" --json` — passed (exit 0, 0.473s)
-- `python -m estate.cli.main global-search "Institutional Search" --json` — passed (exit 0, 0.485s)
-- `python -m estate.cli.main document-registry --json` — passed (exit 0, 0.261s)
+- `python -m estate.cli.main estate-search "Institutional Search" --json` — passed (exit 0, 0.439s)
+- `python -m estate.cli.main global-search "Institutional Search" --json` — passed (exit 0, 0.458s)
+- `python -m estate.cli.main document-registry --json` — passed (exit 0, 0.295s)
 
 ## Findings
 - None.

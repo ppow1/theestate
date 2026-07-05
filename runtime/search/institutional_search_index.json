@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-04T22:25:45+00:00",
+  "generated_at": "2026-07-05T00:58:08+00:00",
   "index_path": "runtime/search/institutional_search_index.json",
-  "record_count": 401,
+  "record_count": 459,
   "records": [
     {
       "artifact_type": "artifact",
@@ -798,7 +798,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0014\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T15:40:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Expanded mailbox destination resolution to cover registry-backed off",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T15:40:00Z\", \"files_changed\": [ \"collaboration/mailboxes/index.json\", \"collaboration/status/event_summary.json\", \"collaboration/status/worker_inbox_s",
       "path": "collaboration/work_packages/completions/WP-0014_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -816,7 +816,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0016\", \"status\": \"architecture_done\", \"mode\": \"ARCHITECTURE-FIRST\", \"ready_for_codex_package\": false, \"implementation_authorized\": false, \"architecture_artifact\": \"Architecture/ADR/ADR-0002-Work-",
+      "excerpt": "{ \"architecture_artifact\": \"Architecture/ADR/ADR-0002-Work-Package-Registry-Proposal.md\", \"branch\": \"work\", \"codex_status\": \"done\", \"completion_note\": \"Produced a proposed ADR for Chief Architect review. No registry sche",
       "path": "collaboration/work_packages/completions/WP-0016_architecture_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -825,7 +825,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0017\", \"status\": \"architecture_done\", \"mode\": \"ARCHITECTURE-FIRST\", \"summary\": \"Produced ADR-0003 proposing a canonical work package state machine, transition authority model, guardrails, and Chi",
+      "excerpt": "{ \"architecture_artifact\": \"Architecture/ADR/ADR-0003-Work-Package-State-Machine-Proposal.md\", \"branch\": \"work\", \"codex_status\": \"done\", \"follow_on_package\": \"collaboration/work_packages/pending/WP-0020_SERIES_work_packa",
       "path": "collaboration/work_packages/completions/WP-0017_architecture_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -834,7 +834,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package\": \"WP-0018\", \"status\": \"codex_done\", \"pr_url\": null, \"files_changed\": [ \"src/estate/core/work_package_handoff.py\", \"src/estate/cli/main.py\", \"tests/test_work_package_handoff.py\", \"docs/operations/Codex_Ha",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"files_changed\": [ \"src/estate/core/work_package_handoff.py\", \"src/estate/cli/main.py\", \"tests/test_work_package_handoff.py\", \"docs/operations/Codex_Handoff_Generator_v1.md\", \"",
       "path": "collaboration/work_packages/completions/WP-0018_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -906,7 +906,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0026\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:08:06Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Added Generated Artifact Policy v1 documenting authoritative source ",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:08:06Z\", \"files_changed\": [ \"docs/operations/Generated_Artifact_Policy_v1.md\", \"operations/README.md\", \"collaboration/work_packages/completions/W",
       "path": "collaboration/work_packages/completions/WP-0026_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -924,7 +924,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0028\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:17:25.370202+00:00\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created stable Estate document registry JSON, human-read",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:17:25.370202+00:00\", \"files_changed\": [ \"data/registry/documents.json\", \"docs/operations/Document_Registry_v1.md\", \"src/estate/core/document_regi",
       "path": "collaboration/work_packages/completions/WP-0028_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -942,7 +942,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0030\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T00:00:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created Mission Registry Standard v1 and seeded the initial machine-",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T00:00:00Z\", \"files_changed\": [ \"docs/operations/Mission_Registry_Standard_v1.md\", \"data/registry/missions.json\", \"collaboration/work_packages/comple",
       "path": "collaboration/work_packages/completions/WP-0030_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -951,7 +951,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0031\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:59:36Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created Transport Adapter Evaluation v1, preserving the Communicatio",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T21:59:36Z\", \"files_changed\": [ \"docs/collaboration/Transport_Adapter_Evaluation_v1.md\", \"collaboration/work_packages/completions/WP-0031_codex_done.",
       "path": "collaboration/work_packages/completions/WP-0031_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -960,7 +960,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0032\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:15:00Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Documented a local Codex completion detection strategy that uses sta",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:15:00Z\", \"files_changed\": [ \"docs/operations/Codex_Completion_Detection_Strategy_v1.md\", \"src/estate/core/codex_completion.py\", \"tests/test_codex",
       "path": "collaboration/work_packages/completions/WP-0032_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -969,7 +969,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0033\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:33:59Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created the Autonomous Estate Operations Charter v1 defining purpose",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:33:59Z\", \"files_changed\": [ \"docs/operations/Autonomous_Estate_Operations_Charter_v1.md\", \"collaboration/work_packages/completions/WP-0033_codex_",
       "path": "collaboration/work_packages/completions/WP-0033_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -978,7 +978,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0034\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:37:52Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Created Steward Recall Decision Model v1 and a machine-readable poli",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:37:52Z\", \"files_changed\": [ \"docs/operations/Steward_Recall_Decision_Model_v1.md\", \"data/policy/steward_recall_reasons.json\", \"collaboration/work",
       "path": "collaboration/work_packages/completions/WP-0034_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -987,7 +987,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0035\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:42:30Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Implemented Notification Router v1 as a transport-independent classi",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-02T22:42:30Z\", \"files_changed\": [ \"src/estate/core/notification_router.py\", \"src/estate/cli/main.py\", \"tests/test_notification_router.py\", \"runtime/not",
       "path": "collaboration/work_packages/completions/WP-0035_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1122,7 +1122,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0050\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:57:31+00:00\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Implemented the Office navigation and tabbed layout shell with ",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:57:31+00:00\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"collaboration/work_package",
       "path": "collaboration/work_packages/completions/WP-0050_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1167,7 +1167,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0055\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T11:10:21Z\", \"branch\": \"work\", \"pull_request_url\": null, \"summary\": \"Added local-first Settings and About surfaces to the Office of the S",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T11:10:21Z\", \"files_changed\": [ \"src/estate/core/steward_command_center.py\", \"tests/test_steward_command_center.py\", \"collaboration/work_packages/com",
       "path": "collaboration/work_packages/completions/WP-0055_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1194,7 +1194,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0059\", \"codex_status\": \"done\", \"ready_for_ca_review\": true, \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\"",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"files_changed\": [ \"src/estate/core/resident_conversations.py\", \"src/estate/core/steward_command_center.py\", \"tests/test_resident_conver",
       "path": "collaboration/work_packages/completions/WP-0059_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1203,7 +1203,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0060\", \"codex_status\": \"done\", \"ready_for_ca_review\": true, \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\"",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"files_changed\": [ \"data/registry/interaction_adapters.json\", \"docs/operations/Interaction_Adapter_Registry_v1.md\", \"src/estate/core/int",
       "path": "collaboration/work_packages/completions/WP-0060_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1212,7 +1212,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0061\", \"codex_status\": \"done\", \"ready_for_ca_review\": true, \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\"",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"files_changed\": [ \"src/estate/core/mission_control_workspace.py\", \"src/estate/core/steward_command_center.py\", \"docs/operations/Mission",
       "path": "collaboration/work_packages/completions/WP-0061_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1221,7 +1221,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0062\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00+00:00\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented Alfred's Steward-assigned personnel identity a",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00+00:00\", \"files_changed\": [ \"data/registry/personnel.json\", \"src/estate/core/personnel_identity.py\", \"src/estate/core/mailbox_index.py\", \"sr",
       "path": "collaboration/work_packages/completions/WP-0062_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1230,7 +1230,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0063\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T22:40:00Z\", \"branch\": \"work\", \"pull_request_url\": \"pending\", \"summary\": \"Implemented the local-first autonomous work queue scheduler wit",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T22:40:00Z\", \"files_changed\": [ \"src/estate/core/autonomous_work_queue_scheduler.py\", \"src/estate/cli/main.py\", \"tests/test_autonomous_work_queue_sch",
       "path": "collaboration/work_packages/completions/WP-0063_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1239,7 +1239,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0064\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"branch\": \"work\", \"summary\": \"Implemented an evidence-only Worker Runtime Monitor that reads worker heartbeat, assignment qu",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-03T00:00:00Z\", \"files_changed\": [ \"src/estate/core/worker_runtime_monitor.py\", \"src/estate/cli/main.py\", \"src/estate/core/steward_command_center.py\", \"",
       "path": "collaboration/work_packages/completions/WP-0064_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1302,7 +1302,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0071\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:00:00+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": nu",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:00:00+00:00\", \"files_changed\": [ \"validation/observations/VALIDATION_REVIEW_CADENCE.md\", \"validation/observations/validation_observation_triage.m",
       "path": "collaboration/work_packages/completions/WP-0071_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1311,7 +1311,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0072\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:25:27+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": nu",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:25:27+00:00\", \"files_changed\": [ \"src/estate/core/validation_metrics_dashboard.py\", \"src/estate/cli/main.py\", \"tests/test_validation_metrics_dash",
       "path": "collaboration/work_packages/completions/WP-0072_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1320,7 +1320,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0074\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:40:01+00:00\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": nu",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T00:40:01+00:00\", \"files_changed\": [ \"src/estate/core/validation_handoff_artifact_workflow.py\", \"src/estate/cli/main.py\", \"tests/test_validation_hand",
       "path": "collaboration/work_packages/completions/WP-0074_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1329,7 +1329,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0075\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T01:21:37Z\", \"branch\": \"work\", \"merge_class\": \"Class A\", \"merge_authority\": \"ca_verified_auto_merge_allowed\", \"pull_request_url\": null, \"",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T01:21:37Z\", \"files_changed\": [ \"src/estate/core/operational_readiness_dashboard.py\", \"src/estate/cli/main.py\", \"tests/test_operational_readiness_das",
       "path": "collaboration/work_packages/completions/WP-0075_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1572,7 +1572,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0104\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T17:31:06+00:00\", \"branch\": \"work\", \"pull_request_url_not_applicable_reason\": \"Local Codex completion artifact created before hosted pull",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T17:31:06+00:00\", \"files_changed\": [ \"docs/operations/Chief_Architect_Operating_Manual_v1.md\", \"docs/operations/Document_Registry_v1.md\", \"data/regis",
       "path": "collaboration/work_packages/completions/WP-0104_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1590,7 +1590,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"authority_and_safety\": { \"autonomous_execution_added\": false, \"cloud_dependency_added\": false, \"new_authority_granted\": false, \"secrets_stored\": false }, \"changed_files\": [ \"src/estate/core/resident_presence.py\", \"run",
+      "excerpt": "{ \"authority_and_safety\": { \"autonomous_execution_added\": false, \"cloud_dependency_added\": false, \"new_authority_granted\": false, \"secrets_stored\": false }, \"branch\": \"work\", \"changed_files\": [ \"src/estate/core/resident_",
       "path": "collaboration/work_packages/completions/WP-0106_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1599,7 +1599,7 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"implemented\", \"completed_at\": \"2026-07-04T20:48:36+00:00\", \"explicit_authority_limitations\": [ \"Alfred may summarize and route; Alfred may not authorize.\", \"Alfred may identify decisi",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T20:48:36+00:00\", \"explicit_authority_limitations\": [ \"Alfred may summarize and route; Alfred may not authorize.\", \"Alfred may identify decisions; Al",
       "path": "collaboration/work_packages/completions/WP-0107_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
@@ -1626,6 +1626,15 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
+      "excerpt": "{ \"audit_storage_path\": \"runtime/residents/authority_decisions.jsonl\", \"branch\": \"work\", \"codex_status\": \"completed\", \"completed_at\": \"2026-07-04T22:32:00+00:00\", \"demonstration_commands\": { \"alfred_attempting_execute_wo",
+      "path": "collaboration/work_packages/completions/WP-0110_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0110_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
       "excerpt": "{ \"work_package_id\": \"WP-0111\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T19:24:49+00:00\", \"branch\": \"work\", \"pull_request_url_not_applicable_reason\": \"Pull request URL will be assigned by repository hosting af",
       "path": "collaboration/work_packages/completions/WP-0111_codex_done.json",
       "policy_classification": "institutional_evidence",
@@ -1644,11 +1653,38 @@
     {
       "artifact_type": "work_package",
       "authoritative": false,
-      "excerpt": "{ \"work_package_id\": \"WP-0113\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T22:25:24+00:00\", \"branch\": \"work\", \"pull_request_url_not_applicable_reason\": \"Pull request URL will be assigned after make_pr is called ",
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-04T22:25:24+00:00\", \"files_changed\": [ \"collaboration/work_packages/completions/WP-0111_codex_done.json\", \"collaboration/work_packages/completions/WP-0",
       "path": "collaboration/work_packages/completions/WP-0113_codex_done.json",
       "policy_classification": "institutional_evidence",
       "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
       "title": "WP-0113_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-05T00:04:23+00:00\", \"files_changed\": [ \"src/estate/core/work_package_validation.py\", \"tests/test_work_package_validation.py\", \"tests/test_production_re",
+      "path": "collaboration/work_packages/completions/WP-0114_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0114_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"codex_status\": \"done\", \"completed_at\": \"2026-07-05T00:23:15+00:00\", \"files_changed\": [ \"src/estate/core/work_package_validation.py\", \"tests/test_work_package_validation.py\", \"operations/validation/pr",
+      "path": "collaboration/work_packages/completions/WP-0115_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0115_codex_done.json"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": false,
+      "excerpt": "{ \"branch\": \"work\", \"classifications\": { \"WP-0016\": \"requires human architectural review\", \"WP-0017\": \"requires human architectural review\", \"WP-0018\": \"requires human architectural review\", \"WP-0040\": \"known limitation ",
+      "path": "collaboration/work_packages/completions/WP-0116_codex_done.json",
+      "policy_classification": "institutional_evidence",
+      "source_of_truth_rule": "Evidence of declared work/review; inspect source artifacts for authority.",
+      "title": "WP-0116_codex_done.json"
     },
     {
       "artifact_type": "work_package",
@@ -2606,6 +2642,33 @@
     },
     {
       "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0114 \u2014 Historical Production-Readiness Sweep ## Codex Command Read collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md and do exactly what it says. ## Mode SERIES ",
+      "path": "collaboration/work_packages/pending/WP-0114_SERIES_historical_production_readiness_sweep.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0114 \u2014 Historical Production-Readiness Sweep"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0115 \u2014 Historical Validation Recipe Bootstrap Sweep ## Codex Command Read collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md and do exactly what it says. #",
+      "path": "collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0115 \u2014 Historical Validation Recipe Bootstrap Sweep"
+    },
+    {
+      "artifact_type": "work_package",
+      "authoritative": true,
+      "excerpt": "# SERIES TASK WP-0116 \u2014 Final Production-Readiness Exception Closure ## Codex Command Read collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md and do exactly what it says. #",
+      "path": "collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md",
+      "policy_classification": "authoritative_source_artifact",
+      "source_of_truth_rule": "Authored institutional/source artifact unless the file declares otherwise.",
+      "title": "SERIES TASK WP-0116 \u2014 Final Production-Readiness Exception Closure"
+    },
+    {
+      "artifact_type": "work_package",
       "authoritative": false,
       "excerpt": "{ \"schema_version\": 1, \"source_of_truth\": \"local-first deterministic allocation blocks; do not use live GitHub search as the real-time allocator\", \"updated_by_work_package\": \"WP-0112\", \"ranges\": [ {\"start\": \"WP-0001\", \"e",
       "path": "collaboration/work_packages/work_package_range_ledger.json",
@@ -2625,7 +2688,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Alfred Duty State Generated: 2026-07-04T20:49:46+00:00 State: waiting_for_steward Needs Steward: True Summary: Local evidence indicates Steward attention is needed. ## Source Artifacts - data/registry/residents.json: a",
+      "excerpt": "# Alfred Duty State Generated: 2026-07-05T00:51:32+00:00 State: waiting_for_steward Needs Steward: True Summary: Local evidence indicates Steward attention is needed. ## Source Artifacts - data/registry/residents.json: a",
       "path": "operations/alfred/duty_summary.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2661,7 +2724,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Estate Operations Board Generated: 2026-07-04T22:25:43+00:00 ## Summary - Repository branch: work - Current commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Overall status: warning - Missing artifact count: 4 - Warni",
+      "excerpt": "# Estate Operations Board Generated: 2026-07-05T00:58:06+00:00 ## Summary - Repository branch: work - Current commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Overall status: warning - Missing artifact count: 4 - Warni",
       "path": "operations/board/latest.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -2742,7 +2805,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Capability Dependency Visualization Read-only visualization for Mission Control and architectural review. This artifact is not a source of truth. Generated: 2026-07-04T20:00:04+00:00 ## Summary - Nodes: 6 - Capability ",
+      "excerpt": "# Capability Dependency Visualization Read-only visualization for Mission Control and architectural review. This artifact is not a source of truth. Generated: 2026-07-05T00:51:33+00:00 ## Summary - Nodes: 6 - Capability ",
       "path": "operations/capabilities/capability_dependency_visualization.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2823,7 +2886,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Operations Center Notification Center Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth. Generated: 2026-07-04T20:00:04+00:00 Refresh behavior: quiet_refresh_from_loc",
+      "excerpt": "# Operations Center Notification Center Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth. Generated: 2026-07-05T00:51:33+00:00 Refresh behavior: quiet_refresh_from_loc",
       "path": "operations/notifications/operations_notification_center.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2850,7 +2913,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Estate Service Catalog Read-only aggregation. This report is not the source of truth and does not create a duplicate command registry. Generated: 2026-07-04T22:25:41+00:00 ## Summary - Services: 10 - Registry services:",
+      "excerpt": "# Estate Service Catalog Read-only aggregation. This report is not the source of truth and does not create a duplicate command registry. Generated: 2026-07-05T00:58:05+00:00 ## Summary - Services: 10 - Registry services:",
       "path": "operations/services/estate_service_catalog.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2877,7 +2940,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Operations Center Service Status Board Read-only Operations Center view. This board aggregates existing artifacts and does not become the source of truth for service status. Generated: 2026-07-04T22:25:42+00:00 Refresh",
+      "excerpt": "# Operations Center Service Status Board Read-only Operations Center view. This board aggregates existing artifacts and does not become the source of truth for service status. Generated: 2026-07-05T00:58:06+00:00 Refresh",
       "path": "operations/services/service_status_board.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2895,7 +2958,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Steward Decision Queue Generated: 2026-07-04T20:00:04+00:00 Local-only, non-authoritative panel. It does not approve decisions or notify the Steward. ## Pending Decisions - **Example implementation routing message** (n",
+      "excerpt": "# Steward Decision Queue Generated: 2026-07-05T00:51:33+00:00 Local-only, non-authoritative panel. It does not approve decisions or notify the Steward. ## Pending Decisions - **Example implementation routing message** (n",
       "path": "operations/steward/decision_queue.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2904,7 +2967,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Operator Activity Stream Read-only Operations Center event feed aggregated from existing artifacts; it does not become an event source. Generated: 2026-07-04T22:25:42+00:00 Refresh behavior: quiet_live_updates_from_loc",
+      "excerpt": "# Operator Activity Stream Read-only Operations Center event feed aggregated from existing artifacts; it does not become an event source. Generated: 2026-07-05T00:58:06+00:00 Refresh behavior: quiet_live_updates_from_loc",
       "path": "operations/steward/operator_activity_stream.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -2976,6 +3039,33 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
+      "excerpt": "# WP-0114 Historical Production-Readiness Sweep Report Generated at: 2026-07-05T00:04:02+00:00 ## Production-Readiness Totals Before Sweep - total_work_packages_scanned: 101 - total_production_ready: 31 - total_blocked: ",
+      "path": "operations/validation/backlog_burn_down/WP-0114_historical_sweep_report.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "WP-0114 Historical Production-Readiness Sweep Report"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# WP-0115 Recipe Bootstrap Report ## Production Readiness Totals Before - total_blocked: 51 - total_incomplete_receipts: 5 - total_missing_receipts: 5 - total_missing_recipes: 47 - total_production_ready: 51 - total_work",
+      "path": "operations/validation/backlog_burn_down/WP-0115_recipe_bootstrap_report.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "WP-0115 Recipe Bootstrap Report"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# WP-0116 Final Exception Closure Report Generated: 2026-07-05T00:52:04+00:00 ## Totals - Before WP-0116: {'total_work_packages_scanned': 102, 'total_production_ready': 90, 'total_blocked': 12, 'total_missing_recipes': 8",
+      "path": "operations/validation/backlog_burn_down/WP-0116_final_exception_closure_report.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "WP-0116 Final Exception Closure Report"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
       "excerpt": "# Local Operational Validation Run Generated: 2026-07-02T21:04:16+00:00 ## Summary - Step Count: 9 - Failed Steps: 0 - Warning Count: 76 - Ok: True ## Source Boundary ### Authoritative Sources - data/registry/**/*.json -",
       "path": "operations/validation/local_operational_validation_run.md",
       "policy_classification": "generated_operational_projection",
@@ -2994,7 +3084,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Production Readiness Report - generated_at: 2026-07-04T22:25:43+00:00 - git branch: work - git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 ## Totals - total_work_packages_scanned: 100 - total_production_ready: 32 ",
+      "excerpt": "# Production Readiness Report - generated_at: 2026-07-05T00:58:07+00:00 - git branch: work - git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d ## Totals - total_work_packages_scanned: 102 - total_production_ready: 93 ",
       "path": "operations/validation/production_readiness_report.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3003,7 +3093,16 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0015 - Timestamp: 2026-07-04T22:25:38+00:00 - Work package ID: WP-0015 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0014 - Timestamp: 2026-07-05T00:21:09+00:00 - Work package ID: WP-0014 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0014_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0014"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0015 - Timestamp: 2026-07-05T00:57:59+00:00 - Work package ID: WP-0015 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0015_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3021,7 +3120,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0020 - Timestamp: 2026-07-04T22:25:33+00:00 - Work package ID: WP-0020 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0020 - Timestamp: 2026-07-05T00:57:54+00:00 - Work package ID: WP-0020 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0020_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3039,11 +3138,65 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0027 - Timestamp: 2026-07-04T22:25:38+00:00 - Work package ID: WP-0027 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0022 - Timestamp: 2026-07-05T00:21:10+00:00 - Work package ID: WP-0022 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0022_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0022"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0023 - Timestamp: 2026-07-05T00:21:12+00:00 - Work package ID: WP-0023 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0023_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0023"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0024 - Timestamp: 2026-07-05T00:21:14+00:00 - Work package ID: WP-0024 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0024_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0024"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0025 - Timestamp: 2026-07-05T00:21:16+00:00 - Work package ID: WP-0025 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0025_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0025"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0026 - Timestamp: 2026-07-05T00:21:18+00:00 - Work package ID: WP-0026 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0026_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0026"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0027 - Timestamp: 2026-07-05T00:58:00+00:00 - Work package ID: WP-0027 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0027_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Work Package Validation Report \u2014 WP-0027"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0028 - Timestamp: 2026-07-05T00:21:20+00:00 - Work package ID: WP-0028 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0028_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0028"
     },
     {
       "artifact_type": "operation",
@@ -3053,6 +3206,60 @@
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Work Package Validation Report \u2014 WP-0029"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0030 - Timestamp: 2026-07-05T00:21:22+00:00 - Work package ID: WP-0030 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0030_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0030"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0031 - Timestamp: 2026-07-05T00:21:24+00:00 - Work package ID: WP-0031 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0031_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0031"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0032 - Timestamp: 2026-07-05T00:21:25+00:00 - Work package ID: WP-0032 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0032_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0032"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0033 - Timestamp: 2026-07-05T00:21:27+00:00 - Work package ID: WP-0033 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0033_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0033"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0034 - Timestamp: 2026-07-05T00:21:29+00:00 - Work package ID: WP-0034 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0034_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0034"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0035 - Timestamp: 2026-07-05T00:21:31+00:00 - Work package ID: WP-0035 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0035_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0035"
     },
     {
       "artifact_type": "operation",
@@ -3084,6 +3291,114 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0039 - Timestamp: 2026-07-05T00:21:33+00:00 - Work package ID: WP-0039 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0039_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0039"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0041 - Timestamp: 2026-07-05T00:21:35+00:00 - Work package ID: WP-0041 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0041_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0041"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0042 - Timestamp: 2026-07-05T00:21:37+00:00 - Work package ID: WP-0042 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0042_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0042"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0043 - Timestamp: 2026-07-05T00:21:38+00:00 - Work package ID: WP-0043 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0043_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0043"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0044 - Timestamp: 2026-07-05T00:21:40+00:00 - Work package ID: WP-0044 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0044_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0044"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0045 - Timestamp: 2026-07-05T00:21:42+00:00 - Work package ID: WP-0045 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0045_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0045"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0046 - Timestamp: 2026-07-05T00:21:44+00:00 - Work package ID: WP-0046 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0046_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0046"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0047 - Timestamp: 2026-07-05T00:21:46+00:00 - Work package ID: WP-0047 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0047_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0047"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0048 - Timestamp: 2026-07-05T00:21:48+00:00 - Work package ID: WP-0048 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0048_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0048"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0049 - Timestamp: 2026-07-05T00:21:49+00:00 - Work package ID: WP-0049 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0049_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0049"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0050 - Timestamp: 2026-07-05T00:21:51+00:00 - Work package ID: WP-0050 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0050_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0050"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0051 - Timestamp: 2026-07-05T00:21:53+00:00 - Work package ID: WP-0051 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0051_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0051"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
       "excerpt": "# Work Package Validation Report \u2014 WP-0052 - Timestamp: 2026-07-04T17:13:05+00:00 - Work package ID: WP-0052 - Local branch: work - Git commit: 10c6ae704cb00dff6026dc79164189a3ac2e3975 - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0052_validation.md",
       "policy_classification": "generated_operational_projection",
@@ -3098,6 +3413,87 @@
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Work Package Validation Report \u2014 WP-0053"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0054 - Timestamp: 2026-07-05T00:21:55+00:00 - Work package ID: WP-0054 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0054_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0054"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0055 - Timestamp: 2026-07-05T00:21:57+00:00 - Work package ID: WP-0055 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0055_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0055"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0057 - Timestamp: 2026-07-05T00:00:26+00:00 - Work package ID: WP-0057 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0057_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0057"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0058 - Timestamp: 2026-07-05T00:00:30+00:00 - Work package ID: WP-0058 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed_with_fi",
+      "path": "operations/validation/reports/WP-0058_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0058"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0059 - Timestamp: 2026-07-05T00:00:34+00:00 - Work package ID: WP-0059 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed_with_fi",
+      "path": "operations/validation/reports/WP-0059_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0059"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0060 - Timestamp: 2026-07-05T00:00:38+00:00 - Work package ID: WP-0060 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0060_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0060"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0061 - Timestamp: 2026-07-05T00:21:59+00:00 - Work package ID: WP-0061 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0061_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0061"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0062 - Timestamp: 2026-07-05T00:22:01+00:00 - Work package ID: WP-0062 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0062_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0062"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0064 - Timestamp: 2026-07-05T00:22:03+00:00 - Work package ID: WP-0064 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0064_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0064"
     },
     {
       "artifact_type": "operation",
@@ -3138,11 +3534,47 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0069 - Timestamp: 2026-07-05T00:22:05+00:00 - Work package ID: WP-0069 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0069_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0069"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
       "excerpt": "# Work Package Validation Report \u2014 WP-0070 - Timestamp: 2026-07-04T17:13:28+00:00 - Work package ID: WP-0070 - Local branch: work - Git commit: 10c6ae704cb00dff6026dc79164189a3ac2e3975 - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0070_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Work Package Validation Report \u2014 WP-0070"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0071 - Timestamp: 2026-07-05T00:22:07+00:00 - Work package ID: WP-0071 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0071_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0071"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0072 - Timestamp: 2026-07-05T00:22:09+00:00 - Work package ID: WP-0072 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0072_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0072"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0074 - Timestamp: 2026-07-05T00:00:42+00:00 - Work package ID: WP-0074 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0074_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0074"
     },
     {
       "artifact_type": "operation",
@@ -3192,7 +3624,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0080 - Timestamp: 2026-07-04T22:25:40+00:00 - Work package ID: WP-0080 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0080 - Timestamp: 2026-07-05T00:58:03+00:00 - Work package ID: WP-0080 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0080_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3201,7 +3633,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0081 - Timestamp: 2026-07-04T22:25:41+00:00 - Work package ID: WP-0081 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0081 - Timestamp: 2026-07-05T00:58:04+00:00 - Work package ID: WP-0081 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0081_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3210,7 +3642,34 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0085 - Timestamp: 2026-07-04T22:25:42+00:00 - Work package ID: WP-0085 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0082 - Timestamp: 2026-07-05T00:22:11+00:00 - Work package ID: WP-0082 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0082_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0082"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0083 - Timestamp: 2026-07-05T00:22:13+00:00 - Work package ID: WP-0083 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0083_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0083"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0084 - Timestamp: 2026-07-05T00:22:15+00:00 - Work package ID: WP-0084 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0084_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0084"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0085 - Timestamp: 2026-07-05T00:58:05+00:00 - Work package ID: WP-0085 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0085_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3237,7 +3696,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0088 - Timestamp: 2026-07-04T18:13:37+00:00 - Work package ID: WP-0088 - Local branch: work - Git commit: 93915946eece30e5abbc23151e88aaeb1df67c72 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0088 - Timestamp: 2026-07-05T00:00:44+00:00 - Work package ID: WP-0088 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0088_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3246,7 +3705,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0089 - Timestamp: 2026-07-04T18:36:36+00:00 - Work package ID: WP-0089 - Local branch: work - Git commit: 4cd4e5d28b7922699398e38d16b7fa1e8c8f2eee - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0089 - Timestamp: 2026-07-05T00:00:53+00:00 - Work package ID: WP-0089 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0089_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3273,7 +3732,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0093 - Timestamp: 2026-07-04T19:36:16+00:00 - Work package ID: WP-0093 - Local branch: work - Git commit: 3894fd761752d3c23ab3fcc23cad632b30fdc26b - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0093 - Timestamp: 2026-07-05T00:00:58+00:00 - Work package ID: WP-0093 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0093_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3291,7 +3750,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0096 - Timestamp: 2026-07-04T19:45:21+00:00 - Work package ID: WP-0096 - Local branch: work - Git commit: 417b8cb044c75ab789d99eb11ebb0ad2055bffd0 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0096 - Timestamp: 2026-07-05T00:01:06+00:00 - Work package ID: WP-0096 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0096_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3300,7 +3759,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0097 - Timestamp: 2026-07-04T19:54:36+00:00 - Work package ID: WP-0097 - Local branch: work - Git commit: 58b902464418f689561c76a4ef9378745a151d9f - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0097 - Timestamp: 2026-07-05T00:01:11+00:00 - Work package ID: WP-0097 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0097_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3327,7 +3786,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0100 - Timestamp: 2026-07-04T20:16:51+00:00 - Work package ID: WP-0100 - Local branch: work - Git commit: f99e9932249ec9fa051c18d8bdece986a9aa394f - Validation status: no_recipe - Re",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0100 - Timestamp: 2026-07-05T00:22:17+00:00 - Work package ID: WP-0100 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0100_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3336,7 +3795,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0101 - Timestamp: 2026-07-04T22:25:36+00:00 - Work package ID: WP-0101 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0101 - Timestamp: 2026-07-05T00:57:57+00:00 - Work package ID: WP-0101 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0101_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3345,7 +3804,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0102 - Timestamp: 2026-07-04T22:25:37+00:00 - Work package ID: WP-0102 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0102 - Timestamp: 2026-07-05T00:57:58+00:00 - Work package ID: WP-0102 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0102_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3354,7 +3813,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0103 - Timestamp: 2026-07-04T22:25:37+00:00 - Work package ID: WP-0103 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0103 - Timestamp: 2026-07-05T00:57:59+00:00 - Work package ID: WP-0103 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0103_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3363,7 +3822,16 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0105 - Timestamp: 2026-07-04T22:25:35+00:00 - Work package ID: WP-0105 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0104 - Timestamp: 2026-07-05T00:22:19+00:00 - Work package ID: WP-0104 - Local branch: work - Git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0104_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0104"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0105 - Timestamp: 2026-07-05T00:57:56+00:00 - Work package ID: WP-0105 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0105_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3372,7 +3840,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0106 - Timestamp: 2026-07-04T20:27:23+00:00 - Work package ID: WP-0106 - Local branch: work - Git commit: a9d622a0c12a802b9b31d88b0b3690d992a671ba - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0106 - Timestamp: 2026-07-05T00:51:26+00:00 - Work package ID: WP-0106 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0106_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3381,7 +3849,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0107 - Timestamp: 2026-07-04T20:49:45+00:00 - Work package ID: WP-0107 - Local branch: work - Git commit: 89bb366fd58314690fc1d894d8467f00c9224d5b - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0107 - Timestamp: 2026-07-05T00:51:32+00:00 - Work package ID: WP-0107 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0107_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3399,7 +3867,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0109 - Timestamp: 2026-07-04T21:36:53+00:00 - Work package ID: WP-0109 - Local branch: work - Git commit: 30e81776adce56d2142f37692b11a52bde7a6e94 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0109 - Timestamp: 2026-07-05T00:01:51+00:00 - Work package ID: WP-0109 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0109_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3408,7 +3876,16 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0111 - Timestamp: 2026-07-04T22:24:49+00:00 - Work package ID: WP-0111 - Local branch: work - Git commit: ca8d493e1f02b430ca21579799b9cbddbda5fcc5 - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0110 - Timestamp: 2026-07-05T00:01:57+00:00 - Work package ID: WP-0110 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0110_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0110"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0111 - Timestamp: 2026-07-05T00:57:53+00:00 - Work package ID: WP-0111 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0111_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3417,11 +3894,47 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Work Package Validation Report \u2014 WP-0112 - Timestamp: 2026-07-04T21:53:01+00:00 - Work package ID: WP-0112 - Local branch: work - Git commit: 4b8ffda3a31cfde43ae6aa9373b0bdb0348c6c6d - Validation status: passed - Recip",
+      "excerpt": "# Work Package Validation Report \u2014 WP-0112 - Timestamp: 2026-07-05T00:02:06+00:00 - Work package ID: WP-0112 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
       "path": "operations/validation/reports/WP-0112_validation.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "Work Package Validation Report \u2014 WP-0112"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0113 - Timestamp: 2026-07-05T00:03:12+00:00 - Work package ID: WP-0113 - Local branch: work - Git commit: 51e0b5912c9ca6293eea2f0f767531bc8b660fdb - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0113_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0113"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0114 - Timestamp: 2026-07-05T00:57:27+00:00 - Work package ID: WP-0114 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0114_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0114"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0115 - Timestamp: 2026-07-05T00:56:45+00:00 - Work package ID: WP-0115 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0115_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0115"
+    },
+    {
+      "artifact_type": "operation",
+      "authoritative": false,
+      "excerpt": "# Work Package Validation Report \u2014 WP-0116 - Timestamp: 2026-07-05T00:54:50+00:00 - Work package ID: WP-0116 - Local branch: work - Git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d - Validation status: passed - Recip",
+      "path": "operations/validation/reports/WP-0116_validation.md",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "Work Package Validation Report \u2014 WP-0116"
     },
     {
       "artifact_type": "operation",
@@ -3435,7 +3948,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Validation Coverage Manifest Generated at: 2026-07-04T22:25:43+00:00 ## Summary - total_work_packages_scanned: 100 - total_production_ready: 32 - total_blocked: 68 - total_missing_recipes: 48 - total_missing_receipts: ",
+      "excerpt": "# Validation Coverage Manifest Generated at: 2026-07-05T00:58:07+00:00 ## Summary - total_work_packages_scanned: 102 - total_production_ready: 93 - total_blocked: 9 - total_missing_recipes: 7 - total_missing_receipts: 3 ",
       "path": "operations/validation/validation_coverage_manifest.md",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3462,7 +3975,7 @@
     {
       "artifact_type": "operation",
       "authoritative": false,
-      "excerpt": "# Estate Assignment Queue Generated: 2026-07-04T20:00:05Z ## Summary - Work packages: 104 - Blocked: 0 - Unassigned: 104 - Warnings: 104 ## Queue | Work Package | Mode | Owner | State | Dependencies | Blockers | Next Act",
+      "excerpt": "# Estate Assignment Queue Generated: 2026-07-05T00:51:33Z ## Summary - Work packages: 108 - Blocked: 0 - Unassigned: 108 - Warnings: 108 ## Queue | Work Package | Mode | Owner | State | Dependencies | Blockers | Next Act",
       "path": "operations/work_packages/assignment_queue.md",
       "policy_classification": "operational_artifact",
       "source_of_truth_rule": "Operational artifact; confirm source-of-truth status before authority-sensitive use.",
@@ -3561,7 +4074,7 @@
     {
       "artifact_type": "runtime_report",
       "authoritative": false,
-      "excerpt": "{ \"blocking_work_packages\": [ { \"blockers\": [ \"Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason\", \"Execution status blocks readiness: no_recipe.\" ], \"completion_artifact_path\": ",
+      "excerpt": "{ \"blocking_work_packages\": [ { \"blockers\": [ \"ready_for_ca_review is not true.\", \"Completion artifact is missing required metadata: merge_authority_or_equivalent, completed_at, summary, files_changed, tests_run, ready_f",
       "path": "runtime/validation/production_readiness_report.json",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3570,7 +4083,7 @@
     {
       "artifact_type": "runtime_report",
       "authoritative": false,
-      "excerpt": "{ \"generated_at\": \"2026-07-04T22:25:43+00:00\", \"summary\": { \"total_blocked\": 68, \"total_incomplete_receipts\": 53, \"total_missing_receipts\": 5, \"total_missing_recipes\": 48, \"total_production_ready\": 32, \"total_work_packag",
+      "excerpt": "{ \"generated_at\": \"2026-07-05T00:58:07+00:00\", \"summary\": { \"total_blocked\": 9, \"total_incomplete_receipts\": 3, \"total_missing_receipts\": 3, \"total_missing_recipes\": 7, \"total_production_ready\": 93, \"total_work_packages_",
       "path": "runtime/validation/validation_coverage_manifest.json",
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
@@ -3611,9 +4124,16 @@
       "policy_classification": "generated_operational_projection",
       "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
       "title": "operations_board.json"
+    },
+    {
+      "artifact_type": "runtime_report",
+      "authoritative": false,
+      "excerpt": "{ \"authority\": \"read_only_visualization_not_source_of_truth\", \"edges\": [], \"generated_at\": \"2026-07-05T00:51:33+00:00\", \"inputs\": { \"dependency_graph\": \"runtime/dependencies/dependency_graph.json\", \"registry\": \"data/regi",
+      "path": "runtime/capabilities/capability_dependency_visualization.json",
+      "policy_classification": "generated_operational_projection",
+      "source_of_truth_rule": "Derived view; use to locate source records, not as independent authority.",
+      "title": "capability_dependency_visualization.json"
     }
   ],
-  "warnings": [
-    "missing runtime report pattern: runtime/capabilities/*.json"
-  ]
+  "warnings": []
 }

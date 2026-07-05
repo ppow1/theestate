@@ -81,6 +81,21 @@ def _latest_report(root:Path, wp:str)->dict[str,Any]:
     if not p.exists(): return {"path":None,"status":"missing"}
     data=_read_json(p); return {"path":str(p.relative_to(root)).replace('\\','/'),"status":data.get("validation_status","unknown")}
 
+def _is_invalid_placeholder_residue(root: Path, wp: str) -> bool:
+    """Return true for validation-only placeholder artifacts outside production inputs."""
+    if wp != "WP-9999":
+        return False
+    has_pending = any((root / "collaboration/work_packages/pending").glob(f"{wp}*.md"))
+    has_completion = find_completion_artifact(root, wp) is not None
+    if has_pending or has_completion:
+        return False
+    report = root / "runtime/validation/work_packages" / f"{wp}_validation.json"
+    if not report.exists():
+        return True
+    data = _read_json(report)
+    return data.get("validation_status") == "no_recipe"
+
+
 def _discover_wps(root:Path)->set[str]:
     ids=set(VALIDATION_RECIPES)
     for folder in ["collaboration/work_packages/completions","collaboration/work_packages/pending","operations/validation/reports","runtime/validation/work_packages"]:
@@ -88,7 +103,8 @@ def _discover_wps(root:Path)->set[str]:
         if d.exists():
             for p in d.glob("*"):
                 wp=_wp_from_name(p.name)
-                if wp: ids.add(wp)
+                if wp and not _is_invalid_placeholder_residue(root, wp):
+                    ids.add(wp)
     return ids
 
 def generate_validation_coverage_manifest(root: str|Path|None=None, write:bool=True)->dict[str,Any]:

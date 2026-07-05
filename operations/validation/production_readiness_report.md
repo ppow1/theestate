@@ -1,16 +1,16 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T00:26:31+00:00
+- generated_at: 2026-07-05T00:58:10+00:00
 - git branch: work
-- git commit: b9d005e9653b5a73c6f58d1ce75a5564e99df4ef
+- git commit: cb8c46e4f3931f36de4eb20b11459ce70297a61d
 
 ## Totals
 - total_work_packages_scanned: 102
-- total_production_ready: 90
-- total_blocked: 12
-- total_missing_recipes: 8
-- total_missing_receipts: 4
-- total_incomplete_receipts: 5
+- total_production_ready: 93
+- total_blocked: 9
+- total_missing_recipes: 7
+- total_missing_receipts: 3
+- total_incomplete_receipts: 3
 
 ## Recommended Next Action
 Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.
@@ -25,9 +25,6 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0073: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 - WP-0089: Blocking known limitation: Production-readiness command still reports unrelated repository-wide blockers for older work packages.
 - WP-0094: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
-- WP-0106: Completion artifact is missing required metadata: merge_authority_or_equivalent, files_changed
-- WP-0107: Completion artifact is missing required metadata: codex_status_done
-- WP-9999: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
 
 ## Ready for Chief Architect Production-Readiness Acceptance
 - WP-0014
@@ -112,6 +109,8 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0103
 - WP-0104
 - WP-0105
+- WP-0106
+- WP-0107
 - WP-0108
 - WP-0109
 - WP-0110
@@ -120,8 +119,10 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0113
 - WP-0114
 - WP-0115
+- WP-0116
 
 ## Recent Validation Reports
+- `runtime/validation/work_packages/WP-0116_validation.json`
 - `runtime/validation/work_packages/WP-0115_validation.json`
 - `runtime/validation/work_packages/WP-0114_validation.json`
 - `runtime/validation/work_packages/WP-0111_validation.json`
@@ -131,4 +132,3 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - `runtime/validation/work_packages/WP-0081_validation.json`
 - `runtime/validation/work_packages/WP-0080_validation.json`
 - `runtime/validation/work_packages/WP-0103_validation.json`
-- `runtime/validation/work_packages/WP-0027_validation.json`
