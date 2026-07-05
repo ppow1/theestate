@@ -303,6 +303,26 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0129": {
+        "recipe_id": "wp-0129-resident-multimodal-paste",
+        "title": "WP-0129 — Resident Multimodal Paste and Image Discussion",
+        "description": "Validates local-first resident attachments, Alfred paste UI, bounded attachment storage, local vision fallback/summary behavior, redaction, reports, and receipt.",
+        "required_checks": ["Reports exist", "JSON companion parses", "Attachment model exists", "Local vision adapter exists", "Paste UI exists", "Endpoint accepts attachments", "Attachment tests pass", "Receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["operations/residents/alfred/WP-0129_resident_multimodal_paste_report.md", "runtime/residents/alfred/WP-0129_resident_multimodal_paste_report.json", "collaboration/work_packages/completions/WP-0129_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Attachments escape bounded runtime storage", "Alfred fakes visual inspection when no local vision model is available"],
+        "success_criteria": ["Pasted image/text attachments persist locally and are linked to resident turns with truthful local vision status"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "import json; from pathlib import Path; md=Path(\'operations/residents/alfred/WP-0129_resident_multimodal_paste_report.md\'); js=Path(\'runtime/residents/alfred/WP-0129_resident_multimodal_paste_report.json\'); assert md.is_file(); data=json.loads(js.read_text(encoding=\'utf-8\')); required=[\'attachment_storage_path\',\'schema_summary\',\'api_design\',\'ui_paste_behavior\',\'local_vision_adapter_status\',\'detected_vision_capable_models\',\'fallback_behavior\',\'example_pasted_image_turn_metadata\',\'forget_redaction_behavior\',\'tests_run\',\'validation_commands_run\',\'known_limitations\',\'recommended_next_action\']; missing=[k for k in required if k not in data]; assert not missing, missing"'),
+            _cmd('python -c "from pathlib import Path; t=Path(\'src/estate/core/resident_interaction.py\').read_text(encoding=\'utf-8\'); required=[\'ATTACHMENT_STORE\',\'class LocalVisionAdapter\',\'create_attachment\',\'data_base64\',\'vision_status\',\'attachments\']; missing=[x for x in required if x not in t]; assert not missing, missing"'),
+            _cmd('python -c "from pathlib import Path; t=Path(\'src/estate/core/steward_command_center.py\').read_text(encoding=\'utf-8\'); required=[\'alfred-pending-attachments\',\'clipboard_paste\',\'paste\',\'attachmentHtml\',\'data-remove-attachment\']; missing=[x for x in required if x not in t]; assert not missing, missing"'),
+            _cmd('python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q'),
+            _cmd('python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt(\'WP-0129\'); assert r[\'receipt_status\']==\'complete\', r"'),
+        ],
+    },
+
     "WP-0112": {
         "recipe_id": "wp-0112-parallel-workstream-standard",
         "title": "WP-0112 — Parallel Workstream Isolation and Install Handoff Standard",

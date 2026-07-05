@@ -1,0 +1,76 @@
+{
+  "api_design": "POST /api/residents/{resident_id}/chat JSON with optional attachments[]; images use data_base64; text snippets use text.",
+  "attachment_storage_path": "runtime/resident_interactions/attachments/{resident_id}/{session_id}/",
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-05T22:20:00+00:00",
+  "detected_vision_capable_models": [],
+  "example_pasted_image_turn_metadata": {
+    "attachment_id": "attach_0001",
+    "kind": "image",
+    "mime_type": "image/png",
+    "redaction_status": "active",
+    "source": "clipboard_paste",
+    "storage_path": "runtime/resident_interactions/attachments/alfred/<session>/attach_0001_clipboard-image.png",
+    "vision_model": null,
+    "vision_provider": "none",
+    "vision_status": "unavailable"
+  },
+  "fallback_behavior": "When no local vision model exists, image is stored and Alfred truthfully reports visual inspection is unavailable.",
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_interaction.py",
+    "tests/test_steward_command_center.py",
+    "operations/residents/alfred/WP-0129_resident_multimodal_paste_report.md",
+    "runtime/residents/alfred/WP-0129_resident_multimodal_paste_report.json",
+    "collaboration/work_packages/completions/WP-0129_codex_done.json"
+  ],
+  "forget_redaction_behavior": "forget_conversation redacts text/response, suppresses turns from normal history, marks attachment redaction_status, and removes attachment summaries.",
+  "known_limitations": [
+    "Vision model detection uses local Ollama name hints",
+    "No OCR pipeline added",
+    "Browser paste depends on clipboard APIs"
+  ],
+  "local_vision_adapter_status": "LocalVisionAdapter uses local Ollama only; no cloud vision APIs.",
+  "local_vision_status": "No local vision-capable model discovered in this environment.",
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "PR will be created with make_pr after the local git commit as required by the Codex handoff.",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Install/configure a local vision-capable Ollama model and run the Steward-local smoke test.",
+  "schema_summary": {
+    "fields": [
+      "attachment_id",
+      "kind",
+      "source",
+      "created_at",
+      "original_filename",
+      "mime_type",
+      "size_bytes",
+      "storage_path",
+      "sha256",
+      "redaction_status",
+      "vision_status",
+      "vision_provider",
+      "vision_model",
+      "summary"
+    ],
+    "turn_field": "attachments"
+  },
+  "summary": "Implemented local-first pasted image/text attachments for Alfred resident chat with bounded storage, UI paste handling, safe history thumbnails, local vision adapter boundary, truthful fallback, tests, report, and validation recipe.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_authority.py tests/test_resident_interaction.py tests/test_steward_command_center.py -q"
+  ],
+  "ui_changes": "Added paste capture, pending attachment display/removal, JSON attachment send, and history attachment rendering.",
+  "ui_paste_behavior": "Alfred textarea paste handler captures clipboard images and long text snippets, shows pending attachments, allows removal, sends text plus attachments, and reloads history with metadata and safe thumbnails.",
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0126 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0127 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0128 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0129 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0129"
+}

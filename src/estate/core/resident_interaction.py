@@ -1,7 +1,7 @@
 """Reusable local resident interaction framework for chat, surfaces, and memory governance."""
 from __future__ import annotations
 
-import json, os, re, shutil, subprocess
+import base64, hashlib, json, os, re, shutil, subprocess
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,6 +11,7 @@ from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_authority import check_authority, list_authority, ALLOWED, REQUIRES_STEWARD, REQUIRES_ESCALATION
 
 CHAT_STORE = Path("runtime/resident_interactions/sessions")
+ATTACHMENT_STORE = Path("runtime/resident_interactions/attachments")
 SURFACE_DIR = Path("operations/residents/surfaces")
 FORGET_AUDIT = Path("runtime/resident_interactions/forget_audit.jsonl")
 STANDARD_VERSION = "resident-api-standard-v1"
@@ -80,6 +81,87 @@ class LocalOllamaAdapter:
         except Exception as exc:
             return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=True, fallback_reason=f"Local Ollama invocation failed: {exc}")}
 
+
+IMAGE_MIME_EXT = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif"}
+VISION_MODEL_HINTS = ("llava", "bakllava", "moondream", "minicpm-v", "qwen2-vl", "qwen2.5vl", "qwen-vl", "vision")
+
+class LocalVisionAdapter:
+    """Local-only multimodal boundary; never calls cloud vision APIs."""
+
+    provider = "ollama"
+
+    def __init__(self, ollama: LocalOllamaAdapter | None = None):
+        self.ollama = ollama or LocalOllamaAdapter()
+
+    def discover_models(self) -> dict[str, Any]:
+        status = self.ollama.discover_models()
+        models = [m for m in (status.get("models") or []) if any(h in m.lower() for h in VISION_MODEL_HINTS)]
+        return {**status, "available": bool(models), "models": models, "model": models[0] if models else None, "vision_capable": bool(models), "discovery": ("local vision-capable Ollama models discovered" if models else "no local vision-capable model discovered")}
+
+    def summarize_image(self, *, image_path: Path, prompt: str = "Describe the pasted image for a resident conversation.", model: str | None = None) -> dict[str, Any]:
+        status = self.discover_models()
+        selected = model or status.get("model")
+        if not status.get("available") or not selected:
+            return {"ok": False, "status": "unavailable", "summary": None, "provider": "none", "model": None, "reason": status.get("discovery")}
+        try:
+            encoded = base64.b64encode(image_path.read_bytes()).decode("ascii")
+            body = json.dumps({"model": selected, "prompt": prompt, "images": [encoded], "stream": False, "options": {"temperature": 0.1}}).encode("utf-8")
+            req = urllib.request.Request(f"{self.ollama.endpoint}/api/generate", data=body, headers={"Content-Type": "application/json"}, method="POST")
+            with urllib.request.urlopen(req, timeout=self.ollama.timeout) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            text = str(payload.get("response") or "").strip()
+            if not text:
+                raise RuntimeError("empty local vision response")
+            return {"ok": True, "status": "processed", "summary": text, "provider": self.provider, "model": selected, "reason": None}
+        except Exception as exc:
+            return {"ok": False, "status": "failed", "summary": None, "provider": self.provider, "model": selected, "reason": f"Local vision invocation failed: {exc}"}
+
+def local_vision_status(adapter: LocalVisionAdapter | None = None) -> dict[str, Any]:
+    return (adapter or LocalVisionAdapter()).discover_models()
+
+def _attachment_dir(root: Path, resident: str, sid: str) -> Path:
+    return root / ATTACHMENT_STORE / _key(resident) / _safe(sid)
+
+def _safe_attachment_metadata(meta: dict[str, Any]) -> dict[str, Any]:
+    return {k: meta.get(k) for k in ("attachment_id","kind","source","created_at","original_filename","mime_type","size_bytes","storage_path","sha256","redaction_status","vision_status","vision_provider","vision_model","summary") if k in meta}
+
+def create_attachment(root: Path, resident: str, sid: str, item: dict[str, Any], *, index: int = 1, vision_adapter: LocalVisionAdapter | None = None) -> dict[str, Any]:
+    if not isinstance(item, dict):
+        raise ValueError("attachment must be an object")
+    kind = item.get("kind")
+    source = item.get("source") or "api"
+    mime = str(item.get("mime_type") or ("text/plain" if kind == "text_snippet" else "")).lower()
+    aid = f"attach_{index:04d}"
+    folder = _attachment_dir(root, resident, sid); folder.mkdir(parents=True, exist_ok=True)
+    if kind == "image":
+        if mime not in IMAGE_MIME_EXT:
+            raise ValueError("unsupported image mime type")
+        raw = base64.b64decode(str(item.get("data_base64") or ""), validate=True)
+        if not raw:
+            raise ValueError("empty image attachment")
+        filename = _safe(item.get("original_filename") or f"clipboard-image{IMAGE_MIME_EXT[mime]}")
+        if not filename.lower().endswith(IMAGE_MIME_EXT[mime]): filename += IMAGE_MIME_EXT[mime]
+        path = folder / f"{aid}_{filename}"
+        path.write_bytes(raw)
+        summary = None; vstatus = "not_attempted"; vprovider = "none"; vmodel = None
+        vision = (vision_adapter or LocalVisionAdapter()).summarize_image(image_path=path, prompt=str(item.get("prompt") or "Describe this pasted resident conversation image."))
+        vstatus = vision.get("status") or ("processed" if vision.get("ok") else "unavailable")
+        vprovider = vision.get("provider") or "none"; vmodel = vision.get("model"); summary = vision.get("summary")
+    elif kind == "text_snippet":
+        text = str(item.get("text") or "")
+        if not text.strip(): raise ValueError("empty text snippet")
+        raw = text.encode("utf-8")
+        mime = "text/plain"
+        path = folder / f"{aid}_clipboard-text.txt"
+        path.write_bytes(raw)
+        summary = text[:500]; vstatus = "not_attempted"; vprovider = "none"; vmodel = None
+    else:
+        raise ValueError("unsupported attachment kind")
+    rel = str(path.relative_to(root)).replace('\\','/')
+    if not rel.startswith(str(ATTACHMENT_STORE).replace('\\','/') + "/"):
+        raise ValueError("attachment storage escaped bounded directory")
+    return {"attachment_id": aid, "kind": kind, "source": source, "created_at": _now(), "original_filename": _safe(item.get("original_filename") or path.name), "mime_type": mime, "size_bytes": len(raw), "storage_path": rel, "sha256": hashlib.sha256(raw).hexdigest(), "redaction_status": "active", "vision_status": vstatus, "vision_provider": vprovider, "vision_model": vmodel, "summary": summary}
+
 def _llm_metadata(mode: str, *, provider="none", model=None, endpoint=None, fallback_used=False, fallback_reason=None):
     return {"mode": mode, "provider": provider or "none", "model": model, "endpoint": endpoint, "fallback_used": bool(fallback_used), "fallback_reason": fallback_reason}
 
@@ -121,7 +203,7 @@ def resident_surface(resident: str, root=None) -> dict[str, Any]:
     artifact = r / SURFACE_DIR / f"{key}.json"
     data = _read_json(artifact) if artifact.exists() else None
     caps = data.get("capabilities") if isinstance(data, dict) and isinstance(data.get("capabilities"), list) else DEFAULT_CAPABILITIES
-    return {"kind":"resident_interaction_surface","resident_id":profile["resident_id"],"resident_display_name":profile["resident_display_name"],"office":profile["office"],"role":profile["role"],"resident_api_standard_version":STANDARD_VERSION,"resident_implementation_version":profile["implementation_version"],"surface_reference":str((SURFACE_DIR / f"{key}.json")).replace('\\','/'),"capabilities":caps,"chat_endpoints":{"get":"GET /api/residents/{resident_id}/chat","post":"POST /api/residents/{resident_id}/chat","forget":"POST /api/residents/{resident_id}/forget","surface":"GET /api/residents/{resident_id}/surface"},"extension_mechanism":{"proposal_template":"docs/operations/residents/resident_api_extension_proposal_template.md","profile_template":"docs/operations/residents/resident_implementation_profile_template.md","rule":"Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."}}
+    return {"kind":"resident_interaction_surface","resident_id":profile["resident_id"],"resident_display_name":profile["resident_display_name"],"office":profile["office"],"role":profile["role"],"resident_api_standard_version":STANDARD_VERSION,"resident_implementation_version":profile["implementation_version"],"surface_reference":str((SURFACE_DIR / f"{key}.json")).replace('\\','/'),"capabilities":caps,"chat_endpoints":{"get":"GET /api/residents/{resident_id}/chat","post":"POST /api/residents/{resident_id}/chat JSON with optional attachments[] base64/text payloads","forget":"POST /api/residents/{resident_id}/forget","surface":"GET /api/residents/{resident_id}/surface"},"extension_mechanism":{"proposal_template":"docs/operations/residents/resident_api_extension_proposal_template.md","profile_template":"docs/operations/residents/resident_implementation_profile_template.md","rule":"Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."}}
 
 def _next_session_id(root, resident):
     day = datetime.now(timezone.utc).strftime("%Y%m%d"); folder = root/CHAT_STORE; folder.mkdir(parents=True, exist_ok=True)
@@ -201,10 +283,11 @@ def _fallback_response(resident, message, surface, root: Path | None = None):
         )
     return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {message[:180]}"
 
-def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None) -> dict[str, Any]:
+def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None) -> dict[str, Any]:
     rootp = _root(root); surface = resident_surface(resident, rootp); sid = session_id or _next_session_id(rootp, resident)
     existing = _read_json(_session_path(rootp, sid)) or {"kind":"resident_interaction_session","session_id":sid,"resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"created_at":_now(),"turns":[],"memory_status":"active"}
     turn_no = len(existing.get("turns", [])) + 1
+    attachment_records = [create_attachment(rootp, surface["resident_id"], sid, item, index=i+1, vision_adapter=vision_adapter) for i, item in enumerate(attachments or [])]
     llm_status = local_llm_status()
     auth = check_authority(surface["resident_id"], action, root=rootp, audit=True)
     status = "within_responsibility" if auth.get("decision")==ALLOWED else ("requires_steward_authorization" if auth.get("decision")==REQUIRES_STEWARD else "blocked" if not auth.get("allowed") else "conversation_only")
@@ -212,11 +295,24 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     adapter = LocalOllamaAdapter()
     base_meta = _llm_metadata("local_llm", provider="ollama", model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=False, fallback_reason=None)
     context_packet = _context_packet(rootp, resident, existing)
-    prompt = _alfred_prompt(user_message, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message
+    if attachment_records:
+        context_packet["attachments"] = [_safe_attachment_metadata(a) for a in attachment_records]
+        summaries = [a.get("summary") for a in attachment_records if a.get("kind") == "image" and a.get("vision_status") == "processed" and a.get("summary")]
+        if summaries:
+            user_message_for_prompt = user_message + "\nLocal image summaries: " + " | ".join(summaries)
+        else:
+            user_message_for_prompt = user_message + "\nAttachment note: pasted image/text artifacts were received and stored locally; visual inspection is unavailable unless a local vision model processed them."
+    else:
+        user_message_for_prompt = user_message
+    prompt = _alfred_prompt(user_message_for_prompt, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message_for_prompt
     generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=llm_status.get("model")) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable")}
     llm_meta = generated.get("metadata") or base_meta
     response = generated.get("text") if generated.get("ok") else _fallback_response(resident, user_message, surface, rootp)
-    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":_now(),"user_message":user_message,"resident_response":response,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"memory_status":"active"}
+    if attachment_records and any(a.get("kind") == "image" and a.get("vision_status") != "processed" for a in attachment_records):
+        response += "\n\nAttachment note: I received and stored the pasted image locally, but no local vision-capable model is available to visually inspect it yet."
+    elif attachment_records and any(a.get("kind") == "image" and a.get("summary") for a in attachment_records) and not generated.get("ok"):
+        response += "\n\nLocal image observation: " + " | ".join(a.get("summary") for a in attachment_records if a.get("summary"))
+    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":_now(),"user_message":user_message,"resident_response":response,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}
@@ -239,6 +335,9 @@ def forget_conversation(session_id: str, *, turn_id: str|None=None, memory_statu
     for t in data.get("turns", []):
         if turn_id is None or t.get("turn_id")==turn_id:
             affected.append(t.get("turn_id")); t["memory_status"]=memory_status; t["user_message"]="[redacted by Steward forget/redaction]"; t["resident_response"]="[redacted by Steward forget/redaction]"
+            for a in t.get("attachments", []) or []:
+                a["redaction_status"] = memory_status
+                a["summary"] = None
     data["memory_status"] = memory_status if turn_id is None else data.get("memory_status","active")
     data["normal_history"]=[t for t in data.get("turns", []) if t.get("memory_status")=="active"]; data["updated_at"]=_now(); path.write_text(json.dumps(data, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     audit={"kind":"resident_conversation_forget_audit","session_id":session_id,"turn_id":turn_id,"affected_turns":affected,"memory_status":memory_status,"reason":reason,"created_at":_now(),"content_preserved_in_normal_history":False}

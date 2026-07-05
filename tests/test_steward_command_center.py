@@ -606,3 +606,30 @@ def test_alfred_chat_endpoint_persists_history_and_refuses_execution_claims(tmp_
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_alfred_chat_ui_includes_multimodal_paste_controls(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+    assert 'id="alfred-pending-attachments"' in html
+    assert 'clipboard_paste' in html
+    assert 'data-remove-attachment' in html
+    assert 'attachmentHtml' in html
+
+
+def test_alfred_chat_endpoint_accepts_attachment_payload(tmp_path):
+    import base64, json, threading
+    from urllib.request import Request, urlopen
+    server = serve_command_center(host="127.0.0.1", port=0, root=tmp_path)
+    try:
+        thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+        host, port = server.server_address
+        png = base64.b64encode(b"\x89PNG\r\n\x1a\nmock").decode("ascii")
+        request = Request(f"http://{host}:{port}/api/residents/alfred/chat", data=json.dumps({"message":"attached", "attachments":[{"kind":"image","mime_type":"image/png","data_base64":png}]}).encode(), headers={"Content-Type":"application/json"}, method="POST")
+        payload = json.loads(urlopen(request, timeout=5).read().decode())
+        assert payload["ok"] is True
+        assert payload["turn"]["attachments"][0]["storage_path"].startswith("runtime/resident_interactions/attachments/alfred/")
+        history = json.loads(urlopen(f"http://{host}:{port}/api/residents/alfred/chat", timeout=5).read().decode())
+        assert history["sessions"][0]["turns"][0]["attachments"][0]["kind"] == "image"
+    finally:
+        server.shutdown(); server.server_close()

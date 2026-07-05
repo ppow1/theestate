@@ -3,11 +3,11 @@
     {
       "classification": "required",
       "command": "python -c \"import json; from pathlib import Path; md=Path('operations/residents/alfred/WP-0127_alfred_operations_center_chat_report.md'); js=Path('runtime/residents/alfred/WP-0127_alfred_operations_center_chat_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); required=['wp_0126_framework_status','alfred_ui_surfaces_changed','endpoint_paths_used','alfred_resident_api_standard_version','alfred_resident_implementation_version','conversation_persistence_path','example_prompt_and_response','authority_and_memory_behavior_shown_to_steward','server_startup_status']; missing=[k for k in required if not data.get(k)]; assert not missing, missing\"",
-      "completed_at": "2026-07-05T21:36:34+00:00",
-      "duration_seconds": 0.092,
+      "completed_at": "2026-07-05T22:08:50+00:00",
+      "duration_seconds": 0.074,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:34+00:00",
+      "started_at": "2026-07-05T22:08:50+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -15,11 +15,11 @@
     {
       "classification": "required",
       "command": "python -c \"from estate.core.steward_command_center import generate_command_center, render_command_center_html; html=render_command_center_html(generate_command_center(write=False)); assert 'id=\\\"alfred-chat-input\\\"' in html; assert 'id=\\\"alfred-chat-send\\\"' in html; assert '/api/residents/alfred/surface' in html\"",
-      "completed_at": "2026-07-05T21:36:35+00:00",
-      "duration_seconds": 1.005,
+      "completed_at": "2026-07-05T22:08:51+00:00",
+      "duration_seconds": 0.839,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:34+00:00",
+      "started_at": "2026-07-05T22:08:50+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -27,11 +27,11 @@
     {
       "classification": "required",
       "command": "python -c \"from estate.core.resident_interaction import process_chat, load_history, resident_surface; import tempfile; root=tempfile.mkdtemp(); p=process_chat('alfred', 'Alfred, what should I look at first?', root=root); assert p['ok']; assert p['turn']['authority']['action_executed'] is False; h=load_history('alfred', session_id=p['session_id'], root=root); assert h['sessions'][0]['turns']; s=resident_surface('alfred', root=root); assert s['resident_api_standard_version']=='resident-api-standard-v1'; assert s['resident_implementation_version']=='alfred-operations-implementation-v1'\"",
-      "completed_at": "2026-07-05T21:36:35+00:00",
-      "duration_seconds": 0.181,
+      "completed_at": "2026-07-05T22:08:51+00:00",
+      "duration_seconds": 0.174,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T21:36:35+00:00",
+      "started_at": "2026-07-05T22:08:51+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -39,68 +39,48 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main validate-work-package --id WP-0126 --json",
-      "completed_at": "2026-07-05T21:36:37+00:00",
-      "duration_seconds": 1.695,
-      "exit_code": 0,
+      "completed_at": "2026-07-05T22:08:53+00:00",
+      "duration_seconds": 1.086,
+      "exit_code": 1,
       "required": true,
-      "started_at": "2026-07-05T21:36:35+00:00",
-      "status": "passed",
+      "started_at": "2026-07-05T22:08:51+00:00",
+      "status": "failed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0127_2026-07-05T213634Z0000/command_04_stdout.txt"
-    },
-    {
-      "classification": "required",
-      "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T21:36:37+00:00",
-      "duration_seconds": 0.395,
-      "exit_code": 0,
-      "required": true,
-      "started_at": "2026-07-05T21:36:37+00:00",
-      "status": "passed",
-      "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0127_2026-07-05T213634Z0000/command_05_stdout.txt"
-    },
-    {
-      "classification": "required",
-      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0127'); assert r['receipt_status']=='complete', r\"",
-      "completed_at": "2026-07-05T21:36:38+00:00",
-      "duration_seconds": 0.106,
-      "exit_code": 0,
-      "required": true,
-      "started_at": "2026-07-05T21:36:37+00:00",
-      "status": "passed",
-      "stderr_excerpt": "",
-      "stdout_excerpt": ""
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0127_2026-07-05T220850Z0000/command_04_stdout.txt"
     }
   ],
   "commands_run": [
     "python -c \"import json; from pathlib import Path; md=Path('operations/residents/alfred/WP-0127_alfred_operations_center_chat_report.md'); js=Path('runtime/residents/alfred/WP-0127_alfred_operations_center_chat_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); required=['wp_0126_framework_status','alfred_ui_surfaces_changed','endpoint_paths_used','alfred_resident_api_standard_version','alfred_resident_implementation_version','conversation_persistence_path','example_prompt_and_response','authority_and_memory_behavior_shown_to_steward','server_startup_status']; missing=[k for k in required if not data.get(k)]; assert not missing, missing\"",
     "python -c \"from estate.core.steward_command_center import generate_command_center, render_command_center_html; html=render_command_center_html(generate_command_center(write=False)); assert 'id=\\\"alfred-chat-input\\\"' in html; assert 'id=\\\"alfred-chat-send\\\"' in html; assert '/api/residents/alfred/surface' in html\"",
     "python -c \"from estate.core.resident_interaction import process_chat, load_history, resident_surface; import tempfile; root=tempfile.mkdtemp(); p=process_chat('alfred', 'Alfred, what should I look at first?', root=root); assert p['ok']; assert p['turn']['authority']['action_executed'] is False; h=load_history('alfred', session_id=p['session_id'], root=root); assert h['sessions'][0]['turns']; s=resident_surface('alfred', root=root); assert s['resident_api_standard_version']=='resident-api-standard-v1'; assert s['resident_implementation_version']=='alfred-operations-implementation-v1'\"",
-    "python -m estate.cli.main validate-work-package --id WP-0126 --json",
-    "python -m estate.cli.main validation-production-readiness --json",
-    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0127'); assert r['receipt_status']=='complete', r\""
+    "python -m estate.cli.main validate-work-package --id WP-0126 --json"
   ],
   "completion_artifact_path": "collaboration/work_packages/completions/WP-0127_codex_done.json",
-  "failures": [],
+  "failures": [
+    "Command failed: python -m estate.cli.main validate-work-package --id WP-0126 --json (exit 1)"
+  ],
   "files_written": [
     "operations/validation/reports/WP-0127_validation.md",
     "runtime/validation/work_packages/WP-0127_validation.json",
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T21:36:34+00:00",
+  "generated_at": "2026-07-05T22:08:50+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "fcbd48a7e5b3c19462d878e5797afc1af925359c",
+  "git_commit_before": "5815f7deeccd7ff3491cc5870dd43d607c308553",
   "production_readiness": {
-    "blocking_reasons": [],
+    "blocking_reasons": [
+      "Execution status blocks readiness: failed."
+    ],
     "coverage_status": "covered",
-    "execution_status": "passed",
+    "execution_status": "failed",
     "non_blocking_findings": [],
-    "production_ready": true,
+    "production_ready": false,
     "receipt_status": "complete",
-    "required_followups": []
+    "required_followups": [
+      "Execution status blocks readiness: failed."
+    ]
   },
   "receipt_gaps": [],
   "receipt_validation": {
@@ -116,11 +96,11 @@
   },
   "recipe_id": "wp-0127-alfred-operations-center-chat",
   "recipe_title": "WP-0127 \u2014 Alfred Operations Center Chat Implementation",
-  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "reviewer_recommendation": "Chief Architect should review failures before approval.",
   "stderr_summary": "Captured stderr for 0 command(s).",
-  "stdout_summary": "Captured stdout for 2 command(s).",
-  "validation_id": "WP-0127_2026-07-05T213634Z0000",
-  "validation_status": "passed",
+  "stdout_summary": "Captured stdout for 1 command(s).",
+  "validation_id": "WP-0127_2026-07-05T220850Z0000",
+  "validation_status": "failed",
   "warnings": [],
   "work_package_id": "WP-0127"
 }

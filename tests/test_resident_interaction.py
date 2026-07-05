@@ -99,3 +99,55 @@ def test_process_chat_falls_back_with_metadata_when_ollama_unavailable(monkeypat
     assert payload["turn"]["llm"]["fallback_used"] is True
     assert "mock Ollama unavailable" in payload["turn"]["llm"]["fallback_reason"]
     assert "Recommended next action" in payload["turn"]["resident_response"]
+
+class MockVisionAdapter:
+    def discover_models(self):
+        return {"available": True, "models": ["llava:latest"], "model": "llava:latest", "vision_capable": True}
+    def summarize_image(self, *, image_path, prompt="", model=None):
+        return {"ok": True, "status": "processed", "summary": "A mocked screenshot summary.", "provider": "ollama", "model": "llava:latest"}
+
+class NoVisionAdapter(MockVisionAdapter):
+    def discover_models(self):
+        return {"available": False, "models": [], "model": None, "vision_capable": False}
+    def summarize_image(self, *, image_path, prompt="", model=None):
+        return {"ok": False, "status": "unavailable", "summary": None, "provider": "none", "model": None, "reason": "no local vision-capable model discovered"}
+
+
+def test_attachment_metadata_image_persistence_and_turn_link(tmp_path):
+    import base64
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\nmock").decode("ascii")
+    payload = process_chat("alfred", "inspect this", root=tmp_path, attachments=[{"kind":"image","source":"clipboard_paste","mime_type":"image/png","original_filename":"screen.png","data_base64":png}], vision_adapter=MockVisionAdapter())
+    att = payload["turn"]["attachments"][0]
+    assert att["attachment_id"] == "attach_0001"
+    assert att["vision_status"] == "processed"
+    assert att["summary"] == "A mocked screenshot summary."
+    assert att["storage_path"].startswith("runtime/resident_interactions/attachments/alfred/")
+    assert (tmp_path / att["storage_path"]).is_file()
+    history = load_history("alfred", session_id=payload["session_id"], root=tmp_path)
+    assert history["sessions"][0]["turns"][0]["attachments"][0]["attachment_id"] == "attach_0001"
+
+
+def test_unsafe_or_unsupported_attachment_payload_rejected(tmp_path):
+    import pytest
+    with pytest.raises(ValueError):
+        process_chat("alfred", "bad", root=tmp_path, attachments=[{"kind":"image","mime_type":"application/pdf","data_base64":"AA=="}])
+
+
+def test_forget_redacts_attachment_summary(tmp_path):
+    import base64
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\nmock").decode("ascii")
+    payload = process_chat("alfred", "secret image", root=tmp_path, attachments=[{"kind":"image","mime_type":"image/png","data_base64":png}], vision_adapter=MockVisionAdapter())
+    forget_conversation(payload["session_id"], root=tmp_path)
+    full = load_history("alfred", session_id=payload["session_id"], root=tmp_path, include_forgotten=True)
+    att = full["sessions"][0]["turns"][0]["attachments"][0]
+    assert att["redaction_status"] == "forgotten"
+    assert att["summary"] is None
+
+
+def test_vision_unavailable_fallback_is_truthful(tmp_path):
+    import base64
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\nmock").decode("ascii")
+    payload = process_chat("alfred", "what is in it?", root=tmp_path, attachments=[{"kind":"image","mime_type":"image/png","data_base64":png}], vision_adapter=NoVisionAdapter())
+    att = payload["turn"]["attachments"][0]
+    assert att["vision_status"] == "unavailable"
+    assert "cannot" in payload["turn"]["resident_response"] or "no local vision" in payload["turn"]["resident_response"] or "no local vision-capable" in payload["turn"]["resident_response"]

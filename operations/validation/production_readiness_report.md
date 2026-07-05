@@ -1,22 +1,25 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T21:36:38+00:00
+- generated_at: 2026-07-05T22:11:48+00:00
 - git branch: work
-- git commit: fcbd48a7e5b3c19462d878e5797afc1af925359c
+- git commit: 5815f7deeccd7ff3491cc5870dd43d607c308553
 
 ## Totals
-- total_work_packages_scanned: 114
-- total_production_ready: 114
-- total_blocked: 0
+- total_work_packages_scanned: 115
+- total_production_ready: 111
+- total_blocked: 4
 - total_missing_recipes: 0
 - total_missing_receipts: 0
 - total_incomplete_receipts: 0
 
 ## Recommended Next Action
-Ready for Chief Architect production-readiness acceptance review.
+Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.
 
 ## Blocking Work Packages
-- None.
+- WP-0123: 
+- WP-0126: Execution status blocks readiness: failed.
+- WP-0127: Execution status blocks readiness: failed.
+- WP-0128: Execution status blocks readiness: failed.
 
 ## Ready for Chief Architect Production-Readiness Acceptance
 - WP-0014
@@ -121,13 +124,13 @@ Ready for Chief Architect production-readiness acceptance review.
 - WP-0114
 
 ## Recent Validation Reports
-- `runtime/validation/work_packages/WP-0127_validation.json`
-- `runtime/validation/work_packages/WP-0126_validation.json`
+- `runtime/validation/work_packages/WP-0129_validation.json`
 - `runtime/validation/work_packages/WP-0128_validation.json`
-- `runtime/validation/work_packages/WP-0123_validation.json`
+- `runtime/validation/work_packages/WP-0126_validation.json`
+- `runtime/validation/work_packages/WP-0127_validation.json`
 - `runtime/validation/work_packages/WP-0119_validation.json`
-- `runtime/validation/work_packages/WP-0110_validation.json`
-- `runtime/validation/work_packages/WP-0108_validation.json`
-- `runtime/validation/work_packages/WP-0080_validation.json`
-- `runtime/validation/work_packages/WP-0020_validation.json`
-- `runtime/validation/work_packages/WP-0121_validation.json`
+- `runtime/validation/work_packages/WP-0106_validation.json`
+- `runtime/validation/work_packages/WP-0107_validation.json`
+- `runtime/validation/work_packages/WP-0109_validation.json`
+- `runtime/validation/work_packages/WP-0125_validation.json`
+- `runtime/validation/work_packages/WP-0124_validation.json`
