@@ -1,0 +1,83 @@
+{
+  "files_changed_to_repair_each_failure": {
+    "WP-0106": [
+      "src/estate/core/work_package_validation.py",
+      "tests/test_work_package_validation.py"
+    ],
+    "WP-0107": [
+      "src/estate/core/work_package_validation.py",
+      "tests/test_work_package_validation.py"
+    ]
+  },
+  "generated_at": "2026-07-05T01:30:35+00:00",
+  "helen_path_status_after_repair": "WP-0106 and WP-0107 now validate successfully and are production-ready; remaining Helen/Alfred path blockers are unrelated historical recipe/receipt gaps listed in remaining_blockers.",
+  "production_readiness_totals_after_wp_0117": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 94,
+    "total_work_packages_scanned": 103
+  },
+  "production_readiness_totals_before_wp_0117": {
+    "total_blocked": 11,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 91,
+    "total_work_packages_scanned": 102
+  },
+  "recommended_next_action": "Address the remaining unrelated historical recipe and receipt gaps: WP-0016, WP-0017, WP-0018, WP-0040, WP-0056, WP-0063, WP-0073, WP-0089, WP-0094.",
+  "remaining_blockers": [
+    "WP-0016",
+    "WP-0017",
+    "WP-0018",
+    "WP-0040",
+    "WP-0056",
+    "WP-0063",
+    "WP-0073",
+    "WP-0089",
+    "WP-0094"
+  ],
+  "repair_touched": {
+    "generated_artifacts": true,
+    "implementation": false,
+    "recipe_commands": true,
+    "tests": true
+  },
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_presence.py tests/test_resident_cards.py tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_cards.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0116 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0102 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0105 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0111 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0114 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0115 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0117",
+  "wp_0106_failure_cause": "The failed pytest recipe command relied on an ambient import path. Reproducing the pytest group without PYTHONPATH produced ModuleNotFoundError: No module named estate during test collection; the CLI smoke checks passed because they were run from a context where estate was importable.",
+  "wp_0106_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0106_2026-07-05T012741Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0107_failure_cause": "The failed pytest recipe command had the same ambient import-path dependency. Reproducing the pytest group without PYTHONPATH produced ModuleNotFoundError: No module named estate via the shared resident-presence test import path; the Alfred CLI smoke checks passed independently.",
+  "wp_0107_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0107_2026-07-05T012747Z0000",
+    "validation_status": "passed"
+  },
+  "wp_0116_validation_result_after_repair": {
+    "production_ready": true,
+    "validation_id": "WP-0116_2026-07-05T012751Z0000",
+    "validation_status": "passed"
+  },
+  "wp_9999_quarantine_status_after_repair": "quarantined_not_promoted"
+}
