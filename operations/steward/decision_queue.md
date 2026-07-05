@@ -1,6 +1,6 @@
 # Steward Decision Queue
 
-Generated: 2026-07-05T18:59:02+00:00
+Generated: 2026-07-05T19:16:44+00:00
 
 Local-only, non-authoritative panel. It does not approve decisions or notify the Steward.
 

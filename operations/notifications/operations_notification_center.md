@@ -2,15 +2,15 @@
 
 Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth.
 
-Generated: 2026-07-05T18:57:49+00:00
+Generated: 2026-07-05T19:16:43+00:00
 Refresh behavior: quiet_refresh_from_local_artifacts
 
 ## Summary
-- total_notification_count: 104
+- total_notification_count: 111
 - filtered_notification_count: 100
-- unavailable_source_count: 8
+- unavailable_source_count: 7
 - locally_acknowledged_count: 0
-- severity_counts: {'critical': 0, 'error': 0, 'warning': 94, 'missing': 0, 'info': 6, 'debug': 0}
+- severity_counts: {'critical': 0, 'error': 0, 'warning': 100, 'missing': 0, 'info': 0, 'debug': 0}
 
 ## Notifications
 - [warning] mailboxes — Example implementation routing message: Example implementation routing message (unacknowledged; source: `collaboration/messages/example_alfred_routing_engine_v1.json`)
@@ -107,9 +107,9 @@ Refresh behavior: quiet_refresh_from_local_artifacts
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] mailboxes — Warning: Warning (unacknowledged; source: `collaboration/mailboxes/index.json`)
-- [info] completions — Completion/review-ready signal: WP-0038 (review_ready; source: `collaboration/work_packages/completions/WP-0038_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0112 (review_ready; source: `collaboration/work_packages/completions/WP-0112_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0125 (review_ready; source: `collaboration/work_packages/completions/WP-0125_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0120 (review_ready; source: `collaboration/work_packages/completions/WP-0120_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0119 (review_ready; source: `collaboration/work_packages/completions/WP-0119_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0121 (review_ready; source: `collaboration/work_packages/completions/WP-0121_codex_done.json`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
+- [warning] service_health — Warning: Provider service field does not exactly match a catalog service id or name; not attached to the matrix. (unacknowledged; source: `runtime/services/service_health_registry.json`)
