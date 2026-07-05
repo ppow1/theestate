@@ -3,47 +3,47 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-presence --json",
-      "completed_at": "2026-07-05T02:42:53+00:00",
-      "duration_seconds": 0.386,
+      "completed_at": "2026-07-05T04:11:39+00:00",
+      "duration_seconds": 0.402,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:42:53+00:00",
+      "started_at": "2026-07-05T04:11:38+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T024253Z0000/command_01_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T041138Z0000/command_01_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-presence --resident Alfred --json",
-      "completed_at": "2026-07-05T02:42:54+00:00",
-      "duration_seconds": 0.378,
+      "completed_at": "2026-07-05T04:11:39+00:00",
+      "duration_seconds": 0.406,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:42:53+00:00",
+      "started_at": "2026-07-05T04:11:39+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T024253Z0000/command_02_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T041138Z0000/command_02_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"import sys; sys.path.insert(0, 'src'); import pytest; raise SystemExit(pytest.main(['tests/test_resident_presence.py', 'tests/test_resident_cards.py', 'tests/test_steward_command_center.py']))\"",
-      "completed_at": "2026-07-05T02:42:57+00:00",
-      "duration_seconds": 3.668,
+      "completed_at": "2026-07-05T04:11:43+00:00",
+      "duration_seconds": 4.034,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:42:54+00:00",
+      "started_at": "2026-07-05T04:11:39+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T024253Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T041138Z0000/command_03_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0106_codex_done.json').is_file()\"",
-      "completed_at": "2026-07-05T02:42:58+00:00",
-      "duration_seconds": 0.095,
+      "completed_at": "2026-07-05T04:11:43+00:00",
+      "duration_seconds": 0.12,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:42:57+00:00",
+      "started_at": "2026-07-05T04:11:43+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -51,26 +51,26 @@
     {
       "classification": "observational",
       "command": "python -m estate.cli.main steward-command-center --json",
-      "completed_at": "2026-07-05T02:42:59+00:00",
-      "duration_seconds": 1.468,
+      "completed_at": "2026-07-05T04:11:45+00:00",
+      "duration_seconds": 1.386,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T02:42:58+00:00",
+      "started_at": "2026-07-05T04:11:43+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T024253Z0000/command_05_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T041138Z0000/command_05_stdout.txt"
     },
     {
       "classification": "observational",
       "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T02:43:00+00:00",
-      "duration_seconds": 0.616,
+      "completed_at": "2026-07-05T04:11:45+00:00",
+      "duration_seconds": 0.593,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T02:42:59+00:00",
+      "started_at": "2026-07-05T04:11:45+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T024253Z0000/command_06_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0106_2026-07-05T041138Z0000/command_06_stdout.txt"
     }
   ],
   "commands_run": [
@@ -89,10 +89,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T02:42:53+00:00",
+  "generated_at": "2026-07-05T04:11:38+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "e245beacfc189c7ae66807a2b28974ef9a8f694f",
+  "git_commit_before": "04a1aeb147602b5a009a3abf42522f54517fd7b1",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -119,7 +119,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 5 command(s).",
-  "validation_id": "WP-0106_2026-07-05T024253Z0000",
+  "validation_id": "WP-0106_2026-07-05T041138Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0106"

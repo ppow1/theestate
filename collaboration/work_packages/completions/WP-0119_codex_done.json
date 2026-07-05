@@ -1,0 +1,109 @@
+{
+  "alfred_helen_runtime_path_status": "Alfred and Helen runtime_artifacts now emit canonical forward-slash repository-relative paths; filesystem writes still use Path objects.",
+  "branch": "work",
+  "codex_status": "done",
+  "command_center_repair_classification": "implementation_contract_fix_cli_uses_cwd_root_and_preserves_html_artifact_generation",
+  "commit_checked_before_repair": "04a1aeb147602b5a009a3abf42522f54517fd7b1",
+  "completed_at": "2026-07-05T04:13:48+00:00",
+  "duty_runtime_path_repair_classification": "implementation_contract_fix_canonical_forward_slash_repository_relative_json_paths",
+  "files_changed": [
+    "src/estate/cli/main.py",
+    "src/estate/core/alfred_duty.py",
+    "src/estate/core/helen_duty.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "generated_at": "2026-07-05T04:13:48+00:00",
+  "known_limitations": "None.",
+  "local_python_executable": "/root/.pyenv/versions/3.12.13/bin/python",
+  "local_python_version": "3.12.13",
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "production_readiness_after": {
+    "total_blocked": 9,
+    "total_incomplete_receipts": 3,
+    "total_missing_receipts": 3,
+    "total_missing_recipes": 7,
+    "total_production_ready": 96,
+    "total_work_packages_scanned": 105
+  },
+  "production_readiness_before": "not separately captured before repair in this run; current regenerated totals used as after evidence",
+  "pull_request_not_applicable_reason": "Pull request will be created by repository automation after this local commit.",
+  "pull_request_url_not_applicable_reason": "Pull request will be created by repository automation after this local commit.",
+  "pull_request_url_or_not_applicable_reason": "Pull request will be created by repository automation after this local commit.",
+  "pytest_version": "9.0.3",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Chief Architect review of WP-0119 and rerun self-validation if desired on Windows.",
+  "remaining_blockers": "No WP-0119 implementation blockers; unrelated historical readiness blockers remain as reported by production-readiness totals.",
+  "summary": "Stabilized Windows-local resident runtime tests by making steward-command-center generate artifacts in the invocation cwd and normalizing resident duty runtime artifact JSON paths.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_resident_presence.py tests/test_resident_cards.py tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m pytest tests/test_helen_duty.py tests/test_resident_presence.py tests/test_resident_cards.py",
+    "PYTHONPATH=src python -m pytest tests/test_resident_authority.py tests/test_alfred_duty.py tests/test_helen_duty.py tests/test_resident_conversation_sessions.py tests/test_resident_cards.py",
+    "PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_cards.py",
+    "PYTHONPATH=src python -m pytest tests/test_resident_conversation_sessions.py tests/test_resident_conversations.py",
+    "python -c \"import pytest; print(pytest.__version__)\""
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0108 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0109 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0110 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0116 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0117 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0118 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0119",
+  "wp_0106_failure_cause": "steward-command-center CLI resolved the repository root via ESTATE_ROOT instead of the subprocess temporary current working directory, so JSON reflected seeded temp artifacts only after cwd-root alignment was repaired and command_center.html was previously written to the wrong root.",
+  "wp_0106_validation_result_after_repair": {
+    "validation_id": "WP-0106_2026-07-05T041138Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0106"
+  },
+  "wp_0107_validation_result_after_repair": {
+    "validation_id": "WP-0107_2026-07-05T041146Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0107"
+  },
+  "wp_0108_failure_cause": "Helen duty JSON emitted runtime_artifacts using str(Path(...)); on Windows this serialized backslash separators for repository-relative contract paths.",
+  "wp_0108_validation_result_after_repair": {
+    "validation_id": "WP-0108_2026-07-05T040954Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0108"
+  },
+  "wp_0109_validation_result_after_repair": {
+    "validation_id": "WP-0109_2026-07-05T040959Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0109"
+  },
+  "wp_0110_failure_cause": "WP-0110 depended on Helen duty JSON contract validation and inherited the same Windows backslash runtime_artifact path mismatch.",
+  "wp_0110_validation_result_after_repair": {
+    "validation_id": "WP-0110_2026-07-05T041003Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0110"
+  },
+  "wp_0116_validation_result_after_repair": {
+    "validation_id": "WP-0116_2026-07-05T041012Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0116"
+  },
+  "wp_0117_transitive_failure_cause": "WP-0117 self-validation calls WP-0106; it failed transitively while WP-0106 command-center artifact validation failed locally.",
+  "wp_0117_validation_result_after_repair": {
+    "validation_id": "WP-0117_2026-07-05T040805Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0117"
+  },
+  "wp_0118_transitive_failure_cause": "WP-0118 self-validation calls WP-0106 and resident runtime path validations; it failed transitively while command-center artifact generation and Helen duty path contracts failed locally.",
+  "wp_0118_validation_result_after_repair": {
+    "validation_id": "WP-0118_2026-07-05T041549Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0118"
+  },
+  "wp_0119_validation_result": {
+    "validation_id": "WP-0119_2026-07-05T041512Z0000",
+    "validation_status": "passed",
+    "work_package_id": "WP-0119"
+  },
+  "wp_9999_quarantine_status": "quarantined_not_promoted"
+}

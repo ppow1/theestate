@@ -194,7 +194,7 @@ def run_helen_duty(root: str | Path | None = None, *, write: bool = True) -> dic
             "summarize": check_authority("Helen", "summarize", root=root, audit=False),
             "execute_work_package": check_authority("Helen", "execute-work-package", root=root, audit=False),
         },
-        "runtime_artifacts": {"duty_state": str(DUTY_STATE_PATH), "audit_log": str(AUDIT_LOG_PATH), "operations_summary": str(OPERATIONS_SUMMARY_PATH), "presence": str(RUNTIME_PATH)},
+        "runtime_artifacts": {"duty_state": DUTY_STATE_PATH.as_posix(), "audit_log": AUDIT_LOG_PATH.as_posix(), "operations_summary": OPERATIONS_SUMMARY_PATH.as_posix(), "presence": RUNTIME_PATH.as_posix()},
     }
     if write:
         _write_json(root / DUTY_STATE_PATH, payload)

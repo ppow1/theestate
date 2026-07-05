@@ -981,7 +981,7 @@ def cmd_steward_command_center(args):
             server.server_close()
         return
 
-    payload = generate_command_center()
+    payload = generate_command_center(Path.cwd())
     if getattr(args, "json", False):
         import json
         print(json.dumps(payload, indent=2, sort_keys=True))

@@ -3,59 +3,59 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main alfred-duty --json",
-      "completed_at": "2026-07-05T02:43:00+00:00",
-      "duration_seconds": 0.418,
+      "completed_at": "2026-07-05T04:11:46+00:00",
+      "duration_seconds": 0.435,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:43:00+00:00",
+      "started_at": "2026-07-05T04:11:46+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T024300Z0000/command_01_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T041146Z0000/command_01_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-duty --resident Alfred --json",
-      "completed_at": "2026-07-05T02:43:01+00:00",
-      "duration_seconds": 0.384,
+      "completed_at": "2026-07-05T04:11:47+00:00",
+      "duration_seconds": 0.45,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:43:00+00:00",
+      "started_at": "2026-07-05T04:11:46+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T024300Z0000/command_02_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T041146Z0000/command_02_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-presence --resident Alfred --json",
-      "completed_at": "2026-07-05T02:43:01+00:00",
-      "duration_seconds": 0.374,
+      "completed_at": "2026-07-05T04:11:47+00:00",
+      "duration_seconds": 0.409,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:43:01+00:00",
+      "started_at": "2026-07-05T04:11:47+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T024300Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T041146Z0000/command_03_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"import sys; sys.path.insert(0, 'src'); import pytest; raise SystemExit(pytest.main(['tests/test_alfred_duty.py', 'tests/test_resident_presence.py', 'tests/test_resident_cards.py']))\"",
-      "completed_at": "2026-07-05T02:43:02+00:00",
-      "duration_seconds": 0.834,
+      "completed_at": "2026-07-05T04:11:48+00:00",
+      "duration_seconds": 0.949,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:43:01+00:00",
+      "started_at": "2026-07-05T04:11:47+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T024300Z0000/command_04_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T041146Z0000/command_04_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0107_codex_done.json').is_file()\"",
-      "completed_at": "2026-07-05T02:43:02+00:00",
-      "duration_seconds": 0.087,
+      "completed_at": "2026-07-05T04:11:48+00:00",
+      "duration_seconds": 0.11,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T02:43:02+00:00",
+      "started_at": "2026-07-05T04:11:48+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -63,26 +63,26 @@
     {
       "classification": "observational",
       "command": "python -m estate.cli.main steward-command-center --json",
-      "completed_at": "2026-07-05T02:43:03+00:00",
-      "duration_seconds": 1.302,
+      "completed_at": "2026-07-05T04:11:49+00:00",
+      "duration_seconds": 1.348,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T02:43:02+00:00",
+      "started_at": "2026-07-05T04:11:48+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T024300Z0000/command_06_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T041146Z0000/command_06_stdout.txt"
     },
     {
       "classification": "observational",
       "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T02:43:04+00:00",
+      "completed_at": "2026-07-05T04:11:50+00:00",
       "duration_seconds": 0.562,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T02:43:03+00:00",
+      "started_at": "2026-07-05T04:11:49+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T024300Z0000/command_07_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0107_2026-07-05T041146Z0000/command_07_stdout.txt"
     }
   ],
   "commands_run": [
@@ -102,10 +102,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T02:43:00+00:00",
+  "generated_at": "2026-07-05T04:11:46+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "e245beacfc189c7ae66807a2b28974ef9a8f694f",
+  "git_commit_before": "04a1aeb147602b5a009a3abf42522f54517fd7b1",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -132,7 +132,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 6 command(s).",
-  "validation_id": "WP-0107_2026-07-05T024300Z0000",
+  "validation_id": "WP-0107_2026-07-05T041146Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0107"
