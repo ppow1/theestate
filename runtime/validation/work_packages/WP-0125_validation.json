@@ -1,0 +1,139 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; charter=Path('operations/departments/engineering/engineering_department_charter.md'); guide=Path('operations/departments/engineering/engineering_department_operating_guide.md'); handoff=Path('operations/departments/engineering/cuemastery_execution_handoff.md'); report=Path('operations/departments/engineering/WP-0125_engineering_department_establishment_report.md'); status=Path('runtime/departments/engineering/WP-0125_engineering_department_status.json'); data=json.loads(Path('runtime/departments/engineering/WP-0125_engineering_department_establishment_report.json').read_text(encoding='utf-8')); assert charter.is_file() and guide.is_file() and handoff.is_file() and report.is_file() and status.is_file(); ct=charter.read_text(encoding='utf-8').lower(); gt=guide.read_text(encoding='utf-8').lower(); ht=handoff.read_text(encoding='utf-8').lower(); assert 'cuemastery' in ct and 'initial primary objective' in ct; assert 'work package' in gt and 'validation' in gt; assert 'immediate engineering discovery steps' in ht and 'cuemastery' in ht; assert data.get('alfred_helen_status') and data.get('precondition_status'); assert all(k in data.get('precondition_status', {}) for k in ['WP-0121','WP-0122','WP-0123','WP-0124']); assert data.get('wp_9999_status',{}).get('promoted') is False\"",
+      "completed_at": "2026-07-05T16:02:41+00:00",
+      "duration_seconds": 0.071,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:02:41+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "completed_at": "2026-07-05T16:02:41+00:00",
+      "duration_seconds": 0.386,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:02:41+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0125_2026-07-05T160241Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0121 --json",
+      "completed_at": "2026-07-05T16:02:42+00:00",
+      "duration_seconds": 0.928,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:02:41+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0125_2026-07-05T160241Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0122 --json",
+      "completed_at": "2026-07-05T16:03:05+00:00",
+      "duration_seconds": 23.157,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:02:42+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0125_2026-07-05T160241Z0000/command_04_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0123 --json",
+      "completed_at": "2026-07-05T16:03:47+00:00",
+      "duration_seconds": 41.665,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:03:05+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0125_2026-07-05T160241Z0000/command_05_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -m estate.cli.main validate-work-package --id WP-0124 --json",
+      "completed_at": "2026-07-05T16:04:55+00:00",
+      "duration_seconds": 68.119,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:03:47+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0125_2026-07-05T160241Z0000/command_06_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0125'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-05T16:04:55+00:00",
+      "duration_seconds": 0.103,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-05T16:04:55+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "python -c \"import json; from pathlib import Path; charter=Path('operations/departments/engineering/engineering_department_charter.md'); guide=Path('operations/departments/engineering/engineering_department_operating_guide.md'); handoff=Path('operations/departments/engineering/cuemastery_execution_handoff.md'); report=Path('operations/departments/engineering/WP-0125_engineering_department_establishment_report.md'); status=Path('runtime/departments/engineering/WP-0125_engineering_department_status.json'); data=json.loads(Path('runtime/departments/engineering/WP-0125_engineering_department_establishment_report.json').read_text(encoding='utf-8')); assert charter.is_file() and guide.is_file() and handoff.is_file() and report.is_file() and status.is_file(); ct=charter.read_text(encoding='utf-8').lower(); gt=guide.read_text(encoding='utf-8').lower(); ht=handoff.read_text(encoding='utf-8').lower(); assert 'cuemastery' in ct and 'initial primary objective' in ct; assert 'work package' in gt and 'validation' in gt; assert 'immediate engineering discovery steps' in ht and 'cuemastery' in ht; assert data.get('alfred_helen_status') and data.get('precondition_status'); assert all(k in data.get('precondition_status', {}) for k in ['WP-0121','WP-0122','WP-0123','WP-0124']); assert data.get('wp_9999_status',{}).get('promoted') is False\"",
+    "python -m estate.cli.main validation-production-readiness --json",
+    "python -m estate.cli.main validate-work-package --id WP-0121 --json",
+    "python -m estate.cli.main validate-work-package --id WP-0122 --json",
+    "python -m estate.cli.main validate-work-package --id WP-0123 --json",
+    "python -m estate.cli.main validate-work-package --id WP-0124 --json",
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0125'); assert r['receipt_status']=='complete', r\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0125_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0125_validation.md",
+    "runtime/validation/work_packages/WP-0125_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-05T16:02:41+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "65e19af67be3c9e8b961fb3e238b34b0cf4a19b9",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0125_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0125"
+  },
+  "recipe_id": "wp-0125-engineering-department-establishment",
+  "recipe_title": "WP-0125 \u2014 Estate Engineering Department for CueMastery Execution",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 5 command(s).",
+  "validation_id": "WP-0125_2026-07-05T160241Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0125"
+}

@@ -2,7 +2,7 @@
 
 Read-only aggregation from existing Estate artifacts; not a notification transport or source of truth.
 
-Generated: 2026-07-05T15:43:50+00:00
+Generated: 2026-07-05T16:04:51+00:00
 Refresh behavior: quiet_refresh_from_local_artifacts
 
 ## Summary
@@ -107,9 +107,9 @@ Refresh behavior: quiet_refresh_from_local_artifacts
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] validation — Warning: Input artifact is unavailable. (unacknowledged; source: `runtime/validation/local_operational_validation_run.json`)
 - [warning] mailboxes — Warning: Warning (unacknowledged; source: `collaboration/mailboxes/index.json`)
-- [info] completions — Completion/review-ready signal: WP-0079 (review_ready; source: `collaboration/work_packages/completions/WP-0079_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0104 (review_ready; source: `collaboration/work_packages/completions/WP-0104_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0093 (review_ready; source: `collaboration/work_packages/completions/WP-0093_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0096 (review_ready; source: `collaboration/work_packages/completions/WP-0096_codex_done.json`)
-- [info] completions — Completion/review-ready signal: WP-0108 (review_ready; source: `collaboration/work_packages/completions/WP-0108_codex_done.json`)
 - [info] completions — Completion/review-ready signal: WP-0113 (review_ready; source: `collaboration/work_packages/completions/WP-0113_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0125 (review_ready; source: `collaboration/work_packages/completions/WP-0125_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0120 (review_ready; source: `collaboration/work_packages/completions/WP-0120_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0117 (review_ready; source: `collaboration/work_packages/completions/WP-0117_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0118 (review_ready; source: `collaboration/work_packages/completions/WP-0118_codex_done.json`)
+- [info] completions — Completion/review-ready signal: WP-0119 (review_ready; source: `collaboration/work_packages/completions/WP-0119_codex_done.json`)

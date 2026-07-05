@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-05T15:43:50Z
+Generated: 2026-07-05T16:04:51Z
 
 ## Summary
 
-- Work packages: 118
+- Work packages: 119
 - Blocked: 0
-- Unassigned: 118
-- Warnings: 118
+- Unassigned: 119
+- Warnings: 119
 
 ## Queue
 
@@ -19,7 +19,6 @@ Generated: 2026-07-05T15:43:50Z
 | [WP-0108](../../collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0108_SERIES_helen_online_duty_runner.md` and do exactly what it says. |
 | [WP-0110](../../collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0110_SERIES_resident_action_authority_boundary.md` and do exactly what it says. |
 | [WP-0112](../../collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md) | SERIES | unassigned | pending | None | None | Read `collaboration/work_packages/pending/WP-0112_SERIES_parallel_workstream_isolation_and_install_handoff.md` and do exactly what it says. |
-| [WP-0125](../../collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md) | SERIES | unassigned | pending | None | None | Read collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md and do exactly what it says. |
 | [WP-LEAP-001](../../collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md) | UNKNOWN | unassigned | open | None | None | Review work package and execute the stated mission. |
 | [WP-0014](../../collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md) | SERIES | unassigned | completed | None | None | Review work package and execute the stated mission. |
 | [WP-0015](../../collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md) | SERIES | unassigned | completed | None | None | Review work package and execute the stated mission. |
@@ -131,6 +130,8 @@ Generated: 2026-07-05T15:43:50Z
 | [WP-0122](../../collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md and do exactly what it says. |
 | [WP-0123](../../collaboration/work_packages/pending/WP-0123_SERIES_bring_helen_online_via_alfred_or_manual_onboarding.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0123_SERIES_bring_helen_online_via_alfred_or_manual_onboarding.md and do exactly what it says. |
 | [WP-0124](../../collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md and do exactly what it says. |
+| [WP-0125](../../collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md and do exactly what it says. |
+| [WP-0125](../../collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md and do exactly what it says. |
 
 ## Warnings
 
@@ -250,5 +251,6 @@ Generated: 2026-07-05T15:43:50Z
 - missing_owner: WP-0122 has no explicit owner. (collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md)
 - missing_owner: WP-0123 has no explicit owner. (collaboration/work_packages/pending/WP-0123_SERIES_bring_helen_online_via_alfred_or_manual_onboarding.md)
 - missing_owner: WP-0124 has no explicit owner. (collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md)
+- missing_owner: WP-0125 has no explicit owner. (collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md)
 - missing_owner: WP-0125 has no explicit owner. (collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)

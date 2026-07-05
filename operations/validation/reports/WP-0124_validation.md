@@ -1,20 +1,20 @@
 # Work Package Validation Report — WP-0124
 
-- Timestamp: 2026-07-05T15:43:06+00:00
+- Timestamp: 2026-07-05T16:03:47+00:00
 - Work package ID: WP-0124
 - Local branch: work
-- Git commit: 97340a973988a132422a221c600ea05b921a8076
+- Git commit: 65e19af67be3c9e8b961fb3e238b34b0cf4a19b9
 - Validation status: passed
 - Recipe used: wp-0124-helen-led-chief-architect-5-hiring-onboarding
 - Recipe title: WP-0124 — Helen-Led Chief Architect #5 Hiring and Onboarding
 
 ## Commands Run
-- `python -c "import json; from pathlib import Path; md=Path('operations/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.md'); js=Path('runtime/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.json'); packet=Path('docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); assert packet.is_file(); identity=data.get('chief_architect_5_identity_assignment',{}); mailbox=data.get('mailbox_assignment',{}); assert identity.get('employee_id') == 8 and identity.get('role_title') == 'Chief Architect #5'; assert mailbox.get('mailbox_id') == 8 and mailbox.get('mailbox_path') == 'collaboration/mailboxes/0008'; assert data.get('helen_performed_or_orchestrated_hire') is True; assert Path(data.get('communication_notice_path', '')).is_file(); assert Path(data.get('audit_runtime_record_path', '')).is_file()"` — passed (exit 0, 0.062s)
-- `python -c "import json; from pathlib import Path; personnel=json.loads(Path('data/registry/personnel.json').read_text(encoding='utf-8')); ca5=[p for p in personnel if p.get('employee_id')==8 and p.get('display_name')=='Chief Architect #5' and p.get('mailbox_id')==8]; assert ca5; assert Path('collaboration/mailboxes/0008/inbox').is_dir(); assert Path('collaboration/mailboxes/0008/sent').is_dir(); assert Path('collaboration/mailboxes/0008/archive').is_dir()"` — passed (exit 0, 0.055s)
-- `python -m estate.cli.main validate-work-package --id WP-0122 --json` — passed (exit 0, 17.205s)
-- `python -m estate.cli.main validate-work-package --id WP-0123 --json` — passed (exit 0, 29.759s)
-- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.282s)
-- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0124'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.069s)
+- `python -c "import json; from pathlib import Path; md=Path('operations/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.md'); js=Path('runtime/onboarding/WP-0124_chief_architect_5_hiring_onboarding_report.json'); packet=Path('docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); assert packet.is_file(); identity=data.get('chief_architect_5_identity_assignment',{}); mailbox=data.get('mailbox_assignment',{}); assert identity.get('employee_id') == 8 and identity.get('role_title') == 'Chief Architect #5'; assert mailbox.get('mailbox_id') == 8 and mailbox.get('mailbox_path') == 'collaboration/mailboxes/0008'; assert data.get('helen_performed_or_orchestrated_hire') is True; assert Path(data.get('communication_notice_path', '')).is_file(); assert Path(data.get('audit_runtime_record_path', '')).is_file()"` — passed (exit 0, 0.075s)
+- `python -c "import json; from pathlib import Path; personnel=json.loads(Path('data/registry/personnel.json').read_text(encoding='utf-8')); ca5=[p for p in personnel if p.get('employee_id')==8 and p.get('display_name')=='Chief Architect #5' and p.get('mailbox_id')==8]; assert ca5; assert Path('collaboration/mailboxes/0008/inbox').is_dir(); assert Path('collaboration/mailboxes/0008/sent').is_dir(); assert Path('collaboration/mailboxes/0008/archive').is_dir()"` — passed (exit 0, 0.073s)
+- `python -m estate.cli.main validate-work-package --id WP-0122 --json` — passed (exit 0, 25.737s)
+- `python -m estate.cli.main validate-work-package --id WP-0123 --json` — passed (exit 0, 41.452s)
+- `python -m estate.cli.main validation-production-readiness --json` — passed (exit 0, 0.391s)
+- `python -c "from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0124'); assert r['receipt_status']=='complete', r"` — passed (exit 0, 0.098s)
 
 ## Findings
 - None.

@@ -1,22 +1,22 @@
 # Production Readiness Report
 
-- generated_at: 2026-07-05T15:43:54+00:00
+- generated_at: 2026-07-05T16:04:55+00:00
 - git branch: work
-- git commit: 97340a973988a132422a221c600ea05b921a8076
+- git commit: 65e19af67be3c9e8b961fb3e238b34b0cf4a19b9
 
 ## Totals
 - total_work_packages_scanned: 111
-- total_production_ready: 110
-- total_blocked: 1
-- total_missing_recipes: 1
-- total_missing_receipts: 1
+- total_production_ready: 111
+- total_blocked: 0
+- total_missing_recipes: 0
+- total_missing_receipts: 0
 - total_incomplete_receipts: 0
 
 ## Recommended Next Action
-Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.
+Ready for Chief Architect production-readiness acceptance review.
 
 ## Blocking Work Packages
-- WP-0125: Completion artifact is missing.; Execution status blocks readiness: no_recipe.
+- None.
 
 ## Ready for Chief Architect Production-Readiness Acceptance
 - WP-0014
@@ -121,7 +121,6 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - WP-0114
 
 ## Recent Validation Reports
-- `runtime/validation/work_packages/WP-0124_validation.json`
 - `runtime/validation/work_packages/WP-0123_validation.json`
 - `runtime/validation/work_packages/WP-0122_validation.json`
 - `runtime/validation/work_packages/WP-0121_validation.json`
@@ -131,3 +130,4 @@ Resolve blocking receipt, recipe, and validation gaps before CA production-readi
 - `runtime/validation/work_packages/WP-0107_validation.json`
 - `runtime/validation/work_packages/WP-0106_validation.json`
 - `runtime/validation/work_packages/WP-0108_validation.json`
+- `runtime/validation/work_packages/WP-0080_validation.json`

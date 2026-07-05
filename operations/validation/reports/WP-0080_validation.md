@@ -1,17 +1,17 @@
 # Work Package Validation Report — WP-0080
 
-- Timestamp: 2026-07-05T15:43:27+00:00
+- Timestamp: 2026-07-05T16:04:18+00:00
 - Work package ID: WP-0080
 - Local branch: work
-- Git commit: 97340a973988a132422a221c600ea05b921a8076
+- Git commit: 65e19af67be3c9e8b961fb3e238b34b0cf4a19b9
 - Validation status: passed
 - Recipe used: wp-0080-helen-employee-onboarding-orchestrator
 - Recipe title: WP-0080 — Helen Employee Onboarding Orchestrator
 
 ## Commands Run
-- `python -m estate.cli.main onboarding-manifest-check --json` — passed (exit 0, 0.204s)
-- `python -m estate.cli.main helen-onboard --help` — passed (exit 0, 0.197s)
-- `python -m estate.cli.main global-search "Helen" --json` — passed (exit 0, 0.359s)
+- `python -m estate.cli.main onboarding-manifest-check --json` — passed (exit 0, 0.297s)
+- `python -m estate.cli.main helen-onboard --help` — passed (exit 0, 0.302s)
+- `python -m estate.cli.main global-search "Helen" --json` — passed (exit 0, 0.522s)
 
 ## Findings
 - None.
