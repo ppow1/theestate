@@ -68,6 +68,7 @@ from estate.core.resident_conversation_sessions import create_session, list_sess
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
+from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def _repo_path(rel):
@@ -111,6 +112,32 @@ def print_table(items, fields):
         return
     for item in items:
         print(" | ".join(str(item.get(field, "")) for field in fields))
+
+
+def cmd_resident_chat(args):
+    if args.action == "send":
+        payload = process_chat(args.resident, args.message, session_id=args.session, action=args.resident_action or "summarize")
+    elif args.action == "history":
+        payload = load_history(args.resident, session_id=args.session, include_forgotten=args.include_forgotten)
+    else:
+        payload = forget_conversation(args.session, turn_id=args.turn, memory_status=args.memory_status, reason=args.reason)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+
+def cmd_resident_interaction_surface(args):
+    payload = resident_surface(args.resident)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"{payload['resident_display_name']} ({payload['resident_id']})")
+        print(f"API standard: {payload['resident_api_standard_version']}")
+        print(f"Implementation: {payload['resident_implementation_version']}")
+        print("Capabilities:")
+        for cap in payload.get('capabilities', []):
+            print(f"- {cap.get('id')} | {cap.get('implementation_status')} | {cap.get('authority_category')} | approval={cap.get('required_approval_level')}")
+        print(f"Extensions: {payload['extension_mechanism']['proposal_template']}")
 
 def cmd_change(args):
     ec_id = create_change(args.title, args.summary, args.status, args.classification)
@@ -1725,6 +1752,25 @@ def main():
     p.add_argument("--canonical-link", action="append", help="Canonical follow-up artifact link")
     p.add_argument("--json", action="store_true", help="Print resident conversation JSON")
     p.set_defaults(func=cmd_resident_conversation)
+
+
+    p = sub.add_parser("resident-chat", help="Send, list, or forget local resident interaction chat")
+    p.add_argument("action", choices=["send", "history", "forget"], help="Chat action")
+    p.add_argument("--resident", default="alfred", help="Resident id or name")
+    p.add_argument("--message", default="", help="Steward message for send")
+    p.add_argument("--session", help="Resident interaction session id")
+    p.add_argument("--turn", help="Turn id to forget/redact")
+    p.add_argument("--memory-status", default="forgotten", choices=["forgotten", "redacted"], help="Forget/redaction marker")
+    p.add_argument("--reason", default="Steward-directed forget/redaction", help="Audit reason")
+    p.add_argument("--action", dest="resident_action", help="Requested resident action category")
+    p.add_argument("--include-forgotten", action="store_true", help="Include forgotten/redacted content placeholders in history")
+    p.add_argument("--json", action="store_true", help="Print resident chat JSON")
+    p.set_defaults(func=cmd_resident_chat)
+
+    p = sub.add_parser("resident-interaction-surface", help="Inspect resident API/surface")
+    p.add_argument("--resident", required=True, help="Resident id or name")
+    p.add_argument("--json", action="store_true", help="Print surface JSON")
+    p.set_defaults(func=cmd_resident_interaction_surface)
 
     p = sub.add_parser("operations-center", help="Start, inspect, or stop the local Operations Center server")
     p.add_argument("action", choices=["start", "status", "stop"], help="Server lifecycle action")

@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-05T16:04:51Z
+Generated: 2026-07-05T18:59:02Z
 
 ## Summary
 
-- Work packages: 119
+- Work packages: 120
 - Blocked: 0
-- Unassigned: 119
-- Warnings: 119
+- Unassigned: 120
+- Warnings: 120
 
 ## Queue
 
@@ -132,6 +132,7 @@ Generated: 2026-07-05T16:04:51Z
 | [WP-0124](../../collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md and do exactly what it says. |
 | [WP-0125](../../collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md and do exactly what it says. |
 | [WP-0125](../../collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md and do exactly what it says. |
+| [WP-0126](../../collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md and do exactly what it says. |
 
 ## Warnings
 
@@ -253,4 +254,5 @@ Generated: 2026-07-05T16:04:51Z
 - missing_owner: WP-0124 has no explicit owner. (collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md)
 - missing_owner: WP-0125 has no explicit owner. (collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md)
 - missing_owner: WP-0125 has no explicit owner. (collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md)
+- missing_owner: WP-0126 has no explicit owner. (collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)

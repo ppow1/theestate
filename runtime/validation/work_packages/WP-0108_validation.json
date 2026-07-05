@@ -3,59 +3,59 @@
     {
       "classification": "required",
       "command": "python -m estate.cli.main helen-duty --json",
-      "completed_at": "2026-07-05T16:04:20+00:00",
-      "duration_seconds": 0.298,
+      "completed_at": "2026-07-05T18:57:17+00:00",
+      "duration_seconds": 0.279,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T16:04:20+00:00",
+      "started_at": "2026-07-05T18:57:16+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T160420Z0000/command_01_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T185716Z0000/command_01_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-duty --resident Helen --json",
-      "completed_at": "2026-07-05T16:04:20+00:00",
-      "duration_seconds": 0.291,
+      "completed_at": "2026-07-05T18:57:17+00:00",
+      "duration_seconds": 0.274,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T16:04:20+00:00",
+      "started_at": "2026-07-05T18:57:17+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T160420Z0000/command_02_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T185716Z0000/command_02_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -m estate.cli.main resident-presence --resident Helen --json",
-      "completed_at": "2026-07-05T16:04:21+00:00",
-      "duration_seconds": 0.288,
+      "completed_at": "2026-07-05T18:57:17+00:00",
+      "duration_seconds": 0.279,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T16:04:20+00:00",
+      "started_at": "2026-07-05T18:57:17+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T160420Z0000/command_03_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T185716Z0000/command_03_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"import sys; sys.path.insert(0, 'src'); import pytest; raise SystemExit(pytest.main(['tests/test_helen_duty.py', 'tests/test_resident_presence.py', 'tests/test_resident_cards.py']))\"",
-      "completed_at": "2026-07-05T16:04:22+00:00",
-      "duration_seconds": 0.877,
+      "completed_at": "2026-07-05T18:57:18+00:00",
+      "duration_seconds": 0.861,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T16:04:21+00:00",
+      "started_at": "2026-07-05T18:57:17+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T160420Z0000/command_04_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T185716Z0000/command_04_stdout.txt"
     },
     {
       "classification": "required",
       "command": "python -c \"from pathlib import Path; assert Path('collaboration/work_packages/completions/WP-0108_codex_done.json').is_file()\"",
-      "completed_at": "2026-07-05T16:04:22+00:00",
-      "duration_seconds": 0.071,
+      "completed_at": "2026-07-05T18:57:18+00:00",
+      "duration_seconds": 0.067,
       "exit_code": 0,
       "required": true,
-      "started_at": "2026-07-05T16:04:22+00:00",
+      "started_at": "2026-07-05T18:57:18+00:00",
       "status": "passed",
       "stderr_excerpt": "",
       "stdout_excerpt": ""
@@ -63,26 +63,26 @@
     {
       "classification": "observational",
       "command": "python -m estate.cli.main steward-command-center --json",
-      "completed_at": "2026-07-05T16:04:23+00:00",
-      "duration_seconds": 1.04,
+      "completed_at": "2026-07-05T18:57:19+00:00",
+      "duration_seconds": 0.938,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T16:04:22+00:00",
+      "started_at": "2026-07-05T18:57:18+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T160420Z0000/command_06_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T185716Z0000/command_06_stdout.txt"
     },
     {
       "classification": "observational",
       "command": "python -m estate.cli.main validation-production-readiness --json",
-      "completed_at": "2026-07-05T16:04:23+00:00",
-      "duration_seconds": 0.495,
+      "completed_at": "2026-07-05T18:57:20+00:00",
+      "duration_seconds": 0.406,
       "exit_code": 0,
       "required": false,
-      "started_at": "2026-07-05T16:04:23+00:00",
+      "started_at": "2026-07-05T18:57:19+00:00",
       "status": "passed",
       "stderr_excerpt": "",
-      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T160420Z0000/command_07_stdout.txt"
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0108_2026-07-05T185716Z0000/command_07_stdout.txt"
     }
   ],
   "commands_run": [
@@ -102,10 +102,10 @@
     "runtime/validation/work_packages/latest.json"
   ],
   "findings": [],
-  "generated_at": "2026-07-05T16:04:20+00:00",
+  "generated_at": "2026-07-05T18:57:16+00:00",
   "git_branch": "work",
   "git_commit_after": null,
-  "git_commit_before": "65e19af67be3c9e8b961fb3e238b34b0cf4a19b9",
+  "git_commit_before": "cf8e598f2cfe9ce7f4000fd9c6052d6a0f5d0e0f",
   "production_readiness": {
     "blocking_reasons": [],
     "coverage_status": "covered",
@@ -132,7 +132,7 @@
   "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
   "stderr_summary": "Captured stderr for 0 command(s).",
   "stdout_summary": "Captured stdout for 6 command(s).",
-  "validation_id": "WP-0108_2026-07-05T160420Z0000",
+  "validation_id": "WP-0108_2026-07-05T185716Z0000",
   "validation_status": "passed",
   "warnings": [],
   "work_package_id": "WP-0108"

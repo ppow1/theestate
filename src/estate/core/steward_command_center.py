@@ -27,6 +27,8 @@ from estate.core.operations_notification_center import generate_operations_notif
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
+from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation
+from urllib.parse import urlparse
 
 
 OFFICE_NAVIGATION = [
@@ -1896,6 +1898,30 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 self.end_headers()
                 self.wfile.write(body)
                 return
-            self.send_error(404, "Command center only serves the local dashboard.")
+            parsed = urlparse(self.path)
+            parts = [p for p in parsed.path.split("/") if p]
+            if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "surface":
+                body = json.dumps(resident_surface(parts[2], root=root), indent=2, sort_keys=True).encode("utf-8")
+                self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
+            if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
+                body = json.dumps(load_history(parts[2], root=root), indent=2, sort_keys=True).encode("utf-8")
+                self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
+            self.send_error(404, "Command center only serves the local dashboard and local resident APIs.")
+
+        def do_POST(self):
+            parsed = urlparse(self.path); parts = [p for p in parsed.path.split("/") if p]
+            length = int(self.headers.get("Content-Length", "0") or "0")
+            try:
+                data = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            except Exception:
+                data = {}
+            if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
+                payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root)
+            elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "forget":
+                payload = forget_conversation(data.get("session_id") or "", turn_id=data.get("turn_id"), memory_status=data.get("memory_status") or "forgotten", reason=data.get("reason") or "Steward-directed redaction", root=root)
+            else:
+                self.send_error(404, "Unknown local resident API endpoint."); return
+            body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
+            self.send_response(200 if payload.get("ok", True) else 400); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
 
     return ThreadingHTTPServer((host, port), Handler)

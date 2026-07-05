@@ -1,0 +1,145 @@
+{
+  "api_server_endpoints_added": [
+    "GET /api/residents/{resident_id}/surface",
+    "GET /api/residents/{resident_id}/chat",
+    "POST /api/residents/{resident_id}/chat",
+    "POST /api/residents/{resident_id}/forget"
+  ],
+  "authority_handling": "resident_authority.check_authority is called for each chat turn; action_executed remains false unless future authorized implementation explicitly changes it.",
+  "character_development_engineer_extensibility_example": "Capability/behavior id character.mood_arc.evaluate and field interaction_profile.mood_arc are represented as planned extension examples without implementation.",
+  "conversation_demo": {
+    "llm_discovery": {
+      "available": false,
+      "discovery": "ollama executable not found; deterministic fallback available",
+      "intended_mode": "local_llm",
+      "model": null,
+      "provider": "none"
+    },
+    "ok": true,
+    "session_id": "alfred_steward_20260705_001",
+    "session_path": "runtime/resident_interactions/sessions/alfred_steward_20260705_001.json",
+    "turn": {
+      "authority": {
+        "action_executed": false,
+        "action_requested": false,
+        "authority_reference": "src/estate/core/resident_authority.py",
+        "authority_status": "within_responsibility",
+        "decision": "allowed"
+      },
+      "context_used": [
+        "operations/residents/surfaces/alfred.json",
+        "src/estate/core/resident_authority.py"
+      ],
+      "created_at": "2026-07-05T18:52:46+00:00",
+      "llm": {
+        "mode": "deterministic_fallback",
+        "model": null,
+        "provider": "none"
+      },
+      "memory_status": "active",
+      "participant_role": "Steward",
+      "resident_display_name": "Alfred",
+      "resident_id": "alfred",
+      "resident_response": "Alfred received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: WP-0126 demonstration prompt",
+      "resident_surface": {
+        "allowed_capabilities": [
+          "conversation.respond",
+          "operations.route_work.propose",
+          "character.mood_arc.evaluate"
+        ],
+        "resident_api_standard_version": "resident-api-standard-v1",
+        "resident_implementation_version": "alfred-operations-implementation-v1",
+        "surface_reference": "operations/residents/surfaces/alfred.json"
+      },
+      "session_id": "alfred_steward_20260705_001",
+      "turn_id": "turn_0001",
+      "user_message": "WP-0126 demonstration prompt"
+    }
+  },
+  "conversation_persistence_path": "runtime/resident_interactions/sessions",
+  "current_git_commit": "cf8e598f2cfe9ce7f4000fd9c6052d6a0f5d0e0f",
+  "deterministic_fallback_status": "implemented and used when no reachable local Ollama model is discovered",
+  "forget_redaction_mechanism": "estate.core.resident_interaction.forget_conversation marks sessions/turns forgotten or redacted, replaces content with redaction placeholders in full audit, suppresses from normal_history, and appends runtime/resident_interactions/forget_audit.jsonl",
+  "known_limitations": [
+    "Local LLM execution is adapter/discovery ready; this Codex environment may use deterministic fallback when Ollama/model is not reachable.",
+    "WP-0127 remains responsible for polished Alfred front-door UI."
+  ],
+  "local_llm_adapter_discovery_status": {
+    "available": false,
+    "discovery": "ollama executable not found; deterministic fallback available",
+    "intended_mode": "local_llm",
+    "model": null,
+    "provider": "none"
+  },
+  "recommended_next_action": "WP-0127 Alfred UI/chat implementation",
+  "resident_api_standard_versioning_mechanism": "Surface artifacts and turn records report resident_api_standard_version; current common contract is resident-api-standard-v1.",
+  "resident_api_surface_extension_mechanism": "docs/operations/residents/resident_api_extension_proposal_template.md plus operations/residents/surfaces/{resident}.json capability records with version and authority fields.",
+  "resident_api_surface_inspection_path": "CLI: PYTHONPATH=src python -m estate.cli.main resident-interaction-surface --resident alfred --json; endpoint: GET /api/residents/{resident_id}/surface",
+  "resident_implementation_versioning_mechanism": "Resident profile/surface reports resident_implementation_version; Alfred current is alfred-operations-implementation-v1.",
+  "resident_interaction_architecture_implemented": "Operations Center UI/API -> resident_interaction service -> surface resolver -> resident-api-standard-v1 -> resident implementation profile -> local LLM discovery with deterministic fallback -> authority check -> persisted turn.",
+  "residents_supported": [
+    "Alfred",
+    "Helen",
+    "Ingrid",
+    "Chief Architect #5",
+    "Character Development Engineer",
+    "future residents"
+  ],
+  "surface_demo": {
+    "capabilities": [
+      {
+        "authority_category": "conversation_only",
+        "backing": "estate.core.resident_interaction.process_chat",
+        "description": "Generate local response to Steward input.",
+        "id": "conversation.respond",
+        "implementation_status": "implemented",
+        "label": "Respond in conversation",
+        "owning_office": "Office of Operations",
+        "required_approval_level": "none",
+        "version_introduced": "resident-api-standard-v1"
+      },
+      {
+        "authority_category": "proposed_action",
+        "backing": "authority metadata only",
+        "description": "Prepare routing recommendations without executing work packages.",
+        "id": "operations.route_work.propose",
+        "implementation_status": "implemented",
+        "label": "Propose work routing",
+        "owning_office": "Office of Operations",
+        "required_approval_level": "steward_for_execution",
+        "version_introduced": "alfred-operations-implementation-v1"
+      },
+      {
+        "authority_category": "behavior_extension",
+        "backing": "extension proposal required",
+        "description": "Future Character Development Engineer extension example; not implemented.",
+        "id": "character.mood_arc.evaluate",
+        "implementation_status": "planned",
+        "label": "Evaluate character mood arc",
+        "owning_office": "Office of Character Development",
+        "required_approval_level": "chief_architect_or_steward_review",
+        "version_introduced": "future-proposal"
+      }
+    ],
+    "chat_endpoints": {
+      "forget": "POST /api/residents/{resident_id}/forget",
+      "get": "GET /api/residents/{resident_id}/chat",
+      "post": "POST /api/residents/{resident_id}/chat",
+      "surface": "GET /api/residents/{resident_id}/surface"
+    },
+    "extension_mechanism": {
+      "profile_template": "docs/operations/residents/resident_implementation_profile_template.md",
+      "proposal_template": "docs/operations/residents/resident_api_extension_proposal_template.md",
+      "rule": "Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."
+    },
+    "kind": "resident_interaction_surface",
+    "office": "Office of Operations",
+    "resident_api_standard_version": "resident-api-standard-v1",
+    "resident_display_name": "Alfred",
+    "resident_id": "alfred",
+    "resident_implementation_version": "alfred-operations-implementation-v1",
+    "role": "Operational resident coordinator",
+    "surface_reference": "operations/residents/surfaces/alfred.json"
+  },
+  "work_package_id": "WP-0126"
+}
