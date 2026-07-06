@@ -1953,6 +1953,25 @@ VALIDATION_RECIPES.update({
     },
 })
 
+
+VALIDATION_RECIPES["WP-0133"] = {
+    "recipe_id": "wp-0133-ai-services-post-launch-health-repair",
+    "title": "WP-0133 — AI Services Post-Launch Health Verification and Process Tracking Repair",
+    "description": "Validates lifecycle-aware AI service execution semantics, WP-0133 reports, completion receipt, and production-readiness compatibility.",
+    "required_checks": ["AI services control-plane tests pass", "WP-0133 artifacts exist", "Receipt is complete", "Health lifecycle implementation is present"],
+    "observational_checks": [],
+    "expected_artifacts": ["operations/ai_services/WP-0133_ai_services_post_launch_health_repair_report.md", "runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json", "collaboration/work_packages/completions/WP-0133_codex_done.json"],
+    "failure_criteria": ["Any required command exits non-zero"],
+    "success_criteria": ["Required commands exit zero"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q"),
+        _cmd("python -c \"import json; from pathlib import Path; paths=['operations/ai_services/WP-0133_ai_services_post_launch_health_repair_report.md','runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json','collaboration/work_packages/completions/WP-0133_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing; data=json.loads(Path('runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json').read_text(encoding='utf-8')); assert data.get('work_package_id')=='WP-0133'; assert data.get('ready_for_ca_review') is True\""),
+        _cmd("python -c \"from pathlib import Path; t=Path('src/estate/ai_services/execution.py').read_text(encoding='utf-8'); required=['health_check_started','health_check_succeeded','health_check_failed','process_exited_before_health','http://127.0.0.1:5000/v1/models']; missing=[x for x in required if x not in t]; assert not missing, missing\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0133'); assert r['receipt_status']=='complete', r\""),
+    ],
+}
+
 VALIDATION_RECIPES["WP-0115"] = {
     "recipe_id": "wp-0115-historical-validation-recipe-bootstrap-sweep",
     "title": "WP-0115 — Historical Validation Recipe Bootstrap Sweep",

@@ -89,9 +89,9 @@
     "json": "runtime/validation/validation_coverage_manifest.json",
     "markdown": "operations/validation/validation_coverage_manifest.md"
   },
-  "generated_at": "2026-07-06T00:20:14+00:00",
+  "generated_at": "2026-07-06T00:53:48+00:00",
   "git_branch": "work",
-  "git_commit": "5ff48cac1c591b0b22610617a04511b4faeb8004",
+  "git_commit": "0651aa1e75f7346b4c86fcb34810512571cccbe1",
   "open_validation_observations": [],
   "ready_for_chief_architect_production_readiness_acceptance": [
     {
@@ -171,7 +171,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0020_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0020_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1131,7 +1131,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0101_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0101_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_update_for_backlog_retrofit.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0101_SERIES_codex_task_template_standard.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1437,25 +1437,37 @@
       "recipe_status": "registered",
       "required_followups": [],
       "work_package_id": "WP-0132"
+    },
+    {
+      "blockers": [],
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0133_codex_done.json",
+      "latest_validation_report_path": "runtime/validation/work_packages/WP-0133_validation.json",
+      "latest_validation_status": "passed",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0133_SERIES_ai_services_post_launch_health_and_process_tracking_repair.md",
+      "production_readiness_status": "ready",
+      "receipt_status": "complete",
+      "recipe_status": "registered",
+      "required_followups": [],
+      "work_package_id": "WP-0133"
     }
   ],
   "recent_validation_reports": [
+    "runtime/validation/work_packages/WP-0133_validation.json",
     "runtime/validation/work_packages/WP-0132_validation.json",
-    "runtime/validation/work_packages/WP-0110_validation.json",
-    "runtime/validation/work_packages/WP-0121_validation.json",
     "runtime/validation/work_packages/WP-0126_validation.json",
-    "runtime/validation/work_packages/WP-0124_validation.json",
-    "runtime/validation/work_packages/WP-0109_validation.json",
+    "runtime/validation/work_packages/WP-0080_validation.json",
+    "runtime/validation/work_packages/WP-0127_validation.json",
     "runtime/validation/work_packages/WP-0128_validation.json",
-    "runtime/validation/work_packages/WP-0119_validation.json",
-    "runtime/validation/work_packages/WP-0108_validation.json",
-    "runtime/validation/work_packages/WP-0080_validation.json"
+    "runtime/validation/work_packages/WP-0020_validation.json",
+    "runtime/validation/work_packages/WP-0122_validation.json",
+    "runtime/validation/work_packages/WP-0107_validation.json",
+    "runtime/validation/work_packages/WP-0121_validation.json"
   ],
   "recommended_next_action": "Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.",
   "total_blocked": 6,
   "total_incomplete_receipts": 0,
   "total_missing_receipts": 0,
   "total_missing_recipes": 0,
-  "total_production_ready": 112,
-  "total_work_packages_scanned": 118
+  "total_production_ready": 113,
+  "total_work_packages_scanned": 119
 }

@@ -11,7 +11,7 @@ def _service(service_id, root=None):
 def status(root=None):
     return {'control_plane':'ai-services-v2','registry':load_registry(root),'state':load_state(root),'state_path':'runtime/ai_services/state.json','approval_path':'runtime/ai_services/approvals.json','local_only':True}
 
-def request(operation, service_id, actor='alfred', approved_by=None, root=None, dry_run=True, reason=None, runner=None, **kwargs):
+def request(operation, service_id, actor='alfred', approved_by=None, root=None, dry_run=True, reason=None, runner=None, health_checker=None, health_timeout_seconds=30, health_interval_seconds=2, **kwargs):
     svc=_service(service_id, root)
     model=kwargs.get('model')
     if not svc:
@@ -45,4 +45,4 @@ def request(operation, service_id, actor='alfred', approved_by=None, root=None, 
     plan['approval_state']='approved' if required else 'planned'
     if dry_run:
         plan['result']='planned'; append_audit({'actor':actor,'operation':operation,'service_id':service_id,'requested_model':model,'authority':pol['authority'],'policy_result':'allowed','result':'planned_dry_run','details':{'dry_run':True}}, root); return plan
-    return execute_plan(plan, svc, runner=runner, root=root)
+    return execute_plan(plan, svc, runner=runner, root=root, health_checker=health_checker, health_timeout_seconds=health_timeout_seconds, health_interval_seconds=health_interval_seconds)

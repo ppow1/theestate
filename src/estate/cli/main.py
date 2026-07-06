@@ -1122,9 +1122,9 @@ def cmd_ai_services(args):
     elif args.ai_services_action == "rediscover":
         payload = rediscover(actor=getattr(args, "actor", "codex"))
     elif args.ai_services_action in {"start", "stop"}:
-        payload = request(args.ai_services_action, args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, dry_run=args.dry_run)
+        payload = request(args.ai_services_action, args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, dry_run=args.dry_run, health_timeout_seconds=args.health_timeout_seconds, health_interval_seconds=args.health_interval_seconds)
     elif args.ai_services_action == "load-model":
-        payload = request("load_model", args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, model=args.model, dry_run=args.dry_run)
+        payload = request("load_model", args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, model=args.model, dry_run=args.dry_run, health_timeout_seconds=args.health_timeout_seconds, health_interval_seconds=args.health_interval_seconds)
     elif args.ai_services_action == "write-report":
         payload = write_wp0131_report()
     else:
@@ -1284,6 +1284,8 @@ def main():
         sp.add_argument("--approved-by")
         sp.add_argument("--actor", default="alfred")
         sp.add_argument("--dry-run", action="store_true", default=False)
+        sp.add_argument("--health-timeout-seconds", type=float, default=30)
+        sp.add_argument("--health-interval-seconds", type=float, default=2)
         sp.add_argument("--json", action="store_true")
         sp.set_defaults(func=cmd_ai_services)
     sp = ai_sub.add_parser("load-model")
@@ -1292,6 +1294,8 @@ def main():
     sp.add_argument("--approved-by")
     sp.add_argument("--actor", default="alfred")
     sp.add_argument("--dry-run", action="store_true", default=False)
+    sp.add_argument("--health-timeout-seconds", type=float, default=30)
+    sp.add_argument("--health-interval-seconds", type=float, default=2)
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_ai_services)
     sp = ai_sub.add_parser("write-report")
