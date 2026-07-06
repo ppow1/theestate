@@ -39,6 +39,15 @@
     "Promote warning or parking lot item to proposal draft",
     "Export validation evidence bundle"
   ],
+  "files_changed": [
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_office_command_surface.py",
+    "operations/steward/WP-0213_office_command_surface_verb_audit.md",
+    "operations/steward/WP-0213_office_command_surface_report.md",
+    "collaboration/work_packages/completions/WP-0213_codex_done.json"
+  ],
   "gated_verbs": [
     "Start/stop/load AI service: gated until governed process-control approval path exists",
     "Validate selected work package: blocked until a work_package_id is supplied",
@@ -81,7 +90,9 @@
     "Confirm generated artifacts changed on disk for completed operations."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Merged as GitHub pull request #158 (merge commit 7b20928); exact repository-host URL was not available in this local environment.",
   "pull_request_url_not_applicable_reason": "PR URL will be assigned by repository host after local commit and PR creation metadata is recorded.",
+  "pull_request_url_or_not_applicable_reason": "Merged as GitHub pull request #158 (merge commit 7b20928); exact repository-host URL was not available in this local environment.",
   "ready_for_ca_review": true,
   "summary": "Implemented a real local Office command surface with handler-backed controls, valid action result model, served-mode API dispatch, UI result rendering, audit/report artifacts, and tests.",
   "tabs_affected": [
