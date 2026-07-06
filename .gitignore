@@ -4,5 +4,26 @@ __pycache__/
 *.pyd
 .env
 .venv/
+
+# Local Estate runtime boundary:
+# Runtime projections, resident/session state, local approvals, attachment
+# references, model inventory, validation rollups, dashboards, and indexes are
+# regenerated locally and may be sensitive. GitHub is an external crossing; do
+# not add live runtime state to source control by default.
 runtime/
+
+# Generated operations projections that mirror local runtime state. Authored
+# operations guides, work packages, governance docs, tests, staged workstream
+# manifests, completion receipts, and deliberate evidence remain trackable.
+operations/work_packages/assignment_queue.md
+operations/steward/decision_queue.md
+operations/validation/production_readiness_report.md
+operations/validation/validation_coverage_manifest.md
+operations/validation/reports/WP-*_validation.md
+operations/capabilities/capability_dependency_visualization.md
+operations/notifications/operations_notification_center.md
+
 Temp/
+collaboration/status/event_summary.json
+operations/services/service_health_registry.md
+operations/validation/validation_metrics_dashboard.md

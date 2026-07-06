@@ -1,4 +1,0 @@
-{"actor": "codex", "authority": "system", "details": {"rejected_count": 0, "service_count": 5}, "operation": "rediscover", "policy_result": "allowed", "result": "success", "service_id": null, "timestamp": "2026-07-06T00:05:47.514642+00:00"}
-{"actor": "codex", "authority": "system", "details": {"rejected_count": 0, "service_count": 5}, "operation": "rediscover", "policy_result": "allowed", "result": "success", "service_id": null, "timestamp": "2026-07-06T00:07:16.186798+00:00"}
-{"actor": "codex", "authority": "system", "details": {"rejected_count": 0, "service_count": 5}, "operation": "rediscover", "policy_result": "allowed", "result": "success", "service_id": null, "timestamp": "2026-07-06T00:07:37.531281+00:00"}
-{"actor": "codex", "authority": "system", "details": {"rejected_count": 0, "service_count": 5}, "operation": "rediscover", "policy_result": "allowed", "result": "success", "service_id": null, "timestamp": "2026-07-06T00:08:21.032900+00:00"}
