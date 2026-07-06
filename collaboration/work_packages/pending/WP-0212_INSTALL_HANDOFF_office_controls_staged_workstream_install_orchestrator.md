@@ -7,11 +7,13 @@ Read collaboration/work_packages/pending/WP-0212_INSTALL_HANDOFF_office_controls
 INSTALL-HANDOFF
 
 ## Mission
-Create a controlled installation handoff for the Office of the Steward staged control workstreams created by Waves 1 through 3.
+Install the completed Office of the Steward staged control workstreams from Waves 1 through 3 into the active Office runtime when their staged artifacts are present, internally consistent, and conflict-reviewed.
 
-This package must not blindly install everything. It must inspect the staged workstreams, validate their manifests, detect conflicts, determine a safe install order, identify what can be installed now, identify what must remain staged, and produce an explicit installation plan and optional install artifacts.
+This is not merely a planning package. This is the install handoff package.
 
-The goal is to move from parallel staged Office control work toward active runtime integration without losing reviewability, rollback, safety boundaries, or Chief Architect / Steward control.
+Codex must inspect the staged workstreams, validate their manifests, detect conflicts, determine a safe install order, and then install the phases that are ready. If a phase is blocked by missing artifacts, incompatible staged designs, active-file conflicts, or failing validation, leave that phase staged and document the block. Do not use caution as a reason to avoid installation when the staged artifacts are valid and the risk is understood.
+
+The goal is to move the Office verb-surface work from parallel staged artifacts into active runtime functionality while preserving reviewability, rollback, safety boundaries, and Chief Architect / Steward control.
 
 ## Background
 The Office verb-surface implementation was intentionally split into staged waves to avoid conflicts while multiple architects and workers operate in parallel.
@@ -37,7 +39,7 @@ Wave 3:
 - WP-0210 — AI Services / Model Controls
 - WP-0211 — Batch wrapper for Wave 3
 
-All individual implementation packages were authored as `PARALLEL-STAGED` packages under the WP-0112 standard. That means their staged artifacts are not installed work. This WP-0212 package creates the install handoff mechanism and installation plan.
+All individual implementation packages were authored as `PARALLEL-STAGED` packages under the WP-0112 standard. Staged work is not installed work. WP-0212 exists to perform the controlled transition from staged work into installed Office functionality.
 
 ## Number Allocation
 This package uses the temporary active authoring block assigned by the Steward to Chief Architect #3:
@@ -76,10 +78,10 @@ Expected staged manifests:
 - `collaboration/workstreams/WP-0209/install_manifest.json`
 - `collaboration/workstreams/WP-0210/install_manifest.json`
 
-If some packages are not complete yet, do not fabricate their outputs. Record missing prerequisites and produce a partial install readiness report rather than forcing installation.
+If some packages are not complete yet, do not fabricate their outputs. Install the ready phases that do not depend on missing work, and explicitly mark missing or dependent phases as blocked.
 
 ## Scope
-Create an install handoff mechanism and integration plan for the staged Office control workstreams.
+Create and execute a controlled install handoff for the staged Office control workstreams.
 
 In scope:
 
@@ -89,11 +91,14 @@ In scope:
 4. Detect overlapping final install paths and expected active files.
 5. Detect incompatible staged action metadata shapes.
 6. Determine installation phases and order.
-7. Create an install readiness report.
-8. Create a rollback plan.
-9. Create optional proposed install artifacts or patch bundle under `collaboration/workstreams/WP-0212/`.
-10. Create an install manifest for WP-0212 itself.
-11. Create a completion receipt for WP-0212.
+7. Install phases that are ready and conflict-reviewed.
+8. Leave blocked phases staged with explicit reasons.
+9. Create an install readiness and execution report.
+10. Create a rollback plan.
+11. Create or update active implementation files when a phase is ready.
+12. Run validation after installed phases.
+13. Create an install manifest for WP-0212 itself.
+14. Create a completion receipt for WP-0212.
 
 ## Out of Scope
 Do not blindly overwrite `src/estate/core/steward_command_center.py` or any active runtime file.
@@ -122,20 +127,17 @@ Create:
 Expected artifacts may include:
 
 - `collaboration/workstreams/WP-0212/install_manifest.json`
-- `collaboration/workstreams/WP-0212/office_controls_install_readiness_report.md`
+- `collaboration/workstreams/WP-0212/office_controls_install_execution_report.md`
 - `collaboration/workstreams/WP-0212/office_controls_install_plan.json`
 - `collaboration/workstreams/WP-0212/office_controls_conflict_matrix.json`
 - `collaboration/workstreams/WP-0212/office_controls_rollback_plan.md`
-- `collaboration/workstreams/WP-0212/proposed_install/README.md`
-- `collaboration/workstreams/WP-0212/proposed_install/patch_notes.md`
+- `collaboration/workstreams/WP-0212/post_install_validation.md`
 - `collaboration/workstreams/WP-0212/validation_notes.md`
 
-Use the structure that best fits the repository, but keep the handoff artifacts isolated and reviewable.
-
-## Required Install Readiness Report
+## Required Install Execution Report
 Create:
 
-`collaboration/workstreams/WP-0212/office_controls_install_readiness_report.md`
+`collaboration/workstreams/WP-0212/office_controls_install_execution_report.md`
 
 The report must include:
 
@@ -146,13 +148,15 @@ The report must include:
 5. Completion receipt validation results.
 6. Cross-package action vocabulary alignment status.
 7. Conflict matrix summary.
-8. Recommended install order.
-9. Packages safe to install now.
-10. Packages that must remain staged.
+8. Final install order.
+9. Packages installed.
+10. Packages left staged.
 11. Blocking issues.
 12. Non-blocking warnings.
-13. Rollback considerations.
-14. Required Chief Architect / Steward review decision.
+13. Active files modified.
+14. Rollback instructions.
+15. Validation results after installation.
+16. Required Chief Architect / Steward review decision.
 
 ## Required Conflict Matrix
 Create:
@@ -171,28 +175,31 @@ The conflict matrix must summarize, for each staged package:
 - whether it overlaps with another staged package
 - whether it overlaps with known active CA4 work if discoverable from available repository artifacts
 - recommended action: `install_now`, `install_later`, `requires_review`, `blocked_missing_artifact`, or `blocked_conflict`
+- final action taken: `installed`, `left_staged`, `blocked`, or `skipped_not_present`
 
 ## Required Install Plan
 Create:
 
 `collaboration/workstreams/WP-0212/office_controls_install_plan.json`
 
-The plan must define install phases. Recommended phases:
+The plan must define install phases.
+
+Recommended phases:
 
 ### Phase 1 — Foundation
-Install or propose installation of the Office action framework from WP-0200.
+Install the Office action framework from WP-0200 when present and internally consistent.
 
 ### Phase 2 — Low-risk utilities
-Install or propose installation of WP-0201 Settings/Help/About controls after the foundation.
+Install WP-0201 Settings/Help/About controls after the foundation.
 
 ### Phase 3 — Core operational controls
-Install or propose installation of WP-0202 Work Packages and WP-0204 Validation controls, if their staged metadata aligns.
+Install WP-0202 Work Packages and WP-0204 Validation controls if their staged metadata aligns.
 
 ### Phase 4 — Planning and communication controls
-Install or propose installation of WP-0205 and WP-0206.
+Install WP-0205 and WP-0206 if their staged metadata aligns and conflicts are manageable.
 
 ### Phase 5 — Board, resident, and AI service controls
-Install or propose installation of WP-0208, WP-0209, and WP-0210, with extra authority review for resident and AI service surfaces.
+Install WP-0208, WP-0209, and WP-0210 with extra authority review for resident and AI service surfaces. Do not start services or grant new resident authority.
 
 The install plan must include:
 
@@ -203,9 +210,30 @@ The install plan must include:
 - validation commands after phase
 - rollback instructions
 - approval requirement
-- install status: `proposed`, `ready`, `blocked`, `installed`, or `deferred`
+- install status: `ready`, `blocked`, `installed`, `partial`, or `deferred`
+- explanation for any phase not installed
 
-Unless the repository state clearly supports safe active installation, leave phases as `proposed` or `ready` rather than `installed`.
+## Installation Posture
+Default posture is now active installation of ready phases, not planning-only.
+
+Install a phase when all of these are true:
+
+1. Required staged artifacts are present.
+2. Required install manifest is present and valid.
+3. Completion receipt is present or missing receipt is explicitly non-blocking with rationale.
+4. Action metadata is compatible with the foundation vocabulary or can be normalized safely.
+5. Active-file conflicts are understood and manageable.
+6. The phase does not grant new authority or perform prohibited actions.
+7. Rollback path is clear.
+8. Validation can be run after installation.
+
+Leave a phase staged when any of these are true:
+
+1. Required artifacts are missing.
+2. Metadata shapes are incompatible and cannot be normalized without guessing.
+3. Active-file conflict cannot be resolved confidently.
+4. The staged work attempts to grant authority outside WP-0118/WP-0200 boundaries.
+5. Validation cannot be run or fails in a way that affects active functionality.
 
 ## Required Rollback Plan
 Create:
@@ -214,23 +242,12 @@ Create:
 
 The rollback plan must include:
 
-- active files that would be modified during installation
+- active files modified during installation
 - staged artifact references used as install sources
-- how to revert each phase
+- how to revert each installed phase
 - validation commands to run after rollback
 - generated/runtime artifacts to ignore or regenerate
 - risks of partial install
-
-## Optional Proposed Install Artifacts
-If the staged artifacts are complete enough to build an actual install patch, place proposed install artifacts under:
-
-`collaboration/workstreams/WP-0212/proposed_install/`
-
-Do not apply the proposed install directly unless all safety conditions are met and the package explicitly records why installation is safe.
-
-If active installation is performed, this package must escalate to Class B, document exact active files modified, run full validation, and produce post-install evidence.
-
-Default posture: create the install plan and proposed install artifacts; do not install active runtime changes yet.
 
 ## Required WP-0212 Install Manifest
 Create:
@@ -244,7 +261,7 @@ It must include:
 - staged artifact paths produced by WP-0212
 - source staged workstreams inspected
 - intended final install paths
-- files expected to be modified during eventual install
+- files modified during install
 - manual install steps
 - automated install steps, if any
 - validation commands
@@ -254,7 +271,7 @@ It must include:
 - generated artifacts to ignore or review
 - authority and review requirements
 - whether active installation was performed
-- `staged_work_is_installed`: `false` unless active files are actually updated
+- `staged_work_is_installed`: `true` if any staged controls are installed into active files, otherwise `false`
 
 ## Required Validation Commands
 Run or document equivalent validation:
@@ -280,6 +297,8 @@ If WP-0212 adds a validation recipe, also run:
 PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0212 --json
 ```
 
+Also run appropriate tests for any active files modified. At minimum, if the Office command center is modified, run relevant command-center tests and a smoke command that renders or serves the Office payload.
+
 ## Required Completion Artifact
 Create:
 
@@ -295,7 +314,8 @@ It must include:
 - `workstream_mode`: `INSTALL-HANDOFF`
 - source staged packages inspected
 - missing staged packages
-- install readiness status
+- installed packages
+- packages left staged
 - install phases produced
 - active files modified, if any
 - staged artifact paths produced
@@ -303,9 +323,10 @@ It must include:
 - conflict matrix path
 - install plan path
 - rollback plan path
+- install execution report path
 - validation commands run or skipped
 - known limitations
-- `staged_work_is_installed`: `false` unless active files are actually updated
+- `staged_work_is_installed`: `true` if any staged controls are installed into active files, otherwise `false`
 - `ready_for_ca_review`: `true`
 - `merge_authority`: `ca_verified_auto_merge_allowed`
 
@@ -316,14 +337,16 @@ WP-0212 is complete when:
 2. Missing workstreams are explicitly listed rather than invented.
 3. Manifest validation is recorded.
 4. A conflict matrix exists.
-5. An install readiness report exists.
-6. An install plan exists with phases and status.
-7. A rollback plan exists.
-8. WP-0212 has its own install manifest.
-9. WP-0212 has a completion receipt.
-10. Active runtime installation is either not performed, or if performed, is explicitly justified, conflict-reviewed, validated, and documented as Class B.
+5. An install execution report exists.
+6. An install plan exists with phases and final status.
+7. Ready phases are installed unless a specific blocker is documented.
+8. Blocked phases remain staged with reasons.
+9. A rollback plan exists.
+10. WP-0212 has its own install manifest.
+11. WP-0212 has a completion receipt.
+12. Active runtime installation, if performed, is explicitly documented, conflict-reviewed, validated, and treated as Class B.
 
 ## Merge Class
-Class A if this package creates install-handoff planning artifacts, conflict matrix, install plan, rollback plan, and completion receipt only.
+Class B if any active runtime files are modified or any staged controls are actually installed.
 
-Escalate to Class B if any active runtime files are modified or any staged controls are actually installed.
+Class A only if no ready phases exist and the package creates install-handoff planning artifacts, conflict matrix, install plan, rollback plan, and completion receipt without modifying active runtime files.
