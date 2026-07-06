@@ -1,0 +1,53 @@
+{
+  "batch_work_package_id": "WP-0207",
+  "batch_title": "Office Controls Wave 2 Operational Surfaces",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T17:19:28Z",
+  "branch": "work",
+  "pull_request_url_or_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit.",
+  "ordered_package_list": [
+    "WP-0204",
+    "WP-0205",
+    "WP-0206"
+  ],
+  "per_package_completion_receipt_paths": {
+    "WP-0204": "collaboration/work_packages/completions/WP-0204_codex_done.json",
+    "WP-0205": "collaboration/work_packages/completions/WP-0205_codex_done.json",
+    "WP-0206": "collaboration/work_packages/completions/WP-0206_codex_done.json"
+  },
+  "per_package_staged_workstream_paths": {
+    "WP-0204": "collaboration/workstreams/WP-0204/",
+    "WP-0205": "collaboration/workstreams/WP-0205/",
+    "WP-0206": "collaboration/workstreams/WP-0206/"
+  },
+  "per_package_install_manifest_paths": {
+    "WP-0204": "collaboration/workstreams/WP-0204/install_manifest.json",
+    "WP-0205": "collaboration/workstreams/WP-0205/install_manifest.json",
+    "WP-0206": "collaboration/workstreams/WP-0206/install_manifest.json"
+  },
+  "cross_package_alignment_decisions": [
+    "Used WP-0200 action vocabulary for action class, authority/safety class, confirmation, local-only posture, artifact reads/writes, handler references, output paths, and failure behavior.",
+    "All controls are staged-only; active Office runtime integration deferred to a future install-handoff.",
+    "Copy commands remain copy-only; local/generated mutations require confirmation; authority-gated requests are not approvals or completions."
+  ],
+  "wp_0200_staged_vocabulary_available_and_used": true,
+  "conflicts_detected_between_wp_0204_wp_0205_wp_0206": "None; artifacts are isolated by workstream directory. Future install conflict surfaces overlap in steward_command_center.py and cli/main.py but no active files were modified.",
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0204 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0206 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0204 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0205 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0206 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
+  ],
+  "known_limitations": [
+    "No active runtime controls were installed.",
+    "validate-work-package reported no registered recipes for WP-0204, WP-0205, and WP-0206; generated validation reports document the limitation.",
+    "Production readiness scans repository-wide historical blockers unrelated to this staged batch."
+  ],
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "merge_authority_or_equivalent": "ca_verified_auto_merge_allowed"
+}

@@ -1,0 +1,347 @@
+[
+  {
+    "action_id": "mailboxes.open_mailbox",
+    "label": "Open mailbox",
+    "target_tab": "Mailboxes",
+    "target_object": "mailbox",
+    "description": "Inspect mailbox index/source artifacts.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "mailbox index",
+      "message artifacts"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_communications_actions.open_mailbox",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Local view is not source closure."
+  },
+  {
+    "action_id": "mailboxes.inspect_message",
+    "label": "Inspect message",
+    "target_tab": "Mailboxes",
+    "target_object": "message",
+    "description": "Read content/status/source/waiting state.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "message artifact"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_communications_actions.inspect_message",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Inspection is not acknowledgement."
+  },
+  {
+    "action_id": "mailboxes.draft_reply",
+    "label": "Draft reply",
+    "target_tab": "Mailboxes",
+    "target_object": "message",
+    "description": "Preview reply draft only.",
+    "action_class": "draft-local-artifact",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "message artifact"
+    ],
+    "writes_artifacts": [
+      "collaboration/messages/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.draft_reply",
+    "expected_output_paths": [
+      "draft path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Draft is not sent reply."
+  },
+  {
+    "action_id": "mailboxes.local_acknowledge",
+    "label": "Local acknowledge",
+    "target_tab": "Mailboxes",
+    "target_object": "message",
+    "description": "Local acknowledgement marker where supported.",
+    "action_class": "local-marker-design",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "message artifact"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/local_acknowledgements/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.local_acknowledge",
+    "expected_output_paths": [
+      "local ack path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Local acknowledgement is not authoritative closure."
+  },
+  {
+    "action_id": "mailboxes.route_to_resident",
+    "label": "Route to resident or review queue",
+    "target_tab": "Mailboxes",
+    "target_object": "message",
+    "description": "Draft/queue authority route request.",
+    "action_class": "route-request",
+    "authority_safety_class": "authority-gated institutional action",
+    "confirmation_requirement": "authority route confirmation",
+    "reads_artifacts": [
+      "message artifact"
+    ],
+    "writes_artifacts": [
+      "collaboration/routing_requests/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.route_to_resident",
+    "expected_output_paths": [
+      "route request draft"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Route request is not completion."
+  },
+  {
+    "action_id": "mailboxes.export_snapshot",
+    "label": "Export mailbox snapshot",
+    "target_tab": "Mailboxes",
+    "target_object": "mailbox",
+    "description": "Local-only snapshot with sensitivity warning.",
+    "action_class": "export-local-bundle-design",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit confirmation",
+    "reads_artifacts": [
+      "mailbox/message artifacts"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/mailbox-snapshot-*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.export_mailbox_snapshot",
+    "expected_output_paths": [
+      "export path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Export is local-only."
+  },
+  {
+    "action_id": "recalls.inspect_recall",
+    "label": "Inspect recall",
+    "target_tab": "Recalls",
+    "target_object": "recall",
+    "description": "Read recall lifecycle/transport/ack/source links.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "recall artifact"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_communications_actions.inspect_recall",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Inspection is not decision."
+  },
+  {
+    "action_id": "recalls.copy_delivery_command",
+    "label": "Copy delivery command",
+    "target_tab": "Recalls",
+    "target_object": "recall",
+    "description": "Copy local delivery command only.",
+    "action_class": "copy-command",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "recall metadata"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_communications_actions.copy_delivery_command",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Copied command does not execute."
+  },
+  {
+    "action_id": "recalls.local_acknowledge",
+    "label": "Local acknowledge recall",
+    "target_tab": "Recalls",
+    "target_object": "recall",
+    "description": "Local ack where supported.",
+    "action_class": "local-marker-design",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "recall artifact"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/local_acknowledgements/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.local_acknowledge_recall",
+    "expected_output_paths": [
+      "local ack path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Acknowledgement is not recall decision."
+  },
+  {
+    "action_id": "recalls.request_steward_decision",
+    "label": "Request Steward decision",
+    "target_tab": "Recalls",
+    "target_object": "recall",
+    "description": "Draft/queue decision request.",
+    "action_class": "route-request",
+    "authority_safety_class": "authority-gated institutional action",
+    "confirmation_requirement": "authority route confirmation",
+    "reads_artifacts": [
+      "recall artifact"
+    ],
+    "writes_artifacts": [
+      "collaboration/decision_requests/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.request_steward_decision",
+    "expected_output_paths": [
+      "decision request draft"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Request is not decision."
+  },
+  {
+    "action_id": "recalls.export_audit_bundle",
+    "label": "Export recall audit bundle",
+    "target_tab": "Recalls",
+    "target_object": "recall",
+    "description": "Local audit bundle with sensitivity warning.",
+    "action_class": "export-local-bundle-design",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit confirmation",
+    "reads_artifacts": [
+      "recall artifacts"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/recall-audit-*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.export_recall_audit_bundle",
+    "expected_output_paths": [
+      "export path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Bundle is local-only."
+  },
+  {
+    "action_id": "notifications.filter",
+    "label": "Filter notifications",
+    "target_tab": "Notifications",
+    "target_object": "notification set",
+    "description": "Filter current notifications.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "notification artifacts"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_communications_actions.filter_notifications",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Filter state is local view only."
+  },
+  {
+    "action_id": "notifications.inspect_source",
+    "label": "Inspect notification source",
+    "target_tab": "Notifications",
+    "target_object": "notification",
+    "description": "Open source artifact/report.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "notification source"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_communications_actions.inspect_notification_source",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Inspection is not acknowledgement."
+  },
+  {
+    "action_id": "notifications.local_acknowledge",
+    "label": "Local acknowledge notification",
+    "target_tab": "Notifications",
+    "target_object": "notification",
+    "description": "Local acknowledgement marker.",
+    "action_class": "local-marker-design",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "notification artifact"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/local_acknowledgements/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.local_acknowledge_notification",
+    "expected_output_paths": [
+      "local ack path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Local ack is not authoritative closure."
+  },
+  {
+    "action_id": "notifications.bulk_local_ack_low",
+    "label": "Bulk local acknowledge low severity",
+    "target_tab": "Notifications",
+    "target_object": "low severity set",
+    "description": "Second-confirmation bulk local ack design.",
+    "action_class": "bulk-local-marker-design",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "second confirmation plus affected-item summary",
+    "reads_artifacts": [
+      "notification artifacts"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/local_acknowledgements/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.bulk_local_ack_low",
+    "expected_output_paths": [
+      "bulk ack audit path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Bulk local ack is reversible local state only."
+  },
+  {
+    "action_id": "notifications.create_follow_up_draft",
+    "label": "Create follow-up draft",
+    "target_tab": "Notifications",
+    "target_object": "notification",
+    "description": "Draft WP/observation/reply/review request.",
+    "action_class": "draft-or-route-design",
+    "authority_safety_class": "Steward-confirmed local mutation or authority-gated route",
+    "confirmation_requirement": "confirmation based on target",
+    "reads_artifacts": [
+      "notification source"
+    ],
+    "writes_artifacts": [
+      "collaboration/**/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_communications_actions.create_follow_up_draft",
+    "expected_output_paths": [
+      "draft/request path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Draft/request is not completed action."
+  }
+]

@@ -1,0 +1,326 @@
+[
+  {
+    "action_id": "mission.refresh_payload",
+    "label": "Refresh Mission Control payload",
+    "target_tab": "Mission Control",
+    "target_object": "mission payload",
+    "description": "Confirmed local refresh with output paths.",
+    "action_class": "refresh-generated-artifact",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "runtime/steward/**",
+      "operations/**/*.md"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/mission-control*.json"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.refresh_mission_payload",
+    "expected_output_paths": [
+      "runtime/steward/mission-control*.json"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Mission summaries remain non-authoritative."
+  },
+  {
+    "action_id": "mission.inspect_source_lane",
+    "label": "Inspect source lane",
+    "target_tab": "Mission Control",
+    "target_object": "lane/warning",
+    "description": "Read source artifacts behind lane or warning.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "source artifacts"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_planning_actions.inspect_source_lane",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Mission summaries remain non-authoritative."
+  },
+  {
+    "action_id": "mission.open_source_artifact",
+    "label": "Open source artifact",
+    "target_tab": "Mission Control",
+    "target_object": "source path",
+    "description": "Show local path/link for source.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "source path"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_planning_actions.open_source_artifact",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Source artifact is authoritative, summary is not."
+  },
+  {
+    "action_id": "mission.warning_to_draft",
+    "label": "Create follow-up draft from warning",
+    "target_tab": "Mission Control",
+    "target_object": "warning",
+    "description": "Draft proposal/observation only.",
+    "action_class": "draft-local-artifact",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "warning evidence"
+    ],
+    "writes_artifacts": [
+      "collaboration/work_packages/drafts/*",
+      "collaboration/validation_observations/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.warning_to_draft",
+    "expected_output_paths": [
+      "draft path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Draft is not executable work."
+  },
+  {
+    "action_id": "mission.request_ca_review",
+    "label": "Request Chief Architect review",
+    "target_tab": "Mission Control",
+    "target_object": "warning/lane",
+    "description": "Draft or queue review request.",
+    "action_class": "route-request",
+    "authority_safety_class": "authority-gated institutional action",
+    "confirmation_requirement": "authority route confirmation",
+    "reads_artifacts": [
+      "warning evidence"
+    ],
+    "writes_artifacts": [
+      "collaboration/review_requests/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.request_ca_review",
+    "expected_output_paths": [
+      "review request draft"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Request is not review completion."
+  },
+  {
+    "action_id": "projects.inspect_active",
+    "label": "Inspect active project/work package",
+    "target_tab": "Projects",
+    "target_object": "project/WP",
+    "description": "Open pending/completion/source artifacts.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "collaboration/work_packages/**"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_planning_actions.inspect_project",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Projects summary remains non-authoritative."
+  },
+  {
+    "action_id": "projects.open_dependency_evidence",
+    "label": "Open dependency evidence",
+    "target_tab": "Projects",
+    "target_object": "dependency",
+    "description": "Inspect graph/pipeline evidence.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "runtime/dependency_graph*",
+      "operations/**"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_planning_actions.open_dependency_evidence",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Dependency summary is not approval."
+  },
+  {
+    "action_id": "projects.copy_next_action",
+    "label": "Copy next-action command",
+    "target_tab": "Projects",
+    "target_object": "project/WP",
+    "description": "Copy known next command only.",
+    "action_class": "copy-command",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "project metadata"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_planning_actions.copy_next_action",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Copied command does not execute."
+  },
+  {
+    "action_id": "projects.create_blocker_note",
+    "label": "Create blocker note draft",
+    "target_tab": "Projects",
+    "target_object": "blocker",
+    "description": "Draft local blocker note only.",
+    "action_class": "draft-local-artifact",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "blocker evidence"
+    ],
+    "writes_artifacts": [
+      "collaboration/project_notes/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.create_blocker_note",
+    "expected_output_paths": [
+      "draft path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Does not change canonical status."
+  },
+  {
+    "action_id": "projects.request_prioritization",
+    "label": "Request review or prioritization",
+    "target_tab": "Projects",
+    "target_object": "project/WP",
+    "description": "Authority-gated request, not approval.",
+    "action_class": "route-request",
+    "authority_safety_class": "authority-gated institutional action",
+    "confirmation_requirement": "authority route confirmation",
+    "reads_artifacts": [
+      "project evidence"
+    ],
+    "writes_artifacts": [
+      "collaboration/review_requests/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.request_prioritization",
+    "expected_output_paths": [
+      "request draft"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Request is not approval."
+  },
+  {
+    "action_id": "roadmap.inspect_evidence",
+    "label": "Inspect roadmap evidence",
+    "target_tab": "Roadmap",
+    "target_object": "roadmap item",
+    "description": "Read roadmap source evidence.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "roadmap artifacts"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_planning_actions.inspect_roadmap_evidence",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Roadmap summary remains non-authoritative."
+  },
+  {
+    "action_id": "roadmap.draft_wp_proposal",
+    "label": "Draft work-package proposal from roadmap item",
+    "target_tab": "Roadmap",
+    "target_object": "roadmap item",
+    "description": "Draft proposal only.",
+    "action_class": "draft-local-artifact",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "roadmap item evidence"
+    ],
+    "writes_artifacts": [
+      "collaboration/work_packages/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.draft_wp_proposal",
+    "expected_output_paths": [
+      "draft path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Proposal grants no execution authority."
+  },
+  {
+    "action_id": "roadmap.export_snapshot",
+    "label": "Export roadmap snapshot",
+    "target_tab": "Roadmap",
+    "target_object": "roadmap",
+    "description": "Local snapshot export.",
+    "action_class": "export-local-bundle-design",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit confirmation",
+    "reads_artifacts": [
+      "roadmap artifacts"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/roadmap-snapshot-*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.export_roadmap_snapshot",
+    "expected_output_paths": [
+      "export path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Snapshot is non-authoritative."
+  },
+  {
+    "action_id": "roadmap.request_prioritization_review",
+    "label": "Request prioritization review",
+    "target_tab": "Roadmap",
+    "target_object": "roadmap item",
+    "description": "Authority-gated prioritization request.",
+    "action_class": "route-request",
+    "authority_safety_class": "authority-gated institutional action",
+    "confirmation_requirement": "authority route confirmation",
+    "reads_artifacts": [
+      "roadmap evidence"
+    ],
+    "writes_artifacts": [
+      "collaboration/review_requests/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.request_prioritization_review",
+    "expected_output_paths": [
+      "request draft"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Request is not prioritization decision."
+  },
+  {
+    "action_id": "roadmap.mark_local_review_note",
+    "label": "Mark local review note",
+    "target_tab": "Roadmap",
+    "target_object": "roadmap item",
+    "description": "Local UI/runtime marker only.",
+    "action_class": "local-marker-design",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "roadmap item"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/local_review_notes/*"
+    ],
+    "command_hook_or_handler_reference": "office_planning_actions.mark_local_review_note",
+    "expected_output_paths": [
+      "local marker path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Not canonical roadmap closure."
+  }
+]
