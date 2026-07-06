@@ -8,6 +8,18 @@ Read collaboration/work_packages/pending/WP-0143_REPAIR_alfred_local_llm_adapter
 
 REPAIR
 
+## Institutional Priority
+
+This repair is a blocking foundation repair for the Estate resident LLM architecture.
+
+Alfred is the reference resident implementation for local LLM-backed resident behavior. Helen, Chief Engineer #5 onboarding, the future character-development Chief Engineer, and other resident/worker surfaces are expected to follow Alfred's model.
+
+Therefore do not treat this as a one-off joke bug.
+
+The core issue is that the Estate cannot safely onboard or operate additional LLM-backed residents until Alfred's local LLM adapter path is truthful, testable, and reusable.
+
+WP-0143 must establish a correct resident LLM pattern that future residents can follow without inheriting the same broken behavior.
+
 ## Problem
 
 The Steward has confirmed that the Steward Command Center shell is now functioning well enough to test Alfred. The only visible browser console issue is a favicon 404, which is not the operational problem.
@@ -41,6 +53,20 @@ The Steward correctly identifies this as evidence that Alfred is not actually us
 
 Repeatedly returning the same canned joke when asked for a new joke is acceptable only if the system clearly says deterministic fallback was used. It is not acceptable to label that response as `local_llm`.
 
+## Downstream Blockers
+
+Do not proceed as though additional resident onboarding can safely build on the current Alfred behavior.
+
+This repair blocks:
+
+- Helen local LLM-backed operation;
+- Chief Engineer #5 onboarding that depends on resident/local LLM behavior;
+- future Chief Engineer for character development;
+- additional Estate residents or workers that would copy Alfred's resident interaction model;
+- any resident governance workflow that depends on truthful local model usage reporting.
+
+The correct outcome is not merely that Alfred tells a new joke. The correct outcome is that Alfred becomes the reliable resident LLM adapter reference implementation.
+
 ## Primary Root-Cause Questions
 
 Codex must answer these directly in the report:
@@ -54,6 +80,8 @@ Codex must answer these directly in the report:
 7. Is Alfred selecting a model but never calling generation?
 8. Is Alfred using deterministic fallback while labeling it as local LLM?
 9. Is the repeated skeleton joke hard-coded in the fallback path?
+10. Which shared resident LLM adapter interface should Helen and future residents use after this repair?
+11. What contract prevents future residents from confusing discovery, selection, and actual generation?
 
 ## Required Repair Outcomes
 
@@ -131,7 +159,25 @@ Expose safe diagnostics per Alfred response:
 
 Do not expose secrets or full sensitive prompts if artifacts include private text. A short safe prompt summary is enough.
 
-### 7. Tests
+### 7. Shared Resident LLM Contract
+
+Create or clarify a resident LLM adapter contract that Alfred uses and Helen/future residents can reuse.
+
+The contract must distinguish:
+
+- provider discovery;
+- model selection;
+- generation attempt;
+- generation success;
+- generation failure;
+- deterministic fallback;
+- per-response diagnostics.
+
+Do not duplicate this logic separately for Helen or future residents.
+
+If an existing WP-0126 resident interaction adapter contract already exists, strengthen it rather than inventing a new parallel system.
+
+### 8. Tests
 
 Add or update tests proving:
 
@@ -145,6 +191,8 @@ Add or update tests proving:
 8. Existing Alfred governed-action boundary remains intact.
 9. Existing resident interaction persistence remains intact.
 10. Existing Command Center navigation/shell tests remain passing.
+11. The resident LLM contract can be reused by another resident without changing Alfred-specific code.
+12. Future resident surfaces cannot report local LLM generation unless generation actually occurred.
 
 ## Files To Inspect
 
@@ -179,12 +227,14 @@ The report must include:
 - fallback behavior;
 - repeated joke behavior;
 - diagnostics added;
+- shared resident LLM contract established or strengthened;
+- downstream residents unblocked only if the contract is now truthful and reusable;
 - tests run;
 - remaining limitations.
 
 ## Acceptance Criteria
 
-WP-0143 is complete when Alfred no longer mislabels deterministic fallback as local LLM generation, actually invokes the local generation adapter when a local model is available, reports truthful per-response mode/diagnostics, avoids repeatedly returning the same canned skeleton joke as proof of local LLM operation, and preserves the resident governance boundary.
+WP-0143 is complete when Alfred no longer mislabels deterministic fallback as local LLM generation, actually invokes the local generation adapter when a local model is available, reports truthful per-response mode/diagnostics, avoids repeatedly returning the same canned skeleton joke as proof of local LLM operation, establishes a reusable resident LLM contract for Helen and future residents, and preserves the resident governance boundary.
 
 ## Merge Class
 
