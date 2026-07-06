@@ -71,15 +71,27 @@
       "recipe_status": "registered",
       "required_followups": [],
       "work_package_id": "WP-0130"
+    },
+    {
+      "blockers": [],
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0131_codex_done.json",
+      "latest_validation_report_path": null,
+      "latest_validation_status": "missing",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md",
+      "production_readiness_status": "blocked",
+      "receipt_status": "complete",
+      "recipe_status": "registered",
+      "required_followups": [],
+      "work_package_id": "WP-0131"
     }
   ],
   "coverage_manifest_paths": {
     "json": "runtime/validation/validation_coverage_manifest.json",
     "markdown": "operations/validation/validation_coverage_manifest.md"
   },
-  "generated_at": "2026-07-06T00:08:22+00:00",
+  "generated_at": "2026-07-06T00:20:14+00:00",
   "git_branch": "work",
-  "git_commit": "02da2068a34cf67d55f500103b2aee76eb76e7b5",
+  "git_commit": "5ff48cac1c591b0b22610617a04511b4faeb8004",
   "open_validation_observations": [],
   "ready_for_chief_architect_production_readiness_acceptance": [
     {
@@ -867,7 +879,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0079_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0079_validation.json",
       "latest_validation_status": "passed_with_findings",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_project_continuation.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0079_SERIES_validation_execution_engine.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1143,7 +1155,7 @@
       "completion_artifact_path": "collaboration/work_packages/completions/WP-0103_codex_done.json",
       "latest_validation_report_path": "runtime/validation/work_packages/WP-0103_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0103_SERIES_historical_validation_recipe_coverage_through_0085.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0103_SERIES_chief_architect_operating_manual.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
@@ -1416,34 +1428,34 @@
     },
     {
       "blockers": [],
-      "completion_artifact_path": "collaboration/work_packages/completions/WP-0131_codex_done.json",
-      "latest_validation_report_path": "runtime/validation/work_packages/WP-0131_validation.json",
+      "completion_artifact_path": "collaboration/work_packages/completions/WP-0132_codex_done.json",
+      "latest_validation_report_path": "runtime/validation/work_packages/WP-0132_validation.json",
       "latest_validation_status": "passed",
-      "pending_file_path": "collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md",
+      "pending_file_path": "collaboration/work_packages/pending/WP-0132_SERIES_ai_services_execution_adapters_and_steward_approval.md",
       "production_readiness_status": "ready",
       "receipt_status": "complete",
       "recipe_status": "registered",
       "required_followups": [],
-      "work_package_id": "WP-0131"
+      "work_package_id": "WP-0132"
     }
   ],
   "recent_validation_reports": [
-    "runtime/validation/work_packages/WP-0131_validation.json",
+    "runtime/validation/work_packages/WP-0132_validation.json",
+    "runtime/validation/work_packages/WP-0110_validation.json",
+    "runtime/validation/work_packages/WP-0121_validation.json",
     "runtime/validation/work_packages/WP-0126_validation.json",
-    "runtime/validation/work_packages/WP-0125_validation.json",
     "runtime/validation/work_packages/WP-0124_validation.json",
-    "runtime/validation/work_packages/WP-0106_validation.json",
-    "runtime/validation/work_packages/WP-0129_validation.json",
-    "runtime/validation/work_packages/WP-0020_validation.json",
-    "runtime/validation/work_packages/WP-0122_validation.json",
     "runtime/validation/work_packages/WP-0109_validation.json",
-    "runtime/validation/work_packages/WP-9999_validation.json"
+    "runtime/validation/work_packages/WP-0128_validation.json",
+    "runtime/validation/work_packages/WP-0119_validation.json",
+    "runtime/validation/work_packages/WP-0108_validation.json",
+    "runtime/validation/work_packages/WP-0080_validation.json"
   ],
   "recommended_next_action": "Resolve blocking receipt, recipe, and validation gaps before CA production-readiness acceptance.",
-  "total_blocked": 5,
+  "total_blocked": 6,
   "total_incomplete_receipts": 0,
   "total_missing_receipts": 0,
   "total_missing_recipes": 0,
   "total_production_ready": 112,
-  "total_work_packages_scanned": 117
+  "total_work_packages_scanned": 118
 }

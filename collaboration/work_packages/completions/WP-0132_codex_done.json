@@ -1,0 +1,59 @@
+{
+  "approval_workflow_paths": [
+    "src/estate/ai_services/execution.py",
+    "runtime/ai_services/approvals.json"
+  ],
+  "audit_log_path": "runtime/ai_services/audit_log.jsonl",
+  "branch": "work",
+  "cli_api_changes": [
+    "CLI dry-run/approved execution flags",
+    "API dry_run query semantics"
+  ],
+  "codex_status": "done",
+  "completed_at": "2026-07-06T00:20:08+00:00",
+  "execution_adapter_paths": [
+    "src/estate/ai_services/execution.py"
+  ],
+  "files_changed": [
+    "operations/steward/decision_queue.md",
+    "operations/validation/production_readiness_report.md",
+    "operations/validation/validation_coverage_manifest.md",
+    "operations/validation/validation_metrics_dashboard.md",
+    "operations/work_packages/assignment_queue.md",
+    "runtime/search/institutional_search_index.json",
+    "runtime/validation/production_readiness_report.json",
+    "runtime/validation/validation_coverage_manifest.json",
+    "runtime/validation/work_packages/latest.json",
+    "runtime/work_packages/assignment_queue.json",
+    "src/estate/ai_services/api.py",
+    "src/estate/ai_services/control.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_ai_services_control_plane.py",
+    "collaboration/work_packages/completions/WP-0132_codex_done.json",
+    "operations/ai_services/WP-0132_ai_services_execution_adapters_report.md",
+    "operations/validation/reports/WP-0132_validation.md",
+    "src/estate/ai_services/execution.py"
+  ],
+  "known_limitations": [
+    "Real local third-party application launchers remain dependent on operator-provided manifest command templates and local paths.",
+    "No desktop GUI approval surface was added; approval is a local runtime artifact/API/CLI semantic."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "process_state_path": "runtime/ai_services/state.json",
+  "pull_request_not_applicable_reason": "not_applicable_created_by_codex_after_commit_via_make_pr_tool",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "CA review, then add a Steward UI decision surface over runtime/ai_services/approvals.json if desired.",
+  "stop_safety_behavior": "Stop executes only against a PID already recorded in runtime/ai_services/state.json by the control plane; no arbitrary process matching is performed.",
+  "summary": "Implemented governed AI service execution adapters, Steward approval artifacts, dry-run/real execution semantics, process state tracking, safe stop handling, and TextGen model-load validation.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q"
+  ],
+  "textgen_model_load_behavior": "Model names are restricted to safe basename characters and checked against an existing manifest-declared models directory when present; approved real execution starts/restarts via the manifest command template through the runner.",
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0132 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0132"
+}
