@@ -1,0 +1,18 @@
+{
+  "work_package_id": "WP-0136",
+  "status": "completed",
+  "summary": "AI Services governed launch attempts now use unique per-attempt logs and richer process/health diagnostics for TextGen failures.",
+  "changes": [
+    "Created per-attempt execution log paths under runtime/ai_services/logs/ before process start.",
+    "Recorded the current attempt log path in state, audit events, and returned execution diagnostics.",
+    "Captured current-attempt log tails only, preventing stale service log contamination.",
+    "Added process handle tracking to ProcessRunner for liveness and return-code diagnostics when available.",
+    "Added regression tests for fresh log handling and process-exit diagnostics."
+  ],
+  "validation": [
+    {"command": "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py", "status": "passed"},
+    {"command": "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_production_readiness_validation.py", "status": "passed"},
+    {"command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json", "status": "completed_with_pre_existing_readiness_blockers"}
+  ],
+  "third_party_ai_services_launched": false
+}

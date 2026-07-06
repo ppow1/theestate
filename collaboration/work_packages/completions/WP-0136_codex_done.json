@@ -1,0 +1,28 @@
+{
+  "branch": "work",
+  "completed_at": "2026-07-06T02:03:28.354827+00:00",
+  "files_changed": [
+    "src/estate/ai_services/execution.py",
+    "tests/test_ai_services_control_plane.py",
+    "operations/ai_services/WP-0136_ai_services_textgen_batch_log_and_process_runner_repair_report.md",
+    "runtime/ai_services/WP-0136_ai_services_textgen_batch_log_and_process_runner_repair_report.json",
+    "collaboration/work_packages/completions/WP-0136_codex_done.json"
+  ],
+  "pull_request_url_or_not_applicable_reason": "not_applicable_created_by_local_codex_make_pr_tool",
+  "status": "complete",
+  "validation": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_production_readiness_validation.py",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "completed_with_pre_existing_readiness_blockers"
+    }
+  ],
+  "work_package_id": "WP-0136"
+}
