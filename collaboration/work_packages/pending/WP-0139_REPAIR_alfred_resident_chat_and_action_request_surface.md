@@ -1,4 +1,4 @@
-# REPAIR TASK WP-0139 - Repair Alfred Resident Chat and Action Request Surface
+# REPAIR TASK WP-0139 - Repair Alfred Resident Chat Availability and Action Request Surface
 
 ## Codex Command
 
@@ -8,18 +8,28 @@ Read collaboration/work_packages/pending/WP-0139_REPAIR_alfred_resident_chat_and
 
 REPAIR
 
+## Correction To Prior Interpretation
+
+Do not assume the Steward asked Alfred to start TextGen or SillyTavern.
+
+The Steward asked whether TextGen and SillyTavern could be started manually. That is different from asking Alfred to execute a privileged start operation.
+
+The immediate failure is more basic: Alfred appears offline or out of commission from the resident chat surface. The Steward asked Alfred to tell a new joke and Alfred did not respond at all.
+
 ## Problem
 
-Alfred's resident card and chat surface are operationally misleading and functionally degraded.
+Alfred's resident card and chat surface are unavailable or functionally degraded.
 
 Observed behavior:
 
-- The Steward asked Alfred for a simple conversational response such as a joke.
-- Alfred returned a generic Estate status summary and repeated operational boundary language instead of responding to the user request.
-- The Alfred card says local LLM is used when available and deterministic fallback is used otherwise, but the fallback behavior is too generic and ignores ordinary conversational intent.
-- The Steward also asked Alfred to start TextGen/SillyTavern. The surface says Alfred will not execute privileged actions, but it does not clearly transform privileged action requests into governed AI Services requests, pending approvals, or copyable Steward commands.
+- Alfred Resident Card renders and accepts input.
+- The card shows `Operational Status: Active` and `Presence State: waiting_for_steward`.
+- The Steward entered a simple prompt: `tell me a new joke`.
+- Alfred did not produce a new response.
+- Earlier behavior also showed Alfred returning a generic Estate status block instead of answering ordinary conversational intent.
+- The surface claims local-first operation through the WP-0126 adapter path, with deterministic fallback when no local model is available, but the UI does not clearly show whether the request is queued, failed, processing, timed out, using fallback, or blocked by adapter failure.
 
-This makes Alfred appear broken from the Steward surface.
+This makes Alfred appear active while the interaction path is not actually functioning.
 
 ## Architectural Boundary
 
@@ -31,23 +41,60 @@ Do not bypass AI Services approval gates.
 
 Do not convert the resident chat into an ungoverned shell.
 
-The repair is to make Alfred's resident surface truthful, useful, and task-aware within existing governance.
+The repair is to make Alfred's resident surface truthful, available, and task-aware within existing governance.
+
+## Investigation Requirements
+
+Before changing behavior, diagnose the request path end-to-end:
+
+1. Browser/UI submit handler for the Alfred card.
+2. Resident surface endpoint wiring: `/api/residents/alfred/surface`.
+3. WP-0126 resident interaction API route handling.
+4. Session persistence under `runtime/resident_interactions/sessions`.
+5. Attachment handling under `runtime/resident_interactions/attachments`.
+6. Alfred implementation routing.
+7. Local LLM adapter availability.
+8. Deterministic fallback path.
+9. Error/timeout reporting back to the UI.
+10. Generated Command Center JavaScript or form wiring if the static page is responsible for sending the request.
+
+The primary root-cause question is:
+
+```text
+Why does a submitted Alfred message not produce a visible Alfred response?
+```
 
 ## Required Outcomes
 
-### 1. Conversational Intent Must Work
+### 1. Alfred Must Respond Or Surface A Clear Failure
+
+When the Steward submits a prompt from Alfred's resident card, the UI must do one of the following:
+
+- display Alfred's response;
+- display that the request is still processing with a durable pending state;
+- display a safe, specific failure state with enough diagnostic information to repair the path.
+
+The UI must not remain indefinitely stuck at:
+
+```text
+Alfred is reviewing local Estate context...
+```
+
+without either a response, timeout, retry option, or diagnostic state.
+
+### 2. Conversational Intent Must Work
 
 When the Steward asks Alfred for ordinary low-risk conversational output, Alfred must answer the request rather than always returning the same Estate status block.
 
 Examples:
 
-- "tell me a new joke" should produce a joke.
-- "summarize this" should summarize the provided text or local artifact context when available.
-- "what should I look at next" may produce Estate operational guidance.
+- `tell me a new joke` should produce a joke or a fallback joke.
+- `summarize this` should summarize the provided text or local artifact context when available.
+- `what should I look at next` may produce Estate operational guidance.
 
 Fallback mode is allowed, but fallback mode must still respect the user's immediate prompt.
 
-### 2. Status Summary Must Be Intent-Gated
+### 3. Status Summary Must Be Intent-Gated
 
 Alfred should not always prepend or replace responses with the same Estate status summary.
 
@@ -58,9 +105,9 @@ Estate status summaries should appear when:
 - an action request needs governance context;
 - there is a high-priority local warning that truly requires Steward attention.
 
-### 3. Privileged Action Requests Must Become Governed Requests
+### 4. Privileged Action Requests Must Be Truthful If They Occur
 
-When the Steward asks Alfred to start/load/stop a governed AI service, Alfred must not silently fail and must not claim to have executed it.
+If a future prompt asks Alfred to start/load/stop a governed AI service, Alfred must not silently fail and must not claim to have executed it.
 
 Instead Alfred should produce one of the following, depending on existing architecture:
 
@@ -69,18 +116,9 @@ Instead Alfred should produce one of the following, depending on existing archit
 - route the request to the Office of the Steward AI Services / Models surface;
 - state that execution is unavailable and explain the next governed step.
 
-Required example:
+This is a secondary requirement. Do not treat it as evidence that the Steward already asked Alfred to start anything.
 
-If the Steward asks Alfred to start TextGen with `Qwen3-8B-Q6_K.gguf`, Alfred should respond with something equivalent to:
-
-```text
-I cannot execute privileged service operations from resident chat. I can prepare the governed request. Current approved command for Steward execution:
-.\estate ai-services load-model --service textgen --model Qwen3-8B-Q6_K.gguf --actor alfred --approved-by steward --health-timeout-seconds 60 --health-interval-seconds 2 --json
-```
-
-If there is already an approval, Alfred should say that approval exists and provide the next execution/check command rather than implying the service is running.
-
-### 4. Local LLM Adapter Visibility
+### 5. Local LLM Adapter Visibility
 
 The Alfred card claims local-first operation through the WP-0126 adapter path.
 
@@ -91,11 +129,14 @@ Add visible diagnostic state showing:
 - selected model if known;
 - fallback mode active/inactive;
 - reason for fallback;
-- last adapter error if safe to display.
+- last adapter error if safe to display;
+- last request timestamp;
+- last response timestamp;
+- last timeout or transport error if any.
 
 Do not expose secrets.
 
-### 5. Resident Response Contract
+### 6. Resident Response Contract
 
 Define or repair a response contract so Alfred responses distinguish:
 
@@ -104,23 +145,28 @@ Define or repair a response contract so Alfred responses distinguish:
 - recommendation;
 - proposed governed action;
 - blocked privileged execution;
-- fallback response.
+- fallback response;
+- request queued;
+- request failed;
+- request timed out.
 
 The UI should render that distinction clearly enough for the Steward to understand what Alfred did and did not do.
 
-### 6. Tests
+### 7. Tests
 
 Add or update tests proving:
 
-1. A simple joke prompt receives a joke-like direct response and does not get replaced by a generic Estate status block.
-2. A status prompt may return Estate status guidance.
-3. A privileged TextGen start/load request is not executed from resident chat.
-4. A privileged TextGen start/load request returns a governed next step or command.
-5. Alfred does not claim execution unless the governed AI Services execution path returns a successful execution result.
-6. Existing resident interaction persistence remains intact.
-7. Attachments/redaction behavior remains intact.
-8. Local LLM fallback state is surfaced safely.
-9. No secrets are leaked from adapter diagnostics.
+1. Submitting an Alfred prompt produces a visible response or visible safe failure state.
+2. The UI does not remain indefinitely stuck in `reviewing local Estate context`.
+3. A simple joke prompt receives a joke-like direct response and does not get replaced by a generic Estate status block.
+4. A status prompt may return Estate status guidance.
+5. A local LLM adapter failure falls back or reports a safe diagnostic state.
+6. No secrets are leaked from adapter diagnostics.
+7. Existing resident interaction persistence remains intact.
+8. Attachments/redaction behavior remains intact.
+9. A privileged TextGen start/load request is not executed from resident chat.
+10. A privileged TextGen start/load request returns a governed next step or command if such a prompt is actually submitted.
+11. Alfred does not claim execution unless the governed AI Services execution path returns a successful execution result.
 
 ## Files To Inspect
 
@@ -133,7 +179,7 @@ Inspect and modify only the existing resident/Alfred architecture unless a narro
 - `data/objects/RES-000001.json`
 - tests covering WP-0126 resident interactions and Alfred surface behavior
 
-Also inspect AI Services interfaces only as needed for governed request/command generation:
+Also inspect AI Services interfaces only as needed for future governed request/command generation:
 
 - `src/estate/ai_services/`
 - `runtime/ai_services/approvals.json`
@@ -155,8 +201,10 @@ The report must include:
 - root cause;
 - changed files;
 - before/after behavior;
+- why Alfred did not respond to the joke prompt;
 - how simple conversation is handled;
-- how governed action requests are handled;
+- how failed/offline/timeout states are surfaced;
+- how governed action requests would be handled if asked;
 - whether local LLM adapter is available;
 - fallback behavior;
 - tests run;
@@ -164,7 +212,7 @@ The report must include:
 
 ## Acceptance Criteria
 
-WP-0139 is complete when Alfred's resident chat can answer simple conversational prompts, does not mask every prompt with generic Estate status text, accurately handles privileged AI Services requests as governed requests or copyable Steward commands, and clearly shows local LLM/fallback state without granting Alfred autonomous privileged execution.
+WP-0139 is complete when Alfred's resident chat can respond to submitted prompts or surface a clear safe failure, does not remain stuck in a processing state, can answer simple conversational prompts, does not mask every prompt with generic Estate status text, accurately handles future privileged AI Services requests as governed requests or copyable Steward commands, and clearly shows local LLM/fallback state without granting Alfred autonomous privileged execution.
 
 ## Merge Class
 
