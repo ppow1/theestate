@@ -2073,6 +2073,22 @@ VALIDATION_RECIPES.update({
             _cmd("python -c \"import json; from pathlib import Path; paths=['operations/ai_services/WP-0131_ai_services_control_plane_report.md','runtime/ai_services/WP-0131_ai_services_control_plane_report.json','runtime/ai_services/registry.json','runtime/ai_services/state.json']; missing=[p for p in paths if not Path(p).exists()]; assert not missing, missing; reg=json.loads(Path('runtime/ai_services/registry.json').read_text(encoding='utf-8')); assert {'ollama','open_webui','textgen','comfyui','sillytavern'} <= {s['service_id'] for s in reg['services']}\""),
             _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0131'); assert r['receipt_status']=='complete', r\""),
         ],
+    },
+    "WP-0132": {
+        "recipe_id": "wp-0132-ai-services-execution-adapters",
+        "title": "WP-0132 — AI Services Execution Adapters and Steward Approval",
+        "description": "Validates mock-tested execution adapters, approval artifacts, reports, and completion receipt.",
+        "required_checks": ["AI services execution tests pass", "Report artifacts exist", "Receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/ai_services/execution.py", "operations/ai_services/WP-0132_ai_services_execution_adapters_report.md", "runtime/ai_services/WP-0132_ai_services_execution_adapters_report.json", "collaboration/work_packages/completions/WP-0132_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q"),
+            _cmd("python -c \"import json; from pathlib import Path; paths=['src/estate/ai_services/execution.py','operations/ai_services/WP-0132_ai_services_execution_adapters_report.md','runtime/ai_services/WP-0132_ai_services_execution_adapters_report.json']; missing=[p for p in paths if not Path(p).exists()]; assert not missing, missing; data=json.loads(Path('runtime/ai_services/WP-0132_ai_services_execution_adapters_report.json').read_text(encoding='utf-8')); assert data.get('work_package_id')=='WP-0132'; assert data.get('ready_for_ca_review') is True\""),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0132'); assert r['receipt_status']=='complete', r\""),
+        ],
     }
 })
 
