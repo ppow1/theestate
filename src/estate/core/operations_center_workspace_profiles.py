@@ -39,7 +39,7 @@ def _profile(name: str, label: str, active_tab: str, tab_order: list[str], *, vi
         "active_tab": active_tab,
         "tab_order": tab_order,
         "visible_panels": {panel: panel in visible for panel in sorted(AVAILABLE_PANELS)},
-        "panel_arrangements": {"left_navigation": "expanded", "activity_console_dock": "bottom", "activity_console_visible": activity_visible},
+        "panel_arrangements": {"left_navigation": "collapsed", "activity_console_dock": "bottom", "activity_console_visible": activity_visible},
         "operator_activity": {"profile": operator_profile, "verbosity": verbosity},
         "compatibility": {"minimum_layout_version": LAYOUT_VERSION, "unavailable_panel_behavior": "skip_and_report"},
         "updated_at": _now(),
@@ -85,15 +85,24 @@ def resolve_workspace_profile(root: str | Path | None = None, *, profile_name: s
     op_name = op.get("profile", "default") if op.get("profile", "default") in operator_profiles else "default"
     warnings = list(loaded.get("warnings", []))
     warnings.extend({"type": "unavailable_panel", "panel": panel, "message": "Configured panel is unavailable and was skipped."} for panel in missing)
+    panel_arrangements = dict(selected.get("panel_arrangements") or {})
+    if panel_arrangements.get("left_navigation") == "expanded":
+        panel_arrangements["left_navigation"] = "collapsed"
+        warnings.append({
+            "type": "left_navigation_layout_migrated",
+            "message": "Expanded left navigation profile state is treated as collapsed so the Office workspace remains prioritized.",
+            "from": "expanded",
+            "to": "collapsed",
+        })
+    panel_arrangements.setdefault("left_navigation", "collapsed")
     return {
         "selected_profile": selected.get("name", profile_name),
-        "profile": {**selected, "active_tab": active, "tab_order": restored_order, "operator_activity": {**op, "profile": op_name}},
+        "profile": {**selected, "active_tab": active, "tab_order": restored_order, "panel_arrangements": panel_arrangements, "operator_activity": {**op, "profile": op_name}},
         "available_profiles": sorted(profiles),
         "profile_store": PROFILES_OUTPUT,
         "warnings": warnings,
         "compatibility": {"layout_version": LAYOUT_VERSION, "profile_version": PROFILE_VERSION, "compatible": selected.get("layout_version") == LAYOUT_VERSION},
     }
-
 
 def save_workspace_profile(root: str | Path | None = None, *, name: str, base_profile: str = DEFAULT_PROFILE, active_tab: str | None = None) -> dict[str, Any]:
     root = _root(root)

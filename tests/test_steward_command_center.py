@@ -291,6 +291,8 @@ def test_command_center_tab_switch_script_and_collapsible_navigation_are_rendere
 
     assert "function activateOfficeTab" in html
     assert "Office Navigation</summary>" in html
+    assert "<details><summary>Office Navigation</summary>" in html
+    assert "<details open><summary>Office Navigation</summary>" not in html
     assert "role='tabpanel' hidden" in html
     assert 'id="activity-console"' in html
     assert 'id="status-bar"' in html
@@ -309,6 +311,8 @@ def test_operations_center_layout_framework_declares_regions_and_persistence(tmp
     assert data["version"] == "layout-framework-v1"
     assert data["layout_preference_key"] == "estate.operations_center.layout.v1"
     assert {"top_navigation_tabs", "left_navigation_panel", "main_workspace", "bottom_activity_stream", "status_bar", "command_console"}.issubset(region_ids)
+    assert data["default_preferences"]["navigation_collapsed"] is True
+    assert data["default_preferences"]["left_navigation"] == "collapsed"
     assert data["default_preferences"]["activity_console_dock"] == "bottom"
     assert data["default_preferences"]["activity_console_visible"] is True
     assert "Mission Control" in data["future_integration_points"]
@@ -317,6 +321,54 @@ def test_operations_center_layout_framework_declares_regions_and_persistence(tmp
     assert "LAYOUT_PREF_KEY" in html
     assert "restoreLayoutPreferences" in html
     assert "Operations Center Layout Framework" in html
+
+
+def test_wp0214_office_tabs_preserved_and_left_navigation_collapsed_by_default(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    expected_tabs = [
+        "Home", "Mission Control", "Alfred", "Helen", "Resident Conversations",
+        "AI Services / Models", "Daily Board", "Projects", "Roadmap", "Parking Lot",
+        "Work Packages", "Mailboxes", "Recalls", "Notifications", "Validation",
+        "Search", "Settings", "Help", "About",
+    ]
+    assert [tab["label"] for tab in payload["tabs"]] == expected_tabs
+    assert "grid-template-columns:1fr" in html
+    assert "<details><summary>Office Navigation</summary>" in html
+    assert "<details open><summary>Office Navigation</summary>" not in html
+    assert "drawer.open = false" in html
+    assert "normalizeNavigationState" in html
+    assert payload["layout_framework"]["data"]["default_preferences"]["navigation_collapsed"] is True
+    assert payload["layout_framework"]["data"]["default_preferences"]["left_navigation"] == "collapsed"
+    assert payload["workspace_profile"]["profile"]["panel_arrangements"]["left_navigation"] == "collapsed"
+
+
+def test_wp0214_legacy_expanded_left_navigation_profile_is_migrated(tmp_path):
+    seed_inputs(tmp_path)
+    write_json(tmp_path, "runtime/steward/operations_center_workspace_profiles.json", {
+        "version": 1,
+        "layout_version": "layout-framework-v1",
+        "profiles": {
+            "mission-control": {
+                "name": "mission-control",
+                "label": "Legacy Mission Control",
+                "version": 1,
+                "layout_version": "layout-framework-v1",
+                "active_tab": "mission-control",
+                "tab_order": ["home", "mission-control", "settings"],
+                "visible_panels": {"home": True, "mission-control": True, "settings": True},
+                "panel_arrangements": {"left_navigation": "expanded", "activity_console_dock": "bottom", "activity_console_visible": True},
+                "operator_activity": {"profile": "default", "verbosity": "normal"},
+            }
+        },
+    })
+
+    payload = generate_command_center(tmp_path, write=False)
+
+    assert payload["workspace_profile"]["profile"]["panel_arrangements"]["left_navigation"] == "collapsed"
+    assert any(warning["type"] == "left_navigation_layout_migrated" for warning in payload["workspace_profile"]["warnings"])
 
 def test_mailbox_operations_center_summarizes_open_ack_steward_and_warnings(tmp_path):
     seed_inputs(tmp_path)

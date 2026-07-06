@@ -1,0 +1,54 @@
+{
+  "branch": "work",
+  "chosen_implementation": "collapsed_by_default",
+  "codex_status": "done",
+  "completed_at": "2026-07-06T21:00:52+00:00",
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/operations_center_workspace_profiles.py",
+    "tests/test_steward_command_center.py",
+    "operations/steward/WP-0214_left_navigation_layout_report.md",
+    "collaboration/work_packages/completions/WP-0214_codex_done.json"
+  ],
+  "known_limitations": [
+    "Drawer uses a styled native details disclosure rather than an animated off-canvas component.",
+    "validation-production-readiness reports unrelated existing backlog blockers outside WP-0214 scope."
+  ],
+  "manual_verification_steps": [
+    "Start the Office locally.",
+    "Open the Office in the browser.",
+    "Confirm the left menu is collapsed by default and does not occupy a permanent left column.",
+    "Confirm the top tabs still change the active viewport.",
+    "Confirm all Office areas remain reachable.",
+    "Confirm the main workspace has more horizontal room than before.",
+    "Open and close the Office Navigation drawer and confirm it does not remain permanently in the way."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "not applicable in local automation; PR metadata recorded via make_pr tool after commit",
+  "ready_for_ca_review": true,
+  "summary": "Changed the Office side navigation from a persistent left column to a collapsed-by-default overlay drawer while preserving top-tab access to all Office workspaces.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_steward_command_center.py -q",
+      "notes": "43 passed",
+      "result": "passed"
+    }
+  ],
+  "validation_commands_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+      "result": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0214 --json",
+      "notes": "No failures/findings reported.",
+      "result": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "notes": "Command succeeded; output reports unrelated existing production-readiness backlog blockers.",
+      "result": "passed_with_existing_backlog_notes"
+    }
+  ],
+  "work_package_id": "WP-0214"
+}
