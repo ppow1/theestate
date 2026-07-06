@@ -29,6 +29,7 @@ from estate.core.operations_center_workspace_profiles import resolve_workspace_p
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
 from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
+from estate.core.office_command_surface import controls_for_tab, execute_office_action
 from urllib.parse import urlparse
 
 
@@ -921,7 +922,7 @@ def generate_command_center(root=None, write=True):
     settings_manager = load_operations_center_settings(root)
     default_profile = settings_manager["settings"].get("workspace", {}).get("default_profile", "mission-control")
     workspace_profile = resolve_workspace_profile(root, profile_name=default_profile, available_panels={tab["id"] for tab in OFFICE_TABS})
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager}
+    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager, "office_actions": {tab["id"]: controls_for_tab(tab["id"]) for tab in OFFICE_TABS}}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -1956,24 +1957,44 @@ def _ai_services_models_html(panel):
     rows.append(f"<p class='source'>Sources: {html.escape(str(panel.get('path')))}. Static HTML renders copyable local commands rather than executing host commands.</p></div>")
     return _panel("AI Services / Models", ''.join(rows), "ready")
 
+
+def _office_action_controls_html(payload, tab_id):
+    controls = (payload.get("office_actions") or {}).get(tab_id) or []
+    if not controls:
+        return ""
+    rows = []
+    for c in controls:
+        aid = html.escape(str(c.get("action_id")), quote=True)
+        label = html.escape(str(c.get("label") or c.get("action_id")))
+        availability = c.get("availability") or "gated"
+        note = html.escape(str(c.get("disabled_reason") or c.get("note") or ""))
+        req = c.get("requires_input")
+        input_html = ""
+        if req:
+            input_html = f"<input type='text' data-action-input='{html.escape(str(req), quote=True)}' placeholder='{html.escape(str(req))}'>"
+        disabled = " disabled" if availability != "available" else ""
+        button = f"<button type='button' data-office-action='{aid}'{disabled}>{label}</button>"
+        rows.append(f"<tr><td>{button}<br>{input_html}</td><td>{html.escape(str(availability))}</td><td>{note}</td><td><code>{html.escape(str(c.get('handler') or 'gated'))}</code></td></tr>")
+    return "<section class='panel office-actions'><h3>Operational Controls</h3><p class='source'>Every available control dispatches to a local handler. Gated controls are unavailable with a concrete reason.</p><table><thead><tr><th>Control</th><th>Availability</th><th>Outcome note / gating reason</th><th>Handler</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table><pre id='office-action-result-" + html.escape(tab_id, quote=True) + "' class='office-action-result'>No action run yet.</pre></section>"
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
-        ("mission-control", "Mission Control Workspace", _mission_control_html(p.get("mission_control_workspace", {}))),
-        ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {})) + _alfred_chat_html(p.get("alfred_chat", {}))),
+        ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {}))),
+        ("alfred", "Alfred Resident Card", _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {})) + _alfred_chat_html(p.get("alfred_chat", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
-        ("ai-services-models", "AI Services / Models", _ai_services_models_html(p.get("ai_services_models", {}))),
-        ("daily-board", "Daily Board / Parking Lot Workspace", _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
+        ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
+        ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
-        ("work-packages", "Work Packages", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
+        ("work-packages", "Work Packages", _office_action_controls_html(payload, "work-packages") + _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
-        ("notifications", "Operations Center Notification Center", _operations_notification_center_html(p.get("operations_notification_center", {}))),
-        ("validation", "Validation and Estate Health", _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
+        ("notifications", "Operations Center Notification Center", _office_action_controls_html(payload, "notifications") + _operations_notification_center_html(p.get("operations_notification_center", {}))),
+        ("validation", "Validation and Estate Health", _office_action_controls_html(payload, "validation") + _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
         ("settings", "Settings", _settings_html(p.get("settings", {})) + _layout_framework_html(p.get("operations_center_layout", {}))),
         ("help", "Help", _help_html(p.get("help", {}))),
@@ -2008,7 +2029,24 @@ function activateOfficeTab(id, persist=true){
 function applyWorkspaceProfile(profile){ if(!profile) return; if(profile.panel_arrangements && profile.panel_arrangements.activity_console_visible === false){ const consoleEl = document.querySelector('#activity-console'); if(consoleEl) consoleEl.setAttribute('hidden',''); } if(profile.active_tab) activateOfficeTab(profile.active_tab, false); }
 function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
 function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab); } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
-function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
+function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); bindOfficeActions(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
+
+async function runOfficeAction(button){
+  const actionId = button.dataset.officeAction;
+  const panel = button.closest('.office-actions');
+  const resultEl = panel ? panel.querySelector('.office-action-result') : null;
+  const body = {action_id: actionId};
+  if(panel){ panel.querySelectorAll('[data-action-input]').forEach(input => { body[input.dataset.actionInput] = input.value; }); }
+  if(resultEl) resultEl.textContent = 'Running ' + actionId + ' locally...';
+  try{
+    if(getCommandCenterMode() !== 'served') throw new Error('Office action execution requires served local mode; static file mode cannot POST to local handlers.');
+    const response = await fetch('/api/office/actions/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const payload = await response.json();
+    if(resultEl) resultEl.textContent = JSON.stringify(payload, null, 2);
+  }catch(error){ if(resultEl) resultEl.textContent = JSON.stringify({outcome:'blocked', steward_message:String(error), authority_gating_status:'served_mode_required'}, null, 2); }
+}
+function bindOfficeActions(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-office-action]'); if(button){ event.preventDefault(); runOfficeAction(button); } }); }
+
 function whenDomReady(callback){ if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', callback, {once:true}); else callback(); }
 whenDomReady(initOfficeRuntime);
 function renderGlobalPaletteResults(){
@@ -2181,13 +2219,16 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 data = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
             except Exception:
                 data = {}
-            if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
+            if parts == ["api", "office", "actions", "execute"]:
+                action_id = data.pop("action_id", "")
+                payload = execute_office_action(action_id, root=root, **data)
+            elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
                 payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root, attachments=data.get("attachments") or [])
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "forget":
                 payload = forget_conversation(data.get("session_id") or "", turn_id=data.get("turn_id"), memory_status=data.get("memory_status") or "forgotten", reason=data.get("reason") or "Steward-directed redaction", root=root)
             else:
-                self.send_error(404, "Unknown local resident API endpoint."); return
+                self.send_error(404, "Unknown local Office API endpoint."); return
             body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
-            self.send_response(200 if payload.get("ok", True) else 400); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
+            self.send_response(200 if payload.get("outcome") != "failed" and payload.get("ok", True) else 400); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
 
     return ThreadingHTTPServer((host, port), Handler)

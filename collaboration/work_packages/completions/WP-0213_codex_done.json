@@ -1,0 +1,107 @@
+{
+  "artifacts_read": [
+    "data/registry/providers.json",
+    "data/registry/services.json",
+    "collaboration/work_packages",
+    "runtime/notifications/operations_notification_center.json"
+  ],
+  "artifacts_written_or_generated": [
+    "runtime/steward/command_center.html",
+    "runtime/steward/office_command_surface_action_results.jsonl",
+    "runtime/services/service_status_board.json",
+    "operations/services/service_status_board.md",
+    "runtime/validation/production_readiness.json",
+    "operations/validation/production_readiness.md",
+    "runtime/work_packages/assignment_queue.json",
+    "operations/work_packages/assignment_queue.md",
+    "runtime/notifications/operations_notification_center.json",
+    "operations/notifications/operations_notification_center.md",
+    "runtime/notifications/operations_notification_center_acknowledgements.json",
+    "runtime/alfred/duty_state.json",
+    "runtime/alfred/duty_runs.jsonl",
+    "operations/alfred/duty_summary.md",
+    "runtime/residents/presence.json",
+    "runtime/steward/mission_control_workspace.json",
+    "runtime/operations/daily_board_integration.json",
+    "operations/boards/daily_board_integration.md",
+    "runtime/briefings/morning_briefing.json",
+    "operations/briefings/morning_briefing.md",
+    "operations/steward/WP-0213_office_command_surface_verb_audit.md",
+    "operations/steward/WP-0213_office_command_surface_report.md",
+    "collaboration/work_packages/completions/WP-0213_codex_done.json"
+  ],
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T20:47:11+00:00",
+  "deferred_verbs": [
+    "Execute pending work package",
+    "Create notification follow-up draft",
+    "Promote warning or parking lot item to proposal draft",
+    "Export validation evidence bundle"
+  ],
+  "gated_verbs": [
+    "Start/stop/load AI service: gated until governed process-control approval path exists",
+    "Validate selected work package: blocked until a work_package_id is supplied",
+    "Acknowledge notification locally: blocked until a notification_id is supplied"
+  ],
+  "handlers_added_or_reused": [
+    "estate.core.office_command_surface.execute_office_action",
+    "estate.core.service_status_board.generate_service_status_board",
+    "estate.core.provider_sync.sync_ollama_providers",
+    "estate.core.production_readiness_validation.generate_production_readiness_report",
+    "estate.core.work_package_validation.validate_work_package",
+    "estate.core.assignment_queue.generate_assignment_queue",
+    "estate.core.operations_notification_center.generate_operations_notification_center",
+    "estate.core.operations_notification_center.acknowledge_operations_notification",
+    "estate.core.alfred_duty.run_alfred_duty",
+    "estate.core.mission_control_workspace.build_mission_control_workspace",
+    "estate.core.daily_board_integration.generate_daily_board_integration",
+    "estate.core.morning_briefing.generate_morning_briefing"
+  ],
+  "implemented_verbs": [
+    "Refresh local AI service inventory",
+    "Run production readiness refresh",
+    "Refresh assignment queue",
+    "Validate selected work package",
+    "Refresh notification center",
+    "Acknowledge notification locally",
+    "Request Alfred briefing",
+    "Refresh Mission Control payload",
+    "Generate morning briefing"
+  ],
+  "known_limitations": [
+    "Actual UI action execution requires served local mode because static file mode cannot POST to local Python handlers.",
+    "Service lifecycle controls remain gated pending governed process-control approval.",
+    "Several draft/promotion/export verbs are deferred to future governed schemas."
+  ],
+  "manual_verification_steps": [
+    "Run PYTHONPATH=src python -m estate.cli.main steward-command-center --serve --host 127.0.0.1 --port 8765.",
+    "Open http://127.0.0.1:8765/ and use each Operational Controls panel listed in the report.",
+    "Confirm the result JSON panel shows completed, blocked, or failed and lists artifact paths.",
+    "Confirm generated artifacts changed on disk for completed operations."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url_not_applicable_reason": "PR URL will be assigned by repository host after local commit and PR creation metadata is recorded.",
+  "ready_for_ca_review": true,
+  "summary": "Implemented a real local Office command surface with handler-backed controls, valid action result model, served-mode API dispatch, UI result rendering, audit/report artifacts, and tests.",
+  "tabs_affected": [
+    "ai-services-models",
+    "validation",
+    "work-packages",
+    "notifications",
+    "alfred",
+    "mission-control",
+    "daily-board"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src python -m pytest tests/test_office_command_surface.py",
+    "PYTHONPATH=src python -m pytest tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m pytest tests/test_office_actions.py tests/test_office_*actions.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0213 --json"
+  ],
+  "work_package_id": "WP-0213"
+}
