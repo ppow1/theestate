@@ -1,83 +1,83 @@
 {
   "work_package_id": "WP-0205",
-  "codex_status": "completed",
-  "completed_at": "2026-07-06T17:19:28Z",
+  "codex_status": "done",
+  "completed_at": "2026-07-06T17:27:47+00:00",
   "branch": "work",
-  "summary": "Staged Mission Control, Projects, and Roadmap controls for source inspection, refresh, draft/request creation, exports, and local notes.",
-  "workstream_mode": "PARALLEL-STAGED",
-  "staged_artifact_paths": [
-    "collaboration/workstreams/WP-0205/install_manifest.json",
-    "collaboration/workstreams/WP-0205/proposed/action_metadata.json",
-    "collaboration/workstreams/WP-0205/proposed/mission_projects_roadmap_controls.md",
-    "collaboration/workstreams/WP-0205/proposed/src/estate/core/office_planning_actions.py",
-    "collaboration/workstreams/WP-0205/proposed/tests/test_office_planning_actions.py",
-    "collaboration/workstreams/WP-0205/validation_notes.md"
-  ],
-  "install_manifest_path": "collaboration/workstreams/WP-0205/install_manifest.json",
-  "intended_install_paths": [
-    "src/estate/core/office_planning_actions.py",
-    "tests/test_office_planning_actions.py",
-    "src/estate/core/steward_command_center.py"
-  ],
-  "conflict_risks": [
-    "src/estate/core/steward_command_center.py",
-    "src/estate/core/steward_dashboard.py",
-    "src/estate/core/operations_board.py",
-    "src/estate/core/dependency_graph.py",
-    "src/estate/core/assignment_queue.py",
-    "src/estate/cli/main.py",
-    "tests/test_steward_command_center.py"
-  ],
-  "controls_staged_by_tab": {
-    "Mission Control": [
-      "mission.refresh_payload",
-      "mission.inspect_source_lane",
-      "mission.open_source_artifact",
-      "mission.warning_to_draft",
-      "mission.request_ca_review"
-    ],
-    "Projects": [
-      "projects.inspect_active",
-      "projects.open_dependency_evidence",
-      "projects.copy_next_action",
-      "projects.create_blocker_note",
-      "projects.request_prioritization"
-    ],
-    "Roadmap": [
-      "roadmap.inspect_evidence",
-      "roadmap.draft_wp_proposal",
-      "roadmap.export_snapshot",
-      "roadmap.request_prioritization_review",
-      "roadmap.mark_local_review_note"
-    ]
-  },
+  "pull_request_url_or_not_applicable_reason": "Not applicable inside local Codex environment; PR metadata will be recorded with the make_pr tool after commit.",
+  "merge_authority_or_equivalent": "Steward / repository maintainer review",
+  "summary": "Established a local-only boundary for live runtime projections and sensitive Estate state, documented generated artifact classifications, stopped tracking selected regenerated dashboards/indexes/queues/rollups/local state while preserving local files, and added Ingrid-oriented repository boundary security guidance.",
   "files_changed": [
-    "collaboration/workstreams/WP-0205/install_manifest.json",
-    "collaboration/workstreams/WP-0205/proposed/action_metadata.json",
-    "collaboration/workstreams/WP-0205/proposed/mission_projects_roadmap_controls.md",
-    "collaboration/workstreams/WP-0205/proposed/src/estate/core/office_planning_actions.py",
-    "collaboration/workstreams/WP-0205/proposed/tests/test_office_planning_actions.py",
-    "collaboration/workstreams/WP-0205/validation_notes.md",
-    "collaboration/work_packages/completions/WP-0205_codex_done.json"
+    "collaboration/status/event_summary.json",
+    "operations/capabilities/capability_dependency_visualization.md",
+    "operations/notifications/operations_notification_center.md",
+    "operations/services/service_health_registry.md",
+    "operations/steward/decision_queue.md",
+    "operations/validation/production_readiness_report.md",
+    "operations/validation/reports/WP-0200_validation.md",
+    "operations/validation/reports/WP-0201_validation.md",
+    "operations/validation/reports/WP-0202_validation.md",
+    "operations/validation/validation_coverage_manifest.md",
+    "operations/validation/validation_metrics_dashboard.md",
+    "operations/work_packages/assignment_queue.md",
+    "runtime/ai_services/audit_log.jsonl",
+    "runtime/ai_services/model_assignments.json",
+    "runtime/ai_services/model_preferences.json",
+    "runtime/ai_services/registry.json",
+    "runtime/ai_services/state.json",
+    "runtime/alfred/duty_state.json",
+    "runtime/alfred/operational_briefing.json",
+    "runtime/helen/duty_runs.jsonl",
+    "runtime/helen/duty_state.json",
+    "runtime/mailboxes/synchronization_duty.json",
+    "runtime/residents/authority_decisions.jsonl",
+    "runtime/search/institutional_search_index.json",
+    "runtime/steward/command_center.html",
+    "runtime/validation/production_readiness_report.json",
+    "runtime/validation/validation_coverage_manifest.json",
+    "runtime/validation/work_packages/latest.json",
+    "runtime/work_packages/assignment_queue.json",
+    "runtime/workers/heartbeats/codex.json",
+    "runtime/workers/worker_runtime_heartbeat.json",
+    ".gitignore",
+    "docs/security/Repository_Boundary_and_Local_Runtime_State_v1.md",
+    "operations/repository/WP-0205_generated_artifact_tracking_inventory.md"
   ],
-  "tests_validation_run": [
-    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json (passed)",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0205 --json (warning: no registered recipe)",
-    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
-  ],
-  "known_limitations": [
-    "Staged artifacts are not installed into active Office runtime files.",
-    "CLI validation may not have recipes for this staged work package until future install."
-  ],
-  "staged_work_is_installed": false,
-  "ready_for_ca_review": true,
-  "merge_authority": "ca_verified_auto_merge_allowed",
-  "pull_request_url_or_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit for WP-0207 batch.",
   "tests_run": [
-    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json (passed)",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0205 --json (warning: no registered recipe)",
-    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
-  ],
-  "merge_authority_or_equivalent": "ca_verified_auto_merge_allowed",
-  "pull_request_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit for WP-0207 batch."
+    {
+      "command": "PYTHONPATH=src python -m pytest tests -q",
+      "status": "failed",
+      "notes": "431 passed, 1 failed: tests/test_institutional_search.py::test_cli_json_output expected tmp-path search result but received repository documentation result."
+    },
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_steward_command_center.py tests/test_assignment_queue.py tests/test_institutional_search.py tests/test_production_readiness_validation.py tests/test_resident_interaction.py -q",
+      "status": "failed",
+      "notes": "89 passed, 1 failed: same institutional search CLI tmp-path expectation mismatch as the full suite."
+    },
+    {
+      "command": "PYTHONPATH=src timeout 5 python -m estate.cli.main steward-command-center --serve --host 127.0.0.1 --port 8765",
+      "status": "warning",
+      "notes": "Server started and was terminated by timeout in non-interactive validation environment; exit code 124 is expected for a long-running server."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json >/tmp/steward2.json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main assignment-queue --json >/tmp/assignment.json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main global-search Estate --json >/tmp/search.json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python - <<PY\nfrom estate.core.production_readiness_validation import generate_validation_coverage_manifest, generate_production_readiness_report\ngenerate_validation_coverage_manifest(write=True)\ngenerate_production_readiness_report(write=True)\nPY",
+      "status": "passed"
+    },
+    {
+      "command": "git status --short before and after Office/search/assignment/validation generation",
+      "status": "passed",
+      "notes": "No additional tracked modifications appeared after generation beyond the intentional index removals and authored WP-0205 files."
+    }
+  ]
 }
