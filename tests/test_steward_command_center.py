@@ -634,3 +634,22 @@ def test_alfred_chat_endpoint_accepts_attachment_payload(tmp_path):
         assert history["sessions"][0]["turns"][0]["attachments"][0]["kind"] == "image"
     finally:
         server.shutdown(); server.server_close()
+
+def test_office_snapshot_button_manifest_and_local_zip_export_are_rendered(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+    manifest = __import__('estate.core.steward_command_center', fromlist=['build_office_snapshot_manifest']).build_office_snapshot_manifest(payload)
+
+    assert 'id="office-snapshot-button"' in html
+    assert 'Office Snapshot' in html
+    assert 'office-snapshot-source-artifacts' in html
+    assert 'function makeZip' in html
+    assert 'exportOfficeSnapshot' in html
+    assert 'No upload is performed' in html
+    assert 'fetch(' not in html[html.index('async function exportOfficeSnapshot'):html.index("document.addEventListener('click', event => { if(event.target.closest('#office-snapshot-button'))")]
+    assert manifest['schema_version'] == 'office-snapshot-v1'
+    assert manifest['local_only'] is True
+    assert 'snapshot_manifest.json' in manifest['package_contents']
+    assert 'source_artifacts.json' in manifest['package_contents']
+    assert manifest['source_artifact_count'] > 0

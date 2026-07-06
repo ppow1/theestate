@@ -1682,6 +1682,36 @@ def _activity_console_html(console):
 </details></aside>"""
 
 
+
+def _snapshot_source_artifacts(payload):
+    artifacts = []
+    for panel_id, panel in (payload.get("panels") or {}).items():
+        if not isinstance(panel, dict):
+            continue
+        paths = panel.get("path")
+        if not paths:
+            continue
+        for path in str(paths).split(";"):
+            path = path.strip()
+            if path:
+                artifacts.append({"panel_id": panel_id, "path": path, "available": bool(panel.get("available")), "kind": panel.get("kind") or "unknown"})
+    return artifacts
+
+
+def build_office_snapshot_manifest(payload):
+    """Build the schema metadata mirrored by the browser-side Office Snapshot export."""
+    active_tab = ((payload.get("workspace_profile") or {}).get("profile") or {}).get("active_tab") or "home"
+    return {
+        "schema_version": "office-snapshot-v1",
+        "local_only": True,
+        "created_at": _now(),
+        "active_tab": active_tab,
+        "active_navigation_item": active_tab,
+        "package_contents": ["snapshot_manifest.json", "page.html", "dom_state.json", "ui_metadata.json", "styles.css", "scripts.js", "source_artifacts.json", "README.md"],
+        "known_limitations": ["Screenshot capture is not included in WP-0117 first pass; use a separate local screenshot if needed.", "Browser security may prevent fetching some external stylesheet/script bodies; references and failures are recorded instead."],
+        "source_artifact_count": len(_snapshot_source_artifacts(payload)),
+    }
+
 def _refresh_script():
     return """<script>
 async function refreshOperationsChrome(){
@@ -1934,7 +1964,9 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.alfred-attachments{margin:.4rem 0;padding:.4rem;background:#fbf7ef;border:1px solid #eadcc8;border-radius:8px}.alfred-attachment-thumb{max-width:180px;max-height:120px;border:1px solid #d6cbbb;border-radius:6px;margin-top:.25rem}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
+    source_artifacts_json = html.escape(json.dumps(_snapshot_source_artifacts(payload), sort_keys=True))
+    snapshot_manifest_json = html.escape(json.dumps(build_office_snapshot_manifest(payload), sort_keys=True))
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.alfred-attachments{margin:.4rem 0;padding:.4rem;background:#fbf7ef;border:1px solid #eadcc8;border-radius:8px}.alfred-attachment-thumb{max-width:180px;max-height:120px;border:1px solid #d6cbbb;border-radius:6px;margin-top:.25rem}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}.snapshot-toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:.75rem}.snapshot-toolbar button{padding:.5rem .8rem;border:1px solid #8b6f3d;border-radius:8px;background:#3f6b50;color:#fff;font-weight:700;cursor:pointer}.snapshot-toolbar .snapshot-status{font-size:.9rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
 const WORKSPACE_PROFILE = __PROFILE_JSON__;
@@ -2003,13 +2035,61 @@ document.addEventListener('submit', async event => {
   pendingAlfredAttachments = []; renderPendingAttachments();
   await loadAlfredHistory();
 });
+
+function utf8Bytes(text){ return new TextEncoder().encode(String(text)); }
+function crc32(bytes){ let c = ~0; for(const b of bytes){ c ^= b; for(let k=0;k<8;k++) c = (c >>> 1) ^ (0xEDB88320 & -(c & 1)); } return ~c >>> 0; }
+function dosDateTime(date){ const y=Math.max(1980,date.getFullYear()); return {time:(date.getHours()<<11)|(date.getMinutes()<<5)|(date.getSeconds()>>1), date:((y-1980)<<9)|((date.getMonth()+1)<<5)|date.getDate()}; }
+function u16(n){ return [n & 255, (n>>>8)&255]; }
+function u32(n){ return [n & 255, (n>>>8)&255, (n>>>16)&255, (n>>>24)&255]; }
+function makeZip(files){
+  const chunks=[]; const central=[]; let offset=0; const stamp=dosDateTime(new Date());
+  for(const file of files){
+    const name=utf8Bytes(file.name); const data=file.bytes instanceof Uint8Array ? file.bytes : utf8Bytes(file.text || ''); const crc=crc32(data);
+    const local=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(stamp.time),...u16(stamp.date),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...name]);
+    chunks.push(local,data);
+    central.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(stamp.time),...u16(stamp.date),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset),...name]));
+    offset += local.length + data.length;
+  }
+  const centralSize=central.reduce((n,c)=>n+c.length,0); const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(centralSize),...u32(offset),...u16(0)]);
+  return new Blob([...chunks,...central,end], {type:'application/zip'});
+}
+function currentUiMetadata(){
+  const activeTab = document.querySelector('.workspace-tab.active')?.dataset.tab || 'unknown';
+  return {schema_version:'office-snapshot-v1', captured_at:new Date().toISOString(), url:location.href, path:location.pathname, viewport:{width:innerWidth,height:innerHeight}, user_agent:navigator.userAgent, active_tab:activeTab, active_navigation_item:document.querySelector('.nav-item.active')?.textContent || activeTab, local_only:true};
+}
+function collectDomState(){
+  return {active_tab:document.querySelector('.workspace-tab.active')?.dataset.tab || null, visible_panels:[...document.querySelectorAll('.workspace-view:not([hidden])')].map(e=>e.id), details:[...document.querySelectorAll('details')].map((e,i)=>({index:i, summary:e.querySelector('summary')?.textContent || '', open:e.open})), collapsed_sections:[...document.querySelectorAll('details:not([open])')].map(e=>e.querySelector('summary')?.textContent || '')};
+}
+async function exportOfficeSnapshot(){
+  const status=document.querySelector('#office-snapshot-status'); if(status) status.textContent='Building local snapshot ZIP…';
+  try{
+    const styles=[...document.querySelectorAll('style')].map((e,i)=>`/* inline style ${i+1} */\n${e.textContent}`).join('\n\n');
+    const scripts=[...document.querySelectorAll('script')].map((e,i)=> e.src ? `/* script reference ${i+1}: ${e.src} */` : `/* inline script ${i+1} */\n${e.textContent}`).join('\n\n');
+    const metadata=currentUiMetadata();
+    const manifest={...JSON.parse(document.querySelector('#office-snapshot-manifest')?.textContent || '{}'), ...metadata, package_contents:['snapshot_manifest.json','page.html','dom_state.json','ui_metadata.json','styles.css','scripts.js','source_artifacts.json','README.md'], privacy_notice:'Local-only browser-created download. No external upload is performed by this feature.'};
+    const files=[
+      {name:'snapshot_manifest.json', text:JSON.stringify(manifest,null,2)},
+      {name:'page.html', text:'<!doctype html>\n'+document.documentElement.outerHTML},
+      {name:'dom_state.json', text:JSON.stringify(collectDomState(),null,2)},
+      {name:'ui_metadata.json', text:JSON.stringify(metadata,null,2)},
+      {name:'styles.css', text:styles || '/* no inline styles captured */'},
+      {name:'scripts.js', text:scripts || '/* no inline scripts or references captured */'},
+      {name:'source_artifacts.json', text:document.querySelector('#office-snapshot-source-artifacts')?.textContent || '[]'},
+      {name:'README.md', text:'# Office Snapshot\n\nThis ZIP was assembled locally in the browser from the rendered Office of the Steward page. It may contain internal Estate information visible in the UI. Screenshot capture is a known future enhancement for WP-0117.\n'}
+    ];
+    const url=URL.createObjectURL(makeZip(files)); const a=document.createElement('a'); a.href=url; a.download=`office-snapshot-${new Date().toISOString().replace(/[:.]/g,'-')}.zip`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    if(status) status.textContent='Snapshot ZIP downloaded locally.';
+  }catch(error){ if(status) status.textContent=`Snapshot export failed after DOM capture attempt: ${error.message}`; console.error('Office Snapshot export failed', error); }
+}
+document.addEventListener('click', event => { if(event.target.closest('#office-snapshot-button')) exportOfficeSnapshot(); });
+
 window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); loadAlfredHistory(); renderPendingAttachments(); });
 </script>"""
     script = script.replace("__PROFILE_JSON__", json.dumps(payload.get("workspace_profile", {})))
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
-        f'<body><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p></header><div class="office-shell">{_nav_html(payload.get("navigation", {}))}<main class="workspace">{_tab_bar_html(payload.get("tabs", []))}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
+        f'<body><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div></header><div class="office-shell">{_nav_html(payload.get("navigation", {}))}<main class="workspace">{_tab_bar_html(payload.get("tabs", []))}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
