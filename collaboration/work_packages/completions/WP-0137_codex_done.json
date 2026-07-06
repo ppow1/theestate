@@ -1,0 +1,36 @@
+{
+  "artifacts": [
+    "operations/ai_services/WP-0137_office_of_steward_ai_services_model_selector_ui_report.md",
+    "runtime/ai_services/WP-0137_office_of_steward_ai_services_model_selector_ui_report.json",
+    "runtime/ai_services/model_preferences.json",
+    "runtime/ai_services/model_assignments.json"
+  ],
+  "branch": "work",
+  "codex_status": "complete",
+  "completed_at": "2026-07-06T02:40:00+00:00",
+  "files_changed": [
+    "src/estate/cli/main.py",
+    "src/estate/core/steward_command_center.py",
+    "collaboration/work_packages/completions/WP-0137_codex_done.json",
+    "operations/ai_services/WP-0137_office_of_steward_ai_services_model_selector_ui_report.md",
+    "src/estate/ai_services/steward_model_selector.py",
+    "tests/test_ai_services_steward_model_selector.py"
+  ],
+  "known_limitations": [
+    "No dedicated WP-0137 validation recipe existed before this work package; report documents this explicitly.",
+    "Live service model APIs are represented by hooks/unavailable markers rather than network queries."
+  ],
+  "merge_authority_or_equivalent": "Chief Architect review required; Codex does not merge.",
+  "pull_request_url_or_not_applicable_reason": "Not applicable in local Codex environment; make_pr tool records PR metadata.",
+  "ready_for_ca_review": true,
+  "status": "done",
+  "summary": [
+    "Added Steward AI Services / Models panel data layer and Office command-center tab.",
+    "Added governed model preferences, assignments, approvals, audit, rediscovery/status hooks, and CLI commands.",
+    "Added WP-0137 tests and reporting artifacts."
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py tests/test_ai_services_steward_model_selector.py"
+  ],
+  "work_package_id": "WP-0137"
+}
