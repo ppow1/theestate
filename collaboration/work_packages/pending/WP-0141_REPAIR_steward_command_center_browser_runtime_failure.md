@@ -47,6 +47,34 @@ Nope nothing works it's absolutely still the same
 
 This means WP-0140 did not repair the real browser/runtime failure. It may have made scripts syntactically valid, but the actual generated page still does not function for the Steward.
 
+## Browser Console Evidence From Steward Machine
+
+The Steward opened the broken page directly as a local file:
+
+```text
+file:///A:/theestate/runtime/steward/command_center.html
+```
+
+Chrome console shows repeated failures equivalent to:
+
+```text
+Failed to load resource: net::ERR_FAILED
+Access to fetch at 'file:///A:/status.json' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: chrome, chrome-extension, chrome-untrusted, data, http, https, isolated-app.
+Unsafe attempt to load URL file:///A:/theestate/runtime/... from frame with URL file:///A:/theestate/runtime/...
+file: URLs are treated as unique security origins.
+GET file:///A:/status.json net::ERR_FAILED
+```
+
+This is now the primary grounded failure evidence.
+
+Likely causes to investigate:
+
+- generated JavaScript is using `fetch()` against local `file://` URLs;
+- relative path resolution may be wrong, producing `/A:/status.json` or `file:///A:/status.json` instead of an embedded artifact;
+- browser CORS/security blocks `fetch()` from `file://` pages;
+- the generated static Command Center currently depends on runtime fetches that cannot work when opened as a file;
+- a failed fetch may be aborting initialization and preventing navigation bindings.
+
 ## Critical Correction
 
 Do not treat `node --check` as sufficient validation.
@@ -62,7 +90,8 @@ Do not treat `node --check` as sufficient validation.
 - query selectors match generated HTML;
 - buttons have correct types and handlers;
 - Alfred submit works;
-- AI Services / Models can be opened from the browser.
+- AI Services / Models can be opened from the browser;
+- `fetch()` works under `file://` browser security.
 
 The repair must validate real browser-facing behavior at the generated HTML level, not only script syntax.
 
@@ -78,13 +107,32 @@ Generate `runtime/steward/command_center.html`, open or inspect it as a browser 
 6. the duplicate top tab bar is intentional and functional, or removed if confusing/broken;
 7. only one workspace is visible at a time;
 8. the Alfred submit form works or shows a safe failure;
-9. the browser console has errors.
+9. the browser console has errors;
+10. there are any `fetch()` calls that target `file://`, `/A:/...`, `status.json`, or other local artifacts directly.
 
-If browser automation is unavailable, use static generated-HTML tests plus a minimal DOM simulation sufficient to prove event handlers attach to the generated elements.
+If browser automation is unavailable, use static generated-HTML tests plus a minimal DOM simulation sufficient to prove event handlers attach to the generated elements and no initialization fetch can abort the shell.
 
 ## Required Repair Outcomes
 
-### 1. Make Navigation Work Without Fragile Script Assumptions
+### 1. Command Center Must Not Depend On `fetch()` Under `file://`
+
+The Command Center is opened locally as:
+
+```text
+A:\theestate\runtime\steward\command_center.html
+```
+
+Therefore the generated static shell must not require browser `fetch()` to read local files.
+
+Required direction:
+
+- Embed required local data at generation time into safe `<script type="application/json">` blocks or static HTML.
+- Do not fetch `status.json`, local runtime JSON, or local file paths from a `file://` page.
+- Any optional live refresh that requires HTTP must be disabled under `file://` and must not break navigation.
+- All fetch failures must be caught and must not abort global initialization.
+- If a feature requires serving over HTTP, the UI must show a safe diagnostic and preserve the rest of the shell.
+
+### 2. Make Navigation Work Without Fragile Script Assumptions
 
 The Steward Command Center must work when opened locally from:
 
@@ -92,7 +140,7 @@ The Steward Command Center must work when opened locally from:
 A:\theestate\runtime\steward\command_center.html
 ```
 
-Navigation must not depend on brittle script timing or external assets.
+Navigation must not depend on brittle script timing, external assets, or successful local-file fetches.
 
 Preferred implementation:
 
@@ -102,10 +150,11 @@ Preferred implementation:
 - Ensure both Office Navigation and workspace tab buttons use the same switching function.
 - Update `hidden`, `.active`, `aria-selected`, and `aria-current` consistently.
 - Prevent default form/button behavior where needed.
+- Catch all optional feature errors so one failing feature cannot disable navigation.
 
 If JavaScript is unavailable, the page should still degrade visibly and explain that tabs require JavaScript rather than appearing silently broken.
 
-### 2. Ensure CSS Is Present And Applied
+### 3. Ensure CSS Is Present And Applied
 
 Verify generated HTML includes required inline CSS.
 
@@ -116,11 +165,12 @@ If the current page looks like plain unstyled document text, diagnose why:
 - stylesheet placed outside `<head>`;
 - broken HTML before style/script blocks;
 - browser treating file as text/html but style invalid;
-- generated CSS selectors not matching DOM.
+- generated CSS selectors not matching DOM;
+- initialization failure leaves the layout in fallback/plain state.
 
 Repair the generator so the page has a usable styled shell.
 
-### 3. Eliminate Confusing Duplicate Navigation If Needed
+### 4. Eliminate Confusing Duplicate Navigation If Needed
 
 The output currently shows Office Navigation and then a second list of the same workspaces immediately underneath.
 
@@ -134,7 +184,7 @@ If it is confusing in the plain fallback state, make the layout clear:
 
 Do not leave the Steward seeing two plain repeated lists and no usable controls.
 
-### 4. Preserve Recent Functionality
+### 5. Preserve Recent Functionality
 
 Do not regress:
 
@@ -144,12 +194,12 @@ Do not regress:
 - WP-0139 Alfred diagnostics and timeout/safe failure behavior;
 - Office Snapshot behavior unless it is the cause of the runtime failure.
 
-### 5. Add A Built-In UI Self-Test Panel Or Diagnostic Banner
+### 6. Add A Built-In UI Self-Test Panel Or Diagnostic Banner
 
 Add a local-only diagnostic indicator that makes browser runtime state visible, for example:
 
 ```text
-UI runtime: scripts loaded / navigation bound / active tab: mission-control
+UI runtime: scripts loaded / navigation bound / active tab: mission-control / file mode: safe static mode
 ```
 
 If scripts fail, the static fallback should visibly say:
@@ -158,9 +208,11 @@ If scripts fail, the static fallback should visibly say:
 UI runtime: script not initialized; navigation may not work
 ```
 
+If the page is opened under `file://`, the runtime diagnostic should explicitly say that network/file fetch refresh is disabled and that embedded static artifacts are being used.
+
 This is to prevent future silent failures where the generated page looks present but is unusable.
 
-### 6. Add Tests That Match The Steward's Failure
+### 7. Add Tests That Match The Steward's Failure
 
 Add tests that fail against the observed broken state.
 
@@ -176,6 +228,9 @@ At minimum:
 8. Alfred form submit handler does not break global navigation binding.
 9. AI Services / Models installed model rows still render when fixture data includes installed models.
 10. The Office Snapshot script does not break navigation binding.
+11. Generated HTML contains no required startup `fetch()` calls to `status.json`, local runtime JSON, `file://`, `/A:/`, or raw local artifact paths.
+12. Any optional `fetch()` call is wrapped in a catch/failure path and cannot abort initialization.
+13. Generated HTML explicitly supports `file://` mode with embedded artifacts.
 
 If a real browser test framework is unavailable, implement the strongest available generated-HTML and JavaScript behavior tests using local tooling already present in the repository.
 
@@ -190,7 +245,7 @@ PYTHONPATH=src pytest -q tests/test_ai_services_steward_model_selector.py
 PYTHONPATH=src python -m estate.cli.main steward-command-center
 ```
 
-Also add and run a validation that proves the generated page is not merely parseable, but browser-navigation capable.
+Also add and run a validation that proves the generated page is not merely parseable, but browser-navigation capable and safe under `file://`.
 
 ## Required Report Artifacts
 
@@ -214,12 +269,13 @@ The report must include:
 - what diagnostic indicator was added;
 - what was preserved from WP-0138;
 - what was preserved from WP-0139;
+- how `file://` mode avoids CORS/local file fetch failure;
 - tests run;
 - remaining limitations.
 
 ## Acceptance Criteria
 
-WP-0141 is complete when the locally generated Steward Command Center opens as a usable browser UI, has a visible runtime diagnostic, navigation and tab switching work in the browser, Alfred and AI Services / Models can be opened from the UI, the page no longer appears as a plain broken dump of headings/lists, and tests protect against this exact failure mode.
+WP-0141 is complete when the locally generated Steward Command Center opens as a usable browser UI from `file:///A:/theestate/runtime/steward/command_center.html`, has a visible runtime diagnostic, does not make required startup fetches blocked by CORS, navigation and tab switching work in the browser, Alfred and AI Services / Models can be opened from the UI, the page no longer appears as a plain broken dump of headings/lists, and tests protect against this exact failure mode.
 
 ## Merge Class
 
