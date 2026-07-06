@@ -312,3 +312,44 @@ def test_textgen_batch_model_validation_rejects_injection_characters(tmp_path):
     for bad in ["../secret.gguf", "sub/model.gguf", "sub\\model.gguf", "x;calc.gguf", "x&calc.gguf", "x|calc.gguf", "x$(calc).gguf"]:
         res=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model=bad)
         assert res["policy"]["allowed"] is False
+
+class _WritingRunner(_Runner):
+    def __init__(self, output, alive=True, return_code=None):
+        super().__init__(alive=alive); self.output=output; self._return_code=return_code
+    def start(self, command, cwd=None, log_path=None):
+        rec=super().start(command, cwd=cwd, log_path=log_path)
+        if log_path:
+            Path(log_path).write_text(Path(log_path).read_text(encoding="utf-8") + self.output, encoding="utf-8")
+        return rec
+    def return_code(self, pid):
+        return self._return_code
+
+
+def test_ai_service_attempt_logs_are_unique_and_exclude_stale_tail(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path)
+    stale=tmp_path/"runtime/ai_services/logs/textgen.log"
+    stale.parent.mkdir(parents=True, exist_ok=True)
+    stale.write_text("STALE POWERSHELL PROMPT\n", encoding="utf-8")
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_WritingRunner("CURRENT CHILD OUTPUT\n"),health_checker=_Health(False))
+    diag=res["execution"]["diagnostics"]
+    assert diag["log_path"] != "runtime/ai_services/logs/textgen.log"
+    assert diag["log_path"].startswith("runtime/ai_services/logs/textgen-")
+    assert "CURRENT CHILD OUTPUT" in diag["log_tail"]
+    assert "STALE POWERSHELL PROMPT" not in diag["log_tail"]
+    state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
+    assert state["processes"]["textgen"]["log_path"] == diag["log_path"]
+    events=[json.loads(line) for line in (tmp_path/"runtime/ai_services/audit_log.jsonl").read_text().splitlines()]
+    failed=[e for e in events if e["result"] == "execution_failed"][-1]
+    assert failed["details"]["log_path"] == diag["log_path"]
+
+
+def test_process_exit_diagnostics_include_exit_code_and_alive_status(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path)
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_WritingRunner("EXITED\n", alive=False, return_code=7),health_checker=_Health(False, "process_exited_before_health", "process_exited"))
+    diag=res["execution"]["diagnostics"]
+    assert diag["pid_alive"] is False
+    assert diag["process_alive"] is False
+    assert diag["process_exit_code"] == 7
+    assert diag["return_code"] == 7

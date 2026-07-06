@@ -1,4 +1,4 @@
-import json, os, re, shlex, subprocess, time
+import json, os, re, shlex, subprocess, time, uuid
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 from datetime import datetime, timezone
@@ -10,18 +10,30 @@ APPROVALS='approvals.json'
 SAFE_MODEL=re.compile(r'^[A-Za-z0-9._+-]+$')
 
 class ProcessRunner:
+    def __init__(self):
+        self._processes={}
+        self._streams={}
     def start(self, command, cwd=None, log_path=None):
         stdout = open(log_path, 'ab') if log_path else subprocess.DEVNULL
         args = command_to_subprocess_args(command)
         proc = subprocess.Popen(args, cwd=cwd, stdout=stdout, stderr=subprocess.STDOUT, shell=False)
-        return {'pid': proc.pid}
+        self._processes[proc.pid]=proc
+        if log_path:
+            self._streams[proc.pid]=stdout
+        return {'pid': proc.pid, 'return_code': proc.poll()}
     def stop(self, pid):
         os.kill(int(pid), 15); return {'stopped': True, 'pid': int(pid)}
     def is_alive(self, pid):
+        proc=self._processes.get(int(pid)) if pid is not None else None
+        if proc is not None:
+            return proc.poll() is None
         try:
             os.kill(int(pid), 0); return True
         except Exception:
             return False
+    def return_code(self, pid):
+        proc=self._processes.get(int(pid)) if pid is not None else None
+        return proc.poll() if proc is not None else None
 
 class HealthChecker:
     def check(self, endpoint, timeout_seconds=30, interval_seconds=2, runner=None, pid=None):
@@ -201,9 +213,38 @@ def _log_tail(path, max_chars=1200):
     except Exception:
         return None
 
-def _diagnostics(sid, svc, proc, health, log_abs, command):
+def _attempt_log_path(sid, root=None):
+    stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    name=f'{sid}-{stamp}-{uuid.uuid4().hex[:8]}.log'
+    rel=f'runtime/ai_services/logs/{name}'
+    return rel, (Path(root)/rel) if root else (STATE.parent/'logs'/name)
+
+def _runner_return_code(runner, pid):
+    if pid is None or not hasattr(runner, 'return_code'):
+        return None
+    try:
+        return runner.return_code(pid)
+    except Exception:
+        return None
+
+def _runner_alive(runner, pid):
+    if pid is None or not hasattr(runner, 'is_alive'):
+        return None
+    try:
+        return runner.is_alive(pid)
+    except Exception:
+        return None
+
+def _diagnostics(sid, svc, proc, health, log_abs, command, runner=None):
     endpoint=(health or {}).get('endpoint') or _status_health_endpoint(svc)
-    return {'tracked_pid': proc.get('pid') if proc else None, 'pid_alive': (health or {}).get('pid_alive'), 'expected_endpoint': endpoint, 'expected_port': (svc.get('ports') or [None])[0], 'last_health_error': (health or {}).get('error'), 'log_path': proc.get('log_path') if proc else None, 'log_tail': _log_tail(log_abs), 'command_label': command}
+    pid=proc.get('pid') if proc else None
+    pid_alive=(health or {}).get('pid_alive')
+    if pid_alive is None:
+        pid_alive=_runner_alive(runner, pid)
+    return_code=(health or {}).get('return_code')
+    if return_code is None:
+        return_code=_runner_return_code(runner, pid)
+    return {'service_id': sid, 'operation': proc.get('operation_id') if proc else None, 'tracked_pid': pid, 'pid': pid, 'working_directory': proc.get('working_directory') if proc else None, 'pid_alive': pid_alive, 'process_alive': pid_alive, 'process_exit_code': return_code, 'return_code': return_code, 'expected_endpoint': endpoint, 'health_endpoint': endpoint, 'expected_port': (svc.get('ports') or [None])[0], 'health_status': (health or {}).get('status'), 'last_health_error': (health or {}).get('error'), 'log_path': proc.get('log_path') if proc else None, 'log_tail': _log_tail(log_abs), 'command_label': command}
 
 
 
@@ -227,7 +268,7 @@ def _record_health_interrupted(plan, svc, sid, op, model, res, pid, endpoint, lo
         'command_label': cmd,
         'endpoint': svc.get('default_endpoint'),
         'expected_ports': svc.get('ports', []),
-        'log_path': f'runtime/ai_services/logs/{sid}.log',
+        'log_path': res.get('log_path') if isinstance(res, dict) else None,
     })
     proc.update({
         'current_status': 'interrupted',
@@ -244,7 +285,7 @@ def _record_health_interrupted(plan, svc, sid, op, model, res, pid, endpoint, lo
         'last_operation': op,
     }
     save_state(st, root)
-    diag=_diagnostics(sid, svc, proc, interrupted, log_abs, cmd)
+    diag=_diagnostics(sid, svc, proc, interrupted, log_abs, cmd, runner=None)
     diag['interruption']={'type': _interruption_name(exc), 'message': str(exc)}
     append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'health_check_interrupted','details':{**interrupted,'diagnostics':diag}}, root)
     append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'execution_interrupted','details':diag}, root)
@@ -265,13 +306,14 @@ def execute_plan(plan, svc, runner=None, root=None, health_checker=None, health_
         if not cmd: raise RuntimeError('no_safe_command_template')
         endpoint=_status_health_endpoint(svc)
         if endpoint and not _loopback_url(endpoint): raise RuntimeError('health_endpoint_must_be_loopback')
-        log=f'runtime/ai_services/logs/{sid}.log'; log_abs=(Path(root)/log) if root else (STATE.parent/'logs'/f'{sid}.log'); log_abs.parent.mkdir(parents=True, exist_ok=True)
-        append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'process_start_attempted','details':{'command_label':cmd}}, root)
+        log, log_abs=_attempt_log_path(sid, root); log_abs.parent.mkdir(parents=True, exist_ok=True); log_abs.write_text(f'[{now()}] ai_services attempt log created service={sid} operation={op}\n', encoding='utf-8')
+        append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'process_start_attempted','details':{'command_label':cmd,'log_path':log,'working_directory':command_working_directory(svc, op)}}, root)
         res=runner.start(cmd, cwd=command_working_directory(svc, op), log_path=str(log_abs))
+        res={**(res or {}), 'log_path': log, 'working_directory': command_working_directory(svc, op)}
         pid=res.get('pid')
-        append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'process_started','details':{'pid':pid}}, root)
+        append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'process_started','details':{'pid':pid,'log_path':log,'working_directory':command_working_directory(svc, op),'return_code':res.get('return_code')}}, root)
         st=load_state(root)
-        proc={'service_id':sid,'operation_id':op,'pid':pid,'start_time':now(),'command_label':cmd,'endpoint':svc.get('default_endpoint'),'expected_ports':svc.get('ports',[]),'current_status':'process_started','health_status':'pending' if endpoint else 'not_declared','log_path':log}
+        proc={'service_id':sid,'operation_id':op,'pid':pid,'start_time':now(),'command_label':cmd,'endpoint':svc.get('default_endpoint'),'expected_ports':svc.get('ports',[]),'current_status':'process_started','health_status':'pending' if endpoint else 'not_declared','log_path':log,'working_directory':command_working_directory(svc, op),'return_code':res.get('return_code')}
         st['processes'][sid]=proc; st['services'][sid]={'status':'health_pending' if endpoint else 'process_started','endpoint':svc.get('default_endpoint'),'last_operation':op}; save_state(st, root)
         if endpoint:
             append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'health_check_started','details':{'endpoint':endpoint,'timeout_seconds':health_timeout_seconds,'interval_seconds':health_interval_seconds}}, root)
@@ -281,7 +323,7 @@ def execute_plan(plan, svc, runner=None, root=None, health_checker=None, health_
                 return _record_health_interrupted(plan, svc, sid, op, model, res, pid, endpoint, log_abs, cmd, root, e)
             health['endpoint']=endpoint
             st=load_state(root); proc=st['processes'][sid]
-            proc['health_status']='healthy' if health.get('healthy') else 'failed'; proc['health_result']=health; proc['pid_alive']=health.get('pid_alive')
+            proc['health_status']='healthy' if health.get('healthy') else 'failed'; proc['health_result']=health; proc['pid_alive']=health.get('pid_alive'); proc['return_code']=_runner_return_code(runner, pid)
             if health.get('healthy'):
                 proc['current_status']='healthy'; st['services'][sid]={'status':'running','endpoint':svc.get('default_endpoint'),'last_operation':op}
                 save_state(st, root)
@@ -292,7 +334,7 @@ def execute_plan(plan, svc, runner=None, root=None, health_checker=None, health_
             proc['current_status']='process_exited' if event=='process_exited_before_health' else 'exited_or_unhealthy'; proc['health_error']=health.get('error')
             st['services'][sid]={'status':'process_exited' if event=='process_exited_before_health' else 'health_failed','endpoint':svc.get('default_endpoint'),'last_operation':op}
             save_state(st, root)
-            diag=_diagnostics(sid, svc, proc, health, log_abs, cmd)
+            diag=_diagnostics(sid, svc, proc, health, log_abs, cmd, runner=runner)
             append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':event,'details':{**health,'diagnostics':diag}}, root)
             append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'execution_failed','details':diag}, root)
             return {**plan,'approval_state':'failed','result':'health_failed','execution':{**res,'lifecycle_state':st['services'][sid]['status'],'health':health,'diagnostics':diag}}
