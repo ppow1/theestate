@@ -1,0 +1,39 @@
+{
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T21:59:47.682112+00:00",
+  "files_changed": [
+    "collaboration/work_packages/completions/WP-0213_codex_done.json",
+    "operations/steward/WP-0215_wp0213_command_surface_validation_repair_report.md",
+    "collaboration/work_packages/completions/WP-0215_codex_done.json"
+  ],
+  "known_limitations": [
+    "No WP-0215 validation recipe is registered locally; validation command reports no_recipe even though the completion receipt is present.",
+    "The original WP-0213 failing capture path was unavailable, but fresh reruns and available captures pass."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "PR URL will be assigned by repository host after local commit and PR creation metadata is recorded.",
+  "pull_request_url_or_not_applicable_reason": "PR URL will be assigned by repository host after local commit and PR creation metadata is recorded.",
+  "ready_for_ca_review": true,
+  "remaining_findings": [
+    "No WP-0215 validation recipe is registered locally; original WP-0213 failing capture path was unavailable, but fresh reruns and available captures pass."
+  ],
+  "root_cause": "The historical tests/test_steward_command_center.py failure capture was not available and the suite now passes; the reproducible WP-0213 readiness blocker was incomplete completion receipt metadata missing PR/not-applicable and files_changed fields.",
+  "summary": "Repaired WP-0213 validation readiness by completing missing receipt metadata, documented the non-reproducible command-center finding, and confirmed the real Office action surface remains present.",
+  "tests_run": [
+    "PYTHONPATH=src python -m pytest tests/test_office_command_surface.py",
+    "PYTHONPATH=src python -m pytest tests/test_steward_command_center.py",
+    "PYTHONPATH=src python -m pytest tests/test_office_actions.py tests/test_office_*actions.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0213 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0215 --json"
+  ],
+  "work_package_id": "WP-0215",
+  "wp0213_receipt_fields_repaired": [
+    "pull_request_url_or_not_applicable_reason",
+    "pull_request_not_applicable_reason",
+    "files_changed"
+  ]
+}
