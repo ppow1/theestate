@@ -1,0 +1,99 @@
+{
+  "batch_work_package_id": "WP-0203",
+  "batch_title": "Office Controls Wave 1 Staged Foundation",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T16:49:20.445518+00:00",
+  "branch": "work",
+  "pull_request_url_or_not_applicable_reason": "PR URL is unavailable from local Codex environment before make_pr tool records PR metadata.",
+  "ordered_package_list": [
+    "WP-0200",
+    "WP-0201",
+    "WP-0202"
+  ],
+  "packages": [
+    {
+      "work_package_id": "WP-0200",
+      "completion_receipt_path": "collaboration/work_packages/completions/WP-0200_codex_done.json",
+      "staged_workstream_path": "collaboration/workstreams/WP-0200/",
+      "install_manifest_path": "collaboration/workstreams/WP-0200/install_manifest.json"
+    },
+    {
+      "work_package_id": "WP-0201",
+      "completion_receipt_path": "collaboration/work_packages/completions/WP-0201_codex_done.json",
+      "staged_workstream_path": "collaboration/workstreams/WP-0201/",
+      "install_manifest_path": "collaboration/workstreams/WP-0201/install_manifest.json"
+    },
+    {
+      "work_package_id": "WP-0202",
+      "completion_receipt_path": "collaboration/work_packages/completions/WP-0202_codex_done.json",
+      "staged_workstream_path": "collaboration/workstreams/WP-0202/",
+      "install_manifest_path": "collaboration/workstreams/WP-0202/install_manifest.json"
+    }
+  ],
+  "per_package_completion_receipt_paths": {
+    "WP-0200": "collaboration/work_packages/completions/WP-0200_codex_done.json",
+    "WP-0201": "collaboration/work_packages/completions/WP-0201_codex_done.json",
+    "WP-0202": "collaboration/work_packages/completions/WP-0202_codex_done.json"
+  },
+  "per_package_staged_workstream_paths": {
+    "WP-0200": "collaboration/workstreams/WP-0200/",
+    "WP-0201": "collaboration/workstreams/WP-0201/",
+    "WP-0202": "collaboration/workstreams/WP-0202/"
+  },
+  "per_package_install_manifest_paths": {
+    "WP-0200": "collaboration/workstreams/WP-0200/install_manifest.json",
+    "WP-0201": "collaboration/workstreams/WP-0201/install_manifest.json",
+    "WP-0202": "collaboration/workstreams/WP-0202/install_manifest.json"
+  },
+  "summary_of_cross_package_alignment_decisions": [
+    "WP-0201 and WP-0202 use WP-0200 authority classes: safe_read_only, safe_local_generated_artifact_update, steward_confirmed_local_mutation, authority_gated_institutional_action, prohibited_until_future_governance.",
+    "All command hooks default to copy-only or handler-reference design; direct execution is not installed or enabled.",
+    "Generated artifacts require confirmation; local mutations require preview-before-write; institutional requests require explicit authority route.",
+    "All staged controls declare local-only/no-upload posture and expected output paths where writes are proposed."
+  ],
+  "conflicts_detected_between_packages": [],
+  "validation_commands_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0200 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0200 --json",
+      "status": "warning_no_recipe",
+      "notes": "Generated validation artifacts but exited 1 because no validation recipe is registered."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0201 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0201 --json",
+      "status": "warning_no_recipe",
+      "notes": "Generated validation artifacts but exited 1 because no validation recipe is registered."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0202 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0202 --json",
+      "status": "warning_no_recipe",
+      "notes": "Generated validation artifacts but exited 1 because no validation recipe is registered."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed_with_existing_repo_blockers",
+      "notes": "Command exited 0 after receipts were complete; report lists unrelated existing blockers and no recipes for WP-0200 through WP-0202."
+    }
+  ],
+  "known_limitations": [
+    "validate-work-package has no registered recipes for WP-0200, WP-0201, or WP-0202, so those commands produced no-recipe warnings.",
+    "Staged pytest tests are proposed under workstream directories and are not installed into active test discovery paths.",
+    "No active Office runtime controls were installed; a future install-handoff must wire reviewed artifacts."
+  ],
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url_not_applicable_reason": "PR URL is unavailable from local Codex environment before make_pr tool records PR metadata.",
+  "pull_request_not_applicable_reason": "PR URL is unavailable from local Codex environment before make_pr tool records PR metadata."
+}

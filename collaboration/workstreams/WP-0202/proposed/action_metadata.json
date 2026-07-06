@@ -1,0 +1,189 @@
+[
+  {
+    "action_id": "work_packages.inspect",
+    "label": "Inspect work package",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "open/read pending, completion, validation artifacts; never execute pending packages",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "work_packages.inspect",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.open_source",
+    "label": "Open source artifact",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "open known source paths only",
+    "action_class": "open_source",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "work_packages.open_source",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.copy_codex_command",
+    "label": "Copy Codex command",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "copy one-line command; execution_allowed false",
+    "action_class": "copy_codex_command",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "copy-only",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.copy_validation_command",
+    "label": "Copy validation command",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "copy validation command; not executable in Wave 1",
+    "action_class": "copy_validation_command",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "copy-only",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.run_validation_recipe_design",
+    "label": "Run validation recipe (design only)",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "future confirmed validation run produces evidence, not acceptance",
+    "action_class": "run_validation_recipe_design",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [
+      "runtime/validation/work-packages/WP-XXXX.json"
+    ],
+    "command_hook_or_handler_reference": "work_packages.run_validation_recipe_design",
+    "expected_output_paths": [
+      "runtime/validation/work-packages/WP-XXXX.json"
+    ],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.request_ca_review",
+    "label": "Request Chief Architect review",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "draft/queue request; does not mark review complete",
+    "action_class": "request_ca_review",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "explicit_authority_route",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [
+      "collaboration/review_requests/WP-XXXX.md"
+    ],
+    "command_hook_or_handler_reference": "work_packages.request_ca_review",
+    "expected_output_paths": [
+      "collaboration/review_requests/WP-XXXX.md"
+    ],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.create_blocker_note",
+    "label": "Create blocker note",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "draft local blocker note; no canonical state transition",
+    "action_class": "create_blocker_note",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [
+      "collaboration/blockers/WP-XXXX.md"
+    ],
+    "command_hook_or_handler_reference": "work_packages.create_blocker_note",
+    "expected_output_paths": [
+      "collaboration/blockers/WP-XXXX.md"
+    ],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.prepare_batch_manifest",
+    "label": "Prepare sequential batch manifest",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "draft manifest only; does not submit or execute batch",
+    "action_class": "prepare_batch_manifest",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "explicit_authority_route",
+    "reads_artifacts": [
+      "collaboration/work_packages/pending/WP-XXXX.md"
+    ],
+    "writes_artifacts": [
+      "collaboration/batch_manifests/WP-BATCH-draft.json"
+    ],
+    "command_hook_or_handler_reference": "work_packages.prepare_batch_manifest",
+    "expected_output_paths": [
+      "collaboration/batch_manifests/WP-BATCH-draft.json"
+    ],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  },
+  {
+    "action_id": "work_packages.inspect_parallel_workstream_manifest",
+    "label": "Inspect parallel workstream manifest",
+    "target_tab": "work-packages",
+    "target_work_package_id": "WP-XXXX",
+    "description": "read manifest only; does not install staged work",
+    "action_class": "inspect_parallel_workstream_manifest",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "collaboration/workstreams/WP-XXXX/install_manifest.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "work_packages.inspect_parallel_workstream_manifest",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; preserve package state; report local error",
+    "local_only_no_upload_guarantee": true,
+    "does_not_execute_pending_work_packages": "Control is inspect/copy/draft/validated-output only; execution_allowed is false and future authority is required."
+  }
+]
