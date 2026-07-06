@@ -1,0 +1,50 @@
+{
+  "approval_behavior": "Approval records are grouped as pending/approved/denied; actors cannot approve their own authority expansion.",
+  "assignment_behavior": "Worker/resident assignments are loaded and persisted through runtime/ai_services/model_assignments.json with Steward-only writes.",
+  "audit_rediscovery_behavior": "Audit tail is newest-first and sanitized; UI exposes rediscover, status, models, registry, state, audit, and approval command hooks.",
+  "cli_api_changes": [
+    "ai-services models",
+    "ai-services model-preferences",
+    "ai-services set-model-preference",
+    "ai-services assignments",
+    "ai-services set-assignment",
+    "ai-services approvals",
+    "ai-services approve",
+    "ai-services deny",
+    "ai-services refresh-status",
+    "ai-services steward-panel"
+  ],
+  "filesystem_model_discovery_behavior": "Enumerates declared service model directories, including GGUF/model files and HuggingFace-style or repository-like directories; loaded models are marked separately from installed inventory.",
+  "final_steward_workspace_path": "runtime/steward/command_center.html#ai-services-models",
+  "known_limitations": [
+    "Static HTML cannot execute local commands directly; it renders copyable local command hooks.",
+    "Filesystem discovery can only enumerate model directories visible to the local host running the generator."
+  ],
+  "model_data_rendered": {
+    "installed_model_count": 0,
+    "model_count": 5
+  },
+  "preference_behavior": "Estate defaults are loaded from runtime/ai_services/model_preferences.json with unresolved markers for unknown references.",
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Chief Architect review and Steward browser verification of the AI Services / Models workspace.",
+  "service_data_rendered": [
+    "comfyui",
+    "ollama",
+    "open_webui",
+    "sillytavern",
+    "textgen"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py",
+    "PYTHONPATH=src pytest -q tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_production_readiness_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src pytest -q tests/test_ai_services_steward_model_selector.py tests/test_steward_command_center.py"
+  ],
+  "validation_results": {
+    "dedicated_wp0138_recipe": "not_available",
+    "production_readiness_command": "completed_with_existing_repository_blockers",
+    "pytest_required": "passed"
+  },
+  "work_package_id": "WP-0138"
+}

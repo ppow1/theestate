@@ -74,3 +74,39 @@ def test_alfred_cannot_approve_own_request_but_steward_can_deny(tmp_path):
     assert denied["state"] == "denied"
     panel = build_steward_ai_services_panel(tmp_path)["data"]
     assert any(r["state"] == "denied" for r in panel["approvals"]["requests"])
+
+
+def test_wp0138_discovers_multiple_gguf_files_directories_and_loaded_separately(tmp_path):
+    models = tmp_path / "models"
+    models.mkdir()
+    for name in ["Qwen3-8B-Q6_K.gguf", "Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf"]:
+        (models / name).write_text("x")
+    repo = models / "Weiwei22_WaifuChat-8b"
+    repo.mkdir()
+    (repo / "config.json").write_text("{}")
+    _write(tmp_path, "textgen", _manifest("textgen", "TextGen", "http://127.0.0.1:5000/v1", 5000, {"models": str(models)}, {"status": {"api_template": "GET /v1/models"}, "load_model": {"command_template": "load {model}"}}, {"load_model": {"required": True}}))
+    rediscover(tmp_path)
+    state = {"version": "ai-services-state-v1", "services": {"textgen": {"status": "running", "loaded_model": "Qwen3-8B-Q6_K.gguf"}}}
+    (tmp_path / "runtime/ai_services/state.json").write_text(json.dumps(state), encoding="utf-8")
+
+    panel = build_steward_ai_services_panel(tmp_path)["data"]
+    inventory = {m["name"]: m for m in panel["models"] if m["backing_service"] == "textgen"}
+
+    assert inventory["Qwen3-8B-Q6_K.gguf"]["installed"] is True
+    assert inventory["Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf"]["installed"] is True
+    assert inventory["Weiwei22_WaifuChat-8b"]["classification_status"] == "huggingface_or_model_directory"
+    assert inventory["Qwen3-8B-Q6_K.gguf"]["currently_loaded"] is True
+    assert inventory["Meta-Llama-3.1-8B-Instruct-Q5_K_M.gguf"]["currently_loaded"] is False
+    assert panel["dashboard"]["known_installed_models"] == 3
+
+
+def test_wp0138_audit_tail_redacts_secrets_and_is_newest_first(tmp_path):
+    _seed(tmp_path)
+    audit = tmp_path / "runtime/ai_services/audit_log.jsonl"
+    audit.write_text('\n'.join([
+        json.dumps({"result": "old", "details": {"api_key": "secret-value"}}),
+        json.dumps({"result": "new", "details": {"message": "ok"}}),
+    ]), encoding="utf-8")
+    tail = build_steward_ai_services_panel(tmp_path)["data"]["audit_tail"]
+    assert tail[0]["result"] == "new"
+    assert tail[1]["details"]["api_key"] == "[redacted]"

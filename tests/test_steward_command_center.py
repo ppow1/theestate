@@ -210,6 +210,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
         "Alfred",
         "Helen",
         "Resident Conversations",
+        "AI Services / Models",
         "Daily Board",
         "Active Projects",
         "Expansion Roadmap",
