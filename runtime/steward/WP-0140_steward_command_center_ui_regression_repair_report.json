@@ -1,0 +1,42 @@
+{
+  "work_package_id": "WP-0140",
+  "status": "done",
+  "root_cause": "Generated executable JavaScript contained Python-interpreted newlines inside single-quoted JavaScript strings, and JSON script blocks were HTML-entity escaped. The active workspace profile also was not reflected in initial tab/nav active state.",
+  "fixed_behavior": [
+    "Command Center shell renders with usable office navigation and workspace tabs.",
+    "Only the active workspace is visible by default; inactive workspaces retain hidden semantics.",
+    "Executable script blocks in the regenerated HTML pass node --check.",
+    "JSON embedded in application/json script blocks is parse-safe without HTML entities.",
+    "Mission Control, Alfred, and AI Services / Models workspaces are present and selectable."
+  ],
+  "preserved_wp0138": [
+    "AI Services / Models workspace",
+    "discovered services",
+    "installed TextGen model inventory rendering",
+    "approvals, service details, and local command hooks"
+  ],
+  "preserved_wp0139": [
+    "Alfred chat form",
+    "timeout handling",
+    "safe failure state",
+    "adapter diagnostics",
+    "governed action boundary"
+  ],
+  "changed_files": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "runtime/steward/command_center.html",
+    "operations/steward/WP-0140_steward_command_center_ui_regression_repair_report.md",
+    "runtime/steward/WP-0140_steward_command_center_ui_regression_repair_report.json",
+    "collaboration/work_packages/completions/WP-0140_codex_done.json"
+  ],
+  "validation": [
+    {"command": "PYTHONPATH=src pytest -q tests/test_steward_command_center.py tests/test_resident_interaction.py tests/test_ai_services_steward_model_selector.py", "result": "pass", "details": "55 passed"},
+    {"command": "PYTHONPATH=src python -m estate.cli.main steward-command-center", "result": "pass"},
+    {"command": "node --check /tmp/wp0140_exec_script1.js && node --check /tmp/wp0140_exec_script2.js", "result": "pass"}
+  ],
+  "remaining_limitations": [
+    "No browser automation screenshot was taken; validation is static and JavaScript syntax-level.",
+    "Default active workspace remains governed by the existing workspace profile/settings."
+  ]
+}

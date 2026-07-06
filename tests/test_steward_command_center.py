@@ -6,6 +6,7 @@ from urllib.request import urlopen
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from estate.core.steward_command_center import generate_command_center, render_command_center_html, serve_command_center
+from estate.ai_services.discovery import rediscover
 
 
 def write_json(root, rel, payload):
@@ -663,3 +664,60 @@ def test_wp0139_alfred_ui_has_failure_timeout_and_diagnostics_state(tmp_path):
     assert "Adapter diagnostics are shown per response" in html
     assert "reviewing local Estate context" in html
     assert "data-state" in html
+
+
+def test_wp0140_command_center_shell_has_safe_navigation_panels_and_scripts(tmp_path):
+    import re
+
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert "id='office-navigation'" in html
+    assert "id='workspace-tabs'" in html
+    for tab in ["mission-control", "alfred", "ai-services-models"]:
+        assert f"data-tab='{tab}'" in html
+        assert f"id='workspace-{tab}'" in html
+    assert len(re.findall(r"<section id='workspace-[^']+'", html)) == len(payload["tabs"])
+    assert len(re.findall(r"<section id='workspace-[^']+'[^>]* hidden>", html)) == len(payload["tabs"]) - 1
+    assert "function activateOfficeTab" in html
+    assert "document.addEventListener('submit'" in html
+    assert "resident_chat_timeout_after_30s" in html
+    assert 'data-state="idle"' in html
+    assert "data-state=\"idle role" not in html
+    assert "const WORKSPACE_PROFILE = {&quot;" not in html
+    assert "&quot;" not in re.search(r'<script id="global-palette-data" type="application/json">(.*?)</script>', html, re.S).group(1)
+    executable_scripts = [m.group(1) for m in re.finditer(r"<script>(.*?)</script>", html, re.S)]
+    assert executable_scripts
+    assert "join('\n" not in "\n".join(executable_scripts)
+    assert "text:'<!doctype html>\n'" not in "\n".join(executable_scripts)
+
+
+def test_wp0140_ai_services_models_workspace_renders_installed_inventory(tmp_path):
+    seed_inputs(tmp_path)
+    models = tmp_path / "models"
+    models.mkdir()
+    (models / "Qwen3.gguf").write_text("x", encoding="utf-8")
+    manifest_dir = tmp_path / "runtime/ai_services/implementations/textgen"
+    manifest_dir.mkdir(parents=True)
+    (manifest_dir / "service.manifest.json").write_text(json.dumps({
+        "service_id": "textgen",
+        "display_name": "TextGen",
+        "service_type": "model_runtime",
+        "local_only": True,
+        "host_policy": {"bind": "127.0.0.1", "allow_public_bind": False},
+        "default_endpoint": "http://127.0.0.1:5000/v1",
+        "ports": [5000],
+        "paths": {"models": str(models)},
+        "operations": {"status": {"api_template": "GET /v1/models"}, "load_model": {"command_template": "load {model}"}},
+        "approval": {"load_model": {"required": True}},
+    }), encoding="utf-8")
+
+    rediscover(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+
+    assert "AI Services / Models" in html
+    assert "Qwen3.gguf" in html
+    assert "textgen:Qwen3.gguf" in html
+    assert "installed" in html
+    assert "ai-services rediscover" in html
