@@ -205,6 +205,51 @@ def _diagnostics(sid, svc, proc, health, log_abs, command):
     endpoint=(health or {}).get('endpoint') or _status_health_endpoint(svc)
     return {'tracked_pid': proc.get('pid') if proc else None, 'pid_alive': (health or {}).get('pid_alive'), 'expected_endpoint': endpoint, 'expected_port': (svc.get('ports') or [None])[0], 'last_health_error': (health or {}).get('error'), 'log_path': proc.get('log_path') if proc else None, 'log_tail': _log_tail(log_abs), 'command_label': command}
 
+
+
+def _interruption_name(exc):
+    return type(exc).__name__
+
+def _record_health_interrupted(plan, svc, sid, op, model, res, pid, endpoint, log_abs, cmd, root, exc):
+    interrupted={
+        'healthy': False,
+        'status': 'interrupted',
+        'error': _interruption_name(exc),
+        'endpoint': endpoint,
+        'pid_alive': None,
+    }
+    st=load_state(root)
+    proc=st.setdefault('processes', {}).setdefault(sid, {
+        'service_id': sid,
+        'operation_id': op,
+        'pid': pid,
+        'start_time': now(),
+        'command_label': cmd,
+        'endpoint': svc.get('default_endpoint'),
+        'expected_ports': svc.get('ports', []),
+        'log_path': f'runtime/ai_services/logs/{sid}.log',
+    })
+    proc.update({
+        'current_status': 'interrupted',
+        'health_status': 'interrupted',
+        'health_error': _interruption_name(exc),
+        'health_result': interrupted,
+        'pid_alive': None,
+        'interrupted_at': now(),
+        'interruption': {'type': _interruption_name(exc), 'message': str(exc)},
+    })
+    st.setdefault('services', {})[sid]={
+        'status': 'interrupted',
+        'endpoint': svc.get('default_endpoint'),
+        'last_operation': op,
+    }
+    save_state(st, root)
+    diag=_diagnostics(sid, svc, proc, interrupted, log_abs, cmd)
+    diag['interruption']={'type': _interruption_name(exc), 'message': str(exc)}
+    append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'health_check_interrupted','details':{**interrupted,'diagnostics':diag}}, root)
+    append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'execution_interrupted','details':diag}, root)
+    return {**plan,'approval_state':'interrupted','result':'interrupted','execution':{**(res or {}),'lifecycle_state':'interrupted','health':interrupted,'diagnostics':diag}}
+
 def execute_plan(plan, svc, runner=None, root=None, health_checker=None, health_timeout_seconds=30, health_interval_seconds=2):
     runner=runner or ProcessRunner(); health_checker=health_checker or HealthChecker(); op=plan['operation']; sid=plan['service_id']
     model=plan.get('details',{}).get('model')
@@ -230,7 +275,10 @@ def execute_plan(plan, svc, runner=None, root=None, health_checker=None, health_
         st['processes'][sid]=proc; st['services'][sid]={'status':'health_pending' if endpoint else 'process_started','endpoint':svc.get('default_endpoint'),'last_operation':op}; save_state(st, root)
         if endpoint:
             append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'health_check_started','details':{'endpoint':endpoint,'timeout_seconds':health_timeout_seconds,'interval_seconds':health_interval_seconds}}, root)
-            health=health_checker.check(endpoint, timeout_seconds=health_timeout_seconds, interval_seconds=health_interval_seconds, runner=runner, pid=pid)
+            try:
+                health=health_checker.check(endpoint, timeout_seconds=health_timeout_seconds, interval_seconds=health_interval_seconds, runner=runner, pid=pid)
+            except (KeyboardInterrupt, InterruptedError) as e:
+                return _record_health_interrupted(plan, svc, sid, op, model, res, pid, endpoint, log_abs, cmd, root, e)
             health['endpoint']=endpoint
             st=load_state(root); proc=st['processes'][sid]
             proc['health_status']='healthy' if health.get('healthy') else 'failed'; proc['health_result']=health; proc['pid_alive']=health.get('pid_alive')
