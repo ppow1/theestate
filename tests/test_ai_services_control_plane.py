@@ -221,6 +221,40 @@ def test_textgen_model_load_uses_models_health_endpoint(tmp_path):
     assert health.calls == ["http://127.0.0.1:5000/v1/models"]
 
 
+class _InterruptingHealth:
+    def __init__(self, exc):
+        self.exc=exc; self.calls=[]
+    def check(self, endpoint, timeout_seconds=30, interval_seconds=2, runner=None, pid=None):
+        self.calls.append(endpoint)
+        raise self.exc
+
+
+def test_health_check_keyboard_interrupt_records_interrupted_state_and_json(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path); health=_InterruptingHealth(KeyboardInterrupt())
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_Runner(),health_checker=health)
+    assert res["result"] == "interrupted"
+    assert res["approval_state"] == "interrupted"
+    assert res["execution"]["lifecycle_state"] == "interrupted"
+    assert res["execution"]["health"]["status"] == "interrupted"
+    state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
+    assert state["services"]["textgen"]["status"] == "interrupted"
+    assert state["services"]["textgen"]["status"] != "health_pending"
+    assert state["processes"]["textgen"]["health_status"] == "interrupted"
+    events=[json.loads(line)["result"] for line in (tmp_path/"runtime/ai_services/audit_log.jsonl").read_text().splitlines()]
+    assert "health_check_interrupted" in events and "execution_interrupted" in events
+    assert "execution_succeeded" not in events[events.index("health_check_interrupted"):]
+
+
+def test_health_check_interrupted_error_records_interrupted_state(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path)
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_Runner(),health_checker=_InterruptingHealth(InterruptedError("signal")))
+    assert res["result"] == "interrupted"
+    state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
+    assert state["services"]["textgen"]["status"] == "interrupted"
+    assert state["processes"]["textgen"]["health_error"] == "InterruptedError"
+
 def _textgen_batch_manifest():
     data=_manifest()
     data["paths"]["application"]="A:\\AI\\TextGen\\textgen-4.9"

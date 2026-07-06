@@ -1,0 +1,32 @@
+{
+  "work_package_id": "WP-0135",
+  "codex_status": "done",
+  "summary": "Repaired AI Services post-launch health interruption handling so KeyboardInterrupt and InterruptedError during health verification record a structured interrupted lifecycle, append audit events, return structured JSON, and clear health_pending state.",
+  "interruption_behavior": "Health-check interruptions are caught at the health-check boundary after process start, converted to result=interrupted with lifecycle_state=interrupted, and recorded in both service and process state.",
+  "state_changes": [
+    "services.<service>.status is set to interrupted instead of remaining health_pending",
+    "processes.<service>.current_status is set to interrupted",
+    "processes.<service>.health_status is set to interrupted",
+    "processes.<service>.health_result includes status=interrupted and the interruption type"
+  ],
+  "audit_changes": [
+    "health_check_interrupted",
+    "execution_interrupted"
+  ],
+  "preserved_behavior": [
+    "WP-0133 post-launch health success and failure semantics remain intact",
+    "WP-0134 windows_batch command planning and execution behavior remains intact",
+    "Steward approval requirements remain intact",
+    "loopback-only health endpoint policy remains intact"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py"
+  ],
+  "known_limitations": [],
+  "recommended_next_action": "Chief Architect review and merge if satisfied with the interruption lifecycle semantics.",
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
