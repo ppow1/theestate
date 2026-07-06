@@ -1,0 +1,81 @@
+{
+  "work_package_id": "WP-0200",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T16:48:39.764192+00:00",
+  "branch": "work",
+  "summary": "Created isolated staged Office control artifacts, install manifest, tests/test plan, and validation notes without installing runtime changes.",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0200/install_manifest.json",
+    "collaboration/workstreams/WP-0200/proposed/docs/office_action_registry_notes.md",
+    "collaboration/workstreams/WP-0200/proposed/src/estate/core/office_actions.py",
+    "collaboration/workstreams/WP-0200/proposed/tests/test_office_actions.py",
+    "collaboration/workstreams/WP-0200/validation_notes.md"
+  ],
+  "install_manifest_path": "collaboration/workstreams/WP-0200/install_manifest.json",
+  "intended_install_paths": [
+    "src/estate/core/office_actions.py",
+    "tests/test_office_actions.py"
+  ],
+  "conflict_risks": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "tests/test_steward_command_center.py"
+  ],
+  "files_changed": [
+    "collaboration/workstreams/WP-0200/install_manifest.json",
+    "collaboration/workstreams/WP-0200/proposed/docs/office_action_registry_notes.md",
+    "collaboration/workstreams/WP-0200/proposed/src/estate/core/office_actions.py",
+    "collaboration/workstreams/WP-0200/proposed/tests/test_office_actions.py",
+    "collaboration/workstreams/WP-0200/validation_notes.md",
+    "collaboration/work_packages/completions/WP-0200_codex_done.json",
+    "operations/validation/reports/WP-0200_validation.md",
+    "runtime/validation/work_packages/WP-0200_validation.json"
+  ],
+  "tests_run_or_staged_test_plan": [
+    "Staged pytest tests included under proposed/tests; run after install by copying proposed modules/tests to active paths."
+  ],
+  "validation_commands_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0200 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0200 --json",
+      "status": "warning_no_recipe",
+      "notes": "Generated validation artifacts but exited 1 because no validation recipe is registered."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed_with_existing_repo_blockers",
+      "notes": "Command exited 0; report lists unrelated existing blockers and no recipes for WP-0200 through WP-0202."
+    }
+  ],
+  "known_limitations": [
+    "Staged tests are not installed into active test tree.",
+    "Workstream validation recipe may not exist until staged validation support is installed.",
+    "validate-work-package reports no registered recipe for this new staged package; validation outputs were generated for reviewer inspection."
+  ],
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url_or_not_applicable_reason": "PR URL is unavailable from local Codex environment before make_pr tool records the PR metadata.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0200 --json",
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0200 --json",
+      "status": "warning_no_recipe",
+      "notes": "Generated validation artifacts but exited 1 because no validation recipe is registered."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed_with_existing_repo_blockers",
+      "notes": "Command exited 0; report lists unrelated existing blockers and no recipes for WP-0200 through WP-0202."
+    }
+  ],
+  "pull_request_url_not_applicable_reason": "PR URL is unavailable from local Codex environment before make_pr tool records the PR metadata.",
+  "pull_request_not_applicable_reason": "PR URL is unavailable from local Codex environment before make_pr tool records the PR metadata."
+}

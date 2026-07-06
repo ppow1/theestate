@@ -1,0 +1,215 @@
+[
+  {
+    "action_id": "settings.inspect_payload",
+    "label": "Inspect current local settings",
+    "target_tab": "settings",
+    "description": "Read the settings payload and source paths without mutation.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "settings.inspect_payload",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "settings.export_snapshot",
+    "label": "Export settings/profile snapshot",
+    "target_tab": "settings",
+    "description": "Write a local snapshot after confirmation.",
+    "action_class": "export",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/settings-profile-snapshot.json"
+    ],
+    "command_hook_or_handler_reference": "settings.export_snapshot",
+    "expected_output_paths": [
+      "runtime/steward/exports/settings-profile-snapshot.json"
+    ],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "settings.preview_reset_defaults",
+    "label": "Preview reset to defaults",
+    "target_tab": "settings",
+    "description": "Draft reset only; no destructive reset.",
+    "action_class": "local_mutation",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/settings-reset-preview.json"
+    ],
+    "command_hook_or_handler_reference": "settings.preview_reset_defaults",
+    "expected_output_paths": [
+      "runtime/steward/drafts/settings-reset-preview.json"
+    ],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "settings.save_active_tab_profile",
+    "label": "Save active tab profile",
+    "target_tab": "settings",
+    "description": "Persist local UI preference only.",
+    "action_class": "local_mutation",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "localStorage active tab",
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "command_hook_or_handler_reference": "settings.save_active_tab_profile",
+    "expected_output_paths": [
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "help.open_local_docs",
+    "label": "Open local documentation links",
+    "target_tab": "help",
+    "description": "Open local docs; no authority change.",
+    "action_class": "open_source",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "docs/operations/Office_of_the_Steward_Verb_Surface_Control_Backlog_v1.md",
+      "docs/templates/Office_Action_Surface_Work_Package_Template.md"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "help.open_local_docs",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "help.copy_support_command",
+    "label": "Copy support/debug command",
+    "target_tab": "help",
+    "description": "Copy command only; do not execute.",
+    "action_class": "copy_command",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "copy: PYTHONPATH=src python -m estate.cli.main steward-command-center --generate",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "help.export_doc_index",
+    "label": "Export help document index snapshot",
+    "target_tab": "help",
+    "description": "Local-only support bundle guidance; no upload.",
+    "action_class": "export",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "docs/operations/Document_Registry_v1.md"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/help-document-index.json"
+    ],
+    "command_hook_or_handler_reference": "help.export_doc_index",
+    "expected_output_paths": [
+      "runtime/steward/exports/help-document-index.json"
+    ],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "help.draft_feedback_note",
+    "label": "Draft documentation feedback note",
+    "target_tab": "help",
+    "description": "Draft only; not an institutional decision.",
+    "action_class": "draft",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "docs/operations/Document_Registry_v1.md"
+    ],
+    "writes_artifacts": [
+      "collaboration/drafts/documentation_feedback.md"
+    ],
+    "command_hook_or_handler_reference": "help.draft_feedback_note",
+    "expected_output_paths": [
+      "collaboration/drafts/documentation_feedback.md"
+    ],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "about.copy_version_manifest",
+    "label": "Copy version manifest",
+    "target_tab": "about",
+    "description": "Copy manifest to clipboard only.",
+    "action_class": "copy_manifest",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "runtime/steward/command_center.html"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "about.copy_version_manifest",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "about.export_diagnostics_manifest",
+    "label": "Export diagnostics manifest",
+    "target_tab": "about",
+    "description": "Includes sensitivity warning for internal paths.",
+    "action_class": "export",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "runtime/steward/command_center.html",
+      "runtime/steward/operations_center_settings.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/diagnostics-manifest.json"
+    ],
+    "command_hook_or_handler_reference": "about.export_diagnostics_manifest",
+    "expected_output_paths": [
+      "runtime/steward/exports/diagnostics-manifest.json"
+    ],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  },
+  {
+    "action_id": "about.inspect_source_inventory",
+    "label": "Inspect component/source inventory",
+    "target_tab": "about",
+    "description": "Read-only source inventory.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "src/estate/core/steward_command_center.py",
+      "src/estate/core/operations_center_settings.py"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "about.inspect_source_inventory",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error; do not upload",
+    "local_only_no_upload_guarantee": true
+  }
+]
