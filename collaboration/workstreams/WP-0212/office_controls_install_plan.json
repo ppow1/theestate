@@ -1,0 +1,208 @@
+{
+  "generated_at": "2026-07-06T00:00:00+00:00",
+  "phases": [
+    {
+      "phase_id": "phase-1-foundation",
+      "included_work_packages": [
+        "WP-0200"
+      ],
+      "prerequisites": [
+        "staged artifacts present",
+        "install manifests valid",
+        "completion receipts present",
+        "WP-0200 vocabulary aligned"
+      ],
+      "active_files_to_modify": [
+        "src/estate/core/office_actions.py",
+        "src/estate/core/office_settings_help_about_actions.py",
+        "src/estate/core/office_work_package_actions.py",
+        "src/estate/core/office_validation_actions.py",
+        "src/estate/core/office_planning_actions.py",
+        "src/estate/core/office_communications_actions.py",
+        "src/estate/core/office_board_actions.py",
+        "src/estate/core/office_resident_actions.py",
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "tests/test_office_validation_actions.py",
+        "tests/test_office_planning_actions.py",
+        "tests/test_office_communications_actions.py",
+        "tests/test_office_board_actions.py",
+        "tests/test_office_resident_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "validation_commands_after_phase": [
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0200 --json"
+      ],
+      "rollback_instructions": "git revert this WP-0212 install commit or remove installed office_* modules/tests for this phase.",
+      "approval_requirement": "Chief Architect / Steward review before merge; resident and AI controls remain metadata-only and do not execute services.",
+      "install_status": "installed",
+      "explanation": "All required staged artifacts and receipts were present; metadata shape was normalized as installed Python metadata/test modules without granting execution authority."
+    },
+    {
+      "phase_id": "phase-2-low-risk-utilities",
+      "included_work_packages": [
+        "WP-0201"
+      ],
+      "prerequisites": [
+        "staged artifacts present",
+        "install manifests valid",
+        "completion receipts present",
+        "WP-0200 vocabulary aligned"
+      ],
+      "active_files_to_modify": [
+        "src/estate/core/office_actions.py",
+        "src/estate/core/office_settings_help_about_actions.py",
+        "src/estate/core/office_work_package_actions.py",
+        "src/estate/core/office_validation_actions.py",
+        "src/estate/core/office_planning_actions.py",
+        "src/estate/core/office_communications_actions.py",
+        "src/estate/core/office_board_actions.py",
+        "src/estate/core/office_resident_actions.py",
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "tests/test_office_validation_actions.py",
+        "tests/test_office_planning_actions.py",
+        "tests/test_office_communications_actions.py",
+        "tests/test_office_board_actions.py",
+        "tests/test_office_resident_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "validation_commands_after_phase": [
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0201 --json"
+      ],
+      "rollback_instructions": "git revert this WP-0212 install commit or remove installed office_* modules/tests for this phase.",
+      "approval_requirement": "Chief Architect / Steward review before merge; resident and AI controls remain metadata-only and do not execute services.",
+      "install_status": "installed",
+      "explanation": "All required staged artifacts and receipts were present; metadata shape was normalized as installed Python metadata/test modules without granting execution authority."
+    },
+    {
+      "phase_id": "phase-3-core-operational-controls",
+      "included_work_packages": [
+        "WP-0202",
+        "WP-0204"
+      ],
+      "prerequisites": [
+        "staged artifacts present",
+        "install manifests valid",
+        "completion receipts present",
+        "WP-0200 vocabulary aligned"
+      ],
+      "active_files_to_modify": [
+        "src/estate/core/office_actions.py",
+        "src/estate/core/office_settings_help_about_actions.py",
+        "src/estate/core/office_work_package_actions.py",
+        "src/estate/core/office_validation_actions.py",
+        "src/estate/core/office_planning_actions.py",
+        "src/estate/core/office_communications_actions.py",
+        "src/estate/core/office_board_actions.py",
+        "src/estate/core/office_resident_actions.py",
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "tests/test_office_validation_actions.py",
+        "tests/test_office_planning_actions.py",
+        "tests/test_office_communications_actions.py",
+        "tests/test_office_board_actions.py",
+        "tests/test_office_resident_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "validation_commands_after_phase": [
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0202 --json",
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0204 --json"
+      ],
+      "rollback_instructions": "git revert this WP-0212 install commit or remove installed office_* modules/tests for this phase.",
+      "approval_requirement": "Chief Architect / Steward review before merge; resident and AI controls remain metadata-only and do not execute services.",
+      "install_status": "installed",
+      "explanation": "All required staged artifacts and receipts were present; metadata shape was normalized as installed Python metadata/test modules without granting execution authority."
+    },
+    {
+      "phase_id": "phase-4-planning-communications",
+      "included_work_packages": [
+        "WP-0205",
+        "WP-0206"
+      ],
+      "prerequisites": [
+        "staged artifacts present",
+        "install manifests valid",
+        "completion receipts present",
+        "WP-0200 vocabulary aligned"
+      ],
+      "active_files_to_modify": [
+        "src/estate/core/office_actions.py",
+        "src/estate/core/office_settings_help_about_actions.py",
+        "src/estate/core/office_work_package_actions.py",
+        "src/estate/core/office_validation_actions.py",
+        "src/estate/core/office_planning_actions.py",
+        "src/estate/core/office_communications_actions.py",
+        "src/estate/core/office_board_actions.py",
+        "src/estate/core/office_resident_actions.py",
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "tests/test_office_validation_actions.py",
+        "tests/test_office_planning_actions.py",
+        "tests/test_office_communications_actions.py",
+        "tests/test_office_board_actions.py",
+        "tests/test_office_resident_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "validation_commands_after_phase": [
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json",
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0206 --json"
+      ],
+      "rollback_instructions": "git revert this WP-0212 install commit or remove installed office_* modules/tests for this phase.",
+      "approval_requirement": "Chief Architect / Steward review before merge; resident and AI controls remain metadata-only and do not execute services.",
+      "install_status": "installed",
+      "explanation": "All required staged artifacts and receipts were present; metadata shape was normalized as installed Python metadata/test modules without granting execution authority."
+    },
+    {
+      "phase_id": "phase-5-board-resident-ai-controls",
+      "included_work_packages": [
+        "WP-0208",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "prerequisites": [
+        "staged artifacts present",
+        "install manifests valid",
+        "completion receipts present",
+        "WP-0200 vocabulary aligned"
+      ],
+      "active_files_to_modify": [
+        "src/estate/core/office_actions.py",
+        "src/estate/core/office_settings_help_about_actions.py",
+        "src/estate/core/office_work_package_actions.py",
+        "src/estate/core/office_validation_actions.py",
+        "src/estate/core/office_planning_actions.py",
+        "src/estate/core/office_communications_actions.py",
+        "src/estate/core/office_board_actions.py",
+        "src/estate/core/office_resident_actions.py",
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "tests/test_office_validation_actions.py",
+        "tests/test_office_planning_actions.py",
+        "tests/test_office_communications_actions.py",
+        "tests/test_office_board_actions.py",
+        "tests/test_office_resident_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "validation_commands_after_phase": [
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0208 --json",
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0209 --json",
+        "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0210 --json"
+      ],
+      "rollback_instructions": "git revert this WP-0212 install commit or remove installed office_* modules/tests for this phase.",
+      "approval_requirement": "Chief Architect / Steward review before merge; resident and AI controls remain metadata-only and do not execute services.",
+      "install_status": "installed",
+      "explanation": "All required staged artifacts and receipts were present; metadata shape was normalized as installed Python metadata/test modules without granting execution authority."
+    }
+  ]
+}
