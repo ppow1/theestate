@@ -1,0 +1,216 @@
+{
+  "generated_at": "2026-07-06T00:08:21.032028+00:00",
+  "rejected_manifests": [],
+  "service_count": 5,
+  "services": [
+    {
+      "approval": {
+        "start": {
+          "required": true
+        },
+        "stop": {
+          "required": true
+        }
+      },
+      "default_endpoint": "http://127.0.0.1:8188",
+      "display_name": "ComfyUI",
+      "host_policy": {
+        "allow_public_bind": false,
+        "bind": "127.0.0.1"
+      },
+      "local_only": true,
+      "manifest_path": "runtime/ai_services/implementations/comfyui/service.manifest.json",
+      "model_locations": [
+        "A:\\AI\\ComfyUI\\models"
+      ],
+      "operations": {
+        "start": {
+          "command_template": "safe launcher candidate must be confirmed in manifest before execution"
+        },
+        "status": {
+          "api_template": "GET http://127.0.0.1:8188/system_stats"
+        }
+      },
+      "paths": {
+        "application": "A:\\AI\\ComfyUI",
+        "models": "A:\\AI\\ComfyUI\\models"
+      },
+      "ports": [
+        8188
+      ],
+      "service_id": "comfyui",
+      "service_type": "workflow_ui"
+    },
+    {
+      "approval": {
+        "load_model": {
+          "required": true
+        },
+        "start": {
+          "required": true
+        },
+        "stop": {
+          "required": true
+        }
+      },
+      "default_endpoint": "http://127.0.0.1:11434",
+      "display_name": "Ollama",
+      "host_policy": {
+        "allow_public_bind": false,
+        "bind": "127.0.0.1"
+      },
+      "local_only": true,
+      "manifest_path": "runtime/ai_services/implementations/ollama/service.manifest.json",
+      "model_locations": [
+        "Ollama-managed model store"
+      ],
+      "operations": {
+        "list_models": {
+          "api_template": "GET http://127.0.0.1:11434/api/tags"
+        },
+        "running_models": {
+          "api_template": "GET http://127.0.0.1:11434/api/ps"
+        },
+        "start": {
+          "command_template": "ollama serve"
+        },
+        "status": {
+          "api_template": "GET http://127.0.0.1:11434/api/tags"
+        }
+      },
+      "paths": {
+        "application": "Ollama-managed local installation",
+        "models": "Ollama-managed model store"
+      },
+      "ports": [
+        11434
+      ],
+      "service_id": "ollama",
+      "service_type": "model_runtime"
+    },
+    {
+      "approval": {
+        "start": {
+          "required": true
+        },
+        "stop": {
+          "required": true
+        }
+      },
+      "default_endpoint": "http://127.0.0.1:8080",
+      "display_name": "Open WebUI",
+      "host_policy": {
+        "allow_public_bind": false,
+        "bind": "127.0.0.1"
+      },
+      "local_only": true,
+      "manifest_path": "runtime/ai_services/implementations/open_webui/service.manifest.json",
+      "model_locations": [
+        "Delegates to configured backend model stores"
+      ],
+      "operations": {
+        "start": {
+          "command_template": "configured Open WebUI launcher from A:\\AI\\OpenWebUI"
+        },
+        "status": {
+          "api_template": "GET http://127.0.0.1:8080"
+        },
+        "stop": {
+          "command_template": "approved Open WebUI stop procedure"
+        }
+      },
+      "paths": {
+        "application": "A:\\AI\\OpenWebUI"
+      },
+      "ports": [
+        8080
+      ],
+      "service_id": "open_webui",
+      "service_type": "web_ui"
+    },
+    {
+      "approval": {
+        "start": {
+          "required": true
+        },
+        "stop": {
+          "required": true
+        }
+      },
+      "default_endpoint": "http://127.0.0.1:8000",
+      "display_name": "SillyTavern",
+      "host_policy": {
+        "allow_public_bind": false,
+        "bind": "127.0.0.1"
+      },
+      "local_only": true,
+      "manifest_path": "runtime/ai_services/implementations/sillytavern/service.manifest.json",
+      "model_locations": [
+        "Delegates to configured backend model stores"
+      ],
+      "operations": {
+        "start": {
+          "command_template": "discover safe launcher candidates; do not run arbitrary Start.bat"
+        },
+        "status": {
+          "api_template": "GET http://127.0.0.1:8000"
+        }
+      },
+      "paths": {
+        "application": "A:\\AI\\SillyTavern"
+      },
+      "ports": [
+        8000
+      ],
+      "service_id": "sillytavern",
+      "service_type": "chat_ui"
+    },
+    {
+      "approval": {
+        "load_model": {
+          "required": true
+        },
+        "start": {
+          "required": true
+        },
+        "stop": {
+          "required": true
+        }
+      },
+      "default_endpoint": "http://127.0.0.1:5000/v1",
+      "display_name": "Text Generation WebUI",
+      "host_policy": {
+        "allow_public_bind": false,
+        "bind": "127.0.0.1"
+      },
+      "local_only": true,
+      "manifest_path": "runtime/ai_services/implementations/textgen/service.manifest.json",
+      "model_locations": [
+        "A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"
+      ],
+      "operations": {
+        "inventory_models": {
+          "path_template": "A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"
+        },
+        "load_model": {
+          "command_template": "powershell -NoProfile -Command \"Set-Location A:\\AI\\TextGen\\textgen-4.9; .\\textgen.bat --nowebui --listen --model '{model}' --loader llama.cpp\""
+        },
+        "status": {
+          "api_template": "GET http://127.0.0.1:5000/v1/models"
+        }
+      },
+      "paths": {
+        "application": "A:\\AI\\TextGen\\textgen-4.9",
+        "launcher": "A:\\AI\\TextGen\\textgen-4.9\\textgen.bat",
+        "models": "A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"
+      },
+      "ports": [
+        5000
+      ],
+      "service_id": "textgen",
+      "service_type": "model_runtime"
+    }
+  ],
+  "source": "manifest_rediscovery",
+  "version": "ai-services-registry-v1"
+}

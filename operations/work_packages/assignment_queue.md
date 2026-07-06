@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-05T23:45:13Z
+Generated: 2026-07-06T00:08:17Z
 
 ## Summary
 
-- Work packages: 124
+- Work packages: 125
 - Blocked: 0
-- Unassigned: 124
-- Warnings: 124
+- Unassigned: 125
+- Warnings: 125
 
 ## Queue
 
@@ -137,6 +137,7 @@ Generated: 2026-07-05T23:45:13Z
 | [WP-0128](../../collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md) | local_llm / provider: ollama / model: qwen3:8b | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md and do exactly what it says. |
 | [WP-0129](../../collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md and do exactly what it says. |
 | [WP-0130](../../collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md and do exactly what it says. |
+| [WP-0131](../../collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md and do exactly what it says. |
 
 ## Warnings
 
@@ -263,4 +264,5 @@ Generated: 2026-07-05T23:45:13Z
 - missing_owner: WP-0128 has no explicit owner. (collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md)
 - missing_owner: WP-0129 has no explicit owner. (collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md)
 - missing_owner: WP-0130 has no explicit owner. (collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md)
+- missing_owner: WP-0131 has no explicit owner. (collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)
