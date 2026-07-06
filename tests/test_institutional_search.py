@@ -61,3 +61,20 @@ def test_cli_json_output(tmp_path, monkeypatch, capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload["query"] == "Chief Architect"
     assert payload["matches"][0]["path"] == "archive/institutional_memory/memo.md"
+
+
+def test_cli_json_output_uses_root_argument(tmp_path, monkeypatch, capsys):
+    doc = tmp_path / "archive/institutional_memory/memo.md"
+    doc.parent.mkdir(parents=True)
+    doc.write_text("# Chief Architect Memorandum\nExplicit root search evidence.", encoding="utf-8")
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    monkeypatch.chdir(elsewhere)
+    from estate.cli.main import main
+    import sys
+
+    monkeypatch.setattr(sys, "argv", ["estate", "estate-search", "Chief Architect", "--json", "--root", str(tmp_path)])
+    main()
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["query"] == "Chief Architect"
+    assert payload["matches"][0]["path"] == "archive/institutional_memory/memo.md"
