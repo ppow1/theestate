@@ -1,0 +1,57 @@
+{
+  "work_package_id": "WP-0204",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0204/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0204/proposed/src/estate/core/office_validation_actions.py",
+    "collaboration/workstreams/WP-0204/proposed/tests/test_office_validation_actions.py",
+    "collaboration/workstreams/WP-0204/proposed/validation_tab_controls.md",
+    "collaboration/workstreams/WP-0204/validation_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_validation_actions.py",
+    "tests/test_office_validation_actions.py",
+    "src/estate/core/steward_command_center.py"
+  ],
+  "files_expected_to_be_modified_during_install": [
+    "src/estate/core/office_validation_actions.py",
+    "tests/test_office_validation_actions.py",
+    "src/estate/core/steward_command_center.py"
+  ],
+  "manual_install_steps": [
+    "Chief Architect reviews staged artifacts",
+    "copy proposed code/tests/docs into intended paths only in explicit install-handoff",
+    "wire controls into Office UI only after authority review"
+  ],
+  "automated_install_steps": [],
+  "validation_commands": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0204 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0204 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "rollback_notes": "Remove installed files and UI wiring from future install commit; this staged package has no active runtime install to roll back.",
+  "dependency_assumptions": [
+    "WP-0118 merged",
+    "WP-0200 staged vocabulary reviewed/available before install"
+  ],
+  "conflict_risks": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "src/estate/core/production_readiness_validation.py",
+    "src/estate/core/validation_observations.py",
+    "src/estate/cli/main.py",
+    "tests/test_steward_command_center.py",
+    "tests/test_work_package_validation.py"
+  ],
+  "generated_artifacts_to_ignore_or_review": [
+    "runtime/steward/exports/*",
+    "runtime/validation/**/*",
+    "collaboration/**/drafts/*"
+  ],
+  "authority_and_review_requirements": [
+    "Chief Architect review required",
+    "Steward authority preserved",
+    "No autonomous execution or external service calls"
+  ],
+  "staged_work_is_installed": false
+}

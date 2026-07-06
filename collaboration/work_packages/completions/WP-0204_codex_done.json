@@ -1,0 +1,72 @@
+{
+  "work_package_id": "WP-0204",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T17:19:28Z",
+  "branch": "work",
+  "summary": "Staged Validation tab controls for report inspection, command copying, recipe/readiness execution design, blocker inspection, observation drafting, and evidence export.",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0204/install_manifest.json",
+    "collaboration/workstreams/WP-0204/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0204/proposed/src/estate/core/office_validation_actions.py",
+    "collaboration/workstreams/WP-0204/proposed/tests/test_office_validation_actions.py",
+    "collaboration/workstreams/WP-0204/proposed/validation_tab_controls.md",
+    "collaboration/workstreams/WP-0204/validation_notes.md"
+  ],
+  "install_manifest_path": "collaboration/workstreams/WP-0204/install_manifest.json",
+  "intended_install_paths": [
+    "src/estate/core/office_validation_actions.py",
+    "tests/test_office_validation_actions.py",
+    "src/estate/core/steward_command_center.py"
+  ],
+  "conflict_risks": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "src/estate/core/production_readiness_validation.py",
+    "src/estate/core/validation_observations.py",
+    "src/estate/cli/main.py",
+    "tests/test_steward_command_center.py",
+    "tests/test_work_package_validation.py"
+  ],
+  "controls_staged_by_tab": {
+    "Validation": [
+      "validation.open_report",
+      "validation.copy_command",
+      "validation.run_recipe",
+      "validation.run_production_readiness",
+      "validation.inspect_blocker",
+      "validation.copy_failing_command",
+      "validation.create_observation_draft",
+      "validation.export_evidence_bundle"
+    ]
+  },
+  "files_changed": [
+    "collaboration/workstreams/WP-0204/install_manifest.json",
+    "collaboration/workstreams/WP-0204/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0204/proposed/src/estate/core/office_validation_actions.py",
+    "collaboration/workstreams/WP-0204/proposed/tests/test_office_validation_actions.py",
+    "collaboration/workstreams/WP-0204/proposed/validation_tab_controls.md",
+    "collaboration/workstreams/WP-0204/validation_notes.md",
+    "collaboration/work_packages/completions/WP-0204_codex_done.json"
+  ],
+  "tests_validation_run": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0204 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0204 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
+  ],
+  "known_limitations": [
+    "Staged artifacts are not installed into active Office runtime files.",
+    "CLI validation may not have recipes for this staged work package until future install."
+  ],
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url_or_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit for WP-0207 batch.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0204 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0204 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
+  ],
+  "merge_authority_or_equivalent": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit for WP-0207 batch."
+}

@@ -1,0 +1,180 @@
+[
+  {
+    "action_id": "validation.open_report",
+    "label": "Open validation report",
+    "target_tab": "Validation",
+    "target_object": "validation report/work package",
+    "description": "Read validation markdown reports and related runtime JSON.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "operations/validation/reports/*.md",
+      "runtime/validation/**/*.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_validation_actions.open_report",
+    "expected_output_paths": [
+      "selected report path"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Validation evidence is not institutional acceptance."
+  },
+  {
+    "action_id": "validation.copy_command",
+    "label": "Copy validation command",
+    "target_tab": "Validation",
+    "target_object": "work package ID",
+    "description": "Copy validate-work-package command text only.",
+    "action_class": "copy-command",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "work package id"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_validation_actions.copy_validation_command",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Copied command grants no acceptance."
+  },
+  {
+    "action_id": "validation.run_recipe",
+    "label": "Run validation recipe",
+    "target_tab": "Validation",
+    "target_object": "work package ID",
+    "description": "Design for confirmed local validation recipe execution with output paths.",
+    "action_class": "execute-local-command-design",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "collaboration/work_packages/**",
+      "src/**"
+    ],
+    "writes_artifacts": [
+      "runtime/validation/work-packages/*",
+      "operations/validation/reports/*"
+    ],
+    "command_hook_or_handler_reference": "office_validation_actions.run_recipe_design",
+    "expected_output_paths": [
+      "runtime/validation/work-packages/<id>.json",
+      "operations/validation/reports/<id>.md"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Generated evidence is not acceptance."
+  },
+  {
+    "action_id": "validation.run_production_readiness",
+    "label": "Run production readiness",
+    "target_tab": "Validation",
+    "target_object": "production readiness",
+    "description": "Design for confirmed production readiness refresh.",
+    "action_class": "execute-local-command-design",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "runtime/validation/**",
+      "operations/validation/**"
+    ],
+    "writes_artifacts": [
+      "runtime/validation/production-readiness*.json",
+      "operations/validation/reports/production-readiness*.md"
+    ],
+    "command_hook_or_handler_reference": "office_validation_actions.run_production_readiness_design",
+    "expected_output_paths": [
+      "runtime/validation/production-readiness*.json"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Readiness output does not override blockers."
+  },
+  {
+    "action_id": "validation.inspect_blocker",
+    "label": "Inspect blocker/failure detail",
+    "target_tab": "Validation",
+    "target_object": "blocker/failure",
+    "description": "Open source artifacts behind warning/error.",
+    "action_class": "inspect",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "reported source artifact"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_validation_actions.inspect_blocker",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Failure inspection is evidence only."
+  },
+  {
+    "action_id": "validation.copy_failing_command",
+    "label": "Copy failing command",
+    "target_tab": "Validation",
+    "target_object": "failing command",
+    "description": "Copy failing command text from report.",
+    "action_class": "copy-command",
+    "authority_safety_class": "safe read-only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "validation report"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_validation_actions.copy_failing_command",
+    "expected_output_paths": [],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Copied command does not execute or accept."
+  },
+  {
+    "action_id": "validation.create_observation_draft",
+    "label": "Create validation observation draft",
+    "target_tab": "Validation",
+    "target_object": "failure/work package",
+    "description": "Draft observation without closing failure.",
+    "action_class": "draft-local-artifact",
+    "authority_safety_class": "Steward-confirmed local mutation",
+    "confirmation_requirement": "explicit Steward confirmation",
+    "reads_artifacts": [
+      "validation report",
+      "source artifact"
+    ],
+    "writes_artifacts": [
+      "collaboration/validation_observations/drafts/*"
+    ],
+    "command_hook_or_handler_reference": "office_validation_actions.create_observation_draft",
+    "expected_output_paths": [
+      "collaboration/validation_observations/drafts/<timestamp>.md"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Observation draft does not close failure."
+  },
+  {
+    "action_id": "validation.export_evidence_bundle",
+    "label": "Export validation evidence bundle",
+    "target_tab": "Validation",
+    "target_object": "selected evidence",
+    "description": "Design local bundle export with sensitivity warning.",
+    "action_class": "export-local-bundle-design",
+    "authority_safety_class": "safe local generated-artifact update",
+    "confirmation_requirement": "explicit confirmation for generated bundle",
+    "reads_artifacts": [
+      "operations/validation/reports/*.md",
+      "runtime/validation/**/*.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/validation-evidence-*"
+    ],
+    "command_hook_or_handler_reference": "office_validation_actions.export_evidence_bundle_design",
+    "expected_output_paths": [
+      "runtime/steward/exports/validation-evidence-*.zip"
+    ],
+    "failure_behavior": "Show error evidence and source paths; do not mutate authoritative state; leave action retryable after review.",
+    "local_only_no_upload_guarantee": true,
+    "non_acceptance_statement": "Evidence bundle is not acceptance."
+  }
+]

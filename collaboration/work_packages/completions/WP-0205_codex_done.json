@@ -1,0 +1,83 @@
+{
+  "work_package_id": "WP-0205",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T17:19:28Z",
+  "branch": "work",
+  "summary": "Staged Mission Control, Projects, and Roadmap controls for source inspection, refresh, draft/request creation, exports, and local notes.",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0205/install_manifest.json",
+    "collaboration/workstreams/WP-0205/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0205/proposed/mission_projects_roadmap_controls.md",
+    "collaboration/workstreams/WP-0205/proposed/src/estate/core/office_planning_actions.py",
+    "collaboration/workstreams/WP-0205/proposed/tests/test_office_planning_actions.py",
+    "collaboration/workstreams/WP-0205/validation_notes.md"
+  ],
+  "install_manifest_path": "collaboration/workstreams/WP-0205/install_manifest.json",
+  "intended_install_paths": [
+    "src/estate/core/office_planning_actions.py",
+    "tests/test_office_planning_actions.py",
+    "src/estate/core/steward_command_center.py"
+  ],
+  "conflict_risks": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/steward_dashboard.py",
+    "src/estate/core/operations_board.py",
+    "src/estate/core/dependency_graph.py",
+    "src/estate/core/assignment_queue.py",
+    "src/estate/cli/main.py",
+    "tests/test_steward_command_center.py"
+  ],
+  "controls_staged_by_tab": {
+    "Mission Control": [
+      "mission.refresh_payload",
+      "mission.inspect_source_lane",
+      "mission.open_source_artifact",
+      "mission.warning_to_draft",
+      "mission.request_ca_review"
+    ],
+    "Projects": [
+      "projects.inspect_active",
+      "projects.open_dependency_evidence",
+      "projects.copy_next_action",
+      "projects.create_blocker_note",
+      "projects.request_prioritization"
+    ],
+    "Roadmap": [
+      "roadmap.inspect_evidence",
+      "roadmap.draft_wp_proposal",
+      "roadmap.export_snapshot",
+      "roadmap.request_prioritization_review",
+      "roadmap.mark_local_review_note"
+    ]
+  },
+  "files_changed": [
+    "collaboration/workstreams/WP-0205/install_manifest.json",
+    "collaboration/workstreams/WP-0205/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0205/proposed/mission_projects_roadmap_controls.md",
+    "collaboration/workstreams/WP-0205/proposed/src/estate/core/office_planning_actions.py",
+    "collaboration/workstreams/WP-0205/proposed/tests/test_office_planning_actions.py",
+    "collaboration/workstreams/WP-0205/validation_notes.md",
+    "collaboration/work_packages/completions/WP-0205_codex_done.json"
+  ],
+  "tests_validation_run": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0205 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
+  ],
+  "known_limitations": [
+    "Staged artifacts are not installed into active Office runtime files.",
+    "CLI validation may not have recipes for this staged work package until future install."
+  ],
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url_or_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit for WP-0207 batch.",
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json (passed)",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0205 --json (warning: no registered recipe)",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json (passed command; repository-wide readiness remains blocked by pre-existing gaps and no_recipe for staged WPs)"
+  ],
+  "merge_authority_or_equivalent": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "Pull request URL pending; make_pr metadata will be recorded after git commit for WP-0207 batch."
+}
