@@ -822,7 +822,12 @@ def cmd_work_package_handoffs(args):
 
 
 def cmd_estate_search(args):
-    result = search_institutional_index(args.query, refresh=not getattr(args, "no_refresh", False))
+    root = Path(args.root) if getattr(args, "root", None) else Path.cwd()
+    result = search_institutional_index(
+        args.query,
+        root=root,
+        refresh=not getattr(args, "no_refresh", False),
+    )
     if getattr(args, "json", False):
         import json
         print(json.dumps(result, indent=2, sort_keys=True))
@@ -1736,6 +1741,7 @@ def main():
     p = sub.add_parser("estate-search", help="Search local institutional Estate artifacts")
     p.add_argument("query", help="Keyword query to search for")
     p.add_argument("--json", action="store_true", help="Print search results JSON")
+    p.add_argument("--root", help="Estate root path to search; defaults to the current working directory")
     p.add_argument("--no-refresh", action="store_true", help="Use existing runtime search index if present")
     p.set_defaults(func=cmd_estate_search)
 

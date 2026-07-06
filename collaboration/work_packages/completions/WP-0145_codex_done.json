@@ -1,0 +1,22 @@
+{
+  "work_package_id": "WP-0145",
+  "codex_status": "done",
+  "completed_at": "2026-07-06T17:43:56Z",
+  "branch": "work",
+  "pull_request_url_or_not_applicable_reason": "not_applicable_pr_tool_records_title_and_body_after_commit",
+  "merge_authority_or_equivalent": "Class A repair; ready for Chief Architect review",
+  "summary": "Added explicit estate-search root selection with a --root option, defaulting to the current working directory, and covered CLI root isolation with tests.",
+  "files_changed": [
+    "src/estate/cli/main.py",
+    "tests/test_institutional_search.py",
+    "collaboration/work_packages/completions/WP-0145_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src python -m pytest tests/test_institutional_search.py -q",
+    "PYTHONPATH=src python -m pytest tests/test_steward_command_center.py tests/test_assignment_queue.py tests/test_institutional_search.py tests/test_production_readiness_validation.py tests/test_resident_interaction.py -q",
+    "git status --short && PYTHONPATH=src python -m estate.cli.main estate-search \"Chief Architect\" --json >/tmp/estate-search-1.json && PYTHONPATH=src python -m estate.cli.main estate-search \"Chief Architect\" --json --root . >/tmp/estate-search-2.json && git status --short",
+    "PYTHONPATH=src python -m pytest tests -q"
+  ],
+  "known_limitations": [],
+  "ready_for_ca_review": true
+}
