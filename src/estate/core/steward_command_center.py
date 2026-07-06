@@ -1168,6 +1168,7 @@ def _alfred_chat_panel(root):
         "authority_message": "Alfred may summarize, recommend, and propose next actions from local Estate artifacts; Alfred will not execute privileged actions or claim Steward authorization from chat.",
         "memory_message": "Conversation turns are persisted locally through the WP-0126 resident interaction framework and can be reloaded from runtime/resident_interactions/sessions. Steward-directed forget/redaction remains available through the resident API.",
         "local_first_message": "Local-first operation: local LLM is used when available through the WP-0126 adapter path; deterministic fallback is used when no local model is available.",
+        "diagnostics_message": "Adapter diagnostics are shown per response: provider/model, fallback state, safe adapter error, request/response timestamps, and transport/timeout status. Secrets are redacted.",
     }
 
 
@@ -1206,6 +1207,7 @@ def _alfred_chat_html(panel):
   <p>{html.escape(str(panel.get('authority_message') or ''))}</p>
   <p class="source">{html.escape(str(panel.get('memory_message') or ''))}</p>
   <p class="source">{html.escape(str(panel.get('local_first_message') or ''))}</p>
+  <p class="source">{html.escape(str(panel.get('diagnostics_message') or ''))}</p>
   <dl>
     <dt>Resident API standard</dt><dd>{html.escape(str(surface.get('resident_api_standard_version') or 'unknown'))}</dd>
     <dt>Alfred implementation</dt><dd>{html.escape(str(surface.get('resident_implementation_version') or 'unknown'))}</dd>
@@ -1218,7 +1220,7 @@ def _alfred_chat_html(panel):
     <div id="alfred-pending-attachments" class="alfred-attachments" aria-live="polite"></div>
     <button id="alfred-chat-send" type="submit">Send to Alfred</button>
   </form>
-  <div id="alfred-chat-response" role="status" aria-live="polite"></div>
+  <div id="alfred-chat-response" data-state="idle" role="status" aria-live="polite"></div>
   <h4>Recent Alfred conversation history</h4>
   <div id="alfred-chat-history">{history_html}</div>
 </section>"""
@@ -2019,7 +2021,7 @@ function blobToBase64(blob){ return new Promise((resolve,reject) => { const read
 document.addEventListener('paste', async event => { const input = event.target && event.target.closest && event.target.closest('#alfred-chat-input'); if(!input) return; const items = Array.from((event.clipboardData && event.clipboardData.items) || []); for(const item of items){ if(item.type && item.type.startsWith('image/')){ event.preventDefault(); const file = item.getAsFile(); if(file){ pendingAlfredAttachments.push({kind:'image', source:'clipboard_paste', original_filename:file.name || 'clipboard-image.png', mime_type:file.type || 'image/png', data_base64: await blobToBase64(file)}); } } } const text = event.clipboardData && event.clipboardData.getData('text/plain'); if(text && text.length > 500){ pendingAlfredAttachments.push({kind:'text_snippet', source:'clipboard_paste', original_filename:'clipboard-text.txt', mime_type:'text/plain', text}); } renderPendingAttachments(); });
 document.addEventListener('click', event => { const btn = event.target.closest('[data-remove-attachment]'); if(btn){ pendingAlfredAttachments.splice(Number(btn.dataset.removeAttachment), 1); renderPendingAttachments(); } });
 
-function llmSourceLine(turn){ const llm = turn.llm || {}; const fallback = llm.fallback_reason ? ` / reason: ${escapeHtml(llm.fallback_reason)}` : ''; return `Mode: ${escapeHtml(llm.mode || 'unknown')} / provider: ${escapeHtml(llm.provider || 'unknown')} / model: ${escapeHtml(llm.model || 'unknown')}${fallback}`; }
+function llmSourceLine(turn){ const llm = turn.llm || {}; const diag = turn.diagnostics || {}; const contract = turn.response_contract || {}; const fallback = (diag.fallback_reason || llm.fallback_reason) ? ` / fallback: ${escapeHtml(diag.fallback_reason || llm.fallback_reason)}` : ''; const err = diag.last_adapter_error ? ` / adapter error: ${escapeHtml(diag.last_adapter_error)}` : ''; return `Type: ${escapeHtml(contract.response_type || 'unknown')} / Status: ${escapeHtml(contract.status || 'unknown')} / Adapter: ${escapeHtml(diag.local_llm_adapter_available === false ? 'unavailable' : 'available')} / provider: ${escapeHtml(diag.selected_provider || llm.provider || 'unknown')} / model: ${escapeHtml(diag.selected_model || llm.model || 'unknown')} / request: ${escapeHtml(diag.last_request_timestamp || 'unknown')} / response: ${escapeHtml(diag.last_response_timestamp || 'unknown')}${fallback}${err}`; }
 function escapeHtml(value){ return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
 document.addEventListener('submit', async event => {
   const form = event.target.closest('#alfred-chat-form');
@@ -2027,13 +2029,18 @@ document.addEventListener('submit', async event => {
   event.preventDefault();
   const input = form.querySelector('#alfred-chat-input');
   const output = document.querySelectorAll('#alfred-chat-response');
-  output.forEach(el => el.textContent = 'Alfred is reviewing local Estate context...');
-  const response = await fetch('/api/residents/alfred/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: input.value, action:'summarize', attachments: pendingAlfredAttachments})});
-  const data = await response.json();
-  output.forEach(el => { el.textContent = data.turn ? `${data.turn.resident_response}\n${llmSourceLine(data.turn)}` : (data.error || 'Alfred did not return a response.'); });
-  input.value = '';
-  pendingAlfredAttachments = []; renderPendingAttachments();
-  await loadAlfredHistory();
+  output.forEach(el => { el.dataset.state = 'processing'; el.textContent = 'Alfred is reviewing local Estate context...'; });
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('resident_chat_timeout_after_30s')), 30000));
+  try{
+    const response = await Promise.race([fetch('/api/residents/alfred/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message: input.value, action:'conversation', attachments: pendingAlfredAttachments})}), timeout]);
+    const data = await response.json();
+    output.forEach(el => { el.dataset.state = data.turn ? 'completed' : 'failed'; el.textContent = data.turn ? `${data.turn.resident_response}\n${llmSourceLine(data.turn)}` : `Alfred request failed safely: ${data.error || response.statusText || 'no response body'}`; });
+    input.value = '';
+    pendingAlfredAttachments = []; renderPendingAttachments();
+    await loadAlfredHistory();
+  }catch(error){
+    output.forEach(el => { el.dataset.state = 'failed'; el.textContent = `Alfred request failed safely: ${error.message || error}. Retry when the local resident API is reachable. Endpoint: /api/residents/alfred/chat`; });
+  }
 });
 
 function utf8Bytes(text){ return new TextEncoder().encode(String(text)); }

@@ -653,3 +653,13 @@ def test_office_snapshot_button_manifest_and_local_zip_export_are_rendered(tmp_p
     assert 'snapshot_manifest.json' in manifest['package_contents']
     assert 'source_artifacts.json' in manifest['package_contents']
     assert manifest['source_artifact_count'] > 0
+
+
+def test_wp0139_alfred_ui_has_failure_timeout_and_diagnostics_state(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+    assert "resident_chat_timeout_after_30s" in html
+    assert "Alfred request failed safely" in html
+    assert "Adapter diagnostics are shown per response" in html
+    assert "reviewing local Estate context" in html
+    assert "data-state" in html

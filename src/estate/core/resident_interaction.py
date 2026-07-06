@@ -233,14 +233,37 @@ def _read_json(path):
     try: return json.loads(path.read_text(encoding="utf-8"))
     except Exception: return None
 
+def _safe_diagnostic_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value)
+    text = re.sub(r"(?i)(api[_-]?key|token|secret|password)=([^\s;&]+)", r"\1=[redacted]", text)
+    text = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/-]+=*", r"\1[redacted]", text)
+    return text[:500]
+
+def _sanitize_llm_status(status: dict[str, Any]) -> dict[str, Any]:
+    safe = dict(status or {})
+    for key in ("discovery", "fallback_reason", "last_adapter_error", "error"):
+        if key in safe:
+            safe[key] = _safe_diagnostic_text(safe.get(key))
+    return safe
+
 def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
     adapter = adapter or LocalOllamaAdapter()
-    status = adapter.discover_models()
+    try:
+        status = adapter.discover_models()
+    except Exception as exc:
+        status = {"available": False, "provider": getattr(adapter, "provider", "unknown"), "endpoint": getattr(adapter, "endpoint", None), "models": [], "discovery": "local adapter discovery failed", "last_adapter_error": f"{type(exc).__name__}: {exc}"}
     models = status.get("models") or []
-    status.update({"intended_mode":"local_llm", "model": adapter.select_model("alfred", models) if models else None})
+    try:
+        selected = adapter.select_model("alfred", models) if models else None
+    except Exception as exc:
+        selected = None
+        status["last_adapter_error"] = f"{type(exc).__name__}: {exc}"
+    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected})
     if not status.get("available"):
         status.setdefault("discovery", "deterministic fallback available")
-    return status
+    return _sanitize_llm_status(status)
 
 def resident_surface(resident: str, root=None) -> dict[str, Any]:
     r = _root(root); key = _key(resident).replace("alfred-operations", "alfred")
@@ -304,8 +327,41 @@ def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], 
         "Respond as Alfred in concise, direct prose.",
     ])
 
-def _fallback_response(resident, message, surface, root: Path | None = None):
+
+def _classify_alfred_request(message: str, action: str) -> dict[str, Any]:
+    text = str(message or "").lower()
+    if re.search(r"\b(start|stop|launch|load)\b.*\b(textgen|sillytavern|ollama|model|ai service)", text):
+        op = "load_model" if "load" in text or "model" in text else ("stop" if "stop" in text else "start")
+        svc = "textgen" if "textgen" in text else ("sillytavern" if "sillytavern" in text else "unknown")
+        return {"response_type": "blocked_privileged_execution", "intent": "governed_ai_service_request", "authority_action": "propose", "service_id": svc, "operation": op}
+    if any(w in text for w in ("joke", "funny", "make me laugh")):
+        return {"response_type": "direct_conversational_response", "intent": "conversation", "authority_action": "conversation"}
+    if any(w in text for w in ("status", "operational", "what should i look at next", "what should i look at first", "look at next", "look at first")):
+        return {"response_type": "recommendation", "intent": "estate_status_or_guidance", "authority_action": "summarize"}
+    if "summarize" in text or action == "summarize":
+        return {"response_type": "local_artifact_summary" if any(w in text for w in ("artifact", "estate")) else "direct_conversational_response", "intent": "summarize", "authority_action": "summarize"}
+    return {"response_type": "direct_conversational_response", "intent": "conversation", "authority_action": "conversation"}
+
+def _governed_action_guidance(root: Path, classification: dict[str, Any]) -> dict[str, Any]:
+    service_id = classification.get("service_id") or "unknown"
+    operation = classification.get("operation") or "start"
+    try:
+        from estate.ai_services.control import request as ai_service_request
+        plan = ai_service_request(operation, service_id, actor="alfred", root=root, dry_run=True, reason="Resident chat surfaced a governed action request; no execution from chat.")
+    except Exception as exc:
+        plan = {"result": "unavailable", "approval_state": "unavailable", "planned_command": None, "safe_error": _safe_diagnostic_text(f"{type(exc).__name__}: {exc}")}
+    command = plan.get("planned_command") or f"PYTHONPATH=src python -m estate.cli.main ai-services {operation.replace('_model','-model')} {service_id} --json"
+    return {"kind": "governed_action_next_step", "service_id": service_id, "operation": operation, "executed": False, "ai_services_plan": plan, "steward_command": command}
+
+def _fallback_response(resident, message, surface, root: Path | None = None, classification: dict[str, Any] | None = None, governed_action: dict[str, Any] | None = None):
     if surface.get("resident_id") == "alfred":
+        classification = classification or _classify_alfred_request(message, "conversation")
+        if classification.get("response_type") == "blocked_privileged_execution":
+            cmd = (governed_action or {}).get("steward_command") or "Open Office of the Steward / AI Services / Models for the governed request."
+            return ("I cannot start, stop, or load governed AI services from resident chat, and I have not executed anything. "
+                    "The safe next step is to use the Office of the Steward AI Services / Models surface or run this copyable Steward command after approval: " + cmd)
+        if classification.get("intent") == "conversation" and any(w in str(message).lower() for w in ("joke", "funny", "make me laugh")):
+            return "Of course, Pat: I told the local model to clean the Estate logs, but it said it needed more cache incentives. I will keep the broom local-first."
         hints = []
         if root is not None:
             for rel in (
@@ -320,6 +376,8 @@ def _fallback_response(resident, message, surface, root: Path | None = None):
                 if hint:
                     hints.append(hint)
         context = "; ".join(hints[:3]) if hints else "local Estate context is available through validation, work-package, resident, and Operations Center artifacts as they are generated."
+        if classification.get("response_type") == "direct_conversational_response":
+            return f"Pat, I received your message and can answer conversationally in deterministic fallback mode. You asked: {message[:180]}"
         return (
             "Good morning, Pat. Current Estate status: " + context + " "
             "Recommended next action: review the validation/production-readiness signal first, then the pending work-package queue and Engineering/CueMastery handoff if present. "
@@ -333,10 +391,14 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     existing = _read_json(_session_path(rootp, sid)) or {"kind":"resident_interaction_session","session_id":sid,"resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"created_at":_now(),"turns":[],"memory_status":"active"}
     turn_no = len(existing.get("turns", [])) + 1
     attachment_records = [create_attachment(rootp, surface["resident_id"], sid, item, index=i+1, vision_adapter=vision_adapter) for i, item in enumerate(attachments or [])]
+    request_started_at = _now()
+    classification = _classify_alfred_request(user_message, action) if surface.get("resident_id") == "alfred" else {"response_type": "direct_conversational_response", "intent": action, "authority_action": action}
+    effective_action = classification.get("authority_action") or action
     llm_status = local_llm_status()
-    auth = check_authority(surface["resident_id"], action, root=rootp, audit=True)
+    auth = check_authority(surface["resident_id"], effective_action, root=rootp, audit=True)
     status = "within_responsibility" if auth.get("decision")==ALLOWED else ("requires_steward_authorization" if auth.get("decision")==REQUIRES_STEWARD else "blocked" if not auth.get("allowed") else "conversation_only")
-    auth_record = {"action_requested": action not in {"summarize","observe","conversation"},"action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")}
+    auth_record = {"action_requested": effective_action not in {"summarize","observe","conversation"} or classification.get("response_type") == "blocked_privileged_execution","action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")}
+    governed_action = _governed_action_guidance(rootp, classification) if classification.get("response_type") == "blocked_privileged_execution" else None
     adapter = LocalOllamaAdapter()
     base_meta = _llm_metadata("local_llm", provider="ollama", model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=False, fallback_reason=None)
     context_packet = _context_packet(rootp, resident, existing)
@@ -352,12 +414,14 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     prompt = _alfred_prompt(user_message_for_prompt, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message_for_prompt
     generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=llm_status.get("model")) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable")}
     llm_meta = generated.get("metadata") or base_meta
-    response = generated.get("text") if generated.get("ok") else _fallback_response(resident, user_message, surface, rootp)
+    response = generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action)
     if attachment_records and any(a.get("kind") == "image" and a.get("vision_status") != "processed" for a in attachment_records):
         response += "\n\nAttachment note: I received and stored the pasted image locally, but no local vision-capable model is available to visually inspect it yet."
     elif attachment_records and any(a.get("kind") == "image" and a.get("summary") for a in attachment_records) and not generated.get("ok"):
         response += "\n\nLocal image observation: " + " | ".join(a.get("summary") for a in attachment_records if a.get("summary"))
-    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":_now(),"user_message":user_message,"resident_response":response,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
+    request_finished_at = _now()
+    diagnostics = {"local_llm_adapter_available": bool(llm_status.get("available")), "selected_provider": llm_status.get("selected_provider") or llm_status.get("provider"), "selected_model": llm_status.get("selected_model") or llm_status.get("model"), "fallback_active": bool(llm_meta.get("fallback_used")), "fallback_reason": _safe_diagnostic_text(llm_meta.get("fallback_reason") or llm_status.get("discovery")), "last_adapter_error": _safe_diagnostic_text(llm_status.get("last_adapter_error")), "last_request_timestamp": request_started_at, "last_response_timestamp": request_finished_at, "last_timeout_or_transport_error": _safe_diagnostic_text(llm_meta.get("fallback_reason") if llm_meta.get("fallback_used") else None)}
+    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":"completed","queued":False,"failed":False,"timed_out":False,"fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}

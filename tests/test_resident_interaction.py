@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface
 
@@ -193,3 +194,46 @@ def test_wp0130_attachment_metadata_records_unavailable_when_no_model(tmp_path):
     assert att["vision_status"] == "unavailable"
     assert att["vision_provider"] == "none"
     assert att["summary"] is None
+
+class SecretFailingAdapter(MockOllamaAdapter):
+    def discover_models(self):
+        return {"available": False, "provider": "ollama", "endpoint": self.endpoint, "models": [], "discovery": "api_key=SUPERSECRET token=ABC123 unavailable", "last_adapter_error": "password=hunter2 failed"}
+
+
+def test_wp0139_joke_prompt_gets_direct_fallback_not_status(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    payload = process_chat("alfred", "tell me a new joke", root=tmp_path)
+    turn = payload["turn"]
+    assert turn["response_contract"]["response_type"] == "direct_conversational_response"
+    assert "joke" in turn["resident_response"].lower() or "local model" in turn["resident_response"].lower()
+    assert "Current Estate status" not in turn["resident_response"]
+    assert turn["diagnostics"]["local_llm_adapter_available"] is False
+
+
+def test_wp0139_status_prompt_may_return_estate_guidance(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    payload = process_chat("alfred", "what is the Estate status and what should I look at next", root=tmp_path)
+    assert payload["turn"]["response_contract"]["response_type"] == "recommendation"
+    assert "Current Estate status" in payload["turn"]["resident_response"]
+
+
+def test_wp0139_adapter_diagnostics_redact_secrets(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", SecretFailingAdapter)
+    payload = process_chat("alfred", "tell me a new joke", root=tmp_path)
+    diagnostic_blob = json.dumps(payload["turn"]["diagnostics"])
+    assert "SUPERSECRET" not in diagnostic_blob
+    assert "hunter2" not in diagnostic_blob
+    assert "[redacted]" in diagnostic_blob
+
+
+def test_wp0139_privileged_textgen_request_is_governed_not_executed(tmp_path):
+    payload = process_chat("alfred", "Please start TextGen and load the model", root=tmp_path)
+    turn = payload["turn"]
+    assert turn["response_contract"]["response_type"] == "blocked_privileged_execution"
+    assert turn["authority"]["action_executed"] is False
+    assert "not executed" in turn["resident_response"].lower() or "have not executed" in turn["resident_response"].lower()
+    assert turn["response_contract"]["governed_action"]["executed"] is False
+    assert "ai-services" in turn["response_contract"]["governed_action"]["steward_command"]

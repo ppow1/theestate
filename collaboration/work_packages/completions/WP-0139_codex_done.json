@@ -1,0 +1,24 @@
+{
+  "changed_files": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/steward_command_center.py",
+    "tests/test_resident_interaction.py",
+    "tests/test_steward_command_center.py",
+    "operations/residents/WP-0139_alfred_resident_chat_and_action_request_repair_report.md",
+    "runtime/resident_interactions/WP-0139_alfred_resident_chat_and_action_request_repair_report.json",
+    "collaboration/work_packages/completions/WP-0139_codex_done.json"
+  ],
+  "codex_status": "done",
+  "completed_at": "2026-07-06T15:20:00+00:00",
+  "local_llm_adapter_available": false,
+  "ready_for_ca_review": true,
+  "summary": [
+    "Repaired Alfred intent-gated fallback responses and response contract diagnostics.",
+    "Added safe UI timeout/transport failure rendering for Alfred resident chat.",
+    "Added governed-action handling that refuses privileged execution from chat and surfaces AI Services next steps."
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_resident_interaction.py tests/test_steward_command_center.py -q"
+  ],
+  "work_package_id": "WP-0139"
+}
