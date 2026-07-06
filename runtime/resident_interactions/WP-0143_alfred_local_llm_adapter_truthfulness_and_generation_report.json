@@ -1,0 +1,56 @@
+{
+  "actually_called_generation_for_observed_joke": "not proven by prior metadata; repeated fallback joke indicates deterministic fallback likely produced the visible response unless Ollama generation succeeded at runtime",
+  "changed_files": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/steward_command_center.py",
+    "tests/test_resident_interaction.py"
+  ],
+  "diagnostics_added": [
+    "provider",
+    "endpoint",
+    "discovered_models_count",
+    "selected_model",
+    "generation_attempted",
+    "generation_endpoint",
+    "generation_result_state",
+    "fallback_active",
+    "fallback_reason",
+    "sanitized_error",
+    "prompt_summary",
+    "last_request_timestamp",
+    "last_response_timestamp"
+  ],
+  "implemented_modes": [
+    "local_llm_generated",
+    "local_llm_discovered_but_generation_failed",
+    "deterministic_fallback",
+    "blocked_privileged_execution"
+  ],
+  "provider_endpoint_model": {
+    "generation_endpoint": "POST /api/generate",
+    "preferred_model": "qwen3:8b",
+    "provider": "ollama"
+  },
+  "remaining_limitations": [
+    "No cloud calls added",
+    "Prompt diagnostics are summarized/redacted",
+    "Fallback jokes have intentionally limited novelty"
+  ],
+  "root_cause": "Alfred conflated local Ollama discovery with final local generation metadata, allowing fallback responses to appear as local_llm.",
+  "status": "complete",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
+      "result": "passed",
+      "tests": 65
+    }
+  ],
+  "truthful_modes": [
+    "local_llm_generated",
+    "local_llm_discovered_but_generation_failed",
+    "deterministic_fallback",
+    "transport_failed",
+    "blocked_privileged_execution"
+  ],
+  "work_package": "WP-0143"
+}

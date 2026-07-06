@@ -7,7 +7,7 @@ def test_alfred_prompt_persists_history_authority_and_versions(tmp_path):
     payload = process_chat("alfred", "What should I look at next?", root=tmp_path)
     turn = payload["turn"]
     assert payload["ok"] is True
-    assert turn["llm"]["mode"] in {"local_llm", "deterministic_fallback"}
+    assert turn["llm"]["mode"] in {"local_llm_generated", "local_llm_discovered_but_generation_failed", "deterministic_fallback"}
     assert turn["authority"]["action_executed"] is False
     assert turn["authority"]["authority_status"] in {"within_responsibility", "conversation_only"}
     assert turn["resident_surface"]["resident_api_standard_version"] == "resident-api-standard-v1"
@@ -58,10 +58,10 @@ class MockOllamaAdapter:
         return "qwen3:8b" if "qwen3:8b" in models else models[0]
     def generate(self, *, resident, prompt, model=None):
         if "running from JSON files or an LLM" in prompt:
-            text = f"Pat, this answer is being generated through local_llm with provider ollama and model {model}; JSON artifacts provide context, not the whole response."
+            text = f"Pat, this answer is being generated through local_llm_generated with provider ollama and model {model}; JSON artifacts provide context, not the whole response."
         else:
             text = "Pat, my role is Alfred of the Office of Operations: I coordinate local Estate status, recommendations, and proposed next actions without executing privileged work."
-        return {"ok": True, "text": text, "metadata": {"mode": "local_llm", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "fallback_reason": None}}
+        return {"ok": True, "text": text, "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "fallback_reason": None, "generation_attempted": True, "generation_endpoint": f"{self.endpoint}/api/generate", "generation_result_state": "generated", "discovered_models_count": 2}}
 
 class UnavailableOllamaAdapter(MockOllamaAdapter):
     def discover_models(self):
@@ -82,11 +82,11 @@ def test_process_chat_uses_mocked_local_llm_and_distinguishes_intents(monkeypatc
     monkeypatch.setattr(mod, "LocalOllamaAdapter", MockOllamaAdapter)
     role = process_chat("alfred", "Good afternoon Alfred, define your role for me.", root=tmp_path)
     mode = process_chat("alfred", "Alfred, are you running from JSON files or an LLM right now?", root=tmp_path)
-    assert role["turn"]["llm"]["mode"] == "local_llm"
+    assert role["turn"]["llm"]["mode"] == "local_llm_generated"
     assert role["turn"]["llm"]["model"] == "qwen3:8b"
     assert mode["turn"]["llm"]["provider"] == "ollama"
     assert "role is Alfred" in role["turn"]["resident_response"]
-    assert "local_llm" in mode["turn"]["resident_response"]
+    assert "local_llm_generated" in mode["turn"]["resident_response"]
     assert role["turn"]["resident_response"] != mode["turn"]["resident_response"]
     assert role["turn"]["authority"]["action_executed"] is False
     assert mode["turn"]["llm"]["fallback_used"] is False
@@ -237,3 +237,54 @@ def test_wp0139_privileged_textgen_request_is_governed_not_executed(tmp_path):
     assert "not executed" in turn["resident_response"].lower() or "have not executed" in turn["resident_response"].lower()
     assert turn["response_contract"]["governed_action"]["executed"] is False
     assert "ai-services" in turn["response_contract"]["governed_action"]["steward_command"]
+
+
+class GenerationFailingAdapter(MockOllamaAdapter):
+    def generate(self, *, resident, prompt, model=None):
+        return {"ok": False, "text": None, "metadata": {"mode": "local_llm_discovered_but_generation_failed", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": True, "fallback_reason": "mock generation failed token=SECRET", "generation_attempted": True, "generation_endpoint": f"{self.endpoint}/api/generate", "generation_result_state": "failed", "discovered_models_count": 2, "sanitized_error": "token=SECRET", "prompt_summary": "Steward message: tell me a new joke"}}
+
+
+def test_wp0143_generated_text_sets_local_llm_generated(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", MockOllamaAdapter)
+    payload = process_chat("alfred", "tell me a new joke", root=tmp_path)
+    assert payload["turn"]["llm"]["mode"] == "local_llm_generated"
+    assert payload["turn"]["resident_response"]
+    assert payload["turn"]["diagnostics"]["generation_attempted"] is True
+    assert payload["turn"]["diagnostics"]["generation_result_state"] in {"generated", None}
+
+
+def test_wp0143_discovered_models_generation_failure_not_generated(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", GenerationFailingAdapter)
+    payload = process_chat("alfred", "tell me a new joke", root=tmp_path)
+    assert payload["turn"]["llm"]["mode"] == "local_llm_discovered_but_generation_failed"
+    assert payload["turn"]["diagnostics"]["generation_attempted"] is True
+    assert payload["turn"]["diagnostics"]["fallback_active"] is True
+    assert "SECRET" not in json.dumps(payload["turn"]["diagnostics"])
+
+
+def test_wp0143_fallback_jokes_rotate_and_metadata_truthful(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    responses = [process_chat("alfred", "tell me a new joke", root=tmp_path)["turn"] for _ in range(5)]
+    assert {t["llm"]["mode"] for t in responses} == {"deterministic_fallback"}
+    assert len({t["resident_response"] for t in responses}) > 1
+    assert "skeletons fight each other" not in " ".join(t["resident_response"] for t in responses).lower()
+
+
+def test_wp0143_discovery_alone_does_not_mark_generated(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", GenerationFailingAdapter)
+    payload = process_chat("alfred", "hello", root=tmp_path)
+    assert payload["llm_discovery"]["available"] is True
+    assert payload["turn"]["llm"]["mode"] != "local_llm_generated"
+
+
+def test_wp0143_governed_action_boundary_mode(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", MockOllamaAdapter)
+    payload = process_chat("alfred", "start ollama", root=tmp_path)
+    assert payload["turn"]["llm"]["mode"] == "blocked_privileged_execution"
+    assert payload["turn"]["authority"]["action_executed"] is False
+    assert payload["turn"]["response_contract"]["governed_action"]["executed"] is False
