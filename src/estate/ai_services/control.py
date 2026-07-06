@@ -1,6 +1,6 @@
 from .discovery import load_registry, rediscover, append_audit
 from .policy import evaluate
-from .execution import record_approval_request, has_approval, validate_model, safe_command, execute_plan, load_state, approvals_path, state_path
+from .execution import record_approval_request, has_approval, validate_model, planned_command_for, execute_plan, load_state, approvals_path, state_path
 
 def _service(service_id, root=None):
     reg=load_registry(root)
@@ -28,8 +28,8 @@ def request(operation, service_id, actor='alfred', approved_by=None, root=None, 
     plan={'operation':operation,'service_id':service_id,'actor':actor,'policy':pol,'approval_state':state,'result':result,'dry_run':dry_run,'planned_command':None,'command_description':None,'details':kwargs,'process_state_path':'runtime/ai_services/state.json'}
     if svc:
         op=svc.get('operations',{}).get(operation,{})
-        plan['planned_command']=safe_command(svc, operation, model=model)
-        plan['command_description']=op.get('command_template') or op.get('status_check') or op.get('api_template')
+        plan['planned_command']=planned_command_for(svc, operation, model=model)
+        plan['command_description']=op.get('command_template') or op.get('command_type') or op.get('status_check') or op.get('api_template')
     if not pol['allowed']:
         needs_approval = svc and 'steward_approval_required' in pol.get('reasons', [])
         if needs_approval:

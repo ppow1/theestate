@@ -12,7 +12,7 @@ SAFE_MODEL=re.compile(r'^[A-Za-z0-9._+-]+$')
 class ProcessRunner:
     def start(self, command, cwd=None, log_path=None):
         stdout = open(log_path, 'ab') if log_path else subprocess.DEVNULL
-        args = command if isinstance(command, list) else shlex.split(command, posix=(os.name != 'nt'))
+        args = command_to_subprocess_args(command)
         proc = subprocess.Popen(args, cwd=cwd, stdout=stdout, stderr=subprocess.STDOUT, shell=False)
         return {'pid': proc.pid}
     def stop(self, pid):
@@ -42,6 +42,66 @@ class HealthChecker:
             if time.monotonic() < deadline:
                 time.sleep(max(0.1, float(interval_seconds)))
         return {'healthy':False,'status':'health_failed','error':last_error or 'timeout','attempts':attempts,'pid_alive':None}
+
+
+def _safe_substitution(value):
+    if value is None:
+        return ''
+    text=str(value)
+    if not SAFE_MODEL.fullmatch(text) or '..' in text or '/' in text or '\\' in text:
+        raise ValueError('invalid_model_name')
+    return text
+
+def _operation(svc, operation):
+    return (svc.get('operations') or {}).get(operation,{})
+
+def command_to_subprocess_args(command):
+    if isinstance(command, dict):
+        args=command.get('subprocess_args') or command.get('arguments')
+        if not isinstance(args, list) or not all(isinstance(a, str) for a in args):
+            raise ValueError('structured_command_requires_string_argument_list')
+        return args
+    if isinstance(command, list):
+        return command
+    return shlex.split(command, posix=(os.name != 'nt'))
+
+def _render_arguments(arguments, model=None):
+    rendered=[]
+    for arg in arguments or []:
+        if not isinstance(arg, str):
+            raise ValueError('command_arguments_must_be_strings')
+        rendered.append(arg.replace('{model}', _safe_substitution(model)))
+    return rendered
+
+def _windows_batch_command(op, model=None):
+    launcher=op.get('launcher')
+    if not launcher or not isinstance(launcher, str):
+        raise ValueError('windows_batch_launcher_required')
+    if any(sep in launcher for sep in ['/', '\\']) or launcher.lower() != Path(launcher).name.lower():
+        raise ValueError('windows_batch_launcher_must_be_local_filename')
+    if not launcher.lower().endswith(('.bat', '.cmd')):
+        raise ValueError('windows_batch_launcher_must_be_batch_file')
+    rendered=_render_arguments(op.get('arguments', []), model=model)
+    subprocess_args=['cmd.exe','/d','/c',launcher,*rendered]
+    return {
+        'command_type':'windows_batch',
+        'working_directory':op.get('working_directory'),
+        'launcher':launcher,
+        'arguments':rendered,
+        'subprocess_args':subprocess_args,
+        'shell':False,
+    }
+
+def planned_command_for(svc, operation, model=None):
+    op=_operation(svc, operation)
+    ctype=op.get('command_type')
+    if ctype == 'windows_batch':
+        return _windows_batch_command(op, model=model)
+    return safe_command(svc, operation, model=model)
+
+def command_working_directory(svc, operation):
+    op=_operation(svc, operation)
+    return op.get('working_directory') or (svc.get('paths') or {}).get('application')
 
 def now(): return datetime.now(timezone.utc).isoformat()
 def _root(root): return Path(root) if root else None
@@ -107,7 +167,7 @@ def safe_command(svc, operation, model=None):
     tmpl=(svc.get('operations') or {}).get(operation,{}).get('command_template')
     if not tmpl: return None
     if any(bad in tmpl.lower() for bad in ['discover safe launcher','must be confirmed','configured open webui','approved open webui']): return None
-    return tmpl.replace('{model}', model or '')
+    return tmpl.replace('{model}', _safe_substitution(model) if model is not None else '')
 
 def _status_health_endpoint(svc):
     status=(svc.get('operations') or {}).get('status', {})
@@ -162,7 +222,7 @@ def execute_plan(plan, svc, runner=None, root=None, health_checker=None, health_
         if endpoint and not _loopback_url(endpoint): raise RuntimeError('health_endpoint_must_be_loopback')
         log=f'runtime/ai_services/logs/{sid}.log'; log_abs=(Path(root)/log) if root else (STATE.parent/'logs'/f'{sid}.log'); log_abs.parent.mkdir(parents=True, exist_ok=True)
         append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'process_start_attempted','details':{'command_label':cmd}}, root)
-        res=runner.start(cmd, cwd=(svc.get('paths') or {}).get('application'), log_path=str(log_abs))
+        res=runner.start(cmd, cwd=command_working_directory(svc, op), log_path=str(log_abs))
         pid=res.get('pid')
         append_audit({'actor':plan.get('actor'),'operation':op,'service_id':sid,'requested_model':model,'authority':'steward_approved','policy_result':'allowed','result':'process_started','details':{'pid':pid}}, root)
         st=load_state(root)

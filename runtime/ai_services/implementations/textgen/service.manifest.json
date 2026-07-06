@@ -1,1 +1,44 @@
-{"service_id":"textgen","display_name":"Text Generation WebUI","service_type":"model_runtime","local_only":true,"host_policy":{"bind":"127.0.0.1","allow_public_bind":false},"default_endpoint":"http://127.0.0.1:5000/v1","ports":[5000],"paths":{"application":"A:\\AI\\TextGen\\textgen-4.9","launcher":"A:\\AI\\TextGen\\textgen-4.9\\textgen.bat","models":"A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"},"operations":{"status":{"api_template":"GET http://127.0.0.1:5000/v1/models"},"load_model":{"command_template":"powershell -NoProfile -Command \"Set-Location A:\\AI\\TextGen\\textgen-4.9; .\\textgen.bat --nowebui --listen --model '{model}' --loader llama.cpp\""},"inventory_models":{"path_template":"A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"}},"approval":{"start":{"required":true},"stop":{"required":true},"load_model":{"required":true}},"model_locations":["A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"]}
+{
+  "service_id": "textgen",
+  "display_name": "Text Generation WebUI",
+  "service_type": "model_runtime",
+  "local_only": true,
+  "host_policy": {
+    "bind": "127.0.0.1",
+    "allow_public_bind": false
+  },
+  "default_endpoint": "http://127.0.0.1:5000/v1",
+  "ports": [5000],
+  "paths": {
+    "application": "A:\\AI\\TextGen\\textgen-4.9",
+    "launcher": "A:\\AI\\TextGen\\textgen-4.9\\textgen.bat",
+    "models": "A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"
+  },
+  "operations": {
+    "status": {
+      "api_template": "GET http://127.0.0.1:5000/v1/models"
+    },
+    "load_model": {
+      "command_type": "windows_batch",
+      "working_directory": "A:\\AI\\TextGen\\textgen-4.9",
+      "launcher": "textgen.bat",
+      "arguments": [
+        "--nowebui",
+        "--listen",
+        "--model",
+        "{model}",
+        "--loader",
+        "llama.cpp"
+      ]
+    },
+    "inventory_models": {
+      "path_template": "A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"
+    }
+  },
+  "approval": {
+    "start": {"required": true},
+    "stop": {"required": true},
+    "load_model": {"required": true}
+  },
+  "model_locations": ["A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"]
+}
