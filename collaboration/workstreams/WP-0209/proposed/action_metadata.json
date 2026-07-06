@@ -1,0 +1,394 @@
+[
+  {
+    "action_id": "alfred.start_alfred_conversation",
+    "label": "Start Alfred Conversation",
+    "target_tab": "alfred",
+    "description": "Staged Resident Conversation Controls control for start alfred conversation. draft/proposal only; not approval or execution.",
+    "action_class": "local_marker",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-start_alfred_conversation.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.start_alfred_conversation",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-start_alfred_conversation.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "alfred.inspect_alfred_surface",
+    "label": "Inspect Alfred Surface",
+    "target_tab": "alfred",
+    "description": "Staged Resident Conversation Controls control for inspect alfred surface. read-only inspection.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_resident_actions.inspect_alfred_surface",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "alfred.copy_alfred_duty_status_commands",
+    "label": "Copy Alfred Duty Status Commands",
+    "target_tab": "alfred",
+    "description": "Staged Resident Conversation Controls control for copy alfred duty status commands. copy-only; visually distinct from execution.",
+    "action_class": "copy_command",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_resident_actions.copy_alfred_duty_status_commands",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "alfred.queue_alfred_request",
+    "label": "Queue Alfred Request",
+    "target_tab": "alfred",
+    "description": "Staged Resident Conversation Controls control for queue alfred request. draft/proposal only; not approval or execution.",
+    "action_class": "draft",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-queue_alfred_request.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.queue_alfred_request",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-queue_alfred_request.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": "draft/proposal only; not executable",
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "alfred.inspect_alfred_job_request",
+    "label": "Inspect Alfred Job Request",
+    "target_tab": "alfred",
+    "description": "Staged Resident Conversation Controls control for inspect alfred job request. draft/proposal only; not approval or execution.",
+    "action_class": "draft",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-inspect_alfred_job_request.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.inspect_alfred_job_request",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-inspect_alfred_job_request.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": "draft/proposal only; not executable",
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "alfred.cancel_retry_job_design",
+    "label": "Cancel Retry Job Design",
+    "target_tab": "alfred",
+    "description": "Staged Resident Conversation Controls control for cancel retry job design. draft/proposal only; not approval or execution; authority-gated.",
+    "action_class": "local_marker",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "authority_route_required",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-cancel_retry_job_design.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.cancel_retry_job_design",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-cancel_retry_job_design.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "helen.inspect_helen_surface",
+    "label": "Inspect Helen Surface",
+    "target_tab": "helen",
+    "description": "Staged Resident Conversation Controls control for inspect helen surface. read-only inspection.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_resident_actions.inspect_helen_surface",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "helen.copy_helen_duty_status_authority_commands",
+    "label": "Copy Helen Duty Status Authority Commands",
+    "target_tab": "helen",
+    "description": "Staged Resident Conversation Controls control for copy helen duty status authority commands. copy-only; visually distinct from execution.",
+    "action_class": "copy_command",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_resident_actions.copy_helen_duty_status_authority_commands",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "helen.start_helen_conversation",
+    "label": "Start Helen Conversation",
+    "target_tab": "helen",
+    "description": "Staged Resident Conversation Controls control for start helen conversation. draft/proposal only; not approval or execution.",
+    "action_class": "local_marker",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-start_helen_conversation.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.start_helen_conversation",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-start_helen_conversation.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "helen.draft_hr_onboarding_request",
+    "label": "Draft Hr Onboarding Request",
+    "target_tab": "helen",
+    "description": "Staged Resident Conversation Controls control for draft hr onboarding request. draft/proposal only; not approval or execution.",
+    "action_class": "draft",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-draft_hr_onboarding_request.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.draft_hr_onboarding_request",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-draft_hr_onboarding_request.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": "draft/proposal only; not executable",
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "resident_conversations.start_session",
+    "label": "Start Session",
+    "target_tab": "resident_conversations",
+    "description": "Staged Resident Conversation Controls control for start session. draft/proposal only; not approval or execution.",
+    "action_class": "local_marker",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-start_session.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.start_session",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-start_session.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "resident_conversations.open_transcript",
+    "label": "Open Transcript",
+    "target_tab": "resident_conversations",
+    "description": "Staged Resident Conversation Controls control for open transcript. read-only inspection.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_resident_actions.open_transcript",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "resident_conversations.export_transcript",
+    "label": "Export Transcript",
+    "target_tab": "resident_conversations",
+    "description": "Staged Resident Conversation Controls control for export transcript. local generated-artifact update only.",
+    "action_class": "export",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/wp-0209-export_transcript.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.export_transcript",
+    "expected_output_paths": [
+      "runtime/steward/exports/wp-0209-export_transcript.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "resident_conversations.redact_forget_with_audit_design",
+    "label": "Redact Forget With Audit Design",
+    "target_tab": "resident_conversations",
+    "description": "Staged Resident Conversation Controls control for redact forget with audit design. draft/proposal only; not approval or execution; authority-gated.",
+    "action_class": "local_marker",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "authority_route_required",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-redact_forget_with_audit_design.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.redact_forget_with_audit_design",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-redact_forget_with_audit_design.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "resident_conversations.draft_promotion_of_outcome",
+    "label": "Draft Promotion Of Outcome",
+    "target_tab": "resident_conversations",
+    "description": "Staged Resident Conversation Controls control for draft promotion of outcome. draft/proposal only; not approval or execution.",
+    "action_class": "draft",
+    "authority_class": "steward_confirmed_local_mutation",
+    "confirmation_requirement": "preview_before_write",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0209-draft_promotion_of_outcome.json"
+    ],
+    "command_hook_or_handler_reference": "office_resident_actions.draft_promotion_of_outcome",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0209-draft_promotion_of_outcome.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": "draft/proposal only; not executable",
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  },
+  {
+    "action_id": "resident_conversations.inspect_authority_boundary",
+    "label": "Inspect Authority Boundary",
+    "target_tab": "resident_conversations",
+    "description": "Staged Resident Conversation Controls control for inspect authority boundary. read-only inspection; authority-gated.",
+    "action_class": "inspect",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "authority_route_required",
+    "reads_artifacts": [
+      "operations/alfred/duty_summary.md",
+      "operations/helen/duty_summary.md",
+      "runtime/residents/conversations/*"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_resident_actions.inspect_authority_boundary",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": "resident may inspect/summarize/draft/request only; no governance/personnel/work-package execution authority",
+    "process_control_statement": null
+  }
+]

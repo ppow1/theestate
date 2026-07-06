@@ -1,0 +1,113 @@
+{
+  "work_package_id": "WP-0209",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T18:38:34.568487+00:00",
+  "branch": "work",
+  "summary": "Staged Resident Conversation controls for Alfred, Helen, and transcript workflows with explicit Resident Action Authority Boundary protections.",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0209/proposed/resident_conversation_controls.md",
+    "collaboration/workstreams/WP-0209/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0209/proposed/src/estate/core/office_resident_actions.py",
+    "collaboration/workstreams/WP-0209/proposed/tests/test_office_resident_actions.py",
+    "collaboration/workstreams/WP-0209/validation_notes.md"
+  ],
+  "install_manifest_path": "collaboration/workstreams/WP-0209/install_manifest.json",
+  "intended_install_paths": [
+    "src/estate/core/office_resident_actions.py",
+    "tests/test_office_resident_actions.py"
+  ],
+  "conflict_risks": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/resident_conversation_sessions.py",
+    "src/estate/core/resident_authority.py",
+    "src/estate/core/resident_presence.py",
+    "src/estate/core/alfred.py",
+    "src/estate/core/alfred_duty.py",
+    "src/estate/core/helen_duty.py",
+    "src/estate/cli/main.py",
+    "tests/test_resident_interaction.py",
+    "tests/test_steward_command_center.py"
+  ],
+  "controls_staged_by_tab": {
+    "alfred": [
+      "start_alfred_conversation",
+      "inspect_alfred_surface",
+      "copy_alfred_duty_status_commands",
+      "queue_alfred_request",
+      "inspect_alfred_job_request",
+      "cancel_retry_job_design"
+    ],
+    "helen": [
+      "inspect_helen_surface",
+      "copy_helen_duty_status_authority_commands",
+      "start_helen_conversation",
+      "draft_hr_onboarding_request"
+    ],
+    "resident_conversations": [
+      "start_session",
+      "open_transcript",
+      "export_transcript",
+      "redact_forget_with_audit_design",
+      "draft_promotion_of_outcome",
+      "inspect_authority_boundary"
+    ]
+  },
+  "files_changed": [
+    "collaboration/workstreams/WP-0209/proposed/resident_conversation_controls.md",
+    "collaboration/workstreams/WP-0209/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0209/proposed/src/estate/core/office_resident_actions.py",
+    "collaboration/workstreams/WP-0209/proposed/tests/test_office_resident_actions.py",
+    "collaboration/workstreams/WP-0209/validation_notes.md",
+    "collaboration/workstreams/WP-0209/install_manifest.json",
+    "collaboration/work_packages/completions/WP-0209_codex_done.json"
+  ],
+  "tests_validation_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0209 --json",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0209 --json",
+      "exit_code": 1,
+      "status": "warning_no_recipe"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "exit_code": 0,
+      "status": "passed_with_existing_repository_blockers"
+    }
+  ],
+  "known_limitations": [
+    "Staged controls are not installed into active Office runtime files.",
+    "Workstream-specific validation may report no recipe until future validation integration.",
+    "validate-work-package reports no registered validation recipe for this staged package.",
+    "validation-production-readiness includes pre-existing repository blockers outside WP-0208/WP-0209/WP-0210."
+  ],
+  "wp0200_staged_vocabulary_available_and_used": true,
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url_or_not_applicable_reason": "PR URL is not available from local Codex execution before make_pr records the pull request metadata.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0209 --json",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0209 --json",
+      "exit_code": 1,
+      "status": "warning_no_recipe"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "exit_code": 0,
+      "status": "passed_with_existing_repository_blockers"
+    }
+  ],
+  "pull_request_not_applicable_reason": "PR URL is not available from local Codex execution before make_pr records the pull request metadata.",
+  "pull_request_url_not_applicable_reason": "PR URL is not available from local Codex execution before make_pr records the pull request metadata."
+}

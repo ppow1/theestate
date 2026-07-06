@@ -1,0 +1,63 @@
+{
+  "work_package_id": "WP-0210",
+  "workstream_mode": "PARALLEL-STAGED",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0210/proposed/ai_services_model_controls.md",
+    "collaboration/workstreams/WP-0210/proposed/action_metadata.json",
+    "collaboration/workstreams/WP-0210/proposed/src/estate/core/office_ai_service_actions.py",
+    "collaboration/workstreams/WP-0210/proposed/tests/test_office_ai_service_actions.py",
+    "collaboration/workstreams/WP-0210/validation_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_ai_service_actions.py",
+    "tests/test_office_ai_service_actions.py"
+  ],
+  "files_expected_to_be_modified_during_install": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/office_ai_service_actions.py",
+    "tests/test_office_ai_service_actions.py"
+  ],
+  "manual_install_steps": [
+    "Chief Architect reviews staged artifacts",
+    "resolve WP-0200 office action framework alignment",
+    "copy proposed files to intended install paths only in a future install-handoff package",
+    "wire UI controls with confirmations and authority gates",
+    "run validation commands"
+  ],
+  "automated_install_steps": [],
+  "validation_commands": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0210 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0210 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "rollback_notes": "Remove future installed files/UI wiring; this staged package has no active runtime install to roll back.",
+  "dependency_assumptions": [
+    "WP-0118 merged or available",
+    "WP-0200 staged vocabulary available"
+  ],
+  "conflict_risks": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/discovery.py",
+    "src/estate/core/discovery_catalog.py",
+    "src/estate/core/discovery_cycle.py",
+    "src/estate/core/provider_sync.py",
+    "src/estate/core/services.py",
+    "src/estate/core/service_layer.py",
+    "src/estate/cli/main.py",
+    "runtime/ai_services/registry.json",
+    "runtime/ai_services/audit_log.jsonl",
+    "tests/test_steward_command_center.py"
+  ],
+  "generated_artifacts_to_ignore_or_review": [
+    "runtime/steward/drafts/*",
+    "runtime/steward/exports/*"
+  ],
+  "authority_and_review_requirements": [
+    "Chief Architect review required",
+    "Steward confirmation required for local mutations",
+    "Authority route required where marked",
+    "Staged work is not installed"
+  ],
+  "staged_work_is_installed": false
+}
