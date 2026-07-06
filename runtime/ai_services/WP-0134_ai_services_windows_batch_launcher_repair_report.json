@@ -1,0 +1,67 @@
+{
+  "work_package_id": "WP-0134",
+  "codex_status": "done",
+  "current_git_commit": "669d9c58bb7520cd1039a25f19167570f19bd76a",
+  "files_changed": [
+    "runtime/ai_services/implementations/textgen/service.manifest.json",
+    "src/estate/ai_services/execution.py",
+    "src/estate/ai_services/control.py",
+    "tests/test_ai_services_control_plane.py",
+    "operations/ai_services/WP-0134_ai_services_windows_batch_launcher_repair_report.md",
+    "runtime/ai_services/WP-0134_ai_services_windows_batch_launcher_repair_report.json",
+    "collaboration/work_packages/completions/WP-0134_codex_done.json"
+  ],
+  "summary": "Repaired TextGen control-plane planning and execution to use structured Windows batch launcher metadata instead of nested PowerShell shell strings.",
+  "launcher_manifest_shape": {
+    "command_type": "windows_batch",
+    "working_directory": "A:\\AI\\TextGen\\textgen-4.9",
+    "launcher": "textgen.bat",
+    "arguments": [
+      "--nowebui",
+      "--listen",
+      "--model",
+      "{model}",
+      "--loader",
+      "llama.cpp"
+    ]
+  },
+  "batch_execution_behavior": "Structured windows_batch operations render to cmd.exe /d /c <launcher> plus separate argument list, use shell=false, and pass the manifest working directory as cwd.",
+  "textgen_command_behavior": "Dry-run and execution plans show textgen.bat launched from A:\\AI\\TextGen\\textgen-4.9 with Qwen3-8B-Q6_K.gguf substituted as the --model argument.",
+  "model_name_safety_behavior": "Model names must match ^[A-Za-z0-9._+-]+$ and may not contain traversal or path separators; arguments are passed as list elements without shell-string interpolation.",
+  "health_check_preservation": "Execution still succeeds only after http://127.0.0.1:5000/v1/models responds; endpoint failures return health_failed with diagnostics.",
+  "cli_behavior": "ai-services load-model --service textgen --model Qwen3-8B-Q6_K.gguf --approved-by steward --health-timeout-seconds 20 --health-interval-seconds 2 --json remains the approved execution path.",
+  "tests_run": [
+    {
+      "command": "PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q",
+      "result": "passed",
+      "summary": "24 passed"
+    },
+    {
+      "command": "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+      "result": "passed",
+      "summary": "45 passed"
+    }
+  ],
+  "validation_commands_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0134 --json",
+      "result": "warning",
+      "summary": "Command exited 1 because no validation recipe is registered for WP-0134; receipt validation is complete and report artifacts were written."
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "result": "passed_with_existing_blockers",
+      "summary": "Command exited 0; WP-0134 is listed blocked only because its validation recipe is missing/no_recipe."
+    }
+  ],
+  "known_limitations": [
+    "Does not install, update, move, or launch third-party TextGen during tests.",
+    "Runtime success depends on the local Windows TextGen installation and port availability."
+  ],
+  "recommended_next_action": "CA review and merge, then validate the approved CLI command on the Windows host.",
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "completed_at": "2026-07-06T01:13:48+00:00",
+  "branch": "work",
+  "pull_request_not_applicable_reason": "Not applicable yet; PR metadata will be created by make_pr after local commit."
+}

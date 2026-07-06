@@ -219,3 +219,62 @@ def test_textgen_model_load_uses_models_health_endpoint(tmp_path):
     data=_manifest(); _write(tmp_path, data); rediscover(tmp_path); health=_Health(True)
     request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3.gguf",dry_run=False,runner=_Runner(),health_checker=health)
     assert health.calls == ["http://127.0.0.1:5000/v1/models"]
+
+
+def _textgen_batch_manifest():
+    data=_manifest()
+    data["paths"]["application"]="A:\\AI\\TextGen\\textgen-4.9"
+    data["paths"]["launcher"]="A:\\AI\\TextGen\\textgen-4.9\\textgen.bat"
+    data["operations"]["load_model"]={
+        "command_type":"windows_batch",
+        "working_directory":"A:\\AI\\TextGen\\textgen-4.9",
+        "launcher":"textgen.bat",
+        "arguments":["--nowebui","--listen","--model","{model}","--loader","llama.cpp"],
+    }
+    return data
+
+
+def test_textgen_manifest_exposes_structured_windows_batch_launcher():
+    manifest=json.loads(Path("runtime/ai_services/implementations/textgen/service.manifest.json").read_text())
+    op=manifest["operations"]["load_model"]
+    assert op["command_type"] == "windows_batch"
+    assert op["working_directory"] == "A:\\AI\\TextGen\\textgen-4.9"
+    assert op["launcher"] == "textgen.bat"
+    assert op["arguments"] == ["--nowebui","--listen","--model","{model}","--loader","llama.cpp"]
+    assert "command_template" not in op
+
+
+def test_textgen_batch_dry_run_plans_cmd_batch_semantics(tmp_path):
+    _write(tmp_path, _textgen_batch_manifest()); rediscover(tmp_path)
+    plan=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3-8B-Q6_K.gguf")
+    cmd=plan["planned_command"]
+    assert cmd["command_type"] == "windows_batch"
+    assert cmd["working_directory"] == "A:\\AI\\TextGen\\textgen-4.9"
+    assert cmd["launcher"] == "textgen.bat"
+    assert cmd["subprocess_args"] == ["cmd.exe","/d","/c","textgen.bat","--nowebui","--listen","--model","Qwen3-8B-Q6_K.gguf","--loader","llama.cpp"]
+    assert "powershell" not in json.dumps(cmd).lower()
+
+
+def test_textgen_batch_execution_passes_manifest_working_directory_and_safe_args(tmp_path):
+    _write(tmp_path, _textgen_batch_manifest()); rediscover(tmp_path); runner=_Runner(); health=_Health(True)
+    res=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3-8B-Q6_K.gguf",dry_run=False,runner=runner,health_checker=health)
+    assert res["result"] == "executed"
+    started=runner.started[0]
+    assert started["cwd"] == "A:\\AI\\TextGen\\textgen-4.9"
+    assert started["command"]["subprocess_args"] == ["cmd.exe","/d","/c","textgen.bat","--nowebui","--listen","--model","Qwen3-8B-Q6_K.gguf","--loader","llama.cpp"]
+    assert health.calls == ["http://127.0.0.1:5000/v1/models"]
+
+
+def test_textgen_batch_health_failure_remains_lifecycle_failure(tmp_path):
+    _write(tmp_path, _textgen_batch_manifest()); rediscover(tmp_path)
+    res=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3-8B-Q6_K.gguf",dry_run=False,runner=_Runner(),health_checker=_Health(False,"connection_refused"))
+    assert res["result"] == "health_failed"
+    state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
+    assert state["services"]["textgen"]["status"] == "health_failed"
+
+
+def test_textgen_batch_model_validation_rejects_injection_characters(tmp_path):
+    _write(tmp_path, _textgen_batch_manifest()); rediscover(tmp_path)
+    for bad in ["../secret.gguf", "sub/model.gguf", "sub\\model.gguf", "x;calc.gguf", "x&calc.gguf", "x|calc.gguf", "x$(calc).gguf"]:
+        res=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model=bad)
+        assert res["policy"]["allowed"] is False
