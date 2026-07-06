@@ -1882,21 +1882,27 @@ def _ai_services_models_html(panel):
     data = panel.get("data") or {}
     services = data.get("services") or []
     models = data.get("models") or []
+    dashboard = data.get("dashboard") or {}
     prefs = ((data.get("model_preferences") or {}).get("preferences") or {})
     assigns = ((data.get("model_assignments") or {}).get("assignments") or {})
     approvals = (data.get("approvals") or {}).get("requests") or []
+    actions = data.get("actions") or {}
     rows = ["<div class='ai-services-models'><p>Steward-governed local AI services and model selector. Actions are backed by ai-services CLI/API hooks and do not bypass policy gates.</p>"]
-    rows.append("<h3>Services</h3><table><thead><tr><th>Service</th><th>Type</th><th>Endpoint</th><th>State / Health</th><th>Operations</th><th>Approval</th><th>Log</th></tr></thead><tbody>")
+    rows.append("<h3>Dashboard</h3><div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(str(k).replace('_',' ').title())}</strong><span>{html.escape(str(v))}</span></span>" for k, v in dashboard.items()) + "</div>")
+    rows.append("<h3>Operational Controls</h3><table><thead><tr><th>Action</th><th>Local command hook</th></tr></thead><tbody>" + "".join(f"<tr><td>{html.escape(str(k).replace('_',' ').title())}</td><td><code>{html.escape(str(v))}</code></td></tr>" for k, v in actions.items()) + "</tbody></table>")
+    rows.append("<h3>Services</h3><table><thead><tr><th>Service</th><th>Type</th><th>Endpoint / Ports</th><th>State / Health</th><th>Operations</th><th>Approval</th><th>Paths / Logs</th></tr></thead><tbody>")
     for svc in services:
-        rows.append("<tr>" + f"<td>{html.escape(str(svc.get('service_id')))}<br><span class='source'>{html.escape(str(svc.get('display_name')))}</span></td>" + f"<td>{html.escape(str(svc.get('service_type')))}</td>" + f"<td>{html.escape(str(svc.get('endpoint')))}<br>{html.escape(str(svc.get('ports')))}</td>" + f"<td>{html.escape(str(svc.get('current_state')))} / {html.escape(str(svc.get('health_status')))}<br><span class='source'>last: {html.escape(str(svc.get('last_operation')))}</span></td>" + f"<td>{html.escape(', '.join(svc.get('available_operations') or []))}</td>" + f"<td><pre>{html.escape(json.dumps(svc.get('approval_requirements') or {}, sort_keys=True))}</pre></td>" + f"<td>{html.escape(str(svc.get('log_reference') or 'none'))}</td>" + "</tr>")
-    rows.append("</tbody></table><h3>Models</h3><table><thead><tr><th>Model</th><th>Service</th><th>Source</th><th>Capabilities</th><th>Status</th></tr></thead><tbody>")
+        details = {"manifest": svc.get("manifest_path"), "models": svc.get("model_locations"), "host_policy": svc.get("host_policy"), "pid": svc.get("pid"), "last_health_result": svc.get("last_health_result"), "last_startup_time": svc.get("last_startup_time"), "startup_failures": svc.get("startup_failures"), "process_exit_code": svc.get("process_exit_code"), "working_directory": svc.get("working_directory"), "launcher": svc.get("launcher"), "local_only": svc.get("local_only")}
+        rows.append("<tr>" + f"<td>{html.escape(str(svc.get('service_id')))}<br><span class='source'>{html.escape(str(svc.get('display_name')))}</span></td>" + f"<td>{html.escape(str(svc.get('service_type')))}</td>" + f"<td>{html.escape(str(svc.get('endpoint')))}<br>{html.escape(str(svc.get('ports')))}</td>" + f"<td>{html.escape(str(svc.get('current_state')))} / {html.escape(str(svc.get('health_status')))}<br><span class='source'>last: {html.escape(str(svc.get('last_operation')))}</span></td>" + f"<td>{html.escape(', '.join(svc.get('available_operations') or []))}<details><summary>Manifest operations</summary><pre>{html.escape(json.dumps(svc.get('operations') or {}, indent=2, sort_keys=True))}</pre></details></td>" + f"<td><pre>{html.escape(json.dumps(svc.get('approval_requirements') or {}, sort_keys=True))}</pre></td>" + f"<td><pre>{html.escape(json.dumps(details, indent=2, sort_keys=True))}</pre><span class='source'>log: {html.escape(str(svc.get('log_reference') or 'none'))}</span></td>" + "</tr>")
+    rows.append("</tbody></table><h3>Model Inventory</h3><table><thead><tr><th>Model</th><th>Service</th><th>Source</th><th>Inventory State</th><th>Roles</th></tr></thead><tbody>")
     for m in models:
-        rows.append(f"<tr><td>{html.escape(str(m.get('model_id')))}</td><td>{html.escape(str(m.get('backing_service')))}</td><td>{html.escape(str(m.get('source')))}</td><td>{html.escape(', '.join(m.get('capabilities') or []))}</td><td>{html.escape(str(m.get('source_status')))} / {html.escape(str(m.get('classification_status')))}</td></tr>")
-    rows.append("</tbody></table><h3>Estate Defaults</h3><pre>" + html.escape(json.dumps(prefs, indent=2, sort_keys=True)) + "</pre>")
-    rows.append("<h3>Worker / Resident Assignments</h3><pre>" + html.escape(json.dumps(assigns, indent=2, sort_keys=True)) + "</pre>")
-    rows.append("<h3>Pending Approvals</h3><pre>" + html.escape(json.dumps([a for a in approvals if a.get('state') == 'requires_approval'], indent=2, sort_keys=True)) + "</pre>")
-    rows.append("<h3>Audit Tail</h3><pre>" + html.escape(json.dumps(data.get('audit_tail') or [], indent=2, sort_keys=True)) + "</pre>")
-    rows.append(f"<p class='source'>Sources: {html.escape(str(panel.get('path')))}. Rediscovery/status hooks: {html.escape(json.dumps(data.get('actions') or {}, sort_keys=True))}</p></div>")
+        roles = [name for name in ["installed", "currently_loaded", "preferred", "assigned", "default", "unavailable", "unresolved"] if m.get(name)]
+        rows.append(f"<tr><td>{html.escape(str(m.get('model_id')))}<br><span class='source'>{html.escape(str(m.get('name')))}</span></td><td>{html.escape(str(m.get('backing_service')))}</td><td>{html.escape(str(m.get('source')))}<br><span class='source'>{html.escape(str(m.get('source_path') or m.get('model_location') or ''))}</span></td><td>{html.escape(str(m.get('source_status')))} / {html.escape(str(m.get('classification_status')))}</td><td>{html.escape(', '.join(roles) or 'known')}</td></tr>")
+    rows.append("</tbody></table><h3>Estate Model Preferences</h3><pre>" + html.escape(json.dumps(prefs, indent=2, sort_keys=True)) + "</pre>")
+    rows.append("<h3>Worker / Resident Assignments and Permissions</h3><pre>" + html.escape(json.dumps(assigns, indent=2, sort_keys=True)) + "</pre>")
+    rows.append("<h3>Authority / Approvals</h3><pre>" + html.escape(json.dumps({"pending":[a for a in approvals if a.get('state') == 'requires_approval'], "approved":[a for a in approvals if a.get('state') == 'approved'], "denied":[a for a in approvals if a.get('state') == 'denied']}, indent=2, sort_keys=True)) + "</pre>")
+    rows.append("<h3>Rediscovery / Audit</h3><pre>" + html.escape(json.dumps(data.get('audit_tail') or [], indent=2, sort_keys=True)) + "</pre>")
+    rows.append(f"<p class='source'>Sources: {html.escape(str(panel.get('path')))}. Static HTML renders copyable local commands rather than executing host commands.</p></div>")
     return _panel("AI Services / Models", ''.join(rows), "ready")
 
 def render_command_center_html(payload):

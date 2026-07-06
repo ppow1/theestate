@@ -1,0 +1,34 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-06T03:10:10+00:00",
+  "files_changed": [
+    "src/estate/ai_services/steward_model_selector.py",
+    "src/estate/core/steward_command_center.py",
+    "tests/test_ai_services_steward_model_selector.py",
+    "tests/test_steward_command_center.py",
+    "operations/ai_services/WP-0138_complete_office_of_steward_ai_services_workspace_report.md",
+    "runtime/ai_services/WP-0138_complete_office_of_steward_ai_services_workspace_report.json",
+    "collaboration/work_packages/completions/WP-0138_codex_done.json",
+    "runtime/steward/command_center.html"
+  ],
+  "json_report": "runtime/ai_services/WP-0138_complete_office_of_steward_ai_services_workspace_report.json",
+  "known_limitations": [
+    "Static HTML cannot execute local commands directly; it renders copyable local command hooks.",
+    "Filesystem discovery can only enumerate model directories visible to the local host running the generator."
+  ],
+  "merge_authority_or_equivalent": "Chief Architect review required",
+  "pull_request_url_or_not_applicable_reason": "not_applicable_created_by_local_codex_tool_after_commit",
+  "ready_for_ca_review": true,
+  "report": "operations/ai_services/WP-0138_complete_office_of_steward_ai_services_workspace_report.md",
+  "status": "done",
+  "summary": "Completed the Office of the Steward AI Services / Models workspace with services, model inventory, preferences, assignments, approvals, controls, health, and audit visibility.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py",
+    "PYTHONPATH=src pytest -q tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_production_readiness_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src pytest -q tests/test_ai_services_steward_model_selector.py tests/test_steward_command_center.py"
+  ],
+  "work_package_id": "WP-0138"
+}
