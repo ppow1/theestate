@@ -1,71 +1,45 @@
 {
   "branch": "work",
+  "cli_command_surface_not_applicable_reason": "No CLI command was added because the required current rendered DOM/page state exists in the browser; server-side generation would not capture user-selected tab, open details elements, or browser-local layout state.",
   "codex_status": "done",
-  "completed_at": "2026-07-05T01:30:35+00:00",
+  "completed_at": "2026-07-06T15:07:55+00:00",
   "files_changed": [
+    "src/estate/core/steward_command_center.py",
     "src/estate/core/work_package_validation.py",
-    "operations/validation/backlog_burn_down/WP-0117_wp0106_wp0107_failure_repair_report.md",
-    "runtime/validation/backlog_burn_down/WP-0117_wp0106_wp0107_failure_repair_report.json",
-    "collaboration/work_packages/completions/WP-0117_codex_done.json",
-    "tests/test_work_package_validation.py"
+    "tests/test_steward_command_center.py",
+    "tests/test_work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0117_codex_done.json"
   ],
-  "helen_path_status_after_repair": "WP-0106 and WP-0107 now validate successfully and are production-ready; remaining Helen/Alfred path blockers are unrelated historical recipe/receipt gaps listed in remaining_blockers.",
   "known_limitations": [
-    "Repository-wide production readiness still has unrelated historical recipe and receipt gaps outside WP-0117 scope."
+    "Screenshot capture is not included yet.",
+    "External stylesheet/script bodies may be unavailable under browser security constraints; inline contents and references are captured.",
+    "The ZIP implementation uses stored/uncompressed ZIP entries to avoid adding a dependency."
   ],
   "merge_authority": "ca_verified_auto_merge_allowed",
-  "production_readiness_totals_after": {
-    "total_blocked": 9,
-    "total_incomplete_receipts": 3,
-    "total_missing_receipts": 3,
-    "total_missing_recipes": 7,
-    "total_production_ready": 94,
-    "total_work_packages_scanned": 103
-  },
-  "production_readiness_totals_before": {
-    "total_blocked": 11,
-    "total_incomplete_receipts": 3,
-    "total_missing_receipts": 3,
-    "total_missing_recipes": 7,
-    "total_production_ready": 91,
-    "total_work_packages_scanned": 102
-  },
-  "pull_request_not_applicable_reason": "Local Codex task; PR URL will be assigned by repository hosting after push if applicable.",
+  "pull_request_not_applicable_reason": "PR URL is assigned by repository hosting after this local branch commit; make_pr metadata is recorded separately.",
+  "pull_request_url_not_applicable_reason": "PR URL is assigned by repository hosting after this local branch commit; make_pr metadata is recorded separately.",
+  "pull_request_url_or_not_applicable_reason": "PR URL is assigned by repository hosting after this local branch commit; make_pr metadata is recorded separately.",
   "ready_for_ca_review": true,
-  "remaining_blockers": [
-    "WP-0016",
-    "WP-0017",
-    "WP-0018",
-    "WP-0040",
-    "WP-0056",
-    "WP-0063",
-    "WP-0073",
-    "WP-0089",
-    "WP-0094"
+  "screenshot_support_status": "Not implemented in WP-0117 first pass; documented in manifest/README as a known future enhancement to avoid heavyweight browser automation dependencies.",
+  "snapshot_button_location": "Office of the Steward page header snapshot toolbar, below the local-only generated timestamp.",
+  "snapshot_package_contents_implemented": [
+    "snapshot_manifest.json",
+    "page.html",
+    "dom_state.json",
+    "ui_metadata.json",
+    "styles.css",
+    "scripts.js",
+    "source_artifacts.json",
+    "README.md"
   ],
-  "repair_classification": {
-    "WP-0106": "validation recipe command import-path repair",
-    "WP-0107": "validation recipe command import-path repair",
-    "targeted_tests": "work-package validation recipe coverage test added for WP-0117 and repaired pytest import-path commands"
-  },
-  "summary": "Repaired WP-0106 and WP-0107 validation recipes by making their pytest commands set src on sys.path explicitly, documented the import-path failure cause, validated repaired packages and WP-0116, and regenerated readiness artifacts.",
+  "summary": "Added a local-only Office Snapshot button to the Office of the Steward that builds and downloads a browser-created ZIP containing DOM, metadata, CSS, JavaScript context, source artifacts, manifest, and README.",
   "tests_run": [
-    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
-    "PYTHONPATH=src python -m pytest tests/test_resident_presence.py tests/test_resident_cards.py tests/test_steward_command_center.py",
-    "PYTHONPATH=src python -m pytest tests/test_alfred_duty.py tests/test_resident_presence.py tests/test_resident_cards.py"
+    "PYTHONPATH=src pytest tests/test_steward_command_center.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q"
   ],
   "validation_commands_run": [
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0106 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0107 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0116 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0102 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0105 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0111 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0114 --json",
-    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0115 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0117 --json",
     "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
   ],
-  "work_package_id": "WP-0117",
-  "wp_0106_failure_cause": "The failed pytest recipe command relied on an ambient import path. Reproducing the pytest group without PYTHONPATH produced ModuleNotFoundError: No module named estate during test collection; the CLI smoke checks passed because they were run from a context where estate was importable.",
-  "wp_0107_failure_cause": "The failed pytest recipe command had the same ambient import-path dependency. Reproducing the pytest group without PYTHONPATH produced ModuleNotFoundError: No module named estate via the shared resident-presence test import path; the Alfred CLI smoke checks passed independently."
+  "work_package_id": "WP-0117"
 }

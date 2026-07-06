@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-06T00:53:40+00:00",
-  "json_report": "runtime/validation/work_packages/WP-0133_validation.json",
-  "latest_validation_report_path": "operations/validation/reports/WP-0133_validation.md",
-  "markdown_report": "operations/validation/reports/WP-0133_validation.md",
-  "validation_id": "WP-0133_2026-07-06T005340Z0000",
+  "generated_at": "2026-07-06T15:09:07+00:00",
+  "json_report": "runtime/validation/work_packages/WP-0117_validation.json",
+  "latest_validation_report_path": "operations/validation/reports/WP-0117_validation.md",
+  "markdown_report": "operations/validation/reports/WP-0117_validation.md",
+  "validation_id": "WP-0117_2026-07-06T150907Z0000",
   "validation_status": "passed",
-  "work_package_id": "WP-0133"
+  "work_package_id": "WP-0117"
 }
