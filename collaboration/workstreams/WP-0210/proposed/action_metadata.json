@@ -1,0 +1,194 @@
+[
+  {
+    "action_id": "ai_services_models.inspect_service_model_manifest",
+    "label": "Inspect Service Model Manifest",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for inspect service model manifest. read-only inspection.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_ai_service_actions.inspect_service_model_manifest",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.refresh_rediscovery_design",
+    "label": "Refresh Rediscovery Design",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for refresh rediscovery design. local generated-artifact update only.",
+    "action_class": "refresh",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/wp-0210-refresh_rediscovery_design.json"
+    ],
+    "command_hook_or_handler_reference": "office_ai_service_actions.refresh_rediscovery_design",
+    "expected_output_paths": [
+      "runtime/steward/exports/wp-0210-refresh_rediscovery_design.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.sync_local_model_provider_inventory_design",
+    "label": "Sync Local Model Provider Inventory Design",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for sync local model provider inventory design. local generated-artifact update only.",
+    "action_class": "refresh",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/wp-0210-sync_local_model_provider_inventory_design.json"
+    ],
+    "command_hook_or_handler_reference": "office_ai_service_actions.sync_local_model_provider_inventory_design",
+    "expected_output_paths": [
+      "runtime/steward/exports/wp-0210-sync_local_model_provider_inventory_design.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.copy_start_stop_load_commands",
+    "label": "Copy Start Stop Load Commands",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for copy start stop load commands. copy-only; visually distinct from execution.",
+    "action_class": "copy_command",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_ai_service_actions.copy_start_stop_load_commands",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.request_service_model_approval",
+    "label": "Request Service Model Approval",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for request service model approval. draft/proposal only; not approval or execution; authority-gated.",
+    "action_class": "draft",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "authority_route_required",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/drafts/wp-0210-request_service_model_approval.json"
+    ],
+    "command_hook_or_handler_reference": "office_ai_service_actions.request_service_model_approval",
+    "expected_output_paths": [
+      "runtime/steward/drafts/wp-0210-request_service_model_approval.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": "draft/proposal only; not executable",
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.inspect_approval_audit_history",
+    "label": "Inspect Approval Audit History",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for inspect approval audit history. read-only inspection; authority-gated.",
+    "action_class": "inspect",
+    "authority_class": "authority_gated_institutional_action",
+    "confirmation_requirement": "authority_route_required",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_ai_service_actions.inspect_approval_audit_history",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.inspect_resident_model_assignment_state",
+    "label": "Inspect Resident Model Assignment State",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for inspect resident model assignment state. read-only inspection.",
+    "action_class": "inspect",
+    "authority_class": "safe_read_only",
+    "confirmation_requirement": "none",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [],
+    "command_hook_or_handler_reference": "office_ai_service_actions.inspect_resident_model_assignment_state",
+    "expected_output_paths": [],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  },
+  {
+    "action_id": "ai_services_models.export_ai_services_snapshot",
+    "label": "Export Ai Services Snapshot",
+    "target_tab": "ai_services_models",
+    "description": "Staged AI Services / Model Controls control for export ai services snapshot. local generated-artifact update only.",
+    "action_class": "export",
+    "authority_class": "safe_local_generated_artifact_update",
+    "confirmation_requirement": "confirm_generated_artifact",
+    "reads_artifacts": [
+      "runtime/ai_services/registry.json",
+      "runtime/ai_services/audit_log.jsonl",
+      "runtime/ai_services/model_assignments.json"
+    ],
+    "writes_artifacts": [
+      "runtime/steward/exports/wp-0210-export_ai_services_snapshot.json"
+    ],
+    "command_hook_or_handler_reference": "office_ai_service_actions.export_ai_services_snapshot",
+    "expected_output_paths": [
+      "runtime/steward/exports/wp-0210-export_ai_services_snapshot.json"
+    ],
+    "failure_behavior": "fail closed; show local error and source path; do not upload or perform fallback mutation",
+    "local_only_no_upload_guarantee": true,
+    "draft_proposal_only_semantics": null,
+    "resident_authority_boundary_statement": null,
+    "process_control_statement": "no start/stop/load execution; future-gated process control only"
+  }
+]

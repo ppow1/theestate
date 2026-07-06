@@ -1,0 +1,81 @@
+{
+  "batch_work_package_id": "WP-0211",
+  "batch_title": "Office Controls Wave 3 Workflow, Resident, and AI Surfaces",
+  "codex_status": "completed",
+  "completed_at": "2026-07-06T18:39:12.531240+00:00",
+  "branch": "work",
+  "pull_request_url_not_applicable_reason": "PR URL is not available from local Codex execution before make_pr records the pull request metadata.",
+  "ordered_package_list": [
+    "WP-0208",
+    "WP-0209",
+    "WP-0210"
+  ],
+  "per_package_completion_receipt_paths": {
+    "WP-0208": "collaboration/work_packages/completions/WP-0208_codex_done.json",
+    "WP-0209": "collaboration/work_packages/completions/WP-0209_codex_done.json",
+    "WP-0210": "collaboration/work_packages/completions/WP-0210_codex_done.json"
+  },
+  "per_package_staged_workstream_paths": {
+    "WP-0208": "collaboration/workstreams/WP-0208/",
+    "WP-0209": "collaboration/workstreams/WP-0209/",
+    "WP-0210": "collaboration/workstreams/WP-0210/"
+  },
+  "per_package_install_manifest_paths": {
+    "WP-0208": "collaboration/workstreams/WP-0208/install_manifest.json",
+    "WP-0209": "collaboration/workstreams/WP-0209/install_manifest.json",
+    "WP-0210": "collaboration/workstreams/WP-0210/install_manifest.json"
+  },
+  "summary_of_cross_package_alignment_decisions": [
+    "All packages use WP-0200 staged vocabulary where available: inspect, refresh, export, draft/proposal, copy_command, local_marker, request; safe_read_only, safe_local_generated_artifact_update, steward_confirmed_local_mutation, authority_gated_institutional_action.",
+    "All staged controls are local-only, fail closed, and preserve no-upload guarantees.",
+    "Drafts, promotions, requests, and approvals are explicitly non-executing until a later authority route/install-handoff accepts them."
+  ],
+  "wp0200_staged_vocabulary_available_and_used": true,
+  "conflicts_detected_between_wp0208_wp0209_wp0210": [],
+  "validation_commands_run": [
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0208 --json",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0209 --json",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0210 --json",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0208 --json",
+      "exit_code": 1,
+      "status": "warning_no_recipe"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0209 --json",
+      "exit_code": 1,
+      "status": "warning_no_recipe"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0210 --json",
+      "exit_code": 1,
+      "status": "warning_no_recipe"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+      "exit_code": 0,
+      "status": "passed_with_existing_repository_blockers"
+    }
+  ],
+  "known_limitations": [
+    "Staged controls are not installed into active Office runtime files.",
+    "validate-work-package reports no registered validation recipes for WP-0208 through WP-0210.",
+    "validation-production-readiness reports pre-existing repository blockers unrelated to this staged wave."
+  ],
+  "staged_work_is_installed": false,
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "PR URL is not available from local Codex execution before make_pr records the pull request metadata."
+}
