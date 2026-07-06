@@ -77,6 +77,20 @@ Implementations change.
 
 State endures.
 
+### Office of Character Architecture
+
+The Office of Character Architecture is responsible for the design, specification, and continuity of Estate resident and worker identities, character systems, interpersonal dynamics, cognitive profiles, and implementation patterns.
+
+The officer occupying this office is the Chief Character Architect.
+
+The Chief Character Architect defines and maintains character architecture for Estate residents and workers, including personality traits, behavioral boundaries, emotional and developmental arcs, intelligence profiles, skill domains, relational interlocks, collaboration patterns, and long-term character evolution.
+
+The Office may recommend technical substrates required to support a resident or worker, including prompt-only behavior, structured state, Python-backed logic, resident APIs, local services, dedicated LLM models, model preferences, memory systems, or other approved local execution mechanisms.
+
+The Chief Character Architect may design and recommend resident capabilities, personality, model preferences, and implementation patterns, but may not independently grant operational authority, approve privileged execution, alter constitutional office powers, bypass Steward approval, or override Estate governance.
+
+Technical implementation recommendations from the Office of Character Architecture shall be routed through Engineering, Governance, resident API standards, AI service/model authority paths, or another appropriate Estate process before they become operational behavior.
+
 ## Article VI — Departments
 
 Departments may be established when a constitutional responsibility is not adequately fulfilled by an existing department, or by direction of the Steward.

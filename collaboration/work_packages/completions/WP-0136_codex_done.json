@@ -1,28 +1,47 @@
 {
+  "work_package_id": "WP-0136",
+  "codex_status": "done",
+  "office_name": "Office of Character Architecture",
+  "officer_title": "Chief Character Architect",
+  "summary": "Established the Office of Character Architecture and Chief Character Architect in constitutional and governance artifacts, documented duties, boundaries, coordination paths, deliverables, and generated operational and machine-readable reports.",
+  "governance_files_updated": [
+    "constitution/constitution.md",
+    "docs/governance/offices/Office_of_Character_Architecture.md",
+    "docs/operations/Document_Registry_v1.md"
+  ],
+  "staff_or_roster_files_updated": [],
+  "role_description_files": [
+    "docs/governance/offices/Office_of_Character_Architecture.md"
+  ],
+  "report_path": "operations/governance/WP-0136_office_of_character_architecture_report.md",
+  "machine_report_path": "runtime/governance/WP-0136_office_of_character_architecture_report.json",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0136 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0136 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "known_limitations": [
+    "No validation recipe is registered for WP-0136, so validate-work-package reports no_recipe and production-readiness notes that repository recipe gap."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "completed_at": "2026-07-06T22:55:00+00:00",
   "branch": "work",
-  "completed_at": "2026-07-06T02:03:28.354827+00:00",
   "files_changed": [
-    "src/estate/ai_services/execution.py",
-    "tests/test_ai_services_control_plane.py",
-    "operations/ai_services/WP-0136_ai_services_textgen_batch_log_and_process_runner_repair_report.md",
-    "runtime/ai_services/WP-0136_ai_services_textgen_batch_log_and_process_runner_repair_report.json",
-    "collaboration/work_packages/completions/WP-0136_codex_done.json"
+    "constitution/constitution.md",
+    "docs/governance/offices/Office_of_Character_Architecture.md",
+    "docs/operations/Document_Registry_v1.md",
+    "operations/governance/WP-0136_office_of_character_architecture_report.md",
+    "runtime/governance/WP-0136_office_of_character_architecture_report.json",
+    "collaboration/work_packages/completions/WP-0136_codex_done.json",
+    "operations/validation/reports/WP-0136_validation.md",
+    "runtime/validation/work_packages/WP-0136_validation.json",
+    "runtime/validation/work_packages/latest.json"
   ],
-  "pull_request_url_or_not_applicable_reason": "not_applicable_created_by_local_codex_make_pr_tool",
-  "status": "complete",
-  "validation": [
-    {
-      "command": "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py",
-      "status": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_production_readiness_validation.py",
-      "status": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
-      "status": "completed_with_pre_existing_readiness_blockers"
-    }
-  ],
-  "work_package_id": "WP-0136"
+  "pull_request_not_applicable_reason": "PR will be created after local commit by automation in this Codex run."
 }

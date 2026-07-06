@@ -1,0 +1,42 @@
+{
+  "work_package_id": "WP-0136",
+  "status": "complete",
+  "office_name": "Office of Character Architecture",
+  "officer_title": "Chief Character Architect",
+  "ratification_basis": "Steward decision encoded through WP-0136",
+  "canonical_artifacts": [
+    "constitution/constitution.md",
+    "docs/governance/offices/Office_of_Character_Architecture.md",
+    "docs/operations/Document_Registry_v1.md"
+  ],
+  "operations_report": "operations/governance/WP-0136_office_of_character_architecture_report.md",
+  "responsibilities": [
+    "resident_and_worker_character_profiles",
+    "traits_temperament_voice_strengths_weaknesses_limitations",
+    "emotional_behavioral_developmental_narrative_arcs",
+    "intelligence_profiles_reasoning_style_specialty_domains_learning_boundaries",
+    "relationship_maps_and_interlocks",
+    "identity_continuity_across_implementation_changes",
+    "model_capability_recommendations",
+    "implementation_pattern_recommendations",
+    "engineering_and_governance_coordination",
+    "character_briefs_design_records_relationship_maps_continuity_notes",
+    "new_resident_character_coherence_review"
+  ],
+  "authority_boundaries": [
+    "does_not_grant_operational_authority",
+    "does_not_execute_privileged_actions",
+    "does_not_bypass_steward_approval",
+    "does_not_override_office_authority_boundaries",
+    "does_not_alter_constitutional_office_powers_independently",
+    "does_not_unilaterally_assign_service_model_api_or_runtime_access_where_approval_is_required",
+    "model_recommendations_remain_recommendations_until_approved"
+  ],
+  "coordination_paths": {
+    "engineering": "Routes code, tools, services, APIs, tests, runtime state, and implementation changes through the Estate Engineering Department or appropriate engineering work-package path.",
+    "governance": "Routes authority, autonomy, escalation, office-power, resident-authority, privileged-execution, and constitutional-boundary issues through Governance and Steward review.",
+    "resident_apis_local_models_ai_services": "May recommend APIs, models, AI services, memory, cognition scaffolds, and local execution mechanisms, but recommendations become operational only through approved authority paths."
+  },
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
