@@ -1,0 +1,24 @@
+{
+  "work_package": "WP-0141",
+  "status": "completed",
+  "root_cause": "Generated HTML parsed but browser runtime navigation was not validated or visibly diagnosed; local-file assumptions around initialization and preferences could leave the UI appearing inert.",
+  "repair": {
+    "navigation_binding": "Delegated data-tab click binding initialized through DOM-ready helper and shared activateOfficeTab function.",
+    "diagnostic": "Added #ui-runtime-diagnostic static fallback and runtime updates.",
+    "css": "Inline style remains emitted in head and is now asserted by tests.",
+    "button_safety": "Sidebar and tab controls are explicit type=button controls with aria-controls."
+  },
+  "preserved": [
+    "WP-0138 AI Services / Models workspace and installed model inventory",
+    "WP-0139 Alfred diagnostics, timeout, and safe failure behavior",
+    "Office Snapshot local-only export behavior"
+  ],
+  "validation": [
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py",
+    "PYTHONPATH=src pytest -q tests/test_resident_interaction.py tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center"
+  ],
+  "remaining_limitations": [
+    "No repository browser automation framework was available; generated-HTML and DOM-behavior-oriented tests were used."
+  ]
+}

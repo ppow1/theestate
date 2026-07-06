@@ -721,3 +721,92 @@ def test_wp0140_ai_services_models_workspace_renders_installed_inventory(tmp_pat
     assert "textgen:Qwen3.gguf" in html
     assert "installed" in html
     assert "ai-services rediscover" in html
+
+
+def _workspace_ids(html):
+    import re
+    return set(re.findall(r"<section id='workspace-([^']+)'", html))
+
+
+def _data_tabs(html):
+    import re
+    return set(re.findall(r"data-tab='([^']+)'", html))
+
+
+def _visible_workspace_ids(html):
+    import re
+    return {match.group(1) for match in re.finditer(r"<section id='(workspace-[^']+)'([^>]*)>", html) if " hidden" not in match.group(2)}
+
+
+def test_wp0141_generated_html_has_browser_runtime_shell_and_diagnostic(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+
+    assert html.startswith("<!doctype html>\n<html")
+    assert "<head>" in html and "<style>" in html and "</style></head>" in html
+    assert "<body>" in html and "<script>" in html and "</script>" in html
+    assert "id=\"ui-runtime-diagnostic\"" in html
+    assert "UI runtime: script not initialized; navigation may not work" in html
+    assert "UI runtime: scripts loaded / navigation bound / active tab:" in html
+    assert "function bindOfficeNavigation()" in html
+    assert "function whenDomReady(callback)" in html
+    assert "whenDomReady(initOfficeRuntime);" in html
+    assert "document.addEventListener('click', event =>" in html
+
+
+def test_wp0141_every_navigation_tab_targets_a_workspace(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+
+    data_tabs = _data_tabs(html)
+    workspaces = _workspace_ids(html)
+    assert data_tabs
+    assert data_tabs <= workspaces
+    for tab in ["mission-control", "alfred", "ai-services-models"]:
+        assert tab in data_tabs
+        assert f"aria-controls='workspace-{tab}'" in html
+        assert f"id='workspace-{tab}'" in html
+
+
+def test_wp0141_initial_profile_has_single_visible_workspace(tmp_path):
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    active_tab = ((payload.get("workspace_profile") or {}).get("profile") or {}).get("active_tab") or "home"
+    assert _visible_workspace_ids(html) == {f"workspace-{active_tab}"}
+    assert len(_workspace_ids(html)) == len(payload["tabs"])
+
+
+def test_wp0141_navigation_behavior_can_show_alfred_and_ai_services(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+    workspaces = {tab: {"hidden": f"id='workspace-{tab}'" not in html or f"id='workspace-{tab}' class='workspace-view active'" not in html} for tab in _workspace_ids(html)}
+
+    def activate(tab):
+        assert tab in workspaces
+        for workspace_tab in workspaces:
+            workspaces[workspace_tab]["hidden"] = workspace_tab != tab
+
+    activate("alfred")
+    assert workspaces["alfred"]["hidden"] is False
+    assert workspaces["mission-control"]["hidden"] is True
+    assert sum(1 for state in workspaces.values() if not state["hidden"]) == 1
+
+    activate("ai-services-models")
+    assert workspaces["ai-services-models"]["hidden"] is False
+    assert workspaces["mission-control"]["hidden"] is True
+    assert workspaces["alfred"]["hidden"] is True
+    assert sum(1 for state in workspaces.values() if not state["hidden"]) == 1
+
+
+def test_wp0141_alfred_submit_and_snapshot_do_not_replace_navigation_binding(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+
+    assert "document.addEventListener('submit', async event =>" in html
+    assert "const form = event.target.closest('#alfred-chat-form');" in html
+    assert "event.preventDefault();" in html
+    assert "document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]');" in html
+    assert "document.addEventListener('click', event => { if(event.target.closest('#office-snapshot-button')) exportOfficeSnapshot(); });" in html
+    assert html.index("function bindOfficeNavigation()") < html.index("document.addEventListener('submit', async event =>")
