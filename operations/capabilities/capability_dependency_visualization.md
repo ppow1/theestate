@@ -2,13 +2,13 @@
 
 Read-only visualization for Mission Control and architectural review. This artifact is not a source of truth.
 
-Generated: 2026-07-05T21:34:06+00:00
+Generated: 2026-07-06T00:37:24+00:00
 
 ## Summary
 - Nodes: 6
 - Capability nodes: 6
 - Edges: 0
-- Warnings: 19
+- Warnings: 13
 - Readiness: {'ready': 6}
 
 ## Nodes
@@ -18,13 +18,12 @@ Generated: 2026-07-05T21:34:06+00:00
 - Readiness: ready
 - Implementation state: Operational
 - Lifecycle state: Implemented
-- Validation state: evidence_found
+- Validation state: valid
 - Upstream dependencies: None explicitly recorded
 - Downstream dependents: None explicitly recorded
 - Authoritative artifact: `data/registry/capabilities.json`
-- Source links: `data/registry/capabilities.json`, `Local AI Workstation`, `A:\AI`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `README.md`, `runtime/validation/operational_validation_report.json`
+- Source links: `data/registry/capabilities.json`, `Local AI Workstation`, `A:\AI`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `README.md`, `runtime/capabilities/capability_lifecycle_report.json`
   - Warning: unresolved_source_link — Source artifact is not present: Local AI Workstation
-  - Warning: unresolved_source_link — Source artifact is not present: A:\AI
   - Warning: no_explicit_relationships — No explicit upstream or downstream dependency relationship is available.
 
 ### Kokoro TTS (CAP-000002)
@@ -32,12 +31,11 @@ Generated: 2026-07-05T21:34:06+00:00
 - Readiness: ready
 - Implementation state: Operational
 - Lifecycle state: Implemented
-- Validation state: evidence_found
+- Validation state: valid
 - Upstream dependencies: None explicitly recorded
 - Downstream dependents: None explicitly recorded
 - Authoritative artifact: `data/registry/capabilities.json`
-- Source links: `data/registry/capabilities.json`, `A:\AI\TTS`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/validation/operational_validation_report.json`
-  - Warning: unresolved_source_link — Source artifact is not present: A:\AI\TTS
+- Source links: `data/registry/capabilities.json`, `A:\AI\TTS`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/capabilities/capability_lifecycle_report.json`
   - Warning: no_explicit_relationships — No explicit upstream or downstream dependency relationship is available.
 
 ### F5-TTS (CAP-000003)
@@ -45,12 +43,11 @@ Generated: 2026-07-05T21:34:06+00:00
 - Readiness: ready
 - Implementation state: Operational
 - Lifecycle state: Implemented
-- Validation state: evidence_found
+- Validation state: valid
 - Upstream dependencies: None explicitly recorded
 - Downstream dependents: None explicitly recorded
 - Authoritative artifact: `data/registry/capabilities.json`
-- Source links: `data/registry/capabilities.json`, `A:\AI\TTS\F5-TTS`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/validation/operational_validation_report.json`
-  - Warning: unresolved_source_link — Source artifact is not present: A:\AI\TTS\F5-TTS
+- Source links: `data/registry/capabilities.json`, `A:\AI\TTS\F5-TTS`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/capabilities/capability_lifecycle_report.json`
   - Warning: no_explicit_relationships — No explicit upstream or downstream dependency relationship is available.
 
 ### ComfyUI (CAP-000004)
@@ -58,12 +55,11 @@ Generated: 2026-07-05T21:34:06+00:00
 - Readiness: ready
 - Implementation state: Installed
 - Lifecycle state: Implemented
-- Validation state: evidence_found
+- Validation state: valid
 - Upstream dependencies: None explicitly recorded
 - Downstream dependents: None explicitly recorded
 - Authoritative artifact: `data/registry/capabilities.json`
-- Source links: `data/registry/capabilities.json`, `A:\AI\ComfyUI`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/validation/operational_validation_report.json`
-  - Warning: unresolved_source_link — Source artifact is not present: A:\AI\ComfyUI
+- Source links: `data/registry/capabilities.json`, `A:\AI\ComfyUI`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/capabilities/capability_lifecycle_report.json`
   - Warning: no_explicit_relationships — No explicit upstream or downstream dependency relationship is available.
 
 ### FFmpeg / FFplay (CAP-000005)
@@ -71,12 +67,11 @@ Generated: 2026-07-05T21:34:06+00:00
 - Readiness: ready
 - Implementation state: Operational
 - Lifecycle state: Implemented
-- Validation state: evidence_found
+- Validation state: valid
 - Upstream dependencies: None explicitly recorded
 - Downstream dependents: None explicitly recorded
 - Authoritative artifact: `data/registry/capabilities.json`
-- Source links: `data/registry/capabilities.json`, `A:\AI\Tools\FFmpeg`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/validation/operational_validation_report.json`
-  - Warning: unresolved_source_link — Source artifact is not present: A:\AI\Tools\FFmpeg
+- Source links: `data/registry/capabilities.json`, `A:\AI\Tools\FFmpeg`, `observations/ai_environment_2026-06-29_23-47-42.json`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `runtime/capabilities/capability_lifecycle_report.json`
   - Warning: no_explicit_relationships — No explicit upstream or downstream dependency relationship is available.
 
 ### Whisper (CAP-000006)
@@ -84,12 +79,11 @@ Generated: 2026-07-05T21:34:06+00:00
 - Readiness: ready
 - Implementation state: Pending Install
 - Lifecycle state: Designed
-- Validation state: evidence_found
+- Validation state: valid
 - Upstream dependencies: None explicitly recorded
 - Downstream dependents: None explicitly recorded
 - Authoritative artifact: `data/registry/capabilities.json`
-- Source links: `data/registry/capabilities.json`, `A:\AI`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `observations/ai_environment_2026-06-29_23-47-42.json`, `runtime/validation/operational_validation_report.json`
-  - Warning: unresolved_source_link — Source artifact is not present: A:\AI
+- Source links: `data/registry/capabilities.json`, `A:\AI`, `estate_ledger/ledger.md`, `development/devlog.md`, `docs/service_catalog.md`, `observations/ai_environment_2026-06-29_23-47-42.json`, `runtime/capabilities/capability_lifecycle_report.json`
   - Warning: no_explicit_relationships — No explicit upstream or downstream dependency relationship is available.
 
 ## Edges
