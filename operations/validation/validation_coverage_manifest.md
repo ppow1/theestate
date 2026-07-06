@@ -1,11 +1,11 @@
 # Validation Coverage Manifest
 
-Generated at: 2026-07-05T23:46:20+00:00
+Generated at: 2026-07-06T00:08:22+00:00
 
 ## Summary
-- total_work_packages_scanned: 116
+- total_work_packages_scanned: 117
 - total_production_ready: 112
-- total_blocked: 4
+- total_blocked: 5
 - total_missing_recipes: 0
 - total_missing_receipts: 0
 - total_incomplete_receipts: 0
@@ -126,4 +126,5 @@ Generated at: 2026-07-05T23:46:20+00:00
 - WP-0127 — receipt: complete; recipe: registered; validation: failed; production: blocked; blockers: 1
 - WP-0128 — receipt: complete; recipe: registered; validation: failed; production: blocked; blockers: 1
 - WP-0129 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
-- WP-0130 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0
+- WP-0130 — receipt: complete; recipe: registered; validation: missing; production: blocked; blockers: 0
+- WP-0131 — receipt: complete; recipe: registered; validation: passed; production: ready; blockers: 0

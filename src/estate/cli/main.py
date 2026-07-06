@@ -1111,6 +1111,29 @@ def cmd_validate_work_package(args):
         raise SystemExit(1)
 
 
+
+def cmd_ai_services(args):
+    import json
+    from estate.ai_services.control import status, request
+    from estate.ai_services.discovery import rediscover
+    from estate.ai_services.reports import write_wp0131_report
+    if args.ai_services_action == "status":
+        payload = status()
+    elif args.ai_services_action == "rediscover":
+        payload = rediscover(actor=getattr(args, "actor", "codex"))
+    elif args.ai_services_action in {"start", "stop"}:
+        payload = request(args.ai_services_action, args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by)
+    elif args.ai_services_action == "load-model":
+        payload = request("load_model", args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, model=args.model)
+    elif args.ai_services_action == "write-report":
+        payload = write_wp0131_report()
+    else:
+        payload = {"error": "unknown_action"}
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+
 def cmd_capability_dependency_visualization(args):
     payload = generate_capability_dependency_visualization()
     if getattr(args, "json", False):
@@ -1244,6 +1267,34 @@ def cmd_sync_ollama(args):
 def main():
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
     sub = parser.add_subparsers(dest="command")
+
+
+    p = sub.add_parser("ai-services", help="Inspect and govern local AI services")
+    ai_sub = p.add_subparsers(dest="ai_services_action", required=True)
+    sp = ai_sub.add_parser("status")
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_ai_services)
+    sp = ai_sub.add_parser("rediscover")
+    sp.add_argument("--actor", default="codex")
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_ai_services)
+    for action_name in ("start", "stop"):
+        sp = ai_sub.add_parser(action_name)
+        sp.add_argument("--service", required=True)
+        sp.add_argument("--approved-by")
+        sp.add_argument("--actor", default="alfred")
+        sp.add_argument("--json", action="store_true")
+        sp.set_defaults(func=cmd_ai_services)
+    sp = ai_sub.add_parser("load-model")
+    sp.add_argument("--service", required=True)
+    sp.add_argument("--model", required=True)
+    sp.add_argument("--approved-by")
+    sp.add_argument("--actor", default="alfred")
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_ai_services)
+    sp = ai_sub.add_parser("write-report")
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_ai_services)
 
     p = sub.add_parser("change")
     p.add_argument("--title", required=True)

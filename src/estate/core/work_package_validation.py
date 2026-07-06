@@ -2055,6 +2055,27 @@ def format_validation_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(line for line in lines if line is not None)
 
 
+
+VALIDATION_RECIPES.update({
+    "WP-0131": {
+        "recipe_id": "wp-0131-ai-services-control-plane",
+        "title": "WP-0131 — AI Services Control Plane",
+        "description": "Validates the local AI services control plane manifests, CLI hooks, reports, and completion receipt.",
+        "required_checks": ["AI services tests pass", "Rediscovery CLI works", "Report artifacts exist", "Receipt is complete"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/ai_services", "runtime/ai_services/registry.json", "operations/ai_services/WP-0131_ai_services_control_plane_report.md", "runtime/ai_services/WP-0131_ai_services_control_plane_report.json", "collaboration/work_packages/completions/WP-0131_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required commands exit zero"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q"),
+            _cmd("PYTHONPATH=src python -m estate.cli.main ai-services rediscover --json"),
+            _cmd("python -c \"import json; from pathlib import Path; paths=['operations/ai_services/WP-0131_ai_services_control_plane_report.md','runtime/ai_services/WP-0131_ai_services_control_plane_report.json','runtime/ai_services/registry.json','runtime/ai_services/state.json']; missing=[p for p in paths if not Path(p).exists()]; assert not missing, missing; reg=json.loads(Path('runtime/ai_services/registry.json').read_text(encoding='utf-8')); assert {'ollama','open_webui','textgen','comfyui','sillytavern'} <= {s['service_id'] for s in reg['services']}\""),
+            _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0131'); assert r['receipt_status']=='complete', r\""),
+        ],
+    }
+})
+
 def validate_work_package(work_package_id: str, root: str | Path | None = None, write: bool = True) -> dict[str, Any]:
     base = _root(root)
     wp = _safe_wp(work_package_id)
