@@ -1,13 +1,13 @@
 # Estate Assignment Queue
 
-Generated: 2026-07-06T00:19:51Z
+Generated: 2026-07-06T00:52:37Z
 
 ## Summary
 
-- Work packages: 126
+- Work packages: 127
 - Blocked: 0
-- Unassigned: 126
-- Warnings: 126
+- Unassigned: 127
+- Warnings: 127
 
 ## Queue
 
@@ -139,6 +139,7 @@ Generated: 2026-07-06T00:19:51Z
 | [WP-0130](../../collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md and do exactly what it says. |
 | [WP-0131](../../collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md and do exactly what it says. |
 | [WP-0132](../../collaboration/work_packages/pending/WP-0132_SERIES_ai_services_execution_adapters_and_steward_approval.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0132_SERIES_ai_services_execution_adapters_and_steward_approval.md and do exactly what it says. |
+| [WP-0133](../../collaboration/work_packages/pending/WP-0133_SERIES_ai_services_post_launch_health_and_process_tracking_repair.md) | SERIES | unassigned | completed | None | None | Read collaboration/work_packages/pending/WP-0133_SERIES_ai_services_post_launch_health_and_process_tracking_repair.md and do exactly what it says. |
 
 ## Warnings
 
@@ -267,4 +268,5 @@ Generated: 2026-07-06T00:19:51Z
 - missing_owner: WP-0130 has no explicit owner. (collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md)
 - missing_owner: WP-0131 has no explicit owner. (collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md)
 - missing_owner: WP-0132 has no explicit owner. (collaboration/work_packages/pending/WP-0132_SERIES_ai_services_execution_adapters_and_steward_approval.md)
+- missing_owner: WP-0133 has no explicit owner. (collaboration/work_packages/pending/WP-0133_SERIES_ai_services_post_launch_health_and_process_tracking_repair.md)
 - missing_owner: WP-LEAP-001 has no explicit owner. (collaboration/work_packages/open/WP-LEAP-001_Audit_Worker_v1_Local_Ollama.md)

@@ -1,0 +1,100 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q",
+      "completed_at": "2026-07-06T00:53:41+00:00",
+      "duration_seconds": 1.766,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-06T00:53:40+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0133_2026-07-06T005340Z0000/command_01_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; paths=['operations/ai_services/WP-0133_ai_services_post_launch_health_repair_report.md','runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json','collaboration/work_packages/completions/WP-0133_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing; data=json.loads(Path('runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json').read_text(encoding='utf-8')); assert data.get('work_package_id')=='WP-0133'; assert data.get('ready_for_ca_review') is True\"",
+      "completed_at": "2026-07-06T00:53:41+00:00",
+      "duration_seconds": 0.099,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-06T00:53:41+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; t=Path('src/estate/ai_services/execution.py').read_text(encoding='utf-8'); required=['health_check_started','health_check_succeeded','health_check_failed','process_exited_before_health','http://127.0.0.1:5000/v1/models']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
+      "completed_at": "2026-07-06T00:53:41+00:00",
+      "duration_seconds": 0.086,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-06T00:53:41+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0133'); assert r['receipt_status']=='complete', r\"",
+      "completed_at": "2026-07-06T00:53:42+00:00",
+      "duration_seconds": 0.141,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-06T00:53:41+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "PYTHONPATH=src pytest tests/test_ai_services_control_plane.py -q",
+    "python -c \"import json; from pathlib import Path; paths=['operations/ai_services/WP-0133_ai_services_post_launch_health_repair_report.md','runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json','collaboration/work_packages/completions/WP-0133_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing; data=json.loads(Path('runtime/ai_services/WP-0133_ai_services_post_launch_health_repair_report.json').read_text(encoding='utf-8')); assert data.get('work_package_id')=='WP-0133'; assert data.get('ready_for_ca_review') is True\"",
+    "python -c \"from pathlib import Path; t=Path('src/estate/ai_services/execution.py').read_text(encoding='utf-8'); required=['health_check_started','health_check_succeeded','health_check_failed','process_exited_before_health','http://127.0.0.1:5000/v1/models']; missing=[x for x in required if x not in t]; assert not missing, missing\"",
+    "python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0133'); assert r['receipt_status']=='complete', r\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0133_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0133_validation.md",
+    "runtime/validation/work_packages/WP-0133_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-06T00:53:40+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "0651aa1e75f7346b4c86fcb34810512571cccbe1",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0133_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0133"
+  },
+  "recipe_id": "wp-0133-ai-services-post-launch-health-repair",
+  "recipe_title": "WP-0133 \u2014 AI Services Post-Launch Health Verification and Process Tracking Repair",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 1 command(s).",
+  "validation_id": "WP-0133_2026-07-06T005340Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0133"
+}

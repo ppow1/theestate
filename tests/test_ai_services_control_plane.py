@@ -81,11 +81,22 @@ def test_api_status_endpoint_and_loopback_serve_policy():
         raise AssertionError("public bind was not rejected")
 
 class _Runner:
-    def __init__(self): self.started=[]; self.stopped=[]
+    def __init__(self, alive=True): self.started=[]; self.stopped=[]; self.alive=alive
     def start(self, command, cwd=None, log_path=None):
         self.started.append({"command":command,"cwd":cwd,"log_path":log_path}); return {"pid":4321}
     def stop(self, pid):
         self.stopped.append(pid); return {"stopped":True,"pid":pid}
+    def is_alive(self, pid):
+        return self.alive
+
+class _Health:
+    def __init__(self, healthy=True, error="connection_refused", status=None):
+        self.healthy=healthy; self.error=error; self.status=status; self.calls=[]
+    def check(self, endpoint, timeout_seconds=30, interval_seconds=2, runner=None, pid=None):
+        self.calls.append(endpoint)
+        if self.healthy:
+            return {"healthy":True,"status":"healthy","attempts":1,"pid_alive":True}
+        return {"healthy":False,"status":self.status or "health_failed","error":self.error,"attempts":1,"pid_alive":False if self.status=="process_exited" else True}
 
 
 def test_dry_run_start_returns_plan_without_launching(tmp_path):
@@ -108,7 +119,7 @@ def test_start_without_approval_records_requires_approval(tmp_path):
 def test_start_with_approval_uses_runner_and_records_process_state(tmp_path):
     data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
     _write(tmp_path, data); rediscover(tmp_path); runner=_Runner()
-    plan=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=runner)
+    plan=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=runner,health_checker=_Health(True))
     assert plan["result"] == "executed"
     assert runner.started and runner.started[0]["command"] == "textgen.bat --listen"
     state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
@@ -141,7 +152,7 @@ def test_textgen_model_load_approval_and_execution(tmp_path):
     data=_manifest(); _write(tmp_path, data); rediscover(tmp_path); runner=_Runner()
     need=request("load_model","textgen",actor="alfred",root=tmp_path,model="Qwen3.gguf",dry_run=False,runner=runner)
     assert need["approval_state"] == "requires_approval"
-    ok=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3.gguf",dry_run=False,runner=runner)
+    ok=request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3.gguf",dry_run=False,runner=runner,health_checker=_Health(True))
     assert ok["result"] == "executed"
     assert runner.started and "Qwen3.gguf" in runner.started[0]["command"]
 
@@ -151,7 +162,7 @@ def test_audit_log_distinguishes_planned_denied_approved_executed(tmp_path):
     _write(tmp_path, data); rediscover(tmp_path); runner=_Runner()
     request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=True)
     request("load_model","textgen",actor="alfred",root=tmp_path,model="../bad")
-    request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=runner)
+    request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=runner,health_checker=_Health(True))
     text=(tmp_path/"runtime/ai_services/audit_log.jsonl").read_text()
     assert "planned_dry_run" in text and "policy_denied" in text and "approval_granted" in text and "execution_succeeded" in text
 
@@ -160,3 +171,51 @@ def test_cloud_endpoint_and_alfred_boundary_remain_rejected():
     svc=_manifest(endpoint="https://api.example.com")
     assert evaluate("status", svc, actor="alfred")["allowed"] is False
     assert evaluate("delete", _manifest(), actor="alfred", approved_by="steward")["allowed"] is False
+
+
+def test_process_started_but_health_fails_is_not_executed_and_state_not_running(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path); runner=_Runner(); health=_Health(False, "connection_refused")
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=runner,health_checker=health)
+    assert res["result"] == "health_failed"
+    assert res["execution"]["diagnostics"]["expected_endpoint"] == "http://127.0.0.1:5000/v1/models"
+    state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
+    assert state["services"]["textgen"]["status"] == "health_failed"
+    assert state["processes"]["textgen"]["health_error"] == "connection_refused"
+    assert state["services"]["textgen"]["status"] != "running"
+
+
+def test_audit_records_process_started_and_health_failed_separately(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path)
+    request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_Runner(),health_checker=_Health(False))
+    events=[json.loads(line)["result"] for line in (tmp_path/"runtime/ai_services/audit_log.jsonl").read_text().splitlines()]
+    assert "process_started" in events and "health_check_failed" in events and "execution_failed" in events
+    assert "execution_succeeded" not in events[events.index("health_check_failed"):]
+
+
+def test_health_success_records_health_before_execution_success(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path)
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_Runner(),health_checker=_Health(True))
+    assert res["result"] == "executed"
+    events=[json.loads(line)["result"] for line in (tmp_path/"runtime/ai_services/audit_log.jsonl").read_text().splitlines()]
+    assert events.index("health_check_succeeded") < events.index("execution_succeeded")
+    state=json.loads((tmp_path/"runtime/ai_services/state.json").read_text())
+    assert state["services"]["textgen"]["status"] == "running"
+
+
+def test_quick_process_exit_before_health_is_reported(tmp_path):
+    data=_manifest(); data["operations"]["start"]={"command_template":"textgen.bat --listen"}; data["approval"]["start"]={"required":True}
+    _write(tmp_path, data); rediscover(tmp_path)
+    res=request("start","textgen",actor="alfred",approved_by="steward",root=tmp_path,dry_run=False,runner=_Runner(alive=False),health_checker=_Health(False, "process_exited_before_health", "process_exited"))
+    assert res["result"] == "health_failed"
+    assert res["execution"]["lifecycle_state"] == "process_exited"
+    text=(tmp_path/"runtime/ai_services/audit_log.jsonl").read_text()
+    assert "process_exited_before_health" in text
+
+
+def test_textgen_model_load_uses_models_health_endpoint(tmp_path):
+    data=_manifest(); _write(tmp_path, data); rediscover(tmp_path); health=_Health(True)
+    request("load_model","textgen",actor="alfred",approved_by="steward",root=tmp_path,model="Qwen3.gguf",dry_run=False,runner=_Runner(),health_checker=health)
+    assert health.calls == ["http://127.0.0.1:5000/v1/models"]
