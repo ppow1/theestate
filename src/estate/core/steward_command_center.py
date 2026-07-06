@@ -1132,12 +1132,22 @@ def _about_panel(root):
     return {"available": True, "path": "local component inventory", "kind": "about", "data": {"inventory": inventory, "runtime_paths": [_runtime_path(root, rel) for rel in ["runtime/steward/command_center.html", "runtime", "data/registry", "collaboration", "operations"]], "local_only": True}}
 
 
+def _script_json(data):
+    """Return JSON safe for embedding in a non-executable script element."""
+    return json.dumps(data, sort_keys=True).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
+def _js_json_literal(data):
+    """Return a JSON literal safe inside an executable script block."""
+    return _script_json(data).replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
+
+
 def _global_search_html(artifact):
     if not artifact.get("available"):
         return _office_placeholder_html("Search", artifact.get("placeholder", "Search is unavailable."), artifact.get("path", "runtime/search/global_command_palette.json"))
     data = artifact.get("data") or {}
     records = (data.get("commands") or []) + (data.get("artifacts") or [])
-    safe_records = html.escape(json.dumps(records))
+    safe_records = _script_json(records)
     domains = ", ".join(data.get("domains") or [])
     return f"""<section class="global-search-palette" aria-label="Global Search and Command Palette">
 <p>Search updates incrementally across Work Packages, Missions, Mailboxes, Residents, Daily Board, Parking Lot, Validation artifacts, Documentation, and registered commands. Press <kbd>/</kbd> to focus search.</p>
@@ -1844,28 +1854,34 @@ def _about_html(artifact):
     )
 
 
-def _nav_html(navigation):
+def _nav_html(navigation, active_tab="home"):
     items = navigation.get("items") or []
     buttons = []
     for item in items:
         status = "ready" if item.get("available") else "placeholder"
-        buttons.append(f"<button class='nav-item {status}' data-tab='{html.escape(str(item.get('tab')))}'>{html.escape(str(item.get('label')))}</button>")
+        tab = str(item.get('tab') or '')
+        active = " active" if tab == active_tab else ""
+        current = " aria-current='page'" if tab == active_tab else ""
+        buttons.append(f"<button class='nav-item {status}{active}' data-tab='{html.escape(tab, quote=True)}'{current}>{html.escape(str(item.get('label')))}</button>")
     return f"<aside id='office-navigation' class='office-navigation'><details open><summary>Office Navigation</summary>{''.join(buttons)}</details></aside>"
 
 
-def _tab_bar_html(tabs):
+def _tab_bar_html(tabs, active_tab="home"):
     buttons = []
     for index, tab in enumerate(tabs or []):
-        selected = "true" if index == 0 else "false"
-        active = " active" if index == 0 else ""
-        buttons.append(f"<button id='tab-{html.escape(str(tab.get('id')))}' class='workspace-tab{active}' role='tab' aria-selected='{selected}' data-tab='{html.escape(str(tab.get('id')))}'>{html.escape(str(tab.get('label')))}</button>")
+        tab_id = str(tab.get('id') or '')
+        is_active = tab_id == active_tab or (index == 0 and not active_tab)
+        selected = "true" if is_active else "false"
+        active = " active" if is_active else ""
+        buttons.append(f"<button id='tab-{html.escape(tab_id, quote=True)}' class='workspace-tab{active}' role='tab' aria-selected='{selected}' data-tab='{html.escape(tab_id, quote=True)}'>{html.escape(str(tab.get('label')))}</button>")
     return f"<div id='workspace-tabs' class='workspace-tabs' role='tablist'>{''.join(buttons)}</div>"
 
 
 def _workspace_section(tab_id, label, body, active=False):
     active_class = " active" if active else ""
     hidden = "" if active else " hidden"
-    return f"<section id='workspace-{html.escape(tab_id)}' class='workspace-view{active_class}' role='tabpanel'{hidden}><h2>{html.escape(label)}</h2>{body}</section>"
+    safe_tab_id = html.escape(str(tab_id), quote=True)
+    return f"<section id='workspace-{safe_tab_id}' class='workspace-view{active_class}' role='tabpanel'{hidden}><h2>{html.escape(label)}</h2>{body}</section>"
 
 
 
@@ -1966,8 +1982,8 @@ def render_command_center_html(payload):
     status_bar = _status_bar_html(payload.get("status_bar", {}))
     activity_console = _activity_console_html(payload.get("activity_console", {}))
     generated = html.escape(str(payload.get("generated_at")))
-    source_artifacts_json = html.escape(json.dumps(_snapshot_source_artifacts(payload), sort_keys=True))
-    snapshot_manifest_json = html.escape(json.dumps(build_office_snapshot_manifest(payload), sort_keys=True))
+    source_artifacts_json = _script_json(_snapshot_source_artifacts(payload))
+    snapshot_manifest_json = _script_json(build_office_snapshot_manifest(payload))
     css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{background:#2f2921;color:#fff;padding:1rem}.office-navigation summary{cursor:pointer;font-weight:700;margin-bottom:.75rem}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.alfred-attachments{margin:.4rem 0;padding:.4rem;background:#fbf7ef;border:1px solid #eadcc8;border-radius:8px}.alfred-attachment-thumb{max-width:180px;max-height:120px;border:1px solid #d6cbbb;border-radius:6px;margin-top:.25rem}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}.snapshot-toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:.75rem}.snapshot-toolbar button{padding:.5rem .8rem;border:1px solid #8b6f3d;border-radius:8px;background:#3f6b50;color:#fff;font-weight:700;cursor:pointer}.snapshot-toolbar .snapshot-status{font-size:.9rem;color:#61584d}@media(max-width:800px){.office-shell{grid-template-columns:1fr}.office-navigation{position:static}}"""
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
@@ -2070,19 +2086,19 @@ function collectDomState(){
 async function exportOfficeSnapshot(){
   const status=document.querySelector('#office-snapshot-status'); if(status) status.textContent='Building local snapshot ZIP…';
   try{
-    const styles=[...document.querySelectorAll('style')].map((e,i)=>`/* inline style ${i+1} */\n${e.textContent}`).join('\n\n');
-    const scripts=[...document.querySelectorAll('script')].map((e,i)=> e.src ? `/* script reference ${i+1}: ${e.src} */` : `/* inline script ${i+1} */\n${e.textContent}`).join('\n\n');
+    const styles=[...document.querySelectorAll('style')].map((e,i)=>`/* inline style ${i+1} */\\n${e.textContent}`).join('\\n\\n');
+    const scripts=[...document.querySelectorAll('script')].map((e,i)=> e.src ? `/* script reference ${i+1}: ${e.src} */` : `/* inline script ${i+1} */\\n${e.textContent}`).join('\\n\\n');
     const metadata=currentUiMetadata();
     const manifest={...JSON.parse(document.querySelector('#office-snapshot-manifest')?.textContent || '{}'), ...metadata, package_contents:['snapshot_manifest.json','page.html','dom_state.json','ui_metadata.json','styles.css','scripts.js','source_artifacts.json','README.md'], privacy_notice:'Local-only browser-created download. No external upload is performed by this feature.'};
     const files=[
       {name:'snapshot_manifest.json', text:JSON.stringify(manifest,null,2)},
-      {name:'page.html', text:'<!doctype html>\n'+document.documentElement.outerHTML},
+      {name:'page.html', text:'<!doctype html>\\n'+document.documentElement.outerHTML},
       {name:'dom_state.json', text:JSON.stringify(collectDomState(),null,2)},
       {name:'ui_metadata.json', text:JSON.stringify(metadata,null,2)},
       {name:'styles.css', text:styles || '/* no inline styles captured */'},
       {name:'scripts.js', text:scripts || '/* no inline scripts or references captured */'},
       {name:'source_artifacts.json', text:document.querySelector('#office-snapshot-source-artifacts')?.textContent || '[]'},
-      {name:'README.md', text:'# Office Snapshot\n\nThis ZIP was assembled locally in the browser from the rendered Office of the Steward page. It may contain internal Estate information visible in the UI. Screenshot capture is a known future enhancement for WP-0117.\n'}
+      {name:'README.md', text:'# Office Snapshot\\n\\nThis ZIP was assembled locally in the browser from the rendered Office of the Steward page. It may contain internal Estate information visible in the UI. Screenshot capture is a known future enhancement for WP-0117.\\n'}
     ];
     const url=URL.createObjectURL(makeZip(files)); const a=document.createElement('a'); a.href=url; a.download=`office-snapshot-${new Date().toISOString().replace(/[:.]/g,'-')}.zip`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
     if(status) status.textContent='Snapshot ZIP downloaded locally.';
@@ -2092,11 +2108,11 @@ document.addEventListener('click', event => { if(event.target.closest('#office-s
 
 window.addEventListener('load', () => { restoreLayoutPreferences(); renderGlobalPaletteResults(); loadAlfredHistory(); renderPendingAttachments(); });
 </script>"""
-    script = script.replace("__PROFILE_JSON__", json.dumps(payload.get("workspace_profile", {})))
+    script = script.replace("__PROFILE_JSON__", _js_json_literal(payload.get("workspace_profile", {})))
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
-        f'<body><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div></header><div class="office-shell">{_nav_html(payload.get("navigation", {}))}<main class="workspace">{_tab_bar_html(payload.get("tabs", []))}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
+        f'<body><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):

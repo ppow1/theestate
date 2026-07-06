@@ -1,0 +1,18 @@
+{
+  "work_package_id": "WP-0140",
+  "codex_status": "done",
+  "ready_for_ca_review": true,
+  "summary": "Repaired the Steward Command Center static HTML shell regression by making embedded JSON/script generation browser-safe, aligning initial active nav/tab state with the workspace profile, preserving Alfred diagnostics and AI Services / Models, adding regression tests, and regenerating the Command Center HTML.",
+  "changed_files": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "runtime/steward/command_center.html",
+    "operations/steward/WP-0140_steward_command_center_ui_regression_repair_report.md",
+    "runtime/steward/WP-0140_steward_command_center_ui_regression_repair_report.json"
+  ],
+  "tests": [
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py tests/test_resident_interaction.py tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center",
+    "node --check extracted executable scripts from runtime/steward/command_center.html"
+  ]
+}
