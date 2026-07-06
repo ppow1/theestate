@@ -1117,6 +1117,7 @@ def cmd_ai_services(args):
     from estate.ai_services.control import status, request
     from estate.ai_services.discovery import rediscover
     from estate.ai_services.reports import write_wp0131_report
+    from estate.ai_services.steward_model_selector import build_steward_ai_services_panel, build_models, load_preferences, set_preference, load_assignments, set_assignment, approvals, decide_approval, refresh_status
     if args.ai_services_action == "status":
         payload = status()
     elif args.ai_services_action == "rediscover":
@@ -1125,6 +1126,24 @@ def cmd_ai_services(args):
         payload = request(args.ai_services_action, args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, dry_run=args.dry_run, health_timeout_seconds=args.health_timeout_seconds, health_interval_seconds=args.health_interval_seconds)
     elif args.ai_services_action == "load-model":
         payload = request("load_model", args.service, actor=getattr(args, "actor", "alfred"), approved_by=args.approved_by, model=args.model, dry_run=args.dry_run, health_timeout_seconds=args.health_timeout_seconds, health_interval_seconds=args.health_interval_seconds)
+    elif args.ai_services_action == "models":
+        payload = {"models": build_models(status()["registry"])}
+    elif args.ai_services_action == "model-preferences":
+        payload = load_preferences()
+    elif args.ai_services_action == "set-model-preference":
+        payload = set_preference(args.name, args.model_id, updated_by=args.updated_by, reason=args.reason)
+    elif args.ai_services_action == "assignments":
+        payload = load_assignments()
+    elif args.ai_services_action == "set-assignment":
+        payload = set_assignment(args.worker, args.model_id, updated_by=args.updated_by, reason=args.reason, allowed_operations=args.allowed_operation)
+    elif args.ai_services_action == "approvals":
+        payload = approvals()
+    elif args.ai_services_action in {"approve", "deny"}:
+        payload = decide_approval("approved" if args.ai_services_action == "approve" else "denied", args.operation, args.service, actor=args.actor, model=args.model, approved_by=args.approved_by, reason=args.reason)
+    elif args.ai_services_action == "refresh-status":
+        payload = refresh_status()
+    elif args.ai_services_action == "steward-panel":
+        payload = build_steward_ai_services_panel()
     elif args.ai_services_action == "write-report":
         payload = write_wp0131_report()
     else:
@@ -1298,6 +1317,17 @@ def main():
     sp.add_argument("--health-interval-seconds", type=float, default=2)
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_ai_services)
+    for action_name in ("models", "model-preferences", "assignments", "approvals", "refresh-status", "steward-panel"):
+        sp = ai_sub.add_parser(action_name)
+        sp.add_argument("--json", action="store_true")
+        sp.set_defaults(func=cmd_ai_services)
+    sp = ai_sub.add_parser("set-model-preference")
+    sp.add_argument("--name", required=True); sp.add_argument("--model-id", required=True); sp.add_argument("--updated-by", default="steward"); sp.add_argument("--reason", default=""); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_ai_services)
+    sp = ai_sub.add_parser("set-assignment")
+    sp.add_argument("--worker", required=True); sp.add_argument("--model-id", required=True); sp.add_argument("--updated-by", default="steward"); sp.add_argument("--reason", default=""); sp.add_argument("--allowed-operation", action="append"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_ai_services)
+    for action_name in ("approve", "deny"):
+        sp = ai_sub.add_parser(action_name)
+        sp.add_argument("--operation", required=True); sp.add_argument("--service", required=True); sp.add_argument("--actor", default="alfred"); sp.add_argument("--model"); sp.add_argument("--approved-by", default="steward"); sp.add_argument("--reason", default=""); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_ai_services)
     sp = ai_sub.add_parser("write-report")
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_ai_services)

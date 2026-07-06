@@ -1,0 +1,441 @@
+{
+  "approval_behavior": "Steward approve/deny uses record_approval_decision through ai-services approve/deny; actor self-approval is blocked in Steward layer.",
+  "audit_rediscovery_behavior": "Panel exposes audit tail, rediscover hook, refresh-status hook, recent log references from state processes.",
+  "cli_api_changes": [
+    "ai-services models",
+    "ai-services model-preferences",
+    "ai-services set-model-preference",
+    "ai-services assignments",
+    "ai-services set-assignment",
+    "ai-services approvals",
+    "ai-services approve",
+    "ai-services deny",
+    "ai-services refresh-status",
+    "ai-services steward-panel"
+  ],
+  "final_ui_control_surface_path": "Office of the Steward command center panel: runtime/steward/command_center.html#ai-services-models and CLI ai-services steward-panel",
+  "known_limitations": [
+    "Model inventory does not query live Ollama/TextGen network APIs; unavailable local directories are marked clearly.",
+    "UI renders governed command hooks; form-driven POST actions can be added later without changing authority semantics.",
+    "No dedicated WP-0137 validation recipe existed before this work package."
+  ],
+  "model_data_displayed": [
+    "TextGen manifest model directory inventory",
+    "Ollama inventory hook/unavailable marker",
+    "manifest model locations",
+    "conservative unknown capability classification"
+  ],
+  "model_preference_artifacts": [
+    "runtime/ai_services/model_preferences.json"
+  ],
+  "panel_summary": {
+    "actions": {
+      "approve": "ai-services approve",
+      "deny": "ai-services deny",
+      "rediscover": "ai-services rediscover",
+      "refresh_status": "ai-services status"
+    },
+    "approvals": {
+      "requests": [],
+      "version": "ai-services-approvals-v1"
+    },
+    "audit_tail": [
+      {
+        "actor": "codex",
+        "authority": "system",
+        "details": {
+          "rejected_count": 0,
+          "service_count": 5
+        },
+        "operation": "rediscover",
+        "policy_result": "allowed",
+        "result": "success",
+        "service_id": null,
+        "timestamp": "2026-07-06T00:05:47.514642+00:00"
+      },
+      {
+        "actor": "codex",
+        "authority": "system",
+        "details": {
+          "rejected_count": 0,
+          "service_count": 5
+        },
+        "operation": "rediscover",
+        "policy_result": "allowed",
+        "result": "success",
+        "service_id": null,
+        "timestamp": "2026-07-06T00:07:16.186798+00:00"
+      },
+      {
+        "actor": "codex",
+        "authority": "system",
+        "details": {
+          "rejected_count": 0,
+          "service_count": 5
+        },
+        "operation": "rediscover",
+        "policy_result": "allowed",
+        "result": "success",
+        "service_id": null,
+        "timestamp": "2026-07-06T00:07:37.531281+00:00"
+      },
+      {
+        "actor": "codex",
+        "authority": "system",
+        "details": {
+          "rejected_count": 0,
+          "service_count": 5
+        },
+        "operation": "rediscover",
+        "policy_result": "allowed",
+        "result": "success",
+        "service_id": null,
+        "timestamp": "2026-07-06T00:08:21.032900+00:00"
+      }
+    ],
+    "control_surface": "Office of the Steward / AI Services / Models",
+    "local_only": true,
+    "model_assignments": {
+      "assignments": {
+        "alfred": {
+          "allowed_operations": [
+            "status"
+          ],
+          "approval_requirement": "steward_required_for_start_stop_load_model",
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        },
+        "chief_architect": {
+          "allowed_operations": [
+            "status"
+          ],
+          "approval_requirement": "steward_required_for_start_stop_load_model",
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        },
+        "codex_worker_default": {
+          "allowed_operations": [
+            "status"
+          ],
+          "approval_requirement": "steward_required_for_start_stop_load_model",
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        },
+        "helen": {
+          "allowed_operations": [
+            "status"
+          ],
+          "approval_requirement": "steward_required_for_start_stop_load_model",
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        }
+      },
+      "version": "ai-services-model-assignments-v1"
+    },
+    "model_preferences": {
+      "preferences": {
+        "estate_fallback_text_model": {
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        },
+        "estate_preferred_text_model": {
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        },
+        "estate_preferred_vision_model": {
+          "backing_service": null,
+          "last_updated": null,
+          "model_id": null,
+          "reason": "Not configured",
+          "resolution": "unresolved",
+          "updated_by": null
+        }
+      },
+      "version": "ai-services-model-preferences-v1"
+    },
+    "models": [
+      {
+        "backing_service": "comfyui",
+        "capabilities": [
+          "unknown"
+        ],
+        "classification_status": "unknown",
+        "model_id": "comfyui:unavailable-inventory",
+        "name": "unavailable-inventory",
+        "source": "manifest_model_directory",
+        "source_status": "unavailable",
+        "unresolved": true
+      },
+      {
+        "backing_service": "ollama",
+        "capabilities": [
+          "unknown"
+        ],
+        "classification_status": "unknown",
+        "model_id": "ollama:unavailable-inventory",
+        "name": "unavailable-inventory",
+        "source": "manifest_model_directory",
+        "source_status": "unavailable",
+        "unresolved": true
+      },
+      {
+        "backing_service": "ollama",
+        "capabilities": [
+          "unknown"
+        ],
+        "classification_status": "unknown",
+        "model_id": "ollama:runtime-api-inventory",
+        "name": "runtime-api-inventory",
+        "source": "runtime_api",
+        "source_status": "available_hook_unqueried"
+      },
+      {
+        "backing_service": "textgen",
+        "capabilities": [
+          "unknown"
+        ],
+        "classification_status": "unknown",
+        "model_id": "textgen:unavailable-inventory",
+        "name": "unavailable-inventory",
+        "source": "manifest_model_directory",
+        "source_status": "unavailable",
+        "unresolved": true
+      },
+      {
+        "backing_service": "textgen",
+        "capabilities": [
+          "unknown"
+        ],
+        "classification_status": "unknown",
+        "model_id": "textgen:runtime-api-inventory",
+        "name": "runtime-api-inventory",
+        "source": "runtime_api",
+        "source_status": "available_hook_unqueried"
+      }
+    ],
+    "services": [
+      {
+        "approval_requirements": {
+          "start": {
+            "required": true
+          },
+          "stop": {
+            "required": true
+          }
+        },
+        "available_operations": [
+          "start",
+          "status"
+        ],
+        "current_state": "unknown",
+        "display_name": "ComfyUI",
+        "endpoint": "http://127.0.0.1:8188",
+        "health_status": "unknown",
+        "host_policy": {
+          "allow_public_bind": false,
+          "bind": "127.0.0.1"
+        },
+        "last_operation": null,
+        "log_reference": null,
+        "manifest_path": "runtime/ai_services/implementations/comfyui/service.manifest.json",
+        "model_locations": {
+          "models": "A:\\AI\\ComfyUI\\models"
+        },
+        "ports": [
+          8188
+        ],
+        "service_id": "comfyui",
+        "service_type": "workflow_ui"
+      },
+      {
+        "approval_requirements": {
+          "load_model": {
+            "required": true
+          },
+          "start": {
+            "required": true
+          },
+          "stop": {
+            "required": true
+          }
+        },
+        "available_operations": [
+          "list_models",
+          "running_models",
+          "start",
+          "status"
+        ],
+        "current_state": "unknown",
+        "display_name": "Ollama",
+        "endpoint": "http://127.0.0.1:11434",
+        "health_status": "unknown",
+        "host_policy": {
+          "allow_public_bind": false,
+          "bind": "127.0.0.1"
+        },
+        "last_operation": null,
+        "log_reference": null,
+        "manifest_path": "runtime/ai_services/implementations/ollama/service.manifest.json",
+        "model_locations": {
+          "models": "Ollama-managed model store"
+        },
+        "ports": [
+          11434
+        ],
+        "service_id": "ollama",
+        "service_type": "model_runtime"
+      },
+      {
+        "approval_requirements": {
+          "start": {
+            "required": true
+          },
+          "stop": {
+            "required": true
+          }
+        },
+        "available_operations": [
+          "start",
+          "status",
+          "stop"
+        ],
+        "current_state": "unknown",
+        "display_name": "Open WebUI",
+        "endpoint": "http://127.0.0.1:8080",
+        "health_status": "unknown",
+        "host_policy": {
+          "allow_public_bind": false,
+          "bind": "127.0.0.1"
+        },
+        "last_operation": null,
+        "log_reference": null,
+        "manifest_path": "runtime/ai_services/implementations/open_webui/service.manifest.json",
+        "model_locations": {},
+        "ports": [
+          8080
+        ],
+        "service_id": "open_webui",
+        "service_type": "web_ui"
+      },
+      {
+        "approval_requirements": {
+          "start": {
+            "required": true
+          },
+          "stop": {
+            "required": true
+          }
+        },
+        "available_operations": [
+          "start",
+          "status"
+        ],
+        "current_state": "unknown",
+        "display_name": "SillyTavern",
+        "endpoint": "http://127.0.0.1:8000",
+        "health_status": "unknown",
+        "host_policy": {
+          "allow_public_bind": false,
+          "bind": "127.0.0.1"
+        },
+        "last_operation": null,
+        "log_reference": null,
+        "manifest_path": "runtime/ai_services/implementations/sillytavern/service.manifest.json",
+        "model_locations": {},
+        "ports": [
+          8000
+        ],
+        "service_id": "sillytavern",
+        "service_type": "chat_ui"
+      },
+      {
+        "approval_requirements": {
+          "load_model": {
+            "required": true
+          },
+          "start": {
+            "required": true
+          },
+          "stop": {
+            "required": true
+          }
+        },
+        "available_operations": [
+          "inventory_models",
+          "load_model",
+          "status"
+        ],
+        "current_state": "unknown",
+        "display_name": "Text Generation WebUI",
+        "endpoint": "http://127.0.0.1:5000/v1",
+        "health_status": "unknown",
+        "host_policy": {
+          "allow_public_bind": false,
+          "bind": "127.0.0.1"
+        },
+        "last_operation": null,
+        "log_reference": null,
+        "manifest_path": "runtime/ai_services/implementations/textgen/service.manifest.json",
+        "model_locations": {
+          "models": "A:\\AI\\TextGen\\textgen-4.9\\user_data\\models"
+        },
+        "ports": [
+          5000
+        ],
+        "service_id": "textgen",
+        "service_type": "model_runtime"
+      }
+    ]
+  },
+  "ready_for_ca_review": true,
+  "recommended_next_action": "Chief Architect review, then add richer live model inventory adapters and UI forms for approval decisions if desired.",
+  "service_data_displayed": [
+    "service_id",
+    "display_name",
+    "service_type",
+    "endpoint",
+    "host_policy",
+    "ports",
+    "current_state",
+    "health_status",
+    "last_operation",
+    "available_operations",
+    "approval_requirements",
+    "log_reference"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src pytest -q tests/test_work_package_validation.py tests/test_production_readiness_validation.py",
+    "PYTHONPATH=src pytest -q tests/test_ai_services_control_plane.py",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "validation_results": "Required validation commands ran successfully (exit 0). Production-readiness JSON still reports pre-existing global blockers and WP-0137 no dedicated recipe status; the WP-0137 report documents the missing dedicated recipe explicitly.",
+  "work_package_id": "WP-0137",
+  "worker_assignment_artifacts": [
+    "runtime/ai_services/model_assignments.json"
+  ]
+}

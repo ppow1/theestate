@@ -28,6 +28,7 @@ from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
 from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation
+from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from urllib.parse import urlparse
 
 
@@ -37,6 +38,7 @@ OFFICE_NAVIGATION = [
     {"id": "alfred", "label": "Alfred", "panel": "alfred_resident_card", "tab": "alfred"},
     {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
+    {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
     {"id": "expansion-roadmap", "label": "Expansion Roadmap", "panel": "expansion_roadmap", "tab": "roadmap"},
@@ -58,6 +60,7 @@ OFFICE_TABS = [
     {"id": "alfred", "label": "Alfred"},
     {"id": "helen", "label": "Helen"},
     {"id": "resident-conversations", "label": "Resident Conversations"},
+    {"id": "ai-services-models", "label": "AI Services / Models"},
     {"id": "daily-board", "label": "Daily Board"},
     {"id": "projects", "label": "Projects"},
     {"id": "roadmap", "label": "Roadmap"},
@@ -895,6 +898,7 @@ def generate_command_center(root=None, write=True):
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
         "resident_conversations_workspace": build_resident_conversations_workspace(root),
+        "ai_services_models": build_steward_ai_services_panel(root),
         "steward_recall_operations": _build_steward_recall_operations(root),
         "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
         "work_package_pipeline": _work_package_pipeline_artifact(root),
@@ -1874,6 +1878,27 @@ def _operations_notification_center_html(panel):
     body += f"<p class='source'>Quiet refresh: {html.escape(str(data.get('refresh_behavior')))}. Source: {html.escape(str(panel.get('path')))}</p>"
     return _panel("Operations Center Notification Center", body, "ready")
 
+def _ai_services_models_html(panel):
+    data = panel.get("data") or {}
+    services = data.get("services") or []
+    models = data.get("models") or []
+    prefs = ((data.get("model_preferences") or {}).get("preferences") or {})
+    assigns = ((data.get("model_assignments") or {}).get("assignments") or {})
+    approvals = (data.get("approvals") or {}).get("requests") or []
+    rows = ["<div class='ai-services-models'><p>Steward-governed local AI services and model selector. Actions are backed by ai-services CLI/API hooks and do not bypass policy gates.</p>"]
+    rows.append("<h3>Services</h3><table><thead><tr><th>Service</th><th>Type</th><th>Endpoint</th><th>State / Health</th><th>Operations</th><th>Approval</th><th>Log</th></tr></thead><tbody>")
+    for svc in services:
+        rows.append("<tr>" + f"<td>{html.escape(str(svc.get('service_id')))}<br><span class='source'>{html.escape(str(svc.get('display_name')))}</span></td>" + f"<td>{html.escape(str(svc.get('service_type')))}</td>" + f"<td>{html.escape(str(svc.get('endpoint')))}<br>{html.escape(str(svc.get('ports')))}</td>" + f"<td>{html.escape(str(svc.get('current_state')))} / {html.escape(str(svc.get('health_status')))}<br><span class='source'>last: {html.escape(str(svc.get('last_operation')))}</span></td>" + f"<td>{html.escape(', '.join(svc.get('available_operations') or []))}</td>" + f"<td><pre>{html.escape(json.dumps(svc.get('approval_requirements') or {}, sort_keys=True))}</pre></td>" + f"<td>{html.escape(str(svc.get('log_reference') or 'none'))}</td>" + "</tr>")
+    rows.append("</tbody></table><h3>Models</h3><table><thead><tr><th>Model</th><th>Service</th><th>Source</th><th>Capabilities</th><th>Status</th></tr></thead><tbody>")
+    for m in models:
+        rows.append(f"<tr><td>{html.escape(str(m.get('model_id')))}</td><td>{html.escape(str(m.get('backing_service')))}</td><td>{html.escape(str(m.get('source')))}</td><td>{html.escape(', '.join(m.get('capabilities') or []))}</td><td>{html.escape(str(m.get('source_status')))} / {html.escape(str(m.get('classification_status')))}</td></tr>")
+    rows.append("</tbody></table><h3>Estate Defaults</h3><pre>" + html.escape(json.dumps(prefs, indent=2, sort_keys=True)) + "</pre>")
+    rows.append("<h3>Worker / Resident Assignments</h3><pre>" + html.escape(json.dumps(assigns, indent=2, sort_keys=True)) + "</pre>")
+    rows.append("<h3>Pending Approvals</h3><pre>" + html.escape(json.dumps([a for a in approvals if a.get('state') == 'requires_approval'], indent=2, sort_keys=True)) + "</pre>")
+    rows.append("<h3>Audit Tail</h3><pre>" + html.escape(json.dumps(data.get('audit_tail') or [], indent=2, sort_keys=True)) + "</pre>")
+    rows.append(f"<p class='source'>Sources: {html.escape(str(panel.get('path')))}. Rediscovery/status hooks: {html.escape(json.dumps(data.get('actions') or {}, sort_keys=True))}</p></div>")
+    return _panel("AI Services / Models", ''.join(rows), "ready")
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
@@ -1882,6 +1907,7 @@ def render_command_center_html(payload):
         ("alfred", "Alfred Resident Card", _resident_html(p.get("alfred_resident_card", {})) + _alfred_chat_html(p.get("alfred_chat", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
+        ("ai-services-models", "AI Services / Models", _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
