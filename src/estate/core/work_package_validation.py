@@ -2239,3 +2239,26 @@ VALIDATION_RECIPES.update({
         ],
     },
 })
+
+VALIDATION_RECIPES["WP-0213"] = {
+    "recipe_id": "wp-0213-office-command-surface-real-verbs",
+    "title": "WP-0213 — Office of the Steward Command Surface",
+    "description": "Validates that WP-0213 installed real Office controls, action result model tests, audit/report artifacts, and completion receipt.",
+    "required_checks": ["Office command surface tests pass", "Office payload exposes action controls", "Audit/report artifacts exist", "Completion receipt exists"],
+    "observational_checks": ["Existing Office tests pass"],
+    "expected_artifacts": [
+        "src/estate/core/office_command_surface.py",
+        "operations/steward/WP-0213_office_command_surface_verb_audit.md",
+        "operations/steward/WP-0213_office_command_surface_report.md",
+        "collaboration/work_packages/completions/WP-0213_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero"],
+    "success_criteria": ["Required commands exit zero"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m pytest tests/test_office_command_surface.py"),
+        _cmd("python -c \"import json, subprocess, sys; p=json.loads(subprocess.check_output([sys.executable,'-m','estate.cli.main','steward-command-center','--json'])); actions=p.get('office_actions') or {}; required=['ai-services-models','validation','work-packages','notifications','alfred','mission-control','daily-board']; missing=[tab for tab in required if not actions.get(tab)]; assert not missing, missing; assert all(c.get('availability') in {'available','gated'} for cs in actions.values() for c in cs)\""),
+        _cmd("python -c \"from pathlib import Path; required=['operations/steward/WP-0213_office_command_surface_verb_audit.md','operations/steward/WP-0213_office_command_surface_report.md','collaboration/work_packages/completions/WP-0213_codex_done.json']; missing=[p for p in required if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -m pytest tests/test_steward_command_center.py", required=False),
+    ],
+}
