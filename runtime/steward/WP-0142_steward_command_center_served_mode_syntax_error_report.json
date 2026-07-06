@@ -1,0 +1,45 @@
+{
+  "work_package_id": "WP-0142",
+  "status": "complete",
+  "root_cause": "Raw Unicode ellipsis in the generated inline Office Snapshot JavaScript string at the browser-reported line made the served script brittle; it is now emitted as an ASCII JavaScript escape.",
+  "exact_line_token": {
+    "served_line_after_repair": 554,
+    "former_token": "…",
+    "repaired_token": "\\u2026",
+    "statement": "status.textContent='Building local snapshot ZIP\\u2026';"
+  },
+  "served_mode": {
+    "status_json_fetch_allowed": true,
+    "refresh_failures_caught": true,
+    "startup_navigation_not_blocked_by_refresh": true
+  },
+  "file_mode": {
+    "startup_fetch_required": false,
+    "safe_static_mode_diagnostic": true,
+    "navigation_static_artifacts_available": true
+  },
+  "navigation": {
+    "delegated_data_tab_binding": true,
+    "updates_hidden": true,
+    "updates_active_class": true,
+    "updates_aria_selected": true,
+    "updates_aria_current": true
+  },
+  "preserved": {
+    "wp_0138_ai_services_models": true,
+    "wp_0139_alfred_safe_failure_governance": true
+  },
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py",
+    "PYTHONPATH=src pytest -q tests/test_resident_interaction.py",
+    "PYTHONPATH=src pytest -q tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src pytest -q tests/test_steward_command_center.py tests/test_resident_interaction.py tests/test_ai_services_steward_model_selector.py",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --serve --host 127.0.0.1 --port 8765",
+    "node --check on each executable script block extracted from runtime/steward/command_center.html"
+  ],
+  "remaining_limitations": [
+    "Chrome was not launched in this environment; validation uses emitted-script parser checks plus served response inspection.",
+    "Direct file mode cannot perform local fetches due to browser security and intentionally uses static-safe behavior."
+  ]
+}
