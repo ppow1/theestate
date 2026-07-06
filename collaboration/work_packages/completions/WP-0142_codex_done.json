@@ -1,0 +1,12 @@
+{
+  "work_package_id": "WP-0142",
+  "codex_status": "done",
+  "ready_for_ca_review": true,
+  "summary": "Repaired Steward Command Center served-mode inline script brittleness at the reported line, preserved served refresh, added file-mode safe static behavior, added runtime diagnostics, and expanded tests for emitted script parsing, navigation binding, Alfred, AI Services / Models, served fetch handling, and file-mode startup behavior.",
+  "artifacts": [
+    "src/estate/core/steward_command_center.py",
+    "tests/test_steward_command_center.py",
+    "operations/steward/WP-0142_steward_command_center_served_mode_syntax_error_report.md",
+    "runtime/steward/WP-0142_steward_command_center_served_mode_syntax_error_report.json"
+  ]
+}

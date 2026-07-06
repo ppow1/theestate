@@ -1727,6 +1727,7 @@ def build_office_snapshot_manifest(payload):
 def _refresh_script():
     return """<script>
 async function refreshOperationsChrome(){
+  if(location.protocol === 'file:'){ updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); return; }
   try{
     const response = await fetch('/status.json', {cache: 'no-store'});
     if(!response.ok) return;
@@ -1741,7 +1742,7 @@ async function refreshOperationsChrome(){
     if(nextConsole && currentConsole) currentConsole.replaceWith(nextConsole);
   }catch(error){ console.debug('Quiet refresh skipped', error); }
 }
-window.addEventListener('load', () => window.setInterval(refreshOperationsChrome, 30000));
+window.addEventListener('load', () => { refreshOperationsChrome(); if(location.protocol !== 'file:') window.setInterval(refreshOperationsChrome, 30000); });
 </script>"""
 
 def _layout_framework_html(artifact):
@@ -1993,7 +1994,8 @@ const WORKSPACE_PROFILE = __PROFILE_JSON__;
 function readLayoutPreferences(){ try{return JSON.parse(localStorage.getItem(LAYOUT_PREF_KEY) || '{}');}catch(error){return {};} }
 function writeLayoutPreferences(update){ try{ const next = {...readLayoutPreferences(), ...update}; localStorage.setItem(LAYOUT_PREF_KEY, JSON.stringify(next)); return next; }catch(error){ updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / local preferences unavailable / active tab: ' + getActiveOfficeTab()); return readLayoutPreferences(); } }
 function getActiveOfficeTab(){ const active = document.querySelector('.workspace-tab.active') || document.querySelector('.nav-item.active'); return active && active.dataset ? active.dataset.tab : 'unknown'; }
-function updateUiRuntimeDiagnostic(state, message){ const el = document.querySelector('#ui-runtime-diagnostic'); if(!el) return; el.dataset.state = state; el.textContent = message; }
+function getCommandCenterMode(){ return location.protocol === 'file:' ? 'file safe static' : 'served'; }
+function updateUiRuntimeDiagnostic(state, message){ const el = document.querySelector('#ui-runtime-diagnostic'); if(!el) return; el.dataset.state = state; el.textContent = message + ' / mode: ' + getCommandCenterMode(); }
 function activateOfficeTab(id, persist=true){
   const target = document.getElementById('workspace-' + id);
   if(!target){ updateUiRuntimeDiagnostic('error', 'UI runtime: navigation bound / missing workspace for tab: ' + id); return false; }
@@ -2006,7 +2008,7 @@ function activateOfficeTab(id, persist=true){
 function applyWorkspaceProfile(profile){ if(!profile) return; if(profile.panel_arrangements && profile.panel_arrangements.activity_console_visible === false){ const consoleEl = document.querySelector('#activity-console'); if(consoleEl) consoleEl.setAttribute('hidden',''); } if(profile.active_tab) activateOfficeTab(profile.active_tab, false); }
 function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
 function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab); } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
-function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); loadAlfredHistory(); renderPendingAttachments(); }
+function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
 function whenDomReady(callback){ if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', callback, {once:true}); else callback(); }
 whenDomReady(initOfficeRuntime);
 function renderGlobalPaletteResults(){
@@ -2095,7 +2097,7 @@ function collectDomState(){
   return {active_tab:document.querySelector('.workspace-tab.active')?.dataset.tab || null, visible_panels:[...document.querySelectorAll('.workspace-view:not([hidden])')].map(e=>e.id), details:[...document.querySelectorAll('details')].map((e,i)=>({index:i, summary:e.querySelector('summary')?.textContent || '', open:e.open})), collapsed_sections:[...document.querySelectorAll('details:not([open])')].map(e=>e.querySelector('summary')?.textContent || '')};
 }
 async function exportOfficeSnapshot(){
-  const status=document.querySelector('#office-snapshot-status'); if(status) status.textContent='Building local snapshot ZIP…';
+  const status=document.querySelector('#office-snapshot-status'); if(status) status.textContent='Building local snapshot ZIP\\u2026';
   try{
     const styles=[...document.querySelectorAll('style')].map((e,i)=>`/* inline style ${i+1} */\\n${e.textContent}`).join('\\n\\n');
     const scripts=[...document.querySelectorAll('script')].map((e,i)=> e.src ? `/* script reference ${i+1}: ${e.src} */` : `/* inline script ${i+1} */\\n${e.textContent}`).join('\\n\\n');

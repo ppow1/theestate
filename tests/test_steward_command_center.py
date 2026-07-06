@@ -810,3 +810,95 @@ def test_wp0141_alfred_submit_and_snapshot_do_not_replace_navigation_binding(tmp
     assert "document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]');" in html
     assert "document.addEventListener('click', event => { if(event.target.closest('#office-snapshot-button')) exportOfficeSnapshot(); });" in html
     assert html.index("function bindOfficeNavigation()") < html.index("document.addEventListener('submit', async event =>")
+
+class _ScriptExtractor(__import__('html.parser').parser.HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.in_script = False
+        self.attrs = {}
+        self.current = []
+        self.scripts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "script":
+            self.in_script = True
+            self.attrs = dict(attrs)
+            self.current = []
+
+    def handle_data(self, data):
+        if self.in_script:
+            self.current.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "script" and self.in_script:
+            self.scripts.append((self.attrs, "".join(self.current)))
+            self.in_script = False
+
+
+def _executable_scripts(html_text):
+    parser = _ScriptExtractor()
+    parser.feed(html_text)
+    return [script for attrs, script in parser.scripts if attrs.get("type") != "application/json"]
+
+
+def test_wp0142_generated_executable_scripts_parse_exactly_as_emitted(tmp_path):
+    import subprocess
+
+    seed_inputs(tmp_path)
+    payload = generate_command_center(tmp_path, write=True)
+    html_text = (tmp_path / "runtime/steward/command_center.html").read_text(encoding="utf-8")
+    scripts = _executable_scripts(html_text)
+    assert scripts
+    for index, script in enumerate(scripts):
+        result = subprocess.run(["node", "--check", "-"], input=script, text=True, capture_output=True)
+        assert result.returncode == 0, f"script {index} failed node --check: {result.stderr}\n{script[:500]}"
+    assert "Office of the Steward" in html_text
+
+
+def test_wp0142_former_line_553_uses_escaped_ellipsis_not_raw_invalid_token(tmp_path):
+    seed_inputs(tmp_path)
+    generate_command_center(tmp_path, write=True)
+    lines = (tmp_path / "runtime/steward/command_center.html").read_text(encoding="utf-8").splitlines()
+    snapshot_lines = "\n".join(line for line in lines if "Building local snapshot ZIP" in line)
+    assert "Building local snapshot ZIP\\u2026" in snapshot_lines
+    assert "Building local snapshot ZIP…" not in snapshot_lines
+
+
+def test_wp0142_navigation_data_tabs_match_workspace_sections(tmp_path):
+    seed_inputs(tmp_path)
+    html_text = render_command_center_html(generate_command_center(tmp_path, write=False))
+    tabs = set(__import__('re').findall(r"data-tab='([^']+)'", html_text)) | set(__import__('re').findall(r'data-tab="([^"]+)"', html_text))
+    workspaces = set(__import__('re').findall(r"id='workspace-([^']+)'", html_text)) | set(__import__('re').findall(r'id="workspace-([^"]+)"', html_text))
+    assert tabs
+    assert tabs <= workspaces
+
+
+def test_wp0142_navigation_click_handlers_cover_alfred_ai_models_and_file_mode(tmp_path):
+    html_text = render_command_center_html(generate_command_center(tmp_path, write=False))
+    script = "\n".join(_executable_scripts(html_text))
+    assert "function activateOfficeTab" in script
+    assert "view.hidden = !active" in script
+    assert "aria-selected" in script
+    assert "aria-current" in script
+    assert "getCommandCenterMode() === 'served'" in script
+    assert "location.protocol === 'file:'" in script
+    assert "fetch('/status.json'" in script
+    assert "catch(error){ console.debug('Quiet refresh skipped', error); }" in script
+    assert "#alfred-chat-form" in script
+    assert "event.preventDefault();" in script
+    assert "workspace-alfred" in html_text
+    assert "workspace-ai-services-models" in html_text
+
+
+def test_wp0142_ai_services_installed_rows_still_render(tmp_path):
+    models = tmp_path / "models"
+    models.mkdir()
+    (models / "Qwen3-8B-Q6_K.gguf").write_text("x", encoding="utf-8")
+    impl = tmp_path / "runtime/ai_services/implementations/textgen"
+    impl.mkdir(parents=True)
+    (impl / "service.manifest.json").write_text(json.dumps({"service_id":"textgen","display_name":"TextGen","service_type":"model_runtime","local_only":True,"host_policy":{"bind":"127.0.0.1","allow_public_bind":False},"default_endpoint":"http://127.0.0.1:5000/v1","ports":[5000],"paths":{"models":str(models)},"operations":{"status":{"api_template":"GET /v1/models"},"load_model":{"command_template":"load {model}"}},"approval":{"load_model":{"required":True}}}), encoding="utf-8")
+    rediscover(tmp_path)
+    html_text = render_command_center_html(generate_command_center(tmp_path, write=False))
+    assert "AI Services / Models" in html_text
+    assert "Model Inventory" in html_text
+    assert "Qwen3-8B-Q6_K.gguf" in html_text
