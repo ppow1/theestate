@@ -1,0 +1,111 @@
+{
+  "work_package_id": "WP-0212",
+  "workstream_mode": "INSTALL-HANDOFF",
+  "staged_artifact_paths": [
+    "collaboration/workstreams/WP-0212/install_manifest.json",
+    "collaboration/workstreams/WP-0212/office_controls_install_execution_report.md",
+    "collaboration/workstreams/WP-0212/office_controls_install_plan.json",
+    "collaboration/workstreams/WP-0212/office_controls_conflict_matrix.json",
+    "collaboration/workstreams/WP-0212/office_controls_rollback_plan.md",
+    "collaboration/workstreams/WP-0212/post_install_validation.md",
+    "collaboration/workstreams/WP-0212/validation_notes.md"
+  ],
+  "source_staged_workstreams": [
+    "collaboration/workstreams/WP-0200",
+    "collaboration/workstreams/WP-0201",
+    "collaboration/workstreams/WP-0202",
+    "collaboration/workstreams/WP-0204",
+    "collaboration/workstreams/WP-0205",
+    "collaboration/workstreams/WP-0206",
+    "collaboration/workstreams/WP-0208",
+    "collaboration/workstreams/WP-0209",
+    "collaboration/workstreams/WP-0210"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_actions.py",
+    "src/estate/core/office_settings_help_about_actions.py",
+    "src/estate/core/office_work_package_actions.py",
+    "src/estate/core/office_validation_actions.py",
+    "src/estate/core/office_planning_actions.py",
+    "src/estate/core/office_communications_actions.py",
+    "src/estate/core/office_board_actions.py",
+    "src/estate/core/office_resident_actions.py",
+    "src/estate/core/office_ai_service_actions.py",
+    "tests/test_office_actions.py",
+    "tests/test_office_settings_help_about_actions.py",
+    "tests/test_office_work_package_actions.py",
+    "tests/test_office_validation_actions.py",
+    "tests/test_office_planning_actions.py",
+    "tests/test_office_communications_actions.py",
+    "tests/test_office_board_actions.py",
+    "tests/test_office_resident_actions.py",
+    "tests/test_office_ai_service_actions.py"
+  ],
+  "files_modified_during_install": [
+    "src/estate/core/office_actions.py",
+    "src/estate/core/office_settings_help_about_actions.py",
+    "src/estate/core/office_work_package_actions.py",
+    "src/estate/core/office_validation_actions.py",
+    "src/estate/core/office_planning_actions.py",
+    "src/estate/core/office_communications_actions.py",
+    "src/estate/core/office_board_actions.py",
+    "src/estate/core/office_resident_actions.py",
+    "src/estate/core/office_ai_service_actions.py",
+    "tests/test_office_actions.py",
+    "tests/test_office_settings_help_about_actions.py",
+    "tests/test_office_work_package_actions.py",
+    "tests/test_office_validation_actions.py",
+    "tests/test_office_planning_actions.py",
+    "tests/test_office_communications_actions.py",
+    "tests/test_office_board_actions.py",
+    "tests/test_office_resident_actions.py",
+    "tests/test_office_ai_service_actions.py",
+    "collaboration/work_packages/completions/WP-0212_codex_done.json"
+  ],
+  "manual_install_steps": [
+    "Inspect manifests and receipts",
+    "Review conflicts",
+    "Copy staged source/test artifacts into active paths",
+    "Normalize installed status/test path assumptions",
+    "Run validation"
+  ],
+  "automated_install_steps": [
+    "Copied proposed Python modules/tests into active src/tests paths"
+  ],
+  "validation_commands": [
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0200 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0201 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0202 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0204 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0205 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0206 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0208 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0209 --json",
+    "PYTHONPATH=src python -m estate.cli.main workstream validate --id WP-0210 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json",
+    "PYTHONPATH=src pytest tests/test_office_actions.py tests/test_office_settings_help_about_actions.py tests/test_office_work_package_actions.py tests/test_office_validation_actions.py tests/test_office_planning_actions.py tests/test_office_communications_actions.py tests/test_office_board_actions.py tests/test_office_resident_actions.py tests/test_office_ai_service_actions.py tests/test_steward_command_center.py -q",
+    "PYTHONPATH=src python -m estate.cli.main steward-command-center --json"
+  ],
+  "rollback_notes": "Revert WP-0212 commit or delete installed office action modules/tests; see rollback plan.",
+  "dependency_assumptions": [
+    "WP-0118 merged",
+    "WP-0200 vocabulary usable by later waves",
+    "No active CA4 artifact conflict discovered"
+  ],
+  "conflict_risks": [
+    "Future UI wiring in steward_command_center.py remains a shared integration point",
+    "Resident and AI controls require explicit review before executable handlers"
+  ],
+  "generated_artifacts_to_ignore_or_review": [
+    "runtime/steward/*",
+    "runtime/validation/**/*"
+  ],
+  "authority_and_review_requirements": [
+    "Chief Architect review required",
+    "Steward boundaries preserved",
+    "No resident/governance/service authority granted",
+    "No AI service start/stop performed"
+  ],
+  "active_installation_was_performed": true,
+  "staged_work_is_installed": true
+}

@@ -1,0 +1,419 @@
+{
+  "generated_at": "2026-07-06T00:00:00+00:00",
+  "summary": {
+    "installed_packages": [
+      "WP-0200",
+      "WP-0201",
+      "WP-0202",
+      "WP-0204",
+      "WP-0205",
+      "WP-0206",
+      "WP-0208",
+      "WP-0209",
+      "WP-0210"
+    ],
+    "missing_packages": [],
+    "shared_active_conflict": "src/estate/core/steward_command_center.py was common intended UI wiring risk; WP-0212 installed metadata modules/tests only and did not overwrite it."
+  },
+  "packages": [
+    {
+      "work_package_id": "WP-0200",
+      "manifest_path": "collaboration/workstreams/WP-0200/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0200/proposed/docs/office_action_registry_notes.md",
+        "collaboration/workstreams/WP-0200/proposed/src/estate/core/office_actions.py",
+        "collaboration/workstreams/WP-0200/proposed/tests/test_office_actions.py"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_actions.py",
+        "tests/test_office_actions.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/office_actions.py",
+        "tests/test_office_actions.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged",
+        "WP-0200 vocabulary reviewed before installing tab controls"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0201",
+      "manifest_path": "collaboration/workstreams/WP-0201/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0201/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0201/proposed/settings_help_about_controls.md",
+        "collaboration/workstreams/WP-0201/proposed/src/estate/core/office_settings_help_about_actions.py",
+        "collaboration/workstreams/WP-0201/proposed/tests/test_office_settings_help_about_actions.py"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_settings_help_about_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/office_settings_help_about_actions.py",
+        "tests/test_office_settings_help_about_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged",
+        "WP-0200 vocabulary reviewed before installing tab controls"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0202",
+        "WP-0204",
+        "WP-0205",
+        "WP-0206",
+        "WP-0208",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0202",
+      "manifest_path": "collaboration/workstreams/WP-0202/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0202/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0202/proposed/src/estate/core/office_work_package_actions.py",
+        "collaboration/workstreams/WP-0202/proposed/tests/test_office_work_package_actions.py",
+        "collaboration/workstreams/WP-0202/proposed/work_packages_tab_controls.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_work_package_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/office_work_package_actions.py",
+        "tests/test_office_work_package_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged",
+        "WP-0200 vocabulary reviewed before installing tab controls"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0204",
+        "WP-0205",
+        "WP-0206",
+        "WP-0208",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0204",
+      "manifest_path": "collaboration/workstreams/WP-0204/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0204/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0204/proposed/src/estate/core/office_validation_actions.py",
+        "collaboration/workstreams/WP-0204/proposed/tests/test_office_validation_actions.py",
+        "collaboration/workstreams/WP-0204/proposed/validation_tab_controls.md",
+        "collaboration/workstreams/WP-0204/validation_notes.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_validation_actions.py",
+        "tests/test_office_validation_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/office_validation_actions.py",
+        "tests/test_office_validation_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged",
+        "WP-0200 staged vocabulary reviewed/available before install"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/core/work_package_validation.py",
+        "src/estate/core/production_readiness_validation.py",
+        "src/estate/core/validation_observations.py",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py",
+        "tests/test_work_package_validation.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0202",
+        "WP-0205",
+        "WP-0206",
+        "WP-0208",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0205",
+      "manifest_path": "collaboration/workstreams/WP-0205/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0205/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0205/proposed/mission_projects_roadmap_controls.md",
+        "collaboration/workstreams/WP-0205/proposed/src/estate/core/office_planning_actions.py",
+        "collaboration/workstreams/WP-0205/proposed/tests/test_office_planning_actions.py",
+        "collaboration/workstreams/WP-0205/validation_notes.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_planning_actions.py",
+        "tests/test_office_planning_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/office_planning_actions.py",
+        "tests/test_office_planning_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged",
+        "WP-0200 staged vocabulary reviewed/available before install"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/core/steward_dashboard.py",
+        "src/estate/core/operations_board.py",
+        "src/estate/core/dependency_graph.py",
+        "src/estate/core/assignment_queue.py",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0202",
+        "WP-0204",
+        "WP-0206",
+        "WP-0208",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0206",
+      "manifest_path": "collaboration/workstreams/WP-0206/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0206/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0206/proposed/mailboxes_recalls_notifications_controls.md",
+        "collaboration/workstreams/WP-0206/proposed/src/estate/core/office_communications_actions.py",
+        "collaboration/workstreams/WP-0206/proposed/tests/test_office_communications_actions.py",
+        "collaboration/workstreams/WP-0206/validation_notes.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_communications_actions.py",
+        "tests/test_office_communications_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/office_communications_actions.py",
+        "tests/test_office_communications_actions.py",
+        "src/estate/core/steward_command_center.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged",
+        "WP-0200 staged vocabulary reviewed/available before install"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/core/mailbox_index.py",
+        "src/estate/core/collaboration_messages.py",
+        "src/estate/core/notification_router.py",
+        "src/estate/core/operations_notification_center.py",
+        "src/estate/core/decision_queue.py",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0202",
+        "WP-0204",
+        "WP-0205",
+        "WP-0208",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0208",
+      "manifest_path": "collaboration/workstreams/WP-0208/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0208/proposed/daily_board_parking_lot_controls.md",
+        "collaboration/workstreams/WP-0208/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0208/proposed/src/estate/core/office_board_actions.py",
+        "collaboration/workstreams/WP-0208/proposed/tests/test_office_board_actions.py",
+        "collaboration/workstreams/WP-0208/validation_notes.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_board_actions.py",
+        "tests/test_office_board_actions.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/cli/main.py",
+        "src/estate/core/office_board_actions.py",
+        "tests/test_office_board_actions.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged or available",
+        "WP-0200 staged vocabulary available"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/core/daily_board_integration.py",
+        "src/estate/core/morning_briefing.py",
+        "src/estate/core/operations_board.py",
+        "operations/boards/daily_board.md",
+        "operations/boards/active_work.md",
+        "operations/boards/parking_lot.md",
+        "src/estate/cli/main.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0202",
+        "WP-0204",
+        "WP-0205",
+        "WP-0206",
+        "WP-0209",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0209",
+      "manifest_path": "collaboration/workstreams/WP-0209/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0209/proposed/resident_conversation_controls.md",
+        "collaboration/workstreams/WP-0209/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0209/proposed/src/estate/core/office_resident_actions.py",
+        "collaboration/workstreams/WP-0209/proposed/tests/test_office_resident_actions.py",
+        "collaboration/workstreams/WP-0209/validation_notes.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_resident_actions.py",
+        "tests/test_office_resident_actions.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/cli/main.py",
+        "src/estate/core/office_resident_actions.py",
+        "tests/test_office_resident_actions.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged or available",
+        "WP-0200 staged vocabulary available"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/core/resident_interaction.py",
+        "src/estate/core/resident_conversation_sessions.py",
+        "src/estate/core/resident_authority.py",
+        "src/estate/core/resident_presence.py",
+        "src/estate/core/alfred.py",
+        "src/estate/core/alfred_duty.py",
+        "src/estate/core/helen_duty.py",
+        "src/estate/cli/main.py",
+        "tests/test_resident_interaction.py",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0202",
+        "WP-0204",
+        "WP-0205",
+        "WP-0206",
+        "WP-0208",
+        "WP-0210"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    },
+    {
+      "work_package_id": "WP-0210",
+      "manifest_path": "collaboration/workstreams/WP-0210/install_manifest.json",
+      "staged_artifact_paths": [
+        "collaboration/workstreams/WP-0210/proposed/ai_services_model_controls.md",
+        "collaboration/workstreams/WP-0210/proposed/action_metadata.json",
+        "collaboration/workstreams/WP-0210/proposed/src/estate/core/office_ai_service_actions.py",
+        "collaboration/workstreams/WP-0210/proposed/tests/test_office_ai_service_actions.py",
+        "collaboration/workstreams/WP-0210/validation_notes.md"
+      ],
+      "intended_final_install_paths": [
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "files_expected_to_be_modified_during_install": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/cli/main.py",
+        "src/estate/core/office_ai_service_actions.py",
+        "tests/test_office_ai_service_actions.py"
+      ],
+      "dependency_assumptions": [
+        "WP-0118 merged or available",
+        "WP-0200 staged vocabulary available"
+      ],
+      "conflict_risks": [
+        "src/estate/core/steward_command_center.py",
+        "src/estate/core/discovery.py",
+        "src/estate/core/discovery_catalog.py",
+        "src/estate/core/discovery_cycle.py",
+        "src/estate/core/provider_sync.py",
+        "src/estate/core/services.py",
+        "src/estate/core/service_layer.py",
+        "src/estate/cli/main.py",
+        "runtime/ai_services/registry.json",
+        "runtime/ai_services/audit_log.jsonl",
+        "tests/test_steward_command_center.py"
+      ],
+      "overlaps_with_another_staged_package": [
+        "WP-0201",
+        "WP-0202",
+        "WP-0204",
+        "WP-0205",
+        "WP-0206",
+        "WP-0208",
+        "WP-0209"
+      ],
+      "overlaps_with_known_active_CA4_work": "not discovered in repository artifacts",
+      "recommended_action": "install_now",
+      "final_action_taken": "installed"
+    }
+  ]
+}
