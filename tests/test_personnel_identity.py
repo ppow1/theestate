@@ -19,6 +19,10 @@ def registry_root(tmp_path):
         {"employee_id": 5, "display_name": "Chief Architect #4", "current_title": "Chief Architect #4", "current_office": "Office of the Chief Architect", "mailbox_id": 5},
         {"employee_id": 6, "display_name": "Helen", "current_title": "Manager of Human Resources", "current_office": "Human Resources", "mailbox_id": 6, "resident_id": "RES-000003"},
         {"employee_id": 7, "display_name": "Alfred", "current_title": "Manager of Administration", "current_office": "Administration", "mailbox_id": 7, "resident_id": "RES-000001"},
+        {"employee_id": 8, "display_name": "Chief Architect #5", "current_title": "Chief Architect #5", "current_office": "Office of the Chief Architect", "mailbox_id": 8},
+        {"employee_id": 9, "display_name": "Chief Architect #6", "current_title": "Chief Architect #6", "current_office": "Office of the Chief Architect", "mailbox_id": 9},
+        {"employee_id": 10, "display_name": "Ingrid", "current_title": "Security Manager / Boundary Guardian", "current_office": "Office of Security and Boundary", "mailbox_id": 10, "resident_id": "RES-000002"},
+        {"employee_id": 11, "display_name": "Chief Character Architect", "current_title": "Chief Character Architect", "current_office": "Office of Character Architecture", "mailbox_id": 11},
     ])
     write_json(tmp_path / "data/registry/mailboxes.json", [
         {"mailbox_id": 10100, "mailbox_type": "queue", "display_name": "Alfred Routing Intake", "owning_office": "Chief of Staff", "responsible_employee_id": None},
@@ -26,6 +30,7 @@ def registry_root(tmp_path):
     ])
     write_json(tmp_path / "data/registry/residents.json", [
         {"id": "RES-000001", "name": "Alfred", "office": "Manager of Administration"},
+        {"id": "RES-000002", "name": "Ingrid", "office": "Manager of Security"},
         {"id": "RES-000003", "name": "Helen", "office": "Manager of Human Resources"},
     ])
     return tmp_path
@@ -81,3 +86,30 @@ def test_personnel_resolve_cli_json():
     payload = json.loads(result.stdout)
     assert payload["canonical_destination"] == "mailbox.5"
     assert payload["employee_id"] == 5
+
+
+def test_helen_created_personnel_resolve_by_display_name_and_canonical_forms(tmp_path):
+    root = registry_root(tmp_path)
+    ca6 = resolve_personnel_identity("Chief Architect #6", root)
+    ca6_no_hash = resolve_personnel_identity("Chief Architect 6", root)
+    character = resolve_personnel_identity("Chief Character Architect", root)
+    ingrid = resolve_personnel_identity("Ingrid", root)
+    assert (ca6["resolved"], ca6["employee_id"], ca6["mailbox_id"]) == (True, 9, 9)
+    assert (ca6_no_hash["resolved"], ca6_no_hash["employee_id"], ca6_no_hash["mailbox_id"]) == (True, 9, 9)
+    assert (character["resolved"], character["employee_id"], character["mailbox_id"]) == (True, 11, 11)
+    assert (ingrid["resolved"], ingrid["employee_id"], ingrid["mailbox_id"], ingrid["resident_id"]) == (True, 10, 10, "RES-000002")
+
+    for employee_id in (9, 10, 11):
+        resolved = resolve_personnel_identity(f"employee.{employee_id}", root)
+        assert (resolved["resolved"], resolved["employee_id"], resolved["mailbox_id"]) == (True, employee_id, employee_id)
+    for mailbox_id in (9, 10, 11):
+        resolved = resolve_personnel_identity(f"mailbox.{mailbox_id}", root)
+        assert (resolved["resolved"], resolved["employee_id"], resolved["mailbox_id"]) == (True, mailbox_id, mailbox_id)
+
+
+def test_existing_chief_architect_5_resolves_without_duplicate(tmp_path):
+    root = registry_root(tmp_path)
+    ca5_entries = [entry for entry in json.loads((root / "data/registry/personnel.json").read_text()) if entry["display_name"] == "Chief Architect #5"]
+    ca5 = resolve_personnel_identity("Chief Architect #5", root)
+    assert len(ca5_entries) == 1
+    assert (ca5["resolved"], ca5["employee_id"], ca5["mailbox_id"]) == (True, 8, 8)

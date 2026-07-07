@@ -90,5 +90,39 @@
     "security_clearance": "metadata_only",
     "status": "onboarding",
     "notes": "Fifth historical identity in the Office of Chief Architect and intended active successor peer while preserving Chief Architect #3 history. Employee ID assigned through WP-0124 with Helen as HR/onboarding operational owner; authority remains within established Chief Architect role boundaries."
+  },
+  {
+    "employee_id": 9,
+    "display_name": "Chief Architect #6",
+    "current_title": "Chief Architect #6",
+    "current_office": "Office of the Chief Architect",
+    "department": "Architecture",
+    "mailbox_id": 9,
+    "security_clearance": "Estate Internal",
+    "status": "onboarding",
+    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence; employee and mailbox IDs are fixed by the WP-0147 repair package."
+  },
+  {
+    "employee_id": 10,
+    "display_name": "Ingrid",
+    "current_title": "Security Manager / Boundary Guardian",
+    "current_office": "Office of Security and Boundary",
+    "department": "Security and Boundary",
+    "mailbox_id": 10,
+    "security_clearance": "Estate Internal",
+    "status": "onboarding",
+    "resident_id": "RES-000002",
+    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence; linked to existing resident RES-000002."
+  },
+  {
+    "employee_id": 11,
+    "display_name": "Chief Character Architect",
+    "current_title": "Chief Character Architect",
+    "current_office": "Office of Character Architecture",
+    "department": "Character Architecture",
+    "mailbox_id": 11,
+    "security_clearance": "Estate Internal",
+    "status": "onboarding",
+    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence and WP-0136 character architecture governance."
   }
 ]

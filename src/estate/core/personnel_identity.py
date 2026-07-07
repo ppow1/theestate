@@ -117,6 +117,38 @@ def _resident_by_slug(residents):
     return aliases
 
 
+def _personnel_aliases(personnel):
+    aliases = {}
+    ambiguous = set()
+
+    def add(alias, entry):
+        if not alias:
+            return
+        if alias in aliases and aliases[alias] is not entry:
+            ambiguous.add(alias)
+            aliases.pop(alias, None)
+            return
+        if alias not in ambiguous:
+            aliases[alias] = entry
+
+    for entry in personnel:
+        employee_id = entry.get("employee_id")
+        mailbox_id = entry.get("mailbox_id")
+        if employee_id is not None:
+            add(f"employee.{int(employee_id)}", entry)
+        if mailbox_id is not None:
+            add(f"mailbox.{int(mailbox_id)}", entry)
+        for field in ("display_name", "current_title"):
+            slug = _slug(entry.get(field))
+            add(slug, entry)
+            add(f"employee.{slug}", entry)
+        for alias in entry.get("aliases") or []:
+            slug = _slug(alias)
+            add(slug, entry)
+            add(f"employee.{slug}", entry)
+    return aliases, ambiguous
+
+
 def _find_alfred_mailbox(mailboxes):
     for mailbox in mailboxes:
         if mailbox.get("display_name") == ALFRED_QUEUE_DISPLAY_NAME:
@@ -134,6 +166,8 @@ def resolve_personnel_identity(actor, root=None):
     by_functional_mailbox = functional_by_mailbox_id(mailboxes)
     resident_aliases = _resident_by_slug(residents)
     normalized = str(actor or "").strip().lower()
+    actor_slug = _slug(actor)
+    personnel_aliases, ambiguous_personnel_aliases = _personnel_aliases(personnel)
 
     if not normalized:
         return _result(actor, normalized, warnings=["empty actor"])
@@ -198,6 +232,12 @@ def resolve_personnel_identity(actor, root=None):
         canonical = WORKER_ALIASES.get(normalized, normalized)
         warnings = [] if normalized in _known_workers() else [f"worker is not in known routing rules: {actor}"]
         return _result(actor, normalized, destination_type="worker", canonical_destination=canonical, worker=canonical, warnings=warnings)
+
+    if actor_slug in ambiguous_personnel_aliases:
+        return _result(actor, normalized, warnings=[f"ambiguous personnel alias: {actor}"])
+    if actor_slug in personnel_aliases:
+        employee = personnel_aliases[actor_slug]
+        return _employee_result(actor, normalized, employee, resident_aliases.get(_slug(employee.get("display_name"))))
 
     if normalized in resident_aliases:
         resident = resident_aliases[normalized]
