@@ -68,7 +68,7 @@ from estate.core.resident_conversation_sessions import create_session, list_sess
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
-from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface
+from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 
 def _repo_path(rel):
@@ -138,6 +138,18 @@ def cmd_resident_interaction_surface(args):
         for cap in payload.get('capabilities', []):
             print(f"- {cap.get('id')} | {cap.get('implementation_status')} | {cap.get('authority_category')} | approval={cap.get('required_approval_level')}")
         print(f"Extensions: {payload['extension_mechanism']['proposal_template']}")
+
+def cmd_alfred_llm_diagnostics(args):
+    payload = alfred_llm_diagnostic(write=True)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"Alfred expected provider: {payload.get('expected_provider')}")
+        print(f"Configuration source: {payload.get('configuration_source')}")
+        print(f"Provider reachable: {payload.get('provider_reachable')}")
+        print(f"Failure reason: {payload.get('failure_reason') or 'none'}")
+        print(f"Recovery hint: {payload.get('recovery_hint')}")
+        print(f"Diagnostic artifact: {payload.get('diagnostic_path')}")
 
 def cmd_change(args):
     ec_id = create_change(args.title, args.summary, args.status, args.classification)
@@ -1351,6 +1363,10 @@ def main():
     p.add_argument("--role", required=True)
     p.add_argument("--classification", default="Estate Internal")
     p.set_defaults(func=cmd_resident)
+
+    p = sub.add_parser("alfred-llm-diagnostics")
+    p.add_argument("--json", action="store_true", help="Print Alfred LLM connection diagnostic JSON")
+    p.set_defaults(func=cmd_alfred_llm_diagnostics)
 
     p = sub.add_parser("status")
     p.set_defaults(func=cmd_status)

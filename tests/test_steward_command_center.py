@@ -628,6 +628,9 @@ def test_alfred_chat_ui_and_surface_versions_are_visible(tmp_path):
     assert 'id="alfred-chat-input"' in html
     assert 'id="alfred-chat-send"' in html
     assert '/api/residents/alfred/surface' in html
+    assert "Expected LLM provider" in html
+    assert "Diagnostic artifact" in html
+    assert payload["panels"]["alfred_chat"]["llm_diagnostic"]["expected_provider"] == "ollama"
     assert payload["panels"]["alfred_chat"]["surface"]["resident_api_standard_version"] == "resident-api-standard-v1"
     assert payload["panels"]["alfred_chat"]["surface"]["resident_implementation_version"] == "alfred-operations-implementation-v1"
 

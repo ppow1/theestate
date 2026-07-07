@@ -27,7 +27,7 @@ from estate.core.operations_notification_center import generate_operations_notif
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
-from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation
+from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation, alfred_llm_diagnostic
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
 from urllib.parse import urlparse
@@ -1166,12 +1166,14 @@ def _global_search_html(artifact):
 def _alfred_chat_panel(root):
     surface = resident_surface("alfred", root=root)
     history = load_history("alfred", root=root)
+    diagnostic = alfred_llm_diagnostic(root, write=True)
     return {
         "available": True,
         "kind": "alfred_operations_center_chat",
         "path": "runtime/resident_interactions/sessions",
         "surface": surface,
         "history": history,
+        "llm_diagnostic": diagnostic,
         "endpoints": {
             "history": "/api/residents/alfred/chat",
             "send": "/api/residents/alfred/chat",
@@ -1223,6 +1225,11 @@ def _alfred_chat_html(panel):
   <dl>
     <dt>Resident API standard</dt><dd>{html.escape(str(surface.get('resident_api_standard_version') or 'unknown'))}</dd>
     <dt>Alfred implementation</dt><dd>{html.escape(str(surface.get('resident_implementation_version') or 'unknown'))}</dd>
+    <dt>Expected LLM provider</dt><dd>{html.escape(str((panel.get('llm_diagnostic') or {}).get('expected_provider') or 'none'))}</dd>
+    <dt>Provider reachable</dt><dd>{html.escape(str((panel.get('llm_diagnostic') or {}).get('provider_reachable') or 'unknown'))}</dd>
+    <dt>LLM failure reason</dt><dd>{html.escape(str((panel.get('llm_diagnostic') or {}).get('failure_reason') or 'none'))}</dd>
+    <dt>Recovery hint</dt><dd>{html.escape(str((panel.get('llm_diagnostic') or {}).get('recovery_hint') or 'No recovery hint available.'))}</dd>
+    <dt>Diagnostic artifact</dt><dd><code>{html.escape(str((panel.get('llm_diagnostic') or {}).get('diagnostic_path') or 'runtime/residents/alfred/llm_diagnostics.json'))}</code></dd>
     <dt>Surface endpoint</dt><dd><code>/api/residents/alfred/surface</code></dd>
   </dl>
   <form id="alfred-chat-form" data-resident-chat="alfred">

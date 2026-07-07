@@ -11,6 +11,7 @@ from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_authority import check_authority, list_authority, ALLOWED, REQUIRES_STEWARD, REQUIRES_ESCALATION
 
 CHAT_STORE = Path("runtime/resident_interactions/sessions")
+LLM_DIAGNOSTIC_PATH = Path("runtime/residents/alfred/llm_diagnostics.json")
 ATTACHMENT_STORE = Path("runtime/resident_interactions/attachments")
 VISION_CONFIG_PATH = Path("runtime/residents/alfred/vision_model_config.json")
 SURFACE_DIR = Path("operations/residents/surfaces")
@@ -268,6 +269,35 @@ def _sanitize_llm_status(status: dict[str, Any]) -> dict[str, Any]:
             safe[key] = _safe_diagnostic_text(safe.get(key))
     return safe
 
+def _llm_failure_reason(status: dict[str, Any], selected: str | None) -> str | None:
+    if not status.get("provider"):
+        return "missing config"
+    if not status.get("available"):
+        text = str(status.get("discovery") or status.get("last_adapter_error") or "").lower()
+        if "executable not found" in text:
+            return "missing local service executable"
+        if "connection refused" in text or "actively refused" in text or "timed out" in text or "unreachable" in text or "failed locally" in text:
+            return "service unavailable or unreachable"
+        if "no local ollama models" in text or "models" in text and "not" in text:
+            return "model unavailable"
+        return "provider discovery unavailable"
+    if not selected:
+        return "model unavailable"
+    return None
+
+def _llm_recovery_hint(reason: str | None, endpoint: str | None, model: str | None) -> str:
+    if reason == "missing config":
+        return "Set ESTATE_OLLAMA_ENDPOINT if Alfred should use a non-default local Ollama endpoint, and optionally ESTATE_ALFRED_OLLAMA_MODEL for the preferred model."
+    if reason == "missing local service executable":
+        return "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward."
+    if reason == "service unavailable or unreachable":
+        return f"Start the local Ollama service and verify {endpoint or OLLAMA_ENDPOINT}/api/tags is reachable."
+    if reason == "model unavailable":
+        return f"Install or pull the preferred Alfred model ({model or PREFERRED_ALFRED_MODEL}) or set ESTATE_ALFRED_OLLAMA_MODEL to an installed local model."
+    if reason:
+        return "Refresh AI Services / Models discovery and check the local Ollama service state."
+    return "No recovery needed; Alfred has a reachable local LLM provider."
+
 def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
     adapter = adapter or LocalOllamaAdapter()
     try:
@@ -280,10 +310,39 @@ def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any
     except Exception as exc:
         selected = None
         status["last_adapter_error"] = f"{type(exc).__name__}: {exc}"
-    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected})
+    config_source = {"provider": "hardcoded_local_first_ollama_adapter", "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434", "preferred_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b", "registry_context": "data/registry/providers.json and Discovery observations are inventory context; Alfred chat selection currently uses runtime Ollama discovery."}
+    reason = _llm_failure_reason(status, selected)
+    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": PREFERRED_ALFRED_MODEL, "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL)})
     if not status.get("available"):
         status.setdefault("discovery", "deterministic fallback available")
     return _sanitize_llm_status(status)
+
+def alfred_llm_diagnostic(root=None, *, write: bool = False, adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
+    rootp = _root(root)
+    status = local_llm_status(adapter)
+    diag = {
+        "kind": "alfred_llm_connection_diagnostic",
+        "version": 1,
+        "generated_at": _now(),
+        "expected_provider": status.get("expected_provider") or "none",
+        "expected_model": status.get("expected_model"),
+        "configuration_source": status.get("configuration_source"),
+        "provider_reachable": status.get("provider_reachable") or "unknown",
+        "provider_endpoint": status.get("endpoint") or OLLAMA_ENDPOINT,
+        "provider_models_discovered": status.get("models") or [],
+        "selected_provider": status.get("selected_provider"),
+        "selected_model": status.get("selected_model"),
+        "failure_reason": status.get("failure_reason"),
+        "recovery_hint": status.get("recovery_hint"),
+        "windows_restart_note": "A Windows restart can leave the Office web server running while the separate local Ollama service is stopped, PATH is unavailable, or runtime discovery has no models; Alfred now reports that dependency state explicitly.",
+        "diagnostic_path": str(LLM_DIAGNOSTIC_PATH),
+        "secrets_policy": "No API keys or secrets are required or recorded for the local Ollama path; diagnostic text is redacted.",
+    }
+    if write:
+        path = rootp / LLM_DIAGNOSTIC_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(diag, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return diag
 
 def resident_surface(resident: str, root=None) -> dict[str, Any]:
     r = _root(root); key = _key(resident).replace("alfred-operations", "alfred")
@@ -291,7 +350,7 @@ def resident_surface(resident: str, root=None) -> dict[str, Any]:
     artifact = r / SURFACE_DIR / f"{key}.json"
     data = _read_json(artifact) if artifact.exists() else None
     caps = data.get("capabilities") if isinstance(data, dict) and isinstance(data.get("capabilities"), list) else DEFAULT_CAPABILITIES
-    return {"kind":"resident_interaction_surface","resident_id":profile["resident_id"],"resident_display_name":profile["resident_display_name"],"office":profile["office"],"role":profile["role"],"resident_api_standard_version":STANDARD_VERSION,"resident_implementation_version":profile["implementation_version"],"surface_reference":str((SURFACE_DIR / f"{key}.json")).replace('\\','/'),"capabilities":caps,"chat_endpoints":{"get":"GET /api/residents/{resident_id}/chat","post":"POST /api/residents/{resident_id}/chat JSON with optional attachments[] base64/text payloads","forget":"POST /api/residents/{resident_id}/forget","surface":"GET /api/residents/{resident_id}/surface"},"extension_mechanism":{"proposal_template":"docs/operations/residents/resident_api_extension_proposal_template.md","profile_template":"docs/operations/residents/resident_implementation_profile_template.md","rule":"Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."}}
+    return {"kind":"resident_interaction_surface","resident_id":profile["resident_id"],"resident_display_name":profile["resident_display_name"],"office":profile["office"],"role":profile["role"],"resident_api_standard_version":STANDARD_VERSION,"resident_implementation_version":profile["implementation_version"],"surface_reference":str((SURFACE_DIR / f"{key}.json")).replace('\\','/'),"capabilities":caps,"chat_endpoints":{"get":"GET /api/residents/{resident_id}/chat","post":"POST /api/residents/{resident_id}/chat JSON with optional attachments[] base64/text payloads","forget":"POST /api/residents/{resident_id}/forget","surface":"GET /api/residents/{resident_id}/surface"},"extension_mechanism":{"proposal_template":"docs/operations/residents/resident_api_extension_proposal_template.md","profile_template":"docs/operations/residents/resident_implementation_profile_template.md","rule":"Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."}, "llm_diagnostic": alfred_llm_diagnostic(r, write=True) if profile["resident_id"] == "alfred" else None}
 
 def _next_session_id(root, resident):
     day = datetime.now(timezone.utc).strftime("%Y%m%d"); folder = root/CHAT_STORE; folder.mkdir(parents=True, exist_ok=True)
