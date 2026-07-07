@@ -1,0 +1,36 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-07T00:25:12+00:00",
+  "files_changed": [
+    "src/estate/core/personnel_identity.py",
+    "data/registry/personnel.json",
+    "tests/test_personnel_identity.py",
+    "collaboration/work_packages/completions/WP-0147_codex_done.json"
+  ],
+  "known_limitations": [
+    "The named WP-0146 onboarding packet JSON files were not present in this checkout, so WP-0147 reconciled the authoritative personnel registry from the work package's stated IDs and roles instead of rewriting nonexistent Helen packet artifacts.",
+    "No broad fuzzy matching was added; aliases remain deterministic slug/display-title/current-title/explicit-alias based."
+  ],
+  "merge_authority_or_equivalent": "Class A personnel resolver, registry consistency, tests, and reconciliation repair; ready for CA review",
+  "pull_request_url_or_not_applicable_reason": "not applicable until PR is created by automation after commit",
+  "ready_for_ca_review": true,
+  "root_cause": "The resolver only resolved canonical employee/mailbox forms, office-prefixed aliases, workers, Alfred queue aliases, and resident-name mappings. It did not perform an unprefixed personnel display-name/current-title alias lookup, so names such as Chief Architect #5, Chief Architect #6, and Chief Character Architect fell through as unresolved unless another resolver path matched. In the checked-out source registry, the Helen-created employee 9-11 records were also absent, while Chief Architect #5 already existed as employee 8; the repair reconciles the registry using the WP-0147/Helen onboarding evidence without creating a duplicate Chief Architect #5.",
+  "summary": "Added deterministic registry-backed personnel alias resolution for display names, title aliases, hash/no-hash normalized variants, canonical employee.N, and mailbox.N forms; reconciled Helen-created personnel entries for Chief Architect #6, Ingrid, and Chief Character Architect; confirmed Chief Architect #5 resolves to the existing employee 8 record without duplicate creation.",
+  "tests_run": [
+    "PYTHONPATH=src python -m pytest tests/test_personnel_identity.py -q",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"Chief Architect #5\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"Chief Architect #6\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"Chief Architect 6\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"Ingrid\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"Chief Character Architect\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"employee.9\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"employee.10\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"employee.11\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"mailbox.9\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"mailbox.10\" --json",
+    "PYTHONPATH=src python -m estate.cli.main personnel-resolve --actor \"mailbox.11\" --json",
+    "PYTHONPATH=src python -m pytest tests -q"
+  ],
+  "work_package_id": "WP-0147"
+}
