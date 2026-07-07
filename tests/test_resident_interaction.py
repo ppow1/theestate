@@ -288,3 +288,23 @@ def test_wp0143_governed_action_boundary_mode(monkeypatch, tmp_path):
     assert payload["turn"]["llm"]["mode"] == "blocked_privileged_execution"
     assert payload["turn"]["authority"]["action_executed"] is False
     assert payload["turn"]["response_contract"]["governed_action"]["executed"] is False
+
+
+def test_alfred_llm_diagnostic_written_and_explains_unreachable_provider(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    diag = mod.alfred_llm_diagnostic(tmp_path, write=True)
+    assert diag["expected_provider"] == "ollama"
+    assert diag["provider_reachable"] == "no"
+    assert diag["configuration_source"]["endpoint"].startswith("ESTATE_OLLAMA_ENDPOINT")
+    assert diag["failure_reason"] in {"provider discovery unavailable", "service unavailable or unreachable", "missing local service executable", "model unavailable"}
+    assert "Ollama" in diag["recovery_hint"] or "AI Services" in diag["recovery_hint"]
+    assert (tmp_path / "runtime/residents/alfred/llm_diagnostics.json").is_file()
+
+
+def test_alfred_surface_includes_llm_diagnostic(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    surface = mod.resident_surface("alfred", root=tmp_path)
+    assert surface["llm_diagnostic"]["expected_provider"] == "ollama"
+    assert surface["llm_diagnostic"]["diagnostic_path"] == "runtime/residents/alfred/llm_diagnostics.json"
