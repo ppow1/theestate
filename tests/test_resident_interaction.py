@@ -7,7 +7,7 @@ def test_alfred_prompt_persists_history_authority_and_versions(tmp_path):
     payload = process_chat("alfred", "What should I look at next?", root=tmp_path)
     turn = payload["turn"]
     assert payload["ok"] is True
-    assert turn["llm"]["mode"] in {"local_llm_generated", "local_llm_discovered_but_generation_failed", "deterministic_fallback"}
+    assert turn["llm"]["mode"] in {"local_llm", "local_llm_discovered_but_generation_failed", "deterministic_fallback"}
     assert turn["authority"]["action_executed"] is False
     assert turn["authority"]["authority_status"] in {"within_responsibility", "conversation_only"}
     assert turn["resident_surface"]["resident_api_standard_version"] == "resident-api-standard-v1"
@@ -82,7 +82,7 @@ def test_process_chat_uses_mocked_local_llm_and_distinguishes_intents(monkeypatc
     monkeypatch.setattr(mod, "LocalOllamaAdapter", MockOllamaAdapter)
     role = process_chat("alfred", "Good afternoon Alfred, define your role for me.", root=tmp_path)
     mode = process_chat("alfred", "Alfred, are you running from JSON files or an LLM right now?", root=tmp_path)
-    assert role["turn"]["llm"]["mode"] == "local_llm_generated"
+    assert role["turn"]["llm"]["mode"] == "local_llm"
     assert role["turn"]["llm"]["model"] == "qwen3:8b"
     assert mode["turn"]["llm"]["provider"] == "ollama"
     assert "role is Alfred" in role["turn"]["resident_response"]
@@ -248,10 +248,10 @@ def test_wp0143_generated_text_sets_local_llm_generated(monkeypatch, tmp_path):
     from estate.core import resident_interaction as mod
     monkeypatch.setattr(mod, "LocalOllamaAdapter", MockOllamaAdapter)
     payload = process_chat("alfred", "tell me a new joke", root=tmp_path)
-    assert payload["turn"]["llm"]["mode"] == "local_llm_generated"
+    assert payload["turn"]["llm"]["mode"] == "local_llm"
     assert payload["turn"]["resident_response"]
     assert payload["turn"]["diagnostics"]["generation_attempted"] is True
-    assert payload["turn"]["diagnostics"]["generation_result_state"] in {"generated", None}
+    assert payload["turn"]["diagnostics"]["generation_result_state"] in {"succeeded", None}
 
 
 def test_wp0143_discovered_models_generation_failure_not_generated(monkeypatch, tmp_path):
@@ -308,3 +308,51 @@ def test_alfred_surface_includes_llm_diagnostic(monkeypatch, tmp_path):
     surface = mod.resident_surface("alfred", root=tmp_path)
     assert surface["llm_diagnostic"]["expected_provider"] == "ollama"
     assert surface["llm_diagnostic"]["diagnostic_path"] == "runtime/residents/alfred/llm_diagnostics.json"
+
+
+class TimeoutOllamaAdapter(MockOllamaAdapter):
+    def __init__(self, endpoint="http://127.0.0.1:11434", timeout=None):
+        self.endpoint = endpoint
+        self.timeout = 42.0 if timeout is None else timeout
+    def generate(self, *, resident, prompt, model=None):
+        import socket
+        meta = __import__("estate.core.resident_interaction", fromlist=["_llm_metadata"]). _llm_metadata
+        raise AssertionError("not used")
+
+
+def test_wp0217_timeout_metadata_and_contract_are_degraded(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    class Adapter(MockOllamaAdapter):
+        def __init__(self, endpoint="http://127.0.0.1:11434", timeout=None):
+            self.endpoint = endpoint
+            self.timeout = 42.0 if timeout is None else timeout
+        def generate(self, *, resident, prompt, model=None):
+            return {"ok": False, "text": None, "metadata": mod._llm_metadata("local_llm_discovered_but_generation_failed", provider="ollama", model=model, endpoint=self.endpoint, fallback_used=True, fallback_reason="Local Ollama invocation timed out after 42 seconds", generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state="timeout", discovered_models_count=2, sanitized_error="TimeoutError: timed out", timeout_seconds=42.0, prompt_summary=mod._prompt_summary(prompt), recovery_hint="Retry after the model is warm.")}
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", Adapter)
+    payload = process_chat("alfred", "Alfred, give me a short operational greeting", root=tmp_path)
+    turn = payload["turn"]
+    assert turn["llm"]["mode"] == "local_llm_discovered_but_generation_failed"
+    assert turn["llm"]["generation_result"] == "timeout"
+    assert turn["llm"]["timeout_seconds"] == 42.0
+    assert turn["response_contract"]["status"] == "degraded_fallback"
+    assert turn["response_contract"]["failed"] is True
+    assert turn["response_contract"]["timed_out"] is True
+    assert "timed out after 42 seconds" in turn["diagnostics"]["fallback_reason"]
+
+
+def test_wp0217_timeout_env_and_prompt_bound(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setenv("ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS", "75")
+    assert mod.LocalOllamaAdapter().timeout == 75.0
+    prompt = mod._alfred_prompt("hello" * 3000, mod.resident_surface("alfred", root=tmp_path), {"authority_status":"conversation_only"}, {"big":"x" * 10000}, {})
+    assert len(prompt) <= mod.MAX_ALFRED_PROMPT_CHARS
+
+
+def test_wp0217_diagnostics_include_timeout_generation_and_prompt(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setenv("ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS", "61")
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", MockOllamaAdapter)
+    diag = mod.alfred_llm_diagnostic(tmp_path, write=True)
+    assert diag["timeout_seconds"] == 61.0
+    assert diag["generation_result"] == "not_attempted"
+    assert "prompt_size_summary" in diag

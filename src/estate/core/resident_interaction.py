@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64, hashlib, json, os, re, shutil, subprocess
+import socket
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,15 +22,26 @@ STANDARD_VERSION = "resident-api-standard-v1"
 
 OLLAMA_ENDPOINT = os.environ.get("ESTATE_OLLAMA_ENDPOINT", "http://127.0.0.1:11434").rstrip("/")
 PREFERRED_ALFRED_MODEL = os.environ.get("ESTATE_ALFRED_OLLAMA_MODEL", "qwen3:8b")
+DEFAULT_ALFRED_OLLAMA_TIMEOUT_SECONDS = 60.0
+MAX_ALFRED_PROMPT_CHARS = 6000
+
+def alfred_ollama_timeout_seconds() -> float:
+    raw = os.environ.get("ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS")
+    if raw:
+        try:
+            return max(1.0, min(float(raw), 300.0))
+        except ValueError:
+            return DEFAULT_ALFRED_OLLAMA_TIMEOUT_SECONDS
+    return DEFAULT_ALFRED_OLLAMA_TIMEOUT_SECONDS
 
 class LocalOllamaAdapter:
     """Small local-only Ollama provider boundary for resident chat."""
 
     provider = "ollama"
 
-    def __init__(self, endpoint: str = OLLAMA_ENDPOINT, timeout: float = 12.0):
+    def __init__(self, endpoint: str = OLLAMA_ENDPOINT, timeout: float | None = None):
         self.endpoint = endpoint.rstrip("/")
-        self.timeout = timeout
+        self.timeout = alfred_ollama_timeout_seconds() if timeout is None else float(timeout)
 
     def discover_models(self) -> dict[str, Any]:
         names: list[str] = []
@@ -67,10 +79,10 @@ class LocalOllamaAdapter:
     def generate(self, *, resident: str, prompt: str, model: str | None = None) -> dict[str, Any]:
         discovery = self.discover_models()
         if not discovery.get("available"):
-            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=model, endpoint=self.endpoint, fallback_used=True, fallback_reason=discovery.get("discovery"), discovered_models_count=len(discovery.get("models") or []), generation_result_state="not_attempted", prompt_summary=_prompt_summary(prompt))}
+            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=model, endpoint=self.endpoint, fallback_used=True, fallback_reason=discovery.get("discovery"), discovered_models_count=len(discovery.get("models") or []), generation_result_state="not_attempted", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt))}
         selected = model or self.select_model(resident, discovery.get("models") or [])
         if not selected:
-            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, endpoint=self.endpoint, fallback_used=True, fallback_reason="No usable local Ollama model selected", discovered_models_count=len(discovery.get("models") or []), generation_result_state="model_selection_failed", prompt_summary=_prompt_summary(prompt))}
+            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, endpoint=self.endpoint, fallback_used=True, fallback_reason="No usable local Ollama model selected", discovered_models_count=len(discovery.get("models") or []), generation_result_state="model_selection_failed", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt))}
         body = json.dumps({"model": selected, "prompt": prompt, "stream": False, "options": {"temperature": 0.2}}).encode("utf-8")
         req = urllib.request.Request(f"{self.endpoint}/api/generate", data=body, headers={"Content-Type": "application/json"}, method="POST")
         try:
@@ -79,9 +91,13 @@ class LocalOllamaAdapter:
             text = str(payload.get("response") or "").strip()
             if not text:
                 raise RuntimeError("Ollama returned an empty response")
-            return {"ok": True, "text": text, "metadata": _llm_metadata("local_llm_generated", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=False, fallback_reason=None, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state="generated", discovered_models_count=len(discovery.get("models") or []), prompt_summary=_prompt_summary(prompt))}
+            return {"ok": True, "text": text, "metadata": _llm_metadata("local_llm_generated", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=False, fallback_reason=None, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state="succeeded", discovered_models_count=len(discovery.get("models") or []), timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt))}
         except Exception as exc:
-            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=True, fallback_reason=f"Local Ollama invocation failed: {exc}", generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state="failed", discovered_models_count=len(discovery.get("models") or []), sanitized_error=f"{type(exc).__name__}: {exc}", prompt_summary=_prompt_summary(prompt))}
+            timed_out = isinstance(exc, TimeoutError) or isinstance(exc, socket.timeout) or "timed out" in str(exc).lower()
+            result = "timeout" if timed_out else "failed"
+            reason = f"Local Ollama invocation timed out after {self.timeout:g} seconds" if timed_out else f"Local Ollama invocation failed: {exc}"
+            hint = "Retry after the model is warm, or increase ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS for first-run Windows/Ollama cold loads." if timed_out else "Check Ollama logs, model availability, and the local /api/generate endpoint."
+            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=True, fallback_reason=reason, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state=result, discovered_models_count=len(discovery.get("models") or []), sanitized_error=f"{type(exc).__name__}: {exc}", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt), recovery_hint=hint)}
 
 
 IMAGE_MIME_EXT = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif"}
@@ -208,8 +224,10 @@ def create_attachment(root: Path, resident: str, sid: str, item: dict[str, Any],
         raise ValueError("attachment storage escaped bounded directory")
     return {"attachment_id": aid, "kind": kind, "source": source, "created_at": _now(), "original_filename": _safe(item.get("original_filename") or path.name), "mime_type": mime, "size_bytes": len(raw), "storage_path": rel, "sha256": hashlib.sha256(raw).hexdigest(), "redaction_status": "active", "vision_status": vstatus, "vision_provider": vprovider, "vision_model": vmodel, "summary": summary}
 
-def _llm_metadata(mode: str, *, provider="none", model=None, endpoint=None, fallback_used=False, fallback_reason=None, generation_attempted=False, generation_endpoint=None, generation_result_state="not_attempted", discovered_models_count=0, sanitized_error=None, prompt_summary=None):
-    return {"mode": mode, "provider": provider or "none", "model": model, "endpoint": endpoint, "fallback_used": bool(fallback_used), "fallback_reason": _safe_diagnostic_text(fallback_reason), "generation_attempted": bool(generation_attempted), "generation_endpoint": generation_endpoint, "generation_result_state": generation_result_state, "discovered_models_count": int(discovered_models_count or 0), "sanitized_error": _safe_diagnostic_text(sanitized_error), "prompt_summary": _safe_diagnostic_text(prompt_summary)}
+def _llm_metadata(mode: str, *, provider="none", model=None, endpoint=None, fallback_used=False, fallback_reason=None, generation_attempted=False, generation_endpoint=None, generation_result_state="not_attempted", discovered_models_count=0, sanitized_error=None, prompt_summary=None, timeout_seconds=None, recovery_hint=None):
+    generation_result = "succeeded" if generation_result_state in {"generated", "succeeded"} else generation_result_state
+    public_mode = "local_llm" if mode in {"local_llm_generated", "local_llm"} else mode
+    return {"mode": public_mode, "provider": provider or "none", "model": model, "endpoint": endpoint, "fallback_used": bool(fallback_used), "fallback_reason": _safe_diagnostic_text(fallback_reason), "generation_attempted": bool(generation_attempted), "generation_endpoint": generation_endpoint, "generation_result_state": generation_result, "generation_result": generation_result, "timeout_seconds": timeout_seconds, "discovered_models_count": int(discovered_models_count or 0), "sanitized_error": _safe_diagnostic_text(sanitized_error), "prompt_summary": _safe_diagnostic_text(prompt_summary), "prompt_size": _prompt_size(prompt_summary), "recovery_hint": _safe_diagnostic_text(recovery_hint)}
 
 RESIDENT_PROFILES = {
     "alfred": {"resident_id":"alfred","resident_display_name":"Alfred","office":"Office of Operations","role":"Operational resident coordinator","implementation_version":"alfred-operations-implementation-v1"},
@@ -243,22 +261,33 @@ def _safe_diagnostic_text(value: Any) -> str | None:
     text = re.sub(r"(?i)(api[_-]?key|token|secret|password)[: ]+([^\s;&]+)", r"\1 [redacted]", text)
     return text[:500]
 
+def _prompt_size(prompt: Any) -> dict[str, int]:
+    text = str(prompt or "")
+    return {"characters": len(text), "approx_tokens": max(1, len(text) // 4) if text else 0}
+
 def _prompt_summary(prompt: str) -> str:
     text = str(prompt or "").replace("\n", " ")
     match = re.search(r"Steward message: (.+?)(?: Respond as Alfred|$)", text)
     if match:
         text = "Steward message: " + match.group(1)
-    return _safe_diagnostic_text(text[:240]) or ""
+    summary = _safe_diagnostic_text(text[:240]) or ""
+    return f"{summary} (prompt_chars={len(str(prompt or ''))})"
 
 
 def _sanitize_llm_metadata(meta: dict[str, Any]) -> dict[str, Any]:
     safe = dict(meta or {})
+    if safe.get("mode") == "local_llm_generated":
+        safe["mode"] = "local_llm"
+    if safe.get("generation_result_state") == "generated":
+        safe["generation_result_state"] = "succeeded"
     for key in ("fallback_reason", "sanitized_error", "prompt_summary"):
         if key in safe:
             safe[key] = _safe_diagnostic_text(safe.get(key))
     safe.setdefault("generation_attempted", False)
-    safe.setdefault("generation_result_state", "not_attempted")
+    safe.setdefault("generation_result_state", safe.get("generation_result", "not_attempted"))
+    safe.setdefault("generation_result", safe.get("generation_result_state", "not_attempted"))
     safe.setdefault("discovered_models_count", 0)
+    safe.setdefault("timeout_seconds", alfred_ollama_timeout_seconds())
     safe.setdefault("fallback_used", safe.get("mode") != "local_llm_generated")
     return safe
 
@@ -310,9 +339,9 @@ def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any
     except Exception as exc:
         selected = None
         status["last_adapter_error"] = f"{type(exc).__name__}: {exc}"
-    config_source = {"provider": "hardcoded_local_first_ollama_adapter", "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434", "preferred_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b", "registry_context": "data/registry/providers.json and Discovery observations are inventory context; Alfred chat selection currently uses runtime Ollama discovery."}
+    config_source = {"provider": "hardcoded_local_first_ollama_adapter", "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434", "preferred_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b", "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds", "registry_context": "data/registry/providers.json and Discovery observations are inventory context; Alfred chat selection currently uses runtime Ollama discovery."}
     reason = _llm_failure_reason(status, selected)
-    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": PREFERRED_ALFRED_MODEL, "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL)})
+    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": PREFERRED_ALFRED_MODEL, "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL), "timeout_seconds": alfred_ollama_timeout_seconds(), "generation_attempted": False, "generation_result": "not_attempted", "prompt_size_summary": None})
     if not status.get("available"):
         status.setdefault("discovery", "deterministic fallback available")
     return _sanitize_llm_status(status)
@@ -334,6 +363,10 @@ def alfred_llm_diagnostic(root=None, *, write: bool = False, adapter: LocalOllam
         "selected_model": status.get("selected_model"),
         "failure_reason": status.get("failure_reason"),
         "recovery_hint": status.get("recovery_hint"),
+        "generation_attempted": status.get("generation_attempted", False),
+        "generation_result": status.get("generation_result", "not_attempted"),
+        "timeout_seconds": status.get("timeout_seconds"),
+        "prompt_size_summary": status.get("prompt_size_summary"),
         "windows_restart_note": "A Windows restart can leave the Office web server running while the separate local Ollama service is stopped, PATH is unavailable, or runtime discovery has no models; Alfred now reports that dependency state explicitly.",
         "diagnostic_path": str(LLM_DIAGNOSTIC_PATH),
         "secrets_policy": "No API keys or secrets are required or recorded for the local Ollama path; diagnostic text is redacted.",
@@ -401,10 +434,10 @@ def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], 
         f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
         f"Authority status for requested action: {json.dumps(auth, sort_keys=True)}",
         f"Response metadata available to you: {json.dumps(llm_meta, sort_keys=True)}",
-        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:4000]}",
+        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:3000]}",
         f"Steward message: {message}",
         "Respond as Alfred in concise, direct prose.",
-    ])
+    ])[:MAX_ALFRED_PROMPT_CHARS]
 
 
 def _classify_alfred_request(message: str, action: str) -> dict[str, Any]:
@@ -498,7 +531,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     else:
         user_message_for_prompt = user_message
     prompt = _alfred_prompt(user_message_for_prompt, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message_for_prompt
-    generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=llm_status.get("model")) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable", discovered_models_count=len(llm_status.get("models") or []), generation_result_state="not_attempted", prompt_summary=_prompt_summary(prompt))}
+    generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=llm_status.get("model")) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable", discovered_models_count=len(llm_status.get("models") or []), generation_result_state="not_attempted", timeout_seconds=alfred_ollama_timeout_seconds(), prompt_summary=_prompt_summary(prompt))}
     llm_meta = _sanitize_llm_metadata(generated.get("metadata") or base_meta)
     if governed_action:
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
@@ -508,8 +541,8 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     elif attachment_records and any(a.get("kind") == "image" and a.get("summary") for a in attachment_records) and not generated.get("ok"):
         response += "\n\nLocal image observation: " + " | ".join(a.get("summary") for a in attachment_records if a.get("summary"))
     request_finished_at = _now()
-    diagnostics = {"provider": llm_meta.get("provider") or llm_status.get("provider"), "endpoint": llm_meta.get("endpoint") or llm_status.get("endpoint"), "discovered_models_count": llm_meta.get("discovered_models_count", len(llm_status.get("models") or [])), "local_llm_adapter_available": bool(llm_status.get("available")), "selected_provider": llm_status.get("selected_provider") or llm_status.get("provider"), "selected_model": llm_status.get("selected_model") or llm_status.get("model"), "generation_attempted": bool(llm_meta.get("generation_attempted")), "generation_endpoint": llm_meta.get("generation_endpoint"), "generation_result_state": llm_meta.get("generation_result_state"), "fallback_active": bool(llm_meta.get("fallback_used")), "fallback_reason": _safe_diagnostic_text(llm_meta.get("fallback_reason") or (None if llm_meta.get("mode") == "local_llm_generated" else llm_status.get("discovery"))), "sanitized_error": _safe_diagnostic_text(llm_meta.get("sanitized_error") or llm_status.get("last_adapter_error")), "prompt_summary": _safe_diagnostic_text(llm_meta.get("prompt_summary")), "last_adapter_error": _safe_diagnostic_text(llm_status.get("last_adapter_error")), "last_request_timestamp": request_started_at, "last_response_timestamp": request_finished_at, "last_timeout_or_transport_error": _safe_diagnostic_text(llm_meta.get("fallback_reason") if llm_meta.get("fallback_used") else None)}
-    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":"completed","queued":False,"failed":False,"timed_out":False,"fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
+    diagnostics = {"provider": llm_meta.get("provider") or llm_status.get("provider"), "endpoint": llm_meta.get("endpoint") or llm_status.get("endpoint"), "discovered_models_count": llm_meta.get("discovered_models_count", len(llm_status.get("models") or [])), "local_llm_adapter_available": bool(llm_status.get("available")), "selected_provider": llm_status.get("selected_provider") or llm_status.get("provider"), "selected_model": llm_status.get("selected_model") or llm_status.get("model"), "generation_attempted": bool(llm_meta.get("generation_attempted")), "generation_endpoint": llm_meta.get("generation_endpoint"), "generation_result_state": llm_meta.get("generation_result_state"), "generation_result": llm_meta.get("generation_result"), "timeout_seconds": llm_meta.get("timeout_seconds"), "prompt_size": llm_meta.get("prompt_size"), "recovery_hint": llm_meta.get("recovery_hint") or llm_status.get("recovery_hint"), "fallback_active": bool(llm_meta.get("fallback_used")), "fallback_reason": _safe_diagnostic_text(llm_meta.get("fallback_reason") or (None if llm_meta.get("mode") == "local_llm" else llm_status.get("discovery"))), "sanitized_error": _safe_diagnostic_text(llm_meta.get("sanitized_error") or llm_status.get("last_adapter_error")), "prompt_summary": _safe_diagnostic_text(llm_meta.get("prompt_summary")), "last_adapter_error": _safe_diagnostic_text(llm_status.get("last_adapter_error")), "last_request_timestamp": request_started_at, "last_response_timestamp": request_finished_at, "last_timeout_or_transport_error": _safe_diagnostic_text(llm_meta.get("fallback_reason") if llm_meta.get("fallback_used") else None)}
+    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":("degraded_fallback" if llm_meta.get("fallback_used") and llm_meta.get("generation_attempted") else "completed"),"queued":False,"failed":bool(llm_meta.get("fallback_used") and llm_meta.get("generation_attempted")),"timed_out":llm_meta.get("generation_result_state")=="timeout","fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}

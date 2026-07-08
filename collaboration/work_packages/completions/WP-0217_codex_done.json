@@ -1,0 +1,37 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-08T16:58:19+00:00",
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_interaction.py",
+    "tests/test_steward_command_center.py",
+    "operations/alfred/WP-0217_alfred_llm_timeout_and_generation_path_repair_report.md",
+    "runtime/residents/alfred/WP-0217_alfred_llm_timeout_and_generation_path_repair_report.json",
+    "collaboration/work_packages/completions/WP-0217_codex_done.json"
+  ],
+  "known_limitations": [
+    "CI uses mocks and does not require real Ollama.",
+    "Extremely slow cold loads may require increasing the timeout environment variable."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_not_applicable_reason": "No PR URL is available inside this local Codex environment; PR metadata created with make_pr tool after commit.",
+  "pull_request_url_or_not_applicable_reason": "No PR URL is available inside this local Codex environment; PR metadata created with make_pr tool after commit.",
+  "ready_for_ca_review": true,
+  "root_cause": "Provider discovery succeeded but /api/generate used a fixed 12 second timeout that was too short for Windows/Ollama cold-loading qwen3:8b, and process_chat labeled deterministic fallback as completed.",
+  "summary": "Repaired Alfred local Ollama generation timeout handling, bounded prompts, truthful degraded fallback metadata/UI diagnostics, tests, validation recipe, and artifacts.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q"
+  ],
+  "timeout_policy": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS, bounded 1-300 seconds, default 60 seconds.",
+  "validation_commands_run": [
+    "PYTHONPATH=src pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0217 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0217"
+}

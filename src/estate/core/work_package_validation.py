@@ -2262,3 +2262,25 @@ VALIDATION_RECIPES["WP-0213"] = {
         _cmd("python -m pytest tests/test_steward_command_center.py", required=False),
     ],
 }
+
+VALIDATION_RECIPES["WP-0217"] = {
+    "recipe_id": "wp-0217-alfred-llm-timeout-generation-path-repair",
+    "title": "WP-0217 — Alfred LLM Timeout and Generation Path Repair",
+    "description": "Validates Alfred's configurable Ollama timeout, truthful degraded generation metadata, UI diagnostics, repair report, runtime artifact, and completion receipt.",
+    "required_checks": ["Resident interaction tests pass", "Office UI tests pass", "Repair artifacts exist", "Receipt is complete"],
+    "observational_checks": ["Production readiness remains executable"],
+    "expected_artifacts": [
+        "operations/alfred/WP-0217_alfred_llm_timeout_and_generation_path_repair_report.md",
+        "runtime/residents/alfred/WP-0217_alfred_llm_timeout_and_generation_path_repair_report.json",
+        "collaboration/work_packages/completions/WP-0217_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero"],
+    "success_criteria": ["Required commands exit zero", "Failed generation is not labeled as normal completed local_llm success"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/test_resident_interaction.py tests/test_steward_command_center.py"),
+        _cmd("python -c \"import json; from pathlib import Path; md=Path('operations/alfred/WP-0217_alfred_llm_timeout_and_generation_path_repair_report.md'); js=Path('runtime/residents/alfred/WP-0217_alfred_llm_timeout_and_generation_path_repair_report.json'); assert md.is_file(); data=json.loads(js.read_text(encoding='utf-8')); assert data.get('work_package_id')=='WP-0217'; assert data.get('timeout_policy'); assert data.get('root_cause')\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0217'); assert r['receipt_status']=='complete', r\""),
+        _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
+    ],
+}
