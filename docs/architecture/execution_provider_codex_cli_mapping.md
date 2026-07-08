@@ -5,12 +5,15 @@ Owner: Chief Architect
 Boundary Authority: Ingrid / Privacy and Boundary Office
 Classification: Estate Internal
 Created: 2026-07-07
+Updated: 2026-07-08
 
 ## Purpose
 
 This document maps generic Estate execution-provider concepts onto the installed Codex CLI command surface.
 
 The goal is to let Alfred, a future orchestrator, or a LEAP-style adapter treat Codex CLI as one execution provider without hard-coding Codex-specific behavior throughout the Estate.
+
+This mapping now also includes operational visibility requirements. A provider mapping is incomplete unless it can describe not only how work is executed, but how that execution becomes visible to the Office of the Steward.
 
 ## Provider Modes
 
@@ -28,7 +31,7 @@ The goal is to let Alfred, a future orchestrator, or a LEAP-style adapter treat 
 | `health` | `codex doctor --json` | Reports auth, config, install, git, network, sandbox, state, terminal |
 | `submit` synchronous | `codex exec [prompt]` or `prompt | codex exec -` | Runs to completion and returns process exit code |
 | `submit` asynchronous/cloud | `codex cloud exec --env <ENV_ID> [QUERY]` | Requires environment id; no live task submitted in this run |
-| `status` local exec | Process state, JSONL events, exit code | No separate local task id for basic `exec` |
+| `status` local exec | Process state, JSONL events, exit code, bridge-maintained status snapshot | No separate local task id for basic `exec`; bridge must create request id |
 | `status` cloud | `codex cloud status <TASK_ID>` | Requires sign-in and task id |
 | `status` seat/fuel | Interactive TUI `/status` | Prior discovery only; no non-interactive command found |
 | `result` text mode | stdout final assistant message | Proven with local provider; prior discovery proved OpenAI provider |
@@ -36,6 +39,8 @@ The goal is to let Alfred, a future orchestrator, or a LEAP-style adapter treat 
 | `result` JSONL | `--json` event stream on stdout | Proven with local provider and failure path |
 | `usage` | JSONL `turn.completed.usage`; text-mode `tokens used` on stderr | Proven with local provider; OpenAI success path untested here |
 | `logs` | stderr plus JSONL events | stderr contains headers, warnings, transcript echoes, token usage, and transport diagnostics |
+| `events` | Bridge-generated lifecycle events plus parsed JSONL events | Codex JSONL is provider telemetry; Estate lifecycle events must be emitted by the bridge |
+| `visibility` | Current-status snapshot written by bridge | Required for Office of the Steward consumption; UI integration may be later |
 | `diff` local | Local `git diff` after a workspace-write run | Bridge should capture separately |
 | `diff` cloud | `codex cloud diff <TASK_ID>` | Requires sign-in and task id |
 | `apply` local | Human-reviewed patch application or `codex apply` | Not approved for bridge v1 automation |
@@ -56,6 +61,8 @@ Work package / request
 -> stream capture
 -> JSONL parser / text fallback parser
 -> output normalizer
+-> lifecycle event emitter
+-> status snapshot writer
 -> result classifier
 -> audit log
 -> optional artifact writer
@@ -84,6 +91,8 @@ Minimum request fields:
 | `cloud_allowed` | Boolean |
 | `expected_outputs` | Files, stdout shape, or completion receipt |
 | `validation_commands` | Commands to run after execution |
+| `visibility_required` | Whether this request must emit Office-visible status |
+| `attention_policy` | Conditions that should raise human attention |
 
 ## Result Model
 
@@ -101,11 +110,77 @@ Minimum result fields:
 | `stdout_hash` / `stderr_hash` | Raw-output audit references |
 | `json_events` | Event counts and final event types |
 | `usage` | Token usage when available |
+| `lifecycle_events` | Estate-visible event records emitted by the bridge |
+| `status_snapshot` | Path or object representing current/final visible state |
+| `attention_required` | Boolean for Steward-visible decision routing |
 | `files_changed` | Git diff summary |
 | `tests_run` | Validation evidence |
 | `known_limitations` | Explicit unresolved items |
 | `classification` | Output classification |
 | `promotion_decision` | `local_only`, `evidence_approved`, or `blocked` |
+
+## Lifecycle Event Model
+
+Codex JSONL events are provider telemetry. They are not sufficient as Estate operational events by themselves.
+
+The bridge should translate execution into Estate lifecycle events such as:
+
+| Event | Typical trigger |
+| --- | --- |
+| `job_accepted` | Request passes validation and receives a request id |
+| `execution_started` | Codex child process launches |
+| `checkpoint_reached` | Significant parser/provider milestone occurs |
+| `waiting_for_approval` | A request cannot proceed without human approval |
+| `validation_started` | Post-execution validation begins |
+| `validation_passed` | Required validation passes |
+| `validation_failed` | Required validation fails |
+| `commit_created` | A commit is created by an approved implementation path |
+| `result_returned` | Final agent message or structured result is parsed |
+| `execution_complete` | Request completes successfully |
+| `execution_failed` | Request fails due process, provider, parsing, or validation failure |
+| `policy_denied` | Request is blocked before dispatch by boundary rules |
+
+Minimum event fields:
+
+| Field | Purpose |
+| --- | --- |
+| `event_id` | Stable event id |
+| `request_id` | Parent request |
+| `work_package_id` | Work package, if any |
+| `provider` | Execution provider label |
+| `worker_label` | Worker or bridge actor label |
+| `state` | Current state after event |
+| `timestamp` | Event time |
+| `elapsed_seconds` | Time since request start when known |
+| `classification` | Security / boundary classification |
+| `budget_source` | Seat/profile/budget source label when available |
+| `validation_status` | Current validation state |
+| `attention_required` | Whether Steward action is needed |
+| `summary` | Human-readable summary |
+
+## Status Snapshot Model
+
+The bridge should maintain a small current-status artifact so the Office of the Steward can answer basic execution questions without reading terminal windows.
+
+Minimum status fields:
+
+| Field | Purpose |
+| --- | --- |
+| `request_id` | Current or most recent bridge request |
+| `worker` | Worker or provider actor label |
+| `current_assignment` | Current work package or prompt source |
+| `current_state` | Planning, Waiting, Running, Reviewing, Blocked, Awaiting Approval, Validation, Completed, Failed |
+| `elapsed_seconds` | Time since start |
+| `estimated_completion` | Known estimate or null |
+| `provider` | Provider label |
+| `budget_source` | Seat/profile/source label |
+| `security_classification` | Classification of request/result |
+| `validation_status` | Unknown, not_started, running, passed, failed |
+| `last_event` | Last lifecycle event id/type |
+| `attention_required` | Boolean |
+| `updated_at` | Snapshot timestamp |
+
+The first Codex Bridge implementation may write this under `runtime/codex_bridge/`. A later Operations or Office package can decide whether to aggregate these snapshots into a shared event/status bus.
 
 ## Command Templates
 
@@ -148,6 +223,7 @@ Preferred path:
 ```text
 stdout JSONL -> parse event records -> extract final agent message and usage
 stderr -> operational telemetry and diagnostics
+bridge state machine -> Estate lifecycle events and status snapshot
 ```
 
 Fallback path:
@@ -155,6 +231,7 @@ Fallback path:
 ```text
 stdout text -> final assistant message
 stderr text -> headers, warnings, transcript echo, tokens used
+bridge state machine -> Estate lifecycle events and status snapshot
 ```
 
 The bridge must not assume stderr means failure. Successful text-mode runs can include token usage and warnings on stderr.
@@ -179,6 +256,8 @@ The bridge should stop after execution before promotion when:
 - output includes secrets or private runtime data
 - cloud diff is present but unreviewed
 
+Boundary stops should emit `policy_denied`, `waiting_for_approval`, or `execution_failed` events as appropriate so they become visible to the Office of the Steward.
+
 ## Relationship To LEAP
 
 Codex Bridge should follow the Local Execution Adapter Protocol lifecycle:
@@ -187,7 +266,7 @@ Codex Bridge should follow the Local Execution Adapter Protocol lifecycle:
 pending -> active -> validate -> execute -> capture -> publish -> archive -> failed
 ```
 
-Only the `execute` step is Codex-specific. Request validation, capture, classification, publication, and archive should stay reusable across future providers.
+Only the `execute` step is Codex-specific. Request validation, capture, classification, publication, archive, event emission, and status reporting should stay reusable across future providers.
 
 ## Unknowns
 
@@ -196,3 +275,5 @@ Only the `execute` step is Codex-specific. Request validation, capture, classifi
 - Codex Cloud task id shape, lifecycle states, and browser mapping.
 - Whether `codex cloud diff` returns enough metadata for safe review without applying.
 - Whether OpenAI-backed JSONL success events include the same usage shape observed with the local provider.
+- Whether provider saturation and quota data can be gathered without terminal/TUI observation.
+- Whether the shared Office event/status bus already has a canonical path or should be introduced by a later Operations package.
