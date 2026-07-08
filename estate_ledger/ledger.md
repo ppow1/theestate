@@ -969,3 +969,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented the shared Estate operational event feed with validated event envelopes, Office-readable activity status derivation, runtime event and status artifacts, CLI record and summary commands, redacted sensitive summaries, tests, and integration documentation.
+
+EC-000088 - Added Office operational activity panel
+
+Timestamp: 2026-07-08 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented WP-0602 with a read-only Office operational activity loader and Steward command center panel consuming WP-0601 status artifacts, including grouped activity, honest missing and malformed artifact states, stale detection, classification-safe summaries, tests, and integration documentation.

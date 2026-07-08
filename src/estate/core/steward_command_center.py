@@ -24,6 +24,7 @@ from estate.core.steward_presence import generate_steward_presence_state
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
+from estate.core.office_operational_activity import load_office_operational_activity
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
@@ -41,6 +42,7 @@ OFFICE_NAVIGATION = [
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
+    {"id": "operational-activity", "label": "Operational Activity", "panel": "operational_activity", "tab": "operational-activity"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
     {"id": "expansion-roadmap", "label": "Expansion Roadmap", "panel": "expansion_roadmap", "tab": "roadmap"},
     {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
@@ -63,6 +65,7 @@ OFFICE_TABS = [
     {"id": "resident-conversations", "label": "Resident Conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models"},
     {"id": "daily-board", "label": "Daily Board"},
+    {"id": "operational-activity", "label": "Operational Activity"},
     {"id": "projects", "label": "Projects"},
     {"id": "roadmap", "label": "Roadmap"},
     {"id": "parking", "label": "Parking Lot"},
@@ -895,6 +898,7 @@ def generate_command_center(root=None, write=True):
         "capability_dependency_visualization": {"available": True, "path": "runtime/capabilities/capability_dependency_visualization.json", "kind": "capability_dependency_visualization", "data": generate_capability_dependency_visualization(root, write=write)},
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
+        "operational_activity": load_office_operational_activity(root),
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
@@ -1640,6 +1644,56 @@ def _capability_dependency_visualization_html(artifact):
     out.append("<p class='source'>Sources: " + html.escape(str(data.get("inputs", {}))) + ". This panel is read-only and does not modify governance or lifecycle state.</p></div>")
     return "".join(out)
 
+
+def _operational_activity_html(artifact):
+    data = artifact or {}
+    expected = data.get("expected_status_artifact_paths") or []
+    errors = data.get("errors") or []
+    summary = data.get("summary") or {}
+    out = ["<div class='operational-activity-panel'>"]
+    out.append("<p>Read-only operational activity surface. Every item below comes from runtime operational status artifacts; this panel does not write events, dispatch workers, or invent activity.</p>")
+    out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value))}</span></span>" for label, value in [("Activities", summary.get("activity_count", 0)), ("Status artifacts found", summary.get("status_artifact_found", False)), ("Malformed/error artifacts", summary.get("error_count", 0)), ("Runtime dir accessible", data.get("runtime_directory_accessible"))]) + "</div>")
+    if not data.get("available"):
+        out.append(f"<p class='placeholder'>{html.escape(data.get('empty_state') or 'No active operational status found.')}</p>")
+        out.append("<p class='source'>Expected status artifact paths: " + html.escape(', '.join(expected)) + ". No fake green status is shown.</p>")
+    if errors:
+        out.append("<h3>Status artifact errors</h3><ul>" + "".join(f"<li><strong>{html.escape(str(e.get('path')))}</strong>: {html.escape(str(e.get('message')))}</li>" for e in errors) + "</ul>")
+    latest = data.get("latest_status") or {}
+    if latest:
+        fresh = latest.get("freshness") or {}
+        out.append("<h3>Latest status</h3><p><strong>" + html.escape(str(latest.get("activity_id") or "unknown")) + "</strong> — " + html.escape(str(latest.get("current_state") or "unknown")) + " · <span class='health-badge " + html.escape(str(fresh.get("state") or "uncertain")) + "'>" + html.escape(str(fresh.get("state") or "uncertain")) + "</span><br>" + html.escape(str(latest.get("display_message") or "")) + "</p>")
+    groups = data.get("groups") or {}
+    for key, label in data.get("group_order") or []:
+        items = groups.get(key) or []
+        out.append(f"<section class='pipeline-section {html.escape(str(key))}'><h3>{html.escape(str(label))} ({len(items)})</h3>")
+        if not items:
+            out.append("<p class='placeholder'>No operational status items in this group.</p></section>")
+            continue
+        out.append("<table><thead><tr><th>Worker / provider</th><th>Assignment</th><th>State</th><th>Elapsed</th><th>Budget / class</th><th>Validation / attention</th><th>Message</th><th>Artifacts</th><th>Freshness</th></tr></thead><tbody>")
+        for item in items[:25]:
+            fresh = item.get("freshness") or {}
+            artifacts = item.get("artifact_paths") or []
+            artifact_text = "<br>".join(html.escape(str(a)) for a in artifacts[:6]) or "None recorded"
+            worker_provider = f"{html.escape(str(item.get('worker_id') or item.get('worker_role') or 'unknown'))}<br><span class='source'>{html.escape(str(item.get('provider_id') or item.get('provider_type') or 'provider unknown'))}</span>"
+            assignment = item.get('assignment_id') or item.get('work_package_id') or item.get('request_id') or item.get('activity_id') or 'unknown'
+            msg = item.get('display_message') or ''
+            if item.get('message_redacted'):
+                msg += ' (redacted by classification rule)'
+            out.append("<tr>"
+                       f"<td>{worker_provider}</td>"
+                       f"<td>{html.escape(str(assignment))}</td>"
+                       f"<td>{html.escape(str(item.get('current_state') or 'unknown'))}</td>"
+                       f"<td>{html.escape(str(item.get('elapsed_seconds') if item.get('elapsed_seconds') is not None else 'unknown'))}s</td>"
+                       f"<td>{html.escape(str(item.get('budget_source') or 'unknown'))}<br><span class='source'>{html.escape(str(item.get('classification') or 'Estate Internal'))}</span></td>"
+                       f"<td>{html.escape(str(item.get('validation_status') or 'not_validated'))}<br>attention={html.escape(str(item.get('requires_attention')))}</td>"
+                       f"<td>{html.escape(str(msg))}</td>"
+                       f"<td>{artifact_text}</td>"
+                       f"<td><span class='health-badge {html.escape(str(fresh.get('state') or 'uncertain'))}'>{html.escape(str(fresh.get('state') or 'uncertain'))}</span><br><span class='source'>{html.escape(str(fresh.get('message') or ''))}</span></td>"
+                       "</tr>")
+        out.append("</tbody></table></section>")
+    out.append("<p class='source'>Sources: " + html.escape(str(data.get("path") or "; ".join(expected))) + ". Classification behavior: " + html.escape(str(data.get("classification_behavior") or "safe display")) + "</p></div>")
+    return "".join(out)
+
 def _artifact_html(artifact):
     if not artifact.get("available"):
         path = artifact.get("path") or "not yet produced"
@@ -1998,6 +2052,7 @@ def render_command_center_html(payload):
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
+        ("operational-activity", "Operational Activity", _operational_activity_html(p.get("operational_activity", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),

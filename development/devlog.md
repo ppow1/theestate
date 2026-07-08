@@ -701,3 +701,9 @@ Implemented the first Estate Planning Provider Framework with validated envelope
 EC-000087 - Added operational event feed and status surface
 
 Implemented WP-0601 with shared operational event and status models, runtime operations artifacts, operations-event-record and operations-status-summary CLI commands, summary redaction behavior, tests, and concise integration documentation.
+
+2026-07-08 00:00:00
+
+EC-000088 - Added Office operational activity panel
+
+Implemented WP-0602 with a read-only Office operational activity loader and Steward command center panel consuming WP-0601 status artifacts, including grouped activity, honest missing and malformed artifact states, stale detection, classification-safe summaries, tests, and integration documentation.
