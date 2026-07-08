@@ -21,6 +21,8 @@ from estate.core.daily_board_integration import generate_daily_board_integration
 from estate.core.mission_control_workspace import build_mission_control_workspace
 from estate.core.morning_briefing import generate_morning_briefing
 from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
+from estate.core.operations_control_runtime import OperationsControlRuntime
+from estate.core.operations_manager import OperationsDecision
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -127,6 +129,28 @@ def record_orchestrator_intake_decision(root=None, intake_id: str | None = None,
     artifact, paths = OrchestratorIntakeDecisionRuntime(base).decide(intake_id=intake_id, decision=decision, decided_by=decided_by, reason=reason, metadata={k: v for k, v in params.items() if k in {'summary_safe', 'boundary_review_completed'}})
     return _completed('orchestrator_intake.record_decision', 'Record Orchestrator intake decision', 'operational-activity', 'estate.core.orchestrator_intake_decisions.OrchestratorIntakeDecisionRuntime.decide', f"Decision {artifact.decision} recorded for {artifact.intake_id}; next state is {artifact.next_state}.", read=['runtime/orchestrator/intake/status/queue.json'], written=[_rel(base, paths['decision']), 'runtime/orchestrator/intake/status/latest.json', 'runtime/orchestrator/intake/status/queue.json', 'runtime/operations/status/latest.json'], state=['orchestrator intake decision state updated'])
 
+def record_operations_control_decision(root=None, decision_type: str | None = None, target_type: str | None = None, target_id: str | None = None, decided_by: str | None = None, reason: str | None = None, priority: str = "normal", **params: Any) -> OfficeActionResult:
+    if not decision_type or not target_type or not decided_by:
+        return _blocked('operations_control.record_decision', 'Record operations-control decision', 'operational-activity', 'estate.core.operations_control_runtime.OperationsControlRuntime.record_decision', 'decision_type, target_type, and decided_by are required.')
+    base = _root(root)
+    decision = OperationsDecision.create(
+        decided_by=decided_by,
+        decision_type=decision_type,
+        target_type=target_type,
+        target_id=target_id or None,
+        priority=priority or 'normal',
+        reason=reason or f'Office recorded {decision_type} decision for {target_type}.',
+        assignment_label=params.get('assignment_label'),
+        provider_id=params.get('provider_id'),
+        worker_id=params.get('worker_id'),
+        requires_boundary_review=bool(params.get('requires_boundary_review')) or decision_type == 'request_boundary_review',
+        requires_steward_attention=decision_type in {'escalate', 'request_boundary_review'},
+        summary_safe=bool(params.get('summary_safe')),
+        metadata={k: v for k, v in params.items() if k not in {'assignment_label', 'provider_id', 'worker_id', 'requires_boundary_review', 'summary_safe'}},
+    )
+    paths = OperationsControlRuntime(base).record_decision(decision)
+    return _completed('operations_control.record_decision', 'Record operations-control decision', 'operational-activity', 'estate.core.operations_control_runtime.OperationsControlRuntime.record_decision', f"Operations decision {decision.decision_type} recorded for {decision.target_type}:{decision.target_id or ''}.", read=['runtime/operations/control/status/latest.json'], written=[_rel(base, paths['decision']), 'runtime/operations/control/status/summary.json', 'runtime/operations/control/status/summary.md', 'runtime/operations/status/latest.json'], state=['operations-control decision artifact recorded'])
+
 def generate_daily_briefing(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); generate_daily_board_integration(root=base, write=True); generate_morning_briefing(root=base, write=True)
     return _completed('daily_board.generate_morning_briefing', 'Generate morning briefing', 'daily-board', 'estate.core.daily_board_integration.generate_daily_board_integration + estate.core.morning_briefing.generate_morning_briefing', 'Daily Board integration and morning briefing generated locally.', written=['runtime/operations/daily_board_integration.json', 'operations/boards/daily_board_integration.md', 'runtime/briefings/morning_briefing.json', 'operations/briefings/morning_briefing.md'], state=['daily board and briefing artifacts refreshed'])
@@ -143,6 +167,7 @@ HANDLERS.update({
  'mission_control.refresh_payload': refresh_mission_control,
  'daily_board.generate_morning_briefing': generate_daily_briefing,
  'orchestrator_intake.record_decision': record_orchestrator_intake_decision,
+ 'operations_control.record_decision': record_operations_control_decision,
 })
 
 ACTION_CONTROLS = [
@@ -156,6 +181,8 @@ ACTION_CONTROLS = [
  {'action_id':'mission_control.refresh_payload','label':'Refresh Mission Control payload','target_tab':'mission-control','handler':'refresh_mission_control','availability':'available'},
  {'action_id':'daily_board.generate_morning_briefing','label':'Generate morning briefing','target_tab':'daily-board','handler':'generate_daily_briefing','availability':'available'},
  {'action_id':'orchestrator_intake.record_decision','label':'Record Orchestrator intake decision','target_tab':'operational-activity','handler':'record_orchestrator_intake_decision','availability':'available','requires_input':'intake_id,decision,decided_by','note':'Records a durable decision artifact; does not schedule or execute work.'},
+ {'action_id':'operations_control.record_decision','label':'Record operations-control decision','target_tab':'operational-activity','handler':'record_operations_control_decision','availability':'available','requires_input':'decision_type,target_type,decided_by','note':'Writes an operations-control decision artifact; does not execute providers.'},
+ {'action_id':'operations_control.run_provider','label':'Run provider','target_tab':'operational-activity','availability':'gated','disabled_reason':'Provider execution is intentionally outside the Office traffic-controller panel.'},
  {'action_id':'ai_services.start_stop_load','label':'Start/stop/load AI service','target_tab':'ai-services-models','availability':'gated','disabled_reason':'Process-control approval workflow is not implemented for Office controls; use existing governed service approval path first.'},
 ]
 
