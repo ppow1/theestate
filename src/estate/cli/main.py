@@ -54,6 +54,7 @@ from estate.core.validation_handoff_artifact_workflow import generate_validation
 from estate.core.work_package_validation import validate_work_package, format_validation_markdown
 from estate.core.production_readiness_validation import generate_production_readiness_report, format_production_readiness_markdown
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
+from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
 from estate.core.operational_readiness_dashboard import generate_operational_readiness_dashboard, format_operational_readiness_summary
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
@@ -1213,6 +1214,20 @@ def cmd_codex_bridge(args):
         raise SystemExit(1)
 
 
+def cmd_execution_activity(args):
+    import json
+    payload = generate_execution_activity_surface()
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_execution_activity_summary(payload))
+
+
+def cmd_execution_activity_report(args):
+    payload = generate_execution_activity_surface()
+    print(format_execution_activity_report(payload))
+
+
 
 def cmd_ai_services(args):
     import json
@@ -1659,6 +1674,13 @@ def main(argv=None):
     p.add_argument("--dry-run", action="store_true", help="Validate and emit visibility artifacts without invoking Codex")
     p.add_argument("--json", action="store_true", help="Print Codex Bridge result JSON")
     p.set_defaults(func=cmd_codex_bridge)
+
+    p = sub.add_parser("execution-activity", help="Generate the shared local execution activity snapshot")
+    p.add_argument("--json", action="store_true", help="Print execution activity current snapshot JSON")
+    p.set_defaults(func=cmd_execution_activity)
+
+    p = sub.add_parser("execution-activity-report", help="Generate the shared local execution activity report")
+    p.set_defaults(func=cmd_execution_activity_report)
 
     p = sub.add_parser("validation-metrics-dashboard", help="Generate Validation Metrics Dashboard")
     p.add_argument("--json", action="store_true", help="Print validation metrics dashboard JSON")

@@ -2313,3 +2313,33 @@ VALIDATION_RECIPES["WP-CODEX-BRIDGE-IMPLEMENTATION"] = {
         _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
     ],
 }
+
+VALIDATION_RECIPES["WP-EXECUTION-ACTIVITY-SURFACE-001"] = {
+    "recipe_id": "wp-execution-activity-surface-001-local-validation",
+    "title": "WP-EXECUTION-ACTIVITY-SURFACE-001 - Execution Activity Surface and Office Visibility",
+    "description": "Validates the local execution activity model, aggregation, CLI/report generation, Office consumption hook, documentation, and completion receipt without live provider calls.",
+    "required_checks": [
+        "Execution activity tests pass",
+        "CLI generates current activity artifacts",
+        "Implementation and usage documentation exist",
+        "Completion receipt is complete",
+    ],
+    "observational_checks": ["Production readiness report remains executable"],
+    "expected_artifacts": [
+        "src/estate/core/execution_activity.py",
+        "tests/test_execution_activity.py",
+        "docs/integration/execution_activity_surface_usage.md",
+        "collaboration/work_packages/completions/WP-EXECUTION-ACTIVITY-SURFACE-001_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider or network access"],
+    "success_criteria": ["Required commands exit zero", "Runtime artifacts are local under runtime/execution_activity"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/test_execution_activity.py --basetemp Temp/pytest-execution-activity"),
+        _cmd("python -m estate.cli.main execution-activity --json"),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_activity.py','tests/test_execution_activity.py','docs/integration/execution_activity_surface_usage.md']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"from estate.core.steward_command_center import generate_command_center; p=generate_command_center(write=False); assert 'execution_activity' in p['panels']; assert {'execution_active_count','execution_blocked_count','execution_attention_required_count','execution_failed_count'} <= set(p['status_bar'])\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-EXECUTION-ACTIVITY-SURFACE-001'); assert r['receipt_status']=='complete', r\""),
+        _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
+    ],
+}

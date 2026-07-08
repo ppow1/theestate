@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-08T21:48:20+00:00",
-  "json_report": "runtime/validation/work_packages/WP-CODEX-BRIDGE-IMPLEMENTATION_validation.json",
-  "latest_validation_report_path": "operations/validation/reports/WP-CODEX-BRIDGE-IMPLEMENTATION_validation.md",
-  "markdown_report": "operations/validation/reports/WP-CODEX-BRIDGE-IMPLEMENTATION_validation.md",
-  "validation_id": "WP-CODEX-BRIDGE-IMPLEMENTATION_2026-07-08T214820Z0000",
+  "generated_at": "2026-07-08T22:26:55+00:00",
+  "json_report": "runtime/validation/work_packages/WP-EXECUTION-ACTIVITY-SURFACE-001_validation.json",
+  "latest_validation_report_path": "operations/validation/reports/WP-EXECUTION-ACTIVITY-SURFACE-001_validation.md",
+  "markdown_report": "operations/validation/reports/WP-EXECUTION-ACTIVITY-SURFACE-001_validation.md",
+  "validation_id": "WP-EXECUTION-ACTIVITY-SURFACE-001_2026-07-08T222655Z0000",
   "validation_status": "passed",
-  "work_package_id": "WP-CODEX-BRIDGE-IMPLEMENTATION"
+  "work_package_id": "WP-EXECUTION-ACTIVITY-SURFACE-001"
 }

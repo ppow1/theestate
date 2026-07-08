@@ -99,6 +99,7 @@ ARTIFACTS = {
     "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
     "worker_runtime_monitor": ["runtime/workers/worker_runtime_monitor.json", "operations/workers/worker_runtime_monitor.md"],
     "steward_presence": ["runtime/steward/steward_presence_state.json", "operations/steward/steward_presence_state.md"],
+    "execution_activity": ["runtime/execution_activity/current.json", "runtime/execution_activity/report.md"],
 }
 
 
@@ -460,6 +461,7 @@ def _build_status_bar(root, panels, generated_at):
     mailbox_ops_summary = (((panels.get("mailbox_operations_center") or {}).get("data") or {}).get("summary") or {})
     recall_ops_summary = (((panels.get("steward_recall_operations") or {}).get("data") or {}).get("summary") or {})
     notification_summary = (((panels.get("operations_notification_center") or {}).get("data") or {}).get("summary") or {})
+    execution_summary = (((panels.get("execution_activity") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
@@ -478,6 +480,10 @@ def _build_status_bar(root, panels, generated_at):
         "active_recall_count": recall_ops_summary.get("active_recall_count"),
         "notification_count": notification_summary.get("filtered_notification_count"),
         "notification_unavailable_source_count": notification_summary.get("unavailable_source_count"),
+        "execution_active_count": execution_summary.get("active_count"),
+        "execution_blocked_count": execution_summary.get("blocked_count"),
+        "execution_attention_required_count": execution_summary.get("attention_required_count"),
+        "execution_failed_count": execution_summary.get("failed_count"),
         "active_workers": active_workers,
         "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
@@ -496,6 +502,16 @@ def _build_activity_console(root, panels, generated_at):
     stream = generate_operator_activity_stream(root=root, write=False, verbosity="normal", limit=25)
     events = [_event(generated_at, "steward.command_center", "refresh", "info", "Operations Center data refreshed quietly from local artifacts.")]
     events.extend({"timestamp": e.get("timestamp"), "source": e.get("source"), "topic": e.get("topic"), "severity": e.get("severity"), "message": e.get("message"), "link": e.get("link")} for e in stream.get("events", []))
+    execution_summary = (((panels.get("execution_activity") or {}).get("data") or {}).get("summary") or {})
+    if execution_summary:
+        severity = "warning" if execution_summary.get("attention_required_count") or execution_summary.get("blocked_count") or execution_summary.get("failed_count") else "info"
+        events.append(_event(
+            generated_at,
+            "execution_activity",
+            "current",
+            severity,
+            f"Execution activity: active={execution_summary.get('active_count', 0)}, blocked={execution_summary.get('blocked_count', 0)}, attention={execution_summary.get('attention_required_count', 0)}, failed={execution_summary.get('failed_count', 0)}.",
+        ))
     if len(events) == 1:
         events.append(_event(generated_at, "local artifacts", "empty", "info", stream.get("empty_state") or "No recent operational activity records were found."))
     return {"collapsed_by_default": True, "verbosity_options": stream.get("verbosity_levels", ["quiet", "normal", "detailed", "diagnostic"]), "selected_verbosity": stream.get("selected_verbosity", "normal"), "filters": stream.get("filters", {}), "available_sources": stream.get("available_sources", []), "events": events[:25]}
@@ -907,6 +923,7 @@ def generate_command_center(root=None, write=True):
         "steward_recall_operations": _build_steward_recall_operations(root),
         "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
         "work_package_pipeline": _work_package_pipeline_artifact(root),
+        "execution_activity": _read_artifact(root, ARTIFACTS["execution_activity"]),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
@@ -1724,6 +1741,10 @@ def _status_bar_html(status):
         ("Mail warn", status.get("mailbox_warning_count")),
         ("Active recalls", status.get("active_recall_count")),
         ("Notifications", status.get("notification_count")),
+        ("Exec active", status.get("execution_active_count")),
+        ("Exec blocked", status.get("execution_blocked_count")),
+        ("Exec attention", status.get("execution_attention_required_count")),
+        ("Exec failed", status.get("execution_failed_count")),
         ("Workers", status.get("active_workers")),
         ("Steward", status.get("steward_presence_state")),
         ("Verbosity", status.get("verbosity")),

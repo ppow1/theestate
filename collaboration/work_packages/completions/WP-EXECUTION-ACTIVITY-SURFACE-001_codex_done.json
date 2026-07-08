@@ -1,0 +1,103 @@
+{
+  "work_package_id": "WP-EXECUTION-ACTIVITY-SURFACE-001",
+  "codex_status": "done",
+  "completed_at": "2026-07-08T21:57:30Z",
+  "branch": "main",
+  "git_commit_before": "fb4d6a2555adbc87273683e6f4abbd9d164c5ffa",
+  "summary": "Implemented a local shared execution activity surface that normalizes execution-provider events, aggregates current activity across workers/providers, writes local current/report artifacts, exposes CLI commands, and provides an Office of the Steward artifact consumption hook.",
+  "files_changed": [
+    "src/estate/core/execution_activity.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/operator_activity_stream.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_activity.py",
+    "docs/integration/execution_activity_surface_usage.md",
+    "collaboration/work_packages/completions/WP-EXECUTION-ACTIVITY-SURFACE-001_codex_done.json"
+  ],
+  "tests_run": [
+    {
+      "command": "pytest -q tests/test_execution_activity.py",
+      "status": "not_completed",
+      "result": "Pytest setup could not create the default temporary directory under A:\\AI\\Temp\\tmp\\pytest-of-wille because the sandbox could not read that path."
+    },
+    {
+      "command": "pytest -q tests/test_execution_activity.py --basetemp Temp/pytest-execution-activity",
+      "status": "passed",
+      "result": "7 passed; one pytest cache warning from the existing .pytest_cache path."
+    },
+    {
+      "command": "python -m estate.cli.main execution-activity --json",
+      "status": "passed",
+      "result": "Generated runtime/execution_activity/current.json and runtime/execution_activity/events.jsonl."
+    },
+    {
+      "command": "python -m estate.cli.main execution-activity-report",
+      "status": "passed",
+      "result": "Generated runtime/execution_activity/report.md."
+    },
+    {
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "status": "completed_with_existing_blockers",
+      "result": "Command completed; repository-wide production readiness still reports pre-existing unrelated blocked packages."
+    },
+    {
+      "command": "python -m estate.cli.main validate-work-package --id WP-EXECUTION-ACTIVITY-SURFACE-001 --json",
+      "status": "passed",
+      "result": "Registered package recipe passed with no warnings, findings, or failures."
+    }
+  ],
+  "runtime_artifacts_generated": [
+    "runtime/execution_activity/events.jsonl",
+    "runtime/execution_activity/current.json",
+    "runtime/execution_activity/report.md",
+    "runtime/validation/work_packages/WP-EXECUTION-ACTIVITY-SURFACE-001_validation.json",
+    "operations/validation/reports/WP-EXECUTION-ACTIVITY-SURFACE-001_validation.md"
+  ],
+  "office_integration_status": "implemented",
+  "office_integration_details": "The existing Office of the Steward command center reads runtime/execution_activity/current.json as a local artifact, exposes execution counts in the status payload/status bar, and includes execution_activity in the operator activity stream sources. No new Office or duplicate dashboard was created.",
+  "codex_bridge_feed": {
+    "event_sources_supported": [
+      "runtime/codex_bridge/events.jsonl",
+      "runtime/codex_bridge/*/events.jsonl"
+    ],
+    "current_status_sources_supported": [
+      "runtime/codex_bridge/current.json",
+      "runtime/codex_bridge/current_status.json"
+    ],
+    "aliases_supported": [
+      "current_state",
+      "security_classification",
+      "worker",
+      "human_attention_required"
+    ],
+    "notes": "Codex Bridge lifecycle events and status snapshots feed this surface without changing Codex Bridge internals."
+  },
+  "known_limitations": [
+    "Provider saturation remains unknown until provider-specific quota reporting exists.",
+    "Codex /status remains interactive unless separately automated.",
+    "ChatGPT CLI status is not defined yet.",
+    "Final Office UI presentation may require a separate Office work package.",
+    "This package does not decide whether an Operations Office is required.",
+    "Missing optional provider runtime files are reported as warnings, not hard failures."
+  ],
+  "skipped_live_provider_calls": [
+    "No live Codex execution was invoked for this package.",
+    "No OpenAI API calls were made.",
+    "No ChatGPT CLI integration was attempted.",
+    "No Ollama worker calls were made.",
+    "No GitHub or other network calls were made."
+  ],
+  "required_reading_status": {
+    "AI_START_HERE.md": "read",
+    "AI_HINTS.md": "read",
+    "docs/governance/Estate_Manual.md": "read",
+    "docs/collaboration/Local_Execution_Adapter_Protocol_v1.md": "read",
+    "docs/architecture/execution_provider_operational_visibility_requirements.md": "read",
+    "docs/architecture/execution_provider_codex_cli_mapping.md": "read",
+    "docs/governance/workers/WP-CODEX-BRIDGE-IMPLEMENTATION.md": "read"
+  },
+  "pull_request_not_applicable_reason": "Local Codex implementation in workspace; no pull request was created by this package.",
+  "merge_authority_equivalent": "Chief Architect / Steward review required before merge or acceptance.",
+  "ready_for_ca_review": true
+}
