@@ -5,6 +5,8 @@ Purpose: Provide a governed resident identity artifact template.
 
 Character Cards are governed identity artifacts. They are used to preserve resident coherence across prompts, models, runtimes, interfaces, command-line workers, memory systems, and future visualization layers.
 
+Character Cards also need to support practical export or adaptation into common local character systems such as text-generation-webui, SillyTavern, Open WebUI-style resident interfaces, and similar local or self-hosted front ends. The Estate card remains canonical; external platform cards are implementation exports or adapters.
+
 ## Template
 
 ```yaml
@@ -33,6 +35,8 @@ escalation_rules:
 memory_state_sources:
 implementation_notes:
 visualization_avatar_references:
+platform_card_compatibility:
+export_targets:
 succession_notes:
 formalization_status:
 ```
@@ -147,6 +151,28 @@ Allowed implementation comments. Avoid protected content.
 
 Optional future visual, audio, 3D, AR, or interface references.
 
+### platform_card_compatibility
+
+Notes for mapping the canonical Estate character card into external or local character-card systems.
+
+Examples include text-generation-webui, SillyTavern, Open WebUI-style resident surfaces, local model front ends, and future Estate-native resident UIs.
+
+The compatibility section should identify which fields map into external card formats and which fields remain Estate-only governance metadata.
+
+### export_targets
+
+The platforms or formats this resident card may be exported to.
+
+Examples:
+
+- Estate canonical YAML / Markdown;
+- SillyTavern-compatible card export;
+- text-generation-webui character format;
+- Open WebUI-style resident profile;
+- future Estate-native resident card.
+
+Export eligibility must respect source classification and GitHub eligibility. Split-source resident exports may include only approved public-boundary material unless the Steward explicitly directs otherwise outside Estate Proper.
+
 ### succession_notes
 
 What must remain stable if occupant, model, or runtime changes.
@@ -154,6 +180,14 @@ What must remain stable if occupant, model, or runtime changes.
 ### formalization_status
 
 Current state of the resident charter and card.
+
+## Canonical vs Exported Cards
+
+The Estate character card is canonical.
+
+Cards created for textgen, SillyTavern, Open WebUI, or other local front ends are implementation exports.
+
+An exported card must not be treated as the authoritative resident record unless it is synchronized back into governed Estate artifacts.
 
 ## Split-Source Character Card Rule
 
