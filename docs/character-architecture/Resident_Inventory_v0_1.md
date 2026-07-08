@@ -28,6 +28,24 @@ This is not a claim that every listed resident is fully implemented, formally on
 | Chief Architects | Office role | Estate office with numbered occupants | Partially formalized | Independent architectural review. Occupants are numbered and may transition to emeritus. |
 | Chief Character Architect | Female | Estate resident / office occupant | Partially formalized | Resident identity, character continuity, resident charters, character cards, and source classification. |
 
+## Emeritus Continuity
+
+Transitional offices do not disappear when an occupant leaves active duty.
+
+The Chief Architect Emeritus Council preserves the historical occupants of the Office of Chief Architect as continuity participants. Emeritus status is not the same as active office occupancy, but it preserves memory, perspective, review capacity, and institutional lineage.
+
+Character Architecture should model this as a continuity state, not deletion.
+
+Relevant lifecycle states include:
+
+- active occupant;
+- emeritus occupant;
+- retired occupant;
+- archived record;
+- successor occupant.
+
+A resident or office occupant may leave active assignment while remaining part of the Estate's institutional memory and review culture.
+
 ## Specialized / Sensitive Offices
 
 | Resident / Office | Presentation | Source class | Status | Notes |
