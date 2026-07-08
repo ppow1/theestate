@@ -689,3 +689,9 @@ Expanded the three core governance documents from skeleton scaffolds into fuller
 EC-000085 - Added Estate Collaboration Layer v1 infrastructure
 
 Added Collaboration Layer v1 infrastructure for multi-worker coordination, including collaboration folders, message templates, transport adapter docs, promotion workflow, worker protocol, and governance integration pointers.
+
+2026-07-08 00:00:00
+
+EC-000086 - Added planning provider framework
+
+Implemented the first Estate Planning Provider Framework with validated envelopes, provider registry, deterministic stub provider, runtime artifact writer, planning-provider-run CLI command, tests, and concise integration documentation.

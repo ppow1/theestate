@@ -70,9 +70,33 @@ from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
+from estate.core.planning_provider import PlanningProviderRequest
+from estate.core.planning_provider_registry import default_planning_provider_registry
+from estate.core.planning_provider_runtime import PlanningProviderRuntimeWriter
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
+
+
+def cmd_planning_provider_run(args):
+    try:
+        request_data = json.loads(Path(args.request).read_text(encoding="utf-8"))
+        request = PlanningProviderRequest.from_dict(request_data)
+        provider = default_planning_provider_registry().resolve(request.provider_id)
+        response = provider.run(request)
+        artifact_paths = PlanningProviderRuntimeWriter().write_all(request, response)
+        print(f"Planning provider: {response.provider_id}")
+        print(f"Request: {response.request_id}")
+        print(f"Status: {response.status}")
+        print(f"Summary: {response.summary}")
+        print(f"Result artifact: {artifact_paths['result']}")
+        if response.errors:
+            print("Errors: " + "; ".join(response.errors))
+        if response.status in {"blocked", "failed"}:
+            raise SystemExit(2)
+    except (OSError, json.JSONDecodeError, ValueError, KeyError) as exc:
+        print(f"Planning provider run failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_work_package_ranges(args):
     path = _repo_path("collaboration/work_packages/work_package_range_ledger.json")
@@ -1734,6 +1758,10 @@ def main(argv=None):
     p.add_argument("--json", action="store_true", help="Print Alfred capability surface JSON")
     p.set_defaults(func=cmd_alfred_capabilities)
 
+
+    p = sub.add_parser("planning-provider-run", help="Run an Estate planning provider request from JSON")
+    p.add_argument("--request", required=True, help="Path to planning provider request JSON")
+    p.set_defaults(func=cmd_planning_provider_run)
 
     p = sub.add_parser("onboarding-manifest-check")
     p.add_argument("--json", action="store_true", help="Validate onboarding manifest required paths and print JSON")

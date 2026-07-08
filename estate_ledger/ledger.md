@@ -949,3 +949,13 @@ Classification: Estate Internal
 
 Summary:
 Added the Estate Collaboration Layer v1 infrastructure and implementation plan. This introduced repository collaboration queues, message/work package/promotion/status folders, canonical templates, GitHub and local filesystem transport adapter documentation, worker collaboration protocol, promotion workflow, and integration pointers in AI_START_HERE, the Estate Manual, the Orientation Handbook, and the Vision and Architecture document.
+
+EC-000086 - Added planning provider framework
+
+Timestamp: 2026-07-08 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented the first Estate Planning Provider Framework with request, response, and event contracts; provider registry; deterministic local stub provider; runtime artifacts; CLI entry point; tests; and integration documentation.
