@@ -719,3 +719,9 @@ Implemented WP-0604 with shared provider descriptor and capability models, confi
 EC-000090 - Added Orchestrator scheduling skeleton
 
 Implemented WP-0606 with schedule record validation, eligibility checks, runtime schedule artifacts, orchestrator-schedule and orchestrator-schedule-list CLI commands, provider catalog compatibility, operational event compatibility, tests, and concise integration documentation. The scheduler creates records only and does not invoke providers.
+
+2026-07-08 00:00:00
+
+EC-000091 - Added provider health and capacity reporting
+
+Implemented WP-0607 with provider health and capacity record validation, runtime provider health artifacts, providers-health-set, providers-capacity-set, and providers-health-summary CLI commands, provider catalog compatibility, operational event hooks for degraded/blocked provider states, redacted summaries, tests, and concise integration documentation.
