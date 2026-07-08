@@ -84,10 +84,53 @@ from estate.core.orchestrator_schedule_runtime import OrchestratorScheduleRuntim
 from estate.core.provider_catalog import load_provider_catalog, write_office_status, format_provider_list
 from estate.core.provider_health import ProviderHealthRecord, write_health_record, generate_provider_health_summary, format_provider_health_summary
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
+from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
+
+def cmd_worker_assignment_create(args):
+    try:
+        metadata = {"summary_safe": args.summary_safe}
+        runtime = WorkerAssignmentRuntime()
+        record, paths = runtime.create_assignment(
+            assigned_by=args.assigned_by, assigned_to=args.assigned_to, assignment_label=args.assignment_label or args.assigned_to,
+            worker_id=args.worker_id, worker_role=args.worker_role, provider_id=args.provider_id, provider_type=args.provider_type, seat_id=args.seat_id, profile_id=args.profile_id,
+            work_package_id=args.work_package_id, work_package_path=args.work_package_path, intake_id=args.intake_id, schedule_id=args.schedule_id, classification=args.classification,
+            priority=args.priority, state=args.state, mission=args.mission, summary=args.summary or args.mission, expected_outputs=args.expected_output or [], validation_required=not args.no_validation_required,
+            requires_attention=args.requires_attention, blocked_reason=args.blocked_reason, metadata=metadata,
+        )
+        print(f"Worker assignment created: {record.assignment_id}")
+        print(f"State: {record.state}")
+        print(f"Record: {paths['record']}")
+        print(f"Board: {paths['board']}")
+    except (OSError, ValueError) as exc:
+        print(f"Worker assignment create failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_worker_assignment_update(args):
+    try:
+        metadata = {"summary_safe": args.summary_safe} if args.summary_safe else None
+        record, paths = WorkerAssignmentRuntime().update_assignment(args.assignment_id, state=args.state, blocked_reason=args.blocked_reason, requires_attention=args.requires_attention, metadata=metadata)
+        print(f"Worker assignment updated: {record.assignment_id}")
+        print(f"State: {record.state}")
+        print(f"Record: {paths['record']}")
+        print(f"Board: {paths['board']}")
+    except (OSError, ValueError) as exc:
+        print(f"Worker assignment update failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_worker_assignment_list(args):
+    try:
+        board = WorkerAssignmentRuntime().generate_board(write=True)
+        if getattr(args, "json", False):
+            print(json.dumps(board, indent=2, sort_keys=True))
+        else:
+            print(format_assignment_board(board))
+    except (OSError, ValueError) as exc:
+        print(f"Worker assignment list failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_providers_list(args):
     try:
@@ -2276,6 +2319,45 @@ def main(argv=None):
     p = sub.add_parser("providers-health-summary", help="Summarize provider health and capacity")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_providers_health_summary)
+
+
+    p = sub.add_parser("worker-assignment-create", help="Create a file-backed worker assignment record")
+    p.add_argument("--assigned-to", required=True)
+    p.add_argument("--assigned-by", required=True)
+    p.add_argument("--mission", required=True)
+    p.add_argument("--summary")
+    p.add_argument("--work-package-id")
+    p.add_argument("--work-package-path")
+    p.add_argument("--assignment-label")
+    p.add_argument("--worker-id")
+    p.add_argument("--worker-role")
+    p.add_argument("--provider-id")
+    p.add_argument("--provider-type")
+    p.add_argument("--seat-id")
+    p.add_argument("--profile-id")
+    p.add_argument("--intake-id")
+    p.add_argument("--schedule-id")
+    p.add_argument("--classification", default="Estate Internal", choices=["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only"])
+    p.add_argument("--priority", default="normal", choices=["low", "normal", "high", "urgent"])
+    p.add_argument("--state", default="assigned", choices=["assigned", "accepted", "running", "blocked", "awaiting_approval", "reviewing", "validation", "completed", "failed", "cancelled", "deferred"])
+    p.add_argument("--expected-output", action="append")
+    p.add_argument("--no-validation-required", action="store_true")
+    p.add_argument("--requires-attention", action="store_true")
+    p.add_argument("--blocked-reason")
+    p.add_argument("--summary-safe", action="store_true")
+    p.set_defaults(func=cmd_worker_assignment_create)
+
+    p = sub.add_parser("worker-assignment-update", help="Update a worker assignment state")
+    p.add_argument("--assignment-id", required=True)
+    p.add_argument("--state", required=True, choices=["assigned", "accepted", "running", "blocked", "awaiting_approval", "reviewing", "validation", "completed", "failed", "cancelled", "deferred"])
+    p.add_argument("--blocked-reason")
+    p.add_argument("--requires-attention", action="store_true")
+    p.add_argument("--summary-safe", action="store_true")
+    p.set_defaults(func=cmd_worker_assignment_update)
+
+    p = sub.add_parser("worker-assignment-list", help="List worker assignments and refresh board artifacts")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_worker_assignment_list)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")
