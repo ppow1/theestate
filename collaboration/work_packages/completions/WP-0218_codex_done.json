@@ -1,0 +1,48 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-08T18:16:58+00:00",
+  "files_changed": [
+    "collaboration/work_packages/completions/WP-0218_codex_done.json",
+    "operations/model_control/WP-0218_estate_model_control_plane_report.md",
+    "operations/validation/reports/WP-0218_validation.md",
+    "runtime/model_control/WP-0218_estate_model_control_plane_report.json",
+    "runtime/model_control/diagnostics.json",
+    "runtime/model_control/registry.json",
+    "runtime/validation/work_packages/WP-0218_validation.json",
+    "runtime/validation/work_packages/latest.json",
+    "src/estate/ai_services/steward_model_selector.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/resident_interaction.py",
+    "src/estate/model_control/__init__.py",
+    "src/estate/model_control/assignments.py",
+    "src/estate/model_control/cli.py",
+    "src/estate/model_control/discovery.py",
+    "src/estate/model_control/policy.py",
+    "src/estate/model_control/registry.py",
+    "src/estate/model_control/reports.py",
+    "tests/test_model_control.py"
+  ],
+  "known_limitations": [
+    "No validation recipe was registered for WP-0218 before completion, so validate-work-package reported no_recipe before this completion artifact existed.",
+    "Runtime discovery of live Ollama tags is opt-in; tests use mocked AI Services registry data and no model installation/download is performed."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "pull_request_url": "not_applicable_until_make_pr_tool_records_pr_metadata_after_commit",
+  "pull_request_url_or_not_applicable_reason": "PR metadata will be recorded by make_pr after commit.",
+  "ready_for_ca_review": true,
+  "root_cause": "Model selection lived inside adapters/resident defaults rather than an Estate-governed model-control layer.",
+  "summary": "Implemented Estate model-control registry, assignment storage, authority policy, CLI controls, Office visibility, and Alfred model-selection integration.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_model_control.py -q",
+    "PYTHONPATH=src pytest tests/test_model_control.py tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main model-control rediscover --json",
+    "PYTHONPATH=src python -m estate.cli.main model-control validate-assignments --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0218 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0218"
+}

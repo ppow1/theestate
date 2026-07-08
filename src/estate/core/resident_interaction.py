@@ -21,7 +21,8 @@ STANDARD_VERSION = "resident-api-standard-v1"
 
 
 OLLAMA_ENDPOINT = os.environ.get("ESTATE_OLLAMA_ENDPOINT", "http://127.0.0.1:11434").rstrip("/")
-PREFERRED_ALFRED_MODEL = os.environ.get("ESTATE_ALFRED_OLLAMA_MODEL", "qwen3:8b")
+BOOTSTRAP_ALFRED_MODEL = os.environ.get("ESTATE_ALFRED_OLLAMA_MODEL", "qwen3:8b")
+PREFERRED_ALFRED_MODEL = BOOTSTRAP_ALFRED_MODEL
 DEFAULT_ALFRED_OLLAMA_TIMEOUT_SECONDS = 60.0
 MAX_ALFRED_PROMPT_CHARS = 6000
 
@@ -71,9 +72,13 @@ class LocalOllamaAdapter:
         unique = list(dict.fromkeys(names))
         return {"available": bool(unique), "provider": self.provider, "endpoint": self.endpoint, "models": unique, "model": unique[0] if unique else None, "discovery": f"local Ollama models discovered via {source}" if unique else f"no local Ollama models discovered via {source}"}
 
-    def select_model(self, resident: str, models: list[str]) -> str | None:
-        if _key(resident) == "alfred" and PREFERRED_ALFRED_MODEL in models:
-            return PREFERRED_ALFRED_MODEL
+    def select_model(self, resident: str, models: list[str], capability: str = "text", root: Path | None = None) -> str | None:
+        selection = resolve_model_control_selection(_key(resident), capability, root=root)
+        assigned = selection.get("adapter_model_name")
+        if assigned and assigned in models:
+            return assigned
+        if _key(resident) == "alfred" and BOOTSTRAP_ALFRED_MODEL in models:
+            return BOOTSTRAP_ALFRED_MODEL
         return models[0] if models else None
 
     def generate(self, *, resident: str, prompt: str, model: str | None = None) -> dict[str, Any]:
@@ -327,6 +332,20 @@ def _llm_recovery_hint(reason: str | None, endpoint: str | None, model: str | No
         return "Refresh AI Services / Models discovery and check the local Ollama service state."
     return "No recovery needed; Alfred has a reachable local LLM provider."
 
+def resolve_model_control_selection(actor: str = "alfred", capability: str = "text", root: Path | None = None) -> dict[str, Any]:
+    try:
+        from estate.model_control.assignments import resolve_assignment
+        from estate.model_control.policy import evaluate_model_use
+        from estate.model_control.registry import load_registry
+        reg = load_registry(root)
+        assignment = resolve_assignment(actor, capability, root=root)
+        model_id = assignment.get("model_id")
+        policy = evaluate_model_use(actor, capability, model_id, root=root, registry=reg) if model_id else {"decision":"denied","allowed":False,"reason":"Model control assignment unavailable"}
+        name = model_id.split(":", 1)[1] if model_id and ":" in model_id and policy.get("allowed") else None
+        return {**assignment, "policy_result": policy.get("decision"), "policy": policy, "assigned_model": model_id, "adapter_model_name": name, "selection_source": "model_control_assignment" if name else "bootstrap_fallback", "warning": None if name else "Model control assignment unavailable"}
+    except Exception as exc:
+        return {"actor": actor, "capability": capability, "model_id": None, "assigned_model": None, "adapter_model_name": None, "selection_source": "bootstrap_fallback", "warning": "Model control assignment unavailable", "policy_result": "unavailable", "policy": {"decision":"denied", "reason": _safe_diagnostic_text(f"{type(exc).__name__}: {exc}")}}
+
 def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
     adapter = adapter or LocalOllamaAdapter()
     try:
@@ -339,9 +358,10 @@ def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any
     except Exception as exc:
         selected = None
         status["last_adapter_error"] = f"{type(exc).__name__}: {exc}"
-    config_source = {"provider": "hardcoded_local_first_ollama_adapter", "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434", "preferred_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b", "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds", "registry_context": "data/registry/providers.json and Discovery observations are inventory context; Alfred chat selection currently uses runtime Ollama discovery."}
+    model_control = resolve_model_control_selection("alfred", "text")
+    config_source = {"provider": "estate_model_control_assignment_then_local_ollama_adapter", "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434", "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b", "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds", "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."}
     reason = _llm_failure_reason(status, selected)
-    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": PREFERRED_ALFRED_MODEL, "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL), "timeout_seconds": alfred_ollama_timeout_seconds(), "generation_attempted": False, "generation_result": "not_attempted", "prompt_size_summary": None})
+    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": PREFERRED_ALFRED_MODEL, "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL), "timeout_seconds": alfred_ollama_timeout_seconds(), "generation_attempted": False, "generation_result": "not_attempted", "prompt_size_summary": None, "model_control_selection": model_control, "selection_source": model_control.get("selection_source"), "policy_result": model_control.get("policy_result")})
     if not status.get("available"):
         status.setdefault("discovery", "deterministic fallback available")
     return _sanitize_llm_status(status)
@@ -531,8 +551,11 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     else:
         user_message_for_prompt = user_message
     prompt = _alfred_prompt(user_message_for_prompt, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message_for_prompt
-    generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=llm_status.get("model")) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable", discovered_models_count=len(llm_status.get("models") or []), generation_result_state="not_attempted", timeout_seconds=alfred_ollama_timeout_seconds(), prompt_summary=_prompt_summary(prompt))}
+    model_control_selection = resolve_model_control_selection(surface["resident_id"], "text", root=rootp)
+    selected_model = model_control_selection.get("adapter_model_name") or llm_status.get("model")
+    generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=selected_model) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable", discovered_models_count=len(llm_status.get("models") or []), generation_result_state="not_attempted", timeout_seconds=alfred_ollama_timeout_seconds(), prompt_summary=_prompt_summary(prompt))}
     llm_meta = _sanitize_llm_metadata(generated.get("metadata") or base_meta)
+    llm_meta.update({"selection_source": model_control_selection.get("selection_source"), "assigned_model": model_control_selection.get("assigned_model"), "capability": "text", "policy_result": model_control_selection.get("policy_result"), "model_control_warning": model_control_selection.get("warning")})
     if governed_action:
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
     response = generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action)

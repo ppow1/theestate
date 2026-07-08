@@ -114,6 +114,10 @@ def print_table(items, fields):
         print(" | ".join(str(item.get(field, "")) for field in fields))
 
 
+def cmd_model_control(args):
+    from estate.model_control.cli import handle
+    handle(args)
+
 def cmd_resident_chat(args):
     if args.action == "send":
         payload = process_chat(args.resident, args.message, session_id=args.session, action=args.resident_action or "summarize")
@@ -1300,7 +1304,7 @@ def cmd_sync_ollama(args):
     else:
         print("No new Ollama providers created.")
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
     sub = parser.add_subparsers(dest="command")
 
@@ -1363,6 +1367,15 @@ def main():
     p.add_argument("--role", required=True)
     p.add_argument("--classification", default="Estate Internal")
     p.set_defaults(func=cmd_resident)
+
+    p = sub.add_parser("model-control", help="Estate model control plane")
+    mc = p.add_subparsers(dest="model_control_action", required=True)
+    q = mc.add_parser("rediscover"); q.add_argument("--fetch-runtime", action="store_true"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_model_control)
+    q = mc.add_parser("list-models"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_model_control)
+    q = mc.add_parser("assignments"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_model_control)
+    q = mc.add_parser("set-default"); q.add_argument("--capability", required=True); q.add_argument("--model", required=True); q.add_argument("--approved-by", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_model_control)
+    q = mc.add_parser("assign"); q.add_argument("--actor", required=True); q.add_argument("--capability", required=True); q.add_argument("--model", required=True); q.add_argument("--approved-by", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_model_control)
+    q = mc.add_parser("validate-assignments"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_model_control)
 
     p = sub.add_parser("alfred-llm-diagnostics")
     p.add_argument("--json", action="store_true", help="Print Alfred LLM connection diagnostic JSON")
@@ -1930,7 +1943,7 @@ def main():
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")
     p.set_defaults(func=cmd_audit_summary)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if not hasattr(args, "func"):
         parser.print_help()
         return

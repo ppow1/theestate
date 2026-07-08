@@ -1,0 +1,56 @@
+{
+  "command_results": [],
+  "commands_run": [],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0218_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0218_validation.md",
+    "runtime/validation/work_packages/WP-0218_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-08T18:17:53+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "37e1f3446a979dd993bc5f22c675fe5f28ce343a",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Execution status blocks readiness: no_recipe."
+    ],
+    "coverage_status": "no_recipe",
+    "execution_status": "no_recipe",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "production_ready": false,
+    "receipt_status": "complete",
+    "required_followups": [
+      "Execution status blocks readiness: no_recipe."
+    ]
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0218_codex_done.json",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "pr_metadata_status": "available",
+    "pull_request_url": "not_applicable_until_make_pr_tool_records_pr_metadata_after_commit",
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0218"
+  },
+  "recipe_id": null,
+  "recipe_title": null,
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 0 command(s).",
+  "validation_id": "WP-0218_2026-07-08T181753Z0000",
+  "validation_status": "no_recipe",
+  "warnings": [
+    "No validation recipe is registered for WP-0218."
+  ],
+  "work_package_id": "WP-0218"
+}
