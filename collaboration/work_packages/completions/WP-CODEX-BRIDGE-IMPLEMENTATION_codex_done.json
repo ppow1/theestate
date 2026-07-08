@@ -1,0 +1,83 @@
+{
+  "boundary_decisions": [
+    "Bridge v1 implements local codex exec only.",
+    "danger-full-access is rejected by request validation.",
+    "Approval and sandbox bypass flags are rejected by request validation.",
+    "Codex Cloud dispatch and Codex Cloud apply are rejected by request validation.",
+    "Workspace-write requires explicit allowed write paths and rejects repository-root write allowlists.",
+    "Runtime events, status snapshots, and audit records are written under runtime/codex_bridge/ and remain local by default.",
+    "Completion receipt authorizes review only, not merge."
+  ],
+  "branch": "main",
+  "codex_status": "done",
+  "completed_at": "2026-07-08T21:41:00Z",
+  "files_changed": [
+    "src/estate/core/codex_bridge.py",
+    "tests/test_codex_bridge.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "docs/integration/codex_bridge_usage.md",
+    "collaboration/work_packages/completions/WP-CODEX-BRIDGE-IMPLEMENTATION_codex_done.json"
+  ],
+  "known_limitations": [
+    "Non-interactive /status automation is unknown.",
+    "Authenticated multi-seat concurrency is unknown.",
+    "Codex Cloud task lifecycle is unknown.",
+    "Codex Cloud apply is unapproved and rejected by this bridge.",
+    "OpenAI-backed JSONL usage shape needs authenticated verification.",
+    "Provider-level saturation and quota reporting may require a later capacity-monitoring package.",
+    "Office of the Steward UI consumption may require a later integration package.",
+    "Codex CLI 0.142.5 exposes workspace-write sandboxing but no path-specific write allowlist flag; bridge validation records allowed write paths and audit evidence for human review."
+  ],
+  "lifecycle_event_status_artifacts": {
+    "dry_run": {
+      "audit": "runtime/codex_bridge/cbr-manual-dry-run/audit.json",
+      "events": "runtime/codex_bridge/cbr-manual-dry-run/events.jsonl",
+      "status": "runtime/codex_bridge/cbr-manual-dry-run/status.json"
+    },
+    "local_ollama_smoke": {
+      "audit": "runtime/codex_bridge/cbr-local-ollama-smoke/audit.json",
+      "events": "runtime/codex_bridge/cbr-local-ollama-smoke/events.jsonl",
+      "status": "runtime/codex_bridge/cbr-local-ollama-smoke/status.json"
+    }
+  },
+  "live_execution": {
+    "local_provider_smoke": {
+      "available": true,
+      "command": "python -m estate.cli.main codex-bridge --request runtime/codex_bridge/local_ollama_smoke_request.json --json",
+      "final_message": "CODEX_BRIDGE_LOCAL_SMOKE",
+      "model": "qwen2.5-coder:7b",
+      "provider": "codex-cli-ollama",
+      "status": "passed"
+    },
+    "openai_backed_smoke": {
+      "reason": "Skipped. This implementation did not verify external network and credentials and did not make an OpenAI-backed live Codex call.",
+      "status": "skipped"
+    }
+  },
+  "merge_authority": "Chief Architect review required; Steward/Ingrid boundary authority preserved",
+  "operational_visibility_acknowledgement": "Terminal output is not treated as sufficient visibility. The bridge emits structured lifecycle events and current-status snapshots under runtime/codex_bridge/ for Office of the Steward consumption.",
+  "production_readiness_command_status": "passed",
+  "promotion_recommendation": "review_required_before_merge",
+  "pull_request_not_applicable_reason": "Local workspace implementation awaiting reviewer-controlled branch, commit, and PR flow.",
+  "ready_for_ca_review": true,
+  "summary": [
+    "Implemented a local Codex Bridge request/result model, request validation, bounded command construction, subprocess runner, JSONL/text parsers, output normalization, usage extraction, lifecycle events, status snapshots, and local audit logging.",
+    "Added a CLI entry point for request JSON execution with dry-run support.",
+    "Added a local validation recipe and usage documentation.",
+    "Verified parser, cleanup, boundary denial, event/status, audit, and redaction behavior without requiring live network access."
+  ],
+  "tests_run": [
+    "pytest -q tests/test_codex_bridge.py",
+    "python -m estate.cli.main codex-bridge --request runtime/codex_bridge/manual_dry_run_request.json --dry-run --json",
+    "python -m estate.cli.main codex-bridge --request runtime/codex_bridge/local_ollama_smoke_request.json --json",
+    "python -m estate.cli.main validate-work-package --id WP-CODEX-BRIDGE-IMPLEMENTATION --json",
+    "python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "validation_artifacts": {
+    "markdown": "operations/validation/reports/WP-CODEX-BRIDGE-IMPLEMENTATION_validation.md",
+    "json": "runtime/validation/work_packages/WP-CODEX-BRIDGE-IMPLEMENTATION_validation.json"
+  },
+  "validation_recipe_status": "registered",
+  "work_package_id": "WP-CODEX-BRIDGE-IMPLEMENTATION"
+}

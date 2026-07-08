@@ -2284,3 +2284,32 @@ VALIDATION_RECIPES["WP-0217"] = {
         _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
     ],
 }
+
+VALIDATION_RECIPES["WP-CODEX-BRIDGE-IMPLEMENTATION"] = {
+    "recipe_id": "wp-codex-bridge-implementation-local-validation",
+    "title": "WP-CODEX-BRIDGE-IMPLEMENTATION - Production Codex Bridge Implementation",
+    "description": "Validates the local Codex Bridge parser, boundary policy, CLI dry-run visibility artifacts, documentation, and completion receipt without live Codex or OpenAI access.",
+    "required_checks": [
+        "Codex Bridge tests pass",
+        "CLI dry-run emits lifecycle/status/audit artifacts",
+        "Bridge documentation exists",
+        "Completion receipt is complete",
+    ],
+    "observational_checks": ["Production readiness report remains executable"],
+    "expected_artifacts": [
+        "src/estate/core/codex_bridge.py",
+        "tests/test_codex_bridge.py",
+        "docs/integration/codex_bridge_usage.md",
+        "collaboration/work_packages/completions/WP-CODEX-BRIDGE-IMPLEMENTATION_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Dry-run invokes live Codex instead of validation-only mode"],
+    "success_criteria": ["Required commands exit zero", "Runtime artifacts are local under runtime/codex_bridge"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/test_codex_bridge.py"),
+        _cmd("python -c \"import json, subprocess, sys; from pathlib import Path; req=Path('runtime/codex_bridge/recipe_dry_run_request.json'); req.parent.mkdir(parents=True, exist_ok=True); req.write_text(json.dumps({'request_id':'cbr-recipe-dry-run','prompt_source':'docs/governance/workers/WP-CODEX-BRIDGE-IMPLEMENTATION.md','classification':'Estate Internal','work_package_id':'WP-CODEX-BRIDGE-IMPLEMENTATION','provider':'codex-cli-openai','codex_home_profile':'default','sandbox':'read-only','allowed_read_paths':['docs/governance/workers'],'cwd':'.'}), encoding='utf-8'); proc=subprocess.run([sys.executable,'-m','estate.cli.main','codex-bridge','--request',str(req),'--dry-run','--json'], text=True, capture_output=True, check=False); assert proc.returncode==0, proc.stderr or proc.stdout; data=json.loads(proc.stdout); assert data['status']=='dry_run_validated'; assert Path(data['events_path']).is_file(); assert Path(data['status_snapshot_path']).is_file(); assert Path(data['audit_path']).is_file()\""),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/codex_bridge.py','tests/test_codex_bridge.py','docs/integration/codex_bridge_usage.md']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-CODEX-BRIDGE-IMPLEMENTATION'); assert r['receipt_status']=='complete', r\""),
+        _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
+    ],
+}
