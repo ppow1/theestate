@@ -707,3 +707,9 @@ Implemented WP-0601 with shared operational event and status models, runtime ope
 EC-000088 - Added Office operational activity panel
 
 Implemented WP-0602 with a read-only Office operational activity loader and Steward command center panel consuming WP-0601 status artifacts, including grouped activity, honest missing and malformed artifact states, stale detection, classification-safe summaries, tests, and integration documentation.
+
+2026-07-08 00:00:00
+
+EC-000089 - Added provider registration and capability discovery
+
+Implemented WP-0604 with shared provider descriptor and capability models, config/providers/catalog.json, provider catalog CLI commands, Office-readable runtime provider status export, tests, and integration documentation.

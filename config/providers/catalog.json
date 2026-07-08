@@ -1,0 +1,262 @@
+{
+  "capabilities": [
+    {
+      "capability_id": "planning",
+      "category": "planning",
+      "description": "Planning capability.",
+      "display_name": "Planning",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "architecture_review",
+      "category": "planning",
+      "description": "Architecture Review capability.",
+      "display_name": "Architecture Review",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "governance_draft",
+      "category": "documentation",
+      "description": "Governance Draft capability.",
+      "display_name": "Governance Draft",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "work_package_draft",
+      "category": "documentation",
+      "description": "Work Package Draft capability.",
+      "display_name": "Work Package Draft",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "documentation_draft",
+      "category": "documentation",
+      "description": "Documentation Draft capability.",
+      "display_name": "Documentation Draft",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "repository_implementation",
+      "category": "execution",
+      "description": "Repository Implementation capability.",
+      "display_name": "Repository Implementation",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "code_review",
+      "category": "validation",
+      "description": "Code Review capability.",
+      "display_name": "Code Review",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": true,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "test_execution",
+      "category": "validation",
+      "description": "Test Execution capability.",
+      "display_name": "Test Execution",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": true,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "audit_execution",
+      "category": "validation",
+      "description": "Audit Execution capability.",
+      "display_name": "Audit Execution",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": true,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "validation_receipt",
+      "category": "validation",
+      "description": "Validation Receipt capability.",
+      "display_name": "Validation Receipt",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": true,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "local_reasoning",
+      "category": "classification",
+      "description": "Local Reasoning capability.",
+      "display_name": "Local Reasoning",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "classification_review",
+      "category": "classification",
+      "description": "Classification Review capability.",
+      "display_name": "Classification Review",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "web_research",
+      "category": "research",
+      "description": "Web Research capability.",
+      "display_name": "Web Research",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": false
+    },
+    {
+      "capability_id": "connector_context_read",
+      "category": "research",
+      "description": "Connector Context Read capability.",
+      "display_name": "Connector Context Read",
+      "input_artifacts": [],
+      "metadata": {},
+      "output_artifacts": [],
+      "requires_approval": false,
+      "requires_validation": false,
+      "supports_offline": false
+    }
+  ],
+  "providers": [
+    {
+      "capabilities": [
+        "planning",
+        "documentation_draft"
+      ],
+      "classification_ceiling": "Estate Internal",
+      "cost_model": "free",
+      "display_name": "Stub Planning Echo",
+      "implementation_kind": "stub",
+      "provider_id": "stub.planning.echo",
+      "provider_type": "planning",
+      "requires_network": false,
+      "routing_notes": "Aligns with the implemented local stub planning provider.",
+      "status": "implemented",
+      "supports_artifacts": true,
+      "supports_events": true,
+      "supports_offline": true
+    },
+    {
+      "capabilities": [
+        "planning",
+        "architecture_review",
+        "governance_draft",
+        "work_package_draft",
+        "documentation_draft",
+        "web_research",
+        "connector_context_read"
+      ],
+      "classification_ceiling": "Estate Internal",
+      "cost_model": "usage_based",
+      "display_name": "ChatGPT External Planning",
+      "implementation_kind": "chatgpt",
+      "provider_id": "chatgpt.planning.external",
+      "provider_type": "planning",
+      "requires_boundary_review": true,
+      "requires_network": true,
+      "status": "designed"
+    },
+    {
+      "capabilities": [
+        "repository_implementation",
+        "code_review"
+      ],
+      "classification_ceiling": "Estate Internal",
+      "cost_model": "usage_based",
+      "display_name": "Codex CLI Execution",
+      "implementation_kind": "codex",
+      "provider_id": "codex.execution.cli",
+      "provider_type": "execution",
+      "requires_boundary_review": true,
+      "status": "designed",
+      "supports_artifacts": true,
+      "supports_events": true
+    },
+    {
+      "capabilities": [
+        "local_reasoning",
+        "classification_review"
+      ],
+      "classification_ceiling": "Local Only",
+      "cost_model": "local",
+      "display_name": "Ollama Local Reasoning",
+      "implementation_kind": "local_llm",
+      "provider_id": "ollama.local.reasoning",
+      "provider_type": "mixed",
+      "requires_network": false,
+      "status": "designed",
+      "supports_offline": true
+    },
+    {
+      "capabilities": [
+        "audit_execution",
+        "validation_receipt",
+        "test_execution"
+      ],
+      "classification_ceiling": "Estate Internal",
+      "cost_model": "local",
+      "display_name": "Estate Local Audit",
+      "implementation_kind": "python",
+      "provider_id": "estate.audit.local",
+      "provider_type": "validation",
+      "requires_network": false,
+      "status": "implemented",
+      "supports_artifacts": true,
+      "supports_offline": true,
+      "supports_validation": true
+    }
+  ],
+  "schema_version": "1.0"
+}
