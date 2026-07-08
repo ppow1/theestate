@@ -86,10 +86,50 @@ from estate.core.provider_health import ProviderHealthRecord, write_health_recor
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
+from estate.core.operations_manager import OperationsDecision
+from estate.core.operations_control_runtime import OperationsControlRuntime, format_operations_review, format_operations_decisions
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
+
+
+def cmd_operations_review(args):
+    try:
+        review, paths = OperationsControlRuntime().generate_review(classification=args.classification, write=True)
+        if getattr(args, "json", False):
+            print(json.dumps(review.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_operations_review(review, paths))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operations review failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_operations_decide(args):
+    try:
+        decision = OperationsDecision.create(decided_by=args.decided_by, decision_type=args.decision_type, target_type=args.target_type, target_id=args.target_id, classification=args.classification, priority=args.priority, reason=args.reason, next_state=args.next_state, assignment_label=args.assignment_label, provider_id=args.provider_id, worker_id=args.worker_id, seat_id=args.seat_id, requires_boundary_review=args.requires_boundary_review, requires_steward_attention=args.requires_steward_attention, summary_safe=args.summary_safe)
+        paths = OperationsControlRuntime().record_decision(decision)
+        print(f"Operations decision recorded: {decision.decision_id}")
+        print(f"Type: {decision.decision_type}")
+        print(f"Target: {decision.target_type}:{decision.target_id or ''}")
+        if decision.assignment_label:
+            print(f"Assignment label: {decision.assignment_label}")
+        print(f"Decision: {paths['decision']}")
+        print(f"Summary: {paths['summary_json']}")
+    except (OSError, ValueError) as exc:
+        print(f"Operations decision failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_operations_decisions_list(args):
+    try:
+        decisions = OperationsControlRuntime().list_decisions()
+        if getattr(args, "json", False):
+            print(json.dumps([d.to_dict() for d in decisions], indent=2, sort_keys=True))
+        else:
+            print(format_operations_decisions(decisions))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operations decisions list failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_worker_assignment_create(args):
     try:
@@ -2394,6 +2434,34 @@ def main(argv=None):
     p = sub.add_parser("worker-assignment-list", help="List worker assignments and refresh board artifacts")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_worker_assignment_list)
+
+
+    p = sub.add_parser("operations-review", help="Generate Traffic Controller / Operations Manager review")
+    p.add_argument("--classification", default="Estate Internal", choices=["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only"])
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_operations_review)
+
+    p = sub.add_parser("operations-decide", help="Record an operations control decision")
+    p.add_argument("--decision-type", required=True, choices=["assign", "reprioritize", "hold", "release", "defer", "cancel", "escalate", "request_boundary_review", "request_revision", "request_validation"])
+    p.add_argument("--target-type", required=True, choices=["intake", "schedule", "dispatch", "assignment", "provider", "work_package", "system"])
+    p.add_argument("--target-id")
+    p.add_argument("--classification", default="Estate Internal", choices=["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only"])
+    p.add_argument("--priority", default="normal", choices=["low", "normal", "high", "urgent"])
+    p.add_argument("--decided-by", required=True)
+    p.add_argument("--reason", required=True)
+    p.add_argument("--next-state")
+    p.add_argument("--assignment-label")
+    p.add_argument("--provider-id")
+    p.add_argument("--worker-id")
+    p.add_argument("--seat-id")
+    p.add_argument("--requires-boundary-review", action="store_true")
+    p.add_argument("--requires-steward-attention", action="store_true")
+    p.add_argument("--summary-safe", action="store_true")
+    p.set_defaults(func=cmd_operations_decide)
+
+    p = sub.add_parser("operations-decisions-list", help="List recorded operations decisions")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_operations_decisions_list)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")
