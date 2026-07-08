@@ -85,6 +85,7 @@ from estate.core.provider_catalog import load_provider_catalog, write_office_sta
 from estate.core.provider_health import ProviderHealthRecord, write_health_record, generate_provider_health_summary, format_provider_health_summary
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
+from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -291,6 +292,30 @@ def cmd_orchestrator_schedule_list(args):
         print(json.dumps(queue, indent=2, sort_keys=True))
     else:
         print(format_schedule_queue_for_cli(queue))
+
+def cmd_orchestrator_cycle(args):
+    try:
+        if args.dry_run == args.single:
+            print("Specify exactly one of --dry-run or --single")
+            raise SystemExit(1)
+        state = OrchestratorCycleRuntime().run_cycle(dry_run=args.dry_run)
+        print(format_cycle_summary(state))
+        if state.errors:
+            raise SystemExit(2)
+    except (OSError, ValueError) as exc:
+        print(f"Orchestrator cycle failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_orchestrator_dispatch_list(args):
+    try:
+        queue = OrchestratorCycleRuntime().dispatch_queue()
+        if getattr(args, "json", False):
+            print(json.dumps(queue, indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_queue(queue))
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Orchestrator dispatch list failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_planning_provider_run(args):
     try:
@@ -2041,6 +2066,17 @@ def main(argv=None):
     p.add_argument("--request", required=True, help="Path to planning provider request JSON")
     p.set_defaults(func=cmd_planning_provider_run)
 
+
+
+    p = sub.add_parser("orchestrator-cycle", help="Run one bounded Orchestrator cycle without provider execution")
+    group = p.add_mutually_exclusive_group(required=True)
+    group.add_argument("--dry-run", action="store_true", help="Evaluate work and status without writing dispatch records")
+    group.add_argument("--single", action="store_true", help="Run one cycle and write dispatch records")
+    p.set_defaults(func=cmd_orchestrator_cycle)
+
+    p = sub.add_parser("orchestrator-dispatch-list", help="List Orchestrator dispatch queue records")
+    p.add_argument("--json", action="store_true", help="Print dispatch queue JSON")
+    p.set_defaults(func=cmd_orchestrator_dispatch_list)
 
     p = sub.add_parser("orchestrator-schedule", help="Schedule eligible approved Orchestrator intake without executing providers")
     group = p.add_mutually_exclusive_group(required=True)
