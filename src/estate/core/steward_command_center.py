@@ -25,6 +25,7 @@ from estate.core.capability_dependency_visualization import generate_capability_
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
 from estate.core.office_operational_activity import load_office_operational_activity
+from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
@@ -916,6 +917,7 @@ def generate_command_center(root=None, write=True):
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
+        "traffic_controller_panel": load_office_traffic_controller_panel(root),
         "orchestrator_intake_decisions": load_office_intake_decision_surface(root),
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
@@ -1664,6 +1666,49 @@ def _capability_dependency_visualization_html(artifact):
     return "".join(out)
 
 
+
+def _traffic_controller_html(artifact):
+    data = artifact or {}
+    summary = data.get("summary") or {}
+    errors = data.get("errors") or []
+    actions = data.get("recommended_actions") or []
+    decisions = data.get("recent_decisions") or []
+    out = ["<div class='traffic-controller-panel'>"]
+    out.append("<h2>Traffic Controller / Operations Manager</h2>")
+    out.append("<p>Steward-facing operations-control posture from runtime operations-control artifacts. Controls record decisions only; they do not run providers.</p>")
+    out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value))}</span></span>" for label, value in [("Posture", summary.get("operational_posture", "unknown")), ("Latest review", summary.get("latest_review_at") or "none"), ("Attention", summary.get("items_requiring_attention", 0)), ("Boundary", summary.get("boundary_review_required", False)), ("Provider warnings", summary.get("provider_capacity_warnings", 0)), ("Assignment gaps", summary.get("assignment_gaps", 0))]) + "</div>")
+    fresh = data.get("freshness") or {}
+    out.append("<p><span class='health-badge " + html.escape(str(fresh.get("state") or "uncertain")) + "'>" + html.escape(str(fresh.get("state") or "uncertain")) + "</span> " + html.escape(str(fresh.get("message") or "No parseable latest review timestamp.")) + "</p>")
+    if not data.get("available"):
+        out.append(f"<p class='placeholder'>{html.escape(data.get('empty_state') or 'No operations-control artifacts found.')}</p>")
+        out.append("<p class='source'>Expected operations-control artifact paths: " + html.escape(', '.join(data.get("expected_status_artifact_paths") or [])) + ". No fake healthy status is shown.</p>")
+    if errors:
+        out.append("<h3>Malformed or unreadable operations-control artifacts</h3><ul>" + "".join(f"<li><strong>{html.escape(str(e.get('path')))}</strong>: {html.escape(str(e.get('message')))}</li>" for e in errors) + "</ul>")
+    blocked = data.get("blocked_items") or {}
+    out.append("<h3>Items requiring Steward attention</h3><ul>" + "".join(f"<li>{html.escape(label)}: {html.escape(str(value))}</li>" for label, value in [("Blocked intake", blocked.get("intake", 0)), ("Blocked assignments", blocked.get("assignments", 0)), ("Blocked providers", blocked.get("providers", 0)), ("Boundary review required", summary.get("boundary_review_required", False))]) + "</ul>")
+    out.append(f"<h3>Recommended Actions ({len(actions)})</h3>")
+    if actions:
+        out.append("<table><thead><tr><th>Action</th><th>Target</th><th>Priority</th><th>Summary</th><th>Requirements</th><th>Control</th></tr></thead><tbody>")
+        for action in actions[:25]:
+            control = action.get("control") or {}
+            if control.get("available"):
+                button = "<button class='office-action' data-office-action='operations_control.record_decision' data-decision-type='" + html.escape(str(control.get("decision_type") or ""), quote=True) + "' data-target-type='" + html.escape(str(action.get("target_type") or "system"), quote=True) + "' data-target-id='" + html.escape(str(action.get("target_id") or ""), quote=True) + "' data-decided-by='Steward'>Record decision</button>"
+            else:
+                button = "<button disabled>Unavailable</button><br><span class='source'>" + html.escape(str(control.get("unavailable_reason") or "No safe handler.")) + "</span>"
+            target = str(action.get("target_type") or "system") + (":" + str(action.get("target_id")) if action.get("target_id") else "")
+            summary_text = str(action.get("summary") or "") + (" (redacted by classification rule)" if action.get("summary_redacted") else "")
+            out.append("<tr>" + f"<td>{html.escape(str(action.get('action_type')))}</td><td>{html.escape(target)}</td><td>{html.escape(str(action.get('priority')))}</td><td>{html.escape(summary_text)}</td><td>approval={html.escape(str(action.get('requires_steward_approval')))}<br>boundary={html.escape(str(action.get('requires_boundary_review')))}</td><td>{button}</td>" + "</tr>")
+        out.append("</tbody></table>")
+    else:
+        out.append("<p class='placeholder'>No recommended operations-control actions are available.</p>")
+    out.append(f"<h3>Latest Operations Decisions ({len(decisions)})</h3>")
+    if decisions:
+        out.append("<ul>" + "".join(f"<li><strong>{html.escape(str(d.get('decision_type')))}</strong> {html.escape(str(d.get('target_type')))}:{html.escape(str(d.get('target_id') or ''))} — {html.escape(str(d.get('safe_reason') or ''))}</li>" for d in decisions[:10]) + "</ul>")
+    else:
+        out.append("<p class='placeholder'>No operations decisions have been recorded.</p>")
+    out.append("<p class='source'>Sources: " + html.escape(str(data.get("path") or "")) + ". Classification behavior: " + html.escape(str(data.get("classification_behavior") or "safe display")) + "</p></div>")
+    return "".join(out)
+
 def _operational_activity_html(artifact):
     data = artifact or {}
     expected = data.get("expected_status_artifact_paths") or []
@@ -2104,7 +2149,7 @@ def render_command_center_html(payload):
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
-        ("operational-activity", "Operational Activity", _operational_activity_html(p.get("operational_activity", {}))),
+        ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
