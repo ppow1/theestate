@@ -959,3 +959,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented the first Estate Planning Provider Framework with request, response, and event contracts; provider registry; deterministic local stub provider; runtime artifacts; CLI entry point; tests; and integration documentation.
+
+EC-000087 - Added operational event feed and status surface
+
+Timestamp: 2026-07-08 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented the shared Estate operational event feed with validated event envelopes, Office-readable activity status derivation, runtime event and status artifacts, CLI record and summary commands, redacted sensitive summaries, tests, and integration documentation.
