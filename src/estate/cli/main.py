@@ -75,10 +75,36 @@ from estate.core.planning_provider_registry import default_planning_provider_reg
 from estate.core.planning_provider_runtime import PlanningProviderRuntimeWriter
 from estate.core.operational_events import OperationalEvent
 from estate.core.operational_status import record_operational_event, format_summary_for_cli
+from estate.core.orchestrator_intake import OrchestratorIntakeRequest
+from estate.core.orchestrator_intake_runtime import OrchestratorIntakeRuntime, format_queue_for_cli, safe_summary
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
+
+def cmd_orchestrator_intake_submit(args):
+    try:
+        data = json.loads(Path(args.request).read_text(encoding="utf-8"))
+        request = OrchestratorIntakeRequest.from_dict(data)
+        status, paths = OrchestratorIntakeRuntime().submit(request)
+        label = "BLOCKED" if status.state == "blocked" else "PENDING"
+        print(f"Orchestrator intake {label}: {status.intake_id}")
+        print(f"State: {status.state}")
+        print(f"Summary: {safe_summary(status.to_dict())}")
+        if status.blocked_reason:
+            print(f"Blocked reason: {status.blocked_reason}")
+        print(f"Artifact: {paths['artifact']}")
+        print(f"Queue status: {paths['queue']}")
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Orchestrator intake submit failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_orchestrator_intake_list(args):
+    queue = OrchestratorIntakeRuntime().queue_state()
+    if getattr(args, "json", False):
+        print(json.dumps(queue, indent=2, sort_keys=True))
+    else:
+        print(format_queue_for_cli(queue))
 
 def cmd_planning_provider_run(args):
     try:
@@ -1789,6 +1815,14 @@ def main(argv=None):
     p = sub.add_parser("planning-provider-run", help="Run an Estate planning provider request from JSON")
     p.add_argument("--request", required=True, help="Path to planning provider request JSON")
     p.set_defaults(func=cmd_planning_provider_run)
+
+    p = sub.add_parser("orchestrator-intake-submit", help="Submit an Orchestrator intake request from JSON")
+    p.add_argument("--request", required=True, help="Path to Orchestrator intake request JSON")
+    p.set_defaults(func=cmd_orchestrator_intake_submit)
+
+    p = sub.add_parser("orchestrator-intake-list", help="List Orchestrator intake queue state")
+    p.add_argument("--json", action="store_true", help="Print queue state JSON")
+    p.set_defaults(func=cmd_orchestrator_intake_list)
 
     p = sub.add_parser("onboarding-manifest-check")
     p.add_argument("--json", action="store_true", help="Validate onboarding manifest required paths and print JSON")
