@@ -80,6 +80,7 @@ from estate.core.operational_status import record_operational_event, format_summ
 from estate.core.orchestrator_intake import OrchestratorIntakeRequest
 from estate.core.orchestrator_intake_runtime import OrchestratorIntakeRuntime, format_queue_for_cli, safe_summary
 from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
+from estate.core.orchestrator_schedule_runtime import OrchestratorScheduleRuntime, format_schedule_queue_for_cli
 from estate.core.provider_catalog import load_provider_catalog, write_office_status, format_provider_list
 
 def _repo_path(rel):
@@ -177,6 +178,35 @@ def cmd_orchestrator_intake_decide(args):
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"Orchestrator intake decide failed: {exc}")
         raise SystemExit(1)
+
+def cmd_orchestrator_schedule(args):
+    try:
+        runtime = OrchestratorScheduleRuntime()
+        record, paths = runtime.schedule(
+            intake_id=args.intake_id,
+            request_path=Path(args.request) if args.request else None,
+            scheduled_by=args.scheduled_by,
+            explicit_defer=args.defer,
+        )
+        print(f"Orchestrator schedule {record.state.upper()}: {record.schedule_id}")
+        print(f"Intake: {record.intake_id}")
+        print(f"State: {record.state}")
+        if record.blocked_reason:
+            print(f"Blocked reason: {record.blocked_reason}")
+        if (record.metadata or {}).get("deferred_reason"):
+            print(f"Deferred reason: {record.metadata['deferred_reason']}")
+        print(f"Artifact: {paths['artifact']}")
+        print(f"Queue status: {paths['queue']}")
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Orchestrator schedule failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_orchestrator_schedule_list(args):
+    queue = OrchestratorScheduleRuntime().queue_state()
+    if getattr(args, "json", False):
+        print(json.dumps(queue, indent=2, sort_keys=True))
+    else:
+        print(format_schedule_queue_for_cli(queue))
 
 def cmd_planning_provider_run(args):
     try:
@@ -1926,6 +1956,19 @@ def main(argv=None):
     p = sub.add_parser("planning-provider-run", help="Run an Estate planning provider request from JSON")
     p.add_argument("--request", required=True, help="Path to planning provider request JSON")
     p.set_defaults(func=cmd_planning_provider_run)
+
+
+    p = sub.add_parser("orchestrator-schedule", help="Schedule eligible approved Orchestrator intake without executing providers")
+    group = p.add_mutually_exclusive_group(required=True)
+    group.add_argument("--intake-id", help="Approved intake id to schedule")
+    group.add_argument("--request", help="Path to schedule request/intake JSON")
+    p.add_argument("--scheduled-by", default="orchestrator", help="Actor recording the schedule")
+    p.add_argument("--defer", action="store_true", help="Explicitly defer otherwise eligible scheduling")
+    p.set_defaults(func=cmd_orchestrator_schedule)
+
+    p = sub.add_parser("orchestrator-schedule-list", help="List Orchestrator schedule queue state")
+    p.add_argument("--json", action="store_true", help="Print schedule queue JSON")
+    p.set_defaults(func=cmd_orchestrator_schedule_list)
 
     p = sub.add_parser("orchestrator-intake-submit", help="Submit an Orchestrator intake request from JSON")
     p.add_argument("--request", required=True, help="Path to Orchestrator intake request JSON")

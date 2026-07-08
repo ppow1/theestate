@@ -713,3 +713,9 @@ Implemented WP-0602 with a read-only Office operational activity loader and Stew
 EC-000089 - Added provider registration and capability discovery
 
 Implemented WP-0604 with shared provider descriptor and capability models, config/providers/catalog.json, provider catalog CLI commands, Office-readable runtime provider status export, tests, and integration documentation.
+
+2026-07-08 00:00:00
+
+EC-000090 - Added Orchestrator scheduling skeleton
+
+Implemented WP-0606 with schedule record validation, eligibility checks, runtime schedule artifacts, orchestrator-schedule and orchestrator-schedule-list CLI commands, provider catalog compatibility, operational event compatibility, tests, and concise integration documentation. The scheduler creates records only and does not invoke providers.

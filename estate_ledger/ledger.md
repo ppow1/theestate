@@ -989,3 +989,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented WP-0604 with shared provider descriptor and capability models, a static provider catalog, lookup and filtering helpers, CLI list/show/find commands, Office-readable provider catalog status export, tests, and concise integration documentation.
+
+EC-000090 - Added Orchestrator scheduling skeleton
+
+Timestamp: 2026-07-08 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented WP-0606 with schedule record validation, eligibility checks, file-backed scheduled/deferred/blocked queues, provider catalog compatibility checks, operational event compatibility, CLI schedule/list commands, tests, and concise integration documentation without provider execution.
