@@ -50,11 +50,26 @@ Resident identity progresses through distinct states:
 7. Suspended
 8. Retired
 9. Succeeded
-10. Archived
+10. Emeritus
+11. Archived
 
 These states must not be collapsed.
 
 A resident may exist conceptually before implementation. A charter may exist before validation. A model implementation may exist without being institutionalized.
+
+## Transitional Occupants and Context-Bloat Succession
+
+Some offices are designed for successive occupants because long-running chat-based implementations degrade over time.
+
+The Estate may appoint a successor occupant when context bloat, chat momentum, degraded response latency, loss of effectiveness, or reduced confidence makes the current implementation less useful for the Steward.
+
+This is not novelty for novelty's sake. It is operational hygiene.
+
+A new Chief Architect, Chief Character Architect, designer, or other transitional office occupant may be created because the office remains necessary while the current chat implementation has become too large, slow, or self-maintaining to perform effectively.
+
+Succession preserves the office while relieving the implementation burden.
+
+The prior occupant does not vanish. Depending on office and Steward direction, they may become emeritus, retired, archived, or otherwise preserved in institutional memory.
 
 ## Office / Occupant / Implementation / State
 
@@ -121,7 +136,7 @@ Ephemeral workers, systems, services, and CLI adapters are not gendered as resid
 
 Character drift occurs when a resident's behavior, claimed authority, communication style, memory use, implementation, or collaboration pattern diverges from its charter.
 
-Potential drift triggers include model replacement, prompt rewrite, resident API expansion, tool scope change, mailbox change, new recurring duties, repeated worker behavior resembling resident continuity, UI or visualization changes that alter perceived authority, and private/public boundary confusion.
+Potential drift triggers include model replacement, prompt rewrite, resident API expansion, tool scope change, mailbox change, new recurring duties, repeated worker behavior resembling resident continuity, UI or visualization changes that alter perceived authority, private/public boundary confusion, and context-bloat degradation in chat-based implementations.
 
 Character Architecture may recommend review when drift is suspected.
 
@@ -139,6 +154,7 @@ Before a new resident is proposed, answer:
 8. What risks arise if this identity is not created?
 9. Does this need a resident, or only a worker / system / service?
 10. What Steward approval is required?
+11. Is this a true new office, or only a successor occupant needed because an existing chat implementation has become context-bloated or degraded?
 
 ## Relationship to Helen / AI HR
 
