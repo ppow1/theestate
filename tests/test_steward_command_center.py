@@ -717,6 +717,11 @@ def test_wp0139_alfred_ui_has_failure_timeout_and_diagnostics_state(tmp_path):
     assert "resident_chat_timeout_after_30s" in html
     assert "Alfred request failed safely" in html
     assert "Adapter diagnostics are shown per response" in html
+    assert "Generation result" in html
+    assert "Timeout seconds" in html
+    assert "Prompt size summary" in html
+    assert "timeout seconds" in html
+    assert "recovery hint" in html
     assert "reviewing local Estate context" in html
     assert "data-state" in html
 

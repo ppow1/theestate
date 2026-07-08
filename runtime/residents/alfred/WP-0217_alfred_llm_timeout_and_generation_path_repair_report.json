@@ -1,0 +1,46 @@
+{
+  "diagnostic_changes": [
+    "generation_result",
+    "timeout_seconds",
+    "prompt_size",
+    "fallback_reason",
+    "recovery_hint"
+  ],
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_resident_interaction.py",
+    "tests/test_steward_command_center.py"
+  ],
+  "generated_at": "2026-07-08T16:58:19+00:00",
+  "known_limitations": [
+    "CI uses mocks and does not require real Ollama.",
+    "Extremely slow cold loads may require increasing the timeout environment variable."
+  ],
+  "local_smoke_test_instructions": [
+    "Set-Location A:\\theestate",
+    "$env:PYTHONPATH=\"A:\\theestate\\src\"",
+    "$env:ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS=\"60\"",
+    "python -m estate.cli.main alfred-llm-diagnostics --json",
+    "python -m estate.cli.main resident-chat send --resident alfred --message \"Alfred, give me a short operational greeting and say whether this came from the local LLM.\" --json"
+  ],
+  "prompt_context_size_findings": "Prompt context is bounded; context JSON slice reduced and final Alfred prompt capped at 6000 characters with per-response prompt size diagnostics.",
+  "recommended_next_action": "Run the Steward-local smoke test against real Ollama/qwen3:8b.",
+  "root_cause": "Provider discovery succeeded but /api/generate used a fixed 12 second timeout that was too short for Windows/Ollama cold-loading qwen3:8b, and process_chat labeled deterministic fallback as completed.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_resident_interaction.py -q",
+    "PYTHONPATH=src pytest tests/test_steward_command_center.py::test_wp0139_alfred_ui_has_failure_timeout_and_diagnostics_state -q"
+  ],
+  "timeout_policy": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS, bounded 1-300 seconds, default 60 seconds.",
+  "ui_changes": [
+    "Alfred panel shows generation result, timeout seconds, prompt size summary, and recovery hint; per-turn line prefixes degraded fallback."
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src pytest tests/test_resident_interaction.py tests/test_steward_command_center.py -q",
+    "PYTHONPATH=src pytest tests/test_work_package_validation.py tests/test_production_readiness_validation.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0217 --json",
+    "PYTHONPATH=src python -m estate.cli.main validation-production-readiness --json"
+  ],
+  "work_package_id": "WP-0217"
+}
