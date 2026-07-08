@@ -3,7 +3,7 @@
 Status: Active
 Owner: Alfred / Chief of Staff
 Classification: Estate Internal
-Updated: 2026-07-07
+Updated: 2026-07-08
 
 ## Purpose
 
@@ -73,7 +73,349 @@ Each item should include:
 | PL-0024 | Reusable portable command node architecture: develop a reusable field/control-node pattern using commodity macro pads with buttons, encoders, RGB, or LCD; ESP32-S3-class USB host hardware; Wi-Fi; optional battery operation; and 3D-printed enclosures so command nodes can be deployed without custom PCBs or full Raspberry Pi builds. Potential uses include Command Chair controls, printer panels, Cue Mastery demo controls, robotic landscaping operator pendants, trailer maintenance consoles, garage nodes, and context-recovery buttons that can emit standard prompts such as GitHub/Parking Lot reorientation instructions when a conversation or connector drifts | Estate Hardware / Distributed Control | High | Pat / Steward | 2026-07-07 | Captured | Portable node architecture exploration | Prototype one portable command node from off-the-shelf hardware and validate it across at least two roles before standardizing firmware, enclosure, and Estate service integration |
 | PL-0025 | Role/task security classification should determine onboarding depth, so Ingrid can assign security levels appropriate to the role and work package; narrowly scoped workers receive bounded onboarding while higher-trust or broader-authority workers receive deeper governance, security, and institutional context | Institutional Onboarding / Security | High | Pat / Steward | 2026-07-07 | Captured | Ingrid security/onboarding implementation | Ingrid has enough security classification authority and onboarding manifest work is promoted from Parking Lot into active implementation |
 | PL-0026 | Proposed onboarding addendum for lessons learned during initial Estate operations: add a section to the onboarding or new-hire handbook capturing conventions that were not obvious during ad hoc onboarding, including that user-pasted artifacts are review requests by default, screenshots and logs often represent engineering state transitions, audit is distinct from validation, validation should produce executable PowerShell command sequences using Estate formatting conventions, GitHub merge is not validation, the work package is the contract while handoff is only the standard Read path and Do exactly what it says instruction, and recurring operational conventions with institutional value should be captured in the Parking Lot at operations/boards/parking_lot.md. Include authoritative source paths: daily_board at operations/boards/daily_board.md, active_work at operations/boards/active_work.md, daily_board_integration at runtime/operations/daily_board_integration.json, parking_lot at operations/boards/parking_lot.md, work_package_pipeline at runtime/work_packages/assignment_queue.json, and alfred_operational_briefing at operations/alfred/operational_briefing.md | Institutional Onboarding | High | Pat / Steward | 2026-07-07 | Captured | Orientation handbook update | The next onboarding handbook revision is opened and these discovered operating conventions can be converted from proposal into canonical guidance |
+| PL-0027 | Command Chair Architecture and Mobile Workstation Environment: redesign the Estate operator workstation around a tethered powered recliner command node, standing service station, separated KVM and daily-driver USB paths, voice-first command workflow, compact split keyboard, mouse shortcuts, control pod, Stream Deck strategy, modular chair accessories, and Bambu-printed mounting hardware | Hardware / Ergonomics / Infrastructure | High | Pat / Steward | 2026-07-08 | Captured | Command Chair architectural planning | Hardware priorities, budget, measurements, and implementation sequencing justify promotion into one or more focused work packages |
 
 ## Review Guidance
 
 During planning, ask whether each idea is still valuable, whether the timing is right, and whether it should become active work, remain deferred, or be closed.
+
+## PL-0027 Detail: Command Chair Architecture and Mobile Workstation Environment
+
+Status: Parking Lot Proposal
+Priority: Medium (Architectural Project)
+Type: Hardware / Ergonomics / Infrastructure
+Scope: Complete redesign of the Estate operator workstation centered around a mobile Command Chair.
+
+### Objective
+
+Transform the existing office workstation from a traditional desk-centered environment into a mobile, ergonomic Command Chair that better supports the Estate development workflow.
+
+The Command Chair is not intended to be a gaming chair or a high-end typing workstation.
+
+It is intended to become the operator's primary human interface node while allowing continuous movement throughout the workshop during AI processing and long-running development tasks.
+
+### Background
+
+Current development consists largely of orchestrating AI systems rather than continuously typing.
+
+The operator now works primarily through:
+
+- Voice dictation
+- AI conversations
+- Mouse shortcuts
+- Command orchestration
+- Brief keyboard interactions
+
+Typing has become a secondary activity.
+
+If text exceeds approximately 100 words, voice dictation is almost always preferred.
+
+The workstation should therefore optimize for command availability and ergonomics rather than typing performance.
+
+### Design Philosophy
+
+The computer is no longer the destination.
+
+The room is the workspace.
+
+The computer is simply one tool within that workspace.
+
+The Command Chair should therefore support rapid interaction without requiring the operator to remain seated while waiting for AI models, Codex, renders, compiles, or long-running operations.
+
+### Operational Modes
+
+#### Mode 1 - Command Chair
+
+Primary development mode.
+
+Activities include:
+
+- Estate development
+- AI orchestration
+- VS Code
+- ChatGPT
+- Codex
+- ComfyUI
+- debugging
+- architectural review
+
+Long-duration seated work.
+
+#### Mode 2 - Shop Floor
+
+Primary workshop mode.
+
+Activities include:
+
+- soldering
+- hardware work
+- electronics
+- cable management
+- organizing components
+- 3D printing
+- bench work
+
+The operator periodically returns to the computer only long enough to:
+
+- continue AI work
+- approve responses
+- press Enter
+- press F12
+- launch another task
+- review output
+
+The objective is minimizing commitment time.
+
+### Standing Service Station
+
+A secondary interaction point will exist behind the Command Chair.
+
+Purpose:
+
+- Provide immediate access to the workstation while standing.
+
+Configuration:
+
+- full-size keyboard
+- duplicate mouse
+- quick interaction only
+
+Typical usage:
+
+- Continue Codex
+- Approve actions
+- Press function keys
+- Brief troubleshooting
+- Return to workshop
+
+This prevents unnecessary sitting during AI wait periods.
+
+### Chair Philosophy
+
+The chair becomes a mobile workstation node.
+
+It is not wireless.
+
+It is intentionally tethered.
+
+### Chair Infrastructure
+
+The chair already requires power because it is a powered recliner.
+
+Additional infrastructure will be integrated into the chair.
+
+Possible onboard components include:
+
+- USB hubs
+- phone charging dock
+- wireless phone charger
+- keyboard interfaces
+- control pod
+- Stream Deck
+- cable management
+- future peripherals
+
+### Tether
+
+The chair will have a managed tether.
+
+Likely contents:
+
+- AC power
+- dedicated USB connection for KVM/HID
+- dedicated USB connection for daily-driver peripherals
+
+Possible future additions if required.
+
+The tether should:
+
+- disconnect easily
+- support rolling the chair away
+- support room cleaning
+- avoid interfering with the robot vacuum
+
+Possible routing:
+
+- elevated wall hook
+- removable cable support
+- quick-disconnect bundle
+
+### KVM Architecture
+
+Current switching environment consists of:
+
+- 16x16 HDMI Matrix
+- dedicated 16-port USB keyboard switch
+
+These function together as a custom KVM environment.
+
+The KVM USB path should remain dedicated to:
+
+- keyboard
+- mouse
+- HID devices
+
+The daily-driver USB path should support:
+
+- Stream Deck
+- control pod
+- USB hub
+- removable flash drives
+- future peripherals
+
+The two USB roles should remain architecturally separate.
+
+### Input Philosophy
+
+Primary Input: Voice.
+
+Primary Command Interface: Mouse.
+
+Secondary Interface: Compact split keyboard.
+
+Auxiliary Interface:
+
+- Control pod
+- Stream Deck
+- Mouse
+
+The mouse is already the primary command interface.
+
+Existing mappings include:
+
+- Copy
+- Paste
+- Enter
+- Screenshot
+- Dictation
+
+Future work should optimize this command hierarchy rather than duplicate functionality elsewhere.
+
+### Split Keyboard
+
+Typing speed is not a design objective.
+
+Primary goals:
+
+- always available
+- ergonomic
+- compact
+- mounted directly to chair
+- minimal footprint
+
+Likely direction:
+
+- wired
+- hot-swappable
+- Vial/QMK compatible
+- Corne-class layout
+- no emphasis on RGB
+- OLED optional
+- rotary encoders optional
+
+The keyboard exists for:
+
+- shortcuts
+- modifiers
+- quick edits
+- passwords
+- terminal commands
+- occasional typing
+
+### Control Pod
+
+Instead of integrating encoders into the keyboard, investigate a dedicated control pod.
+
+Potential controls:
+
+- large volume encoder
+- mute
+- push-to-talk
+- AI controls
+- programmable buttons
+- optional OLED
+
+Purpose:
+
+- Provide tactile controls without increasing keyboard complexity.
+
+### Stream Deck Strategy
+
+Existing Stream Deck remains valuable.
+
+Future evaluation:
+
+- retain existing Stream Deck
+- determine whether additional Stream Deck or Stream Deck+ is justified
+- compare against smaller encoder-based control pods
+
+### Chair Integration
+
+Investigate replacing existing armrests with modular side panels.
+
+Potential concepts include:
+
+- rotating keyboard pods
+- flip-away keyboard mounts
+- hidden keyboard storage
+- removable modules
+- interchangeable accessories
+
+The keyboard should disappear when not needed.
+
+### Mechanical Architecture
+
+The Command Chair should support modular accessories rather than permanent installations.
+
+Potential modules:
+
+- keyboard halves
+- Stream Deck
+- control pod
+- phone dock
+- future accessories
+
+Modules should be replaceable independently.
+
+### 3D Printing
+
+The Estate already includes a Bambu Lab printer.
+
+Rather than purchasing generic mounts, custom hardware should be designed and printed.
+
+Potential printed components:
+
+- armrest pods
+- keyboard mounts
+- rotating mechanisms
+- cable guides
+- USB hub mounts
+- phone dock
+- tether management
+- modular attachment system
+
+Design for rapid iteration.
+
+### Design Principles
+
+- Infrastructure first.
+- Reliability over appearance.
+- Modular hardware.
+- Easy servicing.
+- Easy cleaning.
+- Minimize operator commitment.
+- Optimize for AI orchestration rather than typing.
+- Build around actual workflow rather than traditional desktop assumptions.
+
+### Expected Outcome
+
+The completed Command Chair should function as a mobile operational workstation that:
+
+- supports long development sessions
+- supports rapid standing interactions
+- minimizes idle waiting
+- integrates cleanly with the Estate workstation
+- provides ergonomic access to all primary interfaces
+- serves as the primary operator interface for the Estate while allowing continuous movement throughout the workshop.
+
+This proposal is intended as an architectural starting point for future parking-lot planning and subsequent work package development.
