@@ -79,6 +79,7 @@ from estate.core.operational_events import OperationalEvent
 from estate.core.operational_status import record_operational_event, format_summary_for_cli
 from estate.core.orchestrator_intake import OrchestratorIntakeRequest
 from estate.core.orchestrator_intake_runtime import OrchestratorIntakeRuntime, format_queue_for_cli, safe_summary
+from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
 from estate.core.provider_catalog import load_provider_catalog, write_office_status, format_provider_list
 
 def _repo_path(rel):
@@ -158,6 +159,24 @@ def cmd_orchestrator_intake_list(args):
         print(json.dumps(queue, indent=2, sort_keys=True))
     else:
         print(format_queue_for_cli(queue))
+
+def cmd_orchestrator_intake_decide(args):
+    try:
+        metadata = {"summary_safe": args.summary_safe}
+        if args.boundary_review_completed:
+            metadata["boundary_review_completed"] = True
+        decision, paths = OrchestratorIntakeDecisionRuntime().decide(intake_id=args.intake_id, decision=args.decision, decided_by=args.decided_by, reason=args.reason, metadata=metadata)
+        print(f"Orchestrator intake decision recorded: {decision.decision_id}")
+        print(f"Intake: {decision.intake_id}")
+        print(f"Decision: {decision.decision}")
+        print(f"Next state: {decision.next_state}")
+        print(f"Decision artifact: {paths['decision']}")
+        print(f"Queue status: {paths['queue']}")
+        if decision.requires_boundary_review:
+            print("Boundary review required before approval can proceed.")
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Orchestrator intake decide failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_planning_provider_run(args):
     try:
@@ -1915,6 +1934,15 @@ def main(argv=None):
     p = sub.add_parser("orchestrator-intake-list", help="List Orchestrator intake queue state")
     p.add_argument("--json", action="store_true", help="Print queue state JSON")
     p.set_defaults(func=cmd_orchestrator_intake_list)
+
+    p = sub.add_parser("orchestrator-intake-decide", help="Record a governed decision for a pending or blocked Orchestrator intake item")
+    p.add_argument("--intake-id", required=True, help="Pending or blocked intake id")
+    p.add_argument("--decision", required=True, choices=["approve", "reject", "defer", "request_boundary_review", "mark_needs_revision"], help="Allowed intake decision")
+    p.add_argument("--decided-by", required=True, help="Person or office recording the decision")
+    p.add_argument("--reason", default=None, help="Optional governed decision reason")
+    p.add_argument("--summary-safe", action="store_true", help="Mark the decision summary safe for Office display")
+    p.add_argument("--boundary-review-completed", action="store_true", help="Indicate required boundary review was completed before approval")
+    p.set_defaults(func=cmd_orchestrator_intake_decide)
 
     p = sub.add_parser("onboarding-manifest-check")
     p.add_argument("--json", action="store_true", help="Validate onboarding manifest required paths and print JSON")

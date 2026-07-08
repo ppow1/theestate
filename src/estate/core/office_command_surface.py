@@ -20,6 +20,7 @@ from estate.core.alfred_duty import run_alfred_duty
 from estate.core.daily_board_integration import generate_daily_board_integration
 from estate.core.mission_control_workspace import build_mission_control_workspace
 from estate.core.morning_briefing import generate_morning_briefing
+from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -119,6 +120,13 @@ def refresh_mission_control(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); build_mission_control_workspace(base)
     return _completed('mission_control.refresh_payload', 'Refresh Mission Control payload', 'mission-control', 'estate.core.mission_control_workspace.build_mission_control_workspace', 'Mission Control payload refreshed from local artifacts.', written=['runtime/steward/mission_control_workspace.json'], state=['mission control runtime payload refreshed'])
 
+def record_orchestrator_intake_decision(root=None, intake_id: str | None = None, decision: str | None = None, decided_by: str | None = None, reason: str | None = None, **params: Any) -> OfficeActionResult:
+    if not intake_id or not decision or not decided_by:
+        return _blocked('orchestrator_intake.record_decision', 'Record Orchestrator intake decision', 'operational-activity', 'estate.core.orchestrator_intake_decisions.OrchestratorIntakeDecisionRuntime.decide', 'intake_id, decision, and decided_by are required.')
+    base = _root(root)
+    artifact, paths = OrchestratorIntakeDecisionRuntime(base).decide(intake_id=intake_id, decision=decision, decided_by=decided_by, reason=reason, metadata={k: v for k, v in params.items() if k in {'summary_safe', 'boundary_review_completed'}})
+    return _completed('orchestrator_intake.record_decision', 'Record Orchestrator intake decision', 'operational-activity', 'estate.core.orchestrator_intake_decisions.OrchestratorIntakeDecisionRuntime.decide', f"Decision {artifact.decision} recorded for {artifact.intake_id}; next state is {artifact.next_state}.", read=['runtime/orchestrator/intake/status/queue.json'], written=[_rel(base, paths['decision']), 'runtime/orchestrator/intake/status/latest.json', 'runtime/orchestrator/intake/status/queue.json', 'runtime/operations/status/latest.json'], state=['orchestrator intake decision state updated'])
+
 def generate_daily_briefing(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); generate_daily_board_integration(root=base, write=True); generate_morning_briefing(root=base, write=True)
     return _completed('daily_board.generate_morning_briefing', 'Generate morning briefing', 'daily-board', 'estate.core.daily_board_integration.generate_daily_board_integration + estate.core.morning_briefing.generate_morning_briefing', 'Daily Board integration and morning briefing generated locally.', written=['runtime/operations/daily_board_integration.json', 'operations/boards/daily_board_integration.md', 'runtime/briefings/morning_briefing.json', 'operations/briefings/morning_briefing.md'], state=['daily board and briefing artifacts refreshed'])
@@ -134,6 +142,7 @@ HANDLERS.update({
  'alfred.request_briefing': request_alfred_briefing,
  'mission_control.refresh_payload': refresh_mission_control,
  'daily_board.generate_morning_briefing': generate_daily_briefing,
+ 'orchestrator_intake.record_decision': record_orchestrator_intake_decision,
 })
 
 ACTION_CONTROLS = [
@@ -146,6 +155,7 @@ ACTION_CONTROLS = [
  {'action_id':'alfred.request_briefing','label':'Request Alfred briefing','target_tab':'alfred','handler':'request_alfred_briefing','availability':'available'},
  {'action_id':'mission_control.refresh_payload','label':'Refresh Mission Control payload','target_tab':'mission-control','handler':'refresh_mission_control','availability':'available'},
  {'action_id':'daily_board.generate_morning_briefing','label':'Generate morning briefing','target_tab':'daily-board','handler':'generate_daily_briefing','availability':'available'},
+ {'action_id':'orchestrator_intake.record_decision','label':'Record Orchestrator intake decision','target_tab':'operational-activity','handler':'record_orchestrator_intake_decision','availability':'available','requires_input':'intake_id,decision,decided_by','note':'Records a durable decision artifact; does not schedule or execute work.'},
  {'action_id':'ai_services.start_stop_load','label':'Start/stop/load AI service','target_tab':'ai-services-models','availability':'gated','disabled_reason':'Process-control approval workflow is not implemented for Office controls; use existing governed service approval path first.'},
 ]
 
