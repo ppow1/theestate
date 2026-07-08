@@ -25,6 +25,7 @@ from estate.core.capability_dependency_visualization import generate_capability_
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
 from estate.core.office_operational_activity import load_office_operational_activity
+from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
@@ -915,6 +916,7 @@ def generate_command_center(root=None, write=True):
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
+        "orchestrator_intake_decisions": load_office_intake_decision_surface(root),
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
@@ -1679,6 +1681,35 @@ def _operational_activity_html(artifact):
     if latest:
         fresh = latest.get("freshness") or {}
         out.append("<h3>Latest status</h3><p><strong>" + html.escape(str(latest.get("activity_id") or "unknown")) + "</strong> — " + html.escape(str(latest.get("current_state") or "unknown")) + " · <span class='health-badge " + html.escape(str(fresh.get("state") or "uncertain")) + "'>" + html.escape(str(fresh.get("state") or "uncertain")) + "</span><br>" + html.escape(str(latest.get("display_message") or "")) + "</p>")
+    intake_surface = data.get("orchestrator_intake_decisions") or {}
+    intake_items = intake_surface.get("items") or []
+    out.append(f"<section class='pipeline-section orchestrator-intake'><h3>Orchestrator Intake Decisions ({len(intake_items)})</h3>")
+    if not intake_items:
+        out.append("<p class='placeholder'>No pending or blocked Orchestrator intake items are awaiting decisions.</p></section>")
+    else:
+        out.append("<table><thead><tr><th>Intake</th><th>Work package</th><th>Source / mission</th><th>Summary</th><th>Class / priority</th><th>Requirements</th><th>Latest decision</th><th>Available decisions</th></tr></thead><tbody>")
+        for item in intake_items[:25]:
+            decisions = item.get('available_decisions') or []
+            controls = []
+            for decision_name in decisions:
+                controls.append("<button class='office-action' data-office-action='orchestrator_intake.record_decision' data-intake-id='" + html.escape(str(item.get('intake_id') or '')) + "' data-decision='" + html.escape(str(decision_name)) + "' data-decided-by='Steward'>" + html.escape(str(decision_name)) + "</button>")
+            latest_decision = item.get('latest_decision') or {}
+            requirements = f"boundary={item.get('boundary_review_required')}<br>approval={item.get('approval_required')}<br>validation={item.get('validation_required')}"
+            if item.get('summary_redacted'):
+                summary_text = str(item.get('safe_summary') or '') + ' (redacted by classification rule)'
+            else:
+                summary_text = str(item.get('safe_summary') or '')
+            out.append("<tr>"
+                       f"<td>{html.escape(str(item.get('intake_id') or 'unknown'))}<br><span class='source'>{html.escape(str(item.get('state') or 'unknown'))}</span></td>"
+                       f"<td>{html.escape(str(item.get('work_package_id') or item.get('work_package_path') or 'none'))}</td>"
+                       f"<td>{html.escape(str(item.get('source') or 'unknown'))}<br>{html.escape(str(item.get('mission') or ''))}</td>"
+                       f"<td>{html.escape(summary_text)}</td>"
+                       f"<td>{html.escape(str(item.get('classification') or 'Estate Internal'))}<br><span class='source'>{html.escape(str(item.get('priority') or 'normal'))}</span></td>"
+                       f"<td>{requirements}</td>"
+                       f"<td>{html.escape(str(latest_decision.get('decision') or 'none'))}</td>"
+                       f"<td>{''.join(controls)}</td>"
+                       "</tr>")
+        out.append("</tbody></table></section>")
     groups = data.get("groups") or {}
     for key, label in data.get("group_order") or []:
         items = groups.get(key) or []
@@ -2124,6 +2155,7 @@ async function runOfficeAction(button){
   const panel = button.closest('.office-actions');
   const resultEl = panel ? panel.querySelector('.office-action-result') : null;
   const body = {action_id: actionId};
+  Object.entries(button.dataset).forEach(([key, value]) => { if(key !== 'officeAction') body[key.replace(/[A-Z]/g, m => '_' + m.toLowerCase())] = value; });
   if(panel){ panel.querySelectorAll('[data-action-input]').forEach(input => { body[input.dataset.actionInput] = input.value; }); }
   if(resultEl) resultEl.textContent = 'Running ' + actionId + ' locally...';
   try{
