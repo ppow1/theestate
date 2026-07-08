@@ -82,6 +82,8 @@ from estate.core.orchestrator_intake_runtime import OrchestratorIntakeRuntime, f
 from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
 from estate.core.orchestrator_schedule_runtime import OrchestratorScheduleRuntime, format_schedule_queue_for_cli
 from estate.core.provider_catalog import load_provider_catalog, write_office_status, format_provider_list
+from estate.core.provider_health import ProviderHealthRecord, write_health_record, generate_provider_health_summary, format_provider_health_summary
+from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -135,6 +137,45 @@ def cmd_providers_find(args):
                 print(f"{provider.provider_id} | {provider.provider_type} | {provider.status}")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"Provider catalog find failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_providers_health_set(args):
+    try:
+        metadata = {"summary_safe": args.summary_safe}
+        record = ProviderHealthRecord.create(provider_id=args.provider_id, status=args.status, reported_by=args.reported_by, message=args.message, classification=args.classification, source=args.source, metadata=metadata)
+        paths = write_health_record(record, force=args.force)
+        print(f"Provider health recorded: {record.provider_id} -> {record.status}")
+        if paths.get("warning"):
+            print(f"Warning: {paths['warning']}")
+        print(f"Record: {paths['record']}")
+        print(f"Summary: {paths['summary_json']}")
+    except (OSError, ValueError) as exc:
+        print(f"Provider health set failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_providers_capacity_set(args):
+    try:
+        metadata = {"summary_safe": args.summary_safe}
+        record = ProviderCapacityRecord.create(provider_id=args.provider_id, capacity_state=args.capacity_state, reported_by=args.reported_by, classification=args.classification, active_jobs=args.active_jobs, max_jobs=args.max_jobs, queue_depth=args.queue_depth, quota_remaining=args.quota_remaining, message=args.message, metadata=metadata)
+        paths = write_capacity_record(record, force=args.force)
+        print(f"Provider capacity recorded: {record.provider_id} -> {record.capacity_state}")
+        if paths.get("warning"):
+            print(f"Warning: {paths['warning']}")
+        print(f"Record: {paths['record']}")
+        print(f"Summary: {paths['summary_json']}")
+    except (OSError, ValueError) as exc:
+        print(f"Provider capacity set failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_providers_health_summary(args):
+    try:
+        summary = generate_provider_health_summary(write=True)
+        if getattr(args, "json", False):
+            print(json.dumps(summary, indent=2, sort_keys=True))
+        else:
+            print(format_provider_health_summary(summary))
+    except (OSError, ValueError) as exc:
+        print(f"Provider health summary failed: {exc}")
         raise SystemExit(1)
 
 def cmd_orchestrator_intake_submit(args):
@@ -2205,6 +2246,36 @@ def main(argv=None):
     p.add_argument("--capability", required=True, help="Capability ID to match")
     p.add_argument("--json", action="store_true", help="Print matching providers JSON")
     p.set_defaults(func=cmd_providers_find)
+
+
+    p = sub.add_parser("providers-health-set", help="Record manual provider health")
+    p.add_argument("--provider-id", required=True)
+    p.add_argument("--status", required=True, choices=["available", "degraded", "saturated", "out_of_quota", "blocked", "offline", "unknown"])
+    p.add_argument("--reported-by", required=True)
+    p.add_argument("--message", required=True)
+    p.add_argument("--classification", default="Estate Internal", choices=["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only"])
+    p.add_argument("--source", default="manual")
+    p.add_argument("--summary-safe", action="store_true")
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(func=cmd_providers_health_set)
+
+    p = sub.add_parser("providers-capacity-set", help="Record manual provider capacity")
+    p.add_argument("--provider-id", required=True)
+    p.add_argument("--capacity-state", required=True, choices=["idle", "available", "busy", "saturated", "quota_limited", "unknown"])
+    p.add_argument("--reported-by", required=True)
+    p.add_argument("--classification", default="Estate Internal", choices=["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only"])
+    p.add_argument("--active-jobs", type=int, default=0)
+    p.add_argument("--max-jobs", type=int)
+    p.add_argument("--queue-depth", type=int, default=0)
+    p.add_argument("--quota-remaining")
+    p.add_argument("--message")
+    p.add_argument("--summary-safe", action="store_true")
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(func=cmd_providers_capacity_set)
+
+    p = sub.add_parser("providers-health-summary", help="Summarize provider health and capacity")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_providers_health_summary)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

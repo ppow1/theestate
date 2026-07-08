@@ -999,3 +999,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented WP-0606 with schedule record validation, eligibility checks, file-backed scheduled/deferred/blocked queues, provider catalog compatibility checks, operational event compatibility, CLI schedule/list commands, tests, and concise integration documentation without provider execution.
+
+EC-000091 - Added provider health and capacity reporting
+
+Timestamp: 2026-07-08 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented WP-0607 with provider health and capacity record models, runtime status artifacts, CLI manual update and summary commands, provider catalog validation and enrichment, operational event compatibility for attention states, redacted Office-safe summaries, tests, and concise integration documentation.
