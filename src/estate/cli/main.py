@@ -73,6 +73,8 @@ from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 from estate.core.planning_provider import PlanningProviderRequest
 from estate.core.planning_provider_registry import default_planning_provider_registry
 from estate.core.planning_provider_runtime import PlanningProviderRuntimeWriter
+from estate.core.operational_events import OperationalEvent
+from estate.core.operational_status import record_operational_event, format_summary_for_cli
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -97,6 +99,22 @@ def cmd_planning_provider_run(args):
     except (OSError, json.JSONDecodeError, ValueError, KeyError) as exc:
         print(f"Planning provider run failed: {exc}")
         raise SystemExit(1)
+
+def cmd_operations_event_record(args):
+    try:
+        event_data = json.loads(Path(args.event).read_text(encoding="utf-8"))
+        event = OperationalEvent.from_dict(event_data, allow_extension_event_types=args.allow_extension_event_type)
+        paths = record_operational_event(event, allow_extension_event_types=args.allow_extension_event_type)
+        print(f"Operational event recorded: {event.event_id}")
+        print(f"Activity state: {event.state}")
+        print(f"Event log: {paths['event_log']}")
+        print(f"Latest status: {paths['latest']}")
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Operational event record failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_operations_status_summary(args):
+    print(format_summary_for_cli())
 
 def cmd_work_package_ranges(args):
     path = _repo_path("collaboration/work_packages/work_package_range_ledger.json")
@@ -1568,6 +1586,15 @@ def main(argv=None):
     p.set_defaults(func=cmd_validation_observations)
 
 
+
+
+    p = sub.add_parser("operations-event-record", help="Record a shared operational lifecycle event")
+    p.add_argument("--event", required=True, help="Path to operational event JSON")
+    p.add_argument("--allow-extension-event-type", action="store_true", help="Allow non-standard event_type while preserving the event envelope")
+    p.set_defaults(func=cmd_operations_event_record)
+
+    p = sub.add_parser("operations-status-summary", help="Summarize active and recent operational activity")
+    p.set_defaults(func=cmd_operations_status_summary)
 
     p = sub.add_parser("work-package-ranges", help="Inspect local-first work package range allocations")
     p.add_argument("--json", action="store_true", help="Print range ledger JSON")

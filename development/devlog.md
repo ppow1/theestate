@@ -695,3 +695,9 @@ Added Collaboration Layer v1 infrastructure for multi-worker coordination, inclu
 EC-000086 - Added planning provider framework
 
 Implemented the first Estate Planning Provider Framework with validated envelopes, provider registry, deterministic stub provider, runtime artifact writer, planning-provider-run CLI command, tests, and concise integration documentation.
+
+2026-07-08 00:00:00
+
+EC-000087 - Added operational event feed and status surface
+
+Implemented WP-0601 with shared operational event and status models, runtime operations artifacts, operations-event-record and operations-status-summary CLI commands, summary redaction behavior, tests, and concise integration documentation.
