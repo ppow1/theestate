@@ -77,10 +77,61 @@ from estate.core.operational_events import OperationalEvent
 from estate.core.operational_status import record_operational_event, format_summary_for_cli
 from estate.core.orchestrator_intake import OrchestratorIntakeRequest
 from estate.core.orchestrator_intake_runtime import OrchestratorIntakeRuntime, format_queue_for_cli, safe_summary
+from estate.core.provider_catalog import load_provider_catalog, write_office_status, format_provider_list
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
+
+def cmd_providers_list(args):
+    try:
+        catalog = load_provider_catalog()
+        write_office_status(catalog)
+        if getattr(args, "json", False):
+            print(json.dumps(catalog.status_export(), indent=2, sort_keys=True))
+        else:
+            print(format_provider_list(catalog))
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Provider catalog load failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_providers_show(args):
+    try:
+        catalog = load_provider_catalog()
+        provider = catalog.get_provider(args.provider_id)
+        write_office_status(catalog)
+        if getattr(args, "json", False):
+            print(json.dumps(provider.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(f"Provider: {provider.provider_id}")
+            print(f"Name: {provider.display_name}")
+            print(f"Type: {provider.provider_type}")
+            print(f"Implementation: {provider.implementation_kind}")
+            print(f"Status: {provider.status}")
+            print(f"Capabilities: {', '.join(provider.capabilities)}")
+            print(f"Classification ceiling: {provider.classification_ceiling}")
+    except KeyError as exc:
+        print(str(exc))
+        raise SystemExit(1)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Provider catalog show failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_providers_find(args):
+    try:
+        catalog = load_provider_catalog()
+        providers = catalog.providers_with_capability(args.capability)
+        write_office_status(catalog)
+        if getattr(args, "json", False):
+            print(json.dumps([provider.to_dict() for provider in providers], indent=2, sort_keys=True))
+        else:
+            if not providers:
+                print(f"No providers found for capability: {args.capability}")
+            for provider in providers:
+                print(f"{provider.provider_id} | {provider.provider_type} | {provider.status}")
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"Provider catalog find failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_orchestrator_intake_submit(args):
     try:
@@ -2027,6 +2078,21 @@ def main(argv=None):
     p = sub.add_parser("estate-validate-local")
     p.add_argument("--json", action="store_true", help="Run local operational validation and print JSON")
     p.set_defaults(func=cmd_estate_validate_local)
+
+
+    p = sub.add_parser("providers-list", help="List registered provider descriptors")
+    p.add_argument("--json", action="store_true", help="Print provider catalog status JSON")
+    p.set_defaults(func=cmd_providers_list)
+
+    p = sub.add_parser("providers-show", help="Inspect one registered provider descriptor")
+    p.add_argument("--provider-id", required=True, help="Provider ID to inspect")
+    p.add_argument("--json", action="store_true", help="Print provider descriptor JSON")
+    p.set_defaults(func=cmd_providers_show)
+
+    p = sub.add_parser("providers-find", help="Find providers by capability ID")
+    p.add_argument("--capability", required=True, help="Capability ID to match")
+    p.add_argument("--json", action="store_true", help="Print matching providers JSON")
+    p.set_defaults(func=cmd_providers_find)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

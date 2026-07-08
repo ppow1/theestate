@@ -979,3 +979,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented WP-0602 with a read-only Office operational activity loader and Steward command center panel consuming WP-0601 status artifacts, including grouped activity, honest missing and malformed artifact states, stale detection, classification-safe summaries, tests, and integration documentation.
+
+EC-000089 - Added provider registration and capability discovery
+
+Timestamp: 2026-07-08 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented WP-0604 with shared provider descriptor and capability models, a static provider catalog, lookup and filtering helpers, CLI list/show/find commands, Office-readable provider catalog status export, tests, and concise integration documentation.
