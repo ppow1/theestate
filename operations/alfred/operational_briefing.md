@@ -1,12 +1,12 @@
 # Alfred Operational Briefing
 
-Created: 2026-07-05T14:57:16
+Created: 2026-07-09T12:29:38
 Ready: True
-Services Available: 0
+Services Available: 5
 Capabilities: 13
-Pending Work Packages: 118
-Messages Requiring Acknowledgement: 17
-CA Review Needs: 16
+Pending Work Packages: 177
+Messages Requiring Acknowledgement: 18
+CA Review Needs: 17
 Blocked Work: 0
 Validation Candidates: 5
 
@@ -126,7 +126,9 @@ Validation Candidates: 5
 - WP-0115 | SERIES TASK WP-0115 — Historical Validation Recipe Bootstrap Sweep | collaboration/work_packages/pending/WP-0115_SERIES_historical_validation_recipe_bootstrap_sweep.md
 - WP-0116 | SERIES TASK WP-0116 — Final Production-Readiness Exception Closure | collaboration/work_packages/pending/WP-0116_SERIES_final_production_readiness_exception_closure.md
 - WP-0116 | SERIES TASK WP-0116 — Sequential Pending Queue Batch Execution Standard | collaboration/work_packages/pending/WP-0116_SERIES_sequential_pending_queue_batch_execution_standard.md
+- WP-0117 | SERIES TASK WP-0117 — Office Snapshot Export Button | collaboration/work_packages/pending/WP-0117_SERIES_office_snapshot_export_button.md
 - WP-0117 | SERIES TASK WP-0117 — Repair WP-0106/WP-0107 Validation Failures | collaboration/work_packages/pending/WP-0117_SERIES_repair_wp0106_wp0107_validation_failures.md
+- WP-0118 | SERIES TASK WP-0118 — Office of the Steward Verb Surface Audit and Control Backlog | collaboration/work_packages/pending/WP-0118_SERIES_office_of_steward_verb_surface_audit_and_control_backlog.md
 - WP-0118 | SERIES TASK WP-0118 — Repair Resident Runtime Pytest Validation Failures | collaboration/work_packages/pending/WP-0118_SERIES_repair_resident_runtime_pytest_validation_failures.md
 - WP-0119 | SERIES TASK WP-0119 — Windows Resident Runtime Test Stabilization | collaboration/work_packages/pending/WP-0119_SERIES_windows_resident_runtime_test_stabilization.md
 - WP-0120 | SERIES TASK WP-0120 — Final Historical Exception Cleanup | collaboration/work_packages/pending/WP-0120_SERIES_final_historical_exception_cleanup.md
@@ -134,7 +136,64 @@ Validation Candidates: 5
 - WP-0122 | SERIES TASK WP-0122 — Stand Up Alfred as Operational Resident Runtime | collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md
 - WP-0123 | SERIES TASK WP-0123 — Bring Helen Online Through Alfred or Manual HR Onboarding | collaboration/work_packages/pending/WP-0123_SERIES_bring_helen_online_via_alfred_or_manual_onboarding.md
 - WP-0124 | SERIES TASK WP-0124 — Helen-Led Chief Architect #5 Hiring and Onboarding | collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md
+- WP-0125 | SERIES TASK WP-0125 — Establish Estate Engineering Department for CueMastery Execution | collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_cuemastery.md
 - WP-0125 | SERIES TASK WP-0125 — Establish Estate Engineering Department for Queue Mastery Execution | collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md
+- WP-0126 | SERIES TASK WP-0126 — Resident Interaction Framework and Local LLM Governance | collaboration/work_packages/pending/WP-0126_SERIES_alfred_tsr_chat_front_door.md
+- WP-0127 | SERIES TASK WP-0127 — Alfred Operations Center Chat Implementation | collaboration/work_packages/pending/WP-0127_SERIES_alfred_operations_center_chat_implementation.md
+- WP-0128 | SERIES TASK WP-0128 — Alfred Local LLM Response Path Repair | collaboration/work_packages/pending/WP-0128_SERIES_alfred_local_llm_response_path.md
+- WP-0129 | SERIES TASK WP-0129 — Resident Multimodal Paste and Image Discussion | collaboration/work_packages/pending/WP-0129_SERIES_resident_multimodal_paste_and_image_discussion.md
+- WP-0130 | SERIES TASK WP-0130 — Local Vision Model Enablement for Resident Image Discussion | collaboration/work_packages/pending/WP-0130_SERIES_local_vision_model_enablement_for_resident_images.md
+- WP-0131 | SERIES TASK WP-0131 — AI Services Control Plane | collaboration/work_packages/pending/WP-0131_SERIES_ai_services_control_plane.md
+- WP-0132 | SERIES TASK WP-0132 — AI Services Execution Adapters and Steward Approval | collaboration/work_packages/pending/WP-0132_SERIES_ai_services_execution_adapters_and_steward_approval.md
+- WP-0133 | SERIES TASK WP-0133 — AI Services Post-Launch Health Verification and Process Tracking Repair | collaboration/work_packages/pending/WP-0133_SERIES_ai_services_post_launch_health_and_process_tracking_repair.md
+- WP-0134 | SERIES TASK WP-0134 — AI Services Windows Batch Launcher Command Template Repair | collaboration/work_packages/pending/WP-0134_SERIES_ai_services_windows_batch_launcher_command_template_repair.md
+- WP-0136 | SERIES TASK WP-0136 - AI Services TextGen Batch Log and Process Runner Repair | collaboration/work_packages/pending/WP-0136_SERIES_ai_services_textgen_batch_log_and_process_runner_repair.md
+- WP-0136 | SERIES TASK WP-0136 — Establish the Office of Character Architecture | collaboration/work_packages/pending/WP-0136_SERIES_establish_office_of_character_architecture.md
+- WP-0137 | SERIES TASK WP-0137 - Office of the Steward AI Services and Model Selector UI | collaboration/work_packages/pending/WP-0137_SERIES_office_of_steward_ai_services_and_model_selector_ui.md
+- WP-0138 | SERIES TASK WP-0138 - Complete Office of the Steward AI Services Workspace | collaboration/work_packages/pending/WP-0138_SERIES_complete_office_of_steward_ai_services_workspace.md
+- WP-0139 | REPAIR TASK WP-0139 - Repair Alfred Resident Chat Availability and Action Request Surface | collaboration/work_packages/pending/WP-0139_REPAIR_alfred_resident_chat_and_action_request_surface.md
+- WP-0140 | REPAIR TASK WP-0140 - Repair Steward Command Center UI Regression After WP-0139 | collaboration/work_packages/pending/WP-0140_REPAIR_steward_command_center_ui_regression_after_wp0139.md
+- WP-0141 | REPAIR TASK WP-0141 - Repair Steward Command Center Browser Runtime Failure | collaboration/work_packages/pending/WP-0141_REPAIR_steward_command_center_browser_runtime_failure.md
+- WP-0142 | REPAIR TASK WP-0142 - Repair Steward Command Center Served-Mode Syntax Error | collaboration/work_packages/pending/WP-0142_REPAIR_steward_command_center_served_mode_syntax_error.md
+- WP-0143 | REPAIR TASK WP-0143 - Repair Alfred Local LLM Adapter Truthfulness and Generation | collaboration/work_packages/pending/WP-0143_REPAIR_alfred_local_llm_adapter_truthfulness_and_generation.md
+- WP-0145 | REPAIR TASK WP-0145 — Institutional Search CLI Test Root Isolation | collaboration/work_packages/pending/WP-0145_REPAIR_institutional_search_cli_test_root_isolation.md
+- WP-0146 | SERIES TASK WP-0146 — Helen HR Onboarding Operationalization | collaboration/work_packages/pending/WP-0146_SERIES_helen_hr_onboarding_operationalization.md
+- WP-0147 | REPAIR TASK WP-0147 — Personnel Resolver Consistency After Helen Onboarding | collaboration/work_packages/pending/WP-0147_REPAIR_personnel_resolver_consistency_after_helen_onboarding.md
+- WP-0200 | PARALLEL-STAGED TASK WP-0200 — Office Action Framework / Command Dispatch Foundation | collaboration/work_packages/pending/WP-0200_PARALLEL_STAGED_office_action_framework_command_dispatch_foundation.md
+- WP-0201 | PARALLEL-STAGED TASK WP-0201 — Settings, Help, About Utility Controls | collaboration/work_packages/pending/WP-0201_PARALLEL_STAGED_settings_help_about_utility_controls.md
+- WP-0202 | PARALLEL-STAGED TASK WP-0202 — Work Packages Tab Controls | collaboration/work_packages/pending/WP-0202_PARALLEL_STAGED_work_packages_tab_controls.md
+- WP-0203 | BATCH TASK WP-0203 — Office Controls Wave 1 Staged Foundation | collaboration/work_packages/pending/WP-0203_BATCH_office_controls_wave_1_staged_foundation.md
+- WP-0204 | PARALLEL-STAGED TASK WP-0204 — Validation Tab Controls | collaboration/work_packages/pending/WP-0204_PARALLEL_STAGED_validation_tab_controls.md
+- WP-0205 | PARALLEL-STAGED TASK WP-0205 — Mission Control, Projects, and Roadmap Controls | collaboration/work_packages/pending/WP-0205_PARALLEL_STAGED_mission_control_projects_roadmap_controls.md
+- WP-0206 | PARALLEL-STAGED TASK WP-0206 — Mailboxes, Recalls, and Notifications Controls | collaboration/work_packages/pending/WP-0206_PARALLEL_STAGED_mailboxes_recalls_notifications_controls.md
+- WP-0207 | BATCH TASK WP-0207 — Office Controls Wave 2 Operational Surfaces | collaboration/work_packages/pending/WP-0207_BATCH_office_controls_wave_2_operational_surfaces.md
+- WP-0208 | PARALLEL-STAGED TASK WP-0208 — Daily Board and Parking Lot Controls | collaboration/work_packages/pending/WP-0208_PARALLEL_STAGED_daily_board_parking_lot_controls.md
+- WP-0209 | PARALLEL-STAGED TASK WP-0209 — Resident Conversation Controls | collaboration/work_packages/pending/WP-0209_PARALLEL_STAGED_resident_conversation_controls.md
+- WP-0210 | PARALLEL-STAGED TASK WP-0210 — AI Services / Model Controls | collaboration/work_packages/pending/WP-0210_PARALLEL_STAGED_ai_services_model_controls.md
+- WP-0211 | BATCH TASK WP-0211 — Office Controls Wave 3 Workflow, Resident, and AI Surfaces | collaboration/work_packages/pending/WP-0211_BATCH_office_controls_wave_3_workflow_resident_ai_surfaces.md
+- WP-0212 | INSTALL-HANDOFF TASK WP-0212 — Office Controls Staged Workstream Install Orchestrator | collaboration/work_packages/pending/WP-0212_INSTALL_HANDOFF_office_controls_staged_workstream_install_orchestrator.md
+- WP-0213 | OPERATIONAL TASK WP-0213 — Office of the Steward Command Surface | collaboration/work_packages/pending/WP-0213_OPERATIONAL_office_of_the_steward_command_surface.md
+- WP-0214 | UI TASK WP-0214 — Office Left Navigation Collapse or Removal | collaboration/work_packages/pending/WP-0214_UI_office_left_navigation_collapse_or_removal.md
+- WP-0215 | REPAIR TASK WP-0215 — Repair WP-0213 Command Surface Validation Findings | collaboration/work_packages/pending/WP-0215_REPAIR_wp0213_command_surface_validation_findings.md
+- WP-0216 | REPAIR TASK WP-0216 — Alfred Chat Response Test Expectation | collaboration/work_packages/pending/WP-0216_REPAIR_alfred_chat_response_test_expectation.md
+- WP-0217 | REPAIR TASK WP-0217 — Alfred LLM Timeout and Generation Path Repair | collaboration/work_packages/pending/WP-0217_REPAIR_alfred_llm_timeout_and_generation_path.md
+- WP-0218 | SERIES TASK WP-0218 — Estate Model Control Plane and Selector Authority | collaboration/work_packages/pending/WP-0218_SERIES_estate_model_control_plane_and_selector_authority.md
+- WP-0219 | WP-0219 - Alfred Resident Package Validation and Platform Export Hardening | collaboration/work_packages/pending/WP-0219_CHARACTER_ARCHITECTURE_alfred_resident_package_validation_and_exports.md
+- WP-0220 | WP-0220 - Repair Alfred Ring 2 Findings and Validation Recipe Coverage | collaboration/work_packages/pending/WP-0220_CHARACTER_ARCHITECTURE_repair_alfred_ring2_findings.md
+- WP-0600 | WP-0600 - Planning Provider Framework | collaboration/work_packages/pending/WP-0600_Planning_Provider_Framework.md
+- WP-0601 | WP-0601 - Operational Event Feed and Office Status | collaboration/work_packages/pending/WP-0601_Operational_Event_Feed_and_Office_Status.md
+- WP-0602 | WP-0602 - Office Operational Activity Panel | collaboration/work_packages/pending/WP-0602_Office_Operational_Activity_Panel.md
+- WP-0603 | WP-0603 - Orchestrator Intake Contract | collaboration/work_packages/pending/WP-0603_Orchestrator_Intake_Contract.md
+- WP-0604 | WP-0604 - Provider Registration and Capability Discovery | collaboration/work_packages/pending/WP-0604_Provider_Registration_and_Capability_Discovery.md
+- WP-0605 | WP-0605 - Office Intake Decision Controls | collaboration/work_packages/pending/WP-0605_Office_Intake_Decision_Controls.md
+- WP-0606 | WP-0606 - Orchestrator Scheduling Skeleton | collaboration/work_packages/pending/WP-0606_Orchestrator_Scheduling_Skeleton.md
+- WP-0607 | WP-0607 - Provider Health and Capacity Reporting | collaboration/work_packages/pending/WP-0607_Provider_Health_and_Capacity_Reporting.md
+- WP-0608 | WP-0608 - Worker Assignment Board Integration | collaboration/work_packages/pending/WP-0608_Worker_Assignment_Board_Integration.md
+- WP-0609 | WP-0609 - Orchestrator Runtime Core | collaboration/work_packages/pending/WP-0609_Orchestrator_Runtime_Core.md
+- WP-0610 | WP-0610 - Traffic Controller / Operations Manager | collaboration/work_packages/pending/WP-0610_Traffic_Controller_Operations_Manager.md
+- WP-0611 | WP-0611 - Office Traffic Controller Panel | collaboration/work_packages/pending/WP-0611_Office_Traffic_Controller_Panel.md
+- WP-0612 | WP-0612 - Operations and Execution Integration Audit | collaboration/work_packages/pending/WP-0612_Operations_Execution_Integration_Audit.md
+- WP-Operator-Deck-Prototype | Work Package: Operator Deck Prototype | collaboration/work_packages/pending/WP-Operator-Deck-Prototype.md
 
 ## Messages Requiring Acknowledgement
 - msg_20260701_000000_example_routing | queue | Example implementation routing message
@@ -154,6 +213,7 @@ Validation Candidates: 5
 - msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4 | office.chief_architect_4 | Draft Roadmap Rebaseline for CA4 Review
 - msg_ca4_20260701_0001_reply_to_ca3_mailbox_check | employee.4 | CA4 Response: Check for Updates Review and Architectural Coordination
 - msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3 | employee.4 | CA4 Response: Roadmap Rebaseline Review
+- msg_helen_20260705_0001_ca5_hiring_onboarding_notice | office.chief_architect | Chief Architect #5 Hiring and Onboarding Notice
 
 ## CA Review Needs
 - msg_ca2_20260701_0001_mailbox_index_validation | office.chief_architect_3 | Mailbox Infrastructure Validation Message
@@ -172,18 +232,19 @@ Validation Candidates: 5
 - msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4 | office.chief_architect_4 | Draft Roadmap Rebaseline for CA4 Review
 - msg_ca4_20260701_0001_reply_to_ca3_mailbox_check | employee.4 | CA4 Response: Check for Updates Review and Architectural Coordination
 - msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3 | employee.4 | CA4 Response: Roadmap Rebaseline Review
+- msg_helen_20260705_0001_ca5_hiring_onboarding_notice | office.chief_architect | Chief Architect #5 Hiring and Onboarding Notice
 
 ## Codex-Ready Next Commands
-- Read /workspace/theestate/collaboration/work_packages/pending/README.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md and do exactly what it says.
-- Read /workspace/theestate/collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/README.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md and do exactly what it says.
+- Read A:/theestate/collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md and do exactly what it says.
 
 ## Blocked Work
 - None
@@ -196,13 +257,11 @@ Validation Candidates: 5
 - CAP-000005 | FFmpeg / FFplay | Implemented capability with implementation and validation evidence found.
 
 ## Parking Lot Items Recently Relevant
-- PL-0009 | Strategic | Eleanor and Marie knowledge architecture with spider-based indexing of A drive and GitHub into a searchable tag-based institutional knowledge base
-- PL-0010 | Normal | Institutional memory progression model from chat context to GitHub, Parking Lot, institutional documents, curated knowledge base, and institutional reasoning
-- PL-0011 | High | Mailbox Synchronization Duty Standard: define when Estate personnel must check institutional mailboxes, with different synchronization modes for local workers, ChatGPT workers, Alfred, Audit, Chief Architects, and future autonomous workers; avoid fixed polling intervals until HR/security/worker runtime authority matures
-- PL-0012 | High | Treat onboarding as an institutional capability driven by a canonical onboarding manifest that serves as the configuration for repeatable onboarding rather than documentation; include ordered entries with purpose, required status, canonical path, and lifecycle state while keeping meaning in the referenced documents
-- PL-0013 | Normal | Transition work package range allocation from current Chief Architect occupants to the persistent Office of Chief Architect once office/occupant separation is mature; current operations may assign ranges directly to active occupants until the institution is ready for office-owned allocation
+- PL-0023 | High | Garage command center cable bill of materials: build a purchase and installation list for extending workstation/server access to the garage, including long HDMI runs, powered USB extension options, Ethernet, power injection needs, attic and garage route planning, wall plates, conduit, pull strings, labels, and spare capacity before buying or pulling cable
+- PL-0024 | High | Reusable portable command node architecture: develop a reusable field/control-node pattern using commodity macro pads with buttons, encoders, RGB, or LCD; ESP32-S3-class USB host hardware; Wi-Fi; optional battery operation; and 3D-printed enclosures so command nodes can be deployed without custom PCBs or full Raspberry Pi builds. Potential uses include Command Chair controls, printer panels, Cue Mastery demo controls, robotic landscaping operator pendants, trailer maintenance consoles, garage nodes, and context-recovery buttons that can emit standard prompts such as GitHub/Parking Lot reorientation instructions when a conversation or connector drifts
+- PL-0025 | High | Role/task security classification should determine onboarding depth, so Ingrid can assign security levels appropriate to the role and work package; narrowly scoped workers receive bounded onboarding while higher-trust or broader-authority workers receive deeper governance, security, and institutional context
+- PL-0026 | High | Proposed onboarding addendum for lessons learned during initial Estate operations: add a section to the onboarding or new-hire handbook capturing conventions that were not obvious during ad hoc onboarding, including that user-pasted artifacts are review requests by default, screenshots and logs often represent engineering state transitions, audit is distinct from validation, validation should produce executable PowerShell command sequences using Estate formatting conventions, GitHub merge is not validation, the work package is the contract while handoff is only the standard Read path and Do exactly what it says instruction, and recurring operational conventions with institutional value should be captured in the Parking Lot at operations/boards/parking_lot.md. Include authoritative source paths: daily_board at operations/boards/daily_board.md, active_work at operations/boards/active_work.md, daily_board_integration at runtime/operations/daily_board_integration.json, parking_lot at operations/boards/parking_lot.md, work_package_pipeline at runtime/work_packages/assignment_queue.json, and alfred_operational_briefing at operations/alfred/operational_briefing.md
+- PL-0027 | High | Command Chair Architecture and Mobile Workstation Environment: redesign the Estate operator workstation around a tethered powered recliner command node, standing service station, separated KVM and daily-driver USB paths, voice-first command workflow, compact split keyboard, mouse shortcuts, control pod, Stream Deck strategy, modular chair accessories, and Bambu-printed mounting hardware
 
 ## Warnings
-- missing_artifact | runtime/operations/operations_board.json
 - missing_artifact | runtime/steward/dashboard.json
-- missing_artifact | runtime/capabilities/capability_lifecycle_report.json
