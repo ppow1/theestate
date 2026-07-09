@@ -1,0 +1,50 @@
+{
+  "work_package_id": "WP-0222",
+  "provider": "codex_cloud_web",
+  "files_changed": [
+    "scripts/character-architecture/Install-Alfred-TextGen49.ps1",
+    "docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md",
+    "docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml",
+    "docs/residents/alfred/platform-exports/testing-checklist.md",
+    "tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0222_codex_cloud_web_done.json"
+  ],
+  "tests_run": [
+    "pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0222 --json"
+  ],
+  "validation_commands_run": [
+    "pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0222 --json"
+  ],
+  "local_runtime_requirement": {
+    "required": true,
+    "details": "Final acceptance requires the Steward's local TextGen 4.9 runtime at A:\\AI\\TextGen\\textgen-4.9. Repository artifacts and deterministic tests are complete; manual TextGen validation remains pending."
+  },
+  "skipped_live_calls": true,
+  "privacy_boundary_compliance": {
+    "status": "compliant",
+    "notes": "Work was limited to Alfred export files, TextGen settings helper logic, adapter docs, tests, validation recipe, and completion receipt. No private local character files were inspected or referenced."
+  },
+  "known_limitations": [
+    "Local TextGen 4.9 runtime execution and GPU/UI behavior cannot be validated in this environment.",
+    "Manual acceptance remains required after restarting TextGen and starting a new chat."
+  ],
+  "manual_validation_status": "pending_steward_local_textgen",
+  "exact_local_validation_commands": [
+    "pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "python -m estate.cli.main validate-work-package --id WP-0222 --json",
+    ".\\scripts\\character-architecture\\Install-Alfred-TextGen49.ps1 -EstateRoot \"A:\\theestate\" -TextGenRoot \"A:\\AI\\TextGen\\textgen-4.9\" -InjectPromptFields"
+  ],
+  "pull_request_url_or_not_applicable_reason": "not_applicable_pending_make_pr_tool_metadata",
+  "merge_authority_or_equivalent": "Steward / Character Architecture review",
+  "codex_status": "complete",
+  "completed_at": "2026-07-09T17:42:35+00:00",
+  "branch": "work",
+  "summary": "Repaired Alfred TextGen 4.9 settings YAML serialization helper, added custom_system_message injection safeguards, deterministic regression tests, validation recipe, adapter/checklist updates, and receipt.",
+  "ready_for_ca_review": true,
+  "merge_authority": "steward_character_architecture_review_required",
+  "codex_status_done": true,
+  "pull_request_not_applicable_reason": "not_applicable_pending_make_pr_tool_metadata"
+}
