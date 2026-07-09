@@ -103,6 +103,35 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0224": {
+        "recipe_id": "wp-0224-resident-standup-background-operations-qmaster-gate",
+        "title": "WP-0224 — Resident Standup Aligned to Background Operations Runtime",
+        "description": "Validates Alfred/Helen resident standup artifacts, WP-0617 boundary language, Qmaster return gate, deterministic fixtures, and completion receipt.",
+        "required_checks": ["Resident artifacts exist", "Boundary documents exist", "Deterministic tests pass", "Completion receipt exists"],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md",
+            "docs/residents/helen/Helen_Resident_Profile_v0_1.md",
+            "docs/residents/helen/Helen_Resident_Validation_v0_1.md",
+            "docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md",
+            "docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml",
+            "docs/character-architecture/Resident_Background_Operations_Boundary_v0_1.md",
+            "docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md",
+            "tests/fixtures/background_operations/resident_operation_requests_wp0224.json",
+            "tests/character_architecture/test_resident_background_operations_boundary.py",
+            "tests/character_architecture/test_helen_resident_package.py",
+            "collaboration/work_packages/completions/WP-0224_codex_cloud_web_done.json",
+        ],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required artifacts exist", "WP-0617 remains runtime owner", "No separate resident event loop is introduced"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md','docs/residents/helen/Helen_Resident_Profile_v0_1.md','docs/residents/helen/Helen_Resident_Validation_v0_1.md','docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md','docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml','docs/character-architecture/Resident_Background_Operations_Boundary_v0_1.md','docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md','tests/fixtures/background_operations/resident_operation_requests_wp0224.json','collaboration/work_packages/completions/WP-0224_codex_cloud_web_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("pytest -q tests/character_architecture/test_resident_background_operations_boundary.py tests/character_architecture/test_helen_resident_package.py"),
+            _cmd("python -c \"from pathlib import Path; text=Path('docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md').read_text(encoding='utf-8'); assert 'WP-0617 owns the background operations runtime' in text; assert 'Alfred does not own a competing event loop' in text\""),
+        ],
+    },
+
     "WP-0016": {
         "recipe_id": "wp-0016-work-package-registry-architecture-artifact-presence",
         "title": "WP-0016 — Work Package Registry Architecture",
