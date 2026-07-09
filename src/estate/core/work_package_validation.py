@@ -2343,3 +2343,34 @@ VALIDATION_RECIPES["WP-EXECUTION-ACTIVITY-SURFACE-001"] = {
         _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
     ],
 }
+
+VALIDATION_RECIPES["WP-EXECUTION-DISPATCH-QUEUE-001"] = {
+    "recipe_id": "wp-execution-dispatch-queue-001-local-validation",
+    "title": "WP-EXECUTION-DISPATCH-QUEUE-001 - Provider-Agnostic Execution Dispatch Queue",
+    "description": "Validates the local dispatch queue model, queue operations, events, current/report artifacts, CLI wiring, Office consumption hook, dry-run Codex Bridge handoff shape, documentation, and completion receipt without live provider calls.",
+    "required_checks": [
+        "Execution dispatch tests pass",
+        "CLI list generates current dispatch artifacts",
+        "Implementation and usage documentation exist",
+        "Office command center can consume dispatch current artifact",
+        "Completion receipt is complete",
+    ],
+    "observational_checks": ["Production readiness report remains executable"],
+    "expected_artifacts": [
+        "src/estate/core/execution_dispatch.py",
+        "tests/test_execution_dispatch.py",
+        "docs/integration/execution_dispatch_queue_usage.md",
+        "collaboration/work_packages/completions/WP-EXECUTION-DISPATCH-QUEUE-001_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider or network access"],
+    "success_criteria": ["Required commands exit zero", "Runtime artifacts are local under runtime/execution_dispatch"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/test_execution_dispatch.py --basetemp Temp/pytest-execution-dispatch"),
+        _cmd("python -m estate.cli.main execution-dispatch list --json"),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_dispatch.py','tests/test_execution_dispatch.py','docs/integration/execution_dispatch_queue_usage.md']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"from estate.core.steward_command_center import generate_command_center; p=generate_command_center(write=False); assert 'execution_dispatch' in p['panels']; assert {'dispatch_queued_count','dispatch_ready_count','dispatch_running_count','dispatch_blocked_count','dispatch_attention_required_count'} <= set(p['status_bar'])\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-EXECUTION-DISPATCH-QUEUE-001'); assert r['receipt_status']=='complete', r\""),
+        _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
+    ],
+}

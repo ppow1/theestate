@@ -102,6 +102,7 @@ ARTIFACTS = {
     "worker_runtime_monitor": ["runtime/workers/worker_runtime_monitor.json", "operations/workers/worker_runtime_monitor.md"],
     "steward_presence": ["runtime/steward/steward_presence_state.json", "operations/steward/steward_presence_state.md"],
     "execution_activity": ["runtime/execution_activity/current.json", "runtime/execution_activity/report.md"],
+    "execution_dispatch": ["runtime/execution_dispatch/current.json", "runtime/execution_dispatch/report.md"],
 }
 
 
@@ -464,6 +465,7 @@ def _build_status_bar(root, panels, generated_at):
     recall_ops_summary = (((panels.get("steward_recall_operations") or {}).get("data") or {}).get("summary") or {})
     notification_summary = (((panels.get("operations_notification_center") or {}).get("data") or {}).get("summary") or {})
     execution_summary = (((panels.get("execution_activity") or {}).get("data") or {}).get("summary") or {})
+    dispatch_summary = (((panels.get("execution_dispatch") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
@@ -486,6 +488,11 @@ def _build_status_bar(root, panels, generated_at):
         "execution_blocked_count": execution_summary.get("blocked_count"),
         "execution_attention_required_count": execution_summary.get("attention_required_count"),
         "execution_failed_count": execution_summary.get("failed_count"),
+        "dispatch_queued_count": dispatch_summary.get("queued_count"),
+        "dispatch_ready_count": dispatch_summary.get("ready_count"),
+        "dispatch_running_count": dispatch_summary.get("running_count"),
+        "dispatch_blocked_count": dispatch_summary.get("blocked_count"),
+        "dispatch_attention_required_count": dispatch_summary.get("attention_required_count"),
         "active_workers": active_workers,
         "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
@@ -513,6 +520,16 @@ def _build_activity_console(root, panels, generated_at):
             "current",
             severity,
             f"Execution activity: active={execution_summary.get('active_count', 0)}, blocked={execution_summary.get('blocked_count', 0)}, attention={execution_summary.get('attention_required_count', 0)}, failed={execution_summary.get('failed_count', 0)}.",
+        ))
+    dispatch_summary = (((panels.get("execution_dispatch") or {}).get("data") or {}).get("summary") or {})
+    if dispatch_summary:
+        severity = "warning" if dispatch_summary.get("attention_required_count") or dispatch_summary.get("blocked_count") else "info"
+        events.append(_event(
+            generated_at,
+            "execution_dispatch",
+            "current",
+            severity,
+            f"Execution dispatch: queued={dispatch_summary.get('queued_count', 0)}, ready={dispatch_summary.get('ready_count', 0)}, running={dispatch_summary.get('running_count', 0)}, blocked={dispatch_summary.get('blocked_count', 0)}, attention={dispatch_summary.get('attention_required_count', 0)}.",
         ))
     if len(events) == 1:
         events.append(_event(generated_at, "local artifacts", "empty", "info", stream.get("empty_state") or "No recent operational activity records were found."))
@@ -928,6 +945,7 @@ def generate_command_center(root=None, write=True):
         "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "execution_activity": _read_artifact(root, ARTIFACTS["execution_activity"]),
+        "execution_dispatch": _read_artifact(root, ARTIFACTS["execution_dispatch"]),
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
@@ -1821,6 +1839,11 @@ def _status_bar_html(status):
         ("Exec blocked", status.get("execution_blocked_count")),
         ("Exec attention", status.get("execution_attention_required_count")),
         ("Exec failed", status.get("execution_failed_count")),
+        ("Dispatch queued", status.get("dispatch_queued_count")),
+        ("Dispatch ready", status.get("dispatch_ready_count")),
+        ("Dispatch running", status.get("dispatch_running_count")),
+        ("Dispatch blocked", status.get("dispatch_blocked_count")),
+        ("Dispatch attention", status.get("dispatch_attention_required_count")),
         ("Workers", status.get("active_workers")),
         ("Steward", status.get("steward_presence_state")),
         ("Verbosity", status.get("verbosity")),

@@ -55,6 +55,22 @@ from estate.core.work_package_validation import validate_work_package, format_va
 from estate.core.production_readiness_validation import generate_production_readiness_report, format_production_readiness_markdown
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
+from estate.core.execution_dispatch import (
+    block_dispatch_item,
+    cancel_dispatch_item,
+    complete_dispatch_item,
+    enqueue_dispatch_request,
+    format_dispatch_item,
+    format_execution_dispatch_report,
+    format_execution_dispatch_summary,
+    generate_current_dispatch_snapshot,
+    inspect_dispatch_item,
+    list_dispatch_items,
+    load_dispatch_request,
+    mark_dispatch_attention,
+    prepare_codex_bridge_handoff,
+    update_dispatch_state,
+)
 from estate.core.operational_readiness_dashboard import generate_operational_readiness_dashboard, format_operational_readiness_summary
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
@@ -1477,6 +1493,90 @@ def cmd_execution_activity_report(args):
     print(format_execution_activity_report(payload))
 
 
+def cmd_execution_dispatch(args):
+    import json
+    action = args.execution_dispatch_action
+    if action == "enqueue":
+        item = enqueue_dispatch_request(load_dispatch_request(args.file))
+        payload = item.to_dict()
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "list":
+        items = list_dispatch_items(state=getattr(args, "state", None))
+        snapshot = generate_current_dispatch_snapshot()
+        payload = {"items": [item.to_dict() for item in items], "summary": snapshot.get("summary", {}), "state_filter": getattr(args, "state", None)}
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_execution_dispatch_summary(snapshot))
+        return
+    if action == "inspect":
+        item = inspect_dispatch_item(args.dispatch_id)
+        if getattr(args, "json", False):
+            print(json.dumps(item.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "update-state":
+        item = update_dispatch_state(args.dispatch_id, args.state, summary=getattr(args, "summary", None))
+        if getattr(args, "json", False):
+            print(json.dumps(item.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "block":
+        item = block_dispatch_item(args.dispatch_id, args.reason)
+        if getattr(args, "json", False):
+            print(json.dumps(item.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "attention":
+        item = mark_dispatch_attention(args.dispatch_id, attention_required=not args.clear, reason=getattr(args, "reason", None))
+        if getattr(args, "json", False):
+            print(json.dumps(item.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "cancel":
+        item = cancel_dispatch_item(args.dispatch_id, reason=getattr(args, "reason", None))
+        if getattr(args, "json", False):
+            print(json.dumps(item.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "complete":
+        item = complete_dispatch_item(args.dispatch_id, result_reference=getattr(args, "result_reference", None))
+        if getattr(args, "json", False):
+            print(json.dumps(item.to_dict(), indent=2, sort_keys=True))
+        else:
+            print(format_dispatch_item(item))
+        return
+    if action == "prepare-handoff":
+        payload = prepare_codex_bridge_handoff(args.dispatch_id)
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"Codex Bridge dry-run handoff prepared: {payload.get('handoff_path')}")
+        return
+    if action == "snapshot":
+        payload = generate_current_dispatch_snapshot()
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_execution_dispatch_summary(payload))
+        return
+    raise SystemExit(f"Unknown execution-dispatch action: {action}")
+
+
+def cmd_execution_dispatch_report(args):
+    payload = generate_current_dispatch_snapshot()
+    print(format_execution_dispatch_report(payload))
+
+
 
 def cmd_ai_services(args):
     import json
@@ -1930,6 +2030,68 @@ def main(argv=None):
 
     p = sub.add_parser("execution-activity-report", help="Generate the shared local execution activity report")
     p.set_defaults(func=cmd_execution_activity_report)
+
+    p = sub.add_parser("execution-dispatch", help="Manage the local provider-agnostic execution dispatch queue")
+    dispatch_sub = p.add_subparsers(dest="execution_dispatch_action", required=True)
+
+    q = dispatch_sub.add_parser("enqueue", help="Enqueue a dispatch request JSON file")
+    q.add_argument("--file", required=True, help="Path to dispatch request JSON")
+    q.add_argument("--json", action="store_true", help="Print enqueued dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("list", help="List dispatch queue items")
+    q.add_argument("--state", help="Optional state filter")
+    q.add_argument("--json", action="store_true", help="Print dispatch queue JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("inspect", help="Inspect one dispatch item")
+    q.add_argument("dispatch_id")
+    q.add_argument("--json", action="store_true", help="Print dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("update-state", help="Update a dispatch item state")
+    q.add_argument("dispatch_id")
+    q.add_argument("--state", required=True, choices=sorted({"Queued", "Waiting", "Ready", "Running", "Blocked", "Awaiting Approval", "Validation", "Completed", "Failed", "Cancelled"}))
+    q.add_argument("--summary", help="Optional event summary")
+    q.add_argument("--json", action="store_true", help="Print dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("block", help="Mark a dispatch item blocked with a reason")
+    q.add_argument("dispatch_id")
+    q.add_argument("--reason", required=True)
+    q.add_argument("--json", action="store_true", help="Print dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("attention", help="Mark or clear Steward attention on a dispatch item")
+    q.add_argument("dispatch_id")
+    q.add_argument("--reason")
+    q.add_argument("--clear", action="store_true", help="Clear the attention flag")
+    q.add_argument("--json", action="store_true", help="Print dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("cancel", help="Cancel a dispatch item")
+    q.add_argument("dispatch_id")
+    q.add_argument("--reason")
+    q.add_argument("--json", action="store_true", help="Print dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("complete", help="Complete a dispatch item")
+    q.add_argument("dispatch_id")
+    q.add_argument("--result-reference")
+    q.add_argument("--json", action="store_true", help="Print dispatch item JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("prepare-handoff", help="Write a Codex Bridge dry-run handoff request")
+    q.add_argument("dispatch_id")
+    q.add_argument("--json", action="store_true", help="Print handoff request JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    q = dispatch_sub.add_parser("snapshot", help="Generate the current dispatch queue snapshot")
+    q.add_argument("--json", action="store_true", help="Print current dispatch snapshot JSON")
+    q.set_defaults(func=cmd_execution_dispatch)
+
+    p = sub.add_parser("execution-dispatch-report", help="Generate the local execution dispatch queue report")
+    p.set_defaults(func=cmd_execution_dispatch_report)
 
     p = sub.add_parser("validation-metrics-dashboard", help="Generate Validation Metrics Dashboard")
     p.add_argument("--json", action="store_true", help="Print validation metrics dashboard JSON")

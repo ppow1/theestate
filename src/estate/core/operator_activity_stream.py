@@ -25,6 +25,7 @@ SOURCE_ARTIFACTS = {
     "service_health": ["runtime/services/service_status_board.json", "runtime/services/service_health_registry.json"],
     "work_packages": ["runtime/work_packages/assignment_queue.json"],
     "execution_activity": ["runtime/execution_activity/current.json"],
+    "execution_dispatch": ["runtime/execution_dispatch/current.json"],
     "completions": ["collaboration/work_packages/completions"],
 }
 

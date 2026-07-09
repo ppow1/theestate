@@ -1,0 +1,169 @@
+{
+  "work_package_id": "WP-EXECUTION-DISPATCH-QUEUE-001",
+  "codex_status": "done",
+  "completed_at": "2026-07-08T22:52:00Z",
+  "branch": "main",
+  "git_commit_before": "31f4baaac5337f3e6930d0126eb264bafdaa0ba0",
+  "summary": "Implemented a local provider-agnostic execution dispatch queue with normalized request/item models, runtime queue persistence, queue operations, structured events, current/report visibility artifacts, CLI commands, Office of the Steward consumption hooks, an operator activity source, validation recipe, usage documentation, and Codex Bridge dry-run handoff generation without live provider execution.",
+  "files_changed": [
+    "src/estate/core/execution_dispatch.py",
+    "tests/test_execution_dispatch.py",
+    "docs/integration/execution_dispatch_queue_usage.md",
+    "src/estate/cli/main.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/operator_activity_stream.py",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-EXECUTION-DISPATCH-QUEUE-001_codex_done.json"
+  ],
+  "files_created_or_changed": [
+    "src/estate/core/execution_dispatch.py",
+    "tests/test_execution_dispatch.py",
+    "docs/integration/execution_dispatch_queue_usage.md",
+    "src/estate/cli/main.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/operator_activity_stream.py",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-EXECUTION-DISPATCH-QUEUE-001_codex_done.json"
+  ],
+  "tests_run": [
+    {
+      "command": "pytest -q tests/test_execution_dispatch.py --basetemp Temp/pytest-execution-dispatch",
+      "status": "passed",
+      "result": "11 passed; one existing pytest cache warning from .pytest_cache."
+    },
+    {
+      "command": "python -m estate.cli.main execution-dispatch list --json",
+      "status": "passed",
+      "result": "Generated an empty local queue snapshot without provider calls."
+    },
+    {
+      "command": "python -m estate.cli.main execution-dispatch-report",
+      "status": "passed",
+      "result": "Generated a human-readable empty queue report."
+    },
+    {
+      "command": "pytest -q tests/test_execution_activity.py --basetemp Temp/pytest-execution-activity-dispatch",
+      "status": "passed",
+      "result": "7 passed; one existing pytest cache warning from .pytest_cache."
+    },
+    {
+      "command": "pytest -q tests/test_operator_activity_stream.py --basetemp Temp/pytest-operator-activity-dispatch",
+      "status": "failed_existing_unrelated",
+      "result": "5 passed and 2 failed in existing CLI subprocess root-handling/profile-save assertions that did not set ESTATE_ROOT; not caused by dispatch source addition."
+    },
+    {
+      "command": "pytest -q tests/test_steward_command_center.py --basetemp Temp/pytest-steward-dispatch",
+      "status": "failed_existing_unrelated",
+      "result": "40 passed and 3 failed in existing navigation expectations and Alfred chat endpoint timeout; dispatch-specific Office integration test passed in tests/test_execution_dispatch.py."
+    },
+    {
+      "command": "python -m estate.cli.main validate-work-package --id WP-EXECUTION-DISPATCH-QUEUE-001 --json",
+      "status": "passed",
+      "result": "Package validation recipe passed with no warnings, findings, or failures."
+    },
+    {
+      "command": "python -m estate.cli.main validation-production-readiness --json",
+      "status": "passed",
+      "result": "Command completed; package-specific production readiness for WP-EXECUTION-DISPATCH-QUEUE-001 is ready in its validation report."
+    }
+  ],
+  "runtime_artifacts_generated": [
+    "runtime/execution_dispatch/queue.json",
+    "runtime/execution_dispatch/events.jsonl",
+    "runtime/execution_dispatch/current.json",
+    "runtime/execution_dispatch/report.md",
+    "runtime/validation/work_packages/WP-EXECUTION-DISPATCH-QUEUE-001_validation.json",
+    "operations/validation/reports/WP-EXECUTION-DISPATCH-QUEUE-001_validation.md",
+    "Temp/pytest-execution-dispatch/test_prepare_codex_bridge_handoff*/runtime/execution_dispatch/handoffs/*_codex_bridge_request.json"
+  ],
+  "cli_commands_added": [
+    "python -m estate.cli.main execution-dispatch enqueue --file <request.json>",
+    "python -m estate.cli.main execution-dispatch list --json",
+    "python -m estate.cli.main execution-dispatch inspect <dispatch_id> --json",
+    "python -m estate.cli.main execution-dispatch update-state <dispatch_id> --state Running",
+    "python -m estate.cli.main execution-dispatch block <dispatch_id> --reason <reason>",
+    "python -m estate.cli.main execution-dispatch attention <dispatch_id>",
+    "python -m estate.cli.main execution-dispatch cancel <dispatch_id>",
+    "python -m estate.cli.main execution-dispatch complete <dispatch_id> --result-reference <path>",
+    "python -m estate.cli.main execution-dispatch prepare-handoff <dispatch_id>",
+    "python -m estate.cli.main execution-dispatch snapshot --json",
+    "python -m estate.cli.main execution-dispatch-report"
+  ],
+  "cli_commands_deferred": [],
+  "office_integration_status": "implemented_minimal_consumption_hook",
+  "office_integration_details": "The Office command center reads runtime/execution_dispatch/current.json when present, exposes dispatch queued/ready/running/blocked/attention counts in the status payload and status bar, and adds a dispatch activity-console summary. The Operator Activity Stream also treats runtime/execution_dispatch/current.json as a local source. No new Office was created and the Office remains a consumer, not the dispatch authority.",
+  "visibility_feed": {
+    "current_json": "runtime/execution_dispatch/current.json",
+    "report": "runtime/execution_dispatch/report.md",
+    "answers": [
+      "queued work",
+      "ready work",
+      "running work",
+      "blocked or awaiting-approval work",
+      "Steward attention flags",
+      "provider/profile future assignments",
+      "work packages waiting on dependencies"
+    ]
+  },
+  "provider_handoff_behavior": {
+    "codex_bridge_handoff": "prepare-handoff writes a Codex Bridge request-shaped JSON file under runtime/execution_dispatch/handoffs/ for codex-cli-openai or codex-cli-ollama items.",
+    "live_execution_default": false,
+    "preserved_fields": [
+      "dispatch_id",
+      "work_package_id",
+      "prompt_source",
+      "provider",
+      "profile_label",
+      "sandbox",
+      "classification",
+      "allowed_read_paths",
+      "allowed_write_paths",
+      "validation_commands"
+    ],
+    "safety": "The handoff sets dry_run true, records handoff_mode dry_run_only_no_live_provider_invocation, and does not call Codex Bridge execution or any external provider."
+  },
+  "event_emission": {
+    "event_path": "runtime/execution_dispatch/events.jsonl",
+    "event_types_supported": [
+      "dispatch_enqueued",
+      "dispatch_ready",
+      "dispatch_started",
+      "dispatch_blocked",
+      "dispatch_awaiting_approval",
+      "dispatch_cancelled",
+      "dispatch_completed",
+      "dispatch_failed",
+      "dispatch_handoff_prepared"
+    ]
+  },
+  "validation_recipe_status": "registered",
+  "known_limitations": [
+    "This is not the full Orchestrator.",
+    "This does not decide final scheduling policy.",
+    "This does not perform live provider execution by default.",
+    "Provider saturation and quota data may remain unknown.",
+    "ChatGPT CLI dispatch shape is not finalized.",
+    "Final Operations Office authority remains an architectural question for Steward review."
+  ],
+  "skipped_live_provider_calls": [
+    "No live Codex execution was invoked.",
+    "No OpenAI API calls were made.",
+    "No ChatGPT CLI integration was attempted.",
+    "No Ollama worker calls were made.",
+    "No GitHub or other network calls were made.",
+    "No browser access was used."
+  ],
+  "required_reading_status": {
+    "AI_START_HERE.md": "read",
+    "AI_HINTS.md": "read",
+    "docs/governance/Estate_Manual.md": "read",
+    "docs/collaboration/Local_Execution_Adapter_Protocol_v1.md": "read",
+    "docs/architecture/execution_provider_operational_visibility_requirements.md": "read",
+    "docs/architecture/execution_provider_codex_cli_mapping.md": "read",
+    "docs/integration/execution_activity_surface_usage.md": "read",
+    "docs/integration/codex_bridge_usage.md": "read"
+  },
+  "pull_request_not_applicable_reason": "Local Codex implementation in workspace; no pull request was created by this package.",
+  "merge_authority_equivalent": "Chief Architect / Steward review required before merge or acceptance.",
+  "ready_for_ca_review": true
+}
