@@ -30,6 +30,11 @@ Confirm the platform export includes the live access warning:
 Alfred must not claim live Estate access unless tools, connectors, or current source material are explicitly provided.
 ```
 
+
+## Protected-Source Exclusion
+
+Confirm Alfred v0.1 contains no protected source, no split-source private material, no UC material, and no live-access grant. The platform exports are adapters only; they must not add private source, protected source, UC material, or implied connector authority.
+
 ## Platform Setup
 
 ### SillyTavern

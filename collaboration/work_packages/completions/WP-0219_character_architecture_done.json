@@ -20,7 +20,13 @@
     "collaboration/work_packages/pending/WP-0219_CHARACTER_ARCHITECTURE_alfred_resident_package_validation_and_exports.md",
     "collaboration/work_packages/completions/WP-0219_character_architecture_done.json"
   ],
-  "tests_run": [],
+  "tests_run": [
+    {
+      "command": "pytest -q tests/character_architecture/test_alfred_resident_package.py",
+      "result": "19 passed",
+      "note": "Recorded after local sync and WP-0220 repair evidence."
+    }
+  ],
   "validation_commands_run": [],
   "runtime_artifacts_generated": [],
   "docs_updated": [
@@ -39,12 +45,9 @@
     "No Codex CLI validation was performed."
   ],
   "known_limitations": [
-    "Local deterministic tests have not been run in the user's A:\\theestate checkout from this connector session.",
-    "PyYAML availability is environment-dependent; the test suite skips YAML parse checks if PyYAML is unavailable.",
-    "Alfred employee ID and mailbox ID remain TODO until confirmed from the Estate source of truth.",
-    "Visual profile fields remain TODO pending Steward / Character Architecture confirmation.",
-    "Platform exports are draft adapters and still require local interface testing.",
-    "The Codex work package template exists on main but was not present on this working branch at the time WP-0219 was created."
+    "This Character Architecture connector receipt was initially prepared before local validation; authoritative repaired validation detail is in WP-0219_codex_cloud_web_done.json and WP-0220_codex_cloud_web_done.json.",
+    "Live platform imports and live provider calls remain intentionally skipped.",
+    "Chief Character Architect and Steward acceptance remain pending."
   ],
   "follow_up_recommendations": [
     "Run Ring 0 static validation locally in A:\\theestate.",
@@ -71,5 +74,12 @@
     "resident_worker_distinction_preserved": true,
     "alfred_role_preserved": "Chief of Staff"
   },
-  "promotion_readiness": "not_ready_until_local_validation_and_review_complete"
+  "promotion_readiness": "not_ready_until_local_validation_and_review_complete",
+  "codex_status": "completed",
+  "branch": "main",
+  "summary": "Character Architecture prepared Alfred package artifacts; WP-0220 records subsequent deterministic validation repair evidence and protected-source exclusion.",
+  "ready_for_ca_review": true,
+  "ready_for_ca_review_reason": "Superseded local validation evidence is recorded in WP-0219_codex_cloud_web_done.json and WP-0220 repair receipt; this connector receipt is retained as source-preparation history.",
+  "pull_request_url": "https://github.com/ppow1/theestate/pull/183",
+  "merge_authority_equivalent": "GitHub PR #183 completed; Chief Architect / Steward acceptance remains required."
 }

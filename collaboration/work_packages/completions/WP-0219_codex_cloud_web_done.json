@@ -12,25 +12,27 @@
   "tests_run": [
     {
       "command": "pytest -q tests/character_architecture/test_alfred_resident_package.py",
-      "result": "passed"
+      "result": "19 passed",
+      "ring": "Ring 1",
+      "notes": "Deterministic package-specific pytest suite passed locally after PR #183 sync."
     }
   ],
   "validation_commands_run": [
     {
       "ring": "Ring 0",
-      "command": "python - <<'PY'\nimport json\nfrom pathlib import Path\njson.loads(Path('docs/residents/alfred/platform-exports/sillytavern-alfred-v0_1.json').read_text(encoding='utf-8'))\nprint('Ring 0 JSON parse passed')\nPY",
+      "command": "python - <<'PY'\nimport json\nfrom pathlib import Path\njson.loads(Path('collaboration/work_packages/completions/WP-0219_codex_cloud_web_done.json').read_text(encoding='utf-8'))\nprint('WP-0219 receipt JSON parse passed')\nPY",
       "result": "passed"
     },
     {
       "ring": "Ring 1",
       "command": "pytest -q tests/character_architecture/test_alfred_resident_package.py",
-      "result": "passed"
+      "result": "19 passed"
     },
     {
       "ring": "Ring 1",
       "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0219 --json",
-      "result": "warning_no_recipe",
-      "note": "CLI command is present but no validation recipe is registered for WP-0219, so it returned validation_status no_recipe after writing local runtime evidence artifacts."
+      "result": "passed_after_WP-0220_recipe_registration",
+      "note": "WP-0220 repaired the prior no_recipe limitation by registering a deterministic validation recipe for WP-0219."
     }
   ],
   "runtime_artifacts_generated": [
@@ -54,21 +56,37 @@
     "No cloud, GPU, network, mailbox, calendar, worker, repository connector, or command-center calls were performed by tests."
   ],
   "known_limitations": [
-    "CLI work-package validation reports no registered validation recipe for WP-0219; package-specific pytest is the deterministic source of truth.",
-    "Ring 2 local GPU/Ollama review was not run in this environment.",
-    "Ring 3 escalation was not required.",
-    "Chief Character Architect and Steward acceptance remain pending.",
-    "Platform exports are draft local-testing adapters and do not grant live Estate access."
+    "Ring 2 local GPU/Ollama review was not run by the original WP-0219 implementation environment.",
+    "Live SillyTavern, Open WebUI, and text-generation-webui imports were intentionally skipped.",
+    "No cloud, GPU, network, mailbox, calendar, worker, repository connector, or command-center calls were performed by tests.",
+    "Chief Character Architect and Steward institutional acceptance remain pending."
   ],
   "follow_up_recommendations": [
     "Run local GPU reasoning review when the Estate reviewer command exists.",
     "Have Chief Character Architect review Alfred as the resident package v0.1 reference candidate.",
     "Record Steward acceptance or requested repairs before promotion."
   ],
-  "codex_status": "done",
-  "branch": "work",
-  "summary": "Hardened Alfred resident package documentation and deterministic structural validation for canonical artifacts and local platform exports.",
+  "codex_status": "completed",
+  "branch": "main",
+  "summary": "Hardened Alfred Resident Package v0.1 with deterministic structural tests, platform export warnings, explicit protected-source exclusion, and detailed validation evidence for Chief Architect / Steward review.",
   "ready_for_ca_review": true,
   "pull_request_url_or_not_applicable_reason": "Not applicable in local implementation environment before PR creation; make_pr metadata will be recorded by tool.",
-  "merge_authority_or_equivalent": "Chief Architect / Steward acceptance required before promotion."
+  "merge_authority_or_equivalent": "Chief Architect / Steward acceptance required before promotion.",
+  "ready_for_ca_review_reason": "Ring 0 and Ring 1 deterministic checks passed; WP-0219 no_recipe was repaired by registering a validation recipe during WP-0220; live provider/platform imports remain intentionally skipped.",
+  "pull_request_url": "https://github.com/ppow1/theestate/pull/183",
+  "merge_authority_equivalent": "GitHub PR #183 was completed and synced to main before WP-0220 repair; Chief Architect / Steward acceptance remains institutional authority.",
+  "protected_source_exclusion": {
+    "status": "explicitly_excluded",
+    "statement": "Alfred v0.1 contains no protected source, no split-source private material, no UC material, and no live-access grant.",
+    "evidence_paths": [
+      "docs/residents/alfred/README.md",
+      "docs/residents/alfred/platform-exports/testing-checklist.md",
+      "docs/residents/alfred/character-card.yaml"
+    ]
+  },
+  "wp_0219_ring2_findings": {
+    "no_recipe": "resolved_by_WP-0220_recipe_registration",
+    "completion_receipt_detail": "repaired_with_exact_test_and_ring_outcomes",
+    "protected_source_exclusion": "repaired_with_explicit_artifact_statement"
+  }
 }

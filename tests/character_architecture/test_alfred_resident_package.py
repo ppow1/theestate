@@ -174,3 +174,44 @@ def test_no_protected_source_content_is_declared_in_public_package():
         assert "protected_source_included: true" not in text
         assert "private source included: true" not in text
         assert "uc access granted" not in text
+
+WP_0219_RECEIPT = ROOT / "collaboration" / "work_packages" / "completions" / "WP-0219_codex_cloud_web_done.json"
+WP_0220_RECEIPT = ROOT / "collaboration" / "work_packages" / "completions" / "WP-0220_codex_cloud_web_done.json"
+
+
+def load_json(path: Path) -> dict:
+    return json.loads(read_text(path))
+
+
+def test_completion_receipt_contains_explicit_pytest_result_detail():
+    receipt = load_json(WP_0219_RECEIPT)
+    text = json.dumps(receipt).lower()
+    assert "pytest -q tests/character_architecture/test_alfred_resident_package.py" in text
+    assert "19 passed" in text
+    assert "ring 0" in text
+    assert "ring 1" in text
+    assert receipt["wp_0219_ring2_findings"]["completion_receipt_detail"] == "repaired_with_exact_test_and_ring_outcomes"
+
+
+def test_completion_receipt_records_skipped_live_calls_and_limitations():
+    receipt = load_json(WP_0219_RECEIPT)
+    text = json.dumps(receipt).lower()
+    assert receipt["skipped_live_provider_calls"]
+    for phrase in ["sillytavern", "open webui", "text-generation-webui", "no cloud", "no_recipe"]:
+        assert phrase in text
+    assert receipt["wp_0219_ring2_findings"]["no_recipe"] == "resolved_by_WP-0220_recipe_registration"
+
+
+def test_completion_receipt_records_protected_source_exclusion():
+    receipt = load_json(WP_0219_RECEIPT)
+    text = json.dumps(receipt).lower()
+    for phrase in ["no protected source", "no split-source private material", "no uc material", "no live-access grant"]:
+        assert phrase in text
+    assert receipt["protected_source_exclusion"]["status"] == "explicitly_excluded"
+
+
+def test_alfred_artifacts_explicitly_exclude_protected_source():
+    for path in [ALFRED / "README.md", EXPORTS / "testing-checklist.md"]:
+        text = read_text(path).lower()
+        for phrase in ["no protected source", "no split-source private material", "no uc material", "no live-access grant"]:
+            assert phrase in text, f"Missing {phrase!r} in {path}"
