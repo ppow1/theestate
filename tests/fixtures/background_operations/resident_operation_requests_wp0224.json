@@ -1,0 +1,6 @@
+[
+  {"request_type":"resident_standup_status_request","runtime_owner":"WP-0617","target_resident":"Alfred","status":"review_requested","requires_steward_attention":false},
+  {"request_type":"resident_validation_review_request","runtime_owner":"WP-0617","target_resident":"Alfred","status":"review_requested","requires_steward_attention":true},
+  {"request_type":"resident_identity_boundary_review_request","runtime_owner":"WP-0617","target_resident":"Helen","status":"boundary_review_requested","requires_steward_attention":true},
+  {"request_type":"qmaster_return_gate_status_request","runtime_owner":"WP-0617","target_resident":"Alfred","status":"handoff_review_requested","requires_steward_attention":false}
+]
