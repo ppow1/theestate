@@ -12,6 +12,8 @@ from estate.core.background_operations import (
 )
 from estate.core.operational_events import OperationalEvent, append_event_artifact
 from estate.core.paths import ESTATE_ROOT
+from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.post_merge_audit_runtime import PostMergeAuditRuntime
 
 BASE = Path("runtime/background_operations")
 EVENTS = BASE / "events.jsonl"
@@ -188,6 +190,23 @@ class BackgroundOperationsRuntime:
                     return self._trigger("assignment_gap_detected", "work_package", wp_id, wp, f"Worker assignment gap detected for {wp_id}.", {"work_package_id": wp_id})
         return None
 
+
+    def _eval_operational_target_watch_needed(self, watch):
+        rt = OperationalTargetRuntime(self.root)
+        status = rt.write_status()
+        for target in status.get("available_targets", []):
+            if target.get("watch_state") != "enabled":
+                continue
+            target_id = target.get("target_id")
+            hygiene = (status.get("latest_git_hygiene_issue_by_target") or {}).get(target_id, {})
+            if "audit" in (target.get("capabilities") or []):
+                req = PostMergeAuditRuntime(self.root).create_request(target_id, "WP-0618", source_kind="background_watch", source_reference="HEAD", expected_files=[], metadata={"created_by_background_operations": True, "git_hygiene_issues": hygiene.get("issues", [])})
+                event_type = "git_hygiene_review_needed" if hygiene.get("issues") else "post_merge_audit_needed"
+                summary = f"Git hygiene review and post-merge audit are needed for {target_id}." if hygiene.get("issues") else f"Post-merge audit is needed for {target_id}."
+                payload = req.to_dict(); payload["git_hygiene"] = hygiene
+                return self._trigger(event_type, "operational_target", target_id, self.root / "runtime/post_merge_audit/requests" / f"{req.audit_id}.json", summary, payload)
+        return None
+
     def _trigger(self, event_type, subject_type, subject_id, path, summary, payload):
         return {"event_type": event_type, "subject_type": subject_type, "subject_id": subject_id, "source_artifact": _rel(path, self.root), "summary": summary, "payload": payload}
 
@@ -198,6 +217,7 @@ class BackgroundOperationsRuntime:
             "provider_capacity_review_request": ("provider_capacity_review_request", "Traffic Controller / Operations Manager", "provider_capacity"),
             "worker_assignment_review_request": ("worker_assignment_review_request", "Traffic Controller / Operations Manager", "worker_assignments"),
             "traffic_controller_review_request": ("traffic_controller_review_request", "Traffic Controller / Operations Manager", "traffic_controller_movement"),
+            "post_merge_audit_request": ("post_merge_audit_request", "validation reviewers", "post_merge_audit"),
         }
         rtype, role, subsystem = mapping.get(watch.action_type, ("staff_update_request", "Office of the Steward", "background_operations"))
         return BackgroundOperationRequest.create(request_type=rtype, source_event_id=event.event_id, watch_id=watch.watch_id, target_role=role, target_subsystem=subsystem, recommended_provider=None, requires_human_review=True, requires_boundary_review=False, priority="high" if "capacity" in rtype or "movement" in rtype else "normal", classification=event.classification, summary=event.summary, requested_action="Review the source artifact and create the appropriate governed decision, update, or validation response without provider execution.", source_artifacts=[trigger.get("source_artifact")] if trigger.get("source_artifact") else [], metadata={"subject_type": trigger["subject_type"], "subject_id": trigger["subject_id"], "no_live_provider_calls": True})
@@ -228,6 +248,11 @@ class BackgroundOperationsRuntime:
         s["worker_assignment_gap_count"] = sum(1 for e in events if e.event_type == "assignment_gap_detected")
         s["latest_background_request"] = requests[-1].to_dict() if requests else None
         s["latest_background_event"] = events[-1].to_dict() if events else None
+        try:
+            ots = OperationalTargetRuntime(self.root).write_status()
+            s.update(ots.get("summary", {}))
+        except Exception as exc:
+            warnings.append(f"operational target status unavailable: {exc}")
         s["warnings"] = warnings
         return status
 
@@ -235,7 +260,7 @@ class BackgroundOperationsRuntime:
 def format_background_operations_report(status: dict[str, Any]) -> str:
     s = status.get("summary", {})
     lines = ["# Background Operations Runtime", "", f"Generated: {status.get('generated_at')}", "", "## Summary"]
-    for key in ["active_watches_count", "generated_requests_count", "stale_validation_count", "ring2_review_needed_count", "pending_movement_decision_count", "provider_capacity_warning_count", "worker_assignment_gap_count"]:
+    for key in ["active_watches_count", "generated_requests_count", "stale_validation_count", "ring2_review_needed_count", "pending_movement_decision_count", "provider_capacity_warning_count", "worker_assignment_gap_count", "operational_targets_available", "watched_targets_count", "paused_targets_count", "blocked_targets_count", "import_candidates_count"]:
         lines.append(f"- {key}: {s.get(key, 0)}")
     lines += ["", "Boundary: generated requests only; no live provider, GPU, network, dispatch, or authority execution is performed."]
     return "\n".join(lines).rstrip() + "\n"
