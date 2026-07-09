@@ -2375,6 +2375,38 @@ VALIDATION_RECIPES["WP-EXECUTION-DISPATCH-QUEUE-001"] = {
     ],
 }
 
+
+VALIDATION_RECIPES["WP-0613"] = {
+    "recipe_id": "wp-0613-execution-provider-adapter-contract",
+    "title": "WP-0613 - Execution Provider Adapter Contract",
+    "description": "Validates provider-neutral adapter request/result models, dry-run adapter runtime artifacts, CLI wiring, documentation, and completion receipt without live provider, network, or GPU calls.",
+    "required_checks": [
+        "Adapter contract tests pass",
+        "Adapter runtime tests pass",
+        "CLI dry-run writes local runtime artifacts",
+        "Implementation, documentation, and completion receipt exist",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "src/estate/core/execution_provider_adapter.py",
+        "src/estate/core/execution_provider_adapter_runtime.py",
+        "tests/test_execution_provider_adapter.py",
+        "tests/test_execution_provider_adapter_runtime.py",
+        "docs/integration/execution_provider_adapter_contract.md",
+        "collaboration/work_packages/completions/WP-0613_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, network, or GPU access"],
+    "success_criteria": ["Required commands exit zero", "Runtime artifacts are local under runtime/execution_adapters"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m py_compile src/estate/core/execution_provider_adapter.py"),
+        _cmd("python -m py_compile src/estate/core/execution_provider_adapter_runtime.py"),
+        _cmd("mkdir -p Temp && pytest -q tests/test_execution_provider_adapter.py tests/test_execution_provider_adapter_runtime.py --basetemp Temp/pytest-execution-provider-adapter"),
+        _cmd("python -c \"import json, subprocess, sys; from pathlib import Path; p=Path('Temp/wp0613_adapter_request.json'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(json.dumps({'adapter_request_id':'adapter-wp0613-validation','dispatch_id':'dispatch-wp0613-validation','provider_id':'dry-run-provider','provider_type':'dry-run','classification':'Estate Internal','prompt_source':'collaboration/work_packages/pending/WP-0613_Execution_Provider_Adapter_Contract.md','created_at':'2026-07-09T00:00:00Z'}), encoding='utf-8'); proc=subprocess.run([sys.executable,'-m','estate.cli.main','execution-provider-adapter','dry-run','--request',str(p),'--json'], text=True, capture_output=True, check=False); assert proc.returncode==0, proc.stderr or proc.stdout; data=json.loads(proc.stdout); assert data['status']=='dry_run_completed'; assert data['metadata']['live_provider_called'] is False; assert Path(data['result_path']).is_file(); assert Path(data['latest_status_path']).is_file()\""),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_provider_adapter.py','src/estate/core/execution_provider_adapter_runtime.py','tests/test_execution_provider_adapter.py','tests/test_execution_provider_adapter_runtime.py','docs/integration/execution_provider_adapter_contract.md','collaboration/work_packages/completions/WP-0613_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+    ],
+}
+
 VALIDATION_RECIPES["WP-0219"] = {
     "recipe_id": "wp-0219-alfred-resident-package-validation-and-exports",
     "title": "WP-0219 - Alfred Resident Package Validation and Platform Export Hardening",
