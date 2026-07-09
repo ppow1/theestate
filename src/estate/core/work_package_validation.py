@@ -2431,3 +2431,36 @@ VALIDATION_RECIPES["WP-0220"] = {
         _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0220'); assert r['receipt_status']=='complete', r\""),
     ],
 }
+
+
+VALIDATION_RECIPES["WP-0221"] = {
+    "recipe_id": "wp-0221-textgen49-alfred-character-injection-adapter",
+    "title": "WP-0221 - TextGen 4.9 Character Injection Adapter for Alfred",
+    "description": "Validates Alfred TextGen 4.9 adapter docs, setup helper, platform export, tests, completion receipt, and privacy boundary without live provider calls.",
+    "required_checks": [
+        "TextGen 4.9 Alfred adapter pytest passes",
+        "Adapter artifacts exist",
+        "Setup helper backs up settings and targets Alfred only",
+        "Docs include Qwen/base-model failure and active-character verification prompt",
+        "Completion receipt records pending manual TextGen validation",
+    ],
+    "observational_checks": ["Manual local TextGen UI acceptance remains Steward-run"],
+    "expected_artifacts": [
+        "docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md",
+        "scripts/character-architecture/Install-Alfred-TextGen49.ps1",
+        "docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml",
+        "docs/residents/alfred/platform-exports/testing-checklist.md",
+        "tests/character_architecture/test_textgen49_alfred_adapter.py",
+        "collaboration/work_packages/completions/WP-0221_codex_cloud_web_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, GPU, TextGen UI automation, or private character inspection"],
+    "success_criteria": ["Required commands exit zero", "Recipe does not return no_recipe", "Manual TextGen acceptance is clearly marked pending"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py"),
+        _cmd("python -c \"from pathlib import Path; paths=['docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md','scripts/character-architecture/Install-Alfred-TextGen49.ps1','docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml','tests/character_architecture/test_textgen49_alfred_adapter.py']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"from pathlib import Path; text=Path('scripts/character-architecture/Install-Alfred-TextGen49.ps1').read_text(encoding='utf-8'); assert 'Copy-Item -LiteralPath' in text and 'Destination $BackupPath' in text; assert 'Alfred.yaml' in text; assert 'Get-ChildItem' not in text\""),
+        _cmd("python -c \"from pathlib import Path; text=(Path('docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md').read_text(encoding='utf-8') + Path('docs/residents/alfred/platform-exports/testing-checklist.md').read_text(encoding='utf-8')).lower(); assert 'qwen' in text and 'base model' in text and 'who are you? state your full role and title.' in text\""),
+        _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0221_codex_cloud_web_done.json').read_text(encoding='utf-8')); assert data['work_package_id']=='WP-0221'; assert data['manual_textgen_validation']['status']=='pending'; assert data['skipped_live_calls'] is True\""),
+    ],
+}
