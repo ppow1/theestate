@@ -1,10 +1,10 @@
-# WP-0225 - CUEMASTERY Nomenclature Repair
+# WP-0225 - CueMastery Nomenclature Repair
 
 Status: Proposed
 Priority: Critical
 Owner: Office of Character Architecture
 Boundary Authority: Ingrid / Privacy and Boundary Office
-Primary Consumers: Steward, Alfred, Helen, Character Architecture, CUEMASTERY workstream
+Primary Consumers: Steward, Alfred, Helen, Character Architecture, CueMastery workstream
 Classification: Estate Internal
 Created: 2026-07-09
 
@@ -19,7 +19,7 @@ codex_cloud_web
 Provider rationale:
 
 ```text
-This is a narrow corrective repair package. Recent resident standup artifacts incorrectly used Qmaster/qmaster. The correct project/workstream name is CUEMASTERY. This must be corrected quickly without expanding resident architecture scope.
+This is a narrow corrective repair package. Recent resident standup artifacts incorrectly used Qmaster/qmaster. The correct project/workstream name is CueMastery. This must be corrected quickly without expanding resident architecture scope.
 ```
 
 Local runtime required:
@@ -48,7 +48,7 @@ Read this work package and do exactly what it says.
 
 ## Mission
 
-Correct the resident standup and Character Architecture artifacts so the project/workstream is named **CUEMASTERY**, not Qmaster/qmaster.
+Correct the resident standup and Character Architecture artifacts so the project/workstream is named **CueMastery**, not Qmaster/qmaster.
 
 The prior name escaped review in WP-0224. This package repairs that mistake and adds validation so the wrong form does not continue to spread.
 
@@ -57,10 +57,10 @@ The prior name escaped review in WP-0224. This package repairs that mistake and 
 The correct name is:
 
 ```text
-CUEMASTERY
+CueMastery
 ```
 
-Use CUEMASTERY in prose, headings, titles, workstream names, and user-facing documents.
+Use CueMastery in prose, headings, titles, workstream names, and user-facing documents.
 
 Use lowercase `cuemastery` only where a lowercase machine identifier is appropriate, such as a JSON fixture field, snake_case identifier, or filename convention.
 
@@ -71,7 +71,7 @@ Qmaster
 qmaster
 Q Master
 Cue Mastery
-CueMastery
+CUEMASTERY
 ```
 
 unless a short historical compatibility note is absolutely required to explain the repair. Prefer no historical note unless needed.
@@ -87,10 +87,10 @@ Qmaster
 qmaster
 Q Master
 Cue Mastery
-CueMastery
+CUEMASTERY
 ```
 
-Replace them with the correct CUEMASTERY form.
+Replace them with the correct CueMastery form.
 
 Known files likely affected by WP-0224 include:
 
@@ -110,12 +110,12 @@ This list may not be complete. Search the repository rather than relying only on
 
 ### Required Outcome 2 - Rename Affected Artifact Paths Where Practical
 
-Rename the Qmaster return gate artifact to use CUEMASTERY.
+Rename the Qmaster return gate artifact to use CueMastery.
 
 Expected replacement path:
 
 ```text
-docs/character-architecture/CUEMASTERY_Return_Gate_After_Resident_Standup.md
+docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md
 ```
 
 Remove or replace the old path:
@@ -139,7 +139,7 @@ Qmaster
 qmaster
 Q Master
 Cue Mastery
-CueMastery
+CUEMASTERY
 ```
 
 The test may allow the string list inside the WP-0225 repair package itself only if necessary to define forbidden terms. Prefer implementing the scan so it ignores this repair work package's forbidden-term list rather than allowing future spread.
@@ -189,7 +189,7 @@ The recipe must include:
 
 This package must not:
 
-- change the purpose of CUEMASTERY;
+- change the purpose of CueMastery;
 - redesign the resident standup architecture;
 - redesign WP-0617;
 - add new residents;
@@ -203,8 +203,8 @@ This package must not:
 
 Accept this package only if:
 
-- active resident/Character Architecture artifacts use CUEMASTERY correctly;
-- incorrect Qmaster/qmaster forms are removed from active affected files;
+- active resident/Character Architecture artifacts use CueMastery correctly;
+- incorrect Qmaster/qmaster/CUEMASTERY forms are removed from active affected files;
 - the return gate artifact path is corrected or intentionally redirected;
 - tests pass;
 - WP-0225 validation passes;
@@ -216,7 +216,7 @@ Accept this package only if:
 After this repair, return to the prior execution path:
 
 ```text
-Continue CUEMASTERY work with Alfred/Helen resident support and WP-0617 background operations alignment.
+Continue CueMastery work with Alfred/Helen resident support and WP-0617 background operations alignment.
 ```
 
 Do not continue resident expansion by default.
