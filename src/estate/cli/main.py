@@ -109,12 +109,28 @@ from estate.core.operations_manager import OperationsDecision
 from estate.core.operations_control_runtime import OperationsControlRuntime, format_operations_review, format_operations_decisions
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
+from estate.core.operational_targets_runtime import OperationalTargetRuntime
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
 
 
+
+def cmd_operational_targets(args):
+    try:
+        rt = OperationalTargetRuntime()
+        action = args.operational_targets_action
+        if action == "list": payload = rt.list_payload()
+        elif action == "show": payload = rt.get(args.target).to_dict()
+        elif action == "status": payload = rt.write_status()
+        else:
+            state = {"enable":"enabled","pause":"paused","resume":"enabled","disable":"disabled","retire":"retired","import-candidate":"import_candidate"}[action]
+            payload = rt.transition(args.target, state)
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operational targets failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_background_operations(args):
     try:
@@ -2641,6 +2657,16 @@ def main(argv=None):
 
 
 
+
+
+
+    p = sub.add_parser("operational-targets", help="List and control Background Operations operational targets")
+    ot = p.add_subparsers(dest="operational_targets_action", required=True)
+    for name in ["list", "status"]:
+        q = ot.add_parser(name); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
+    q = ot.add_parser("show"); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
+    for name in ["enable", "pause", "resume", "disable", "retire", "import-candidate"]:
+        q = ot.add_parser(name); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
 
     p = sub.add_parser("background-operations", help="Evaluate and inspect event-driven background operation requests")
     bo = p.add_subparsers(dest="background_operations_action", required=True)
