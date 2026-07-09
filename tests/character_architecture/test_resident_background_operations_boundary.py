@@ -62,7 +62,7 @@ def test_resident_operation_examples_are_wp0617_request_concepts():
 
 def test_cuemastery_return_gate_contains_required_principle_and_wp0617_transition():
     text = read(CUEMASTERY_GATE)
-    assert "Resident work exists to support Estate execution and CueMastery progress. It must not become an indefinite blocker to CueMastery." in text
+    assert "Resident work exists to support Estate execution, Engineering Department bring-up, and CueMastery progress without making Alfred responsible for CueMastery execution." in text
     assert "WP-0617 background operations" in text
     assert "separate resident watch daemon or event runtime" in text
 
