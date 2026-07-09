@@ -1,10 +1,10 @@
-# WP-0225 - CueMastery Nomenclature Repair
+# WP-0225 - CueMastery and IONOGE Nomenclature Repair
 
 Status: Proposed
 Priority: Critical
 Owner: Office of Character Architecture
 Boundary Authority: Ingrid / Privacy and Boundary Office
-Primary Consumers: Steward, Alfred, Helen, Character Architecture, CueMastery workstream
+Primary Consumers: Steward, Alfred, Helen, Character Architecture, CueMastery workstream, IONOGE workstreams
 Classification: Estate Internal
 Created: 2026-07-09
 
@@ -19,7 +19,7 @@ codex_cloud_web
 Provider rationale:
 
 ```text
-This is a narrow corrective repair package. Recent resident standup artifacts incorrectly used Qmaster/qmaster. The correct project/workstream name is CueMastery. This must be corrected quickly without expanding resident architecture scope.
+This is a narrow corrective repair package. Recent resident standup artifacts incorrectly used Qmaster/qmaster for CueMastery. The Steward also identified IONOGE as a dictation-sensitive canonical term. This package must repair the current CueMastery mistake and add explicit nomenclature guardrails without expanding resident architecture scope.
 ```
 
 Local runtime required:
@@ -37,7 +37,7 @@ This repair should be completed from repository context with deterministic tests
 Capacity note:
 
 ```text
-This is a correction, not a new design effort. Repair the nomenclature, update tests/validation references, and stop.
+This is a correction and guardrail package, not a new design effort. Repair nomenclature, add dictation-sensitive validation references, update tests/validation references, and stop.
 ```
 
 ## Codex Command
@@ -50,9 +50,17 @@ Read this work package and do exactly what it says.
 
 Correct the resident standup and Character Architecture artifacts so the project/workstream is named **CueMastery**, not Qmaster/qmaster or dictation-derived variants.
 
-The prior name escaped review in WP-0224. This package repairs that mistake and adds validation so the wrong form does not continue to spread.
+Also add an explicit canonical nomenclature guard for **IONOGE**, which is pronounced:
 
-## Correct Name
+```text
+eye-oh-no-gee
+```
+
+The prior CueMastery mistake escaped review in WP-0224. This package repairs that mistake and adds validation so known dictation failures do not continue to spread.
+
+## Correct Names
+
+### CueMastery
 
 The correct name is:
 
@@ -64,11 +72,33 @@ Use CueMastery in prose, headings, titles, workstream names, and user-facing doc
 
 Use lowercase `cuemastery` only where a lowercase machine identifier is appropriate, such as a JSON fixture field, snake_case identifier, or filename convention.
 
+### IONOGE
+
+The correct name is:
+
+```text
+IONOGE
+```
+
+Pronunciation aid:
+
+```text
+eye-oh-no-gee
+```
+
+Use IONOGE in prose, headings, titles, workstream names, and user-facing documents.
+
+Use lowercase `ionoge` only where a lowercase machine identifier is appropriate, such as repository names, hostnames, JSON fields, snake_case identifiers, filenames, or URLs.
+
 ## Dictation / Mishearing Risk
 
-The Steward often uses dictation. CueMastery is frequently misconstrued as variants involving the letter Q, queue/line terminology, or separated words. This package must explicitly guard against those variants.
+The Steward often uses dictation. CueMastery and IONOGE are both prone to speech-recognition errors.
 
-Do not use:
+CueMastery is frequently misconstrued as variants involving the letter Q, queue/line terminology, or separated words.
+
+IONOGE is pronounced eye-oh-no-gee and dictation frequently fails to capture it correctly.
+
+Do not use these CueMastery variants:
 
 ```text
 Qmaster
@@ -83,11 +113,25 @@ Cue Mastery
 CUEMASTERY
 ```
 
-unless a short historical compatibility note is absolutely required to explain the repair. Prefer no historical note unless needed.
+Do not use these IONOGE variants in active artifacts unless they are part of this repair package's forbidden-term list or a documented URL/hostname/repository identifier that is already canonical lowercase:
+
+```text
+Ionoge
+ion oge
+ion-oge
+Iono Gee
+IonoGee
+Ionogy
+Eyeonoge
+Eye Oh No Gee
+Eye-Oh-No-Gee
+```
+
+Historical compatibility notes should be avoided unless necessary to explain the repair.
 
 ## Scope
 
-### Required Outcome 1 - Rename / Replace Incorrect Nomenclature
+### Required Outcome 1 - Rename / Replace Incorrect CueMastery Nomenclature
 
 Search the repository for incorrect occurrences of:
 
@@ -122,7 +166,7 @@ tests/fixtures/background_operations/resident_operation_requests_wp0224.json
 
 This list may not be complete. Search the repository rather than relying only on the list.
 
-### Required Outcome 2 - Rename Affected Artifact Paths Where Practical
+### Required Outcome 2 - Rename Affected CueMastery Artifact Paths Where Practical
 
 Rename the Qmaster return gate artifact to use CueMastery.
 
@@ -142,11 +186,38 @@ Update all references, validation recipes, tests, fixtures, and completion recei
 
 If repository mechanics make deletion awkward, leave a tiny redirect/stub only if necessary, but preferred outcome is that the incorrect filename is gone.
 
-### Required Outcome 3 - Validation Guard
+### Required Outcome 3 - Add Canonical Nomenclature Guard Artifact
 
-Add deterministic validation that fails if the incorrect names remain in active Character Architecture / resident standup artifacts.
+Create or update a small canonical terminology guard artifact for dictation-sensitive names.
 
-At minimum, tests must scan the relevant WP-0224/WP-0225 files and assert that these strings do not appear:
+Preferred path:
+
+```text
+docs/character-architecture/Canonical_Nomenclature_Guard_v0_1.md
+```
+
+It must include at least:
+
+```text
+CueMastery
+IONOGE
+```
+
+For each term, include:
+
+- canonical spelling;
+- pronunciation aid if useful;
+- allowed lowercase machine identifier;
+- forbidden dictation/misheard variants;
+- note that canonical terminology must be used in resident and Character Architecture artifacts.
+
+Do not turn this into a broad registry project. Keep it small and useful.
+
+### Required Outcome 4 - Validation Guard
+
+Add deterministic validation that fails if the incorrect CueMastery names remain in active Character Architecture / resident standup artifacts.
+
+At minimum, tests must scan the relevant WP-0224/WP-0225 files and assert that these strings do not appear outside the WP-0225 repair package's own forbidden-term list or the canonical nomenclature guard's forbidden-term examples:
 
 ```text
 Qmaster
@@ -161,9 +232,9 @@ Cue Mastery
 CUEMASTERY
 ```
 
-The test may allow the string list inside the WP-0225 repair package itself only if necessary to define forbidden terms. Prefer implementing the scan so it ignores this repair work package's forbidden-term list rather than allowing future spread.
+Also add validation that the canonical terminology guard contains IONOGE with pronunciation `eye-oh-no-gee` and allowed lowercase machine identifier `ionoge`.
 
-### Required Outcome 4 - Completion Receipt
+### Required Outcome 5 - Completion Receipt
 
 Create:
 
@@ -178,12 +249,13 @@ The receipt must include:
 - files changed;
 - terms replaced;
 - paths renamed or deleted;
+- canonical terms added;
 - tests run;
 - validation commands run;
 - known limitations;
 - confirmation that live calls were avoided.
 
-### Required Outcome 5 - Validation Recipe
+### Required Outcome 6 - Validation Recipe
 
 Add a WP-0225 validation recipe if consistent with current validation registry conventions.
 
@@ -200,17 +272,21 @@ The recipe must include:
 
 - required corrected artifacts exist;
 - old Qmaster return gate path is absent or an intentional redirect stub;
+- canonical nomenclature guard exists;
+- CueMastery and IONOGE canonical entries are present;
 - deterministic tests pass;
 - completion receipt exists;
-- forbidden nomenclature does not remain in active affected files.
+- forbidden CueMastery nomenclature does not remain in active affected files.
 
 ## Out Of Scope
 
 This package must not:
 
 - change the purpose of CueMastery;
+- change the purpose of IONOGE;
 - redesign the resident standup architecture;
 - redesign WP-0617;
+- create a broad terminology registry beyond this minimal guard;
 - add new residents;
 - add new event runtimes;
 - run live providers;
@@ -225,6 +301,8 @@ Accept this package only if:
 - active resident/Character Architecture artifacts use CueMastery correctly;
 - incorrect Qmaster/qmaster/QueueMastery/CUEMASTERY forms are removed from active affected files;
 - the return gate artifact path is corrected or intentionally redirected;
+- a canonical nomenclature guard records CueMastery and IONOGE;
+- IONOGE pronunciation is recorded as eye-oh-no-gee;
 - tests pass;
 - WP-0225 validation passes;
 - completion receipt exists;
