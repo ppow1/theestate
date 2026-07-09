@@ -1,0 +1,72 @@
+{
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-09T00:00:00Z",
+  "docs_updated": [
+    "docs/integration/execution_provider_adapter_contract.md"
+  ],
+  "files_changed": [
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/execution_provider_adapter_runtime.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_provider_adapter.py",
+    "tests/test_execution_provider_adapter_runtime.py",
+    "docs/integration/execution_provider_adapter_contract.md",
+    "collaboration/work_packages/completions/WP-0613_codex_done.json"
+  ],
+  "follow_up_recommendations": [
+    "Integrate Codex Bridge as a concrete adapter behind this contract in a future bounded package.",
+    "Have Chief Architect / Steward review validation evidence before promotion."
+  ],
+  "known_limitations": [
+    "Dry-run adapter validates contract shape only and does not execute provider work.",
+    "Ring 2 local GPU review was not run in this environment."
+  ],
+  "merge_authority": "Chief Architect / Steward acceptance required after validation review.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward acceptance required after validation review.",
+  "not_applicable_reason": "Pull request URL is not available until make_pr tool records PR metadata after commit.",
+  "office_integration_status": "No Office UI changes; adapter writes status artifacts for future Office consumption.",
+  "provider": "codex_cloud_web",
+  "pull_request_not_applicable_reason": "Pull request URL is not available until make_pr tool records PR metadata after commit.",
+  "pull_request_url_or_not_applicable_reason": "Not available until make_pr tool is called after commit in this environment.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_generated": [
+    "runtime/execution_adapters/requests/adapter-wp0613-validation.json",
+    "runtime/execution_adapters/results/adapter-wp0613-validation.json",
+    "runtime/execution_adapters/status/latest.json",
+    "runtime/execution_adapters/status/summary.json",
+    "runtime/validation/work_packages/WP-0613_validation.json",
+    "operations/validation/reports/WP-0613_validation.md"
+  ],
+  "skipped_live_provider_calls": [
+    "Codex CLI",
+    "ChatGPT CLI",
+    "Ollama",
+    "network providers",
+    "GPU reasoning review"
+  ],
+  "status": "implemented",
+  "summary": "Implemented provider-neutral execution provider adapter contract, deterministic dry-run runtime artifacts, CLI validation, tests, documentation, and validation recipe for WP-0613.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/execution_provider_adapter.py src/estate/core/execution_provider_adapter_runtime.py src/estate/cli/main.py src/estate/core/work_package_validation.py",
+    "pytest -q tests/test_execution_provider_adapter.py tests/test_execution_provider_adapter_runtime.py",
+    "python -m estate.cli.main execution-provider-adapter dry-run --request Temp/wp0613_adapter_request.json --json",
+    "python -m estate.cli.main validate-work-package --id WP-0613 --json"
+  ],
+  "validation_commands_run": [
+    "Ring 0 py_compile for adapter modules",
+    "Ring 1 deterministic pytest and work-package validation"
+  ],
+  "validation_ring_evidence_paths": {
+    "ring_0": [
+      "py_compile command output in implementation transcript"
+    ],
+    "ring_1": [
+      "runtime/validation/work_packages/WP-0613_validation.json",
+      "operations/validation/reports/WP-0613_validation.md"
+    ],
+    "ring_2": []
+  },
+  "work_package_id": "WP-0613"
+}

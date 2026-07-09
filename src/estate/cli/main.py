@@ -55,6 +55,7 @@ from estate.core.work_package_validation import validate_work_package, format_va
 from estate.core.production_readiness_validation import generate_production_readiness_report, format_production_readiness_markdown
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
+from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
 from estate.core.execution_dispatch import (
     block_dispatch_item,
     cancel_dispatch_item,
@@ -1479,6 +1480,28 @@ def cmd_codex_bridge(args):
         raise SystemExit(1)
 
 
+
+def cmd_execution_provider_adapter(args):
+    import json
+    try:
+        if args.execution_provider_adapter_action == "validate":
+            payload = validate_adapter_request_file(args.request)
+        elif args.execution_provider_adapter_action == "dry-run":
+            payload = run_dry_run_adapter(load_adapter_contract_request(args.request))
+        else:
+            raise SystemExit(f"Unknown execution-provider-adapter action: {args.execution_provider_adapter_action}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "failed", "error": str(exc)}, indent=2, sort_keys=True))
+        else:
+            print(f"Execution provider adapter validation failed: {exc}")
+        raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        status = payload.get("status") or (payload.get("validation") or {}).get("status")
+        print(f"Execution provider adapter {args.execution_provider_adapter_action}: {status}")
+
 def cmd_execution_activity(args):
     import json
     payload = generate_execution_activity_surface()
@@ -2023,6 +2046,18 @@ def main(argv=None):
     p.add_argument("--dry-run", action="store_true", help="Validate and emit visibility artifacts without invoking Codex")
     p.add_argument("--json", action="store_true", help="Print Codex Bridge result JSON")
     p.set_defaults(func=cmd_codex_bridge)
+
+
+    p = sub.add_parser("execution-provider-adapter", help="Validate provider-neutral adapter requests and deterministic dry runs")
+    adapter_sub = p.add_subparsers(dest="execution_provider_adapter_action", required=True)
+    q = adapter_sub.add_parser("validate", help="Validate an adapter request JSON file")
+    q.add_argument("--request", required=True, help="Path to adapter request JSON")
+    q.add_argument("--json", action="store_true", help="Print adapter validation JSON")
+    q.set_defaults(func=cmd_execution_provider_adapter)
+    q = adapter_sub.add_parser("dry-run", help="Run the deterministic dry-run adapter and write artifacts")
+    q.add_argument("--request", required=True, help="Path to adapter request JSON")
+    q.add_argument("--json", action="store_true", help="Print dry-run result JSON")
+    q.set_defaults(func=cmd_execution_provider_adapter)
 
     p = sub.add_parser("execution-activity", help="Generate the shared local execution activity snapshot")
     p.add_argument("--json", action="store_true", help="Print execution activity current snapshot JSON")
