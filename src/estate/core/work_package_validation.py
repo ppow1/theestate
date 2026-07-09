@@ -53,6 +53,30 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0223": {
+        "recipe_id": "wp-0223-alfred-standalone-runtime-event-intake",
+        "title": "WP-0223 — Alfred Standalone Runtime and Event Intake Foundation",
+        "description": "Validates Alfred runtime documents, deterministic module behavior, CLI event briefing, and completion receipt.",
+        "required_checks": ["Runtime documents exist", "Deterministic tests pass", "CLI sample renders", "Receipt exists"],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "docs/residents/alfred/runtime/Alfred_Standalone_Runtime_Foundation_v0_1.md",
+            "docs/residents/alfred/runtime/Alfred_Event_Intake_Schema_v0_1.md",
+            "docs/character-architecture/Resident_Output_Verbosity_Contract_v0_1.md",
+            "src/estate/core/alfred_runtime.py",
+            "tests/test_alfred_runtime.py",
+            "collaboration/work_packages/completions/WP-0223_codex_cloud_web_done.json",
+        ],
+        "failure_criteria": ["Any required command exits non-zero"],
+        "success_criteria": ["Required artifacts exist", "Runtime remains non-executing"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['docs/residents/alfred/runtime/Alfred_Standalone_Runtime_Foundation_v0_1.md','docs/residents/alfred/runtime/Alfred_Event_Intake_Schema_v0_1.md','docs/character-architecture/Resident_Output_Verbosity_Contract_v0_1.md','src/estate/core/alfred_runtime.py','tests/test_alfred_runtime.py','collaboration/work_packages/completions/WP-0223_codex_cloud_web_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("pytest -q tests/test_alfred_runtime.py"),
+            _cmd("python -m estate.cli.main alfred-runtime event-brief --sample --verbosity mid --json"),
+        ],
+    },
+
     "WP-0016": {
         "recipe_id": "wp-0016-work-package-registry-architecture-artifact-presence",
         "title": "WP-0016 — Work Package Registry Architecture",

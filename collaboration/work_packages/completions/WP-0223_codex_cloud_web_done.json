@@ -1,0 +1,35 @@
+{
+  "work_package_id": "WP-0223",
+  "provider": "codex_cloud_web",
+  "files_changed": [
+    "docs/residents/alfred/runtime/Alfred_Standalone_Runtime_Foundation_v0_1.md",
+    "docs/residents/alfred/runtime/Alfred_Event_Intake_Schema_v0_1.md",
+    "docs/character-architecture/Resident_Output_Verbosity_Contract_v0_1.md",
+    "src/estate/core/alfred_runtime.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/conftest.py",
+    "tests/test_alfred_runtime.py",
+    "collaboration/work_packages/completions/WP-0223_codex_cloud_web_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_alfred_runtime.py"
+  ],
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main alfred-runtime event-brief --sample --verbosity mid --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0223 --json"
+  ],
+  "skipped_live_calls": true,
+  "local_runtime_requirement": "partially; deterministic local tests only, no live TextGen/Ollama calls required",
+  "governance_boundary_compliance": {
+    "non_autonomous": true,
+    "no_event_execution": true,
+    "no_approval_merge_validation_spend_hire_or_governance_authority": true,
+    "textgen_is_adapter_not_home": true
+  },
+  "known_limitations": [
+    "No event watcher, daemon, live queue monitor, model call, or provider smoke test is implemented.",
+    "CLI surface only renders explicit/sample event briefings."
+  ],
+  "recommended_next_package": "Alfred Event Watcher and Triggered Briefing Prototype"
+}
