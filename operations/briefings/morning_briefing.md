@@ -8,7 +8,7 @@ Non-authoritative operational summary.
 - WP-0028: Created stable Estate document registry JSON, human-readable registry documentation, document-registry CLI output, and validation tests.
 - WP-0029: Implemented the Artifact Provenance Model v1 documentation, machine-readable JSON Schema, and document registry entries without migrating existing artifacts or changing governance authority.
 - WP-0030: Created Mission Registry Standard v1 and seeded the initial machine-readable Estate Mission Registry with conservative mission IDs, status values, ownership notes, related work packages, documents, artifacts, and non-final Steward authorization notes.
-- WP-0031: Created Transport Adapter Evaluation v1, preserving the Communication Bus as the institutional messaging model while evaluating GitHub repository files, local filesystem/local broker, Gmail/email, Gotify, Q Mastery/MPT-style mailbox connectors, and a future Codex task status adapter. Included a recommendation matrix, near-term transport priorities, and a future-work note for Codex task status integration.
+- WP-0031: Created Transport Adapter Evaluation v1, preserving the Communication Bus as the institutional messaging model while evaluating GitHub repository files, local filesystem/local broker, Gmail/email, Gotify, CueMastery/MPT-style mailbox connectors, and a future Codex task status adapter. Included a recommendation matrix, near-term transport priorities, and a future-work note for Codex task status integration.
 - WP-0032: Documented a local Codex completion detection strategy that uses standard completion records as the primary pre-merge signal and added helper support for reading and validating those records.
 
 ## Failed or blocked work

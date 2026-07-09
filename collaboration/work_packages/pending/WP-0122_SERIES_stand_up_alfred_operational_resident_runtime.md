@@ -63,7 +63,7 @@ Out of scope:
 - Bypassing Steward, Chief Architect, or governance authority.
 - Implementing Helen onboarding in this package except to identify whether Alfred can initiate or assist it.
 - Hiring Chief Architect #5.
-- Building Queue Mastery.
+- Building CueMastery.
 
 ## Required Operational Checks
 

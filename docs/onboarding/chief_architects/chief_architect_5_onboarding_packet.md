@@ -65,7 +65,7 @@ Chief Architect #5 must independently review architecture proposals, challenge a
 - Follow the work-package instructions exactly.
 - Respect SERIES/PARALLEL execution mode and branch discipline.
 - Preserve completion receipts, validation reports, and runtime JSON companions.
-- Do not expand scope into constitutional redesign, new departments, Queue Mastery, or Social Character Engineer work unless a future package explicitly authorizes it.
+- Do not expand scope into constitutional redesign, new departments, CueMastery, or Social Character Engineer work unless a future package explicitly authorizes it.
 
 ## Communication Bus Usage Expectations
 

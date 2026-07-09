@@ -154,9 +154,9 @@
         },
         {
           "id": "WP-0031",
-          "title": "Transport Adapter Evaluation: GitHub, Gmail, Local Broker, MPT/Q Mastery",
+          "title": "Transport Adapter Evaluation: GitHub, Gmail, Local Broker, MPT/CueMastery",
           "track": "Architecture research first",
-          "why_next": "Voice and GitHub experiments showed transport friction; Q Mastery may already contain useful mailbox patterns.",
+          "why_next": "Voice and GitHub experiments showed transport friction; CueMastery may already contain useful mailbox patterns.",
           "summary": "Evaluate transport options while preserving the Communication Bus as the institutional model."
         },
         {

@@ -9,7 +9,7 @@ Related model: `docs/collaboration/Communication_Bus_v1_Operational_Flow.md`
 
 This document evaluates candidate transport adapters for Estate communication while preserving the Communication Bus as the institutional messaging model.
 
-The evaluation responds to operational friction with GitHub as a live transport, the current inability to directly observe Codex task completion, and the possibility of adopting mailbox connector patterns similar to Q Mastery / MPT-style systems.
+The evaluation responds to operational friction with GitHub as a live transport, the current inability to directly observe Codex task completion, and the possibility of adopting mailbox connector patterns similar to CueMastery / MPT-style systems.
 
 ## 2. Architectural Position
 
@@ -127,7 +127,7 @@ Each candidate is evaluated against these criteria:
 
 **Evaluation:** Gotify is a strong notification surface but a poor primary transport for full Communication Bus semantics. It should carry event summaries, links, and urgency markers while canonical records remain local/Git-backed.
 
-### 5.5 Q Mastery / MPT-Style Mailbox Connector Pattern
+### 5.5 CueMastery / MPT-Style Mailbox Connector Pattern
 
 **Description:** Use explicit mailboxes, inbox/outbox folders, message claiming, acknowledgement, synchronization duties, and connector processes to bridge participants or runtimes.
 
@@ -173,7 +173,7 @@ Each candidate is evaluated against these criteria:
 | Local filesystem / local broker | Primary local-first live transport and completion artifact surface | Add watchers, SQLite, queue semantics, or broker if patterns stabilize | Durable local substrate for autonomous operation | Prioritize near-term. |
 | Gmail/email adapter | Avoid as core; possible manual notification only | Controlled notification or inbound human message adapter after boundary design | External human communication bridge | Defer until credential and boundary controls mature. |
 | Gotify notification adapter | Optional notification adjunct only if no credentials are added in this package | Event notification layer over local detection | Operator alerting fabric | Prioritize after local status detection, not before. |
-| Q Mastery / MPT-style mailbox connector | Use pattern concepts with existing `collaboration/mailboxes/` and canonical envelopes | Formalize connector loops, sync duties, and mailbox-aware routing | Cross-transport connector framework | Prioritize as design pattern and adapter-neutral connector model. |
+| CueMastery / MPT-style mailbox connector | Use pattern concepts with existing `collaboration/mailboxes/` and canonical envelopes | Formalize connector loops, sync duties, and mailbox-aware routing | Cross-transport connector framework | Prioritize as design pattern and adapter-neutral connector model. |
 | Future Codex task status adapter | Not available / do not implement | Investigate only if official access emerges | Direct task lifecycle observation | Park as future work. |
 
 ## 7. Near-Term Transport Priorities

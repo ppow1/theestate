@@ -30,4 +30,4 @@ Helen has no default live access to worker queues, mailboxes, provider dashboard
 
 ## Background Operations Boundary
 
-Helen may consume, summarize, or prepare governed WP-0617-compatible background operation requests about worker assignment, resident readiness, and Qmaster transition staffing. Helen does not own event watches, background runtime status, provider execution, dispatch queues, or a competing resident event loop.
+Helen may consume, summarize, or prepare governed WP-0617-compatible background operation requests about worker assignment, resident readiness, and CueMastery transition staffing. Helen does not own event watches, background runtime status, provider execution, dispatch queues, or a competing resident event loop.
