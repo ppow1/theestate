@@ -4,7 +4,7 @@ Status: Proposed
 Priority: Critical
 Owner: Office of Character Architecture
 Boundary Authority: Ingrid / Privacy and Boundary Office
-Primary Consumers: Steward, Alfred, Helen, Character Architecture, CueMastery workstream, IONOGE workstreams
+Primary Consumers: Steward, Alfred, Helen, Character Architecture, Engineering Department, CueMastery workstream, IONOGE workstreams
 Classification: Estate Internal
 Created: 2026-07-09
 
@@ -37,7 +37,7 @@ This repair should be completed from repository context with deterministic tests
 Capacity note:
 
 ```text
-This is a correction and guardrail package, not a new design effort. Repair nomenclature, add dictation-sensitive validation references, update tests/validation references, and stop.
+This is a correction and guardrail package, not a new design effort. Repair nomenclature, add dictation-sensitive validation references, update tests/validation references, preserve institutional responsibility boundaries, and stop.
 ```
 
 ## Codex Command
@@ -57,6 +57,23 @@ eye-oh-no-gee
 ```
 
 The prior CueMastery mistake escaped review in WP-0224. This package repairs that mistake and adds validation so known dictation failures do not continue to spread.
+
+## Institutional Responsibility Boundary
+
+This repair must preserve the Steward's responsibility distinction:
+
+```text
+Alfred worries about the Estate.
+Alfred does not own CueMastery.
+
+The Estate is bringing up and bringing online the Engineering Department.
+The Engineering Department will take on the engineering tasks associated with CueMastery.
+
+CueMastery is a project/workstream that Engineering may execute.
+Alfred may brief Estate-level status, surface blockers, route attention, and protect the Steward's focus, but Alfred should not be framed as directly responsible for CueMastery execution.
+```
+
+When repairing text, prefer language that says Alfred supports Estate coordination, resident readiness, background-operations awareness, and Engineering Department bring-up. Do not imply that Alfred personally manages CueMastery tasks.
 
 ## Correct Names
 
@@ -213,7 +230,21 @@ For each term, include:
 
 Do not turn this into a broad registry project. Keep it small and useful.
 
-### Required Outcome 4 - Validation Guard
+### Required Outcome 4 - Preserve Alfred / Engineering / CueMastery Boundary
+
+When replacing Qmaster/qmaster language in WP-0224 outputs, ensure the corrected text does not incorrectly make Alfred responsible for CueMastery execution.
+
+Required boundary language, in substance:
+
+```text
+Alfred worries about Estate-level coordination, Steward attention, and resident/background-operations awareness.
+Engineering takes on CueMastery engineering tasks once the Engineering Department is brought online.
+CueMastery is not Alfred's direct execution responsibility.
+```
+
+Acceptable implementation may update the CueMastery return gate, Alfred integration document, Helen profile, and tests so they refer to returning focus to Estate bring-up and Engineering Department readiness, with CueMastery work flowing through Engineering rather than Alfred.
+
+### Required Outcome 5 - Validation Guard
 
 Add deterministic validation that fails if the incorrect CueMastery names remain in active Character Architecture / resident standup artifacts.
 
@@ -234,7 +265,9 @@ CUEMASTERY
 
 Also add validation that the canonical terminology guard contains IONOGE with pronunciation `eye-oh-no-gee` and allowed lowercase machine identifier `ionoge`.
 
-### Required Outcome 5 - Completion Receipt
+Also add validation, where practical, that corrected Alfred/CueMastery language preserves the boundary that Alfred coordinates Estate-level work while Engineering owns CueMastery execution.
+
+### Required Outcome 6 - Completion Receipt
 
 Create:
 
@@ -250,12 +283,13 @@ The receipt must include:
 - terms replaced;
 - paths renamed or deleted;
 - canonical terms added;
+- Alfred / Engineering / CueMastery boundary correction summary;
 - tests run;
 - validation commands run;
 - known limitations;
 - confirmation that live calls were avoided.
 
-### Required Outcome 6 - Validation Recipe
+### Required Outcome 7 - Validation Recipe
 
 Add a WP-0225 validation recipe if consistent with current validation registry conventions.
 
@@ -274,6 +308,7 @@ The recipe must include:
 - old Qmaster return gate path is absent or an intentional redirect stub;
 - canonical nomenclature guard exists;
 - CueMastery and IONOGE canonical entries are present;
+- Alfred / Engineering / CueMastery responsibility boundary is preserved;
 - deterministic tests pass;
 - completion receipt exists;
 - forbidden CueMastery nomenclature does not remain in active affected files.
@@ -284,6 +319,8 @@ This package must not:
 
 - change the purpose of CueMastery;
 - change the purpose of IONOGE;
+- make Alfred responsible for CueMastery execution;
+- redesign the Engineering Department;
 - redesign the resident standup architecture;
 - redesign WP-0617;
 - create a broad terminology registry beyond this minimal guard;
@@ -292,7 +329,7 @@ This package must not:
 - run live providers;
 - alter private/protected source boundaries;
 - inspect private local characters;
-- expand beyond nomenclature repair and validation guardrails.
+- expand beyond nomenclature repair, responsibility-boundary correction, and validation guardrails.
 
 ## Acceptance Criteria
 
@@ -303,6 +340,8 @@ Accept this package only if:
 - the return gate artifact path is corrected or intentionally redirected;
 - a canonical nomenclature guard records CueMastery and IONOGE;
 - IONOGE pronunciation is recorded as eye-oh-no-gee;
+- Alfred is not framed as directly responsible for CueMastery execution;
+- Engineering is identified as the proper home for CueMastery engineering tasks;
 - tests pass;
 - WP-0225 validation passes;
 - completion receipt exists;
@@ -313,7 +352,7 @@ Accept this package only if:
 After this repair, return to the prior execution path:
 
 ```text
-Continue CueMastery work with Alfred/Helen resident support and WP-0617 background operations alignment.
+Continue Estate bring-up by standing up Alfred/Helen and bringing the Engineering Department online, so Engineering can take on CueMastery work with Alfred providing Estate-level coordination rather than direct CueMastery execution.
 ```
 
 Do not continue resident expansion by default.
