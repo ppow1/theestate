@@ -1,0 +1,59 @@
+{
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-09T20:49:28Z",
+  "dispatch_execution_performed": false,
+  "docs_updated": [
+    "docs/integration/background_operations_event_runtime.md"
+  ],
+  "files_changed": [
+    "src/estate/core/background_operations.py",
+    "src/estate/core/background_operations_runtime.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_background_operations.py",
+    "tests/test_background_operations_runtime.py",
+    "docs/integration/background_operations_event_runtime.md",
+    "collaboration/work_packages/completions/WP-0617_codex_done.json"
+  ],
+  "follow_up_recommendations": [
+    "Run Ring 2 local GPU reasoning review when available.",
+    "Tune watch conditions as additional movement and validation artifacts are promoted."
+  ],
+  "known_limitations": [
+    "The runtime is a deterministic one-cycle runner, not an always-on daemon.",
+    "Watches use existing durable artifact conventions and can be refined as future schemas stabilize."
+  ],
+  "merge_authority_or_equivalent": "Chief Architect / Steward acceptance required by WP-0617 Ring 4.",
+  "office_integration_status": "Integrated into steward command center status payload without adding fake controls.",
+  "provider": "codex_cloud_web",
+  "provider_execution_performed": false,
+  "pull_request_url_or_not_applicable_reason": "Not applicable in local implementation environment; make_pr metadata recorded after commit.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_generated": [
+    "runtime/background_operations/events.jsonl",
+    "runtime/background_operations/requests/<request_id>.json",
+    "runtime/background_operations/status/latest.json",
+    "runtime/background_operations/status/summary.json",
+    "runtime/background_operations/reports/latest.md",
+    "runtime/background_operations/watches.json"
+  ],
+  "skipped_gpu_calls": true,
+  "skipped_live_provider_calls": true,
+  "skipped_network_calls": true,
+  "status": "completed",
+  "summary": "Implemented deterministic background operations event/runtime models, watches, request writer, CLI, Office status integration, validation recipe, tests, and documentation.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/background_operations.py src/estate/core/background_operations_runtime.py",
+    "pytest -q tests/test_background_operations.py tests/test_background_operations_runtime.py --basetemp Temp/pytest-background-operations",
+    "PYTHONPATH=src python -m estate.cli.main background-operations cycle --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0617 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/background_operations.py src/estate/core/background_operations_runtime.py",
+    "pytest -q tests/test_background_operations.py tests/test_background_operations_runtime.py --basetemp Temp/pytest-background-operations",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0617 --json"
+  ],
+  "work_package_id": "WP-0617"
+}
