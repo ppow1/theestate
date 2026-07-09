@@ -2408,6 +2408,38 @@ VALIDATION_RECIPES["WP-0613"] = {
     ],
 }
 
+VALIDATION_RECIPES["WP-0614"] = {
+    "recipe_id": "wp-0614-provider-routing-recommendations",
+    "title": "WP-0614 - Execution Provider Routing Recommendations",
+    "description": "Validates deterministic provider recommendation models, runtime artifacts, CLI JSON, documentation, and completion receipt without live provider, network, GPU, dispatch, or Orchestrator mutation.",
+    "required_checks": [
+        "Recommendation tests pass",
+        "Runtime artifact tests pass",
+        "CLI evaluation writes local recommendation artifacts",
+        "Implementation, documentation, and completion receipt exist",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "src/estate/core/provider_routing_recommendations.py",
+        "src/estate/core/provider_routing_recommendations_runtime.py",
+        "tests/test_provider_routing_recommendations.py",
+        "tests/test_provider_routing_recommendations_runtime.py",
+        "docs/integration/provider_routing_recommendations.md",
+        "collaboration/work_packages/completions/WP-0614_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, network, GPU, dispatch, or Orchestrator mutation"],
+    "success_criteria": ["Required commands exit zero", "Runtime artifacts are local under runtime/provider_routing"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m py_compile src/estate/core/provider_routing_recommendations.py"),
+        _cmd("python -m py_compile src/estate/core/provider_routing_recommendations_runtime.py"),
+        _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+        _cmd("pytest -q tests/test_provider_routing_recommendations.py tests/test_provider_routing_recommendations_runtime.py --basetemp Temp/pytest-provider-routing-recommendations"),
+        _cmd("python -c \"import json, subprocess, sys; from pathlib import Path; p=Path('Temp/wp0614_provider_routing_request.json'); p.parent.mkdir(exist_ok=True); p.write_text(json.dumps({'routing_request_id':'route-wp0614-validation','work_package_id':'WP-0614','work_type':'repository implementation','requires_repo_write':True,'requires_local_runtime':False}), encoding='utf-8'); proc=subprocess.run([sys.executable,'-m','estate.cli.main','provider-routing-recommendation','evaluate','--request',str(p),'--json'], text=True, capture_output=True, check=False); assert proc.returncode==0, proc.stderr or proc.stdout; data=json.loads(proc.stdout); assert data['recommended_provider']=='codex_cloud_web'; assert data['metadata']['recommendation_only'] is True; assert data['metadata']['dispatch_mutated'] is False; assert data['metadata']['orchestrator_mutated'] is False; assert Path(data['recommendation_path']).is_file(); assert Path(data['latest_status_path']).is_file()\""),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/provider_routing_recommendations.py','src/estate/core/provider_routing_recommendations_runtime.py','tests/test_provider_routing_recommendations.py','tests/test_provider_routing_recommendations_runtime.py','docs/integration/provider_routing_recommendations.md','collaboration/work_packages/completions/WP-0614_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+    ],
+}
+
 VALIDATION_RECIPES["WP-0219"] = {
     "recipe_id": "wp-0219-alfred-resident-package-validation-and-exports",
     "title": "WP-0219 - Alfred Resident Package Validation and Platform Export Hardening",

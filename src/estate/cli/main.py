@@ -56,6 +56,8 @@ from estate.core.production_readiness_validation import generate_production_read
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
 from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
+from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
+from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
 from estate.core.execution_dispatch import (
     block_dispatch_item,
     cancel_dispatch_item,
@@ -1502,6 +1504,34 @@ def cmd_execution_provider_adapter(args):
         status = payload.get("status") or (payload.get("validation") or {}).get("status")
         print(f"Execution provider adapter {args.execution_provider_adapter_action}: {status}")
 
+
+def cmd_provider_routing_recommendation(args):
+    import json
+    try:
+        if args.provider_routing_action == "evaluate":
+            payload = evaluate_recommendation_file(args.request, write=True)
+            if getattr(args, "json", False):
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(f"Provider routing recommendation: {payload['recommended_provider']}")
+                print(f"Recommendation: {payload['recommendation_path']}")
+                print(f"Report: {payload['report_path']}")
+        elif args.provider_routing_action == "explain":
+            request = load_recommendation_request(args.request)
+            result = evaluate_provider_routing_recommendation(request)
+            if getattr(args, "json", False):
+                print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+            else:
+                print(explain_provider_routing_recommendation(result), end="")
+        else:
+            raise SystemExit(f"Unknown provider routing action: {args.provider_routing_action}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "failed", "error": str(exc)}, indent=2, sort_keys=True))
+        else:
+            print(f"Provider routing recommendation failed: {exc}")
+        raise SystemExit(1)
+
 def cmd_execution_activity(args):
     import json
     payload = generate_execution_activity_surface()
@@ -2548,6 +2578,13 @@ def main(argv=None):
     p.add_argument("--json", action="store_true", help="Run local operational validation and print JSON")
     p.set_defaults(func=cmd_estate_validate_local)
 
+
+
+    p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
+    p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")
+    p.add_argument("--request", required=True, help="Path to provider routing recommendation request JSON")
+    p.add_argument("--json", action="store_true", help="Print recommendation JSON")
+    p.set_defaults(func=cmd_provider_routing_recommendation)
 
     p = sub.add_parser("providers-list", help="List registered provider descriptors")
     p.add_argument("--json", action="store_true", help="Print provider catalog status JSON")

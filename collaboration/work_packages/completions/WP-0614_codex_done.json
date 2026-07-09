@@ -1,0 +1,57 @@
+{
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-09T18:39:31Z",
+  "docs_updated": [
+    "docs/integration/provider_routing_recommendations.md"
+  ],
+  "files_changed": [
+    "src/estate/core/provider_routing_recommendations.py",
+    "src/estate/core/provider_routing_recommendations_runtime.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_provider_routing_recommendations.py",
+    "tests/test_provider_routing_recommendations_runtime.py",
+    "docs/integration/provider_routing_recommendations.md",
+    "collaboration/work_packages/completions/WP-0614_codex_done.json"
+  ],
+  "follow_up_recommendations": [
+    "Run Ring 2 local GPU reasoning review when local GPU validation is available.",
+    "Chief Architect / Steward should accept or request repair after reviewing validation evidence."
+  ],
+  "known_limitations": [
+    "Recommendations are deterministic fit metadata only and do not authorize movement or execution.",
+    "Ring 2 local GPU reasoning review is expected after merge in an environment with the local RTX 4090/Ollama tooling."
+  ],
+  "merge_authority": "Chief Architect / Steward acceptance required by WP-0614 Ring 4.",
+  "office_integration_status": "CLI integration only; no new office, provider catalog, dispatch queue, event system, or command surface beyond the required recommendation CLI action.",
+  "provider": "codex_cloud_web",
+  "pull_request_not_applicable_reason": "Not available before make_pr tool records PR metadata in this environment.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_generated": [
+    "runtime/provider_routing/recommendations/<recommendation_id>.json",
+    "runtime/provider_routing/status/latest.json",
+    "runtime/provider_routing/status/summary.json",
+    "runtime/provider_routing/reports/<recommendation_id>.md",
+    "runtime/validation/work_packages/WP-0614_validation.json",
+    "operations/validation/reports/WP-0614_validation.md"
+  ],
+  "skipped_live_provider_calls": [
+    "Codex CLI",
+    "ChatGPT",
+    "Ollama/local GPU",
+    "network services",
+    "dispatch queue execution",
+    "Orchestrator runtime mutation"
+  ],
+  "status": "implemented",
+  "summary": "Implemented deterministic provider routing recommendation models, runtime artifact writer/loader, CLI evaluate/explain actions, documentation, tests, and validation recipe for WP-0614.",
+  "tests_run": [
+    "PYTHONPATH=src python -m py_compile src/estate/core/provider_routing_recommendations.py src/estate/core/provider_routing_recommendations_runtime.py",
+    "mkdir -p Temp && PYTHONPATH=src pytest -q tests/test_provider_routing_recommendations.py tests/test_provider_routing_recommendations_runtime.py --basetemp Temp/pytest-provider-routing-recommendations"
+  ],
+  "validation_commands_run": [
+    "python -m estate.cli.main validate-work-package --id WP-0614 --json"
+  ],
+  "work_package_id": "WP-0614"
+}
