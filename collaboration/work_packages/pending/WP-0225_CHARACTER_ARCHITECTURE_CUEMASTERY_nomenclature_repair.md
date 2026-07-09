@@ -48,7 +48,7 @@ Read this work package and do exactly what it says.
 
 ## Mission
 
-Correct the resident standup and Character Architecture artifacts so the project/workstream is named **CueMastery**, not Qmaster/qmaster.
+Correct the resident standup and Character Architecture artifacts so the project/workstream is named **CueMastery**, not Qmaster/qmaster or dictation-derived variants.
 
 The prior name escaped review in WP-0224. This package repairs that mistake and adds validation so the wrong form does not continue to spread.
 
@@ -64,12 +64,21 @@ Use CueMastery in prose, headings, titles, workstream names, and user-facing doc
 
 Use lowercase `cuemastery` only where a lowercase machine identifier is appropriate, such as a JSON fixture field, snake_case identifier, or filename convention.
 
+## Dictation / Mishearing Risk
+
+The Steward often uses dictation. CueMastery is frequently misconstrued as variants involving the letter Q, queue/line terminology, or separated words. This package must explicitly guard against those variants.
+
 Do not use:
 
 ```text
 Qmaster
 qmaster
 Q Master
+Q mastery
+Q Mastery
+queue mastery
+Queue Mastery
+QueueMastery
 Cue Mastery
 CUEMASTERY
 ```
@@ -86,6 +95,11 @@ Search the repository for incorrect occurrences of:
 Qmaster
 qmaster
 Q Master
+Q mastery
+Q Mastery
+queue mastery
+Queue Mastery
+QueueMastery
 Cue Mastery
 CUEMASTERY
 ```
@@ -138,6 +152,11 @@ At minimum, tests must scan the relevant WP-0224/WP-0225 files and assert that t
 Qmaster
 qmaster
 Q Master
+Q mastery
+Q Mastery
+queue mastery
+Queue Mastery
+QueueMastery
 Cue Mastery
 CUEMASTERY
 ```
@@ -204,7 +223,7 @@ This package must not:
 Accept this package only if:
 
 - active resident/Character Architecture artifacts use CueMastery correctly;
-- incorrect Qmaster/qmaster/CUEMASTERY forms are removed from active affected files;
+- incorrect Qmaster/qmaster/QueueMastery/CUEMASTERY forms are removed from active affected files;
 - the return gate artifact path is corrected or intentionally redirected;
 - tests pass;
 - WP-0225 validation passes;
