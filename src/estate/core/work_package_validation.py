@@ -2374,3 +2374,60 @@ VALIDATION_RECIPES["WP-EXECUTION-DISPATCH-QUEUE-001"] = {
         _cmd("python -m estate.cli.main validation-production-readiness --json", required=False),
     ],
 }
+
+VALIDATION_RECIPES["WP-0219"] = {
+    "recipe_id": "wp-0219-alfred-resident-package-validation-and-exports",
+    "title": "WP-0219 - Alfred Resident Package Validation and Platform Export Hardening",
+    "description": "Validates Alfred v0.1 resident package artifacts, deterministic tests, completion evidence, live-access warnings, and protected-source exclusion without live provider calls.",
+    "required_checks": [
+        "Alfred resident package pytest passes",
+        "Completion receipt records exact deterministic result and skipped live calls",
+        "Protected-source exclusion is explicit",
+        "Platform exports retain live-access warnings",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "docs/residents/alfred/README.md",
+        "docs/residents/alfred/platform-exports/testing-checklist.md",
+        "tests/character_architecture/test_alfred_resident_package.py",
+        "collaboration/work_packages/completions/WP-0219_codex_cloud_web_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, platform, GPU, network, mailbox, calendar, worker, or command-center access"],
+    "success_criteria": ["Required commands exit zero", "Recipe does not return no_recipe"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/character_architecture/test_alfred_resident_package.py"),
+        _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0219_codex_cloud_web_done.json').read_text(encoding='utf-8')); text=json.dumps(data).lower(); assert '19 passed' in text; assert 'skipped_live_provider_calls' in data and data['skipped_live_provider_calls']; assert 'protected-source' in text or 'protected source' in text; assert data.get('wp_0219_ring2_findings',{}).get('no_recipe') == 'resolved_by_WP-0220_recipe_registration'\""),
+        _cmd("python -c \"from pathlib import Path; paths=['docs/residents/alfred/README.md','docs/residents/alfred/platform-exports/testing-checklist.md']; required=['no protected source','no split-source private material','no uc material','no live-access grant']; missing=[]; [missing.append((p, phrase)) for p in paths for phrase in required if phrase not in Path(p).read_text(encoding='utf-8').lower()]; assert not missing, missing\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0219'); assert r['receipt_status']=='complete', r\""),
+    ],
+}
+
+VALIDATION_RECIPES["WP-0220"] = {
+    "recipe_id": "wp-0220-repair-alfred-ring2-findings",
+    "title": "WP-0220 - Repair Alfred Ring 2 Findings and Validation Recipe Coverage",
+    "description": "Validates repair evidence for WP-0219 Ring 2 findings, including recipe coverage, completion receipt detail, protected-source exclusion, and deterministic Alfred package tests.",
+    "required_checks": [
+        "Alfred resident package pytest passes",
+        "WP-0219 validation recipe is registered and passes",
+        "WP-0220 completion receipt is complete",
+        "Protected-source exclusion and skipped live calls are recorded",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "collaboration/work_packages/completions/WP-0219_codex_cloud_web_done.json",
+        "collaboration/work_packages/completions/WP-0220_codex_cloud_web_done.json",
+        "docs/residents/alfred/README.md",
+        "docs/residents/alfred/platform-exports/testing-checklist.md",
+        "tests/character_architecture/test_alfred_resident_package.py",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe", "Protected-source or live-access boundary is weakened"],
+    "success_criteria": ["Required commands exit zero", "WP-0219 and WP-0220 validation recipes are registered"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/character_architecture/test_alfred_resident_package.py"),
+        _cmd("python -m estate.cli.main validate-work-package --id WP-0219 --json"),
+        _cmd("python -c \"import json; from pathlib import Path; p=Path('collaboration/work_packages/completions/WP-0220_codex_cloud_web_done.json'); data=json.loads(p.read_text(encoding='utf-8')); text=json.dumps(data).lower(); assert data.get('work_package_id') == 'WP-0220'; assert '19 passed' in text; assert 'skipped_live_provider_calls' in data and data['skipped_live_provider_calls']; assert 'protected-source' in text or 'protected source' in text; assert data.get('wp_0219_ring2_findings',{}).get('no_recipe') in {'resolved','resolved_by_recipe_registration'}\""),
+        _cmd("python -c \"from estate.core.production_readiness_validation import validate_receipt; r=validate_receipt('WP-0220'); assert r['receipt_status']=='complete', r\""),
+    ],
+}

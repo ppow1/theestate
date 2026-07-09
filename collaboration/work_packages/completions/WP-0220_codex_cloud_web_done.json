@@ -1,0 +1,92 @@
+{
+  "work_package_id": "WP-0220",
+  "provider": "codex_cloud_web",
+  "codex_status": "completed",
+  "status": "implemented",
+  "completed_at": "2026-07-09T00:00:00Z",
+  "branch": "main",
+  "summary": "Repaired Alfred WP-0219 Ring 2 findings by registering deterministic WP-0219/WP-0220 validation recipes, expanding completion receipt evidence, making protected-source exclusion explicit, and strengthening Alfred package tests.",
+  "files_changed": [
+    "collaboration/work_packages/completions/WP-0219_codex_cloud_web_done.json",
+    "collaboration/work_packages/completions/WP-0220_codex_cloud_web_done.json",
+    "docs/residents/alfred/README.md",
+    "docs/residents/alfred/platform-exports/testing-checklist.md",
+    "src/estate/core/work_package_validation.py",
+    "tests/character_architecture/test_alfred_resident_package.py"
+  ],
+  "tests_run": [
+    {
+      "command": "pytest -q tests/character_architecture/test_alfred_resident_package.py",
+      "result": "23 passed",
+      "ring": "Ring 1"
+    }
+  ],
+  "validation_commands_run": [
+    {
+      "ring": "Ring 0",
+      "command": "python - <<'PY'\nimport json\nfrom pathlib import Path\njson.loads(Path('collaboration/work_packages/completions/WP-0219_codex_cloud_web_done.json').read_text(encoding='utf-8'))\nprint('WP-0219 receipt JSON parse passed')\nPY",
+      "result": "passed"
+    },
+    {
+      "ring": "Ring 1",
+      "command": "pytest -q tests/character_architecture/test_alfred_resident_package.py",
+      "result": "23 passed"
+    },
+    {
+      "ring": "Ring 1",
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0219 --json",
+      "result": "passed"
+    },
+    {
+      "ring": "Ring 1",
+      "command": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0220 --json",
+      "result": "passed"
+    }
+  ],
+  "runtime_artifacts_generated": [
+    "runtime/validation/work_packages/WP-0219_validation.json",
+    "operations/validation/reports/WP-0219_validation.md",
+    "runtime/validation/work_packages/WP-0220_validation.json",
+    "operations/validation/reports/WP-0220_validation.md",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "docs_updated": [
+    "docs/residents/alfred/README.md",
+    "docs/residents/alfred/platform-exports/testing-checklist.md"
+  ],
+  "office_integration_status": "Used the existing work-package validation recipe registry only; no new offices, registries, providers, event systems, command surfaces, resident identity systems, live routing, or runtime behavior were created.",
+  "skipped_live_provider_calls": [
+    "No SillyTavern live import was performed.",
+    "No Open WebUI live import was performed.",
+    "No text-generation-webui live import was performed.",
+    "No live provider, cloud, GPU, network, mailbox, calendar, worker, repository connector, command-center, or platform calls were performed by tests."
+  ],
+  "known_limitations": [
+    "Chief Architect / Steward institutional acceptance remains pending.",
+    "Ring 2 local GPU/Ollama review was not run in this implementation environment and should be performed locally if available.",
+    "WP-0219's prior no_recipe finding is resolved by recipe registration rather than by redesigning the validation system."
+  ],
+  "follow_up_recommendations": [
+    "Run local Ring 2 review for WP-0220 with the changed files, deterministic test output, and WP-0219/WP-0220 receipts.",
+    "Promote Alfred Resident Package v0.1 to Chief Architect / Steward acceptance review after Ring 2 confirms the repair evidence."
+  ],
+  "wp_0219_ring2_findings": {
+    "no_recipe": "resolved_by_recipe_registration",
+    "completion_receipt_detail": "resolved",
+    "protected_source_exclusion": "resolved",
+    "remaining_open_findings": []
+  },
+  "protected_source_exclusion": {
+    "status": "explicitly_excluded_and_test_backed",
+    "statement": "Alfred v0.1 contains no protected source, no split-source private material, no UC material, and no live-access grant.",
+    "evidence_paths": [
+      "docs/residents/alfred/README.md",
+      "docs/residents/alfred/platform-exports/testing-checklist.md",
+      "tests/character_architecture/test_alfred_resident_package.py"
+    ]
+  },
+  "pull_request_url": "pending-local-pr-tool",
+  "merge_authority_equivalent": "Chief Architect / Steward acceptance remains required; this receipt does not claim institutional acceptance.",
+  "ready_for_ca_review": true,
+  "ready_for_ca_review_reason": "WP-0219 Ring 2 findings are resolved or documented, deterministic validation recipes are registered, WP-0220 package pytest reports 23 passed while preserving the WP-0219 19 passed evidence, protected-source exclusion is explicit, and live calls were skipped."
+}

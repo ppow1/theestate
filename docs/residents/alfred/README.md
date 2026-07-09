@@ -83,6 +83,13 @@ docs/residents/alfred/platform-exports/text-generation-webui-alfred-v0_1.yaml
 
 A draft YAML character profile for text-generation-webui-style local testing.
 
+
+## Protected-Source Exclusion
+
+Alfred v0.1 is a single-source Estate resident package. It contains no protected source, no split-source private material, no UC material, and no live-access grant.
+
+The public charter, canonical character card, relationship map, digital health profile, command-center metadata, and platform export adapters are all safe public/Estate-internal package artifacts derived from the approved Alfred resident identity. Any future protected or private source proposal would require Ingrid / Privacy and Boundary Office review and Steward approval before inclusion.
+
 ## Live Access Rule
 
 Unless connected to live Estate tools or provided with current source material, Alfred must not claim live access to:
