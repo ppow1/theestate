@@ -26,6 +26,7 @@ from estate.core.operator_activity_stream import generate_operator_activity_stre
 from estate.core.operations_notification_center import generate_operations_notification_center
 from estate.core.office_operational_activity import load_office_operational_activity
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
+from estate.core.background_operations_runtime import load_background_operations_status
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
@@ -103,6 +104,7 @@ ARTIFACTS = {
     "steward_presence": ["runtime/steward/steward_presence_state.json", "operations/steward/steward_presence_state.md"],
     "execution_activity": ["runtime/execution_activity/current.json", "runtime/execution_activity/report.md"],
     "execution_dispatch": ["runtime/execution_dispatch/current.json", "runtime/execution_dispatch/report.md"],
+    "background_operations": ["runtime/background_operations/status/latest.json", "runtime/background_operations/status/summary.json"],
 }
 
 
@@ -466,6 +468,7 @@ def _build_status_bar(root, panels, generated_at):
     notification_summary = (((panels.get("operations_notification_center") or {}).get("data") or {}).get("summary") or {})
     execution_summary = (((panels.get("execution_activity") or {}).get("data") or {}).get("summary") or {})
     dispatch_summary = (((panels.get("execution_dispatch") or {}).get("data") or {}).get("summary") or {})
+    background_summary = (((panels.get("background_operations") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
@@ -493,6 +496,18 @@ def _build_status_bar(root, panels, generated_at):
         "dispatch_running_count": dispatch_summary.get("running_count"),
         "dispatch_blocked_count": dispatch_summary.get("blocked_count"),
         "dispatch_attention_required_count": dispatch_summary.get("attention_required_count"),
+        "background_operations_available": background_summary.get("background_operations_available"),
+        "active_watches_count": background_summary.get("active_watches_count"),
+        "generated_requests_count": background_summary.get("generated_requests_count"),
+        "blocked_requests_count": background_summary.get("blocked_requests_count"),
+        "stale_validation_count": background_summary.get("stale_validation_count"),
+        "ring2_review_needed_count": background_summary.get("ring2_review_needed_count"),
+        "pending_movement_decision_count": background_summary.get("pending_movement_decision_count"),
+        "provider_capacity_warning_count": background_summary.get("provider_capacity_warning_count"),
+        "worker_assignment_gap_count": background_summary.get("worker_assignment_gap_count"),
+        "latest_background_request": background_summary.get("latest_background_request"),
+        "latest_background_event": background_summary.get("latest_background_event"),
+        "background_operations_warnings": background_summary.get("warnings"),
         "active_workers": active_workers,
         "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
@@ -522,6 +537,7 @@ def _build_activity_console(root, panels, generated_at):
             f"Execution activity: active={execution_summary.get('active_count', 0)}, blocked={execution_summary.get('blocked_count', 0)}, attention={execution_summary.get('attention_required_count', 0)}, failed={execution_summary.get('failed_count', 0)}.",
         ))
     dispatch_summary = (((panels.get("execution_dispatch") or {}).get("data") or {}).get("summary") or {})
+    background_summary = (((panels.get("background_operations") or {}).get("data") or {}).get("summary") or {})
     if dispatch_summary:
         severity = "warning" if dispatch_summary.get("attention_required_count") or dispatch_summary.get("blocked_count") else "info"
         events.append(_event(
@@ -946,6 +962,7 @@ def generate_command_center(root=None, write=True):
         "work_package_pipeline": _work_package_pipeline_artifact(root),
         "execution_activity": _read_artifact(root, ARTIFACTS["execution_activity"]),
         "execution_dispatch": _read_artifact(root, ARTIFACTS["execution_dispatch"]),
+        "background_operations": {"available": True, "path": "runtime/background_operations/status/latest.json", "kind": "json", "data": load_background_operations_status(root)},
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),

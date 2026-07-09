@@ -108,11 +108,38 @@ from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycl
 from estate.core.operations_manager import OperationsDecision
 from estate.core.operations_control_runtime import OperationsControlRuntime, format_operations_review, format_operations_decisions
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
+from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
 
+
+
+def cmd_background_operations(args):
+    try:
+        runtime = BackgroundOperationsRuntime()
+        action = args.background_operations_action
+        if action == "cycle":
+            payload = runtime.run_cycle(write=True)
+            if getattr(args, "json", False):
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(format_background_operations_report(payload))
+        elif action == "watches":
+            payload = {"watches": [w.to_dict() for w in runtime.load_watches()]}
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else "\n".join(w["watch_id"] for w in payload["watches"]))
+        elif action == "requests":
+            payload = {"requests": runtime.list_requests()}
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else "\n".join(r.get("request_id", "unknown") for r in payload["requests"]))
+        elif action == "status":
+            payload = runtime.load_status()
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else format_background_operations_report(payload))
+        elif action == "report":
+            print(format_background_operations_report(runtime.load_status()))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Background operations failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_operations_review(args):
     try:
@@ -2613,6 +2640,24 @@ def main(argv=None):
     p.set_defaults(func=cmd_estate_validate_local)
 
 
+
+
+    p = sub.add_parser("background-operations", help="Evaluate and inspect event-driven background operation requests")
+    bo = p.add_subparsers(dest="background_operations_action", required=True)
+    q = bo.add_parser("cycle", help="Run one deterministic background operations evaluation cycle")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_background_operations)
+    q = bo.add_parser("watches", help="List background operation watches")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_background_operations)
+    q = bo.add_parser("requests", help="List generated background operation requests")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_background_operations)
+    q = bo.add_parser("status", help="Show background operations status")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_background_operations)
+    q = bo.add_parser("report", help="Render background operations markdown report")
+    q.set_defaults(func=cmd_background_operations)
 
     p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
     p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")

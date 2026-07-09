@@ -53,6 +53,32 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0617": {
+        "recipe_id": "wp-0617-background-operations-event-runtime",
+        "title": "WP-0617 — Background Operations Event Runtime",
+        "description": "Validates background operation models, runtime, CLI, documentation, and completion receipt without live providers.",
+        "required_checks": ["Required files exist", "Deterministic tests pass", "CLI cycle works", "Receipt exists"],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/background_operations.py",
+            "src/estate/core/background_operations_runtime.py",
+            "tests/test_background_operations.py",
+            "tests/test_background_operations_runtime.py",
+            "docs/integration/background_operations_event_runtime.md",
+            "collaboration/work_packages/completions/WP-0617_codex_done.json",
+        ],
+        "failure_criteria": ["Any required command exits non-zero", "Live provider execution is reported"],
+        "success_criteria": ["Background operations writes governed requests/status only"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/background_operations.py','src/estate/core/background_operations_runtime.py','tests/test_background_operations.py','tests/test_background_operations_runtime.py','docs/integration/background_operations_event_runtime.md','collaboration/work_packages/completions/WP-0617_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/background_operations.py src/estate/core/background_operations_runtime.py"),
+            _cmd("pytest -q tests/test_background_operations.py tests/test_background_operations_runtime.py"),
+            _cmd("python -m estate.cli.main background-operations cycle --json"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0617_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0617'; assert data.get('skipped_live_provider_calls') is True\""),
+        ],
+    },
+
     "WP-0223": {
         "recipe_id": "wp-0223-alfred-standalone-runtime-event-intake",
         "title": "WP-0223 — Alfred Standalone Runtime and Event Intake Foundation",
