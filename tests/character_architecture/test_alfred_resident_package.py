@@ -1,12 +1,13 @@
+import importlib
+import importlib.util
 import json
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
 
-try:
-    import yaml
-except Exception:  # pragma: no cover - test environment dependency check
-    yaml = None
+yaml = importlib.import_module("yaml") if importlib.util.find_spec("yaml") else None
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,9 +32,41 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def require_yaml():
-    if yaml is None:
-        pytest.skip("PyYAML is not available in this environment")
+def parse_yaml_mapping(path: Path) -> dict:
+    text = read_text(path)
+    if yaml is not None:
+        parsed = yaml.safe_load(text)
+        assert isinstance(parsed, dict), f"Expected mapping YAML in {path}"
+        return parsed
+
+    if shutil.which("ruby"):
+        subprocess.run(
+            ["ruby", "-e", "require \"yaml\"; YAML.load_file(ARGV.fetch(0))", str(path)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    parsed = {}
+    for raw_line in text.splitlines():
+        if not raw_line or raw_line.startswith(" ") or raw_line.startswith("-"):
+            continue
+        if ":" not in raw_line:
+            continue
+        key, value = raw_line.split(":", 1)
+        value = value.strip()
+        if value in {">-", "|-"}:
+            parsed[key] = value
+        elif value == "false":
+            parsed[key] = False
+        elif value == "true":
+            parsed[key] = True
+        elif value:
+            parsed[key] = value
+        else:
+            parsed[key] = None
+    assert parsed, f"Expected parseable YAML-like mapping in {path}"
+    return parsed
 
 
 @pytest.mark.parametrize("path", REQUIRED_FILES)
@@ -49,20 +82,18 @@ def test_sillytavern_export_is_valid_chara_card_v2_json():
     assert "Chief of Staff" in data["data"]["description"]
 
 
-def test_yaml_exports_parse_when_yaml_available():
-    require_yaml()
+def test_yaml_exports_parse():
     for path in [
         ALFRED / "character-card.yaml",
         ALFRED / "command-center-metadata.yaml",
         EXPORTS / "text-generation-webui-alfred-v0_1.yaml",
     ]:
-        parsed = yaml.safe_load(read_text(path))
+        parsed = parse_yaml_mapping(path)
         assert isinstance(parsed, dict), f"Expected mapping YAML in {path}"
 
 
 def test_canonical_card_identity_fields_are_consistent():
-    require_yaml()
-    card = yaml.safe_load(read_text(ALFRED / "character-card.yaml"))
+    card = parse_yaml_mapping(ALFRED / "character-card.yaml")
     assert card["resident_name"] == "Alfred"
     assert card["office"] == "Chief of Staff"
     assert card["presentation"] == "male"
@@ -72,8 +103,7 @@ def test_canonical_card_identity_fields_are_consistent():
 
 
 def test_command_center_metadata_identity_fields_are_consistent():
-    require_yaml()
-    metadata = yaml.safe_load(read_text(ALFRED / "command-center-metadata.yaml"))
+    metadata = parse_yaml_mapping(ALFRED / "command-center-metadata.yaml")
     assert metadata["resident"] == "Alfred"
     assert metadata["office"] == "Chief of Staff"
     assert metadata["source_classification"] == "single-source Estate resident"
