@@ -2440,6 +2440,35 @@ VALIDATION_RECIPES["WP-0614"] = {
     ],
 }
 
+
+VALIDATION_RECIPES["WP-0615"] = {
+    "recipe_id": "wp-0615-provider-routing-office-panel",
+    "title": "WP-0615 - Office Provider Routing Recommendations Panel",
+    "description": "Validates Office-facing provider routing recommendation panel payloads, safe empty/error/stale states, documentation, and completion receipt without live provider, network, GPU, dispatch, assignment, or execution calls.",
+    "required_checks": [
+        "Office panel tests pass",
+        "Office panel implementation compiles",
+        "Implementation, documentation, and completion receipt exist",
+        "Panel remains advisory-only and does not introduce routing or dispatch engines",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "src/estate/core/provider_routing_office_panel.py",
+        "tests/test_provider_routing_office_panel.py",
+        "docs/integration/provider_routing_office_panel.md",
+        "collaboration/work_packages/completions/WP-0615_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, network, GPU, dispatch, assignment, or execution access"],
+    "success_criteria": ["Required commands exit zero", "Panel payloads keep advisory_only true"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m py_compile src/estate/core/provider_routing_office_panel.py"),
+        _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+        _cmd("PYTHONPATH=src pytest -q tests/test_provider_routing_office_panel.py --basetemp Temp/pytest-provider-routing-office-panel"),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/provider_routing_office_panel.py','tests/test_provider_routing_office_panel.py','docs/integration/provider_routing_office_panel.md','collaboration/work_packages/completions/WP-0615_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+    ],
+}
+
 VALIDATION_RECIPES["WP-0219"] = {
     "recipe_id": "wp-0219-alfred-resident-package-validation-and-exports",
     "title": "WP-0219 - Alfred Resident Package Validation and Platform Export Hardening",

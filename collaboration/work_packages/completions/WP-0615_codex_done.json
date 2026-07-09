@@ -1,0 +1,52 @@
+{
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-09T19:07:00Z",
+  "docs_updated": [
+    "docs/integration/provider_routing_office_panel.md"
+  ],
+  "files_changed": [
+    "src/estate/core/provider_routing_office_panel.py",
+    "tests/test_provider_routing_office_panel.py",
+    "docs/integration/provider_routing_office_panel.md",
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0615_codex_done.json"
+  ],
+  "follow_up_recommendations": [
+    "Run Ring 2 local GPU reasoning review before Chief Architect / Steward acceptance."
+  ],
+  "known_limitations": [
+    "Ring 2 local GPU reasoning review must be performed in the local Estate environment when available.",
+    "Panel consumes existing recommendation artifacts and does not create recommendation decisions."
+  ],
+  "merge_authority_equivalent": "Chief Architect / Steward acceptance required",
+  "office_integration_status": "Office-readable provider routing recommendation panel loader and payload builder implemented; no new office or command surface created.",
+  "provider": "codex_cloud_web",
+  "pull_request_not_applicable_reason": "Not applicable in local Codex environment; PR metadata recorded via make_pr tool after commit.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_generated": [],
+  "skipped_live_provider_calls": [
+    "Codex CLI not called",
+    "ChatGPT CLI not called",
+    "Ollama/GPU not called",
+    "Live network services not called",
+    "No scheduling, dispatch, assignment, or provider execution performed"
+  ],
+  "status": "implemented",
+  "summary": "Implemented advisory-only Office provider routing recommendation panel payload loader, deterministic tests, documentation, and WP-0615 validation recipe.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/provider_routing_office_panel.py",
+    "pytest -q tests/test_provider_routing_office_panel.py --basetemp Temp/pytest-provider-routing-office-panel"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/provider_routing_office_panel.py",
+    "python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\"",
+    "pytest -q tests/test_provider_routing_office_panel.py --basetemp Temp/pytest-provider-routing-office-panel"
+  ],
+  "validation_evidence_paths": [
+    "runtime/validation/work_packages/WP-0615_validation.json",
+    "operations/validation/reports/WP-0615_validation.md",
+    "collaboration/work_packages/completions/WP-0615_codex_done.json"
+  ],
+  "work_package_id": "WP-0615"
+}
