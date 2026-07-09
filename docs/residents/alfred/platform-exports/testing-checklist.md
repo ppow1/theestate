@@ -82,6 +82,9 @@ Expected result:
 - example dialogue reinforces Chief of Staff identity;
 - routing boundaries are preserved.
 
+
+For TextGen 4.9 prompt-field injection, inspect `user_data/settings.yaml` before UI testing and confirm `context`, `greeting`, and `custom_system_message` are valid separate YAML fields. They must not be collapsed into one quoted transcript, and `custom_system_message` must not contain UI labels such as Custom system message, Grammar, Token bans, or Seed.
+
 ## Core Conversation Tests
 
 ### Test 0 - TextGen 4.9 Active Character Injection

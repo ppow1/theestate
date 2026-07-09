@@ -2496,3 +2496,36 @@ VALIDATION_RECIPES["WP-0221"] = {
         _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0221_codex_cloud_web_done.json').read_text(encoding='utf-8')); assert data['work_package_id']=='WP-0221'; assert data['manual_textgen_validation']['status']=='pending'; assert data['skipped_live_calls'] is True\""),
     ],
 }
+
+
+VALIDATION_RECIPES["WP-0222"] = {
+    "recipe_id": "wp-0222-textgen49-alfred-yaml-serialization-repair",
+    "title": "WP-0222 - Repair TextGen 4.9 Alfred YAML Serialization",
+    "description": "Validates the repaired Alfred TextGen 4.9 helper, YAML prompt-field safeguards, adapter documentation, completion receipt, and privacy boundary without live TextGen calls.",
+    "required_checks": [
+        "TextGen 4.9 Alfred adapter pytest passes",
+        "Helper avoids fragile PowerShell string-array and $Key parser-risk patterns",
+        "Helper writes custom_system_message from Alfred adapter content",
+        "Generated prompt fields remain separate and clean",
+        "Completion receipt records pending Steward-run local TextGen validation",
+    ],
+    "observational_checks": ["Manual local TextGen UI acceptance remains Steward-run"],
+    "expected_artifacts": [
+        "scripts/character-architecture/Install-Alfred-TextGen49.ps1",
+        "docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md",
+        "docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml",
+        "docs/residents/alfred/platform-exports/testing-checklist.md",
+        "tests/character_architecture/test_textgen49_alfred_adapter.py",
+        "collaboration/work_packages/completions/WP-0222_codex_cloud_web_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, GPU, TextGen UI automation, or private character inspection"],
+    "success_criteria": ["Required commands exit zero", "Recipe does not return no_recipe", "Manual TextGen acceptance is clearly marked pending"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py"),
+        _cmd("python -c \"from pathlib import Path; paths=['scripts/character-architecture/Install-Alfred-TextGen49.ps1','docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md','docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml','docs/residents/alfred/platform-exports/testing-checklist.md','tests/character_architecture/test_textgen49_alfred_adapter.py','collaboration/work_packages/completions/WP-0222_codex_cloud_web_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"from pathlib import Path; import re; text=Path('scripts/character-architecture/Install-Alfred-TextGen49.ps1').read_text(encoding='utf-8'); assert '[Parameter(Mandatory = $true)][string[]]$Lines' not in text; assert not re.search(r'\\\"[^\\\"\\n]*\\$Key:', text); assert 'custom_system_message' in text; assert 'Get-ChildItem' not in text\""),
+        _cmd("python -c \"from pathlib import Path; text=Path('docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md').read_text(encoding='utf-8'); assert 'malformed ' in text and 'settings.yaml' in text and 'not proof that TextGen ignores all character cards' in text\""),
+        _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0222_codex_cloud_web_done.json').read_text(encoding='utf-8')); assert data['work_package_id']=='WP-0222'; assert data['manual_validation_status']=='pending_steward_local_textgen'; assert data['skipped_live_calls'] is True\""),
+    ],
+}

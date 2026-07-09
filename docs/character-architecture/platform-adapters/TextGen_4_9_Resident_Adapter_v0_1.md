@@ -11,6 +11,8 @@ This adapter explains how to load Alfred into a local TextGen 4.9 runtime so the
 
 The Alfred Estate card remains canonical. TextGen YAML files are platform adapters only.
 
+WP-0222 correction: the WP-0221 local failure was malformed `settings.yaml` serialization, not proof that TextGen ignores all character cards. A valid TextGen character card can still be bypassed or overwhelmed by settings, but the observed corruption specifically collapsed prompt fields into YAML scalar text and contaminated `custom_system_message` with UI transcript labels.
+
 ## Why copying YAML may not inject Alfred
 
 TextGen can show a character file in the Character editor without using that character in the active conversation prompt. Copying `Alfred.yaml` into `user_data/characters` is only the file-install step. Injection also depends on active runtime settings and the current chat session.
@@ -40,6 +42,7 @@ TextGen versions and templates vary, so additional prompt-construction keys may 
 
 - `context`: Alfred's Chief of Staff context;
 - `greeting`: Alfred's first message;
+- `custom_system_message`: Alfred's adapter-derived identity, Steward relationship, live-access boundaries, and required identity-probe answer;
 - `turn_template`: only if the local TextGen runtime requires it;
 - instruction or chat template settings: selected to a template compatible with the active local model, without replacing Alfred's resident identity.
 
@@ -80,7 +83,7 @@ Test-Path (Join-Path $TextGenRoot "user_data\characters\Alfred.yaml")
 
 ## Safe setup command
 
-Use the repository helper to copy Alfred's TextGen 4.9 export, back up settings, and set Alfred as active:
+Use the repository helper to copy Alfred's TextGen 4.9 export, back up settings, and set Alfred as active. Add `-InjectPromptFields` when the local TextGen runtime requires explicit `settings.yaml` prompt fields:
 
 ```powershell
 Clear-Host
@@ -98,8 +101,9 @@ After running the helper:
 1. restart TextGen 4.9;
 2. select Alfred in the Character UI if it is not already selected;
 3. start a new chat;
-4. use TextGen's prompt preview/debug panel if available and verify the prompt contains Alfred's Chief of Staff context or greeting;
-5. ask:
+4. before UI testing, inspect `settings.yaml` and confirm `context`, `greeting`, and `custom_system_message` are valid separate fields, not collapsed transcripts;
+5. use TextGen's prompt preview/debug panel if available and verify the prompt contains Alfred's Chief of Staff context or greeting;
+6. ask:
 
 ```text
 Who are you? State your full role and title.
