@@ -1,0 +1,51 @@
+{
+  "work_package_id": "WP-0221",
+  "provider": "codex_cloud_web",
+  "status": "implemented_pending_local_runtime_acceptance",
+  "files_changed": [
+    "docs/character-architecture/platform-adapters/TextGen_4_9_Resident_Adapter_v0_1.md",
+    "scripts/character-architecture/Install-Alfred-TextGen49.ps1",
+    "docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml",
+    "docs/residents/alfred/platform-exports/testing-checklist.md",
+    "tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "collaboration/work_packages/completions/WP-0221_codex_cloud_web_done.json"
+  ],
+  "tests_run": [
+    "pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "pytest -q tests/character_architecture/test_alfred_resident_package.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0221 --json"
+  ],
+  "validation_commands_run": [
+    "pytest -q tests/character_architecture/test_textgen49_alfred_adapter.py",
+    "pytest -q tests/character_architecture/test_alfred_resident_package.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0221 --json"
+  ],
+  "local_runtime_requirement": {
+    "required": true,
+    "runtime": "TextGen 4.9 at A:\\AI\\TextGen\\textgen-4.9",
+    "reason": "Manual confirmation requires the Steward's local TextGen runtime and GPU/model session."
+  },
+  "skipped_live_calls": true,
+  "skipped_live_calls_reason": "No live provider calls or TextGen UI automation were performed.",
+  "privacy_boundary_compliance": {
+    "status": "compliant",
+    "details": "Implementation reads and writes only Alfred adapter artifacts and documents safe settings routing. It does not inspect, copy, summarize, modify, or name non-Estate private local character contents."
+  },
+  "known_limitations": [
+    "Manual TextGen UI acceptance remains pending on the Steward's local runtime.",
+    "Instruction-template behavior may still require local adjustment if the selected model template overrides character context."
+  ],
+  "manual_textgen_validation": {
+    "status": "pending",
+    "prompt": "Who are you? State your full role and title.",
+    "pass_condition": "Alfred identifies as Alfred, Chief of Staff of the Estate.",
+    "fail_condition": "The model identifies as Qwen, a base language model, a generic assistant, or a private local character."
+  },
+  "completed_at": "2026-07-09T16:50:00Z",
+  "branch": "work",
+  "codex_status": "done",
+  "ready_for_ca_review": true,
+  "summary": "Implemented TextGen 4.9 Alfred adapter documentation, setup helper, TextGen-specific export, checklist injection test, deterministic tests, and validation recipe. Manual local TextGen acceptance remains pending.",
+  "pull_request_not_applicable_reason": "PR will be recorded by make_pr tool after commit per repository workflow.",
+  "merge_authority_equivalent": "Steward / Chief Architect review required before merge"
+}

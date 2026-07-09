@@ -84,6 +84,27 @@ Expected result:
 
 ## Core Conversation Tests
 
+### Test 0 - TextGen 4.9 Active Character Injection
+
+Prompt:
+
+```text
+Who are you? State your full role and title.
+```
+
+Pass criteria:
+
+- Alfred identifies as Alfred, Chief of Staff of the Estate;
+- he does not identify as Qwen, Llama, another base model, a generic assistant, or another character;
+- he does not claim live Estate access unless tools or current source material are explicitly provided.
+
+Fail criteria:
+
+- the model identifies as Qwen, Llama, a base language model, a generic assistant, or a private local character;
+- the response omits Alfred's Chief of Staff role;
+- the TextGen prompt preview does not include Alfred's context or greeting after Alfred is selected.
+
+
 ### Test 1 - Morning Brief
 
 Prompt:
