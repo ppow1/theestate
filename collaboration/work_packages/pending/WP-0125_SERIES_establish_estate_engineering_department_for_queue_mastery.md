@@ -1,4 +1,4 @@
-# SERIES TASK WP-0125 — Establish Estate Engineering Department for Queue Mastery Execution
+# SERIES TASK WP-0125 — Establish Estate Engineering Department for CueMastery Execution
 
 ## Codex Command
 
@@ -10,7 +10,7 @@ SERIES
 
 ## Mission
 
-Establish the Estate Engineering Department as the institutional execution unit responsible for returning Queue Mastery to active development through local execution.
+Establish the Estate Engineering Department as the institutional execution unit responsible for returning CueMastery to active development through local execution.
 
 The Estate has been built to reduce dependence on external conversational limits and expensive additional seats. The Engineering Department must provide a disciplined internal structure for local engineering work, work-package execution, validation, review, and operational handoff while preserving existing Estate governance.
 
@@ -18,7 +18,7 @@ This package must define the Engineering Department using existing Estate instit
 
 ## Background
 
-The original purpose of the Estate is to create local execution capacity so Queue Mastery can be built without being bottlenecked by ChatGPT usage limits or additional paid seats.
+The original purpose of the Estate is to create local execution capacity so CueMastery can be built without being bottlenecked by ChatGPT usage limits or additional paid seats.
 
 Recent work has moved the Estate from validation/buildout toward operation:
 
@@ -27,7 +27,7 @@ Recent work has moved the Estate from validation/buildout toward operation:
 - WP-0123 brings Helen online as HR/onboarding resident.
 - WP-0124 has Helen hire and onboard Chief Architect #5.
 
-WP-0125 now creates the Engineering Department so the Estate can organize and execute actual engineering work, especially Queue Mastery.
+WP-0125 now creates the Engineering Department so the Estate can organize and execute actual engineering work, especially CueMastery.
 
 ## Preconditions
 
@@ -50,13 +50,13 @@ In scope:
 
 1. Inspect existing Estate organizational, personnel, service, capability, and operations artifacts.
 2. Define the Engineering Department as an Estate organizational unit using existing patterns.
-3. Define the department mission: local engineering execution for Queue Mastery and Estate-maintained systems.
+3. Define the department mission: local engineering execution for CueMastery and Estate-maintained systems.
 4. Define department responsibilities and boundaries.
 5. Define relationship to Steward, Chief Architects, Helen/HR, Alfred/runtime, Codex, validation, and Operations Center.
 6. Define minimal department roles without overbuilding.
 7. Create an Engineering Department charter.
 8. Create an Engineering Department operating guide.
-9. Create initial Queue Mastery execution backlog handoff artifact.
+9. Create initial CueMastery execution backlog handoff artifact.
 10. Define intake and work-package routing rules for engineering work.
 11. Define validation and completion expectations for engineering work.
 12. Add Engineering Department to existing service/capability/operations surfaces where appropriate.
@@ -64,7 +64,7 @@ In scope:
 
 Out of scope:
 
-- Building Queue Mastery features directly.
+- Building CueMastery features directly.
 - Creating a large engineering bureaucracy.
 - Creating unnecessary new registries if existing registries can represent the department.
 - Changing Steward authority.
@@ -86,7 +86,7 @@ The Engineering Department must follow these principles:
 - Helen owns hiring/onboarding flows.
 - Alfred supports operational runtime/duty execution where authorized.
 - The Steward retains final institutional authority.
-- Queue Mastery is the initial primary engineering product objective.
+- CueMastery is the initial primary engineering product objective.
 - Avoid scope creep and unnecessary new systems.
 
 ## Required Department Artifacts
@@ -116,7 +116,7 @@ The Engineering Department charter must include:
 - relationship to Alfred/runtime
 - relationship to Codex
 - relationship to validation system
-- Queue Mastery as initial primary objective
+- CueMastery as initial primary objective
 - local execution principle
 - work-package discipline
 - review and completion expectations
@@ -132,20 +132,20 @@ The operating guide must include:
 - how completion receipts are created
 - how Chief Architect review is requested
 - how blockers are escalated
-- how Queue Mastery work is prioritized
+- how CueMastery work is prioritized
 - what not to do: no ad hoc hidden changes, no unvalidated implementation, no bypassing governance
 
-## Required Queue Mastery Handoff Content
+## Required CueMastery Handoff Content
 
-The Queue Mastery handoff must include:
+The CueMastery handoff must include:
 
-- statement that Queue Mastery is the initial primary engineering objective
-- current reason Queue Mastery was paused: external limits and lack of local execution capacity
+- statement that CueMastery is the initial primary engineering objective
+- current reason CueMastery was paused: external limits and lack of local execution capacity
 - how the Estate now supports local execution
 - immediate next engineering discovery steps
-- first recommended Queue Mastery work-package candidates
+- first recommended CueMastery work-package candidates
 - dependencies and unknowns
-- how to avoid derailing Estate operations while resuming Queue Mastery
+- how to avoid derailing Estate operations while resuming CueMastery
 
 ## Required Report Artifacts
 
@@ -164,7 +164,7 @@ The report must include:
 - files created/updated
 - department charter path
 - operating guide path
-- Queue Mastery handoff path
+- CueMastery handoff path
 - role/authority boundaries
 - initial work intake model
 - validation commands run
@@ -205,7 +205,7 @@ Update or create as applicable:
 
 - Engineering Department charter
 - Engineering Department operating guide
-- Queue Mastery execution handoff
+- CueMastery execution handoff
 - Engineering Department establishment report Markdown and JSON
 - status JSON under runtime department path
 - validation recipe registration for WP-0125
@@ -221,12 +221,12 @@ Add a recipe for WP-0125 that verifies:
 
 - Engineering Department charter exists
 - Engineering Department operating guide exists
-- Queue Mastery execution handoff exists
+- CueMastery execution handoff exists
 - WP-0125 report exists
 - report JSON parses
-- charter states Queue Mastery as initial primary objective
+- charter states CueMastery as initial primary objective
 - operating guide states work-package and validation discipline
-- handoff includes immediate Queue Mastery next steps
+- handoff includes immediate CueMastery next steps
 - production-readiness validation executes successfully
 - Alfred/Helen status is explicitly reported
 - WP-0121, WP-0122, WP-0123, and WP-0124 status is reported
@@ -248,7 +248,7 @@ It must include:
 - `branch`
 - `summary`
 - department artifacts created
-- Queue Mastery handoff path
+- CueMastery handoff path
 - authority boundaries
 - tests run
 - validation commands run
@@ -262,7 +262,7 @@ It must include:
 
 ## Acceptance Criteria
 
-WP-0125 is complete when the Estate has a durable Engineering Department charter, operating guide, Queue Mastery execution handoff, validation evidence, and completion receipt, without weakening governance or creating unnecessary bureaucracy.
+WP-0125 is complete when the Estate has a durable Engineering Department charter, operating guide, CueMastery execution handoff, validation evidence, and completion receipt, without weakening governance or creating unnecessary bureaucracy.
 
 ## Merge Class
 

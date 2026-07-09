@@ -16,7 +16,7 @@
   "pull_request_not_applicable_reason": "Live PR metadata unavailable in local-first historical validation; completion evidence derived from repository artifacts.",
   "pull_request_url": null,
   "ready_for_ca_review": true,
-  "summary": "Created Transport Adapter Evaluation v1, preserving the Communication Bus as the institutional messaging model while evaluating GitHub repository files, local filesystem/local broker, Gmail/email, Gotify, Q Mastery/MPT-style mailbox connectors, and a future Codex task status adapter. Included a recommendation matrix, near-term transport priorities, and a future-work note for Codex task status integration.",
+  "summary": "Created Transport Adapter Evaluation v1, preserving the Communication Bus as the institutional messaging model while evaluating GitHub repository files, local filesystem/local broker, Gmail/email, Gotify, CueMastery/MPT-style mailbox connectors, and a future Codex task status adapter. Included a recommendation matrix, near-term transport priorities, and a future-work note for Codex task status integration.",
   "tests_run": [
     "Documentation review only; verified referenced repository paths exist with find/sed shell checks."
   ],

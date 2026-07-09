@@ -1,12 +1,12 @@
-# Qmaster Return Gate After Resident Standup
+# CueMastery Return Gate After Resident Standup
 
-Resident work exists to support Estate execution and Qmaster progress. It must not become an indefinite blocker to Qmaster.
+Resident work exists to support Estate execution and CueMastery progress. It must not become an indefinite blocker to CueMastery.
 
 ## Why Resident Work Was Undertaken
 
-Alfred and Helen were stood up so the Steward can stop carrying resident-development conversations manually and return attention to Qmaster and other primary Estate execution.
+Alfred and Helen were stood up so the Steward can stop carrying resident-development conversations manually and return attention to CueMastery and other primary Estate execution.
 
-## Required Before Returning to Qmaster
+## Required Before Returning to CueMastery
 
 - Alfred has a resident package and WP-0617-aligned background operations integration.
 - Helen has a minimum viable resident profile, validation prompts, export placeholder, and WP-0617 boundary language.
@@ -29,10 +29,10 @@ Alfred can summarize and route supplied WP-0617-compatible requests, state live-
 
 Helen has enough durable identity and boundaries to support later export/local testing without protected-source dependence or impersonation.
 
-## Next Qmaster Handoff Condition
+## Next CueMastery Handoff Condition
 
-Once WP-0224 tests and validation pass, the normal next step is to run or implement WP-0617 so background operations can carry Alfred/Helen task awareness while the Steward returns to Qmaster.
+Once WP-0224 tests and validation pass, the normal next step is to run or implement WP-0617 so background operations can carry Alfred/Helen task awareness while the Steward returns to CueMastery.
 
 ## Alfred's Transition Watch
 
-Alfred keeps an eye on resident/Qmaster transition tasks only through WP-0617 background operations requests, status, and Office-visible reports. Alfred does not run a separate resident watch daemon or event runtime.
+Alfred keeps an eye on resident/CueMastery transition tasks only through WP-0617 background operations requests, status, and Office-visible reports. Alfred does not run a separate resident watch daemon or event runtime.

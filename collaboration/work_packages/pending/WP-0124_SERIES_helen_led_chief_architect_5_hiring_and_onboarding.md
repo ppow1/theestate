@@ -69,7 +69,7 @@ Out of scope:
 - Removing Chief Architect #3 artifacts.
 - Creating the Social Character Engineer role.
 - Creating the Engineering Department.
-- Building Queue Mastery.
+- Building CueMastery.
 - Granting Chief Architect #5 permissions beyond established Chief Architect role boundaries.
 
 ## Required Onboarding Packet

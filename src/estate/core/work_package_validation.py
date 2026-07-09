@@ -104,9 +104,9 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
 
     "WP-0224": {
-        "recipe_id": "wp-0224-resident-standup-background-operations-qmaster-gate",
+        "recipe_id": "wp-0224-resident-standup-background-operations-cuemastery-gate",
         "title": "WP-0224 — Resident Standup Aligned to Background Operations Runtime",
-        "description": "Validates Alfred/Helen resident standup artifacts, WP-0617 boundary language, Qmaster return gate, deterministic fixtures, and completion receipt.",
+        "description": "Validates Alfred/Helen resident standup artifacts, WP-0617 boundary language, CueMastery return gate, deterministic fixtures, and completion receipt.",
         "required_checks": ["Resident artifacts exist", "Boundary documents exist", "Deterministic tests pass", "Completion receipt exists"],
         "observational_checks": [],
         "expected_artifacts": [
@@ -116,7 +116,7 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             "docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md",
             "docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml",
             "docs/character-architecture/Resident_Background_Operations_Boundary_v0_1.md",
-            "docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md",
+            "docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md",
             "tests/fixtures/background_operations/resident_operation_requests_wp0224.json",
             "tests/character_architecture/test_resident_background_operations_boundary.py",
             "tests/character_architecture/test_helen_resident_package.py",
@@ -126,9 +126,40 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         "success_criteria": ["Required artifacts exist", "WP-0617 remains runtime owner", "No separate resident event loop is introduced"],
         "continue_on_failure": True,
         "commands": [
-            _cmd("python -c \"from pathlib import Path; paths=['docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md','docs/residents/helen/Helen_Resident_Profile_v0_1.md','docs/residents/helen/Helen_Resident_Validation_v0_1.md','docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md','docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml','docs/character-architecture/Resident_Background_Operations_Boundary_v0_1.md','docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md','tests/fixtures/background_operations/resident_operation_requests_wp0224.json','collaboration/work_packages/completions/WP-0224_codex_cloud_web_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"from pathlib import Path; paths=['docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md','docs/residents/helen/Helen_Resident_Profile_v0_1.md','docs/residents/helen/Helen_Resident_Validation_v0_1.md','docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md','docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml','docs/character-architecture/Resident_Background_Operations_Boundary_v0_1.md','docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md','tests/fixtures/background_operations/resident_operation_requests_wp0224.json','collaboration/work_packages/completions/WP-0224_codex_cloud_web_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
             _cmd("pytest -q tests/character_architecture/test_resident_background_operations_boundary.py tests/character_architecture/test_helen_resident_package.py"),
             _cmd("python -c \"from pathlib import Path; text=Path('docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md').read_text(encoding='utf-8'); assert 'WP-0617 owns the background operations runtime' in text; assert 'Alfred does not own a competing event loop' in text\""),
+        ],
+    },
+
+    "WP-0225": {
+        "recipe_id": "wp-0225-cuemastery-ionoge-nomenclature-repair",
+        "title": "WP-0225 — CueMastery and IONOGE Nomenclature Repair",
+        "description": "Validates the CueMastery return gate rename, canonical nomenclature guard, deterministic tests, completion receipt, and absence of forbidden CueMastery variants in active affected artifacts.",
+        "required_checks": [
+            "Corrected CueMastery artifacts exist",
+            "Old return gate path is absent",
+            "Canonical nomenclature guard records CueMastery and IONOGE",
+            "Deterministic tests pass",
+            "Completion receipt exists",
+            "Forbidden CueMastery nomenclature is absent from active affected files",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md",
+            "docs/character-architecture/Canonical_Nomenclature_Guard_v0_1.md",
+            "tests/character_architecture/test_resident_background_operations_boundary.py",
+            "collaboration/work_packages/completions/WP-0225_codex_cloud_web_done.json",
+        ],
+        "failure_criteria": ["Any required command exits non-zero", "Old Qmaster return gate path remains as an active artifact"],
+        "success_criteria": ["CueMastery and IONOGE canonical nomenclature is guarded without live provider calls"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; required=['docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md','docs/character-architecture/Canonical_Nomenclature_Guard_v0_1.md','tests/character_architecture/test_resident_background_operations_boundary.py','collaboration/work_packages/completions/WP-0225_codex_cloud_web_done.json']; missing=[p for p in required if not Path(p).is_file()]; assert not missing, missing; assert not Path('docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md').exists()\""),
+            _cmd("python -c \"from pathlib import Path; text=Path('docs/character-architecture/Canonical_Nomenclature_Guard_v0_1.md').read_text(encoding='utf-8'); assert 'CueMastery' in text; assert 'IONOGE' in text; assert 'eye-oh-no-gee' in text; assert '`ionoge`' in text\""),
+            _cmd("pytest -q tests/character_architecture/test_resident_background_operations_boundary.py"),
+            _cmd("python -c \"from pathlib import Path; forbidden=['Qmaster','qmaster','Q Master','Q mastery','Q Mastery','queue mastery','Queue Mastery','QueueMastery','Cue Mastery','CUEMASTERY']; paths=['docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md','docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md','docs/residents/helen/Helen_Resident_Profile_v0_1.md','docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md','collaboration/work_packages/pending/WP-0224_CHARACTER_ARCHITECTURE_resident_standup_sprint_qmaster_return_gate.md','collaboration/work_packages/completions/WP-0224_codex_cloud_web_done.json','tests/fixtures/background_operations/resident_operation_requests_wp0224.json']; hits=[(p,t) for p in paths for t in forbidden if t in Path(p).read_text(encoding='utf-8')]; assert not hits, hits\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0225_codex_cloud_web_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0225'; assert data.get('provider') == 'codex_cloud_web'; assert data.get('live_calls_avoided') is True\""),
         ],
     },
 

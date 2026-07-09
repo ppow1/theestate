@@ -10,7 +10,7 @@ SERIES. Documentation/research implementation. Depends on existing Communication
 Evaluate candidate transport adapters for Estate communication while preserving the Communication Bus as the institutional messaging model.
 
 ## Why This Is Next
-Operational use exposed friction with GitHub as live transport, inability to directly observe Codex task completion, and possible prior mailbox patterns from Q Mastery/MPT. The Estate needs a disciplined transport adapter evaluation before committing to GitHub, Gmail, local broker, Gotify, or MPT-style approaches.
+Operational use exposed friction with GitHub as live transport, inability to directly observe Codex task completion, and possible prior mailbox patterns from CueMastery/MPT. The Estate needs a disciplined transport adapter evaluation before committing to GitHub, Gmail, local broker, Gotify, or MPT-style approaches.
 
 ## Scope
 Create an evaluation document such as:
@@ -23,7 +23,7 @@ Evaluate at least:
 - local filesystem / local broker
 - Gmail/email adapter
 - Gotify notification adapter
-- Q Mastery / MPT-style mailbox connector pattern
+- CueMastery / MPT-style mailbox connector pattern
 - future Codex task status adapter if API access becomes available
 
 ## Evaluation Criteria

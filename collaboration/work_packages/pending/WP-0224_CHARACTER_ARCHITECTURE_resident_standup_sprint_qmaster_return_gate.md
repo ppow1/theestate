@@ -4,7 +4,7 @@ Status: Proposed
 Priority: Critical
 Owner: Office of Character Architecture
 Boundary Authority: Ingrid / Privacy and Boundary Office
-Primary Consumers: Steward, Alfred, Helen, Office of the Steward, Qmaster workstream, Background Operations Runtime
+Primary Consumers: Steward, Alfred, Helen, Office of the Steward, CueMastery workstream, Background Operations Runtime
 Classification: Estate Internal
 Created: 2026-07-09
 
@@ -19,7 +19,7 @@ codex_cloud_web
 Provider rationale:
 
 ```text
-This package is an operational resident standup sprint. It must make Alfred and Helen useful without creating a competing event runtime. WP-0617 is the Estate-wide Background Operations Event Runtime. WP-0224 must align residents to that architecture and avoid turning Character Architecture into an all-consuming branch that blocks Qmaster.
+This package is an operational resident standup sprint. It must make Alfred and Helen useful without creating a competing event runtime. WP-0617 is the Estate-wide Background Operations Event Runtime. WP-0224 must align residents to that architecture and avoid turning Character Architecture into an all-consuming branch that blocks CueMastery.
 ```
 
 Local runtime required:
@@ -37,7 +37,7 @@ Repository implementation and deterministic tests should complete through Codex 
 Capacity note:
 
 ```text
-Bias toward an 80/20 working implementation. Do not polish abstractions that do not materially help stand up Alfred, stand up Helen, integrate resident readiness with WP-0617, or return focus to Qmaster.
+Bias toward an 80/20 working implementation. Do not polish abstractions that do not materially help stand up Alfred, stand up Helen, integrate resident readiness with WP-0617, or return focus to CueMastery.
 ```
 
 ## Codex Command
@@ -48,7 +48,7 @@ Read this work package and do exactly what it says.
 
 ## Mission
 
-Stand up the minimum useful resident layer needed to return the Steward to Qmaster work, while aligning resident operation with the Estate-wide Background Operations Event Runtime defined by WP-0617.
+Stand up the minimum useful resident layer needed to return the Steward to CueMastery work, while aligning resident operation with the Estate-wide Background Operations Event Runtime defined by WP-0617.
 
 WP-0224 must not implement a parallel event system.
 
@@ -69,7 +69,7 @@ Alfred and Helen resident artifacts
   -> resident readiness and validation prompts
   -> resident-specific request/briefing patterns
   -> resident-sensitive boundary rules
-  -> Qmaster return gate
+  -> CueMastery return gate
   -> hooks/fixtures/examples compatible with WP-0617 background operations requests
 ```
 
@@ -78,15 +78,15 @@ This package has four practical outcomes:
 1. Alfred is stood up as the first operational resident with resident-facing background-operations integration points.
 2. Helen receives a minimum viable resident package and export path comparable to Alfred's first operational layer.
 3. Resident task visibility is expressed through WP-0617-compatible events/requests/status concepts, not a competing runtime.
-4. The Estate records a Qmaster return gate so resident work does not sprawl indefinitely.
+4. The Estate records a CueMastery return gate so resident work does not sprawl indefinitely.
 
 ## Steward Intent
 
-The Steward needs Alfred and Helen stood up so work can return to Qmaster.
+The Steward needs Alfred and Helen stood up so work can return to CueMastery.
 
 Resident architecture is important, but it must not become the entire project.
 
-Alfred is needed because the Steward cannot stay inside resident-development conversations indefinitely. Alfred must become able to keep an eye on resident tasks and Estate task flow through the background operations layer while the Steward returns to Qmaster or other primary work.
+Alfred is needed because the Steward cannot stay inside resident-development conversations indefinitely. Alfred must become able to keep an eye on resident tasks and Estate task flow through the background operations layer while the Steward returns to CueMastery or other primary work.
 
 This package must therefore prepare Alfred and Helen for event-driven operations without duplicating WP-0617.
 
@@ -95,8 +95,8 @@ This package must therefore prepare Alfred and Helen for event-driven operations
 Use the 80/20 rule.
 
 ```text
-Get the resident layer useful enough to support Qmaster.
-Do not chase perfection before returning to Qmaster.
+Get the resident layer useful enough to support CueMastery.
+Do not chase perfection before returning to CueMastery.
 Correct the remaining 20% while operating.
 ```
 
@@ -127,9 +127,9 @@ The Steward needs:
 - Helen stood up;
 - resident readiness visible to background operations;
 - enough resident capability to support real work;
-- a return to Qmaster development.
+- a return to CueMastery development.
 
-Character Architecture work is justified because it should help Qmaster and the broader Estate move faster. It must not become a permanent detour.
+Character Architecture work is justified because it should help CueMastery and the broader Estate move faster. It must not become a permanent detour.
 
 ## Scope
 
@@ -169,7 +169,7 @@ Examples:
 resident_standup_status_request
 resident_validation_review_request
 resident_identity_boundary_review_request
-qmaster_return_gate_status_request
+cuemastery_return_gate_status_request
 ```
 
 These may live in documentation, tests, or lightweight code depending on existing repository structure.
@@ -241,30 +241,30 @@ This document must define:
 - resident/persona/worker/provider/office roles must remain distinct;
 - character-sensitive or protected-source events require Ingrid/Steward or appropriate Chief Architect review.
 
-### Required Outcome 5 - Qmaster Return Gate
+### Required Outcome 5 - CueMastery Return Gate
 
-Create a short planning artifact that defines when resident work pauses and Qmaster resumes.
+Create a short planning artifact that defines when resident work pauses and CueMastery resumes.
 
 Preferred path:
 
 ```text
-docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md
+docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md
 ```
 
 This document must define:
 
 - why resident work was undertaken;
-- what is required before returning to Qmaster;
-- what is explicitly not required before returning to Qmaster;
+- what is required before returning to CueMastery;
+- what is explicitly not required before returning to CueMastery;
 - the minimum acceptance line for Alfred;
 - the minimum acceptance line for Helen;
-- the next Qmaster handoff condition;
-- how Alfred is expected to keep an eye on resident/Qmaster transition tasks through WP-0617 background operations rather than through a separate resident runtime.
+- the next CueMastery handoff condition;
+- how Alfred is expected to keep an eye on resident/CueMastery transition tasks through WP-0617 background operations rather than through a separate resident runtime.
 
 Required principle:
 
 ```text
-Resident work exists to support Estate execution and Qmaster progress. It must not become an indefinite blocker to Qmaster.
+Resident work exists to support Estate execution and CueMastery progress. It must not become an indefinite blocker to CueMastery.
 ```
 
 ### Required Outcome 6 - Tests
@@ -290,7 +290,7 @@ Tests must verify:
 - Helen boundaries are present;
 - Helen background-operations boundary is present;
 - Helen export does not reference protected/private local characters;
-- Qmaster return gate exists and contains the required principle.
+- CueMastery return gate exists and contains the required principle.
 
 ### Required Outcome 7 - Validation Recipe
 
@@ -325,7 +325,7 @@ The receipt must include:
 - Alfred/WP-0617 integration summary;
 - Helen package summary;
 - Helen/WP-0617 integration summary;
-- Qmaster return gate summary;
+- CueMastery return gate summary;
 - known limitations;
 - recommended next action.
 
@@ -343,7 +343,7 @@ This package must not:
 - inspect private local characters;
 - require live TextGen, Ollama, Open WebUI, or SillyTavern calls;
 - redesign Estate governance;
-- block Qmaster return on perfect resident completeness.
+- block CueMastery return on perfect resident completeness.
 
 ## Acceptance Criteria
 
@@ -354,7 +354,7 @@ Accept this package only if:
 - resident/background-operations boundary is explicit;
 - Helen has a minimum viable resident package following Alfred's pattern;
 - Helen includes background-operations boundary language;
-- Qmaster return gate exists;
+- CueMastery return gate exists;
 - tests pass;
 - WP-0224 validation passes;
 - scope remains operational and 80/20.
@@ -364,13 +364,13 @@ Accept this package only if:
 After WP-0224, the next action should normally be one of:
 
 ```text
-Run or implement WP-0617 so background operations can carry Alfred/Helen resident task awareness while the Steward returns to Qmaster.
+Run or implement WP-0617 so background operations can carry Alfred/Helen resident task awareness while the Steward returns to CueMastery.
 ```
 
 or:
 
 ```text
-Return to Qmaster work with Alfred/Helen available as support residents and WP-0617 identified as the event-driven substrate.
+Return to CueMastery work with Alfred/Helen available as support residents and WP-0617 identified as the event-driven substrate.
 ```
 
 Only create a narrowly scoped fix package if a blocking defect prevents Alfred/Helen standup or WP-0617 alignment.

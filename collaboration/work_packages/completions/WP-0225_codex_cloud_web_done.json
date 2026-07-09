@@ -1,0 +1,71 @@
+{
+  "work_package_id": "WP-0225",
+  "provider": "codex_cloud_web",
+  "files_changed": [
+    "collaboration/messages/msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4.json",
+    "collaboration/work_packages/completions/WP-0031_codex_done.json",
+    "collaboration/work_packages/completions/WP-0224_codex_cloud_web_done.json",
+    "collaboration/work_packages/completions/WP-0225_codex_cloud_web_done.json",
+    "collaboration/work_packages/pending/WP-0031_SERIES_transport_adapter_evaluation.md",
+    "collaboration/work_packages/pending/WP-0122_SERIES_stand_up_alfred_operational_resident_runtime.md",
+    "collaboration/work_packages/pending/WP-0124_SERIES_helen_led_chief_architect_5_hiring_and_onboarding.md",
+    "collaboration/work_packages/pending/WP-0125_SERIES_establish_estate_engineering_department_for_queue_mastery.md",
+    "collaboration/work_packages/pending/WP-0224_CHARACTER_ARCHITECTURE_resident_standup_sprint_qmaster_return_gate.md",
+    "docs/character-architecture/Canonical_Nomenclature_Guard_v0_1.md",
+    "docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md",
+    "docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md",
+    "docs/collaboration/Transport_Adapter_Evaluation_v1.md",
+    "docs/onboarding/chief_architects/chief_architect_5_onboarding_packet.md",
+    "docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md",
+    "docs/residents/helen/Helen_Resident_Profile_v0_1.md",
+    "docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md",
+    "operations/alfred/operational_briefing.md",
+    "operations/briefings/morning_briefing.md",
+    "runtime/validation/work_packages/latest.json",
+    "src/estate/core/work_package_validation.py",
+    "tests/character_architecture/test_resident_background_operations_boundary.py",
+    "tests/fixtures/background_operations/resident_operation_requests_wp0224.json"
+  ],
+  "terms_replaced": [
+    "Qmaster -> CueMastery",
+    "qmaster -> cuemastery where lowercase machine identifier",
+    "Q Master/Q mastery/Q Mastery -> CueMastery",
+    "queue mastery/Queue Mastery/QueueMastery -> CueMastery",
+    "Cue Mastery/CUEMASTERY -> CueMastery"
+  ],
+  "paths_renamed_or_deleted": [
+    {
+      "deleted": "docs/character-architecture/Qmaster_Return_Gate_After_Resident_Standup.md",
+      "replacement": "docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md"
+    }
+  ],
+  "canonical_terms_added": [
+    {
+      "term": "CueMastery",
+      "allowed_lowercase_machine_identifier": "cuemastery"
+    },
+    {
+      "term": "IONOGE",
+      "pronunciation": "eye-oh-no-gee",
+      "allowed_lowercase_machine_identifier": "ionoge"
+    }
+  ],
+  "tests_run": [
+    "pytest -q tests/character_architecture/test_resident_background_operations_boundary.py"
+  ],
+  "validation_commands_run": [
+    "python -m estate.cli.main validate-work-package --id WP-0225 --json"
+  ],
+  "known_limitations": [
+    "No live provider, browser, email, calendar, TextGen, Ollama, Open WebUI, or SillyTavern calls were run.",
+    "Historical archive transcripts were not rewritten."
+  ],
+  "live_calls_avoided": true,
+  "codex_status": "completed",
+  "completed_at": "2026-07-09T21:59:03+00:00",
+  "branch": "work",
+  "summary": "Repaired CueMastery nomenclature in active resident and Character Architecture artifacts, renamed the return gate artifact, added a canonical nomenclature guard for CueMastery and IONOGE, added deterministic validation coverage, and created the WP-0225 validation recipe.",
+  "ready_for_ca_review": true,
+  "pull_request_not_applicable_reason": "PR metadata will be recorded by make_pr after commit.",
+  "merge_authority": "Chief Architect / repository maintainer review"
+}
