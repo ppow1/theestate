@@ -107,6 +107,7 @@ from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, forma
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 from estate.core.operations_manager import OperationsDecision
 from estate.core.operations_control_runtime import OperationsControlRuntime, format_operations_review, format_operations_decisions
+from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -1459,6 +1460,27 @@ def cmd_validation_production_readiness(args):
         print(format_production_readiness_markdown(payload))
 
 
+
+def cmd_alfred_runtime(args):
+    if args.alfred_runtime_action == "event-brief":
+        if args.sample:
+            event = build_alfred_event(
+                "manual_steward_note",
+                "cli_sample",
+                event_id="alfred_evt_sample",
+                timestamp="2026-07-09T00:00:00+00:00",
+                source_artifacts=["docs/residents/alfred/runtime/Alfred_Event_Intake_Schema_v0_1.md"],
+                required_action="brief_only",
+                payload={"note": "Sample non-executing Alfred runtime event."},
+            )
+        else:
+            event = build_alfred_event(args.event_type, args.source, source_artifacts=args.source_artifact or [], payload={})
+        briefing = render_alfred_briefing(event, verbosity=args.verbosity)
+        if getattr(args, "json", False):
+            print(json.dumps({"event": event, "briefing": briefing}, indent=2, sort_keys=True))
+        else:
+            print(briefing["briefing"])
+
 def cmd_validate_work_package(args):
     import json
     payload = validate_work_package(args.id)
@@ -2065,6 +2087,18 @@ def main(argv=None):
     p = sub.add_parser("validation-production-readiness", help="Generate production readiness validation report")
     p.add_argument("--json", action="store_true", help="Print production readiness report JSON")
     p.set_defaults(func=cmd_validation_production_readiness)
+
+
+    p = sub.add_parser("alfred-runtime", help="Build read-only Alfred runtime event briefings")
+    ar_sub = p.add_subparsers(dest="alfred_runtime_action", required=True)
+    q = ar_sub.add_parser("event-brief", help="Render a deterministic non-executing Alfred event briefing")
+    q.add_argument("--sample", action="store_true", help="Use a deterministic sample event")
+    q.add_argument("--event-type", default="manual_steward_note", help="Event type when not using --sample")
+    q.add_argument("--source", default="manual", help="Event source when not using --sample")
+    q.add_argument("--source-artifact", action="append", help="Source artifact for non-sample event")
+    q.add_argument("--verbosity", default="standard", choices=["brief", "standard", "mid", "detailed", "forensic"], help="Briefing verbosity")
+    q.add_argument("--json", action="store_true", help="Print event and briefing JSON")
+    q.set_defaults(func=cmd_alfred_runtime)
 
     p = sub.add_parser("validate-work-package", help="Run a registered work-package validation recipe")
     p.add_argument("--id", required=True, help="Work package id, such as WP-0058")
