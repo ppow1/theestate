@@ -1,10 +1,10 @@
-# WP-0224 - Resident Standup Sprint and Qmaster Return Gate
+# WP-0224 - Resident Standup Sprint Aligned to Background Operations Runtime
 
 Status: Proposed
 Priority: Critical
 Owner: Office of Character Architecture
 Boundary Authority: Ingrid / Privacy and Boundary Office
-Primary Consumers: Steward, Alfred, Helen, Office of the Steward, Qmaster workstream
+Primary Consumers: Steward, Alfred, Helen, Office of the Steward, Qmaster workstream, Background Operations Runtime
 Classification: Estate Internal
 Created: 2026-07-09
 
@@ -19,7 +19,7 @@ codex_cloud_web
 Provider rationale:
 
 ```text
-This package is an operational sprint package. It must move the Estate from resident foundation work toward useful resident capability quickly, without turning resident architecture into an all-consuming branch that blocks return to Qmaster.
+This package is an operational resident standup sprint. It must make Alfred and Helen useful without creating a competing event runtime. WP-0617 is the Estate-wide Background Operations Event Runtime. WP-0224 must align residents to that architecture and avoid turning Character Architecture into an all-consuming branch that blocks Qmaster.
 ```
 
 Local runtime required:
@@ -37,7 +37,7 @@ Repository implementation and deterministic tests should complete through Codex 
 Capacity note:
 
 ```text
-Bias toward an 80/20 working implementation. Do not spend the package polishing abstractions that do not materially help stand up Alfred, stand up Helen, keep resident tasks running, or return focus to Qmaster.
+Bias toward an 80/20 working implementation. Do not polish abstractions that do not materially help stand up Alfred, stand up Helen, integrate resident readiness with WP-0617, or return focus to Qmaster.
 ```
 
 ## Codex Command
@@ -48,15 +48,36 @@ Read this work package and do exactly what it says.
 
 ## Mission
 
-Stand up the minimum useful resident layer needed to return the Steward to Qmaster work.
+Stand up the minimum useful resident layer needed to return the Steward to Qmaster work, while aligning resident operation with the Estate-wide Background Operations Event Runtime defined by WP-0617.
 
-The Estate has validated Alfred locally and implemented the first standalone runtime foundation in WP-0223. That work must now become useful enough to stop consuming the entire development agenda.
+WP-0224 must not implement a parallel event system.
+
+WP-0617 owns the Estate-wide background operations substrate:
+
+```text
+an event occurs
+  -> a standing watch or rule notices it
+  -> the background operations runtime produces the next governed artifact
+  -> participants receive work/update/review requests through proper channels
+  -> the Office shows what is happening and what requires the Steward
+```
+
+WP-0224 owns resident standup and resident-facing integration points:
+
+```text
+Alfred and Helen resident artifacts
+  -> resident readiness and validation prompts
+  -> resident-specific request/briefing patterns
+  -> resident-sensitive boundary rules
+  -> Qmaster return gate
+  -> hooks/fixtures/examples compatible with WP-0617 background operations requests
+```
 
 This package has four practical outcomes:
 
-1. Alfred has a runnable standalone MVP loop, not just foundation artifacts.
-2. Alfred begins moving from turn-driven chat toward event-driven operation.
-3. Helen has a minimum viable resident package and export path comparable to Alfred's first operational layer.
+1. Alfred is stood up as the first operational resident with resident-facing background-operations integration points.
+2. Helen receives a minimum viable resident package and export path comparable to Alfred's first operational layer.
+3. Resident task visibility is expressed through WP-0617-compatible events/requests/status concepts, not a competing runtime.
 4. The Estate records a Qmaster return gate so resident work does not sprawl indefinitely.
 
 ## Steward Intent
@@ -65,9 +86,9 @@ The Steward needs Alfred and Helen stood up so work can return to Qmaster.
 
 Resident architecture is important, but it must not become the entire project.
 
-Alfred is needed specifically because the Steward cannot stay inside resident-development conversations indefinitely. Alfred must become capable of keeping an eye on resident tasks and Estate task flow while the Steward moves back to Qmaster or other primary work.
+Alfred is needed because the Steward cannot stay inside resident-development conversations indefinitely. Alfred must become able to keep an eye on resident tasks and Estate task flow through the background operations layer while the Steward returns to Qmaster or other primary work.
 
-This package must therefore prioritize useful event-driven operation over another purely turn-driven or document-only resident increment.
+This package must therefore prepare Alfred and Helen for event-driven operations without duplicating WP-0617.
 
 ## Operating Principle
 
@@ -81,6 +102,21 @@ Correct the remaining 20% while operating.
 
 This package must think operationally, not academically.
 
+## Relationship to WP-0617
+
+WP-0617 is the controlling architecture for background event-driven operations.
+
+WP-0224 must:
+
+- reference WP-0617 as the background operations substrate;
+- avoid creating a separate resident event feed, resident watch daemon, or resident dispatch queue;
+- express resident task visibility using WP-0617-compatible event/request/status patterns;
+- define how Alfred and Helen should receive or generate governed background operation requests;
+- preserve Character Architecture boundaries for resident identity, protected sources, continuity, and no-impersonation rules;
+- make clear that TextGen/Open WebUI/SillyTavern/Ollama are resident interface/model adapters, not the event runtime.
+
+WP-0224 may include deterministic fixtures or helper functions that prepare WP-0617-compatible resident-related events or requests, but it must not own the Estate-wide evaluator loop.
+
 ## Background
 
 The Steward's current strategic priority is not endless resident architecture expansion.
@@ -89,117 +125,72 @@ The Steward needs:
 
 - Alfred stood up;
 - Helen stood up;
-- Alfred capable of non-turn-driven event awareness at MVP level;
-- enough resident runtime capability to support real work;
+- resident readiness visible to background operations;
+- enough resident capability to support real work;
 - a return to Qmaster development.
 
 Character Architecture work is justified because it should help Qmaster and the broader Estate move faster. It must not become a permanent detour.
 
 ## Scope
 
-### Required Outcome 1 - Alfred Standalone Runtime MVP
+### Required Outcome 1 - Alfred Operational Resident Standup
 
-Build on WP-0223 and implement a runnable local MVP loop for Alfred.
+Build on WP-0219 through WP-0223 and make Alfred's resident standup usable in the larger Estate architecture.
 
-Preferred module/entry paths, if consistent with repository conventions:
+Required work:
 
-```text
-src/estate/core/alfred_runtime.py
-src/estate/cli/main.py
-```
+- document Alfred's operational standup status;
+- define Alfred's role in relation to WP-0617 background operation requests;
+- define what kinds of background operation requests Alfred may receive, summarize, route, or brief;
+- define what Alfred must never execute directly;
+- define how Alfred reports lack of live access unless supplied by event/request artifacts;
+- define how Alfred uses verbosity when producing briefings from background operation requests;
+- update or add deterministic resident validation prompts for event-driven/background-operation scenarios.
 
-The MVP loop must support:
-
-- reading local event files from a governed intake folder;
-- classifying events through the WP-0223 schema;
-- rendering Alfred briefings at supported verbosity levels;
-- writing briefing artifacts to a governed output folder;
-- recording a simple runtime/audit log;
-- explicitly recording actions Alfred did not take;
-- running without live model calls;
-- refusing to imply live Estate access unless an event explicitly supplies context.
-
-Suggested local folders:
+Preferred artifact path:
 
 ```text
-runtime/alfred/events/inbox
-runtime/alfred/events/processed
-runtime/alfred/briefings
-runtime/alfred/logs
-runtime/alfred/state
-runtime/alfred/tasks
+docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md
 ```
 
-If another runtime folder convention already exists, use it rather than inventing a conflicting structure.
-
-Minimum CLI surface:
+This document must state:
 
 ```text
-python -m estate.cli.main alfred-runtime run-once --sample --verbosity mid --json
-python -m estate.cli.main alfred-runtime run-once --inbox runtime/alfred/events/inbox --verbosity mid --json
+WP-0617 owns the background operations runtime. Alfred consumes, prepares, or summarizes governed operation requests through that substrate. Alfred does not own a competing event loop.
 ```
 
-If the existing CLI pattern differs, use the existing pattern while preserving equivalent capability.
+### Required Outcome 2 - Alfred Background Operation Fixtures or Helpers
 
-### Required Outcome 2 - Non-Turn Event-Driven Operation MVP
+Add minimal deterministic fixtures or helper functions, if consistent with repository conventions, that create resident-related operation request examples compatible with the WP-0617 model.
 
-Alfred must not remain only a turn-driven chat resident.
-
-Implement a minimal event-driven operating mode that can be run locally without live model calls.
-
-Minimum acceptable capability:
+Examples:
 
 ```text
-Alfred can be invoked repeatedly or in a lightweight watch loop.
-Alfred can notice new local event files without the Steward writing a chat prompt for each event.
-Alfred can produce briefing artifacts and logs from those events.
-Alfred can record task/watch status so the Steward can later ask what happened.
+resident_standup_status_request
+resident_validation_review_request
+resident_identity_boundary_review_request
+qmaster_return_gate_status_request
 ```
 
-Preferred CLI surface, if consistent with the repository:
+These may live in documentation, tests, or lightweight code depending on existing repository structure.
 
-```text
-python -m estate.cli.main alfred-runtime watch --inbox runtime/alfred/events/inbox --interval 10 --max-cycles 3 --verbosity mid --json
-python -m estate.cli.main alfred-runtime status --json
-```
+If code is added, it should be small and deterministic. It must not call live models or providers.
 
-If a persistent watch command is too much for this package, implement a deterministic bounded loop command instead. It must still demonstrate non-turn-driven behavior by processing pending event files without chat interaction.
+Acceptable implementation examples:
 
-The watch/status implementation must be conservative:
+- a helper that builds a WP-0617-compatible request payload for Alfred review;
+- a fixture file under tests/fixtures;
+- documentation examples consumed by tests;
+- a small CLI/sample command only if it fits existing CLI conventions.
 
-- no uncontrolled autonomous actions;
-- no background daemon/service manager requirement;
-- no deleting user files;
-- no approving, merging, validating, spending, or modifying governance;
-- no live model requirement;
-- no claim that Alfred has live access beyond the folders/events supplied to the runtime.
+Do not create:
 
-### Required Outcome 3 - Resident Task Tracking for Steward Return to Qmaster
+- a separate resident event runtime;
+- a resident-specific watch daemon;
+- a separate resident dispatch queue;
+- a second background operations status system.
 
-Implement or document a minimal resident task tracking surface so Alfred can keep resident work visible while the Steward returns to Qmaster.
-
-Minimum capability:
-
-- record known resident-runtime tasks or watched task entries;
-- mark tasks as observed, briefed, blocked, or needs_steward_attention;
-- surface a status summary through CLI or artifact output;
-- include Qmaster-related task routing as a first-class use case.
-
-Suggested event/task examples:
-
-```text
-wp_0224_codex_submitted
-wp_0224_pr_opened
-wp_0224_validation_failed
-wp_0224_validation_passed
-helen_package_missing_export
-qmaster_return_gate_ready
-qmaster_work_resumed
-```
-
-This does not need to be a full project management system. It only needs to give Alfred a place to keep an eye on active resident/Qmaster transition items.
-
-### Required Outcome 4 - Helen Minimum Viable Resident Package
+### Required Outcome 3 - Helen Minimum Viable Resident Package
 
 Create a minimum viable Helen resident package sufficient for later local export and testing.
 
@@ -214,6 +205,7 @@ Helen must have enough durable identity to be stood up after Alfred, including:
 - protected-source boundaries;
 - no impersonation rules;
 - connector honesty rules;
+- background-operations request boundary rules;
 - initial validation prompts;
 - platform export placeholder or first export if the export pattern is already clear.
 
@@ -223,11 +215,31 @@ Preferred paths, if consistent with Alfred's structure:
 docs/residents/helen/Helen_Resident_Profile_v0_1.md
 docs/residents/helen/Helen_Resident_Validation_v0_1.md
 docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml
+docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md
 ```
 
 If the repository has a canonical resident package pattern from Alfred, follow that pattern rather than inventing a new one.
 
 Helen must not be derived from or inspect private local characters.
+
+### Required Outcome 4 - Resident / Background Operations Boundary Document
+
+Create or update a Character Architecture document that defines how residents relate to WP-0617.
+
+Preferred path:
+
+```text
+docs/character-architecture/Resident_Background_Operations_Boundary_v0_1.md
+```
+
+This document must define:
+
+- WP-0617 owns event watches, background operation events, background operation requests, runtime status, and Office-visible background operations reports;
+- Character Architecture owns resident identity, resident validation, resident exports, resident-sensitive boundaries, and resident-specific prompt/briefing behavior;
+- residents may consume or prepare governed operation requests;
+- residents do not directly execute providers, approve institutional truth, bypass Traffic Controller, or replace validation;
+- resident/persona/worker/provider/office roles must remain distinct;
+- character-sensitive or protected-source events require Ingrid/Steward or appropriate Chief Architect review.
 
 ### Required Outcome 5 - Qmaster Return Gate
 
@@ -247,7 +259,7 @@ This document must define:
 - the minimum acceptance line for Alfred;
 - the minimum acceptance line for Helen;
 - the next Qmaster handoff condition;
-- how Alfred is expected to keep an eye on resident/Qmaster transition tasks while the Steward returns to Qmaster.
+- how Alfred is expected to keep an eye on resident/Qmaster transition tasks through WP-0617 background operations rather than through a separate resident runtime.
 
 Required principle:
 
@@ -262,21 +274,21 @@ Add deterministic tests for the new functionality.
 Likely test files:
 
 ```text
-tests/test_alfred_runtime_mvp.py
+tests/character_architecture/test_resident_background_operations_boundary.py
 tests/character_architecture/test_helen_resident_package.py
 ```
 
 Tests must verify:
 
-- Alfred run-once processes a sample event;
-- Alfred writes a briefing artifact;
-- Alfred writes or updates a runtime log;
-- Alfred can process pending event files without a chat turn;
-- Alfred watch/bounded-loop mode does not execute unauthorized actions;
-- Alfred status or task tracking can report active/observed items;
-- verbosity affects presentation depth;
+- Alfred background-operations integration artifact exists;
+- Alfred integration explicitly names WP-0617 as the background runtime owner;
+- Alfred integration does not define a competing resident event loop;
+- resident/WP-0617 boundary artifact exists;
+- boundary artifact preserves role separation among residents, workers, providers, personas, offices, and background operations;
+- resident operation examples are compatible with WP-0617 request concepts where practical;
 - Helen resident artifacts exist;
 - Helen boundaries are present;
+- Helen background-operations boundary is present;
 - Helen export does not reference protected/private local characters;
 - Qmaster return gate exists and contains the required principle.
 
@@ -309,10 +321,10 @@ The receipt must include:
 - tests run;
 - validation commands run;
 - whether live model calls were avoided;
-- Alfred MVP behavior summary;
-- Alfred non-turn/event-driven behavior summary;
-- resident task tracking summary;
+- Alfred standup summary;
+- Alfred/WP-0617 integration summary;
 - Helen package summary;
+- Helen/WP-0617 integration summary;
 - Qmaster return gate summary;
 - known limitations;
 - recommended next action.
@@ -322,8 +334,10 @@ The receipt must include:
 This package must not:
 
 - build a full production daemon/service manager;
+- implement the WP-0617 background operations runtime;
+- create a separate resident event feed, watch daemon, dispatch queue, or status system;
 - implement uncontrolled autonomous actions;
-- approve, merge, validate, spend, delete, or modify governance on Alfred's behalf;
+- approve, merge, validate, spend, delete, or modify governance on Alfred's or Helen's behalf;
 - build a full Helen runtime;
 - create additional residents beyond Helen;
 - inspect private local characters;
@@ -335,12 +349,11 @@ This package must not:
 
 Accept this package only if:
 
-- Alfred can run a deterministic local run-once MVP loop;
-- Alfred can process event files without the Steward issuing a chat prompt for each event;
-- Alfred can produce briefing artifacts from event input;
-- Alfred records what happened without executing unauthorized actions;
-- Alfred has a minimal status/task tracking surface for resident/Qmaster transition work;
+- Alfred is documented as stood up enough to participate in WP-0617-style background operations;
+- Alfred's role does not duplicate WP-0617 runtime responsibilities;
+- resident/background-operations boundary is explicit;
 - Helen has a minimum viable resident package following Alfred's pattern;
+- Helen includes background-operations boundary language;
 - Qmaster return gate exists;
 - tests pass;
 - WP-0224 validation passes;
@@ -351,13 +364,15 @@ Accept this package only if:
 After WP-0224, the next action should normally be one of:
 
 ```text
-Return to Qmaster work with Alfred/Helen available as support residents.
+Run or implement WP-0617 so background operations can carry Alfred/Helen resident task awareness while the Steward returns to Qmaster.
 ```
 
-or, only if absolutely required:
+or:
 
 ```text
-Create one narrowly scoped fix package for a blocking defect found in Alfred or Helen standup.
+Return to Qmaster work with Alfred/Helen available as support residents and WP-0617 identified as the event-driven substrate.
 ```
+
+Only create a narrowly scoped fix package if a blocking defect prevents Alfred/Helen standup or WP-0617 alignment.
 
 Do not continue resident expansion by default.
