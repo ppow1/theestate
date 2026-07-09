@@ -2636,6 +2636,44 @@ VALIDATION_RECIPES["WP-0615"] = {
     ],
 }
 
+VALIDATION_RECIPES["WP-0501"] = {
+    "recipe_id": "wp-0501-execution-provider-boundary-review",
+    "title": "WP-0501 - Execution Provider Boundary Review After Background Operations Merge Wave",
+    "description": "Validates the CA5 boundary review artifacts and targeted boundary assertions without live provider, dispatch, assignment, routing-authority, or acceptance behavior.",
+    "required_checks": [
+        "Architecture boundary review exists",
+        "Validation report exists",
+        "Completion receipt exists",
+        "Provider routing remains advisory",
+        "Office panel remains visibility-only",
+        "Background Operations remains request/status-only",
+        "Post-merge audit and operations runtime do not claim autonomous acceptance authority",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "docs/architecture/execution_provider_boundary_review_after_background_operations_merge_wave.md",
+        "operations/validation/reports/WP-0501_execution_provider_boundary_review.md",
+        "collaboration/work_packages/completions/WP-0501_codex_done.json",
+    ],
+    "failure_criteria": [
+        "Any required command exits non-zero",
+        "Receipt reports live provider calls",
+        "Review artifacts fail to preserve advisory, visibility-only, evidence-only, and no-autonomous-authority language",
+    ],
+    "success_criteria": [
+        "Required artifacts exist",
+        "Boundary assertions are present",
+        "Completion receipt records no live provider calls and no behavior modifications",
+    ],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -c \"from pathlib import Path; paths=['docs/architecture/execution_provider_boundary_review_after_background_operations_merge_wave.md','operations/validation/reports/WP-0501_execution_provider_boundary_review.md','collaboration/work_packages/completions/WP-0501_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"from pathlib import Path; text=Path('docs/architecture/execution_provider_boundary_review_after_background_operations_merge_wave.md').read_text(encoding='utf-8'); required=['CA5 execution-provider ownership','CA6 Background Operations','WP-0614 and WP-0615 remain advisory and visibility-only','no-provider-execution','no-dispatch-authority','No live provider calls were required or made']; missing=[x for x in required if x not in text]; assert not missing, missing\""),
+        _cmd("python -c \"from pathlib import Path; text=Path('operations/validation/reports/WP-0501_execution_provider_boundary_review.md').read_text(encoding='utf-8'); required=['Provider routing recommendations are advisory only','Provider routing Office panel is visibility only','Background Operations is not an execution provider','Post-merge audit produces evidence, not acceptance','Provider Adapter Contract remains provider handoff seam']; missing=[x for x in required if x not in text]; assert not missing, missing\""),
+        _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0501_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0501'; assert data.get('live_provider_calls_made') is False; assert data.get('dispatch_behavior_modified') is False; assert data.get('provider_adapter_behavior_modified') is False; assert data.get('background_operations_behavior_modified') is False; assert data.get('office_surface_behavior_modified') is False; assert data.get('ready_for_ca_review') is True\""),
+    ],
+}
+
 VALIDATION_RECIPES["WP-0219"] = {
     "recipe_id": "wp-0219-alfred-resident-package-validation-and-exports",
     "title": "WP-0219 - Alfred Resident Package Validation and Platform Export Hardening",
