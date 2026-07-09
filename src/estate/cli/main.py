@@ -110,6 +110,7 @@ from estate.core.operations_control_runtime import OperationsControlRuntime, for
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -155,6 +156,31 @@ def cmd_background_operations(args):
             print(format_background_operations_report(runtime.load_status()))
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Background operations failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_operations_runtime(args):
+    try:
+        service = OperationsRuntimeService()
+        action = args.operations_runtime_action
+        if action == "run-once":
+            payload = service.run_once(dry_run=getattr(args, "dry_run", False))
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
+        elif action == "start":
+            payload = service.start(max_cycles=args.max_cycles, interval_seconds=args.interval_seconds, dry_run=getattr(args, "dry_run", False))
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
+        elif action == "status":
+            payload = service.status()
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else service.report())
+        elif action == "request-stop":
+            payload = service.request_stop()
+            print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else "Operations Runtime stop requested")
+        elif action == "report":
+            print(service.report())
+    except OperationsRuntimeLockError as exc:
+        print(f"Operations runtime blocked: {exc}")
+        raise SystemExit(2)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operations runtime failed: {exc}")
         raise SystemExit(1)
 
 def cmd_operations_review(args):
@@ -2684,6 +2710,28 @@ def main(argv=None):
     q.set_defaults(func=cmd_background_operations)
     q = bo.add_parser("report", help="Render background operations markdown report")
     q.set_defaults(func=cmd_background_operations)
+
+
+    p = sub.add_parser("operations-runtime", help="Run and inspect the bounded Operations Runtime service loop")
+    ort = p.add_subparsers(dest="operations_runtime_action", required=True)
+    q = ort.add_parser("run-once", help="Run one Operations Runtime cycle")
+    q.add_argument("--json", action="store_true")
+    q.add_argument("--dry-run", action="store_true")
+    q.set_defaults(func=cmd_operations_runtime)
+    q = ort.add_parser("start", help="Run a bounded Operations Runtime loop")
+    q.add_argument("--max-cycles", type=int, default=1)
+    q.add_argument("--interval-seconds", type=float, default=30.0)
+    q.add_argument("--json", action="store_true")
+    q.add_argument("--dry-run", action="store_true")
+    q.set_defaults(func=cmd_operations_runtime)
+    q = ort.add_parser("status", help="Show Operations Runtime status")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_operations_runtime)
+    q = ort.add_parser("request-stop", help="Request the bounded loop to stop")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_operations_runtime)
+    q = ort.add_parser("report", help="Render Operations Runtime report")
+    q.set_defaults(func=cmd_operations_runtime)
 
     p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
     p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")

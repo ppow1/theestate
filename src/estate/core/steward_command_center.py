@@ -27,6 +27,7 @@ from estate.core.operations_notification_center import generate_operations_notif
 from estate.core.office_operational_activity import load_office_operational_activity
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
 from estate.core.background_operations_runtime import load_background_operations_status
+from estate.core.operations_runtime import load_operations_runtime_status
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
@@ -963,6 +964,7 @@ def generate_command_center(root=None, write=True):
         "execution_activity": _read_artifact(root, ARTIFACTS["execution_activity"]),
         "execution_dispatch": _read_artifact(root, ARTIFACTS["execution_dispatch"]),
         "background_operations": {"available": True, "path": "runtime/background_operations/status/latest.json", "kind": "json", "data": load_background_operations_status(root)},
+        "operations_runtime": {"available": True, "path": "runtime/operations_runtime/status/latest.json", "kind": "json", "data": load_operations_runtime_status(root)},
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
