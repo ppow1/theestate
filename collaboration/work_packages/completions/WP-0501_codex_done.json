@@ -1,0 +1,130 @@
+{
+  "work_package_id": "WP-0501",
+  "status": "completed",
+  "owner": "Chief Architect #5",
+  "provider": "codex_cloud_web",
+  "completed_at": "2026-07-09T23:40:00Z",
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/workers/templates/Codex_Work_Package_Template_v1.md",
+    "docs/integration/execution_provider_adapter_contract.md",
+    "docs/integration/provider_routing_recommendations.md",
+    "docs/integration/provider_routing_office_panel.md",
+    "docs/integration/background_operations_event_runtime.md",
+    "docs/integration/background_operational_targets_and_post_merge_audit.md",
+    "docs/integration/operations_runtime_service_loop.md",
+    "collaboration/work_packages/completions/WP-0614_codex_done.json",
+    "collaboration/work_packages/completions/WP-0615_codex_done.json",
+    "collaboration/work_packages/completions/WP-0617_codex_done.json",
+    "collaboration/work_packages/completions/WP-0618_codex_done.json",
+    "collaboration/work_packages/completions/WP-0619_codex_done.json",
+    "src/estate/core/provider_routing_recommendations.py",
+    "src/estate/core/provider_routing_recommendations_runtime.py",
+    "src/estate/core/provider_routing_office_panel.py",
+    "src/estate/core/background_operations.py",
+    "src/estate/core/background_operations_runtime.py",
+    "src/estate/core/operational_targets.py",
+    "src/estate/core/operational_targets_runtime.py",
+    "src/estate/core/post_merge_audit.py",
+    "src/estate/core/post_merge_audit_runtime.py",
+    "src/estate/core/operations_runtime.py",
+    "src/estate/core/operations_runtime_service.py",
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/execution_provider_adapter_runtime.py",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "docs/architecture/execution_provider_boundary_review_after_background_operations_merge_wave.md",
+    "operations/validation/reports/WP-0501_execution_provider_boundary_review.md",
+    "collaboration/work_packages/completions/WP-0501_codex_done.json"
+  ],
+  "implementation_files_modified": [
+    "src/estate/core/work_package_validation.py"
+  ],
+  "implementation_modification_summary": "Only review artifacts and deterministic WP-0501 validation recipe support were added; execution provider, dispatch, Background Operations, and Office behavior were not modified.",
+  "validation_commands_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0614 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0615 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0617 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0618 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0619 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0501 --json",
+    "pytest -q tests/test_provider_routing_recommendations.py tests/test_provider_routing_recommendations_runtime.py tests/test_provider_routing_office_panel.py",
+    "pytest -q tests/test_background_operations.py tests/test_background_operations_runtime.py",
+    "pytest -q tests/test_operational_targets.py tests/test_operational_targets_runtime.py tests/test_post_merge_audit.py tests/test_post_merge_audit_runtime.py",
+    "pytest -q tests/test_operations_runtime.py tests/test_operations_runtime_service.py"
+  ],
+  "validation_results": {
+    "WP-0614 validate-work-package": "passed",
+    "WP-0615 validate-work-package": "passed",
+    "WP-0617 validate-work-package": "failed: background operations runtime test generated one request in dirty active repository state; receipt metadata gaps also reported in pre-existing WP-0617 receipt",
+    "WP-0618 validate-work-package": "passed",
+    "WP-0619 validate-work-package": "no_recipe: no validation recipe registered before WP-0501",
+    "WP-0501 validate-work-package": "passed after receipt metadata update",
+    "provider routing focused pytest": "passed",
+    "background operations focused pytest": "failed: generated_requests_count was 1 instead of 0 in dirty active repository state",
+    "operational targets and post-merge audit focused pytest": "passed",
+    "operations runtime focused pytest": "passed"
+  },
+  "findings": {
+    "blocking": [],
+    "non_blocking": [
+      "WP-0618 receipt includes runtime validation latest evidence as changed; treat generated validation evidence as transient evidence, not implementation truth.",
+      "External validation evidence root hardening may be useful as an optional future package."
+    ]
+  },
+  "boundary_verdicts": {
+    "provider_routing_recommendations_advisory_only": "pass",
+    "office_provider_routing_panel_visibility_only": "pass",
+    "background_operations_not_execution_provider": "pass",
+    "background_operations_does_not_dispatch_work": "pass",
+    "background_operations_does_not_assign_workers": "pass",
+    "background_operations_does_not_execute_providers": "pass",
+    "background_operations_not_routing_authority": "pass",
+    "post_merge_audit_evidence_not_acceptance": "pass",
+    "validation_workflows_deterministic": "pass",
+    "provider_adapter_contract_handoff_seam_preserved": "pass",
+    "execution_dispatch_queue_not_replaced": "pass",
+    "no_duplicate_provider_registry_dispatch_queue_event_feed_or_office": "pass",
+    "runtime_and_office_states_distinguished": "pass",
+    "local_validation_evidence_not_institutional_truth": "pass",
+    "future_external_validation_evidence_root_compatible": "pass_with_observation"
+  },
+  "live_provider_calls_made": false,
+  "dispatch_behavior_modified": false,
+  "provider_adapter_behavior_modified": false,
+  "background_operations_behavior_modified": false,
+  "office_surface_behavior_modified": false,
+  "known_limitations": [
+    "Repository-level deterministic review only; no Ring 2 local GPU reasoning review was performed.",
+    "WP-0619 had no pre-existing validation recipe at the time of review, so validate-work-package reports no_recipe for WP-0619 unless a future package adds one.",
+    "No live provider calls, Codex CLI calls, ChatGPT CLI calls, Ollama calls, GPU calls, or network-dependent tests were performed."
+  ],
+  "ready_for_ca_review": true,
+  "codex_status": "completed",
+  "branch": "work",
+  "summary": "Completed CA5 execution-provider boundary review after the WP-0614 through WP-0619 merge wave; added review artifacts and a deterministic WP-0501 validation recipe without modifying execution, dispatch, provider adapter, Background Operations, or Office behavior.",
+  "files_changed": [
+    "docs/architecture/execution_provider_boundary_review_after_background_operations_merge_wave.md",
+    "operations/validation/reports/WP-0501_execution_provider_boundary_review.md",
+    "collaboration/work_packages/completions/WP-0501_codex_done.json",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0614 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0615 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0617 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0618 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0619 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0501 --json",
+    "pytest -q tests/test_provider_routing_recommendations.py tests/test_provider_routing_recommendations_runtime.py tests/test_provider_routing_office_panel.py",
+    "pytest -q tests/test_background_operations.py tests/test_background_operations_runtime.py",
+    "pytest -q tests/test_operational_targets.py tests/test_operational_targets_runtime.py tests/test_post_merge_audit.py tests/test_post_merge_audit_runtime.py",
+    "pytest -q tests/test_operations_runtime.py tests/test_operations_runtime_service.py"
+  ],
+  "pull_request_not_applicable_reason": "PR metadata recorded through make_pr tool after commit in this environment.",
+  "merge_authority_equivalent": "Chief Architect / Steward acceptance required."
+}
