@@ -193,6 +193,33 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+    "WP-0226": {
+        "recipe_id": "wp-0226-alfred-estate-engineering-boundary",
+        "title": "WP-0226 — Alfred Estate and Engineering Department Boundary",
+        "description": "Validates the Alfred/Estate/Engineering/CueMastery responsibility boundary, deterministic tests, and completion receipt.",
+        "required_checks": [
+            "Boundary artifact exists",
+            "Deterministic boundary tests pass",
+            "Completion receipt exists",
+            "Alfred / Engineering / CueMastery boundary is present",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "docs/character-architecture/Alfred_Estate_Engineering_Boundary_v0_1.md",
+            "tests/character_architecture/test_alfred_estate_engineering_boundary.py",
+            "collaboration/work_packages/completions/WP-0226_codex_cloud_web_done.json",
+        ],
+        "failure_criteria": ["Any required command exits non-zero", "Active artifacts frame Alfred as direct CueMastery executor"],
+        "success_criteria": ["Alfred remains Estate-level Chief of Staff/coordinator", "Engineering owns CueMastery engineering execution"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['docs/character-architecture/Alfred_Estate_Engineering_Boundary_v0_1.md','tests/character_architecture/test_alfred_estate_engineering_boundary.py','collaboration/work_packages/completions/WP-0226_codex_cloud_web_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("pytest -q tests/character_architecture/test_alfred_estate_engineering_boundary.py"),
+            _cmd("python -c \"from pathlib import Path; text=Path('docs/character-architecture/Alfred_Estate_Engineering_Boundary_v0_1.md').read_text(encoding='utf-8'); assert 'Alfred worries about the Estate' in text; assert 'Alfred does not own CueMastery execution' in text; assert 'Engineering Department is the institutional owner for CueMastery engineering execution' in text\""),
+            _cmd("python -c \"from pathlib import Path; paths=['docs/character-architecture/CueMastery_Return_Gate_After_Resident_Standup.md','docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md','docs/residents/helen/Helen_Resident_Profile_v0_1.md']; forbidden=['Alfred owns CueMastery','Alfred owns CueMastery execution','Alfred manages CueMastery','Alfred project manages CueMastery','Alfred executes CueMastery','Alfred runs CueMastery development','Alfred is responsible for CueMastery execution']; hits=[(p,f) for p in paths for f in forbidden if f in Path(p).read_text(encoding='utf-8')]; assert not hits, hits\""),
+        ],
+    },
+
     "WP-0016": {
         "recipe_id": "wp-0016-work-package-registry-architecture-artifact-presence",
         "title": "WP-0016 — Work Package Registry Architecture",

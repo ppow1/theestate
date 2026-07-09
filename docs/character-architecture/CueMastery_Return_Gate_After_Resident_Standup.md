@@ -1,10 +1,10 @@
 # CueMastery Return Gate After Resident Standup
 
-Resident work exists to support Estate execution and CueMastery progress. It must not become an indefinite blocker to CueMastery.
+Resident work exists to support Estate execution, Engineering Department bring-up, and CueMastery progress without making Alfred responsible for CueMastery execution. It must not become an indefinite blocker to CueMastery.
 
 ## Why Resident Work Was Undertaken
 
-Alfred and Helen were stood up so the Steward can stop carrying resident-development conversations manually and return attention to CueMastery and other primary Estate execution.
+Alfred and Helen were stood up so the Steward can stop carrying resident-development conversations manually while the Estate brings the Engineering Department online to take on CueMastery engineering execution.
 
 ## Required Before Returning to CueMastery
 
@@ -31,8 +31,8 @@ Helen has enough durable identity and boundaries to support later export/local t
 
 ## Next CueMastery Handoff Condition
 
-Once WP-0224 tests and validation pass, the normal next step is to run or implement WP-0617 so background operations can carry Alfred/Helen task awareness while the Steward returns to CueMastery.
+Once WP-0224 tests and validation pass, the normal next step is to run or implement WP-0617 so background operations can carry Alfred/Helen resident task awareness while the Engineering Department takes on CueMastery engineering work through normal Estate channels.
 
 ## Alfred's Transition Watch
 
-Alfred keeps an eye on resident/CueMastery transition tasks only through WP-0617 background operations requests, status, and Office-visible reports. Alfred does not run a separate resident watch daemon or event runtime.
+Alfred briefs Estate-level resident/CueMastery transition readiness only through WP-0617 background operations requests, status, and Office-visible reports. Alfred may route attention and surface blockers, but the Engineering Department owns CueMastery engineering execution. Alfred does not run a separate resident watch daemon or event runtime.
