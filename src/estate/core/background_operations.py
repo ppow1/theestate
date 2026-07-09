@@ -18,11 +18,13 @@ ALLOWED_EVENT_TYPES = {
     "validation_stale", "ring2_review_needed", "provider_capacity_warning",
     "assignment_gap_detected", "background_request_created", "background_request_completed",
     "background_request_blocked",
+    "operational_target_watch_needed", "git_hygiene_review_needed", "post_merge_audit_needed",
+    "validation_evidence_root_drift", "steward_acceptance_needed",
 }
 ALLOWED_REQUEST_TYPES = {
     "staff_update_request", "validation_review_request", "traffic_controller_review_request",
     "routing_review_request", "provider_capacity_review_request", "worker_assignment_review_request",
-    "steward_attention_request",
+    "steward_attention_request", "post_merge_audit_request",
 }
 SENSITIVE_TERMS = ("resident", "character", "persona", "identity", "continuity", "private", "sensitive")
 
@@ -171,5 +173,6 @@ def default_background_operation_watches() -> list[BackgroundOperationWatch]:
         ("provider_capacity_warning_watch", "Provider capacity warning", "artifact_status", ["runtime/providers/health/status/summary.json", "runtime/providers/health/status/latest_capacity.json"], {"watch_kind": "provider_capacity_warning"}, "provider_capacity_review_request"),
         ("worker_assignment_gap_watch", "Worker assignment gap", "artifact_status", ["runtime/workers/assignments/status/board.json", "collaboration/work_packages/pending"], {"watch_kind": "worker_assignment_gap"}, "worker_assignment_review_request"),
         ("pending_movement_decision_watch", "Pending movement decision", "artifact_status", ["runtime/provider_routing/status/summary.json", "runtime/traffic_controller/movement/status/summary.json"], {"watch_kind": "pending_movement_decision"}, "traffic_controller_review_request"),
+        ("operational_target_watch", "Operational target watch", "artifact_status", ["runtime/operational_targets/registry.json"], {"watch_kind": "operational_target_watch_needed"}, "post_merge_audit_request"),
     ]
     return [BackgroundOperationWatch(wid, name, **base, trigger_type=trig, source_paths=paths, conditions=conds, action_type=action) for wid, name, trig, paths, conds, action in specs]
