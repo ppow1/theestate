@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/workforce_intervention_v1.schema.json",
+  "title": "Helen Workforce Cognitive-Health Intervention v1",
+  "type": "object",
+  "required": ["request_id", "assessment_id", "recommendations", "evidence_artifacts", "institutional_factors", "follow_up_checkpoints", "outcome_review", "ingrid_boundary_enforcement"],
+  "properties": {
+    "request_id": {"type": "string"},
+    "assessment_id": {"type": "string"},
+    "recommendations": {"type": "array", "items": {"type": "string"}},
+    "evidence_artifacts": {"type": "array", "items": {"type": "string"}},
+    "worker_factors": {"type": "array", "items": {"type": "string"}},
+    "institutional_factors": {"type": "array", "items": {"type": "string"}},
+    "follow_up_checkpoints": {"type": "array", "items": {"type": "string"}},
+    "outcome_review": {"type": "string", "enum": ["pending", "scheduled", "completed", "not_required"]},
+    "alfred_exception_summary": {"type": "string"},
+    "grace_operational_constraint_summary": {"type": "string"},
+    "ingrid_boundary_enforcement": {"type": "string"}
+  },
+  "examples": [{"request_id":"wfr-example","assessment_id":"wfa-example","recommendations":["coaching"],"evidence_artifacts":["runtime/workers/status.json","runtime/events/window.jsonl"],"worker_factors":["repeated handoff misses"],"institutional_factors":["unclear retrieval path"],"follow_up_checkpoints":["review next cycle"],"outcome_review":"pending","alfred_exception_summary":"Bounded exception only.","grace_operational_constraint_summary":"Avoid urgent parallel queues.","ingrid_boundary_enforcement":"No diagnosis or private journal body included."}]
+}

@@ -1,0 +1,26 @@
+{
+  "work_package_id": "WP-4009",
+  "status": "completed",
+  "completed_by": "Codex",
+  "summary": "Implemented Helen governed cognitive-health request and intervention runtime, extended the existing workforce store and schemas, added Office/CLI status summaries, and added focused tests for privacy, proportionality, institutional causes, and false-diagnosis prevention.",
+  "deliverables": [
+    "src/estate/core/helen_workforce.py",
+    "src/estate/cli/helen_workforce.py",
+    "docs/schemas/workforce_development/workforce_request_v1.schema.json",
+    "docs/schemas/workforce_development/workforce_assessment_v1.schema.json",
+    "docs/schemas/workforce_development/workforce_intervention_v1.schema.json",
+    "tests/test_workforce_cognitive_health.py",
+    "operations/validation/reports/WP-4009_workforce_cognitive_health.md"
+  ],
+  "validation": {
+    "command": "PYTHONPATH=src pytest -q tests/test_helen_workforce.py tests/test_helen_workforce_runtime_integration.py tests/test_helen_workforce_cli.py tests/test_workforce_cognitive_health.py tests/test_grace_operations_runtime.py tests/test_alfred_runtime.py",
+    "result": "30 passed"
+  },
+  "boundaries": {
+    "diagnosis_allowed": false,
+    "private_journals_routine_evidence": false,
+    "grace_prescribes_interventions": false,
+    "helen_controls_operational_queues": false,
+    "new_hr_institution_created": false
+  }
+}
