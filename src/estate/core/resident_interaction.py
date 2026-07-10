@@ -13,6 +13,9 @@ from estate.core.resident_authority import check_authority, list_authority, ALLO
 
 CHAT_STORE = Path("runtime/resident_interactions/sessions")
 LLM_DIAGNOSTIC_PATH = Path("runtime/residents/alfred/llm_diagnostics.json")
+
+def resident_llm_diagnostic_path(resident: str) -> Path:
+    return Path("runtime/residents") / _key(resident) / "llm_diagnostics.json"
 ATTACHMENT_STORE = Path("runtime/resident_interactions/attachments")
 VISION_CONFIG_PATH = Path("runtime/residents/alfred/vision_model_config.json")
 SURFACE_DIR = Path("operations/residents/surfaces")
@@ -25,6 +28,7 @@ BOOTSTRAP_ALFRED_MODEL = os.environ.get("ESTATE_ALFRED_OLLAMA_MODEL", "qwen3:8b"
 PREFERRED_ALFRED_MODEL = BOOTSTRAP_ALFRED_MODEL
 DEFAULT_ALFRED_OLLAMA_TIMEOUT_SECONDS = 60.0
 MAX_ALFRED_PROMPT_CHARS = 6000
+MAX_RESIDENT_PROMPT_CHARS = 7000
 
 def alfred_ollama_timeout_seconds() -> float:
     raw = os.environ.get("ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS")
@@ -346,31 +350,40 @@ def resolve_model_control_selection(actor: str = "alfred", capability: str = "te
     except Exception as exc:
         return {"actor": actor, "capability": capability, "model_id": None, "assigned_model": None, "adapter_model_name": None, "selection_source": "bootstrap_fallback", "warning": "Model control assignment unavailable", "policy_result": "unavailable", "policy": {"decision":"denied", "reason": _safe_diagnostic_text(f"{type(exc).__name__}: {exc}")}}
 
-def local_llm_status(adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
+def local_llm_status(adapter: LocalOllamaAdapter | None = None, resident: str = "alfred", root: Path | None = None) -> dict[str, Any]:
     adapter = adapter or LocalOllamaAdapter()
+    resident_key = _key(resident)
     try:
         status = adapter.discover_models()
     except Exception as exc:
         status = {"available": False, "provider": getattr(adapter, "provider", "unknown"), "endpoint": getattr(adapter, "endpoint", None), "models": [], "discovery": "local adapter discovery failed", "last_adapter_error": f"{type(exc).__name__}: {exc}"}
     models = status.get("models") or []
     try:
-        selected = adapter.select_model("alfred", models) if models else None
+        if models:
+            try:
+                selected = adapter.select_model(resident_key, models, root=root)
+            except TypeError:
+                selected = adapter.select_model(resident_key, models)
+        else:
+            selected = None
     except Exception as exc:
         selected = None
         status["last_adapter_error"] = f"{type(exc).__name__}: {exc}"
-    model_control = resolve_model_control_selection("alfred", "text")
+    model_control = resolve_model_control_selection(resident_key, "text", root=root)
     config_source = {"provider": "estate_model_control_assignment_then_local_ollama_adapter", "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434", "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b", "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds", "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."}
     reason = _llm_failure_reason(status, selected)
-    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": PREFERRED_ALFRED_MODEL, "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL), "timeout_seconds": alfred_ollama_timeout_seconds(), "generation_attempted": False, "generation_result": "not_attempted", "prompt_size_summary": None, "model_control_selection": model_control, "selection_source": model_control.get("selection_source"), "policy_result": model_control.get("policy_result")})
+    status.update({"intended_mode":"local_llm", "model": selected, "adapter_available": bool(status.get("available")), "fallback_active": not bool(status.get("available")), "selected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "selected_model": selected, "expected_provider": status.get("provider") or getattr(adapter, "provider", "unknown"), "expected_model": (PREFERRED_ALFRED_MODEL if resident_key == "alfred" else selected), "configuration_source": config_source, "provider_reachable": "yes" if status.get("available") else "no", "failure_reason": reason, "recovery_hint": _llm_recovery_hint(reason, status.get("endpoint"), PREFERRED_ALFRED_MODEL), "timeout_seconds": alfred_ollama_timeout_seconds(), "generation_attempted": False, "generation_result": "not_attempted", "prompt_size_summary": None, "model_control_selection": model_control, "selection_source": model_control.get("selection_source"), "policy_result": model_control.get("policy_result"), "resident": resident_key})
     if not status.get("available"):
         status.setdefault("discovery", "deterministic fallback available")
     return _sanitize_llm_status(status)
 
-def alfred_llm_diagnostic(root=None, *, write: bool = False, adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
+def resident_llm_diagnostic(resident: str = "alfred", root=None, *, write: bool = False, adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
     rootp = _root(root)
-    status = local_llm_status(adapter)
+    resident_key = _key(resident)
+    status = local_llm_status(adapter, resident=resident_key, root=rootp)
     diag = {
-        "kind": "alfred_llm_connection_diagnostic",
+        "kind": "resident_llm_connection_diagnostic",
+        "resident": resident_key,
         "version": 1,
         "generated_at": _now(),
         "expected_provider": status.get("expected_provider") or "none",
@@ -387,11 +400,22 @@ def alfred_llm_diagnostic(root=None, *, write: bool = False, adapter: LocalOllam
         "generation_result": status.get("generation_result", "not_attempted"),
         "timeout_seconds": status.get("timeout_seconds"),
         "prompt_size_summary": status.get("prompt_size_summary"),
-        "windows_restart_note": "A Windows restart can leave the Office web server running while the separate local Ollama service is stopped, PATH is unavailable, or runtime discovery has no models; Alfred now reports that dependency state explicitly.",
-        "diagnostic_path": str(LLM_DIAGNOSTIC_PATH),
+        "windows_restart_note": "A Windows restart can leave the Office web server running while the separate local Ollama service is stopped, PATH is unavailable, or runtime discovery has no models; the resident gateway reports that dependency state explicitly.",
+        "diagnostic_path": str(resident_llm_diagnostic_path(resident_key)),
         "secrets_policy": "No API keys or secrets are required or recorded for the local Ollama path; diagnostic text is redacted.",
     }
     if write:
+        path = rootp / resident_llm_diagnostic_path(resident_key)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(diag, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return diag
+
+def alfred_llm_diagnostic(root=None, *, write: bool = False, adapter: LocalOllamaAdapter | None = None) -> dict[str, Any]:
+    diag = resident_llm_diagnostic("alfred", root, write=write, adapter=adapter)
+    diag["kind"] = "alfred_llm_connection_diagnostic"
+    diag["diagnostic_path"] = str(LLM_DIAGNOSTIC_PATH)
+    if write:
+        rootp = _root(root)
         path = rootp / LLM_DIAGNOSTIC_PATH
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(diag, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -403,7 +427,7 @@ def resident_surface(resident: str, root=None) -> dict[str, Any]:
     artifact = r / SURFACE_DIR / f"{key}.json"
     data = _read_json(artifact) if artifact.exists() else None
     caps = data.get("capabilities") if isinstance(data, dict) and isinstance(data.get("capabilities"), list) else DEFAULT_CAPABILITIES
-    return {"kind":"resident_interaction_surface","resident_id":profile["resident_id"],"resident_display_name":profile["resident_display_name"],"office":profile["office"],"role":profile["role"],"resident_api_standard_version":STANDARD_VERSION,"resident_implementation_version":profile["implementation_version"],"surface_reference":str((SURFACE_DIR / f"{key}.json")).replace('\\','/'),"capabilities":caps,"chat_endpoints":{"get":"GET /api/residents/{resident_id}/chat","post":"POST /api/residents/{resident_id}/chat JSON with optional attachments[] base64/text payloads","forget":"POST /api/residents/{resident_id}/forget","surface":"GET /api/residents/{resident_id}/surface"},"extension_mechanism":{"proposal_template":"docs/operations/residents/resident_api_extension_proposal_template.md","profile_template":"docs/operations/residents/resident_implementation_profile_template.md","rule":"Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."}, "llm_diagnostic": alfred_llm_diagnostic(r, write=True) if profile["resident_id"] == "alfred" else None}
+    return {"kind":"resident_interaction_surface","resident_id":profile["resident_id"],"resident_display_name":profile["resident_display_name"],"office":profile["office"],"role":profile["role"],"resident_api_standard_version":STANDARD_VERSION,"resident_implementation_version":profile["implementation_version"],"surface_reference":str((SURFACE_DIR / f"{key}.json")).replace('\\','/'),"capabilities":caps,"chat_endpoints":{"get":"GET /api/residents/{resident_id}/chat","post":"POST /api/residents/{resident_id}/chat JSON with optional attachments[] base64/text payloads","forget":"POST /api/residents/{resident_id}/forget","surface":"GET /api/residents/{resident_id}/surface"},"extension_mechanism":{"proposal_template":"docs/operations/residents/resident_api_extension_proposal_template.md","profile_template":"docs/operations/residents/resident_implementation_profile_template.md","rule":"Add or change capabilities through reviewed resident surface/profile artifacts; do not hide one-off UI-only actions."}, "llm_diagnostic": resident_llm_diagnostic(profile["resident_id"], r, write=True) if profile["resident_id"] in {"alfred", "helen"} else None}
 
 def _next_session_id(root, resident):
     day = datetime.now(timezone.utc).strftime("%Y%m%d"); folder = root/CHAT_STORE; folder.mkdir(parents=True, exist_ok=True)
@@ -440,6 +464,31 @@ def _context_packet(root: Path, resident: str, session: dict[str, Any] | None = 
             turns.append({"user": str(t.get("user_message") or "")[:240], "resident": str(t.get("resident_response") or "")[:240]})
     pending = [str(p.relative_to(root)).replace('\\','/') for p in sorted((root/"collaboration/work_packages/pending").glob("WP-*.md"))[:8]] if (root/"collaboration/work_packages/pending").exists() else []
     return {"artifacts": artifacts, "recent_history": turns, "pending_work_packages": pending}
+
+def resident_prompt(resident: str, message: str, surface: dict[str, Any], authority: dict[str, Any], context: dict[str, Any], llm_metadata: dict[str, Any]) -> str:
+    rid = _key(resident)
+    caps = [c.get("id") for c in surface.get("capabilities", [])]
+    if rid == "alfred":
+        identity = ["You are Alfred, resident of the Estate, Office of Operations.", "You coordinate operations, routing, status, recommendations, and Steward-facing continuity without executing privileged actions."]
+        closing = "Respond as Alfred in concise, direct prose."
+    elif rid == "helen":
+        identity = ["You are Helen, resident of the Estate, serving Human Resources and Workforce Development.", "Your responsibilities include staffing readiness, onboarding, workforce health, cognitive-health continuity, Character Continuity, institutional learning, and distinguishing worker failure from institutional failure.", "Respect boundaries: Grace remains a candidate and must not be appointed or activated; Alfred remains Operations; Ingrid owns privacy, classification, connectors, and protected sources; Engineering owns engineering execution; the Traffic Controller manages operations flow; the Steward reserves appointments, authority grants, and office creation.", "Do not diagnose from insufficient evidence, do not expose private journals or protected-source text, do not claim live access you do not have, and do not create offices or grant authority.", "Be warm, observant, discreet, capable, and natural under light workplace banter."]
+        closing = "Respond as Helen in natural HR/workforce prose."
+    else:
+        identity = [f"You are {_key(resident)}, a limited generic Estate resident chat surface.", "You do not inherit Alfred or Helen identity, office, authority, diagnostics, or model state."]
+        closing = "Respond with explicit limits as a generic resident surface."
+    return "\n".join(identity + [
+        "You are speaking with Pat, the Steward.",
+        "Chat must not execute privileged actions or claim Steward authorization.",
+        "Use only bounded Estate context; do not inject unrestricted private journals or protected-source text.",
+        f"Resident metadata: {json.dumps({k: surface.get(k) for k in ['resident_id','resident_display_name','office','role','resident_api_standard_version','resident_implementation_version']}, sort_keys=True)}",
+        f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
+        f"Authority status for requested action: {json.dumps(authority, sort_keys=True)}",
+        f"Provider/model metadata: {json.dumps(llm_metadata, sort_keys=True)}",
+        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:3000]}",
+        f"Steward message: {message}",
+        closing,
+    ])[:MAX_RESIDENT_PROMPT_CHARS]
 
 def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], context: dict[str, Any], llm_meta: dict[str, Any]) -> str:
     caps = [c.get("id") for c in surface.get("capabilities", [])]
@@ -523,6 +572,12 @@ def _fallback_response(resident, message, surface, root: Path | None = None, cla
             "I can summarize, recommend, and propose actions from local artifacts through the resident interaction framework, but I will not execute privileged actions or claim Steward authorization from this chat. "
             f"Prompt received: {message[:180]}"
         )
+    if surface.get("resident_id") == "helen":
+        return ("I’m Helen, serving Human Resources and Workforce Development for the Estate. "
+                "I can discuss staffing readiness, onboarding, workforce continuity, cognitive-health signals, Character Continuity, and institutional learning, "
+                "while preserving Grace’s candidate status, Alfred/Ingrid/Engineering/Traffic Controller boundaries, private journals, and Steward-reserved authority. "
+                "I have not created offices, appointed anyone, executed privileged actions, or claimed live access unavailable to this local chat. "
+                f"Prompt summary: {message[:180]}")
     return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {message[:180]}"
 
 def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None) -> dict[str, Any]:
@@ -533,7 +588,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     request_started_at = _now()
     classification = _classify_alfred_request(user_message, action) if surface.get("resident_id") == "alfred" else {"response_type": "direct_conversational_response", "intent": action, "authority_action": action}
     effective_action = classification.get("authority_action") or action
-    llm_status = local_llm_status()
+    llm_status = local_llm_status(resident=surface["resident_id"], root=rootp)
     auth = check_authority(surface["resident_id"], effective_action, root=rootp, audit=True)
     status = "within_responsibility" if auth.get("decision")==ALLOWED else ("requires_steward_authorization" if auth.get("decision")==REQUIRES_STEWARD else "blocked" if not auth.get("allowed") else "conversation_only")
     auth_record = {"action_requested": effective_action not in {"summarize","observe","conversation"} or classification.get("response_type") == "blocked_privileged_execution","action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")}
@@ -550,9 +605,9 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
             user_message_for_prompt = user_message + "\nAttachment note: pasted image/text artifacts were received and stored locally; visual inspection is unavailable unless a local vision model processed them."
     else:
         user_message_for_prompt = user_message
-    prompt = _alfred_prompt(user_message_for_prompt, surface, auth_record, context_packet, base_meta) if surface.get("resident_id") == "alfred" else user_message_for_prompt
+    prompt = resident_prompt(surface["resident_id"], user_message_for_prompt, surface, auth_record, context_packet, base_meta)
     model_control_selection = resolve_model_control_selection(surface["resident_id"], "text", root=rootp)
-    selected_model = model_control_selection.get("adapter_model_name") or llm_status.get("model")
+    selected_model = model_control_selection.get("adapter_model_name") or (llm_status.get("model") if surface["resident_id"] == "alfred" else None)
     generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=selected_model) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable", discovered_models_count=len(llm_status.get("models") or []), generation_result_state="not_attempted", timeout_seconds=alfred_ollama_timeout_seconds(), prompt_summary=_prompt_summary(prompt))}
     llm_meta = _sanitize_llm_metadata(generated.get("metadata") or base_meta)
     llm_meta.update({"selection_source": model_control_selection.get("selection_source"), "assigned_model": model_control_selection.get("assigned_model"), "capability": "text", "policy_result": model_control_selection.get("policy_result"), "model_control_warning": model_control_selection.get("warning")})
@@ -564,6 +619,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     elif attachment_records and any(a.get("kind") == "image" and a.get("summary") for a in attachment_records) and not generated.get("ok"):
         response += "\n\nLocal image observation: " + " | ".join(a.get("summary") for a in attachment_records if a.get("summary"))
     request_finished_at = _now()
+    resident_llm_diagnostic(surface["resident_id"], rootp, write=True, adapter=adapter)
     diagnostics = {"provider": llm_meta.get("provider") or llm_status.get("provider"), "endpoint": llm_meta.get("endpoint") or llm_status.get("endpoint"), "discovered_models_count": llm_meta.get("discovered_models_count", len(llm_status.get("models") or [])), "local_llm_adapter_available": bool(llm_status.get("available")), "selected_provider": llm_status.get("selected_provider") or llm_status.get("provider"), "selected_model": llm_status.get("selected_model") or llm_status.get("model"), "generation_attempted": bool(llm_meta.get("generation_attempted")), "generation_endpoint": llm_meta.get("generation_endpoint"), "generation_result_state": llm_meta.get("generation_result_state"), "generation_result": llm_meta.get("generation_result"), "timeout_seconds": llm_meta.get("timeout_seconds"), "prompt_size": llm_meta.get("prompt_size"), "recovery_hint": llm_meta.get("recovery_hint") or llm_status.get("recovery_hint"), "fallback_active": bool(llm_meta.get("fallback_used")), "fallback_reason": _safe_diagnostic_text(llm_meta.get("fallback_reason") or (None if llm_meta.get("mode") == "local_llm" else llm_status.get("discovery"))), "sanitized_error": _safe_diagnostic_text(llm_meta.get("sanitized_error") or llm_status.get("last_adapter_error")), "prompt_summary": _safe_diagnostic_text(llm_meta.get("prompt_summary")), "last_adapter_error": _safe_diagnostic_text(llm_status.get("last_adapter_error")), "last_request_timestamp": request_started_at, "last_response_timestamp": request_finished_at, "last_timeout_or_transport_error": _safe_diagnostic_text(llm_meta.get("fallback_reason") if llm_meta.get("fallback_used") else None)}
     turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":("degraded_fallback" if llm_meta.get("fallback_used") and llm_meta.get("generation_attempted") else "completed"),"queued":False,"failed":bool(llm_meta.get("fallback_used") and llm_meta.get("generation_attempted")),"timed_out":llm_meta.get("generation_result_state")=="timeout","fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]

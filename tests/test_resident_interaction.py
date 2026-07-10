@@ -92,6 +92,24 @@ def test_process_chat_uses_mocked_local_llm_and_distinguishes_intents(monkeypatc
     assert mode["turn"]["llm"]["fallback_used"] is False
 
 
+def test_process_chat_uses_mocked_local_llm_for_helen(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    class HelenMockAdapter(MockOllamaAdapter):
+        def generate(self, *, resident, prompt, model=None):
+            assert resident == "helen"
+            assert "You are Helen" in prompt
+            assert "Human Resources and Workforce Development" in prompt
+            assert "Grace remains a candidate" in prompt
+            return {"ok": True, "text": "I’m Helen in Human Resources and Workforce Development; I support staffing, onboarding, continuity, cognitive health, and institutional learning without appointing Grace or taking Alfred’s role.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "fallback_reason": None, "generation_attempted": True, "generation_endpoint": f"{self.endpoint}/api/generate", "generation_result_state": "generated", "discovered_models_count": 2}}
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", HelenMockAdapter)
+    payload = process_chat("helen", "Who are you?", root=tmp_path)
+    text = payload["turn"]["resident_response"]
+    assert "Helen" in text and "Human Resources and Workforce Development" in text
+    assert "Alfred" in text and "generic assistant" not in text
+    assert payload["turn"]["resident_id"] == "helen"
+    assert payload["turn"]["llm"]["fallback_used"] is False
+
+
 def test_process_chat_falls_back_with_metadata_when_ollama_unavailable(monkeypatch, tmp_path):
     from estate.core import resident_interaction as mod
     monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
@@ -356,3 +374,21 @@ def test_wp0217_diagnostics_include_timeout_generation_and_prompt(monkeypatch, t
     assert diag["timeout_seconds"] == 61.0
     assert diag["generation_result"] == "not_attempted"
     assert "prompt_size_summary" in diag
+
+
+def test_resident_prompt_is_resident_specific(tmp_path):
+    from estate.core.resident_interaction import resident_prompt, resident_surface
+    a = resident_prompt('alfred','hello',resident_surface('alfred', tmp_path),{}, {}, {})
+    h = resident_prompt('helen','hello',resident_surface('helen', tmp_path),{}, {}, {})
+    u = resident_prompt('unknown','hello',resident_surface('unknown', tmp_path),{}, {}, {})
+    assert 'You are Alfred' in a and 'Human Resources and Workforce Development' not in a
+    assert 'You are Helen' in h and 'Human Resources and Workforce Development' in h and 'Grace remains a candidate' in h
+    assert 'limited generic Estate resident' in u and 'You are Alfred' not in u
+
+
+def test_helen_diagnostic_path_and_fallback(tmp_path):
+    from estate.core.resident_interaction import process_chat
+    res = process_chat('helen', 'Who are you?', root=tmp_path)
+    assert res['turn']['resident_id'] == 'helen'
+    assert res['turn']['llm']['fallback_used'] is True
+    assert (tmp_path/'runtime/residents/helen/llm_diagnostics.json').exists()

@@ -1,0 +1,46 @@
+{
+  "available_resident_models": [
+    "estate/alfred",
+    "estate/helen"
+  ],
+  "cloud_provider_called": false,
+  "completed_at": "2026-07-10T04:37:43+00:00",
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/resident_gateway.py",
+    "src/estate/cli/main.py",
+    "src/estate/model_control/assignments.py",
+    "tests/test_resident_interaction.py",
+    "tests/test_resident_gateway.py",
+    "docs/residents/Open_WebUI_Estate_Resident_Gateway_Setup_v0_1.md",
+    "operations/residents/helen/WP-4001_helen_activation_report.md",
+    "runtime/residents/helen/WP-4001_helen_activation_report.json",
+    "operations/validation/reports/WP-4001_multi_resident_chat_gateway_and_helen_activation.md",
+    "collaboration/work_packages/completions/WP-4001_codex_done.json"
+  ],
+  "grace_appointed_or_activated": false,
+  "helen_identity_prompt_status": "implemented",
+  "helen_local_llm_path_status": "implemented_with_model_control_and_deterministic_fallback",
+  "known_limitations": [
+    "Streaming unsupported",
+    "Manual Open WebUI validation pending",
+    "Live provider depends on local Ollama and model-control assignments"
+  ],
+  "local_provider_called": false,
+  "manual_open_webui_validation_status": "pending_not_run_in_this_environment",
+  "privileged_action_executed_from_chat": false,
+  "resident_gateway_status": "implemented_local_non_streaming",
+  "status": "completed",
+  "summary": "Shared resident prompts and OpenAI-compatible local resident gateway implemented; Helen activated without activating Grace.",
+  "validation_commands": [
+    "pytest -q tests/test_resident_interaction.py tests/test_resident_gateway.py",
+    "pytest -q",
+    "python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py tests/test_helen_workforce.py tests/test_helen_workforce_cli.py tests/character_architecture/test_helen_resident_package.py tests/test_resident_gateway.py -q"
+  ],
+  "validation_results": {
+    "pytest -q": "failed during collection due pre-existing import-file-name collisions between collaboration/workstreams/WP-020x/proposed/tests and tests/ office action modules; unrelated to WP-4001 changes",
+    "pytest -q tests/test_resident_interaction.py tests/test_resident_gateway.py": "passed (36 passed)",
+    "python -m pytest tests/test_resident_interaction.py tests/test_steward_command_center.py tests/test_helen_workforce.py tests/test_helen_workforce_cli.py tests/character_architecture/test_helen_resident_package.py tests/test_resident_gateway.py -q": "passed (102 passed)"
+  },
+  "work_package_id": "WP-4001"
+}
