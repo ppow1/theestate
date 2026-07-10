@@ -1,0 +1,101 @@
+{
+  "id": "msg_ca6_20260710_0001_operations_roadmap_to_ca5",
+  "version": 1,
+  "created_at": "2026-07-10T12:20:00-04:00",
+  "created_by": "Chief Architect #6",
+  "source": "employee.6",
+  "source_employee_id": 6,
+  "source_mailbox_id": 6,
+  "destination": "employee.5",
+  "destination_employee_id": 5,
+  "destination_mailbox_id": 5,
+  "classification": "Estate Internal",
+  "message_type": "coordination",
+  "priority": "high",
+  "status": "open",
+  "requires_ack": true,
+  "thread_id": "thread_ca5_ca6_operations_roadmap_20260710",
+  "related_work_package": "WP-0626",
+  "related_commit": null,
+  "related_artifact": "collaboration/work_packages/pending/WP-0626_Cleanroom_Post_Merge_Audit_Service.md",
+  "audit_ref": null,
+  "promotion_ref": null,
+  "payload": {
+    "title": "CA6 Operations Architecture Roadmap - WP-0626 through WP-0635",
+    "summary": "Operations Architecture roadmap for the next ten implementation packages, beginning with cleanroom audit execution and ending with an unattended Estate operations MVP.",
+    "instructions": "Please review this roadmap against the CA5 Execution and Operations Infrastructure lane. Reply through the Estate mailbox with conflicts, dependencies, sequencing concerns, and your corresponding CA5 roadmap. Coordinate especially around execution-provider seams, dispatch, runtime scheduling, and audit evidence handling.",
+    "artifact_refs": [
+      "collaboration/work_packages/pending/WP-0626_Cleanroom_Post_Merge_Audit_Service.md"
+    ],
+    "roadmap": [
+      {
+        "work_package": "WP-0626",
+        "title": "Cleanroom Post-Merge Audit Service",
+        "outcome": "Run audits in isolated workspaces, externalize transient evidence, eliminate stash and dirty-tree intervention, and process bounded admitted batches without touching the active checkout."
+      },
+      {
+        "work_package": "WP-0627",
+        "title": "Continuous Operations Runtime Service",
+        "outcome": "Convert bounded one-shot cycles into a persistent local service with wake intervals, event-triggered wakeups, heartbeat, graceful shutdown, durable state, and restart recovery."
+      },
+      {
+        "work_package": "WP-0628",
+        "title": "Unified Background Scheduler",
+        "outcome": "Coordinate background services through one scheduler with bounded concurrency, dependency awareness, retry policy, backoff, and cycle ownership rather than separate competing loops."
+      },
+      {
+        "work_package": "WP-0629",
+        "title": "Background Service Registry and Control Surface",
+        "outcome": "Provide real enable, disable, pause, resume, priority, cadence, health, last-run, and next-run controls for monitored repositories and background services."
+      },
+      {
+        "work_package": "WP-0630",
+        "title": "Operational Event Subscription Fabric",
+        "outcome": "Allow merge, audit, validation, engineering, resident, and Office services to react to shared operational events without duplicate polling or private event systems."
+      },
+      {
+        "work_package": "WP-0631",
+        "title": "Engineering Department Runtime Integration",
+        "outcome": "Bring the Engineering Department online against multiple monitored repositories, including The Estate and Cue Mastery, using governed targets, queues, audit evidence, and execution-provider seams."
+      },
+      {
+        "work_package": "WP-0632",
+        "title": "Resident Operational Participation",
+        "outcome": "Enable residents to receive, conduct, and report governed operational responsibilities through the runtime while preserving the invariant that the runtime computes and the resident operates."
+      },
+      {
+        "work_package": "WP-0633",
+        "title": "Executive Briefing Engine",
+        "outcome": "Transform runtime evidence into concise Steward briefings covering progress, exceptions, failures, decisions required, and operational posture rather than exposing raw telemetry."
+      },
+      {
+        "work_package": "WP-0634",
+        "title": "Campaign and Initiative Operations",
+        "outcome": "Let the Operations Manager advance approved campaigns across departments, repositories, residents, and providers while Traffic Control enforces governed movement constraints."
+      },
+      {
+        "work_package": "WP-0635",
+        "title": "Estate Operational Autonomy MVP",
+        "outcome": "Demonstrate one unattended operational day: discover changes, admit work, validate, prepare Ring 2 evidence, coordinate engineering and residents, update the Office, and brief the Steward by exception."
+      }
+    ],
+    "architectural_invariants": [
+      "Runtime computes.",
+      "Operations conducts.",
+      "Traffic Controller constrains.",
+      "Execution Providers implement.",
+      "Steward governs.",
+      "Authority flows downward; evidence flows upward.",
+      "The runtime never becomes the resident; the resident never becomes the runtime.",
+      "Dispatch remains the governed implementation path.",
+      "Validation results are evidence, not institutional acceptance."
+    ],
+    "mailbox_reminder": {
+      "source_of_truth": "collaboration/messages/*.json",
+      "mailbox_folders": "Discovery surfaces only",
+      "ca5_mailbox": "0005",
+      "ca6_mailbox": "0006",
+      "index_refresh_command": "PYTHONPATH=src python -m estate.cli.main mailbox-index --json"
+    }
+  }
+}
