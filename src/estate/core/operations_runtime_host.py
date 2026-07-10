@@ -225,7 +225,13 @@ class OperationsRuntimeHost:
             except Exception:
                 md_summary = {}
         task_state = self._query_windows_task() if os.name == "nt" else {"scheduled_task_exists": bool(install), "scheduled_task_state": None}
-        return {"installed": bool(install), **task_state, "host_state": "running" if running else "stopped", "pid": pid or None, "state_dir": str(self.state_dir), "heartbeat_age_seconds": _iso_age_seconds(heartbeat.get("heartbeat_at")), "runtime_code_revision": self._runtime_revision(), "watched_remote_ref": md_summary.get("watched_remote_ref", "origin/main"), "last_fetch_at": md_summary.get("last_fetch_at"), "last_scanned_commit": md_summary.get("last_scanned_commit"), "last_processed_work_package": summary.get("latest_admitted_work_package"), "cycle_state": summary.get("operations_runtime_state"), "last_verdict": summary.get("latest_audit_verdict"), "blocking_fault": (summary.get("runtime_warnings") or md_summary.get("errors") or [None])[0], "runtime_status": runtime, "lock_present": self.lock_path.exists()}
+        heartbeat_age = _iso_age_seconds(heartbeat.get("heartbeat_at"))
+        heartbeat_current = heartbeat_age is not None and heartbeat_age < STALE_LOCK_SECONDS
+        host_pid_alive = bool(pid and _pid_alive(pid))
+        lock_present = self.lock_path.exists()
+        host_process_state = "running" if host_pid_alive and lock_present else ("stale_lock_dead_pid" if lock_present else "stopped")
+        host_state = "running" if host_pid_alive and heartbeat_current and lock_present else "stopped"
+        return {"installed": bool(install), **task_state, "host_process_state": host_process_state, "host_pid_alive": host_pid_alive, "heartbeat_state": heartbeat.get("state"), "heartbeat_age_seconds": heartbeat_age, "host_state": host_state, "pid": pid or None, "state_dir": str(self.state_dir), "current_cycle_state": "running" if heartbeat.get("state") == "running" else None, "last_completed_cycle_state": summary.get("operations_runtime_state"), "last_completed_cycle_at": summary.get("last_cycle_at"), "runtime_code_revision": self._runtime_revision(), "watched_remote_ref": md_summary.get("watched_remote_ref", "origin/main"), "last_fetch_at": md_summary.get("last_fetch_at"), "last_scanned_commit": md_summary.get("last_scanned_commit"), "last_processed_work_package": summary.get("latest_admitted_work_package"), "cycle_state": summary.get("operations_runtime_state"), "last_verdict": summary.get("latest_audit_verdict"), "blocking_fault": (summary.get("runtime_warnings") or md_summary.get("errors") or [None])[0], "runtime_status": runtime, "lock_present": lock_present}
 
     def _launcher_path(self) -> Path:
         return self.state_dir / "run_operations_runtime_host.ps1"
@@ -237,8 +243,9 @@ class OperationsRuntimeHost:
             "$ErrorActionPreference = 'Stop'\n"
             f"$env:{ROOT_ENV} = {_quote_ps(str(self.root))}\n"
             f"$env:{HOST_ENV} = {_quote_ps(str(self.state_dir))}\n"
+            f"$env:PYTHONPATH = {_quote_ps(str(self.root / 'src'))}\n"
             f"Set-Location {_quote_ps(str(self.root))}\n"
-            f"& {_quote_ps(sys.executable)} -m estate.cli.main operations-runtime host run-foreground --discover-merges --auto-admit\n",
+            f"& {_quote_ps(sys.executable)} -m estate.cli.main operations-runtime host run-foreground --discover-merges --auto-admit --process-audits --max-audit-requests 5\n",
             encoding="utf-8",
         )
         return launcher
@@ -300,18 +307,34 @@ class OperationsRuntimeHost:
     def bootstrap(cls, target: str = "estate-main", *, runtime_code_root: Path | None = None, source_root: Path | None = None) -> dict[str, Any]:
         source = _root(source_root)
         code_root = (runtime_code_root or DEFAULT_RUNTIME_CODE_ROOT).resolve()
-        _run_command(["git", "fetch", "--quiet", "origin"], cwd=source)
-        if code_root.exists():
-            _run_command(["git", "fetch", "--quiet", "origin"], cwd=code_root)
-            _run_command(["git", "checkout", "--quiet", "-B", "main", "origin/main"], cwd=code_root)
-        else:
+        fetch = _run_command(["git", "fetch", "--quiet", "origin", "main"], cwd=source)
+        if fetch.returncode != 0:
+            raise OperationsRuntimeHostError(fetch.stderr or fetch.stdout or "failed to fetch source origin/main")
+        remote_url = _run_command(["git", "remote", "get-url", "origin"], cwd=source).stdout.strip() or str(source)
+        source_rev = _run_command(["git", "rev-parse", "HEAD"], cwd=source).stdout.strip()
+        remote_rev = _run_command(["git", "rev-parse", "origin/main"], cwd=source).stdout.strip()
+        if not remote_rev:
+            raise OperationsRuntimeHostError("could not resolve source origin/main")
+        if code_root.exists() and not (code_root / ".git").exists():
+            raise OperationsRuntimeHostError(f"runtime workspace exists but is not a git checkout: {code_root}")
+        if not code_root.exists():
             code_root.parent.mkdir(parents=True, exist_ok=True)
-            clone = _run_command(["git", "clone", "--quiet", "--branch", "main", str(source), str(code_root)])
+            clone = _run_command(["git", "clone", "--quiet", remote_url, str(code_root)])
             if clone.returncode != 0:
                 raise OperationsRuntimeHostError(clone.stderr or clone.stdout or "failed to create runtime code workspace")
-            origin = _run_command(["git", "remote", "get-url", "origin"], cwd=source)
-            if origin.returncode == 0 and origin.stdout.strip():
-                _run_command(["git", "remote", "set-url", "origin", origin.stdout.strip()], cwd=code_root)
+        set_url = _run_command(["git", "remote", "set-url", "origin", remote_url], cwd=code_root)
+        if set_url.returncode != 0:
+            raise OperationsRuntimeHostError(set_url.stderr or set_url.stdout or "failed to set runtime origin")
+        runtime_fetch = _run_command(["git", "fetch", "--quiet", "origin", "main"], cwd=code_root)
+        if runtime_fetch.returncode != 0:
+            raise OperationsRuntimeHostError(runtime_fetch.stderr or runtime_fetch.stdout or "failed to fetch runtime origin/main")
+        reset = _run_command(["git", "reset", "--hard", "origin/main"], cwd=code_root)
+        if reset.returncode != 0:
+            raise OperationsRuntimeHostError(reset.stderr or reset.stdout or "failed to reset runtime workspace")
+        runtime_rev = _run_command(["git", "rev-parse", "HEAD"], cwd=code_root).stdout.strip()
+        runtime_matches_remote = bool(runtime_rev and runtime_rev == remote_rev)
+        if not runtime_matches_remote:
+            raise OperationsRuntimeHostError("runtime workspace revision does not match origin/main")
         state_dir = code_root.parent / "state"
         host = cls(code_root, state_dir)
         installed = host.install()
@@ -324,4 +347,4 @@ class OperationsRuntimeHost:
                 break
             time.sleep(0.1)
         status = host.status()
-        return {"target": target, "remote_ref_used": "origin/main", "runtime_code_workspace": str(code_root), "scheduled_task_name": TASK_NAME, "scheduled_task_installed": bool(installed.get("installed")), "scheduled_task_verified": bool(installed.get("scheduled_task_verified") or os.name != "nt"), "host_started": bool(started.get("pid")), "heartbeat_verified": heartbeat_verified or status.get("host_state") == "running", "active_checkout_modifications_performed": False, "pending_only_commits_suppressed": True, "eligible_completed_work_detected": None, "provider_execution_performed": False, "dispatch_execution_performed": False, "install": installed, "start": started, "status": status}
+        return {"target": target, "remote_ref_used": "origin/main", "source_checkout_revision": source_rev, "remote_main_revision": remote_rev, "runtime_workspace_revision": runtime_rev, "runtime_matches_remote": runtime_matches_remote, "runtime_code_workspace": str(code_root), "scheduled_task_name": TASK_NAME, "scheduled_task_installed": bool(installed.get("installed")), "scheduled_task_verified": bool(installed.get("scheduled_task_verified") or os.name != "nt"), "host_started": bool(started.get("pid")), "heartbeat_verified": heartbeat_verified or status.get("host_state") == "running", "active_checkout_modifications_performed": False, "pending_only_commits_suppressed": True, "eligible_completed_work_detected": None, "provider_execution_performed": False, "dispatch_execution_performed": False, "install": installed, "start": started, "status": status}

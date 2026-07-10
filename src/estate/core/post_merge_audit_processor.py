@@ -10,6 +10,7 @@ from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.paths import ESTATE_ROOT
 from estate.core.post_merge_validation_pipeline import PipelineConfig, PostMergeValidationPipeline, utc_now_iso
+from estate.core.post_merge_audit_lifecycle import FINAL_VERDICTS
 
 BASE = Path("runtime/post_merge_audit")
 REQUESTS = BASE / "requests"
@@ -80,7 +81,8 @@ class PostMergeAuditProcessor:
             r = self.process_next();
             if not r.get("processed"): break
             results.append(r)
-        payload = {"processed_count": len(results), "results": results, "provider_execution_performed": False, "dispatch_execution_performed": False}
+        reason = None if results else self._zero_throughput_reason()
+        payload = {"processed_count": len(results), "results": results, "zero_throughput_reason": reason, "provider_execution_performed": False, "dispatch_execution_performed": False}
         self._write_status(payload); return payload
 
     def demonstrate(self, work_package: str, pr: str | int | None = None) -> dict[str, Any]:
@@ -124,9 +126,16 @@ class PostMergeAuditProcessor:
             for vp in paths:
                 try: d = _read_json(vp)
                 except Exception: continue
-                if d.get("target_id") == req.get("target_id") and d.get("work_package_id") == req.get("work_package_id") and d.get("verdict") in {"accepted", "accepted_with_notes", "ring2_required", "needs_repair", "blocked", "not_merged", "workspace_failed", "validation_failed"}:
+                if d.get("target_id") == req.get("target_id") and d.get("work_package_id") == req.get("work_package_id") and d.get("verdict") in FINAL_VERDICTS:
                     return True
         return False
+
+    def _zero_throughput_reason(self) -> str:
+        reqs = self.list_requests()
+        if not reqs or not any(r.get("state") == "pending" for r in reqs): return "no_pending_requests"
+        if all(r.get("state") in {"superseded", "quarantined", "manual_hold"} for r in reqs): return "all_requests_held"
+        if all(self._has_final_verdict(r) or r.get("state") in {"completed", "ring2_required", "blocked", "validation_failed", "workspace_failed", "already_audited"} for r in reqs): return "all_requests_terminal"
+        return "processor_fault"
 
     def summary(self) -> dict[str, Any]:
         reqs = self.list_requests()

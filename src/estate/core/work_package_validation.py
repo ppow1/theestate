@@ -52,6 +52,25 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
+    "WP-0638": {
+        "recipe_id": "wp-0638-automatic-audit-queue-runtime-host-integrity",
+        "title": "WP-0638 — Automatic Audit Queue and Runtime Host Integrity",
+        "description": "Validates idempotent automatic admission, active-capacity accounting, same-cycle audit processing, bootstrap revision synchronization, launcher environment, host status semantics, documentation, and completion receipt.",
+        "required_checks": ["Expected artifacts exist", "Runtime modules compile", "Focused runtime tests pass", "Completion receipt confirms safety boundaries"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/post_merge_audit_lifecycle.py", "src/estate/core/merge_discovery_admission.py", "src/estate/core/post_merge_audit_processor.py", "src/estate/core/operations_runtime.py", "src/estate/core/operations_runtime_host.py", "docs/integration/automatic_audit_queue_and_runtime_host_integrity.md", "collaboration/work_packages/completions/WP-0638_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Recipe returns no_recipe", "Provider or dispatch execution is reported", "Runtime workspace revision verification is absent"],
+        "success_criteria": ["Existing pending requests are not readmitted", "Terminal requests do not consume active capacity", "Same-cycle processing is visible", "Host status distinguishes process, heartbeat, and completed cycles"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/post_merge_audit_lifecycle.py','src/estate/core/merge_discovery_admission.py','src/estate/core/post_merge_audit_processor.py','src/estate/core/operations_runtime.py','src/estate/core/operations_runtime_host.py','docs/integration/automatic_audit_queue_and_runtime_host_integrity.md','collaboration/work_packages/completions/WP-0638_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/merge_discovery_admission.py src/estate/core/post_merge_audit_processor.py src/estate/core/operations_runtime.py src/estate/core/operations_runtime_host.py"),
+            _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+            _cmd("pytest -q tests/test_merge_discovery_admission.py tests/test_post_merge_audit_processor.py tests/test_operations_runtime.py tests/test_operations_runtime_host.py tests/test_merge_discovery_runtime.py --basetemp Temp/pytest-wp0638"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0638_codex_done.json').read_text()); assert d['validation_recipe_registered'] is True; assert d['provider_execution_performed'] is False; assert d['dispatch_execution_performed'] is False; assert d['runtime_matches_remote'] is True; assert d['launcher_pythonpath_verified'] is True\""),
+        ],
+    },
+
 
     "WP-0521": {
         "recipe_id": "wp-0521-office-end-to-end-regression-recovery-operational-acceptance",
