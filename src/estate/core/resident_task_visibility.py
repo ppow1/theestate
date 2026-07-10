@@ -14,7 +14,7 @@ from typing import Any
 
 from estate.core.paths import ESTATE_ROOT
 
-SCHEMA_VERSION = "resident_task_status.v1"
+SCHEMA_VERSION = "office_resident_task_board.v1"
 TASK_STATUS_PATH = Path("runtime/residents/task_status.json")
 STALE_AFTER_HOURS = 24
 PRIVATE_FIELDS = {"private_journal", "detailed_workforce_assessment", "health_notes", "confidential_notes"}
@@ -89,7 +89,67 @@ def unread_message_count(messages: list[dict[str, Any]], person: dict[str, Any])
     return sum(1 for m in messages if str(m.get("destination") or m.get("to") or m.get("destination_mailbox_id") or "") in aliases and m.get("status", "open") not in {"closed", "archived"} and m.get("ack_status") != "acknowledged")
 
 
-def build_resident_task_board(root: str | Path | None = None) -> dict[str, Any]:
+def _norm(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def _status_kind(entry: dict[str, Any], availability: str, blocker: Any, stale: bool) -> str:
+    raw = _norm(entry.get("status") or entry.get("state") or availability)
+    if stale:
+        return "stale"
+    if blocker:
+        return "blocked"
+    if raw in {"completed", "complete", "done"}:
+        return "completed"
+    if raw in {"paused", "pause"}:
+        return "paused"
+    if raw in {"waiting", "waiting_on", "waiting_for_steward", "pending"} or entry.get("waiting_on"):
+        return "waiting"
+    if raw in {"blocked", "degraded"}:
+        return "blocked"
+    if raw in {"working", "active", "available", "online"}:
+        return "active"
+    return "unknown"
+
+
+def _elapsed_seconds(value: Any, now: datetime) -> int | None:
+    parsed = _parse_dt(value)
+    if parsed is None:
+        return None
+    return max(0, int((now - parsed).total_seconds()))
+
+
+def _matches(row: dict[str, Any], filters: dict[str, Any]) -> bool:
+    for field, value in filters.items():
+        if value in (None, "", []):
+            continue
+        hay = row.get(field)
+        if field == "staleness":
+            want = str(value).lower() in {"1", "true", "stale", "yes"}
+            if bool(row.get("stale_status")) != want:
+                return False
+        elif field == "blocker":
+            want = str(value).lower() in {"1", "true", "blocked", "yes"}
+            if bool(row.get("blocker")) != want:
+                return False
+        elif field == "resident":
+            if _slug(value) not in {_slug(row.get("resident_id")), _slug(row.get("resident_name")), _slug(row.get("task_owner"))}:
+                return False
+        elif field == "office":
+            if _norm(value) not in _norm(row.get("office")):
+                return False
+        elif field == "project":
+            if _norm(value) not in _norm(row.get("related_work_package_or_project")):
+                return False
+        elif field == "status":
+            if _norm(value) != _norm(row.get("status")) and _norm(value) != _norm(row.get("availability_state")):
+                return False
+        elif _norm(value) not in _norm(hay):
+            return False
+    return True
+
+
+def build_resident_task_board(root: str | Path | None = None, **filters: Any) -> dict[str, Any]:
     base = _root(root)
     now_dt = datetime.now(timezone.utc)
     residents = _read_json(base / "data/registry/residents.json", []) or []
@@ -118,25 +178,38 @@ def build_resident_task_board(root: str | Path | None = None) -> dict[str, Any]:
             "resident_name": resident.get("name"),
             "employee_id": person.get("employee_id"),
             "mailbox_id": person.get("mailbox_id"),
-            "goal": public.get("goal") or resident.get("role"),
-            "current_task": public.get("current_task") or runtime.get("current_duty"),
+            "current_goal": public.get("current_goal") or public.get("goal") or resident.get("role"),
+            "goal": public.get("current_goal") or public.get("goal") or resident.get("role"),
+            "current_task": public.get("current_task") or runtime.get("current_duty") or "unknown",
+            "task_owner": public.get("task_owner") or person.get("display_name") or resident.get("name"),
+            "office": public.get("office") or person.get("current_office") or resident.get("office"),
             "last_meaningful_movement": movement,
             "waiting_on": public.get("waiting_on"),
             "blocker": blocker,
             "next_action": public.get("next_action"),
             "next_checkpoint": public.get("next_checkpoint"),
             "availability_state": public.get("availability_state") or runtime.get("presence_state") or "unknown",
+            "status": _status_kind(public, public.get("availability_state") or runtime.get("presence_state") or "unknown", blocker, stale),
+            "elapsed_seconds": _elapsed_seconds(movement, now_dt),
+            "elapsed_time": None if _elapsed_seconds(movement, now_dt) is None else str(timedelta(seconds=_elapsed_seconds(movement, now_dt))),
+            "related_work_package_or_project": public.get("related_work_package") or public.get("work_package") or public.get("project") or "unknown",
+            "source_artifact": public.get("source_artifact") or str(TASK_STATUS_PATH),
+            "source_last_updated": public.get("source_last_updated") or movement,
+            "detail_navigation": {"action_id": "resident_task_board.open_detail", "resident_id": resident.get("id"), "target_tab": "resident-task-board"},
             "unread_message_count": unread_message_count(all_messages, person),
             "escalation_state": escalation,
             "stale_status": stale,
             "source_links": [p for p in ["data/registry/residents.json", "data/registry/personnel.json", str(TASK_STATUS_PATH), "runtime/residents/presence.json"] if (base / p).exists()],
         })
-    return {"schema_version": SCHEMA_VERSION, "generated_at": _now(), "privacy": "participant board omits private journals and detailed workforce assessments", "participants": rows}
+    active_filters = {k: v for k, v in filters.items() if v not in (None, "", [])}
+    if active_filters:
+        rows = [row for row in rows if _matches(row, active_filters)]
+    return {"schema_version": SCHEMA_VERSION, "generated_at": _now(), "privacy": "participant board omits private journals and detailed workforce assessments", "filters": active_filters, "participants": rows}
 
 
-def write_resident_task_board(root: str | Path | None = None) -> dict[str, Any]:
+def write_resident_task_board(root: str | Path | None = None, **filters: Any) -> dict[str, Any]:
     base = _root(root)
-    payload = build_resident_task_board(base)
+    payload = build_resident_task_board(base, **filters)
     path = _write_json(base / "runtime/office/steward_participant_board.json", payload)
     return {"path": str(Path(path).relative_to(base)), "board": payload}
 

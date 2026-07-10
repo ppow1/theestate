@@ -40,6 +40,7 @@ from estate.core.office_parking_lot_controls import parking_action, roadmap_acti
 from estate.core.office_personnel_directory import refresh_personnel_directory, open_employee_detail, route_personnel_mailbox, route_personnel_conversation
 from estate.core.office_validation_actions import inspect_validation_control_center, request_validation, acknowledge_failure, automatic_validator_status, open_artifact as open_validation_artifact, governed_retry
 from estate.core.office_mailbox_control import refresh_mailbox_control_center, open_message_detail, mark_message_read_state, route_message, local_attention_acknowledge, inspect_delivery_failures
+from estate.core.resident_task_visibility import write_resident_task_board, build_resident_task_board
 from estate.core.collaboration_messages import acknowledge_message, create_reply
 from estate.core.office_personnel_directory import open_employee_detail as mailbox_open_employee_detail
 
@@ -703,6 +704,21 @@ def mailbox_inspect_failures(root=None, **params: Any) -> OfficeActionResult:
     payload=inspect_delivery_failures(_root(root))
     return _completed('delivery.inspect_failures', 'Inspect delivery failures', 'notifications', 'estate.core.office_mailbox_control.inspect_delivery_failures', f"Delivery failure inspection found {payload.get('failure_count', 0)} actionable failure source(s).", read=payload.get('sources') or [], written=['runtime/steward/delivery_failure_inspection.json'], state=['delivery failure evidence inspected'], request_id=params.get('request_id'))
 
+
+def resident_task_board_refresh(root=None, **params: Any) -> OfficeActionResult:
+    filters = {k: params.get(k) for k in ("resident", "office", "project", "status", "blocker", "staleness") if params.get(k) not in (None, "")}
+    payload = write_resident_task_board(_root(root), **filters)
+    count = len((payload.get("board") or {}).get("participants") or [])
+    return _completed('resident_task_board.refresh', 'Refresh resident task board', 'resident-task-board', 'estate.core.resident_task_visibility.write_resident_task_board', f"Resident task board refreshed with {count} participant row(s).", read=['data/registry/residents.json','data/registry/personnel.json','runtime/residents/task_status.json','runtime/residents/presence.json','collaboration/messages/*.json'], written=['runtime/office/steward_participant_board.json'], state=['resident task board rebuilt'], request_id=params.get('request_id'))
+
+def resident_task_board_open_detail(root=None, resident_id: str | None = None, resident: str | None = None, **params: Any) -> OfficeActionResult:
+    board = build_resident_task_board(_root(root), resident=resident_id or resident)
+    rows = board.get('participants') or []
+    if not rows:
+        return _blocked('resident_task_board.open_detail', 'Open resident task detail', 'resident-task-board', 'estate.core.resident_task_visibility.build_resident_task_board', 'No matching resident task detail is available.', request_id=params.get('request_id'))
+    row = rows[0]
+    return _completed('resident_task_board.open_detail', 'Open resident task detail', 'resident-task-board', 'estate.core.resident_task_visibility.build_resident_task_board', f"Detail ready for {row.get('resident_name')}; source artifact {row.get('source_artifact')} last updated {row.get('source_last_updated') or 'unknown'}.", read=row.get('source_links') or ['runtime/residents/task_status.json'], state=['resident task detail selected'], request_id=params.get('request_id'))
+
 HANDLERS: dict[str, Callable[..., OfficeActionResult]] = {f.__name__: f for f in []}
 HANDLERS.update({
  'ai_services.refresh_local_inventory': refresh_ai_services,
@@ -781,10 +797,14 @@ HANDLERS.update({
  'personnel.open_employee_detail': personnel_open_detail,
  'personnel.open_mailbox': personnel_open_mailbox,
  'personnel.open_conversation': personnel_open_conversation,
+ 'resident_task_board.refresh': resident_task_board_refresh,
+ 'resident_task_board.open_detail': resident_task_board_open_detail,
 })
 
 ACTION_CONTROLS = [
 
+ {'action_id':'resident_task_board.refresh','label':'Refresh resident task board','target_tab':'resident-task-board','handler':'resident_task_board_refresh','availability':'available','requires_input':'resident,office,project,status,blocker,staleness','note':'Rebuilds privacy-safe board data from existing resident, assignment, mailbox, operations, and Office artifacts.'},
+ {'action_id':'resident_task_board.open_detail','label':'Open resident task detail','target_tab':'resident-task-board','handler':'resident_task_board_open_detail','availability':'available','requires_input':'resident_id,resident','note':'Detail navigation selects source-linked status only; journal bodies and protected workforce detail remain hidden.'},
  {'action_id':'personnel.refresh','label':'Refresh Personnel','target_tab':'personnel','handler':'personnel_refresh','availability':'available','note':'Rebuilds the Office personnel/org-chart payload from canonical artifacts.'},
  {'action_id':'personnel.open_employee_detail','label':'Open employee details','target_tab':'personnel','handler':'personnel_open_detail','availability':'available','requires_input':'employee_id'},
  {'action_id':'personnel.open_mailbox','label':'Open mailbox','target_tab':'personnel','handler':'personnel_open_mailbox','availability':'available','requires_input':'employee_id'},

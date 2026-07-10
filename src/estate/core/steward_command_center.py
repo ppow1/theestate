@@ -16,6 +16,7 @@ from pathlib import Path
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_cards import build_resident_cards
 from estate.core.resident_conversations import build_resident_conversations_workspace
+from estate.core.resident_task_visibility import build_resident_task_board, write_resident_task_board
 from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.mailbox_index import generate_mailbox_index
@@ -1034,6 +1035,13 @@ def _operations_control_surface_panel(root):
     }
 
 
+
+def _safe_office_personnel_directory(root, write=True):
+    try:
+        return {"available": True, "path": "runtime/steward/office_personnel_directory.json", "kind": "office_personnel_directory", "data": build_office_personnel_directory(root, write=write)}
+    except Exception as exc:
+        return {"available": False, "path": "runtime/steward/office_personnel_directory.json", "kind": "office_personnel_directory", "placeholder": f"Personnel directory unavailable: {exc}", "data": {"personnel": [], "summary": {}}}
+
 def generate_command_center(root=None, write=True):
     root = _root(root)
     resident_cards = build_resident_cards(root)
@@ -1051,8 +1059,9 @@ def generate_command_center(root=None, write=True):
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
-        "office_personnel_directory": {"available": True, "path": "runtime/steward/office_personnel_directory.json", "kind": "office_personnel_directory", "data": build_office_personnel_directory(root, write=write)},
+        "office_personnel_directory": _safe_office_personnel_directory(root, write=write),
         "resident_conversations_workspace": build_resident_conversations_workspace(root),
+        "resident_task_board": {"available": True, "path": "runtime/office/steward_participant_board.json", "kind": "office_resident_task_board", "data": (write_resident_task_board(root)["board"] if write else build_resident_task_board(root))},
         "ai_services_models": build_steward_ai_services_panel(root),
         "steward_recall_operations": _build_steward_recall_operations(root),
         "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
@@ -2565,14 +2574,29 @@ def _office_action_controls_html(payload, tab_id):
         rows.append(f"<tr><td>{button}<br>{input_html}</td><td>{html.escape(str(availability))}</td><td>{note}</td><td><code>{html.escape(str(c.get('handler') or 'gated'))}</code></td></tr>")
     return "<section class='panel office-actions'><h3>Operational Controls</h3><p class='source'>Every available control dispatches to a local handler. Gated controls are unavailable with a concrete reason.</p><table><thead><tr><th>Control</th><th>Availability</th><th>Outcome note / gating reason</th><th>Handler</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table><pre id='office-action-result-" + html.escape(tab_id, quote=True) + "' class='office-action-result'>No action run yet.</pre></section>"
 
+
+def _resident_task_board_html(artifact):
+    data = artifact.get("data") if isinstance(artifact, dict) else {}
+    rows = (data or {}).get("participants") or []
+    body = ["<p class='source'>Privacy-safe operational visibility only; journal bodies and protected workforce detail are omitted.</p>"]
+    body.append("<p>Filters supported by CLI/action payload: resident, office, project, status, blocker, staleness.</p>")
+    body.append("<table><thead><tr><th>Resident</th><th>Goal</th><th>Task</th><th>Owner</th><th>Status</th><th>Waiting on</th><th>Blocker</th><th>Next action</th><th>Checkpoint</th><th>Elapsed</th><th>Source</th></tr></thead><tbody>")
+    if not rows:
+        body.append("<tr><td colspan='11'>No authorized resident task status is available.</td></tr>")
+    for row in rows:
+        vals = [row.get('resident_name'), row.get('current_goal') or row.get('goal'), row.get('current_task'), row.get('task_owner'), row.get('status'), row.get('waiting_on'), row.get('blocker'), row.get('next_action'), row.get('next_checkpoint'), row.get('elapsed_time'), row.get('source_artifact')]
+        body.append("<tr>" + "".join(f"<td>{html.escape(str(v or 'unknown'))}</td>" for v in vals) + "</tr>")
+    body.append("</tbody></table>")
+    return _panel("Resident Task Board", "".join(body), "ready" if artifact.get("available") else "placeholder")
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
         ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {}))),
-        ("alfred", "Alfred Office", _alfred_chat_html(p.get("alfred_chat", {})) + _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {}))),
+        ("alfred", "Alfred Office", "<h3>Alfred Resident Card</h3>" + _alfred_chat_html(p.get("alfred_chat", {})) + _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
-        ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
+        ("resident-conversations", "Resident Conversations Workspace", _office_action_controls_html(payload, "resident-task-board") + _resident_task_board_html(p.get("resident_task_board", {})) + _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("operational-dashboard", "Office Operational Command Dashboard", _office_action_controls_html(payload, "operational-dashboard") + _office_operational_command_dashboard_html(p.get("office_operational_command_dashboard", {}))),
