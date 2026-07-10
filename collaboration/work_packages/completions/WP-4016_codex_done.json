@@ -1,0 +1,17 @@
+{
+  "work_package_id": "WP-4016",
+  "status": "codex_done",
+  "completed_at": "2026-07-10T20:06:45Z",
+  "summary": "Implemented resident mail and conversation bus over existing Estate collaboration messages, mailbox index, personnel identities, acknowledgements, replies, and audit events.",
+  "deliverables": [
+    "src/estate/core/resident_mail_bus.py",
+    "src/estate/cli/main.py",
+    "data/schemas/resident_mail_conversation_bus_v1.json",
+    "tests/test_resident_mail_bus.py",
+    "operations/validation/reports/WP-4016_resident_mail_conversation_bus.md"
+  ],
+  "validation": {
+    "focused_tests": "pytest -q tests/test_resident_mail_bus.py tests/test_collaboration_messages.py tests/test_mailbox_index.py",
+    "result": "16 passed"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/resident_mail_conversation_bus.v1",
+  "title": "Resident Mail Conversation Bus Message v1",
+  "type": "object",
+  "required": ["schema_version", "id", "created_at", "source_identity", "destination_identity", "classification", "thread_id", "delivery", "payload"],
+  "properties": {
+    "schema_version": {"const": "estate.communication_bus.v1"},
+    "id": {"type": "string"},
+    "created_at": {"type": "string"},
+    "source_identity": {"type": "object"},
+    "destination_identity": {"type": "object"},
+    "classification": {"type": "string"},
+    "thread_id": {"type": "string"},
+    "reply_to": {"type": "string"},
+    "acknowledges": {"type": "string"},
+    "routing": {"type": "object"},
+    "delivery": {"type": "object", "required": ["status", "dedupe_key", "destination_mailbox_ids"]},
+    "payload": {"type": "object"}
+  }
+}
