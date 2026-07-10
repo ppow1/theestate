@@ -244,6 +244,14 @@ def cmd_merge_discovery(args):
         payload = runtime.quarantine_status(target=target)
     elif action == "admit":
         payload = runtime.admit(target=target, work_package=args.work_package)
+    elif action == "admission-status":
+        payload = runtime.admission_status(target=target)
+    elif action == "auto-admit":
+        payload = runtime.auto_admit(target=target, max_requests=getattr(args, "max_requests_per_cycle", 5))
+    elif action == "hold":
+        payload = runtime.hold(target=target, work_package=args.work_package)
+    elif action == "release":
+        payload = runtime.release(target=target, work_package=args.work_package)
     elif action == "reconcile-requests":
         payload = runtime.reconcile_requests(target=target)
     else:
@@ -270,12 +278,34 @@ def cmd_operations_runtime(args):
         service = OperationsRuntimeService()
         action = args.operations_runtime_action
         if action == "run-once":
-            mode = "discover-merges-and-process-audits-and-ring2" if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False) else ("discover-merges-and-process-audits" if getattr(args, "discover_merges", False) and getattr(args, "process_audits", False) else ("discover-merges" if getattr(args, "discover_merges", False) else ("process-audits-and-ring2" if getattr(args, "process_audits_and_ring2", False) else ("process-audits" if getattr(args, "process_audits", False) else "observe-only"))))
-            payload = service.run_once(dry_run=getattr(args, "dry_run", False), mode=mode)
+            if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
+                mode = "discover-merges-and-process-audits-and-ring2"
+            elif getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
+                mode = "discover-merges-and-process-audits"
+            elif getattr(args, "discover_merges", False):
+                mode = "discover-merges"
+            elif getattr(args, "process_audits_and_ring2", False):
+                mode = "process-audits-and-ring2"
+            elif getattr(args, "process_audits", False):
+                mode = "process-audits"
+            else:
+                mode = "observe-only"
+            payload = service.run_once(dry_run=getattr(args, "dry_run", False), mode=mode, max_audit_requests=getattr(args, "max_audit_requests", 1))
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
         elif action == "start":
-            mode = "discover-merges-and-process-audits-and-ring2" if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False) else ("discover-merges-and-process-audits" if getattr(args, "discover_merges", False) and getattr(args, "process_audits", False) else ("discover-merges" if getattr(args, "discover_merges", False) else ("process-audits-and-ring2" if getattr(args, "process_audits_and_ring2", False) else ("process-audits" if getattr(args, "process_audits", False) else "observe-only"))))
-            payload = service.start(max_cycles=args.max_cycles, interval_seconds=args.interval_seconds, dry_run=getattr(args, "dry_run", False), mode=mode)
+            if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
+                mode = "discover-merges-and-process-audits-and-ring2"
+            elif getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
+                mode = "discover-merges-and-process-audits"
+            elif getattr(args, "discover_merges", False):
+                mode = "discover-merges"
+            elif getattr(args, "process_audits_and_ring2", False):
+                mode = "process-audits-and-ring2"
+            elif getattr(args, "process_audits", False):
+                mode = "process-audits"
+            else:
+                mode = "observe-only"
+            payload = service.start(max_cycles=args.max_cycles, interval_seconds=args.interval_seconds, dry_run=getattr(args, "dry_run", False), mode=mode, max_audit_requests=getattr(args, "max_audit_requests", 1))
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
         elif action == "status":
             payload = service.status()
@@ -3097,7 +3127,7 @@ def main(argv=None):
 
     p = sub.add_parser("merge-discovery", help="Discover local merges/promotions and create post-merge audit requests")
     md = p.add_subparsers(dest="merge_discovery_action", required=True)
-    for name in ["scan", "status", "candidates", "replay", "consolidate", "quarantine-status", "reconcile-requests"]:
+    for name in ["scan", "status", "candidates", "replay", "consolidate", "quarantine-status", "reconcile-requests", "admission-status", "auto-admit"]:
         q = md.add_parser(name)
         q.add_argument("--target", default="estate-main")
         q.add_argument("--max-commits", type=int, default=50 if name == "replay" else 100)
@@ -3105,11 +3135,12 @@ def main(argv=None):
         q.add_argument("--max-requests-per-cycle", type=int, default=5)
         q.add_argument("--json", action="store_true")
         q.set_defaults(func=cmd_merge_discovery)
-    q = md.add_parser("admit")
-    q.add_argument("--target", default="estate-main")
-    q.add_argument("--work-package", required=True)
-    q.add_argument("--json", action="store_true")
-    q.set_defaults(func=cmd_merge_discovery)
+    for name in ["admit", "hold", "release"]:
+        q = md.add_parser(name)
+        q.add_argument("--target", default="estate-main")
+        q.add_argument("--work-package", required=True)
+        q.add_argument("--json", action="store_true")
+        q.set_defaults(func=cmd_merge_discovery)
 
     p = sub.add_parser("post-merge-audit", help="Process pending automatic post-merge audit requests")
     pma = p.add_subparsers(dest="post_merge_audit_action", required=True)
@@ -3137,6 +3168,8 @@ def main(argv=None):
     q.add_argument("--process-audits", action="store_true")
     q.add_argument("--process-audits-and-ring2", action="store_true")
     q.add_argument("--discover-merges", action="store_true")
+    q.add_argument("--auto-admit", action="store_true")
+    q.add_argument("--max-audit-requests", type=int, default=1)
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("start", help="Run a bounded Operations Runtime loop")
     q.add_argument("--max-cycles", type=int, default=1)
@@ -3146,6 +3179,8 @@ def main(argv=None):
     q.add_argument("--process-audits", action="store_true")
     q.add_argument("--process-audits-and-ring2", action="store_true")
     q.add_argument("--discover-merges", action="store_true")
+    q.add_argument("--auto-admit", action="store_true")
+    q.add_argument("--max-audit-requests", type=int, default=1)
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("status", help="Show Operations Runtime status")
     q.add_argument("--json", action="store_true")

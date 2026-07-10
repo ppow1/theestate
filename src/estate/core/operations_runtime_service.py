@@ -38,14 +38,14 @@ class OperationsRuntimeService:
         if self.lock_path.exists():
             self.lock_path.unlink()
 
-    def run_once(self, *, dry_run: bool = False, mode: str = "observe-only") -> dict[str, Any]:
+    def run_once(self, *, dry_run: bool = False, mode: str = "observe-only", max_audit_requests: int = 1) -> dict[str, Any]:
         self.acquire_lock()
         try:
-            return self.runtime.run_cycle(dry_run=dry_run, mode=mode)
+            return self.runtime.run_cycle(dry_run=dry_run, mode=mode, max_audit_requests=max_audit_requests)
         finally:
             self.release_lock()
 
-    def start(self, *, max_cycles: int = 1, interval_seconds: float = 30.0, dry_run: bool = False, mode: str = "observe-only") -> dict[str, Any]:
+    def start(self, *, max_cycles: int = 1, interval_seconds: float = 30.0, dry_run: bool = False, mode: str = "observe-only", max_audit_requests: int = 1) -> dict[str, Any]:
         if max_cycles < 1:
             raise ValueError("max_cycles must be at least 1")
         if interval_seconds < 0:
@@ -60,7 +60,7 @@ class OperationsRuntimeService:
                 if self.runtime.stop_requested():
                     state = "stop_requested"
                     break
-                cycle = self.runtime.run_cycle(dry_run=dry_run, mode=mode)
+                cycle = self.runtime.run_cycle(dry_run=dry_run, mode=mode, max_audit_requests=max_audit_requests)
                 cycles.append(cycle)
                 if self.runtime.stop_requested():
                     state = "stop_requested"

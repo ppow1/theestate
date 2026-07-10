@@ -50,10 +50,17 @@ class PostMergeAuditProcessor:
         return out
 
     def claim_next(self) -> dict[str, Any] | None:
-        for req in self.list_requests("pending"):
+        pending = self.list_requests("pending")
+        pending.sort(key=lambda r: (0 if ((r.get("metadata") or {}).get("canonical_status") == "admitted" or (r.get("metadata") or {}).get("canonical_discovery_id")) else 1, r.get("created_at", "")))
+        for req in pending:
             p = Path(req["request_path"])
             current = _read_json(p)
             if current.get("state", current.get("status", "pending")) != "pending":
+                continue
+            if self._has_final_verdict(current):
+                current["state"] = "already_audited"; current.setdefault("history", []).append({"at": utc_now_iso(), "action": "skipped_final_verdict_duplicate"})
+                _write_json(p, current); continue
+            if current.get("state") in {"superseded", "quarantined", "manual_hold"}:
                 continue
             current["state"] = "claimed"; current["claimed_at"] = utc_now_iso()
             _write_json(p, current)
@@ -109,6 +116,17 @@ class PostMergeAuditProcessor:
             req["state"] = "failed"; req.setdefault("errors", []).append(str(exc)); _write_json(p, {k:v for k,v in req.items() if k != "request_path"})
             result = {"processed": True, "request": req, "error": str(exc), "provider_execution_performed": False, "dispatch_execution_performed": False}
         self._write_status(result); return result
+
+    def _has_final_verdict(self, req: dict[str, Any]) -> bool:
+        for base in [self.root / BASE / "verdicts", self.root / BASE / "evidence"]:
+            if not base.exists(): continue
+            paths = list(base.glob("*.json")) + list(base.glob("*/verdict.json"))
+            for vp in paths:
+                try: d = _read_json(vp)
+                except Exception: continue
+                if d.get("target_id") == req.get("target_id") and d.get("work_package_id") == req.get("work_package_id") and d.get("verdict") in {"accepted", "accepted_with_notes", "ring2_required", "needs_repair", "blocked", "not_merged", "workspace_failed", "validation_failed"}:
+                    return True
+        return False
 
     def summary(self) -> dict[str, Any]:
         reqs = self.list_requests()

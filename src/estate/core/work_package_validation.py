@@ -53,6 +53,25 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0625": {
+        "recipe_id": "wp-0625-governed-automatic-admission-and-bounded-audit-execution",
+        "title": "WP-0625 — Governed Automatic Admission and Bounded Audit Execution",
+        "description": "Validates automatic admission, bounded audit processing, Ring 2 prompt/verdict publication, Office visibility counters, and authority boundaries.",
+        "required_checks": ["Expected artifacts exist", "Admission module compiles", "Focused admission/runtime tests pass", "Receipt confirms no provider or dispatch execution"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/merge_discovery_admission.py", "tests/test_merge_discovery_admission.py", "docs/integration/governed_automatic_admission_and_bounded_audit_execution.md", "collaboration/work_packages/completions/WP-0625_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Runtime processes more than configured audit maximum", "Receipt reports provider or dispatch execution"],
+        "success_criteria": ["Current receipt-backed candidates admit automatically", "Historical, held, ambiguous, superseded, and final-verdict duplicates do not admit", "Bounded audit counters and Ring 2/verdict evidence are exposed"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/merge_discovery_admission.py','tests/test_merge_discovery_admission.py','docs/integration/governed_automatic_admission_and_bounded_audit_execution.md','collaboration/work_packages/completions/WP-0625_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/merge_discovery_admission.py"),
+            _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+            _cmd("pytest -q tests/test_merge_discovery.py tests/test_merge_discovery_consolidation.py tests/test_merge_discovery_admission.py tests/test_operations_runtime.py tests/test_post_merge_audit_processor.py --basetemp Temp/pytest-auto-admission"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0625_codex_done.json').read_text()); assert d['work_package_id']=='WP-0625'; assert d['provider_execution_performed'] is False; assert d['dispatch_execution_performed'] is False; assert d['ready_for_ca_review'] is True\""),
+        ],
+    },
+
     "WP-0624": {
         "recipe_id": "wp-0624-merge-discovery-consolidation",
         "title": "WP-0624 — Merge Discovery Consolidation and Backfill Control",
