@@ -122,6 +122,7 @@ from estate.core.operational_targets_runtime import OperationalTargetRuntime
 from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
+from estate.core.operations_runtime_host import OperationsRuntimeHost, OperationsRuntimeHostError
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 
@@ -274,8 +275,43 @@ def cmd_post_merge_audit(args):
         raise SystemExit(1)
     print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
 
+def _operations_runtime_mode(args):
+    if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
+        return "discover-merges-and-process-audits-and-ring2"
+    if getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
+        return "discover-merges-and-process-audits"
+    if getattr(args, "discover_merges", False):
+        return "discover-merges"
+    if getattr(args, "process_audits_and_ring2", False):
+        return "process-audits-and-ring2"
+    if getattr(args, "process_audits", False):
+        return "process-audits"
+    return "observe-only"
+
+
 def cmd_operations_runtime(args):
     try:
+        if args.operations_runtime_action == "host":
+            host = OperationsRuntimeHost()
+            action = args.operations_runtime_host_action
+            if action == "install":
+                payload = host.install()
+            elif action == "uninstall":
+                payload = host.uninstall()
+            elif action == "start":
+                payload = host.start()
+            elif action == "stop":
+                payload = host.stop()
+            elif action == "restart":
+                payload = host.restart()
+            elif action == "status":
+                payload = host.status()
+            elif action == "run-foreground":
+                payload = host.run_foreground(interval_seconds=args.interval_seconds, max_cycles=args.max_cycles, dry_run=getattr(args, "dry_run", False), mode=_operations_runtime_mode(args), max_audit_requests=getattr(args, "max_audit_requests", 1))
+            else:
+                raise SystemExit(1)
+            print(json.dumps(payload, indent=2, sort_keys=True))
+            return
         service = OperationsRuntimeService()
         action = args.operations_runtime_action
         if action == "run-once":
@@ -316,7 +352,7 @@ def cmd_operations_runtime(args):
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else "Operations Runtime stop requested")
         elif action == "report":
             print(service.report())
-    except OperationsRuntimeLockError as exc:
+    except (OperationsRuntimeLockError, OperationsRuntimeHostError) as exc:
         print(f"Operations runtime blocked: {exc}")
         raise SystemExit(2)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
@@ -3214,6 +3250,22 @@ def main(argv=None):
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("report", help="Render Operations Runtime report")
     q.set_defaults(func=cmd_operations_runtime)
+
+    q = ort.add_parser("host", help="Install and control durable Operations Runtime host")
+    host_sub = q.add_subparsers(dest="operations_runtime_host_action", required=True)
+    for name in ["install", "uninstall", "start", "stop", "restart", "status"]:
+        h = host_sub.add_parser(name)
+        h.set_defaults(func=cmd_operations_runtime)
+    h = host_sub.add_parser("run-foreground", help="Run host loop in the foreground for debugging")
+    h.add_argument("--max-cycles", type=int, default=1000000)
+    h.add_argument("--interval-seconds", type=float, default=30.0)
+    h.add_argument("--dry-run", action="store_true")
+    h.add_argument("--process-audits", action="store_true")
+    h.add_argument("--process-audits-and-ring2", action="store_true")
+    h.add_argument("--discover-merges", action="store_true")
+    h.add_argument("--auto-admit", action="store_true")
+    h.add_argument("--max-audit-requests", type=int, default=1)
+    h.set_defaults(func=cmd_operations_runtime)
 
     p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
     p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")
