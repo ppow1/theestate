@@ -54,6 +54,41 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
 
+    "WP-0506": {
+        "recipe_id": "wp-0506-steward-authorized-live-codex-execution-gate",
+        "title": "WP-0506 — Steward-Authorized Live Codex Execution Gate",
+        "description": "Validates the live Codex execution gate, CLI, documentation, tests, and completion receipt without live provider calls.",
+        "required_checks": [
+            "Gate module, tests, documentation, and receipt exist",
+            "Gate module compiles",
+            "Focused gate, adapter, and bridge tests pass",
+            "Receipt records no live provider calls, fake-runner tests, and required boundary claims",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/codex_live_execution_gate.py",
+            "tests/test_codex_live_execution_gate.py",
+            "docs/integration/steward_authorized_live_codex_execution.md",
+            "collaboration/work_packages/completions/WP-0506_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live provider calls or modified authorization/acceptance behavior",
+        ],
+        "success_criteria": [
+            "Live Codex execution is gated by dispatch, adapter, Traffic Controller, Steward, workspace, profile, sandbox, and confirmation checks",
+            "Preview records no live provider call",
+            "Execute tests use an injected fake runner exactly once",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "from pathlib import Path; paths=[\'src/estate/core/codex_live_execution_gate.py\',\'tests/test_codex_live_execution_gate.py\',\'docs/integration/steward_authorized_live_codex_execution.md\',\'collaboration/work_packages/completions/WP-0506_codex_done.json\']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"'),
+            _cmd("python -m py_compile src/estate/core/codex_live_execution_gate.py"),
+            _cmd("pytest -q tests/test_codex_live_execution_gate.py tests/test_codex_bridge_execution_provider_adapter.py tests/test_codex_bridge.py"),
+            _cmd('python -c "import json; from pathlib import Path; data=json.loads(Path(\'collaboration/work_packages/completions/WP-0506_codex_done.json\').read_text(encoding=\'utf-8\')); assert data.get(\'work_package_id\') == \'WP-0506\'; assert data.get(\'live_provider_calls_made_during_implementation\') is False; assert data.get(\'fake_runner_used_for_tests\') is True; assert data.get(\'preview_live_provider_called\') is False; assert data.get(\'execute_confirmation_required\') is True; assert data.get(\'authorization_authority_modified\') is False; assert data.get(\'institutional_acceptance_behavior_modified\') is False; assert data.get(\'optional_local_smoke_test_required\') is False; assert data.get(\'ready_for_ca_review\') is True"'),
+        ],
+    },
+
     "WP-0504": {
         "recipe_id": "wp-0504-codex-bridge-execution-provider-adapter",
         "title": "WP-0504 — Codex Bridge Execution Provider Adapter",

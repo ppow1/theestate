@@ -1,0 +1,127 @@
+{
+  "authorization_authority_modified": false,
+  "authorization_fields_implemented": [
+    "execution_authorization_id",
+    "dispatch_id",
+    "adapter_request_id",
+    "provider_id",
+    "provider_type",
+    "work_package_id",
+    "decision_reference",
+    "traffic_controller_authorization_reference",
+    "steward_approval_reference",
+    "approved_by",
+    "approved_at",
+    "approval_scope",
+    "allowed_sandbox",
+    "allowed_read_paths",
+    "allowed_write_paths",
+    "approved_codex_profile",
+    "workspace_commit",
+    "workspace_clean_required",
+    "expires_at",
+    "revoked",
+    "revoked_at",
+    "revocation_reason",
+    "metadata"
+  ],
+  "background_operations_behavior_modified": false,
+  "branch": "work",
+  "codex_bridge_behavior_modified": false,
+  "codex_status": "done",
+  "completed_at": "2026-07-10T02:20:00Z",
+  "dispatch_behavior_modified": true,
+  "eligibility_checks_implemented": [
+    "dispatch exists",
+    "dispatch Ready state",
+    "handoff reference exists",
+    "adapter request validates",
+    "dispatch/provider/request matching",
+    "decision reference present",
+    "Traffic Controller reference present",
+    "Steward approval reference present",
+    "authorization expiry and revocation",
+    "workspace commit and clean state",
+    "Codex binary availability",
+    "approved profile and sandbox",
+    "path scope and forbidden overlap",
+    "explicit execution confirmation"
+  ],
+  "execute_confirmation_required": true,
+  "fake_runner_used_for_tests": true,
+  "files_changed": [
+    "src/estate/core/codex_live_execution_gate.py",
+    "tests/test_codex_live_execution_gate.py",
+    "docs/integration/steward_authorized_live_codex_execution.md",
+    "collaboration/work_packages/completions/WP-0506_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "src/estate/core/codex_live_execution_gate.py",
+    "tests/test_codex_live_execution_gate.py",
+    "docs/integration/steward_authorized_live_codex_execution.md",
+    "collaboration/work_packages/completions/WP-0506_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "docs/integration/codex_bridge_execution_provider_adapter.md",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "src/estate/core/codex_bridge.py",
+    "src/estate/core/execution_provider_adapter_runtime.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_adapter_handoff_runtime.py",
+    "tests/test_codex_bridge_execution_provider_adapter.py",
+    "tests/test_codex_bridge.py"
+  ],
+  "institutional_acceptance_behavior_modified": false,
+  "known_limitations": [
+    "Optional real local smoke test remains Steward-initiated and is not required for package completion."
+  ],
+  "live_provider_calls_made_during_implementation": false,
+  "merge_authority": "Chief Architect / Steward review required; validation is evidence only.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward review required; validation is evidence only.",
+  "optional_local_smoke_test_required": false,
+  "orchestrator_behavior_modified": false,
+  "owner": "Chief Architect #5",
+  "preview_live_provider_called": false,
+  "provider_adapter_behavior_modified": false,
+  "pull_request_not_applicable_reason": "PR is created after commit by make_pr tool.",
+  "pull_request_url_or_not_applicable_reason": "PR will be created by make_pr tool after commit.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_written": false,
+  "status": "complete",
+  "summary": "Implemented Steward-authorized live Codex execution gate with deterministic fake-runner tests, CLI, docs, validation recipe, and completion receipt.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/codex_live_execution_gate.py",
+    "pytest -q tests/test_codex_live_execution_gate.py tests/test_codex_bridge_execution_provider_adapter.py tests/test_codex_bridge.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0506 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/codex_live_execution_gate.py",
+    "pytest -q tests/test_codex_live_execution_gate.py"
+  ],
+  "validation_results": {
+    "pytest -q tests/test_codex_live_execution_gate.py": "passed",
+    "python -m py_compile src/estate/core/codex_live_execution_gate.py": "passed"
+  },
+  "work_package_id": "WP-0506",
+  "workspace_safety_checks": [
+    "current commit recorded",
+    "dirty tree recorded",
+    "dirty tree blocks without explicit exception",
+    "no stash/reset/clean/repair workflow introduced"
+  ]
+}
