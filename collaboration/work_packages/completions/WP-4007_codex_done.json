@@ -1,0 +1,18 @@
+{
+  "work_package": "WP-4007",
+  "status": "done",
+  "completed_by": "Codex",
+  "classification": "Estate Internal",
+  "outputs": [
+    "docs/residents/ingrid/Ingrid_Boundary_Inventory_v0_1.md",
+    "docs/residents/ingrid/Ingrid_Boundary_Matrix_v0_1.json",
+    "src/estate/core/ingrid_boundary.py",
+    "tests/character_architecture/test_ingrid_boundary_inventory.py",
+    "operations/validation/reports/WP-4007_ingrid_boundary_inventory.md"
+  ],
+  "protected_source_handling": "No protected private local character content was inspected, stored, summarized, routed, or exported.",
+  "validation": {
+    "command": "PYTHONPATH=src pytest tests/character_architecture/test_ingrid_boundary_inventory.py",
+    "expected_result": "pass"
+  }
+}
