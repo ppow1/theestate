@@ -72,7 +72,7 @@ def test_store_writes_request_assessment_and_status(tmp_path: Path):
         requesting_office="Engineering",
         summary="Worker has repeated mistakes and visible context strain.",
         requested_outcome="Assess worker and institutional causes.",
-        source_artifacts=["runtime/workers/worker-42/status.json"],
+        source_artifacts=["runtime/workers/worker-42/status.json", "runtime/operations/events/worker-42.jsonl"],
     )
 
     request_path = store.save_request(request)
@@ -86,6 +86,7 @@ def test_store_writes_request_assessment_and_status(tmp_path: Path):
         missing_evidence=[],
         recommendations=["targeted_reread", "onboarding_repair", "retrieval_repair"],
         rationale="The evidence supports both worker-level and institutional intervention.",
+        follow_up_checkpoints=["review after the next operating cycle"],
     )
 
     assessment_path = store.save_assessment(assessment)

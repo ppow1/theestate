@@ -56,6 +56,8 @@ def _print(payload: dict, *, as_json: bool) -> None:
         print(f"Ready for action: {summary['ready_for_action_requests']}")
         print(f"Boundary reviews: {summary['boundary_review_count']}")
         print(f"Steward attention: {summary['steward_attention_count']}")
+        print(f"Cognitive-health requests: {summary.get('cognitive_health_request_count', 0)}")
+        print(f"Missing-evidence assessments: {summary.get('missing_evidence_assessment_count', 0)}")
         print(f"Assessments: {summary['assessment_count']}")
     elif kind == "request":
         request = payload["request"]

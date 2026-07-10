@@ -38,9 +38,9 @@ def test_malformed_artifacts_are_ignored_in_status(tmp_path: Path):
 
 def test_event_bridge_for_request_and_escalated_assessment(tmp_path: Path):
     store = HelenWorkforceStore(tmp_path)
-    req = WorkforceRequest.create(request_type="continuity_review", subject_id="resident-x", subject_type="resident", requesting_office="Office of the Steward", summary="Resident continuity review.", requested_outcome="Determine boundary-safe next step.", requires_steward_attention=True)
+    req = WorkforceRequest.create(request_type="continuity_review", subject_id="resident-x", subject_type="resident", requesting_office="Office of the Steward", summary="Resident continuity review.", requested_outcome="Determine boundary-safe next step.", source_artifacts=["runtime/residents/resident-x/status.json", "runtime/operations/events/resident-x.jsonl"], requires_steward_attention=True)
     store.save_request(req)
-    assessment = WorkforceAssessment.create(request_id=req.request_id, subject_id="resident-x", recommendations=["temporary_stand_down"], rationale="Attention required.")
+    assessment = WorkforceAssessment.create(request_id=req.request_id, subject_id="resident-x", institutional_factors=["handoff evidence requires continuity repair"], evidence_artifacts=["runtime/residents/resident-x/continuity.json"], follow_up_checkpoints=["review before next operational cycle"], recommendations=["temporary_stand_down"], rationale="Attention required.")
     store.save_assessment(assessment)
     events = "\n".join(p.read_text(encoding="utf-8") for p in (tmp_path / "runtime/operations/events").glob("*.jsonl"))
     assert req.request_id in events

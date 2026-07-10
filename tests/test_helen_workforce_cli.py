@@ -98,6 +98,7 @@ def test_cli_lists_requests_and_assessments(tmp_path: Path, capsys):
         requesting_office="Engineering",
         summary="Targeted coaching requested.",
         requested_outcome="Improve policy retrieval behavior.",
+        source_artifacts=["runtime/workers/worker-9/status.json", "runtime/operations/events/worker-9.jsonl"],
     )
     request_path = _write(tmp_path / "request.json", request.to_dict())
     run(["--root", str(tmp_path), "request-create", "--file", str(request_path)])
@@ -106,6 +107,8 @@ def test_cli_lists_requests_and_assessments(tmp_path: Path, capsys):
     assessment = WorkforceAssessment.create(
         request_id=request.request_id,
         subject_id="worker-9",
+        worker_factors=["policy retrieval misses"],
+        institutional_factors=["unclear policy index"],
         recommendations=["coaching"],
         rationale="A focused coaching intervention is proportionate.",
     )

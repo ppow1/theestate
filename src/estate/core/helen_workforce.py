@@ -36,6 +36,9 @@ ALLOWED_REQUEST_TYPES = {
     "reflection_cycle_request",
     "continuity_review",
     "stand_down_review",
+    "overload_review",
+    "repeated_error_review",
+    "context_strain_review",
     "reassignment_review",
     "lessons_learned_intake",
     "institutional_improvement_review",
@@ -68,6 +71,39 @@ ALLOWED_RECOMMENDATIONS = {
     "retrieval_repair",
     "governance_review",
     "staffing_action",
+}
+
+COGNITIVE_HEALTH_REQUEST_TYPES = {
+    "overload_review",
+    "repeated_error_review",
+    "context_strain_review",
+    "role_fit_review",
+    "worker_health_review",
+    "coaching_request",
+    "reflection_cycle_request",
+    "stand_down_review",
+    "reassignment_review",
+    "continuity_review",
+}
+
+PROPORTIONAL_RECOMMENDATIONS = {
+    "no_action": 0,
+    "request_more_evidence": 0,
+    "targeted_reread": 1,
+    "coaching": 1,
+    "mentoring": 1,
+    "reflection_cycle": 2,
+    "workload_adjustment": 2,
+    "temporary_stand_down": 3,
+    "reassignment": 3,
+    "succession_review": 3,
+}
+
+INSTITUTIONAL_REPAIR_RECOMMENDATIONS = {
+    "onboarding_repair",
+    "documentation_repair",
+    "retrieval_repair",
+    "governance_review",
 }
 
 
@@ -214,6 +250,13 @@ class WorkforceAssessment:
     private_detail_included: bool
     created_at: str
     status: str = "ready_for_action"
+    evidence_artifacts: list[str] = field(default_factory=list)
+    follow_up_checkpoints: list[str] = field(default_factory=list)
+    outcome_review: str = "pending"
+    protected_evidence_used: bool = False
+    alfred_exception_summary: str = ""
+    grace_operational_constraint_summary: str = ""
+    ingrid_boundary_enforcement: str = "private records are not routine evidence"
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -229,6 +272,13 @@ class WorkforceAssessment:
         rationale: str,
         classification: str = "Estate Internal",
         private_detail_included: bool = False,
+        evidence_artifacts: list[str] | None = None,
+        follow_up_checkpoints: list[str] | None = None,
+        outcome_review: str = "pending",
+        protected_evidence_used: bool = False,
+        alfred_exception_summary: str = "",
+        grace_operational_constraint_summary: str = "",
+        ingrid_boundary_enforcement: str = "private records are not routine evidence",
         metadata: dict[str, Any] | None = None,
     ) -> "WorkforceAssessment":
         return cls(
@@ -243,6 +293,13 @@ class WorkforceAssessment:
             recommendations=recommendations or [],
             rationale=rationale,
             private_detail_included=bool(private_detail_included),
+            evidence_artifacts=evidence_artifacts or [],
+            follow_up_checkpoints=follow_up_checkpoints or [],
+            outcome_review=outcome_review,
+            protected_evidence_used=bool(protected_evidence_used),
+            alfred_exception_summary=alfred_exception_summary,
+            grace_operational_constraint_summary=grace_operational_constraint_summary,
+            ingrid_boundary_enforcement=ingrid_boundary_enforcement,
             created_at=utc_now_iso(),
             status="ready_for_action",
             metadata=metadata or {},
@@ -278,6 +335,8 @@ class WorkforceAssessment:
             "institutional_factors",
             "missing_evidence",
             "recommendations",
+            "evidence_artifacts",
+            "follow_up_checkpoints",
         ]:
             _require_string_list(getattr(self, field_name), field_name)
         unknown = set(self.recommendations) - ALLOWED_RECOMMENDATIONS
@@ -285,7 +344,14 @@ class WorkforceAssessment:
             raise ValueError(f"unknown recommendations: {sorted(unknown)}")
         if not isinstance(self.private_detail_included, bool):
             raise ValueError("private_detail_included must be boolean")
-        if self.private_detail_included and self.classification not in {
+        if not isinstance(self.protected_evidence_used, bool):
+            raise ValueError("protected_evidence_used must be boolean")
+        if self.outcome_review not in {"pending", "scheduled", "completed", "not_required"}:
+            raise ValueError("unknown outcome_review state")
+        for field_name in ["outcome_review", "alfred_exception_summary", "grace_operational_constraint_summary", "ingrid_boundary_enforcement"]:
+            if not isinstance(getattr(self, field_name), str):
+                raise ValueError(f"{field_name} must be string")
+        if (self.private_detail_included or self.protected_evidence_used) and self.classification not in {
             "Restricted",
             "Steward Only",
             "Sensitive",
@@ -293,6 +359,8 @@ class WorkforceAssessment:
             "Local Only",
         }:
             raise ValueError("private detail requires a restricted classification")
+        if self.protected_evidence_used and any("journal" in item.lower() for item in self.evidence_artifacts):
+            raise ValueError("private journals may not be routine evidence artifacts")
         if not isinstance(self.metadata, dict):
             raise ValueError("metadata must be object")
 
@@ -332,6 +400,7 @@ class HelenWorkforceStore:
         request = self.load_request(assessment.request_id)
         if request.subject_id != assessment.subject_id:
             raise ValueError("assessment subject must match workforce request subject")
+        self.validate_intervention_assessment(request, assessment)
         payload = assessment.to_dict()
         path = self.root / ASSESSMENTS / f"{assessment.assessment_id}.json"
         wrote = self._write_new_or_idempotent(path, payload, "assessment")
@@ -341,6 +410,35 @@ class HelenWorkforceStore:
             self.emit_assessment_attention_event(assessment, request, path)
         self.write_status()
         return path
+
+    def validate_intervention_assessment(self, request: WorkforceRequest, assessment: WorkforceAssessment) -> None:
+        if request.request_type not in COGNITIVE_HEALTH_REQUEST_TYPES:
+            return
+        evidence_count = len(request.source_artifacts) + len(assessment.evidence_artifacts)
+        substantive = [r for r in assessment.recommendations if r != "request_more_evidence"]
+        if assessment.missing_evidence and substantive:
+            raise ValueError("interventions cannot proceed while evidence is missing")
+        if substantive and evidence_count < 2:
+            raise ValueError("minimum evidence requirements not met")
+        if substantive and not assessment.institutional_factors:
+            raise ValueError("institutional causes must be evaluated alongside worker factors")
+        max_level = max((PROPORTIONAL_RECOMMENDATIONS.get(r, 1) for r in substantive), default=0)
+        if max_level >= 2 and len(assessment.follow_up_checkpoints) < 1:
+            raise ValueError("follow-up checkpoints are required for material interventions")
+        if max_level >= 3 and evidence_count < 3:
+            raise ValueError("high-impact interventions require stronger evidence")
+        if any(r in INSTITUTIONAL_REPAIR_RECOMMENDATIONS for r in assessment.recommendations) and not assessment.institutional_factors:
+            raise ValueError("institutional repairs require institutional factors")
+        medical_terms = ["diagnosis", "depression", "anxiety disorder", "adhd", "burnout disorder", "psychological condition"]
+        text = " ".join([assessment.rationale, *assessment.worker_factors]).lower()
+        if any(term in text for term in medical_terms):
+            raise ValueError("false-diagnosis prevention: do not diagnose medical or psychological conditions")
+
+    def grace_constraint_summary(self, assessment: WorkforceAssessment) -> dict[str, Any]:
+        return {"assessment_id": assessment.assessment_id, "subject_id": assessment.subject_id, "availability_constraint": assessment.grace_operational_constraint_summary, "allowed_for_grace": True, "raw_private_records_included": False, "prescribes_intervention": False}
+
+    def alfred_exception_summary(self, assessment: WorkforceAssessment) -> dict[str, Any]:
+        return {"assessment_id": assessment.assessment_id, "subject_id": assessment.subject_id, "exception_summary": assessment.alfred_exception_summary, "raw_private_records_included": False}
 
     def list_requests(self) -> list[WorkforceRequest]:
         directory = self.root / REQUESTS
@@ -382,6 +480,8 @@ class HelenWorkforceStore:
                 "steward_attention_count": sum(request.requires_steward_attention for request in requests),
                 "boundary_review_count": sum(request.requires_boundary_review for request in requests),
                 "private_assessment_count": sum(assessment.private_detail_included for assessment in assessments),
+                "cognitive_health_request_count": sum(request.request_type in COGNITIVE_HEALTH_REQUEST_TYPES for request in requests),
+                "missing_evidence_assessment_count": sum(bool(assessment.missing_evidence) for assessment in assessments),
                 "latest_request_id": requests[-1].request_id if requests else None,
                 "latest_assessment_id": assessments[-1].assessment_id if assessments else None,
             },
@@ -391,6 +491,8 @@ class HelenWorkforceStore:
             "provider_execution_performed": False,
             "constitutional_authority_granted": False,
             "grace_appointed_or_activated": False,
+            "grace_operational_constraints": [self.grace_constraint_summary(a) for a in assessments if a.grace_operational_constraint_summary],
+            "alfred_exceptions": [self.alfred_exception_summary(a) for a in assessments if a.alfred_exception_summary],
         }
 
 

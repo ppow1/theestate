@@ -1,30 +1,213 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theestate.local/schemas/workforce_development/workforce_assessment_v1.schema.json",
-  "title": "Helen Workforce Assessment v1",
-  "type": "object",
-  "required": ["schema_version", "assessment_id", "request_id", "assessor", "subject_id", "classification", "worker_factors", "institutional_factors", "missing_evidence", "recommendations", "rationale", "private_detail_included", "created_at", "status", "metadata"],
-  "properties": {
-    "schema_version": {"const": "workforce_assessment.v1"},
-    "assessment_id": {"type": "string", "pattern": "^wfa-"},
-    "request_id": {"type": "string", "pattern": "^wfr-"},
-    "assessor": {"const": "Helen"},
-    "subject_id": {"type": "string", "minLength": 1},
-    "classification": {"enum": ["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only", "Sensitive", "Private"]},
-    "worker_factors": {"type":"array", "items":{"type":"string"}},
-    "institutional_factors": {"type":"array", "items":{"type":"string"}},
-    "missing_evidence": {"type":"array", "items":{"type":"string"}},
-    "recommendations": {"type":"array", "items":{"enum":["no_action", "request_more_evidence", "targeted_reread", "coaching", "mentoring", "workload_adjustment", "reflection_cycle", "continuity_artifact", "fresh_operational_cycle", "temporary_stand_down", "reassignment", "succession_review", "onboarding_repair", "documentation_repair", "retrieval_repair", "governance_review", "staffing_action"]}},
-    "rationale": {"type":"string", "description":"Classification-appropriate rationale only; unrestricted private journal bodies are prohibited."},
-    "private_detail_included": {"type":"boolean"},
-    "created_at": {"type":"string", "format":"date-time"},
-    "status": {"enum": ["open", "blocked", "in_review", "ready_for_action", "closed", "declined"]},
-    "metadata": {"type":"object"},
-    "provider_execution_performed": {"const": false},
-    "operational_queue_control_performed": {"const": false},
-    "constitutional_authority_granted": {"const": false}
-  },
-  "not": {"required": ["journal_body"]},
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
-  "examples": [{"schema_version":"workforce_assessment.v1","assessment_id":"wfa-example","request_id":"wfr-example","assessor":"Helen","subject_id":"worker-42","classification":"Estate Internal","worker_factors":["context strain"],"institutional_factors":["unclear onboarding guidance"],"missing_evidence":[],"recommendations":["targeted_reread","onboarding_repair"],"rationale":"Evidence supports worker-level and institutional intervention.","private_detail_included":false,"created_at":"2026-07-10T00:00:00Z","status":"ready_for_action","metadata":{},"provider_execution_performed":false,"operational_queue_control_performed":false,"constitutional_authority_granted":false}]
+  "examples": [
+    {
+      "alfred_exception_summary": "Bounded exception summary only.",
+      "assessment_id": "wfa-example",
+      "assessor": "Helen",
+      "classification": "Estate Internal",
+      "constitutional_authority_granted": false,
+      "created_at": "2026-07-10T00:00:00Z",
+      "evidence_artifacts": [
+        "runtime/workers/worker-42/status.json"
+      ],
+      "follow_up_checkpoints": [
+        "review after next operating cycle"
+      ],
+      "grace_operational_constraint_summary": "Avoid parallel urgent queues this cycle.",
+      "ingrid_boundary_enforcement": "No private journals or diagnoses included.",
+      "institutional_factors": [
+        "unclear onboarding guidance"
+      ],
+      "metadata": {},
+      "missing_evidence": [],
+      "operational_queue_control_performed": false,
+      "outcome_review": "pending",
+      "private_detail_included": false,
+      "protected_evidence_used": false,
+      "provider_execution_performed": false,
+      "rationale": "Evidence supports worker-level and institutional intervention.",
+      "recommendations": [
+        "targeted_reread",
+        "onboarding_repair"
+      ],
+      "request_id": "wfr-example",
+      "schema_version": "workforce_assessment.v1",
+      "status": "ready_for_action",
+      "subject_id": "worker-42",
+      "worker_factors": [
+        "context strain"
+      ]
+    }
+  ],
+  "not": {
+    "required": [
+      "journal_body"
+    ]
+  },
+  "properties": {
+    "alfred_exception_summary": {
+      "description": "Concise exception only; no raw private records.",
+      "type": "string"
+    },
+    "assessment_id": {
+      "pattern": "^wfa-",
+      "type": "string"
+    },
+    "assessor": {
+      "const": "Helen"
+    },
+    "classification": {
+      "enum": [
+        "Public",
+        "Estate Internal",
+        "Restricted",
+        "Steward Only",
+        "Local Only",
+        "Sensitive",
+        "Private"
+      ]
+    },
+    "constitutional_authority_granted": {
+      "const": false
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "evidence_artifacts": {
+      "description": "Non-private artifacts supporting the assessment; private journal bodies are excluded.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "follow_up_checkpoints": {
+      "description": "Required checkpoint(s) for material interventions.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "grace_operational_constraint_summary": {
+      "description": "Actionable availability/constraint summary only; Grace does not prescribe intervention.",
+      "type": "string"
+    },
+    "ingrid_boundary_enforcement": {
+      "description": "Boundary decision preventing diagnosis and routine private evidence exposure.",
+      "type": "string"
+    },
+    "institutional_factors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "missing_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "operational_queue_control_performed": {
+      "const": false
+    },
+    "outcome_review": {
+      "enum": [
+        "pending",
+        "scheduled",
+        "completed",
+        "not_required"
+      ],
+      "type": "string"
+    },
+    "private_detail_included": {
+      "type": "boolean"
+    },
+    "protected_evidence_used": {
+      "type": "boolean"
+    },
+    "provider_execution_performed": {
+      "const": false
+    },
+    "rationale": {
+      "description": "Classification-appropriate rationale only; unrestricted private journal bodies are prohibited.",
+      "type": "string"
+    },
+    "recommendations": {
+      "items": {
+        "enum": [
+          "no_action",
+          "request_more_evidence",
+          "targeted_reread",
+          "coaching",
+          "mentoring",
+          "workload_adjustment",
+          "reflection_cycle",
+          "continuity_artifact",
+          "fresh_operational_cycle",
+          "temporary_stand_down",
+          "reassignment",
+          "succession_review",
+          "onboarding_repair",
+          "documentation_repair",
+          "retrieval_repair",
+          "governance_review",
+          "staffing_action"
+        ]
+      },
+      "type": "array"
+    },
+    "request_id": {
+      "pattern": "^wfr-",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "workforce_assessment.v1"
+    },
+    "status": {
+      "enum": [
+        "open",
+        "blocked",
+        "in_review",
+        "ready_for_action",
+        "closed",
+        "declined"
+      ]
+    },
+    "subject_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "worker_factors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "assessment_id",
+    "request_id",
+    "assessor",
+    "subject_id",
+    "classification",
+    "worker_factors",
+    "institutional_factors",
+    "missing_evidence",
+    "recommendations",
+    "rationale",
+    "private_detail_included",
+    "created_at",
+    "status",
+    "metadata"
+  ],
+  "title": "Helen Workforce Assessment v1",
+  "type": "object"
 }
