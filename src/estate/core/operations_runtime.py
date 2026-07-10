@@ -14,6 +14,7 @@ from uuid import uuid4
 
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.post_merge_audit_processor import PostMergeAuditProcessor
 from estate.core.paths import ESTATE_ROOT
 
 RUNTIME_BASE = Path("runtime/operations_runtime")
@@ -63,6 +64,14 @@ class OperationsRuntimeCycle:
     audits_requested: int = 0
     git_hygiene_findings: int = 0
     ring2_requests_created: int = 0
+    audits_claimed: int = 0
+    audits_completed: int = 0
+    audits_blocked: int = 0
+    audit_validation_pass: int = 0
+    audit_validation_fail: int = 0
+    ring2_prompts_generated: int = 0
+    ring2_reviews_captured: int = 0
+    audit_verdicts_published: int = 0
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     provider_execution_performed: bool = False
@@ -93,7 +102,7 @@ class OperationsRuntime:
         for rel in [STATUS_DIR, REPORTS_DIR, CYCLES_DIR]:
             (self.root / rel).mkdir(parents=True, exist_ok=True)
 
-    def run_cycle(self, *, dry_run: bool = False) -> dict[str, Any]:
+    def run_cycle(self, *, dry_run: bool = False, mode: str = "observe-only") -> dict[str, Any]:
         self.ensure_dirs()
         cycle = OperationsRuntimeCycle.start()
         try:
@@ -112,10 +121,24 @@ class OperationsRuntime:
             cycle.git_hygiene_findings = sum(len(v.get("issues") or []) for v in hygiene.values())
             cycle.ring2_requests_created = sum(1 for e in background_status.get("events", []) if e.get("event_type") == "ring2_review_needed")
             cycle.warnings.extend(background_status.get("summary", {}).get("warnings") or [])
+            if mode in {"process-audits", "process-audits-and-ring2"} and not dry_run:
+                audit_result = PostMergeAuditProcessor(self.root, ollama_enabled=(mode == "process-audits-and-ring2")).process_next()
+                if audit_result.get("processed"):
+                    v = audit_result.get("verdict") or {}
+                    cycle.audits_claimed = 1
+                    cycle.audits_completed = 1 if v.get("state") in {"completed", "ring2_required"} else 0
+                    cycle.audits_blocked = 1 if v.get("state") == "blocked" else 0
+                    cycle.audit_validation_pass = 1 if v.get("validation_status") in {"passed", "passed_with_findings"} else 0
+                    cycle.audit_validation_fail = 1 if v.get("validation_status") in {"failed", "no_recipe"} or v.get("verdict") == "validation_failed" else 0
+                    cycle.ring2_prompts_generated = 1 if (v.get("artifacts") or {}).get("ring2_prompt") else 0
+                    cycle.ring2_reviews_captured = 1 if v.get("ring2_status") == "review_captured" else 0
+                    cycle.audit_verdicts_published = 1 if v.get("verdict_path") else 0
             cycle.artifacts = {
                 "background_status": "runtime/background_operations/status/latest.json",
                 "operational_targets_status": "runtime/operational_targets/status/latest.json",
             }
+            if cycle.audits_claimed:
+                cycle.artifacts["post_merge_audit_status"] = "runtime/post_merge_audit/status/latest.json"
             cycle.runtime_state = "stopped"
         except Exception as exc:  # cycle status must persist failures for Office visibility
             cycle.runtime_state = "failed"
@@ -160,10 +183,10 @@ class OperationsRuntime:
             p.unlink()
 
     def empty_summary(self, state: str) -> dict[str, Any]:
-        return {"operations_runtime_available": True, "operations_runtime_state": state, "last_cycle_id": None, "last_cycle_at": None, "active_targets_count": 0, "enabled_watches_count": 0, "requests_created_last_cycle": 0, "audits_requested_last_cycle": 0, "git_hygiene_findings_count": 0, "ring2_requests_count": 0, "runtime_warnings": []}
+        return {"operations_runtime_available": True, "operations_runtime_state": state, "last_cycle_id": None, "last_cycle_at": None, "active_targets_count": 0, "enabled_watches_count": 0, "requests_created_last_cycle": 0, "audits_requested_last_cycle": 0, "git_hygiene_findings_count": 0, "ring2_requests_count": 0, "audits_claimed_last_cycle": 0, "audits_completed_last_cycle": 0, "audits_blocked_last_cycle": 0, "audit_validation_pass_last_cycle": 0, "audit_validation_fail_last_cycle": 0, "ring2_prompts_generated_last_cycle": 0, "ring2_reviews_captured_last_cycle": 0, "audit_verdicts_published_last_cycle": 0, "runtime_warnings": []}
 
     def summary_from_cycle(self, cycle: dict[str, Any], *, state: str | None = None) -> dict[str, Any]:
-        return {"operations_runtime_available": True, "operations_runtime_state": state or cycle.get("runtime_state", "stopped"), "last_cycle_id": cycle.get("cycle_id"), "last_cycle_at": cycle.get("finished_at") or cycle.get("started_at"), "active_targets_count": cycle.get("targets_evaluated", 0), "enabled_watches_count": cycle.get("watches_evaluated", 0), "requests_created_last_cycle": cycle.get("requests_created", 0), "audits_requested_last_cycle": cycle.get("audits_requested", 0), "git_hygiene_findings_count": cycle.get("git_hygiene_findings", 0), "ring2_requests_count": cycle.get("ring2_requests_created", 0), "runtime_warnings": cycle.get("warnings", []) + cycle.get("errors", [])}
+        return {"operations_runtime_available": True, "operations_runtime_state": state or cycle.get("runtime_state", "stopped"), "last_cycle_id": cycle.get("cycle_id"), "last_cycle_at": cycle.get("finished_at") or cycle.get("started_at"), "active_targets_count": cycle.get("targets_evaluated", 0), "enabled_watches_count": cycle.get("watches_evaluated", 0), "requests_created_last_cycle": cycle.get("requests_created", 0), "audits_requested_last_cycle": cycle.get("audits_requested", 0), "git_hygiene_findings_count": cycle.get("git_hygiene_findings", 0), "ring2_requests_count": cycle.get("ring2_requests_created", 0), "audits_claimed_last_cycle": cycle.get("audits_claimed", 0), "audits_completed_last_cycle": cycle.get("audits_completed", 0), "audits_blocked_last_cycle": cycle.get("audits_blocked", 0), "audit_validation_pass_last_cycle": cycle.get("audit_validation_pass", 0), "audit_validation_fail_last_cycle": cycle.get("audit_validation_fail", 0), "ring2_prompts_generated_last_cycle": cycle.get("ring2_prompts_generated", 0), "ring2_reviews_captured_last_cycle": cycle.get("ring2_reviews_captured", 0), "audit_verdicts_published_last_cycle": cycle.get("audit_verdicts_published", 0), "runtime_warnings": cycle.get("warnings", []) + cycle.get("errors", [])}
 
 
 def format_operations_runtime_report(status: dict[str, Any]) -> str:

@@ -28,6 +28,7 @@ from estate.core.office_operational_activity import load_office_operational_acti
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
 from estate.core.background_operations_runtime import load_background_operations_status
 from estate.core.operations_runtime import load_operations_runtime_status
+from estate.core.post_merge_audit_processor import load_post_merge_audit_processor_status
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
@@ -470,6 +471,7 @@ def _build_status_bar(root, panels, generated_at):
     execution_summary = (((panels.get("execution_activity") or {}).get("data") or {}).get("summary") or {})
     dispatch_summary = (((panels.get("execution_dispatch") or {}).get("data") or {}).get("summary") or {})
     background_summary = (((panels.get("background_operations") or {}).get("data") or {}).get("summary") or {})
+    post_merge_summary = (((panels.get("post_merge_audit") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
@@ -509,6 +511,17 @@ def _build_status_bar(root, panels, generated_at):
         "latest_background_request": background_summary.get("latest_background_request"),
         "latest_background_event": background_summary.get("latest_background_event"),
         "background_operations_warnings": background_summary.get("warnings"),
+        "automatic_validation_available": post_merge_summary.get("automatic_validation_available"),
+        "pending_audit_requests": post_merge_summary.get("pending_audit_requests"),
+        "running_audit_request": post_merge_summary.get("running_audit_request"),
+        "latest_completed_audit": post_merge_summary.get("latest_completed_audit"),
+        "latest_validation_status": post_merge_summary.get("latest_validation_status"),
+        "latest_production_ready": post_merge_summary.get("latest_production_ready"),
+        "latest_ring2_status": post_merge_summary.get("latest_ring2_status"),
+        "latest_verdict": post_merge_summary.get("latest_verdict"),
+        "latest_verdict_artifact": post_merge_summary.get("latest_verdict_artifact"),
+        "validation_workspace_health": post_merge_summary.get("validation_workspace_health"),
+        "validation_evidence_root": post_merge_summary.get("validation_evidence_root"),
         "active_workers": active_workers,
         "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
@@ -965,6 +978,7 @@ def generate_command_center(root=None, write=True):
         "execution_dispatch": _read_artifact(root, ARTIFACTS["execution_dispatch"]),
         "background_operations": {"available": True, "path": "runtime/background_operations/status/latest.json", "kind": "json", "data": load_background_operations_status(root)},
         "operations_runtime": {"available": True, "path": "runtime/operations_runtime/status/latest.json", "kind": "json", "data": load_operations_runtime_status(root)},
+        "post_merge_audit": {"available": True, "path": "runtime/post_merge_audit/status/latest.json", "kind": "json", "data": load_post_merge_audit_processor_status(root)},
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),

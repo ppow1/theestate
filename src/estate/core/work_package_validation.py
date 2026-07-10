@@ -122,6 +122,31 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
 
 
+    "WP-0621": {
+        "recipe_id": "wp-0621-automatic-post-merge-validation-pipeline",
+        "title": "WP-0621 — Automatic Post-Merge Validation Pipeline",
+        "description": "Validates automatic post-merge audit processing, clean workspace validation, Ring 2 prompt generation, runtime/Office integration, CLI, documentation, and completion receipt without provider or dispatch execution.",
+        "required_checks": ["Required files exist", "New modules compile", "Deterministic tests pass", "Receipt reports no provider/dispatch execution"],
+        "observational_checks": ["Ollama is disabled by default", "Verdicts remain evidence pending Steward acceptance"],
+        "expected_artifacts": [
+            "src/estate/core/post_merge_audit_processor.py",
+            "src/estate/core/post_merge_validation_pipeline.py",
+            "tests/test_post_merge_audit_processor.py",
+            "tests/test_post_merge_validation_pipeline.py",
+            "docs/integration/automatic_post_merge_validation_pipeline.md",
+            "collaboration/work_packages/completions/WP-0621_codex_done.json"
+        ],
+        "failure_criteria": ["Any required command exits non-zero", "Provider or dispatch execution is reported"],
+        "success_criteria": ["Pending audit requests are consumed and produce validation/Ring 2/verdict evidence from a dedicated workspace"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "from pathlib import Path; paths=[\'src/estate/core/post_merge_audit_processor.py\',\'src/estate/core/post_merge_validation_pipeline.py\',\'tests/test_post_merge_audit_processor.py\',\'tests/test_post_merge_validation_pipeline.py\',\'docs/integration/automatic_post_merge_validation_pipeline.md\',\'collaboration/work_packages/completions/WP-0621_codex_done.json\']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"'),
+            _cmd("python -m py_compile src/estate/core/post_merge_audit_processor.py src/estate/core/post_merge_validation_pipeline.py"),
+            _cmd("pytest -q tests/test_post_merge_audit_processor.py tests/test_post_merge_validation_pipeline.py --basetemp Temp/pytest-post-merge-validation-pipeline"),
+            _cmd('python -c "import json; from pathlib import Path; data=json.loads(Path(\'collaboration/work_packages/completions/WP-0621_codex_done.json\').read_text(encoding=\'utf-8\')); assert data.get(\'work_package_id\') == \'WP-0621\'; assert data.get(\'provider_execution_performed\') is False; assert data.get(\'dispatch_execution_performed\') is False; assert data.get(\'ready_for_ca_review\') is True"'),
+        ],
+    },
+
     "WP-0619": {
         "recipe_id": "wp-0619-operations-runtime-service-loop",
         "title": "WP-0619 — Operations Runtime Service Loop",
