@@ -1,0 +1,14 @@
+{
+  "work_package_id": "WP-0633",
+  "status": "completed",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "summary": "Implemented governed cross-department operational coordination model, runtime, tests, and integration documentation.",
+  "artifacts": [
+    "src/estate/core/department_coordination.py",
+    "src/estate/core/department_coordination_runtime.py",
+    "tests/test_department_coordination.py",
+    "tests/test_department_coordination_runtime.py",
+    "docs/integration/cross_department_operational_coordination.md"
+  ]
+}
