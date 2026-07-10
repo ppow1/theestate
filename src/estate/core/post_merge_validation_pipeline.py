@@ -21,7 +21,7 @@ from estate.core.audit_workspace_service import AuditWorkspaceService
 from estate.core.production_readiness_validation import calculate_production_readiness, validate_receipt
 
 DEFAULT_STATES = {"pending","claimed","running_validation","ring2_required","running_ring2","completed","blocked","failed"}
-DEFAULT_VERDICTS = {"ring2_required","accepted","accepted_with_notes","needs_repair","blocked","validation_failed"}
+DEFAULT_VERDICTS = {"ring2_required","accepted","accepted_with_notes","needs_repair","blocked","validation_failed","no_recipe"}
 
 
 def utc_now_iso() -> str:
@@ -119,7 +119,9 @@ class PostMergeValidationPipeline:
                 validation = self.validator(wp, workspace)
                 _write_json(reports / "validation.json", validation)
                 artifacts["validation_report"] = _rel(reports / "validation.json", self.root)
-                if validation.get("validation_status") not in {"passed", "passed_with_findings"}:
+                if validation.get("validation_status") == "no_recipe":
+                    blocking.append("validation_recipe_missing")
+                elif validation.get("validation_status") not in {"passed", "passed_with_findings"}:
                     blocking.append("validation_failed")
             receipt = validate_receipt(wp, root=workspace) if workspace.exists() else {"receipt_status": "missing"}
             readiness = calculate_production_readiness(validation.get("validation_status", "failed"), receipt)
@@ -134,7 +136,9 @@ class PostMergeValidationPipeline:
                 if out:
                     artifacts["ring2_review"] = _rel(out, self.root)
             verdict = "ring2_required"
-            if blocking:
+            if validation.get("validation_status") == "no_recipe" or "validation_recipe_missing" in blocking:
+                verdict = "no_recipe"
+            elif blocking:
                 verdict = "validation_failed" if "validation_failed" in blocking else "blocked"
             elif ring2_verdict:
                 verdict = ring2_verdict
@@ -162,7 +166,7 @@ class PostMergeValidationPipeline:
             "base_branch_verified": workspace_record.revision_reachable, "expected_revision_verified": workspace_record.resolved_commit is not None, "expected_files_present": not missing,
             "failures": validation.get("failures", []), "findings": validation.get("findings", []) + readiness.get("non_blocking_findings", []),
             "warnings": warnings + validation.get("warnings", []), "errors": errors,
-            "blocking_reasons": blocking, "artifacts": artifacts,
+            "blocking_reasons": blocking, "blocking_reason": "validation_recipe_missing" if verdict == "no_recipe" else (blocking[0] if blocking else None), "retry_eligible": verdict == "no_recipe", "artifacts": artifacts,
             "provider_execution_performed": False, "dispatch_execution_performed": False, "created_at": utc_now_iso(),
         }
         verdict_path = evidence / "verdict.json"

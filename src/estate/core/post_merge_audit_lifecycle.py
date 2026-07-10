@@ -6,8 +6,8 @@ from typing import Any
 ACTIVE_REQUEST_STATES = {"pending", "claimed", "running_validation", "running_ring2"}
 PENDING_REQUEST_STATES = {"pending"}
 RUNNING_REQUEST_STATES = {"claimed", "running_validation", "running_ring2"}
-FINAL_VERDICTS = {"accepted", "accepted_with_notes", "ring2_required", "needs_repair", "blocked", "not_merged", "workspace_failed", "validation_failed"}
-TERMINAL_REQUEST_STATES = {"completed", "ring2_required", "blocked", "validation_failed", "workspace_failed", "already_audited", "not_merged"}
+FINAL_VERDICTS = {"accepted", "accepted_with_notes", "ring2_required", "needs_repair", "blocked", "not_merged", "workspace_failed", "validation_failed", "no_recipe"}
+TERMINAL_REQUEST_STATES = {"completed", "ring2_required", "blocked", "validation_failed", "workspace_failed", "already_audited", "not_merged", "no_recipe"}
 RETRYABLE_REQUEST_STATES = {"failed"}
 INELIGIBLE_CANDIDATE_STATES = {"superseded", "quarantined", "ambiguous", "manual_hold", "held", "historical_backfill", "retired"}
 

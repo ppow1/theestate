@@ -139,6 +139,8 @@ from estate.core.operations_runtime_host import OperationsRuntimeHost, Operation
 from estate.core.operations_scheduler import format_scheduler
 from estate.core.operations_scheduler_runtime import OperationsSchedulerRuntime
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
+from estate.core.validation_reconciliation import ValidationReconciliationService
+from estate.core.validation_reconciliation_runtime import admit_eligible as validation_reconciliation_admit_eligible, drain as validation_reconciliation_drain, write_path_audit as validation_reconciliation_write_path_audit
 from estate.core.character_continuity import create_cycle as continuity_create_cycle, prepare_reflection as continuity_prepare_reflection, create_continuity as continuity_create_artifact, start_next_cycle as continuity_start_next_cycle, status as continuity_status
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 from estate.cli.institutional_learning import run as run_institutional_learning_cli
@@ -2026,6 +2028,30 @@ def cmd_alfred_runtime(args):
         else:
             print(briefing["briefing"])
 
+def cmd_validation_reconciliation(args):
+    svc = ValidationReconciliationService(Path.cwd())
+    action = args.validation_reconciliation_action
+    if action == "rebuild":
+        payload = svc.rebuild(target=args.target, since=getattr(args, "since", None), max_commits=getattr(args, "max_commits", 500))
+    elif action == "status":
+        payload = svc.status(target=args.target)
+    elif action == "list":
+        payload = {"rows": svc.list(target=args.target)}
+    elif action == "inspect":
+        payload = {"rows": svc.inspect(args.work_package_id, target=args.target)}
+    elif action == "admit-eligible":
+        payload = validation_reconciliation_admit_eligible(Path.cwd(), target=args.target, max_requests=args.max_requests)
+    elif action == "drain":
+        payload = validation_reconciliation_drain(Path.cwd(), target=args.target, max_audit_requests=args.max_audit_requests)
+    elif action == "write-path-audit":
+        payload = validation_reconciliation_write_path_audit(Path.cwd())
+    else:
+        raise SystemExit(f"unknown validation reconciliation action {action}")
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(json.dumps(payload.get("summary", payload), indent=2, sort_keys=True))
+
 def cmd_validate_work_package(args):
     import json
     payload = validate_work_package(args.id)
@@ -2522,6 +2548,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
     sub = parser.add_subparsers(dest="command")
 
+
+
+    p = sub.add_parser("validation-reconciliation", help="Rebuild and inspect automatic validation reconciliation")
+    vr = p.add_subparsers(dest="validation_reconciliation_action", required=True)
+    sp = vr.add_parser("rebuild"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--since"); sp.add_argument("--max-commits", type=int, default=500); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
+    sp = vr.add_parser("status"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
+    sp = vr.add_parser("list"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
+    sp = vr.add_parser("inspect"); sp.add_argument("work_package_id"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
+    sp = vr.add_parser("admit-eligible"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--max-requests", type=int, default=5); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
+    sp = vr.add_parser("drain"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--max-audit-requests", type=int, default=5); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
+    sp = vr.add_parser("write-path-audit"); sp.add_argument("--target", default="estate-main"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_validation_reconciliation)
 
     p = sub.add_parser("ai-services", help="Inspect and govern local AI services")
     ai_sub = p.add_subparsers(dest="ai_services_action", required=True)

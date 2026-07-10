@@ -62,16 +62,18 @@ class BackgroundOperationsRuntime:
         self.base.mkdir(parents=True, exist_ok=True)
 
     def load_watches(self) -> list[BackgroundOperationWatch]:
-        if not self.watches_path.exists():
+        had_explicit_watches = self.watches_path.exists()
+        if not had_explicit_watches:
             watches = default_background_operation_watches()
             self.write_watches(watches)
         else:
             data = _read_json(self.watches_path)
             raw = data.get("watches", data) if isinstance(data, dict) else data
             watches = [BackgroundOperationWatch.from_dict(item) for item in raw]
-        ext_watches, failures = BackgroundOperationsExtensionRuntime(self.root).extension_watches()
-        existing = {w.watch_id for w in watches}
-        watches.extend(w for w in ext_watches if w.watch_id not in existing)
+        if not had_explicit_watches:
+            ext_watches, failures = BackgroundOperationsExtensionRuntime(self.root).extension_watches()
+            existing = {w.watch_id for w in watches}
+            watches.extend(w for w in ext_watches if w.watch_id not in existing)
         return watches
 
     def write_watches(self, watches: list[BackgroundOperationWatch]) -> None:
