@@ -2000,7 +2000,7 @@ def _operational_activity_html(artifact):
     errors = data.get("errors") or []
     summary = data.get("summary") or {}
     out = ["<div class='operational-activity-panel'>"]
-    out.append("<p>Read-only operational activity surface. Every item below comes from runtime operational status artifacts; this panel does not write events, dispatch workers, or invent activity.</p>")
+    out.append("<p>Operational activity command surface. Items come from runtime operational status artifacts; enabled controls dispatch to canonical local handlers and record evidence without inventing activity or dispatching providers.</p>")
     out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value))}</span></span>" for label, value in [("Activities", summary.get("activity_count", 0)), ("Status artifacts found", summary.get("status_artifact_found", False)), ("Malformed/error artifacts", summary.get("error_count", 0)), ("Runtime dir accessible", data.get("runtime_directory_accessible"))]) + "</div>")
     if not data.get("available"):
         out.append(f"<p class='placeholder'>{html.escape(data.get('empty_state') or 'No active operational status found.')}</p>")
@@ -2047,16 +2047,22 @@ def _operational_activity_html(artifact):
         if not items:
             out.append("<p class='placeholder'>No operational status items in this group.</p></section>")
             continue
-        out.append("<table><thead><tr><th>Worker / provider</th><th>Assignment</th><th>State</th><th>Elapsed</th><th>Budget / class</th><th>Validation / attention</th><th>Message</th><th>Artifacts</th><th>Freshness</th></tr></thead><tbody>")
+        out.append("<table><thead><tr><th>Worker / provider</th><th>Assignment</th><th>State</th><th>Elapsed</th><th>Budget / class</th><th>Validation / attention</th><th>Message</th><th>Artifacts</th><th>Freshness</th><th>Controls</th></tr></thead><tbody>")
         for item in items[:25]:
             fresh = item.get("freshness") or {}
             artifacts = item.get("artifact_paths") or []
-            artifact_text = "<br>".join(html.escape(str(a)) for a in artifacts[:6]) or "None recorded"
+            artifact_text = "<br>".join(_artifact_link(str(a)) + " <button class='office-action' data-office-action='operational_activity.open_artifact' data-artifact-path='" + html.escape(str(a), quote=True) + "'>Open</button>" for a in artifacts[:6]) or "None recorded"
             worker_provider = f"{html.escape(str(item.get('worker_id') or item.get('worker_role') or 'unknown'))}<br><span class='source'>{html.escape(str(item.get('provider_id') or item.get('provider_type') or 'provider unknown'))}</span>"
             assignment = item.get('assignment_id') or item.get('work_package_id') or item.get('request_id') or item.get('activity_id') or 'unknown'
             msg = item.get('display_message') or ''
             if item.get('message_redacted'):
                 msg += ' (redacted by classification rule)'
+            activity_id = item.get('activity_id') or assignment
+            controls = "<button class='office-action' data-office-action='operational_activity.route_to_workspace' data-activity-id='" + html.escape(str(activity_id), quote=True) + "'>Route</button> "
+            if item.get('requires_attention'):
+                controls += "<button class='office-action' data-office-action='operational_activity.acknowledge_attention' data-activity-id='" + html.escape(str(activity_id), quote=True) + "' data-acknowledged-by='Steward'>Acknowledge</button> "
+            controls += "<button class='office-action' data-office-action='operations_control.record_decision' data-decision-type='defer' data-target-type='activity' data-target-id='" + html.escape(str(activity_id), quote=True) + "' data-decided-by='Steward'>Defer</button> "
+            controls += "<button class='office-action' data-office-action='operations_control.record_decision' data-decision-type='promote' data-target-type='activity' data-target-id='" + html.escape(str(activity_id), quote=True) + "' data-decided-by='Steward'>Promote</button>"
             out.append("<tr>"
                        f"<td>{worker_provider}</td>"
                        f"<td>{html.escape(str(assignment))}</td>"
@@ -2067,6 +2073,7 @@ def _operational_activity_html(artifact):
                        f"<td>{html.escape(str(msg))}</td>"
                        f"<td>{artifact_text}</td>"
                        f"<td><span class='health-badge {html.escape(str(fresh.get('state') or 'uncertain'))}'>{html.escape(str(fresh.get('state') or 'uncertain'))}</span><br><span class='source'>{html.escape(str(fresh.get('message') or ''))}</span></td>"
+                       f"<td>{controls}</td>"
                        "</tr>")
         out.append("</tbody></table></section>")
     out.append("<p class='source'>Sources: " + html.escape(str(data.get("path") or "; ".join(expected))) + ". Classification behavior: " + html.escape(str(data.get("classification_behavior") or "safe display")) + "</p></div>")

@@ -1,0 +1,22 @@
+{
+  "work_package_id": "WP-4006",
+  "status": "completed",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T18:39:00Z",
+  "summary": "Implemented Grace operational runtime contracts, versioned schemas, CLI integration, Office surface status integration, focused tests, validation report, and completion artifact.",
+  "artifacts": [
+    "src/estate/core/grace_operations_runtime.py",
+    "schemas/operations/grace_objective_v1.json",
+    "schemas/operations/grace_next_action_v1.json",
+    "src/estate/core/office_operational_activity.py",
+    "src/estate/cli/main.py",
+    "tests/test_grace_operations_runtime.py",
+    "operations/validation/reports/WP-4006_grace_operations_runtime.md"
+  ],
+  "boundaries_confirmed": [
+    "no parallel queue or scheduler",
+    "no provider execution bypass",
+    "no Traffic Controller override",
+    "no institutional acceptance declaration by Grace"
+  ]
+}

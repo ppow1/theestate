@@ -170,6 +170,54 @@ def record_operations_control_decision(root=None, decision_type: str | None = No
 
 
 
+
+def refresh_operational_activity(root=None, **params: Any) -> OfficeActionResult:
+    base = _root(root)
+    from estate.core.office_operational_activity import load_office_operational_activity
+    payload = load_office_operational_activity(base)
+    rel = 'runtime/operations/status/office_operational_activity_payload.json'
+    path = base / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    return _completed('operational_activity.refresh', 'Refresh operational activity', 'operational-activity', 'estate.core.office_operational_activity.load_office_operational_activity', f"Operational activity refreshed with {(payload.get('summary') or {}).get('activity_count', 0)} item(s).", read=payload.get('expected_status_artifact_paths') or [], written=[rel], state=['operational activity payload refreshed'], request_id=params.get('request_id'))
+
+def acknowledge_operational_activity(root=None, activity_id: str | None = None, acknowledged_by: str | None = None, reason: str | None = None, **params: Any) -> OfficeActionResult:
+    if not activity_id or not acknowledged_by:
+        return _blocked('operational_activity.acknowledge_attention', 'Acknowledge attention item', 'operational-activity', 'office_command_surface.acknowledge_operational_activity', 'activity_id and acknowledged_by are required.', request_id=params.get('request_id'))
+    base=_root(root); rel='runtime/operations/status/attention_acknowledgements.json'; path=base/rel; path.parent.mkdir(parents=True, exist_ok=True)
+    data=[]
+    if path.exists():
+        try: data=json.loads(path.read_text(encoding='utf-8'))
+        except Exception: data=[]
+    rec={'activity_id':activity_id,'acknowledged_by':acknowledged_by,'reason':reason or 'Office attention acknowledgement','timestamp':datetime.now(timezone.utc).isoformat(timespec='seconds'),'request_id':params.get('request_id') or _request_id()}
+    data.append(rec); path.write_text(json.dumps(data, indent=2, sort_keys=True)+'\n', encoding='utf-8')
+    refresh_operational_activity(base)
+    return _completed('operational_activity.acknowledge_attention', 'Acknowledge attention item', 'operational-activity', 'office_command_surface.acknowledge_operational_activity', f"Attention item {activity_id} acknowledged locally by {acknowledged_by}.", read=['runtime/operations/status/active.json','runtime/operations/status/recent.json'], written=[rel,'runtime/operations/status/office_operational_activity_payload.json'], state=['attention acknowledgement evidence recorded'], request_id=rec['request_id'])
+
+def route_operational_activity(root=None, activity_id: str | None = None, route_target: str | None = None, **params: Any) -> OfficeActionResult:
+    if not activity_id:
+        return _blocked('operational_activity.route_to_workspace', 'Route to controlling workspace', 'operational-activity', 'office_command_surface.route_operational_activity', 'activity_id is required.', request_id=params.get('request_id'))
+    target = route_target or ('work-packages' if str(activity_id).startswith('WP-') else 'execution-control')
+    rel='runtime/operations/status/activity_routes.jsonl'; base=_root(root); path=base/rel; path.parent.mkdir(parents=True, exist_ok=True)
+    path.open('a',encoding='utf-8').write(json.dumps({'activity_id':activity_id,'target_tab':target,'timestamp':datetime.now(timezone.utc).isoformat(timespec='seconds'),'request_id':params.get('request_id') or _request_id()}, sort_keys=True)+'\n')
+    return _completed('operational_activity.route_to_workspace', 'Route to controlling workspace', target, 'office_command_surface.route_operational_activity', f"Route prepared for {activity_id} to {target}.", written=[rel], state=['workspace route evidence recorded'], request_id=params.get('request_id'))
+
+def open_operational_artifact(root=None, artifact_path: str | None = None, **params: Any) -> OfficeActionResult:
+    if not artifact_path:
+        return _blocked('operational_activity.open_artifact', 'Open related evidence/artifact', 'operational-activity', 'office_command_surface.open_operational_artifact', 'artifact_path is required.', request_id=params.get('request_id'))
+    base=_root(root); path=(base/artifact_path).resolve()
+    try: path.relative_to(base.resolve())
+    except ValueError:
+        return _blocked('operational_activity.open_artifact', 'Open related evidence/artifact', 'operational-activity', 'office_command_surface.open_operational_artifact', 'artifact_path must stay inside the Estate root.', request_id=params.get('request_id'))
+    if not path.exists():
+        return _blocked('operational_activity.open_artifact', 'Open related evidence/artifact', 'operational-activity', 'office_command_surface.open_operational_artifact', f'Artifact is not available: {artifact_path}.', read=[artifact_path], request_id=params.get('request_id'))
+    return _completed('operational_activity.open_artifact', 'Open related evidence/artifact', 'operational-activity', 'office_command_surface.open_operational_artifact', f"Artifact available for opening: {artifact_path}.", read=[artifact_path], state=['artifact availability verified'], request_id=params.get('request_id'))
+
+def filter_operational_activity(root=None, state: str = '', owner: str = '', priority: str = '', attention_required: str = '', **params: Any) -> OfficeActionResult:
+    base=_root(root); rel='runtime/operations/status/activity_filter.json'; payload={'state':state,'owner':owner,'priority':priority,'attention_required':attention_required,'timestamp':datetime.now(timezone.utc).isoformat(timespec='seconds')}
+    path=base/rel; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(payload, indent=2, sort_keys=True)+'\n', encoding='utf-8')
+    return _completed('operational_activity.filter', 'Filter operational activity', 'operational-activity', 'office_command_surface.filter_operational_activity', 'Operational activity filter persisted for the local Office render.', written=[rel], state=['operational activity filter state changed'], request_id=params.get('request_id'))
+
 def settings_load_current(root=None, **_: Any) -> OfficeActionResult:
     return _completed('settings.load_current', 'Load current settings', 'settings', 'estate.core.operations_center_settings.load_operations_center_settings', 'Current settings are loaded in the refreshed Office payload.', read=[SETTINGS_OUTPUT], state=['settings payload refreshed'])
 
@@ -465,6 +513,11 @@ HANDLERS.update({
  'operations_surface.watch_control': operations_watch_control,
  'operations_surface.scheduler_control': operations_scheduler_control,
  'operations_surface.host_control': operations_host_control,
+ 'operational_activity.refresh': refresh_operational_activity,
+ 'operational_activity.acknowledge_attention': acknowledge_operational_activity,
+ 'operational_activity.route_to_workspace': route_operational_activity,
+ 'operational_activity.open_artifact': open_operational_artifact,
+ 'operational_activity.filter': filter_operational_activity,
  'execution_session.preview': execution_session_preview,
  'execution_session.start': execution_session_start,
  'execution_session.resume': execution_session_resume,
@@ -538,6 +591,11 @@ ACTION_CONTROLS = [
  {'action_id':'operations_surface.inspect_evidence','label':'Inspect operations evidence','target_tab':'operational-activity','handler':'operations_inspect_evidence','availability':'available','requires_input':'evidence_path','note':'Reads an existing evidence file under the Estate root and returns truthful status.'},
  {'action_id':'orchestrator_intake.record_decision','label':'Record Orchestrator intake decision','target_tab':'operational-activity','handler':'record_orchestrator_intake_decision','availability':'available','requires_input':'intake_id,decision,decided_by','note':'Records a durable decision artifact; does not schedule or execute work.'},
  {'action_id':'operations_control.record_decision','label':'Record operations-control decision','target_tab':'operational-activity','handler':'record_operations_control_decision','availability':'available','requires_input':'decision_type,target_type,decided_by','note':'Writes an operations-control decision artifact; does not execute providers.'},
+ {'action_id':'operational_activity.refresh','label':'Refresh operational activity','target_tab':'operational-activity','handler':'refresh_operational_activity','availability':'available'},
+ {'action_id':'operational_activity.acknowledge_attention','label':'Acknowledge attention item','target_tab':'operational-activity','handler':'acknowledge_operational_activity','availability':'available','requires_input':'activity_id,acknowledged_by,reason','note':'Records local durable acknowledgement evidence; source activity is not falsified.'},
+ {'action_id':'operational_activity.route_to_workspace','label':'Route to controlling workspace','target_tab':'operational-activity','handler':'route_operational_activity','availability':'available','requires_input':'activity_id,route_target'},
+ {'action_id':'operational_activity.open_artifact','label':'Open related artifact','target_tab':'operational-activity','handler':'open_operational_artifact','availability':'available','requires_input':'artifact_path'},
+ {'action_id':'operational_activity.filter','label':'Filter operational activity','target_tab':'operational-activity','handler':'filter_operational_activity','availability':'available','requires_input':'state,owner,priority,attention_required'},
  {'action_id':'operations_control.run_provider','label':'Run provider','target_tab':'operational-activity','availability':'gated','disabled_reason':'Provider execution is intentionally outside the Office traffic-controller panel.'},
  {'action_id':'ai_services.start_stop_load','label':'Start/stop/load AI service','target_tab':'ai-services-models','availability':'gated','disabled_reason':'Process-control approval workflow is not implemented for Office controls; use existing governed service approval path first.'},
 ]
