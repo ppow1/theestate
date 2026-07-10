@@ -1,0 +1,16 @@
+{
+  "work_package_id": "WP-0527",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "status": "completed",
+  "staged_not_installed": true,
+  "summary": [
+    "Created staged unified search contract and implementation under collaboration/workstreams/WP-0527/.",
+    "Added typed result categories, relevance scoring, filters, source freshness, direct Office navigation destinations, settings-aware recent/pinned query state, and safe registered action invocation.",
+    "Declared overlap with global_search_command_palette.py and WP-0520 safe Office action registration.",
+    "Staged work is not installed work; WP-0531 remains responsible for installation."
+  ],
+  "evidence": [
+    "PYTHONPATH=collaboration/workstreams/WP-0527/staged pytest -q collaboration/workstreams/WP-0527/staged/test_office_unified_search.py"
+  ]
+}

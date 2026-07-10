@@ -1,0 +1,32 @@
+{
+  "work_package_id": "WP-0527",
+  "schema": "estate.staged_install_manifest.v1",
+  "staged_not_installed": true,
+  "summary": "Staged unified Estate search and safe command experience for later WP-0531 installation.",
+  "files": [
+    "collaboration/workstreams/WP-0527/staged/office_unified_search.py",
+    "collaboration/workstreams/WP-0527/staged/test_office_unified_search.py",
+    "collaboration/workstreams/WP-0527/unified_search_contract.md",
+    "collaboration/workstreams/WP-0527/validation_notes.md",
+    "collaboration/workstreams/WP-0527/rollback_notes.md"
+  ],
+  "expected_final_targets": [
+    "dedicated Office search module",
+    "command-palette adapter",
+    "Office registration hooks",
+    "active tests",
+    "user/operator documentation"
+  ],
+  "declared_overlaps": [
+    {
+      "target": "src/estate/core/global_search_command_palette.py",
+      "reason": "Existing global palette indexes artifacts and registered commands; WP-0527 stages a richer typed contract and safe invocation adapter."
+    },
+    {
+      "target": "WP-0520",
+      "reason": "WP-0520 registered AI Services / local runtime safe Office actions in search and command palette surfaces; WP-0527 must preserve that safe-action-only boundary."
+    }
+  ],
+  "install_owner": "WP-0531",
+  "no_active_office_files_modified": true
+}
