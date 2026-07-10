@@ -123,6 +123,7 @@ from estate.core.orchestrator_schedule_runtime import OrchestratorScheduleRuntim
 from estate.core.provider_catalog import load_provider_catalog, write_office_status, format_provider_list
 from estate.core.provider_health import ProviderHealthRecord, write_health_record, generate_provider_health_summary, format_provider_health_summary
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
+from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard, format_engineering_capacity_dashboard
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 from estate.core.operations_manager import OperationsDecision
@@ -733,6 +734,18 @@ def cmd_providers_capacity_set(args):
     except (OSError, ValueError) as exc:
         print(f"Provider capacity set failed: {exc}")
         raise SystemExit(1)
+
+def cmd_engineering_capacity_dashboard(args):
+    try:
+        payload = generate_engineering_capacity_dashboard(stale_after_minutes=args.stale_after_minutes, write=True)
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_engineering_capacity_dashboard(payload))
+    except (OSError, ValueError) as exc:
+        print(f"Engineering capacity dashboard failed: {exc}")
+        raise SystemExit(1)
+
 
 def cmd_providers_health_summary(args):
     try:
@@ -3817,6 +3830,11 @@ def main(argv=None):
     p = sub.add_parser("providers-health-summary", help="Summarize provider health and capacity")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_providers_health_summary)
+
+    p = sub.add_parser("engineering-capacity-dashboard", help="Generate Engineering Capacity Runtime dashboard")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--stale-after-minutes", type=int, default=30)
+    p.set_defaults(func=cmd_engineering_capacity_dashboard)
 
 
     p = sub.add_parser("worker-assignment-create", help="Create a file-backed worker assignment record")
