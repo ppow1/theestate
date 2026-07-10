@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
 from estate.core.operational_target_resolution import OperationalTargetResolver
-from estate.core.post_merge_audit import PostMergeAuditRequest
+from estate.core.merge_discovery_consolidation import MergeDiscoveryConsolidator
 from estate.core.paths import ESTATE_ROOT
 
 BASE = Path("runtime/merge_discovery")
@@ -48,7 +48,7 @@ class MergeDiscovery:
     def cursor_path(self, target_id): return self.root/TARGETS/target_id/"cursor.json"
     def records_dir(self): return self.root/DISCOVERIES
     def requests_dir(self): return self.root/"runtime/post_merge_audit/requests"
-    def scan(self, target="estate-main", max_commits:int=100, replay:bool=False) -> dict[str,Any]:
+    def scan(self, target="estate-main", max_commits:int=100, replay:bool=False, backfill_mode:str="quarantine", max_candidates:int=20, max_requests_per_cycle:int=5, minimum_evidence_level:str="implementation") -> dict[str,Any]:
         res=self.resolver.resolve(target); target_id=res.canonical_target_id or target
         t=self.targets.get(target_id); repo=Path(t.local_path or self.root)
         curp=self.cursor_path(target_id); cursor=_read(curp) if curp.exists() and not replay else {}
@@ -62,7 +62,8 @@ class MergeDiscovery:
             rec=self._discover_commit(repo, target_id, sha)
             if not rec: continue
             if rec.source_kind=="merge": metrics["merge_commits_scanned"]+=1
-            self._dedupe_and_request(rec, metrics)
+            if self._has_final_verdict(rec):
+                rec.state="already_processed"; metrics["duplicate_audit_requests_suppressed"]+=1
             records.append(rec.to_dict())
             if rec.state in {"discovered","request_created","already_processed"}: metrics["work_packages_discovered"]+=1
             if rec.state=="ambiguous": metrics["discoveries_ambiguous"]+=1
@@ -72,8 +73,12 @@ class MergeDiscovery:
         head=_git(repo,"rev-parse",t.base_branch) if repo.exists() else None
         cursor={"target_id":target_id,"base_branch":t.base_branch,"last_scanned_commit":head,"last_scanned_at":utc_now_iso(),"last_discovery_count":len(records),"last_request_count":metrics["audit_requests_created_from_merges"],"status":"ok","warnings":[],"errors":[]}
         _write(curp,cursor)
-        summary={"merge_discovery_available":True, **metrics, "last_merge_scan_at":cursor["last_scanned_at"], "last_scanned_commit":head, "pending_discovery_candidates":self._candidate_count(), "ambiguous_discoveries":self._ambiguous_count(), "latest_discovered_work_package":next((r.get("work_package_id") for r in reversed(records) if r.get("work_package_id")), None), "latest_created_audit_request":next((r.get("audit_request_id") for r in reversed(records) if r.get("audit_request_id")), None), "duplicate_requests_suppressed":metrics["duplicate_audit_requests_suppressed"]}
-        payload={"target_id":target_id,"cursor":cursor,"records":records,"summary":summary,"provider_execution_performed":False,"dispatch_execution_performed":False}
+        consolidation=MergeDiscoveryConsolidator(self.root).consolidate(target_id, records=records, mode=backfill_mode, max_candidates=max_candidates, max_requests_per_cycle=max_requests_per_cycle, minimum_evidence_level=minimum_evidence_level)
+        cs=consolidation.get("summary", {})
+        metrics["audit_requests_created_from_merges"]=cs.get("admitted_requests",0)
+        metrics["duplicate_audit_requests_suppressed"]=cs.get("requests_suppressed_by_grouping",0)
+        summary={"merge_discovery_available":True, **metrics, **cs, "last_merge_scan_at":cursor["last_scanned_at"], "last_scanned_commit":head, "pending_discovery_candidates":self._candidate_count(), "ambiguous_discoveries":self._ambiguous_count(), "latest_discovered_work_package":next((r.get("work_package_id") for r in reversed(records) if r.get("work_package_id")), None), "latest_created_audit_request":next((r.get("audit_request_id") for r in reversed(consolidation.get("admitted_requests", [])) if r.get("audit_request_id")), None), "duplicate_requests_suppressed":metrics["duplicate_audit_requests_suppressed"]}
+        payload={"target_id":target_id,"cursor":cursor,"records":records,"consolidation":consolidation,"summary":summary,"provider_execution_performed":False,"dispatch_execution_performed":False}
         _write(self.root/STATUS/"latest.json", payload); _write(self.root/STATUS/"summary.json", summary)
         return payload
     def _discover_commit(self, repo, target_id, sha):
@@ -98,6 +103,9 @@ class MergeDiscovery:
         ids={x[0] for x in evidence}
         rec=MergeDiscoveryRecord(f"md-{uuid4().hex}",target_id,source_kind,sha,sha,completion_receipt_path=receipt_path,warnings=warnings,metadata=metadata)
         if not ids: rec.state="ignored"; rec.warnings.append("no_work_package_identity_evidence"); return rec
+        receipt_ids={wp for wp,method in evidence if method in {"receipt_work_package_id","receipt_filename"}}
+        if receipt_ids and len(receipt_ids)==1:
+            rec.work_package_id=next(iter(receipt_ids)); rec.correlation_method=next(m for wp,m in evidence if wp==rec.work_package_id and m in {"receipt_work_package_id","receipt_filename"}); rec.state="discovered"; rec.metadata["identity_evidence"]=evidence; rec.metadata["evidence_level"]="completion_receipt_commit"; return rec
         if len(ids)>1: rec.state="ambiguous"; rec.errors.append("conflicting_work_package_ids:"+",".join(sorted(ids))); rec.metadata["identity_evidence"]=evidence; return rec
         rec.work_package_id=next(iter(ids)); rec.correlation_method=next(m for wp,m in evidence if wp==rec.work_package_id); rec.state="discovered"; rec.metadata["identity_evidence"]=evidence; return rec
     def _dedupe_and_request(self, rec, metrics):

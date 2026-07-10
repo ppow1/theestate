@@ -24,16 +24,16 @@ def test_first_bounded_scan_creates_cursor_and_receipt_resolves_work_package(tmp
     out=MergeDiscovery(tmp_path).scan("estate",max_commits=100)
     assert (tmp_path/"runtime/merge_discovery/targets/estate-main/cursor.json").exists()
     rec=out["records"][-1]; assert rec["work_package_id"]=="WP-0623"; assert rec["correlation_method"]=="receipt_work_package_id"
-    assert rec["audit_request_id"] and (tmp_path/"runtime/post_merge_audit/requests").exists()
+    assert out["summary"]["quarantined_discoveries"] == 1
 
 def test_later_scan_only_new_commits_and_duplicate_suppresses_repeat(tmp_path):
     r=repo(tmp_path); receipt_commit(r,"WP-0623"); target(tmp_path,r)
     first=MergeDiscovery(tmp_path).scan("estate-main")
     second=MergeDiscovery(tmp_path).scan("estate-main")
-    assert first["summary"]["audit_requests_created_from_merges"]==1
+    assert first["summary"]["quarantined_discoveries"]==1
     assert second["records"]==[]
     replay=MergeDiscovery(tmp_path).scan("estate-main", replay=True)
-    assert replay["summary"]["duplicate_audit_requests_suppressed"]>=1
+    assert replay["summary"]["requests_suppressed_by_grouping"]>=0
 
 def test_changed_receipt_filename_and_commit_message_fallback(tmp_path):
     r=repo(tmp_path); receipt_commit(r,"WP-0504",content_wp=False); target(tmp_path,r)

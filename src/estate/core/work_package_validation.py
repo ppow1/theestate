@@ -53,6 +53,41 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0624": {
+        "recipe_id": "wp-0624-merge-discovery-consolidation",
+        "title": "WP-0624 — Merge Discovery Consolidation and Backfill Control",
+        "description": "Validates canonical merge-discovery grouping, backfill controls, reconciliation, Office visibility, and authority boundaries.",
+        "required_checks": [
+            "Consolidation implementation, tests, documentation, and completion receipt exist",
+            "Consolidation module compiles",
+            "Focused merge discovery consolidation tests pass",
+            "Receipt confirms provider and dispatch execution remain false",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/merge_discovery_consolidation.py",
+            "tests/test_merge_discovery_consolidation.py",
+            "docs/integration/merge_discovery_consolidation_and_backfill_control.md",
+            "collaboration/work_packages/completions/WP-0624_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports provider or dispatch execution",
+        ],
+        "success_criteria": [
+            "Canonical grouping suppresses duplicate audit requests",
+            "Historical backfill is quarantined by default and admitted explicitly within queue limits",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/merge_discovery_consolidation.py','tests/test_merge_discovery_consolidation.py','docs/integration/merge_discovery_consolidation_and_backfill_control.md','collaboration/work_packages/completions/WP-0624_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/merge_discovery_consolidation.py"),
+            _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+            _cmd("pytest -q tests/test_merge_discovery.py tests/test_merge_discovery_runtime.py tests/test_merge_discovery_consolidation.py --basetemp Temp/pytest-merge-consolidation"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0624_codex_done.json').read_text()); assert d['work_package_id']=='WP-0624'; assert d['provider_execution_performed'] is False; assert d['dispatch_execution_performed'] is False; assert d['ready_for_ca_review'] is True\""),
+        ],
+    },
+
     "WP-0623": {
         "recipe_id": "wp-0623-automatic-merge-and-receipt-discovery",
         "title": "WP-0623 — Automatic Merge and Receipt Discovery",

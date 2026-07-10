@@ -1,0 +1,59 @@
+{
+  "admitted_requests": "Admit mode creates canonical pending audit requests only up to max_requests_per_cycle.",
+  "branch": "work",
+  "canonical_groups": {
+    "ca5_packages": [
+      "WP-0504",
+      "WP-0505",
+      "WP-0506"
+    ],
+    "grouping_key": "target_id + work_package_id + promoted_revision",
+    "implemented": true
+  },
+  "codex_status": "done",
+  "completed_at": "2026-07-10T03:40:00Z",
+  "demonstration_results": {
+    "focused_tests": "passed",
+    "py_compile": "passed",
+    "validate_work_package": "passed"
+  },
+  "dispatch_execution_performed": false,
+  "files_changed": [
+    "src/estate/core/merge_discovery_consolidation.py",
+    "src/estate/core/merge_discovery.py",
+    "src/estate/core/merge_discovery_runtime.py",
+    "src/estate/core/operations_runtime.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "src/estate/cli/main.py",
+    "tests/test_merge_discovery.py",
+    "tests/test_merge_discovery_consolidation.py",
+    "docs/integration/merge_discovery_consolidation_and_backfill_control.md",
+    "collaboration/work_packages/completions/WP-0624_codex_done.json"
+  ],
+  "known_limitations": [
+    "The repository CLI requires PYTHONPATH=src in this container because the package is not installed into the active Python environment.",
+    "Historical max_age_hours is documented as a policy default; current deterministic tests exercise candidate and request limits."
+  ],
+  "merge_authority_equivalent": "Chief Architect review required before merge.",
+  "provider_execution_performed": false,
+  "pull_request_not_applicable_reason": "Not applicable in local validation environment; PR is created by make_pr tool after commit.",
+  "quarantined_records": "Default first-run consolidation mode is quarantine; canonical candidates are not admitted unless explicitly requested.",
+  "queue_limits": {
+    "max_age_hours": 48,
+    "max_candidates": 20,
+    "max_commits": 50,
+    "max_requests_per_cycle": 5,
+    "minimum_evidence_level": "implementation"
+  },
+  "ready_for_ca_review": true,
+  "reconciled_existing_requests": "reconcile-requests retains one active request per group and marks weaker active requests superseded with history.",
+  "summary": "Implemented merge discovery consolidation, default quarantine backfill control, explicit admission, existing request reconciliation, runtime and Office metrics, CLI commands, tests, and documentation.",
+  "superseded_records": "Weaker discoveries are marked superseded and linked through superseded_by/canonical_discovery_id.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/merge_discovery_consolidation.py src/estate/core/merge_discovery.py src/estate/core/merge_discovery_runtime.py src/estate/core/operations_runtime.py src/estate/core/work_package_validation.py src/estate/cli/main.py",
+    "pytest -q tests/test_merge_discovery.py tests/test_merge_discovery_runtime.py tests/test_merge_discovery_consolidation.py --basetemp Temp/pytest-merge-consolidation",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0624 --json"
+  ],
+  "work_package_id": "WP-0624"
+}
