@@ -131,6 +131,7 @@ from estate.core.operations_scheduler_runtime import OperationsSchedulerRuntime
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.core.character_continuity import create_cycle as continuity_create_cycle, prepare_reflection as continuity_prepare_reflection, create_continuity as continuity_create_artifact, start_next_cycle as continuity_start_next_cycle, status as continuity_status
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
+from estate.cli.institutional_learning import run as run_institutional_learning_cli
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -217,6 +218,25 @@ def cmd_helen_workforce(args):
         run_helen_workforce_cli(argv)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Helen workforce command failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_institutional_learning(args):
+    argv = []
+    if getattr(args, "root", None):
+        argv += ["--root", args.root]
+    if getattr(args, "json", False):
+        argv.append("--json")
+    argv.append(args.institutional_learning_action)
+    if getattr(args, "file", None):
+        argv += ["--file", args.file]
+    if getattr(args, "lesson_id", None):
+        argv += ["--lesson-id", args.lesson_id]
+    if getattr(args, "closure_summary", None):
+        argv += ["--closure-summary", args.closure_summary]
+    try:
+        run_institutional_learning_cli(argv)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Institutional learning command failed: {exc}")
         raise SystemExit(1)
 
 
@@ -3282,6 +3302,31 @@ def main(argv=None):
         q.add_argument("--root")
         q.add_argument("--json", action="store_true")
         q.set_defaults(func=cmd_helen_workforce)
+
+
+    p = sub.add_parser("institutional-learning", help="Create and inspect governed institutional learning lessons")
+    il = p.add_subparsers(dest="institutional_learning_action", required=True)
+    q = il.add_parser("intake")
+    q.add_argument("--file", required=True)
+    q.add_argument("--root")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_institutional_learning)
+    q = il.add_parser("close")
+    q.add_argument("--lesson-id", required=True)
+    q.add_argument("--closure-summary", required=True)
+    q.add_argument("--root")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_institutional_learning)
+    q = il.add_parser("show")
+    q.add_argument("--lesson-id", required=True)
+    q.add_argument("--root")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_institutional_learning)
+    for name in ["list", "status"]:
+        q = il.add_parser(name)
+        q.add_argument("--root")
+        q.add_argument("--json", action="store_true")
+        q.set_defaults(func=cmd_institutional_learning)
 
 
     p = sub.add_parser("execution-chain", help="Run deterministic end-to-end execution-chain demonstrations")

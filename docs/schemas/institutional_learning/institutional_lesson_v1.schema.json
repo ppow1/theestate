@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "institutional_lesson_v1.schema.json",
+  "type": "object",
+  "required": ["schema_version", "lesson_id", "lesson_type", "source_type", "summary", "evidence_artifacts", "recommended_owner", "next_action", "follow_up_checkpoint", "status"],
+  "properties": {
+    "schema_version": {"const": "institutional_learning_lesson.v1"},
+    "lesson_id": {"type": "string"},
+    "lesson_type": {"enum": ["lesson_intake", "mistake_or_failure_pattern", "worker_suggestion", "onboarding_gap", "documentation_gap", "retrieval_gap", "policy_ambiguity", "governance_ambiguity", "repeated_cross_worker_pattern"]},
+    "source_type": {"enum": ["worker", "office", "resident", "validation", "operations"]},
+    "summary": {"type": "string"},
+    "evidence_artifacts": {"type": "array", "items": {"type": "string"}},
+    "recommended_owner": {"enum": ["Engineering", "Validation", "Human Resources", "Ingrid", "Alfred", "Chief Architect"]},
+    "next_action": {"type": "string"},
+    "follow_up_checkpoint": {"type": "string"},
+    "status": {"enum": ["new", "accepted", "routed", "in_follow_up", "closed", "declined", "duplicate"]}
+  },
+  "examples": [{"schema_version": "institutional_learning_lesson.v1", "lesson_id": "ilr-example", "lesson_type": "retrieval_gap", "source_type": "worker", "summary": "Workers repeatedly missed the validation report location.", "evidence_artifacts": ["operations/validation/reports/example.md"], "recommended_owner": "Engineering", "next_action": "Improve retrieval hinting.", "follow_up_checkpoint": "Review after next cycle.", "status": "accepted"}]
+}
