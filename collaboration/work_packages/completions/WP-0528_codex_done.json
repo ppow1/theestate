@@ -1,0 +1,16 @@
+{
+  "work_package_id": "WP-0528",
+  "status": "done",
+  "completed_by": "codex",
+  "staged_not_installed": true,
+  "statement": "WP-0528 staged work is not installed work.",
+  "artifacts": [
+    "collaboration/workstreams/WP-0528/install_manifest.json",
+    "collaboration/workstreams/WP-0528/staged/office_operational_timeline.py",
+    "collaboration/workstreams/WP-0528/staged/test_office_operational_timeline.py",
+    "collaboration/workstreams/WP-0528/operational_timeline_contract.md",
+    "collaboration/workstreams/WP-0528/validation_notes.md",
+    "collaboration/workstreams/WP-0528/rollback_notes.md"
+  ],
+  "no_active_office_files_modified": true
+}
