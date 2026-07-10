@@ -1,0 +1,25 @@
+{
+  "work_package_id": "WP-4012",
+  "status": "completed",
+  "completed_by": "Codex",
+  "completed_at": "2026-07-10T19:43:00Z",
+  "summary": "Implemented the governed local Estate knowledge index and retrieval service with reusable API, CLI integration, schema, compatibility layer, validation report, and focused tests.",
+  "artifacts": [
+    "src/estate/core/estate_knowledge_index.py",
+    "src/estate/core/institutional_search.py",
+    "src/estate/cli/main.py",
+    "data/schemas/estate_knowledge_index_v1.json",
+    "tests/test_estate_knowledge_index.py",
+    "operations/validation/reports/WP-4012_estate_knowledge_index.md"
+  ],
+  "validation": [
+    {
+      "command": "pytest -q tests/test_estate_knowledge_index.py tests/test_global_search_command_palette.py",
+      "result": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.cli.main knowledge-index --json status",
+      "result": "passed"
+    }
+  ]
+}
