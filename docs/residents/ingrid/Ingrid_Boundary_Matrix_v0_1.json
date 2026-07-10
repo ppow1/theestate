@@ -1,0 +1,306 @@
+{
+  "schema_version": "ingrid-boundary-matrix-v0.1",
+  "classification_levels": [
+    "Public",
+    "Estate Internal",
+    "Restricted",
+    "Steward Only",
+    "Local Only"
+  ],
+  "default_denial": "Deny access, summary, or export when requested use is below the source classification or lacks an allowed reader/writer grant.",
+  "artifact_classes": [
+    {
+      "artifact_class": "resident_identity_records",
+      "owner": "Character Architecture",
+      "minimum_classification": "Estate Internal",
+      "allowed_readers": [
+        "steward",
+        "character_architecture",
+        "ingrid",
+        "character_continuity",
+        "helen"
+      ],
+      "allowed_writers": [
+        "character_architecture",
+        "ingrid"
+      ],
+      "permitted_summaries": "public-safe identity fields only; no protected-source notes",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "public_interaction_layers",
+      "owner": "Resident Office Owner",
+      "minimum_classification": "Public",
+      "allowed_readers": [
+        "public",
+        "steward",
+        "residents",
+        "workers",
+        "systems"
+      ],
+      "allowed_writers": [
+        "resident_office_owner",
+        "character_architecture"
+      ],
+      "permitted_summaries": "public transcript excerpts and office-safe summaries",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "private_interaction_layers",
+      "owner": "Resident Office Owner",
+      "minimum_classification": "Restricted",
+      "allowed_readers": [
+        "steward",
+        "resident_office_owner",
+        "ingrid"
+      ],
+      "allowed_writers": [
+        "resident_office_owner",
+        "steward"
+      ],
+      "permitted_summaries": "metadata-only or consented redacted summary",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "working_journals",
+      "owner": "Character Continuity",
+      "minimum_classification": "Estate Internal",
+      "allowed_readers": [
+        "steward",
+        "character_continuity",
+        "ingrid",
+        "originating_resident"
+      ],
+      "allowed_writers": [
+        "originating_resident",
+        "character_continuity"
+      ],
+      "permitted_summaries": "decisions and open work; exclude restricted/private/local material",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "reflection_records",
+      "owner": "Character Continuity",
+      "minimum_classification": "Restricted",
+      "allowed_readers": [
+        "steward",
+        "character_continuity",
+        "ingrid",
+        "helen_if_health_review"
+      ],
+      "allowed_writers": [
+        "character_continuity",
+        "ingrid"
+      ],
+      "permitted_summaries": "health/status summary only",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "continuity_artifacts",
+      "owner": "Character Continuity",
+      "minimum_classification": "Estate Internal",
+      "allowed_readers": [
+        "steward",
+        "character_continuity",
+        "ingrid",
+        "resident_successor",
+        "helen"
+      ],
+      "allowed_writers": [
+        "character_continuity",
+        "ingrid"
+      ],
+      "permitted_summaries": "carry-forward lessons cleared for classification",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "workforce_assessments",
+      "owner": "Helen",
+      "minimum_classification": "Restricted",
+      "allowed_readers": [
+        "steward",
+        "helen",
+        "ingrid",
+        "grace_limited_action_status"
+      ],
+      "allowed_writers": [
+        "helen"
+      ],
+      "permitted_summaries": "staffing readiness and action status; no private evidence",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "cognitive_health_records",
+      "owner": "Helen / Character Architecture",
+      "minimum_classification": "Restricted",
+      "allowed_readers": [
+        "steward",
+        "helen",
+        "character_architecture",
+        "ingrid"
+      ],
+      "allowed_writers": [
+        "helen",
+        "character_architecture"
+      ],
+      "permitted_summaries": "health band and mitigation only",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "personnel_onboarding_records",
+      "owner": "Helen",
+      "minimum_classification": "Estate Internal",
+      "allowed_readers": [
+        "steward",
+        "helen",
+        "ingrid",
+        "office_leads"
+      ],
+      "allowed_writers": [
+        "helen",
+        "office_leads"
+      ],
+      "permitted_summaries": "role, mailbox, clearance, start/stop state",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "mailbox_communication_content",
+      "owner": "Collaboration Layer",
+      "minimum_classification": "Estate Internal",
+      "allowed_readers": [
+        "sender",
+        "recipient",
+        "steward",
+        "authorized_office",
+        "ingrid"
+      ],
+      "allowed_writers": [
+        "sender",
+        "collaboration_layer"
+      ],
+      "permitted_summaries": "routing metadata and non-sensitive action summaries",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "connector_derived_data",
+      "owner": "Connector Owner",
+      "minimum_classification": "Restricted",
+      "allowed_readers": [
+        "steward",
+        "connector_owner",
+        "ingrid",
+        "authorized_processor"
+      ],
+      "allowed_writers": [
+        "connector_owner",
+        "authorized_processor"
+      ],
+      "permitted_summaries": "provenance, sync status, and sanitized findings",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "protected_private_local_character_material",
+      "owner": "Steward",
+      "minimum_classification": "Local Only",
+      "allowed_readers": [
+        "steward"
+      ],
+      "allowed_writers": [
+        "steward"
+      ],
+      "permitted_summaries": "existence/boundary notice only; no content summary",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "provider_prompts_outputs",
+      "owner": "Execution Provider Owner",
+      "minimum_classification": "Restricted",
+      "allowed_readers": [
+        "steward",
+        "provider_owner",
+        "ingrid",
+        "audit_authorized_worker"
+      ],
+      "allowed_writers": [
+        "provider_owner",
+        "execution_runtime"
+      ],
+      "permitted_summaries": "capability/health summary; redact prompts, outputs, secrets",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    },
+    {
+      "artifact_class": "office_task_board_summaries",
+      "owner": "Grace / Office Owner",
+      "minimum_classification": "Estate Internal",
+      "allowed_readers": [
+        "steward",
+        "grace",
+        "office_owner",
+        "helen_limited_staffing_context",
+        "ingrid"
+      ],
+      "allowed_writers": [
+        "grace",
+        "office_owner"
+      ],
+      "permitted_summaries": "objective/status/dependency summary only",
+      "export_restrictions": "Export only to destinations that enforce equal-or-stronger classification; GitHub/public export allowed only for Public or sanitized Estate Internal records without restricted source content.",
+      "retention_expectations": "Retain governed records while operationally needed; archive or purge according to owner review; do not retain protected private local content in Estate Proper.",
+      "audit_requirements": "Log classification decision, writer, source/provenance, summary/export decision, rejection reason, and escalation when access is denied.",
+      "connector_requirements": "Connector data must preserve provenance, source classification, transform history, and revocation state; connectors are processors, not privacy authorities.",
+      "escalation_path": "Ingrid classification review; Steward decides exceptions; owner supplies context without disclosing higher-classification content."
+    }
+  ]
+}
