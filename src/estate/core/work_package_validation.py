@@ -127,6 +127,44 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
 
 
+    "WP-0510": {
+        "recipe_id": "wp-0510-office-execution-session-control-surface",
+        "title": "WP-0510 — Office Execution Session Control Surface",
+        "description": "Validates Office execution-session controls, browser payload, real local handlers, deterministic fake-provider execution, docs, and receipt without live provider calls.",
+        "required_checks": [
+            "Office handlers, controls, Execution Control workspace, tests, documentation, and receipt exist",
+            "Office command surface and Steward command center compile",
+            "Focused Office execution controls and dependent runtimes pass",
+            "Receipt records functional controls, direct runtime calls, fake provider use, no live provider calls, no automatic retry/authorization, and no acceptance mutation",
+        ],
+        "observational_checks": ["Open the served Office, select Execution Control, enter fixture IDs, and observe completed/blocked/failed action results."],
+        "expected_artifacts": [
+            "src/estate/core/office_command_surface.py",
+            "src/estate/core/steward_command_center.py",
+            "tests/test_office_execution_session_controls.py",
+            "docs/integration/office_execution_session_control_surface.md",
+            "collaboration/work_packages/completions/WP-0510_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live provider calls, automatic retry, automatic authorization, or institutional acceptance mutation",
+            "Execution Control workspace or required Office actions are missing",
+        ],
+        "success_criteria": [
+            "Preview performs no provider call and writes evidence",
+            "Start requires confirmation and deterministic fake start calls provider exactly once",
+            "Attempt and reconciliation controls invoke canonical runtimes and preserve governance boundaries",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "from pathlib import Path; paths=[\'src/estate/core/office_command_surface.py\',\'src/estate/core/steward_command_center.py\',\'tests/test_office_execution_session_controls.py\',\'docs/integration/office_execution_session_control_surface.md\',\'collaboration/work_packages/completions/WP-0510_codex_done.json\']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"'),
+            _cmd('python -m py_compile src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py'),
+            _cmd('pytest -q tests/test_office_execution_session_controls.py tests/test_office_command_surface.py tests/test_steward_command_center.py tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_execution_result_reconciliation_runtime.py'),
+            _cmd('python -c "from estate.core.steward_command_center import generate_command_center, render_command_center_html; p=generate_command_center(write=False); ids={c[\'action_id\'] for c in p[\'office_actions\'].get(\'execution-control\', [])}; required={\'execution_session.preview\',\'execution_session.start\',\'execution_session.resume\',\'execution_session.status\',\'execution_session.report\',\'execution_attempt.cancel_request\',\'execution_attempt.inspect_recovery\',\'execution_attempt.retry_eligibility\',\'execution_attempt.release_stale\',\'execution_result.inspect_reconciliation\',\'execution_result.reconcile\',\'execution_result.report\'}; assert required <= ids, ids; assert any(t[\'id\']==\'execution-control\' for t in p[\'tabs\']); assert \'Execution Control\' in render_command_center_html(p)"'),
+            _cmd('python -c "import json; from pathlib import Path; data=json.loads(Path(\'collaboration/work_packages/completions/WP-0510_codex_done.json\').read_text(encoding=\'utf-8\')); assert data.get(\'work_package_id\') == \'WP-0510\'; assert data.get(\'functional_controls_added\') is True; assert data.get(\'session_controller_called_directly\') is True; assert data.get(\'attempt_runtime_called_directly\') is True; assert data.get(\'reconciliation_runtime_called_directly\') is True; assert data.get(\'live_provider_calls_made\') is False; assert data.get(\'fake_provider_runner_used\') is True; assert data.get(\'automatic_retry_implemented\') is False; assert data.get(\'automatic_authorization_implemented\') is False; assert data.get(\'institutional_acceptance_behavior_modified\') is False; assert data.get(\'ready_for_ca_review\') is True"'),
+        ],
+    },
+
     "WP-0509": {
         "recipe_id": "wp-0509-end-to-end-execution-chain-demonstration",
         "title": "WP-0509 — End-to-End Execution Chain Demonstration",

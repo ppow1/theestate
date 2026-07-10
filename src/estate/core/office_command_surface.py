@@ -23,6 +23,9 @@ from estate.core.morning_briefing import generate_morning_briefing
 from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
 from estate.core.operations_control_runtime import OperationsControlRuntime
 from estate.core.operations_manager import OperationsDecision
+from estate.core.execution_session_controller import ExecutionSessionController
+from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
+from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -151,6 +154,107 @@ def record_operations_control_decision(root=None, decision_type: str | None = No
     paths = OperationsControlRuntime(base).record_decision(decision)
     return _completed('operations_control.record_decision', 'Record operations-control decision', 'operational-activity', 'estate.core.operations_control_runtime.OperationsControlRuntime.record_decision', f"Operations decision {decision.decision_type} recorded for {decision.target_type}:{decision.target_id or ''}.", read=['runtime/operations/control/status/latest.json'], written=[_rel(base, paths['decision']), 'runtime/operations/control/status/summary.json', 'runtime/operations/control/status/summary.md', 'runtime/operations/status/latest.json'], state=['operations-control decision artifact recorded'])
 
+
+def _truthy(value: Any) -> bool:
+    return value is True or str(value).strip().lower() in {"true", "1", "yes", "on", "confirm", "confirmed"}
+
+def _require(action_id: str, label: str, handler: str, params: dict[str, Any], fields: list[str]) -> OfficeActionResult | None:
+    missing = [f for f in fields if not str(params.get(f) or "").strip()]
+    if missing:
+        return _blocked(action_id, label, 'execution-control', handler, 'Required input missing: ' + ', '.join(missing))
+    return None
+
+def _session_refs(base: Path, payload: dict[str, Any]) -> tuple[list[str], list[str]]:
+    sid = payload.get('execution_session_id')
+    read: list[str] = []
+    written = ['runtime/execution_adapters/status/sessions_summary.json']
+    if sid:
+        written += [f'runtime/execution_adapters/sessions/{sid}.json', f'runtime/execution_adapters/session_stages/{sid}.jsonl', f'runtime/execution_adapters/reports/{sid}_session.md']
+    if payload.get('result_reference'):
+        read.append(str(payload['result_reference']))
+    return read, written
+
+def execution_session_preview(root=None, dispatch_id: str | None = None, authorization_path: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Preview execution session'; handler='estate.core.execution_session_controller.ExecutionSessionController.preview'; data={'dispatch_id':dispatch_id,'authorization_path':authorization_path}
+    if blocked := _require('execution_session.preview', label, handler, data, ['dispatch_id','authorization_path']): return blocked
+    base=_root(root); payload=ExecutionSessionController(root=base).preview(str(dispatch_id), str(authorization_path)); read,written=_session_refs(base,payload)
+    outcome='blocked' if payload.get('state')=='blocked' else 'completed'
+    return OfficeActionResult('execution_session.preview', label, 'execution-control', outcome, f"Preview session {payload.get('execution_session_id')} state={payload.get('state')} readiness={'ready' if not payload.get('blocking_reasons') else 'blocked'} reasons={payload.get('blocking_reasons') or []}.", handler, read, written, ['execution session preview artifact written'], 'governed_preview_no_provider_call')
+
+def execution_session_start(root=None, dispatch_id: str | None = None, authorization_path: str | None = None, confirm_live_execution: Any = None, **params: Any) -> OfficeActionResult:
+    label='Start execution session'; handler='estate.core.execution_session_controller.ExecutionSessionController.start'; data={'dispatch_id':dispatch_id,'authorization_path':authorization_path}
+    if blocked := _require('execution_session.start', label, handler, data, ['dispatch_id','authorization_path']): return blocked
+    base=_root(root); payload=ExecutionSessionController(root=base).start(str(dispatch_id), str(authorization_path), confirm_live_execution=_truthy(confirm_live_execution)); read,written=_session_refs(base,payload)
+    outcome='completed' if payload.get('state') in {'completed_execution','validation_ready'} else 'blocked' if payload.get('state')=='blocked' else 'failed' if payload.get('state')=='failed' else 'completed'
+    return OfficeActionResult('execution_session.start', label, 'execution-control', outcome, f"Start session {payload.get('execution_session_id')} state={payload.get('state')} stage={payload.get('current_stage')} reasons={payload.get('blocking_reasons') or []}.", handler, read, written, ['execution session start advanced runtime state'] if outcome=='completed' else [], 'steward_and_traffic_controller_gated')
+
+def execution_session_resume(root=None, session_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Resume execution session'; handler='estate.core.execution_session_controller.ExecutionSessionController.resume'
+    if blocked := _require('execution_session.resume', label, handler, {'session_id':session_id}, ['session_id']): return blocked
+    base=_root(root); payload=ExecutionSessionController(root=base).resume(str(session_id)); read,written=_session_refs(base,payload)
+    outcome='failed' if payload.get('state')=='failed' else 'completed'
+    return OfficeActionResult('execution_session.resume', label, 'execution-control', outcome, f"Resume inspected session {session_id}; state={payload.get('state')} stage={payload.get('current_stage')}.", handler, read, written, ['session resume/reconciliation evidence updated'], 'duplicate_provider_call_protection_preserved')
+
+def execution_session_status(root=None, session_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Refresh execution-session status'; handler='estate.core.execution_session_controller.ExecutionSessionController.status'
+    if blocked := _require('execution_session.status', label, handler, {'session_id':session_id}, ['session_id']): return blocked
+    base=_root(root); payload=ExecutionSessionController(root=base).status(str(session_id))
+    return _completed('execution_session.status', label, 'execution-control', handler, f"Session {session_id} state={payload.get('state')} stage={payload.get('current_stage')}.", read=[f'runtime/execution_adapters/sessions/{session_id}.json'])
+
+def execution_session_report(root=None, session_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Generate/open execution-session report'; handler='estate.core.execution_session_controller.ExecutionSessionController.report'
+    if blocked := _require('execution_session.report', label, handler, {'session_id':session_id}, ['session_id']): return blocked
+    base=_root(root); ExecutionSessionController(root=base).report(str(session_id)); return _completed('execution_session.report', label, 'execution-control', handler, f"Session report generated for {session_id}.", read=[f'runtime/execution_adapters/sessions/{session_id}.json'], written=[f'runtime/execution_adapters/reports/{session_id}_session.md'])
+
+def execution_attempt_cancel_request(root=None, dispatch_id: str | None = None, attempt_id: str | None = None, actor: str | None = None, reason: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Request cancellation'; handler='estate.core.execution_attempt_runtime.ExecutionAttemptRuntime.request_cancellation'; data=locals()
+    if blocked := _require('execution_attempt.cancel_request', label, handler, data, ['dispatch_id','attempt_id','actor','reason']): return blocked
+    base=_root(root); payload=ExecutionAttemptRuntime(root=base).request_cancellation(str(dispatch_id), str(attempt_id), requested_by=str(actor), reason=str(reason))
+    return _completed('execution_attempt.cancel_request', label, 'execution-control', handler, f"Cancellation requested for {attempt_id}; provider stop is not claimed. status={payload.get('status')}.", written=[f'runtime/execution_adapters/cancellations/{attempt_id}.json', f'runtime/execution_adapters/attempts/{attempt_id}.json'], state=['cancellation request recorded'])
+
+def execution_attempt_inspect_recovery(root=None, dispatch_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Inspect recovery state'; handler='estate.core.execution_attempt_runtime.ExecutionAttemptRuntime.inspect_recovery'
+    if blocked := _require('execution_attempt.inspect_recovery', label, handler, {'dispatch_id':dispatch_id}, ['dispatch_id']): return blocked
+    base=_root(root); payload=ExecutionAttemptRuntime(root=base).inspect_recovery(str(dispatch_id))
+    return _completed('execution_attempt.inspect_recovery', label, 'execution-control', handler, f"Recovery classification: {payload.get('classification')}; stale_release_safe={payload.get('stale_release_safe')}.", written=[f'runtime/execution_adapters/recovery/{dispatch_id}.json'])
+
+def execution_attempt_retry_eligibility(root=None, dispatch_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Inspect retry eligibility'; handler='estate.core.execution_attempt_runtime.ExecutionAttemptRuntime.retry_eligibility'
+    if blocked := _require('execution_attempt.retry_eligibility', label, handler, {'dispatch_id':dispatch_id}, ['dispatch_id']): return blocked
+    base=_root(root); payload=ExecutionAttemptRuntime(root=base).retry_eligibility(str(dispatch_id))
+    return _completed('execution_attempt.retry_eligibility', label, 'execution-control', handler, f"Retry eligible={payload.get('retry_eligible')}; automatic retry started={payload.get('automatic_retry_started')}.", read=['runtime/execution_adapters/attempts'], state=['retry eligibility evidence updated; no retry started'])
+
+def execution_attempt_release_stale(root=None, dispatch_id: str | None = None, attempt_id: str | None = None, reason: str | None = None, confirm_stale_release: Any = None, released_by: str = 'Steward', **params: Any) -> OfficeActionResult:
+    label='Release stale lease'; handler='estate.core.execution_attempt_runtime.ExecutionAttemptRuntime.release_stale'; data=locals()
+    if blocked := _require('execution_attempt.release_stale', label, handler, data, ['dispatch_id','attempt_id','reason']): return blocked
+    if not _truthy(confirm_stale_release): return _blocked('execution_attempt.release_stale', label, 'execution-control', handler, 'Explicit stale-release confirmation is required.')
+    base=_root(root)
+    try:
+        payload=ExecutionAttemptRuntime(root=base).release_stale(str(dispatch_id), str(attempt_id), confirm_stale_release=True, released_by=str(released_by), reason=str(reason))
+    except ValueError as exc:
+        return _blocked('execution_attempt.release_stale', label, 'execution-control', handler, str(exc), read=[f'runtime/execution_adapters/recovery/{dispatch_id}.json'])
+    return _completed('execution_attempt.release_stale', label, 'execution-control', handler, f"Stale lease released for {attempt_id}; retry_authorized={payload.get('retry_authorized')}.", written=[f'runtime/execution_adapters/attempts/{attempt_id}.json'], state=['stale lease explicitly released'])
+
+def execution_result_inspect_reconciliation(root=None, dispatch_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Inspect execution result reconciliation'; handler='estate.core.execution_result_reconciliation_runtime.inspect_reconciliation'
+    if blocked := _require('execution_result.inspect_reconciliation', label, handler, {'dispatch_id':dispatch_id}, ['dispatch_id']): return blocked
+    base=_root(root); payload=inspect_reconciliation(str(dispatch_id), base)
+    return _completed('execution_result.inspect_reconciliation', label, 'execution-control', handler, f"Reconciliation status={payload.get('status')}; institutional acceptance={payload.get('institutional_acceptance_state')}.", read=[f'runtime/execution_adapters/reconciliation/{dispatch_id}.json'])
+
+def execution_result_reconcile(root=None, dispatch_id: str | None = None, result_path: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Reconcile execution result'; handler='estate.core.execution_result_reconciliation_runtime.reconcile_result'
+    if blocked := _require('execution_result.reconcile', label, handler, {'dispatch_id':dispatch_id,'result_path':result_path}, ['dispatch_id','result_path']): return blocked
+    base=_root(root); payload=reconcile_result(str(dispatch_id), str(result_path), base)
+    return _completed('execution_result.reconcile', label, 'execution-control', handler, f"Result reconciled status={payload.get('status')} dispatch_state={payload.get('dispatch_state')} acceptance={payload.get('institutional_acceptance_state')}.", read=[str(result_path)], written=[payload.get('reconciliation_path') or f'runtime/execution_adapters/reconciliation/{dispatch_id}.json', payload.get('report_path') or f'runtime/execution_adapters/reports/{dispatch_id}_reconciliation.md'], state=['result reconciliation updated dispatch evidence'])
+
+def execution_result_report(root=None, dispatch_id: str | None = None, **params: Any) -> OfficeActionResult:
+    label='Generate/open reconciliation report'; handler='estate.core.execution_result_reconciliation_runtime.format_reconciliation_report'
+    if blocked := _require('execution_result.report', label, handler, {'dispatch_id':dispatch_id}, ['dispatch_id']): return blocked
+    base=_root(root); rec_path=base/'runtime/execution_adapters/reconciliation'/f'{dispatch_id}.json'
+    if not rec_path.exists(): return _blocked('execution_result.report', label, 'execution-control', handler, 'No reconciliation artifact exists for this dispatch.', read=[_rel(base, rec_path)])
+    payload=json.loads(rec_path.read_text(encoding='utf-8')); report=base/'runtime/execution_adapters/reports'/f'{dispatch_id}_reconciliation.md'; report.parent.mkdir(parents=True, exist_ok=True); report.write_text(format_reconciliation_report(payload)+'\n', encoding='utf-8')
+    return _completed('execution_result.report', label, 'execution-control', handler, f"Reconciliation report generated for {dispatch_id}.", read=[_rel(base, rec_path)], written=[_rel(base, report)])
+
 def generate_daily_briefing(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); generate_daily_board_integration(root=base, write=True); generate_morning_briefing(root=base, write=True)
     return _completed('daily_board.generate_morning_briefing', 'Generate morning briefing', 'daily-board', 'estate.core.daily_board_integration.generate_daily_board_integration + estate.core.morning_briefing.generate_morning_briefing', 'Daily Board integration and morning briefing generated locally.', written=['runtime/operations/daily_board_integration.json', 'operations/boards/daily_board_integration.md', 'runtime/briefings/morning_briefing.json', 'operations/briefings/morning_briefing.md'], state=['daily board and briefing artifacts refreshed'])
@@ -168,9 +272,33 @@ HANDLERS.update({
  'daily_board.generate_morning_briefing': generate_daily_briefing,
  'orchestrator_intake.record_decision': record_orchestrator_intake_decision,
  'operations_control.record_decision': record_operations_control_decision,
+ 'execution_session.preview': execution_session_preview,
+ 'execution_session.start': execution_session_start,
+ 'execution_session.resume': execution_session_resume,
+ 'execution_session.status': execution_session_status,
+ 'execution_session.report': execution_session_report,
+ 'execution_attempt.cancel_request': execution_attempt_cancel_request,
+ 'execution_attempt.inspect_recovery': execution_attempt_inspect_recovery,
+ 'execution_attempt.retry_eligibility': execution_attempt_retry_eligibility,
+ 'execution_attempt.release_stale': execution_attempt_release_stale,
+ 'execution_result.inspect_reconciliation': execution_result_inspect_reconciliation,
+ 'execution_result.reconcile': execution_result_reconcile,
+ 'execution_result.report': execution_result_report,
 })
 
 ACTION_CONTROLS = [
+ {'action_id':'execution_session.preview','label':'Preview execution session','target_tab':'execution-control','handler':'execution_session_preview','availability':'available','requires_input':'dispatch_id,authorization_path','note':'No provider call; writes preview/session evidence.'},
+ {'action_id':'execution_session.start','label':'Start execution session','target_tab':'execution-control','handler':'execution_session_start','availability':'available','requires_input':'dispatch_id,authorization_path,confirm_live_execution','note':'Requires explicit confirmation and existing authorization evidence.'},
+ {'action_id':'execution_session.resume','label':'Resume execution session','target_tab':'execution-control','handler':'execution_session_resume','availability':'available','requires_input':'session_id','note':'Preserves duplicate-provider-call protection.'},
+ {'action_id':'execution_session.status','label':'Refresh execution-session status','target_tab':'execution-control','handler':'execution_session_status','availability':'available','requires_input':'session_id'},
+ {'action_id':'execution_session.report','label':'Generate/open execution-session report','target_tab':'execution-control','handler':'execution_session_report','availability':'available','requires_input':'session_id'},
+ {'action_id':'execution_attempt.cancel_request','label':'Request cancellation','target_tab':'execution-control','handler':'execution_attempt_cancel_request','availability':'available','requires_input':'dispatch_id,attempt_id,actor,reason','note':'Records request; does not claim provider stopped.'},
+ {'action_id':'execution_attempt.inspect_recovery','label':'Inspect recovery state','target_tab':'execution-control','handler':'execution_attempt_inspect_recovery','availability':'available','requires_input':'dispatch_id'},
+ {'action_id':'execution_attempt.retry_eligibility','label':'Inspect retry eligibility','target_tab':'execution-control','handler':'execution_attempt_retry_eligibility','availability':'available','requires_input':'dispatch_id','note':'Does not authorize or start a retry.'},
+ {'action_id':'execution_attempt.release_stale','label':'Release stale lease','target_tab':'execution-control','handler':'execution_attempt_release_stale','availability':'available','requires_input':'dispatch_id,attempt_id,reason,confirm_stale_release','note':'Requires explicit confirmation and stale-safe evidence.'},
+ {'action_id':'execution_result.inspect_reconciliation','label':'Inspect execution result reconciliation','target_tab':'execution-control','handler':'execution_result_inspect_reconciliation','availability':'available','requires_input':'dispatch_id'},
+ {'action_id':'execution_result.reconcile','label':'Reconcile execution result','target_tab':'execution-control','handler':'execution_result_reconcile','availability':'available','requires_input':'dispatch_id,result_path','note':'Idempotent; never grants institutional acceptance.'},
+ {'action_id':'execution_result.report','label':'Generate/open reconciliation report','target_tab':'execution-control','handler':'execution_result_report','availability':'available','requires_input':'dispatch_id'},
  {'action_id':'ai_services.refresh_local_inventory','label':'Refresh local AI service inventory','target_tab':'ai-services-models','handler':'refresh_ai_services','availability':'available'},
  {'action_id':'validation.run_production_readiness','label':'Run production readiness refresh','target_tab':'validation','handler':'run_production_readiness','availability':'available','note':'Evidence is not institutional acceptance.'},
  {'action_id':'work_packages.refresh_assignment_queue','label':'Refresh assignment queue','target_tab':'work-packages','handler':'refresh_work_package_queue','availability':'available'},
