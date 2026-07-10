@@ -26,6 +26,7 @@ from estate.core.operations_manager import OperationsDecision
 from estate.core.execution_session_controller import ExecutionSessionController
 from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
+from estate.core.operations_center_settings import save_settings_document, reset_operations_center_settings, export_operations_center_settings, import_operations_center_settings, SETTINGS_OUTPUT
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -154,6 +155,43 @@ def record_operations_control_decision(root=None, decision_type: str | None = No
     paths = OperationsControlRuntime(base).record_decision(decision)
     return _completed('operations_control.record_decision', 'Record operations-control decision', 'operational-activity', 'estate.core.operations_control_runtime.OperationsControlRuntime.record_decision', f"Operations decision {decision.decision_type} recorded for {decision.target_type}:{decision.target_id or ''}.", read=['runtime/operations/control/status/latest.json'], written=[_rel(base, paths['decision']), 'runtime/operations/control/status/summary.json', 'runtime/operations/control/status/summary.md', 'runtime/operations/status/latest.json'], state=['operations-control decision artifact recorded'])
 
+
+
+def settings_load_current(root=None, **_: Any) -> OfficeActionResult:
+    return _completed('settings.load_current', 'Load current settings', 'settings', 'estate.core.operations_center_settings.load_operations_center_settings', 'Current settings are loaded in the refreshed Office payload.', read=[SETTINGS_OUTPUT], state=['settings payload refreshed'])
+
+def settings_save_apply(root=None, settings_json: str | None = None, **params: Any) -> OfficeActionResult:
+    if not settings_json:
+        return _blocked('settings.save_apply', 'Save and apply settings', 'settings', 'estate.core.operations_center_settings.save_settings_document', 'settings_json is required.')
+    base = _root(root)
+    try:
+        document = json.loads(settings_json)
+        settings = document.get('settings', document) if isinstance(document, dict) else None
+        if not isinstance(settings, dict):
+            raise ValueError('settings_json must be a settings object or export document.')
+        save_settings_document(base, settings, backup=True)
+    except Exception as exc:
+        return OfficeActionResult('settings.save_apply', 'Save and apply settings', 'settings', 'failed', f'Settings were not saved: {exc}', 'estate.core.operations_center_settings.save_settings_document')
+    return _completed('settings.save_apply', 'Save and apply settings', 'settings', 'estate.core.operations_center_settings.save_settings_document', 'Settings saved atomically and will be applied by the refreshed Office payload.', read=[SETTINGS_OUTPUT], written=[SETTINGS_OUTPUT], state=['settings persisted', 'office payload configuration changed'])
+
+def settings_reset_defaults(root=None, **_: Any) -> OfficeActionResult:
+    reset_operations_center_settings(_root(root))
+    return _completed('settings.reset_defaults', 'Reset settings to defaults', 'settings', 'estate.core.operations_center_settings.reset_operations_center_settings', 'Settings reset to documented defaults.', written=[SETTINGS_OUTPUT], state=['settings persisted', 'office payload configuration changed'])
+
+def settings_export(root=None, **_: Any) -> OfficeActionResult:
+    base=_root(root); payload=export_operations_center_settings(base); rel='runtime/steward/operations_center_settings_export.json'; path=base/rel; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(payload, indent=2, sort_keys=True)+'\n', encoding='utf-8')
+    return _completed('settings.export', 'Export settings', 'settings', 'estate.core.operations_center_settings.export_operations_center_settings', f'Settings export written to {rel}.', read=[SETTINGS_OUTPUT], written=[rel], state=['settings export artifact written'])
+
+def settings_import(root=None, settings_json: str | None = None, **_: Any) -> OfficeActionResult:
+    if not settings_json:
+        return _blocked('settings.import', 'Import settings', 'settings', 'estate.core.operations_center_settings.import_operations_center_settings', 'settings_json is required.')
+    base=_root(root)
+    try:
+        document=json.loads(settings_json); payload=import_operations_center_settings(base, document)
+    except Exception as exc:
+        return OfficeActionResult('settings.import', 'Import settings', 'settings', 'failed', f'Import rejected without changing active settings: {exc}', 'estate.core.operations_center_settings.import_operations_center_settings')
+    written=[SETTINGS_OUTPUT] + ([payload.get('import_backup_path')] if payload.get('import_backup_path') else [])
+    return _completed('settings.import', 'Import settings', 'settings', 'estate.core.operations_center_settings.import_operations_center_settings', 'Settings import validated, previous settings backed up, and new settings applied.', read=[SETTINGS_OUTPUT], written=written, state=['settings persisted', 'office payload configuration changed'])
 
 def _truthy(value: Any) -> bool:
     return value is True or str(value).strip().lower() in {"true", "1", "yes", "on", "confirm", "confirmed"}
@@ -284,6 +322,11 @@ HANDLERS.update({
  'execution_result.inspect_reconciliation': execution_result_inspect_reconciliation,
  'execution_result.reconcile': execution_result_reconcile,
  'execution_result.report': execution_result_report,
+ 'settings.load_current': settings_load_current,
+ 'settings.save_apply': settings_save_apply,
+ 'settings.reset_defaults': settings_reset_defaults,
+ 'settings.export': settings_export,
+ 'settings.import': settings_import,
 })
 
 ACTION_CONTROLS = [
@@ -299,6 +342,11 @@ ACTION_CONTROLS = [
  {'action_id':'execution_result.inspect_reconciliation','label':'Inspect execution result reconciliation','target_tab':'execution-control','handler':'execution_result_inspect_reconciliation','availability':'available','requires_input':'dispatch_id'},
  {'action_id':'execution_result.reconcile','label':'Reconcile execution result','target_tab':'execution-control','handler':'execution_result_reconcile','availability':'available','requires_input':'dispatch_id,result_path','note':'Idempotent; never grants institutional acceptance.'},
  {'action_id':'execution_result.report','label':'Generate/open reconciliation report','target_tab':'execution-control','handler':'execution_result_report','availability':'available','requires_input':'dispatch_id'},
+ {'action_id':'settings.load_current','label':'Load current settings','target_tab':'settings','handler':'settings_load_current','availability':'available'},
+ {'action_id':'settings.save_apply','label':'Save and apply settings','target_tab':'settings','handler':'settings_save_apply','availability':'available','requires_input':'settings_json','note':'Persists atomically and reloads Office payload.'},
+ {'action_id':'settings.reset_defaults','label':'Reset to defaults','target_tab':'settings','handler':'settings_reset_defaults','availability':'available'},
+ {'action_id':'settings.export','label':'Export settings','target_tab':'settings','handler':'settings_export','availability':'available'},
+ {'action_id':'settings.import','label':'Import settings','target_tab':'settings','handler':'settings_import','availability':'available','requires_input':'settings_json'},
  {'action_id':'ai_services.refresh_local_inventory','label':'Refresh local AI service inventory','target_tab':'ai-services-models','handler':'refresh_ai_services','availability':'available'},
  {'action_id':'validation.run_production_readiness','label':'Run production readiness refresh','target_tab':'validation','handler':'run_production_readiness','availability':'available','note':'Evidence is not institutional acceptance.'},
  {'action_id':'work_packages.refresh_assignment_queue','label':'Refresh assignment queue','target_tab':'work-packages','handler':'refresh_work_package_queue','availability':'available'},

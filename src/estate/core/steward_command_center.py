@@ -33,7 +33,7 @@ from estate.core.merge_discovery import MergeDiscovery
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
-from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT
+from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT, THEME_OPTIONS, ACCENT_OPTIONS, DENSITY_OPTIONS, STARTUP_TAB_OPTIONS
 from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation, alfred_llm_diagnostic
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
@@ -1023,7 +1023,7 @@ def generate_command_center(root=None, write=True):
     settings_manager = load_operations_center_settings(root)
     default_profile = settings_manager["settings"].get("workspace", {}).get("default_profile", "mission-control")
     workspace_profile = resolve_workspace_profile(root, profile_name=default_profile, available_panels={tab["id"] for tab in OFFICE_TABS})
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels), "tabs": _office_tabs(panels), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager, "office_actions": {tab["id"]: controls_for_tab(tab["id"]) for tab in OFFICE_TABS}}
+    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels, settings_manager), "tabs": _office_tabs(panels, settings_manager), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager, "office_actions": {tab["id"]: controls_for_tab(tab["id"]) for tab in OFFICE_TABS}}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -1135,16 +1135,27 @@ def _global_search_panel(root):
         return {"available": False, "path": "runtime/search/global_command_palette.json", "kind": "global_search_command_palette", "placeholder": f"Global search palette is unavailable: {exc}"}
 
 
-def _office_navigation(panels):
+def _office_navigation(panels, settings_manager=None):
+    settings = (settings_manager or {}).get("settings", {})
+    workspace = settings.get("workspace", {}) if isinstance(settings, dict) else {}
+    visible = workspace.get("visible_panels") or {}
+    order = {tab_id: i for i, tab_id in enumerate(workspace.get("navigation_order") or [])}
     items = []
-    for item in OFFICE_NAVIGATION:
+    for item in sorted(OFFICE_NAVIGATION, key=lambda item: order.get(item["id"], 999)):
+        if visible.get(item["id"], True) is False and item["id"] != "settings":
+            continue
         panel = panels.get(item["panel"], {})
         items.append({**item, "available": bool(panel.get("available")) if isinstance(panel, dict) else False})
     return {"collapsed_by_default": False, "items": items}
 
 
-def _office_tabs(panels):
-    return [{**tab, "available": True} for tab in OFFICE_TABS]
+def _office_tabs(panels, settings_manager=None):
+    settings = (settings_manager or {}).get("settings", {})
+    workspace = settings.get("workspace", {}) if isinstance(settings, dict) else {}
+    visible = workspace.get("visible_panels") or {}
+    order = {tab_id: i for i, tab_id in enumerate(workspace.get("navigation_order") or [])}
+    tabs = [tab for tab in OFFICE_TABS if visible.get(tab["id"], True) is not False or tab["id"] == "settings"]
+    return [{**tab, "available": True} for tab in sorted(tabs, key=lambda tab: order.get(tab["id"], 999))]
 
 
 def _office_placeholder_html(title, description, source="future Office package"):
@@ -1198,6 +1209,9 @@ def _settings_panel(root):
             "command_console": settings.get("command_console"),
             "warnings": managed.get("warnings", []),
             "persistence": "local-first Settings Manager; no secrets, cloud settings, or account policy",
+            "path": SETTINGS_OUTPUT,
+            "settings": settings,
+            "defaults": managed.get("defaults"),
         },
     }
 
@@ -2034,7 +2048,7 @@ async function refreshOperationsChrome(){
     if(nextConsole && currentConsole) currentConsole.replaceWith(nextConsole);
   }catch(error){ console.debug('Quiet refresh skipped', error); }
 }
-window.addEventListener('load', () => { refreshOperationsChrome(); if(location.protocol !== 'file:') window.setInterval(refreshOperationsChrome, 30000); });
+window.addEventListener('load', () => { if(window.startOfficeAutoRefresh) startOfficeAutoRefresh(); else refreshOperationsChrome(); });
 </script>"""
 
 def _layout_framework_html(artifact):
@@ -2055,40 +2069,59 @@ def _layout_framework_html(artifact):
 
 def _settings_html(artifact):
     data = artifact.get("data") or {}
-    theme = data.get("theme") or {}
-    verbosity = data.get("global_verbosity") or {}
-    visible = data.get("visible_panels") or {}
-    topic = data.get("per_topic_verbosity") or {}
-    resident = data.get("per_resident_verbosity") or {}
-    theme_options = "".join(f"<option {'selected' if option == theme.get('value') else ''}>{html.escape(str(option))}</option>" for option in theme.get("options", []))
-    verbosity_options = "".join(f"<option {'selected' if option == verbosity.get('value') else ''}>{html.escape(str(option))}</option>" for option in verbosity.get("options", []))
-    panel_rows = "".join(f"<label><input type='checkbox' checked disabled> {html.escape(str(label))}</label>" for label in visible)
-    topic_rows = "".join(f"<dt>{html.escape(str(k).title())}</dt><dd>{html.escape(str(v))}</dd>" for k, v in topic.items())
-    resident_rows = "".join(f"<dt>{html.escape(str(k))}</dt><dd>{html.escape(str(v))}</dd>" for k, v in resident.items())
-    tab_order = ", ".join(str(tab) for tab in data.get("tab_order") or [])
-    pinned = ", ".join(str(tab) for tab in data.get("pinned_views") or [])
-    refresh = data.get("refresh_behavior") or {}
+    settings = data.get("settings") or {}
+    defaults = data.get("defaults") or {}
+    appearance = settings.get("appearance") or {}
+    workspace = settings.get("workspace") or {}
+    operator = settings.get("operator_visibility") or {}
+    refresh = settings.get("refresh") or {}
+    console = settings.get("command_console") or {}
+    visible = workspace.get("visible_panels") or {}
     warnings = data.get("warnings") or []
+    def options(values, current):
+        return "".join(f"<option value='{html.escape(str(option), quote=True)}' {'selected' if option == current else ''}>{html.escape(str(option))}</option>" for option in values)
+    visible_rows = "".join(f"<label><input type='checkbox' data-settings-visible-tab='{html.escape(str(tab), quote=True)}' {'checked' if enabled else ''} {'disabled' if tab == 'settings' else ''}> {html.escape(str(tab))}</label>" for tab, enabled in visible.items())
+    nav_order = ",".join(str(x) for x in workspace.get("navigation_order") or [])
     warning_rows = "".join(f"<li>{html.escape(str(w.get('setting') or w.get('type')))} — {html.escape(str(w.get('message')))}</li>" for w in warnings)
+    settings_json = html.escape(json.dumps(settings, indent=2, sort_keys=True))
+    defaults_json = html.escape(json.dumps(defaults, indent=2, sort_keys=True))
     return (
-        "<div class='settings-surface'>"
-        "<p class='source'>Local-first UI preferences. Controls are initial placeholders unless marked by the browser shell; no secrets or cloud settings are stored.</p>"
-        f"<p><strong>Settings version:</strong> {html.escape(str(data.get('settings_schema_version', 'unknown/unavailable')))} · <strong>UI config:</strong> {html.escape(str(data.get('ui_version', 'unknown/unavailable')))}</p>"
-        f"<label>Theme <select disabled>{theme_options}</select></label>"
-        f"<p><strong>Accent:</strong> {html.escape(str(data.get('accent', 'unknown/unavailable')))} · <strong>Default workspace:</strong> {html.escape(str(data.get('default_workspace_profile', 'unknown/unavailable')))} · <strong>Default verbosity profile:</strong> {html.escape(str(data.get('default_verbosity_profile', 'unknown/unavailable')))}</p>"
-        f"<label>Global verbosity <select disabled>{verbosity_options}</select></label>"
-        f"<p><strong>Refresh behavior:</strong> quiet local refresh every {html.escape(str(refresh.get('quiet_refresh_seconds', 'unknown/unavailable')))} seconds.</p>"
-        f"<p><strong>Activity console visible:</strong> {html.escape(str(data.get('activity_console_visible', 'unknown/unavailable')))} · <strong>Status bar visible:</strong> {html.escape(str(data.get('status_bar_visible', 'unknown/unavailable')))}</p>"
-        f"<p><strong>Tab order:</strong> {html.escape(tab_order)}</p>"
-        f"<p><strong>Pinned views:</strong> {html.escape(pinned)}</p>"
-        f"<h3>Visible panels</h3><div class='settings-grid'>{panel_rows}</div>"
-        f"<h3>Per-topic verbosity placeholders</h3><dl>{topic_rows}</dl>"
-        f"<h3>Per-resident verbosity placeholders</h3><dl>{resident_rows}</dl>"
+        "<div class='settings-surface' data-settings-surface='true'>"
+        "<p class='source'>Local-first persistent settings. Enabled controls submit to the canonical Office action endpoint and are persisted atomically; unsupported capabilities are named below instead of faked.</p>"
+        f"<p><strong>Settings version:</strong> {html.escape(str(data.get('settings_schema_version', 'unknown/unavailable')))} · <strong>UI config:</strong> {html.escape(str(data.get('ui_version', 'unknown/unavailable')))} · <code>{html.escape(str(data.get('path')))}</code></p>"
+        "<section class='panel'><h3>Appearance</h3>"
+        f"<label>Theme <select id='settings-theme'>{options(THEME_OPTIONS, appearance.get('theme'))}</select></label>"
+        f"<label>Accent <select id='settings-accent'>{options(ACCENT_OPTIONS, appearance.get('accent'))}</select></label>"
+        f"<label>Layout density <select id='settings-density'>{options(DENSITY_OPTIONS, appearance.get('layout_density'))}</select></label></section>"
+        "<section class='panel'><h3>Navigation</h3>"
+        f"<p><strong>Default workspace:</strong> {html.escape(str(workspace.get('default_profile') or 'mission-control'))}</p>"
+        f"<label>Startup tab <select id='settings-startup-tab'>{options(STARTUP_TAB_OPTIONS, workspace.get('default_active_tab'))}</select></label>"
+        f"<label>Default workspace <input id='settings-default-workspace' value='{html.escape(str(workspace.get('default_profile') or ''), quote=True)}'></label>"
+        f"<label>Navigation order (comma-separated tab IDs) <input id='settings-nav-order' value='{html.escape(nav_order, quote=True)}'></label>"
+        f"<h4>Visible tabs</h4><div class='settings-grid'>{visible_rows}</div><p class='source'>Settings is locked visible as the recovery path.</p></section>"
+        "<section class='panel'><h3>Refresh and chrome</h3>"
+        f"<label><input id='settings-refresh-enabled' type='checkbox' {'checked' if refresh.get('enabled') else ''}> Auto-refresh enabled</label>"
+        f"<label>Auto-refresh interval seconds <input id='settings-refresh-seconds' type='number' min='5' max='3600' value='{html.escape(str(refresh.get('quiet_refresh_seconds')), quote=True)}'></label>"
+        f"<label><input id='settings-status-visible' type='checkbox' {'checked' if workspace.get('status_bar_visible') else ''}> Status bar visible</label>"
+        f"<label><input id='settings-console-visible' type='checkbox' {'checked' if workspace.get('bottom_activity_stream_visible') else ''}> Action console visible</label>"
+        f"<label>Command console mode <select id='settings-command-mode'>{options(['inline','collapsed'], console.get('mode'))}</select></label></section>"
+        "<section class='panel'><h3>Verbosity</h3>"
+        f"<label>Global verbosity <select id='settings-global-verbosity'>{options(['quiet','normal','detailed','diagnostic'], operator.get('global_verbosity'))}</select></label>"
+        f"<label>Topic verbosity overrides JSON <textarea id='settings-topic-overrides'>{html.escape(json.dumps(operator.get('topic_overrides') or {}, sort_keys=True))}</textarea></label>"
+        f"<label>Resident verbosity overrides JSON <textarea id='settings-resident-overrides'>{html.escape(json.dumps(operator.get('resident_overrides') or {}, sort_keys=True))}</textarea></label></section>"
+        "<section class='panel'><h3>Actions</h3>"
+        "<button type='button' id='settings-load-current' data-office-action='settings.load_current'>Load current settings</button> "
+        "<button type='button' id='settings-save-apply'>Save and apply settings</button> "
+        "<button type='button' data-office-action='settings.reset_defaults'>Reset to defaults</button> "
+        "<button type='button' data-office-action='settings.export'>Export settings</button> "
+        "<button type='button' id='settings-import'>Import settings</button>"
+        "<label>Import / raw settings JSON <textarea id='settings-json' data-action-input='settings_json'>" + settings_json + "</textarea></label>"
+        "<pre id='office-action-result-settings' class='office-action-result'>No settings action run yet.</pre></section>"
         f"<h3>Safe-default warnings</h3><ul>{warning_rows or '<li>None</li>'}</ul>"
-        f"<p class='source'>{html.escape(str(data.get('persistence')))}</p>"
+        "<h3>Unsupported in this package</h3><ul><li>Arbitrary executable settings: rejected to preserve local safety.</li><li>Remote account/cloud sync: out of scope and not rendered as an enabled control.</li></ul>"
+        f"<script id='settings-defaults-json' type='application/json'>{defaults_json}</script>"
         "</div>"
     )
-
 
 
 def _help_html(artifact):
@@ -2295,14 +2328,20 @@ def render_command_center_html(payload):
         ("about", "About", _about_html(p.get("about", {}))),
     ]
     selected_profile = (payload.get('workspace_profile') or {}).get('profile') or {}
-    active_tab = selected_profile.get('active_tab') or 'home'
+    active_tab = ((payload.get('settings_manager') or {}).get('settings') or {}).get('workspace', {}).get('default_active_tab') or selected_profile.get('active_tab') or 'home'
+    visible_tabs = {tab["id"] for tab in payload.get("tabs", [])}
+    tab_order = {tab_id: i for i, tab_id in enumerate(((payload.get("settings_manager") or {}).get("settings") or {}).get("workspace", {}).get("navigation_order") or [])}
+    tab_bodies = sorted([b for b in tab_bodies if b[0] in visible_tabs], key=lambda b: tab_order.get(b[0], 999))
+    if active_tab not in visible_tabs:
+        active_tab = "settings" if "settings" in visible_tabs else (tab_bodies[0][0] if tab_bodies else "home")
     workspace = "".join(_workspace_section(tab_id, label, body, active=(tab_id == active_tab)) for i, (tab_id, label, body) in enumerate(tab_bodies))
-    status_bar = _status_bar_html(payload.get("status_bar", {}))
-    activity_console = _activity_console_html(payload.get("activity_console", {}))
+    settings_workspace = ((payload.get("settings_manager") or {}).get("settings") or {}).get("workspace", {})
+    status_bar = _status_bar_html(payload.get("status_bar", {})) if settings_workspace.get("status_bar_visible", True) else ""
+    activity_console = _activity_console_html(payload.get("activity_console", {})) if settings_workspace.get("bottom_activity_stream_visible", True) else ""
     generated = html.escape(str(payload.get("generated_at")))
     source_artifacts_json = _script_json(_snapshot_source_artifacts(payload))
     snapshot_manifest_json = _script_json(build_office_snapshot_manifest(payload))
-    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{position:fixed;top:1rem;left:1rem;z-index:20;max-width:min(20rem,calc(100vw - 2rem));color:#fff}.office-navigation details{background:#2f2921;border:1px solid #5b5045;border-radius:12px;box-shadow:0 6px 20px #0003;overflow:hidden}.office-navigation summary{cursor:pointer;font-weight:700;padding:.65rem .85rem;list-style:none}.office-navigation summary::-webkit-details-marker{display:none}.office-navigation summary::before{content:'☰';margin-right:.45rem}.office-navigation details[open] summary{border-bottom:1px solid #5b5045}.office-navigation .nav-items{padding:.45rem .75rem .75rem;max-height:70vh;overflow:auto}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem;min-width:0}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.alfred-attachments{margin:.4rem 0;padding:.4rem;background:#fbf7ef;border:1px solid #eadcc8;border-radius:8px}.alfred-attachment-thumb{max-width:180px;max-height:120px;border:1px solid #d6cbbb;border-radius:6px;margin-top:.25rem}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}.snapshot-toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:.75rem}.snapshot-toolbar button{padding:.5rem .8rem;border:1px solid #8b6f3d;border-radius:8px;background:#3f6b50;color:#fff;font-weight:700;cursor:pointer}.snapshot-toolbar .snapshot-status{font-size:.9rem;color:#61584d}.ui-runtime-diagnostic{margin-top:.75rem;padding:.55rem .75rem;border:1px solid #b9904a;border-radius:8px;background:#fff8e8;color:#4b3515;font-size:.92rem}.ui-runtime-diagnostic[data-state='ready']{background:#eaf7ef;border-color:#3f6b50;color:#163d25}.ui-runtime-diagnostic[data-state='error']{background:#f8d7da;border-color:#842029;color:#842029}@media(max-width:800px){.office-navigation{top:.5rem;left:.5rem}.workspace{padding:.75rem}}"""
+    css = """body{font-family:system-ui,sans-serif;margin:0 0 9rem;background:#f6f3ed;color:#241f1a}.office-shell{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 7rem)}header{padding:1.25rem 1.5rem;background:#fff;border-bottom:1px solid #d6cbbb}.office-navigation{position:fixed;top:1rem;left:1rem;z-index:20;max-width:min(20rem,calc(100vw - 2rem));color:#fff}.office-navigation details{background:#2f2921;border:1px solid #5b5045;border-radius:12px;box-shadow:0 6px 20px #0003;overflow:hidden}.office-navigation summary{cursor:pointer;font-weight:700;padding:.65rem .85rem;list-style:none}.office-navigation summary::-webkit-details-marker{display:none}.office-navigation summary::before{content:'☰';margin-right:.45rem}.office-navigation details[open] summary{border-bottom:1px solid #5b5045}.office-navigation .nav-items{padding:.45rem .75rem .75rem;max-height:70vh;overflow:auto}.nav-item{display:block;width:100%;margin:.25rem 0;padding:.55rem .65rem;text-align:left;border:1px solid #5b5045;border-radius:8px;background:#40382f;color:#fff;cursor:pointer}.nav-item.placeholder{opacity:.78}.workspace{padding:1rem 1.25rem;min-width:0}.workspace-tabs{display:flex;gap:.35rem;overflow:auto;border-bottom:1px solid #d6cbbb;margin-bottom:1rem}.workspace-tab{padding:.55rem .75rem;border:1px solid #d6cbbb;border-bottom:0;border-radius:8px 8px 0 0;background:#eee3d3;cursor:pointer;white-space:nowrap}.workspace-tab.active{background:#fff;font-weight:700}.workspace-view{background:#fff;border:1px solid #d6cbbb;border-radius:0 12px 12px 12px;padding:1rem;box-shadow:0 1px 4px #0001}.workspace-view[hidden]{display:none}.panel{background:#fff;border:1px solid #d6cbbb;border-radius:12px;padding:1rem;margin:1rem 0}.placeholder{color:#6b4e16}.source{font-size:.85rem;color:#61584d}pre{white-space:pre-wrap;max-height:18rem;overflow:auto;background:#f8f8f8;padding:.75rem;border-radius:8px}dt{font-weight:700}dd{margin:0 0 .5rem}.status-bar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;padding:.6rem .9rem;background:#241f1a;color:#fff;border-top:3px solid #b9904a;box-shadow:0 -2px 8px #0002}.status-item{font-size:.85rem;white-space:nowrap}.status-item strong{color:#f2d28b}.activity-console{position:fixed;left:1rem;right:1rem;bottom:3.3rem;z-index:9;background:#fff;border:1px solid #bcae9b;border-radius:12px;box-shadow:0 2px 12px #0002}.activity-console details{padding:.75rem}.activity-console summary{cursor:pointer;font-weight:700}.activity-console table{width:100%;border-collapse:collapse;margin-top:.5rem;max-height:16rem;display:block;overflow:auto}.activity-console th,.activity-console td,.pipeline-view th,.pipeline-view td,.health-table th,.health-table td,.mailbox-operations-center th,.mailbox-operations-center td,.steward-recall-operations th,.steward-recall-operations td,.resident-conversations th,.resident-conversations td{border-bottom:1px solid #eee;padding:.35rem;text-align:left;vertical-align:top}.pipeline-view table,.health-table,.mailbox-operations-center table,.steward-recall-operations table,.resident-conversations table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem}.pipeline-view textarea{width:100%;font-family:ui-monospace,monospace;font-size:.8rem;background:#f8f8f8;border:1px solid #d6cbbb;border-radius:6px}.severity,.health-badge{border-radius:999px;padding:.1rem .4rem;background:#e9ecef}.mailbox-kpis{display:flex;gap:.5rem;flex-wrap:wrap}.mailbox-kpi{display:flex;flex-direction:column;min-width:8rem;background:#f8f3e8;border:1px solid #d6cbbb;border-radius:10px;padding:.55rem}.mailbox-warning{color:#842029}.severity.warning,.severity.missing,.health-badge.warning,.health-badge.missing{background:#fff3cd;color:#6b4e16}.health-badge.fail{background:#f8d7da;color:#842029}.health-badge.pass{background:#d1e7dd;color:#0f5132}.alfred-chat textarea{width:100%;font:inherit;margin:.35rem 0}.alfred-chat button{padding:.45rem .75rem}.alfred-chat-turn{border-left:3px solid #b9904a;padding-left:.75rem;margin:.75rem 0}.alfred-attachments{margin:.4rem 0;padding:.4rem;background:#fbf7ef;border:1px solid #eadcc8;border-radius:8px}.alfred-attachment-thumb{max-width:180px;max-height:120px;border:1px solid #d6cbbb;border-radius:6px;margin-top:.25rem}.global-search-palette input{width:100%;font-size:1rem;padding:.65rem;border:1px solid #bcae9b;border-radius:8px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.35rem}.settings-surface label{display:block;margin:.45rem 0}.settings-surface select{margin-left:.4rem}body[data-theme=dark]{background:#171411;color:#f5efe5}body[data-theme=dark] .workspace-view,body[data-theme=dark] header,body[data-theme=dark] .panel{background:#241f1a;color:#f5efe5}body[data-accent=blue] .status-bar{border-top-color:#4a90e2}body[data-accent=green] .status-bar{border-top-color:#3f6b50}body[data-density=compact] .panel,body[data-density=compact] .workspace-view{padding:.55rem;margin:.45rem 0}body[data-density=spacious] .panel,body[data-density=spacious] .workspace-view{padding:1.5rem;margin:1.5rem 0}.settings-surface textarea{width:100%;min-height:6rem}.palette-result{border-bottom:1px solid #eee;padding:.55rem 0}.palette-result button{margin-top:.25rem}.palette-result.unavailable{opacity:.8}.result-meta{font-size:.85rem;color:#61584d}.snapshot-toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:.75rem}.snapshot-toolbar button{padding:.5rem .8rem;border:1px solid #8b6f3d;border-radius:8px;background:#3f6b50;color:#fff;font-weight:700;cursor:pointer}.snapshot-toolbar .snapshot-status{font-size:.9rem;color:#61584d}.ui-runtime-diagnostic{margin-top:.75rem;padding:.55rem .75rem;border:1px solid #b9904a;border-radius:8px;background:#fff8e8;color:#4b3515;font-size:.92rem}.ui-runtime-diagnostic[data-state='ready']{background:#eaf7ef;border-color:#3f6b50;color:#163d25}.ui-runtime-diagnostic[data-state='error']{background:#f8d7da;border-color:#842029;color:#842029}@media(max-width:800px){.office-navigation{top:.5rem;left:.5rem}.workspace{padding:.75rem}}"""
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
 const WORKSPACE_PROFILE = __PROFILE_JSON__;
@@ -2324,7 +2363,62 @@ function applyWorkspaceProfile(profile){ if(!profile) return; if(profile.panel_a
 function normalizeNavigationState(value){ return value === 'expanded' ? 'collapsed' : (value || 'collapsed'); }
 function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); prefs.left_navigation = normalizeNavigationState(prefs.left_navigation || prefs.navigation_state); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
 function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab); const drawer = button.closest('#office-navigation details'); if(drawer) drawer.open = false; } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
-function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); bindOfficeActions(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
+function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); bindOfficeActions(); bindSettingsSurface(); startOfficeAutoRefresh(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
+
+function collectSettingsFromForm(){
+  const raw = JSON.parse(document.querySelector('#settings-json')?.value || '{}');
+  const settings = raw.settings || raw;
+  settings.appearance = settings.appearance || {};
+  settings.workspace = settings.workspace || {};
+  settings.operator_visibility = settings.operator_visibility || {};
+  settings.refresh = settings.refresh || {};
+  settings.command_console = settings.command_console || {};
+  settings.appearance.theme = document.querySelector('#settings-theme')?.value;
+  settings.appearance.accent = document.querySelector('#settings-accent')?.value;
+  settings.appearance.layout_density = document.querySelector('#settings-density')?.value;
+  settings.workspace.default_active_tab = document.querySelector('#settings-startup-tab')?.value;
+  settings.workspace.default_profile = document.querySelector('#settings-default-workspace')?.value || 'mission-control';
+  settings.workspace.navigation_order = (document.querySelector('#settings-nav-order')?.value || '').split(',').map(x => x.trim()).filter(Boolean);
+  settings.workspace.visible_panels = settings.workspace.visible_panels || {};
+  document.querySelectorAll('[data-settings-visible-tab]').forEach(input => { settings.workspace.visible_panels[input.dataset.settingsVisibleTab] = input.checked; });
+  settings.workspace.visible_panels.settings = true;
+  settings.refresh.enabled = !!document.querySelector('#settings-refresh-enabled')?.checked;
+  settings.refresh.mode = settings.refresh.enabled ? 'quiet' : 'manual';
+  settings.refresh.quiet_refresh_seconds = Number(document.querySelector('#settings-refresh-seconds')?.value || 30);
+  settings.workspace.status_bar_visible = !!document.querySelector('#settings-status-visible')?.checked;
+  settings.workspace.bottom_activity_stream_visible = !!document.querySelector('#settings-console-visible')?.checked;
+  settings.command_console.mode = document.querySelector('#settings-command-mode')?.value || 'inline';
+  settings.operator_visibility.global_verbosity = document.querySelector('#settings-global-verbosity')?.value || 'normal';
+  settings.operator_visibility.topic_overrides = JSON.parse(document.querySelector('#settings-topic-overrides')?.value || '{}');
+  settings.operator_visibility.resident_overrides = JSON.parse(document.querySelector('#settings-resident-overrides')?.value || '{}');
+  return {version: 1, settings};
+}
+async function submitSettingsAction(actionId, settingsDocument){
+  const resultEl = document.querySelector('#office-action-result-settings');
+  if(resultEl){ resultEl.className='office-action-result running'; resultEl.textContent='Running ' + actionId + ' locally...'; }
+  try{
+    if(getCommandCenterMode() !== 'served') throw new Error('Settings actions require served local mode.');
+    const response = await fetch('/api/office/actions/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action_id: actionId, settings_json: JSON.stringify(settingsDocument)})});
+    const payload = await response.json();
+    if(resultEl){ resultEl.className='office-action-result ' + (payload.outcome || 'unknown'); resultEl.textContent=JSON.stringify(payload,null,2); }
+    if(payload.outcome === 'completed') setTimeout(() => location.reload(), 450);
+  }catch(error){ if(resultEl){ resultEl.className='office-action-result failed'; resultEl.textContent=JSON.stringify({outcome:'failed', steward_message:String(error)},null,2); } }
+}
+function bindSettingsSurface(){
+  const save = document.querySelector('#settings-save-apply');
+  if(save) save.addEventListener('click', event => { event.preventDefault(); try{ const doc=collectSettingsFromForm(); document.querySelector('#settings-json').value=JSON.stringify(doc.settings,null,2); submitSettingsAction('settings.save_apply', doc); }catch(error){ const resultEl=document.querySelector('#office-action-result-settings'); if(resultEl){ resultEl.className='office-action-result failed'; resultEl.textContent='Settings validation failed in browser: '+error.message; } } });
+  const imp = document.querySelector('#settings-import');
+  if(imp) imp.addEventListener('click', event => { event.preventDefault(); try{ submitSettingsAction('settings.import', JSON.parse(document.querySelector('#settings-json')?.value || '{}')); }catch(error){ const resultEl=document.querySelector('#office-action-result-settings'); if(resultEl){ resultEl.className='office-action-result failed'; resultEl.textContent='Import JSON parse failed: '+error.message; } } });
+}
+let officeRefreshTimer = null;
+function startOfficeAutoRefresh(){
+  const enabled = document.body.dataset.refreshEnabled === 'true';
+  const seconds = Math.max(5, Number(document.body.dataset.refreshSeconds || 30));
+  if(officeRefreshTimer) clearInterval(officeRefreshTimer);
+  officeRefreshTimer = null;
+  refreshOperationsChrome();
+  if(enabled && location.protocol !== 'file:') officeRefreshTimer = window.setInterval(refreshOperationsChrome, seconds * 1000);
+}
 
 async function runOfficeAction(button){
   const actionId = button.dataset.officeAction;
@@ -2459,10 +2553,15 @@ document.addEventListener('click', event => { if(event.target.closest('#office-s
 window.addEventListener('load', () => { updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); });
 </script>"""
     script = script.replace("__PROFILE_JSON__", _js_json_literal(payload.get("workspace_profile", {})))
+    settings_for_body = ((payload.get('settings_manager') or {}).get('settings') or {})
+    appearance_for_body = settings_for_body.get('appearance') or {}
+    workspace_for_body = settings_for_body.get('workspace') or {}
+    refresh_for_body = settings_for_body.get('refresh') or {}
+    body_attrs = f"data-theme='{html.escape(str(appearance_for_body.get('theme') or 'system'), quote=True)}' data-accent='{html.escape(str(appearance_for_body.get('accent') or 'estate-gold'), quote=True)}' data-density='{html.escape(str(appearance_for_body.get('layout_density') or 'comfortable'), quote=True)}' data-refresh-enabled='{str(bool(refresh_for_body.get('enabled'))).lower()}' data-refresh-seconds='{html.escape(str(refresh_for_body.get('quiet_refresh_seconds') or 30), quote=True)}'"
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
-        f'<body><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
+        f'<body {body_attrs}><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
