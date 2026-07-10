@@ -95,7 +95,7 @@ def test_helen_v0_2_profile_defines_workforce_development_and_cognitive_health()
         "relationship to grace / office of operations",
         "relationship to engineering",
         "privacy and journal boundary",
-        "grace's future role",
+        "helen's future role",
     ]:
         assert phrase in text
 
@@ -178,7 +178,7 @@ def test_helen_hiring_workflow_preserves_authorization_and_steward_appointment()
         "grace-specific application",
     ]:
         assert phrase in text
-    assert "helen may not create the office" in text
+    assert "she may not create the office" in text
     assert "grace's validation must prove decisive operation" in text
 
 
