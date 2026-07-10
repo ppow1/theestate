@@ -731,3 +731,9 @@ Implemented WP-0607 with provider health and capacity record validation, runtime
 EC-000092 - Added Traffic Controller operations manager layer
 
 Implemented WP-0610 with operations review and decision models, file-backed runtime artifacts, Office-readable operations control summaries, CLI commands for review/decision/list workflows, operational event compatibility, sensitive-summary redaction, tests, and integration documentation. This layer records operational posture and decisions only; it does not execute providers or provision workers.
+
+2026-07-10 00:00:00
+
+EC-000093 - Added Engineering Capacity Runtime dashboard
+
+Implemented WP-0532 with an advisory Engineering Capacity Runtime that combines provider health/capacity evidence, cloud Codex seat fuel gauges, local worker runtime evidence, a CLI dashboard command, staged Office handoff Markdown, tests, and concise integration documentation.

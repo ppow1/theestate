@@ -1,0 +1,26 @@
+{
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T23:24:57Z",
+  "files_changed": [
+    "src/estate/core/engineering_capacity_runtime.py",
+    "src/estate/cli/main.py",
+    "docs/integration/engineering_capacity_runtime.md",
+    "tests/test_engineering_capacity_runtime.py",
+    "development/devlog.md",
+    "estate_ledger/ledger.md"
+  ],
+  "known_limitations": [
+    "Original work package file is truncated after the mission sentence; implementation follows the recoverable mission text and existing Estate patterns.",
+    "Dashboard is advisory-only and derives state from available provider and worker artifacts."
+  ],
+  "merge_authority": "ca_verified_auto_merge_allowed",
+  "mode": "PARALLEL-INDEPENDENT with staged Office install handoff",
+  "ready_for_ca_review": true,
+  "staged_work_is_installed": false,
+  "summary": "Implemented Engineering Capacity Runtime dashboard combining cloud Codex/provider fuel gauges with local worker runtime evidence and staged Office handoff artifacts.",
+  "tests_validation_run": [
+    "pytest -q tests/test_engineering_capacity_runtime.py tests/test_provider_capacity.py"
+  ],
+  "work_package_id": "WP-0532"
+}
