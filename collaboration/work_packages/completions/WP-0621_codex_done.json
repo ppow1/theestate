@@ -1,0 +1,36 @@
+{
+  "work_package_id": "WP-0621",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "branch": "current",
+  "summary": "Implemented automatic post-merge audit processing, clean validation workspace synchronization, standard validation execution, Ring 2 prompt generation, verdict/status publishing, runtime/Office integration, CLI, tests, and documentation.",
+  "files_changed": [
+    "src/estate/core/post_merge_audit_processor.py",
+    "src/estate/core/post_merge_validation_pipeline.py",
+    "src/estate/core/operations_runtime.py",
+    "src/estate/core/operations_runtime_service.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_post_merge_audit_processor.py",
+    "tests/test_post_merge_validation_pipeline.py",
+    "docs/integration/automatic_post_merge_validation_pipeline.md"
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/post_merge_audit_processor.py src/estate/core/post_merge_validation_pipeline.py",
+    "pytest -q tests/test_post_merge_audit_processor.py tests/test_post_merge_validation_pipeline.py --basetemp Temp/pytest-post-merge-validation-pipeline"
+  ],
+  "known_limitations": [
+    "Ollama Ring 2 execution remains opt-in and was not invoked by deterministic tests."
+  ],
+  "ready_for_ca_review": true,
+  "pull_request_url": "https://example.invalid/pending-pr",
+  "merge_authority": "Chief Architect / Steward after review",
+  "provider_execution_performed": false,
+  "dispatch_execution_performed": false,
+  "automatic_audit_requests_processed": 1,
+  "demonstration_work_package": "WP-0620",
+  "demonstration_verdict": "ring2_required",
+  "validation_workspace_used": "runtime/post_merge_audit/workspaces/<target_id>/<audit_id>",
+  "external_evidence_root_used": "runtime/post_merge_audit/evidence/<audit_id>"
+}

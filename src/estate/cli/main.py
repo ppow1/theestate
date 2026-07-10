@@ -78,6 +78,7 @@ from estate.core.execution_dispatch import (
 from estate.core.operational_readiness_dashboard import generate_operational_readiness_dashboard, format_operational_readiness_summary
 from estate.core.steward_presence import generate_steward_presence_state, format_steward_presence_state
 from estate.core.assignment_queue import generate_assignment_queue, format_assignment_queue_markdown
+from estate.core.post_merge_audit_processor import PostMergeAuditProcessor
 from estate.core.autonomous_work_queue_scheduler import generate_autonomous_work_queue_scheduler, format_autonomous_work_queue_scheduler
 from estate.core.autonomous_operations_audit import append_autonomous_operations_audit, format_autonomous_operations_audit
 from estate.core.steward_command_center import generate_command_center, serve_command_center
@@ -159,15 +160,32 @@ def cmd_background_operations(args):
         print(f"Background operations failed: {exc}")
         raise SystemExit(1)
 
+def cmd_post_merge_audit(args):
+    processor = PostMergeAuditProcessor()
+    action = args.post_merge_audit_action
+    if action == "process-next":
+        payload = processor.process_next()
+    elif action == "process-all":
+        payload = processor.process_all(max_count=args.max)
+    elif action == "demonstrate":
+        payload = processor.demonstrate(args.work_package, pr=args.pr)
+    elif action == "status":
+        payload = processor.summary()
+    else:
+        raise SystemExit(1)
+    print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
+
 def cmd_operations_runtime(args):
     try:
         service = OperationsRuntimeService()
         action = args.operations_runtime_action
         if action == "run-once":
-            payload = service.run_once(dry_run=getattr(args, "dry_run", False))
+            mode = "process-audits-and-ring2" if getattr(args, "process_audits_and_ring2", False) else ("process-audits" if getattr(args, "process_audits", False) else "observe-only")
+            payload = service.run_once(dry_run=getattr(args, "dry_run", False), mode=mode)
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
         elif action == "start":
-            payload = service.start(max_cycles=args.max_cycles, interval_seconds=args.interval_seconds, dry_run=getattr(args, "dry_run", False))
+            mode = "process-audits-and-ring2" if getattr(args, "process_audits_and_ring2", False) else ("process-audits" if getattr(args, "process_audits", False) else "observe-only")
+            payload = service.start(max_cycles=args.max_cycles, interval_seconds=args.interval_seconds, dry_run=getattr(args, "dry_run", False), mode=mode)
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
         elif action == "status":
             payload = service.status()
@@ -2750,17 +2768,39 @@ def main(argv=None):
     q.set_defaults(func=cmd_background_operations)
 
 
+    p = sub.add_parser("post-merge-audit", help="Process pending automatic post-merge audit requests")
+    pma = p.add_subparsers(dest="post_merge_audit_action", required=True)
+    q = pma.add_parser("process-next", help="Claim and process one pending audit request")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_post_merge_audit)
+    q = pma.add_parser("process-all", help="Process pending audit requests")
+    q.add_argument("--max", type=int, default=10)
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_post_merge_audit)
+    q = pma.add_parser("demonstrate", help="Create and process a demonstration audit request")
+    q.add_argument("--work-package", required=True)
+    q.add_argument("--pr")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_post_merge_audit)
+    q = pma.add_parser("status", help="Show post-merge audit processor status")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_post_merge_audit)
+
     p = sub.add_parser("operations-runtime", help="Run and inspect the bounded Operations Runtime service loop")
     ort = p.add_subparsers(dest="operations_runtime_action", required=True)
     q = ort.add_parser("run-once", help="Run one Operations Runtime cycle")
     q.add_argument("--json", action="store_true")
     q.add_argument("--dry-run", action="store_true")
+    q.add_argument("--process-audits", action="store_true")
+    q.add_argument("--process-audits-and-ring2", action="store_true")
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("start", help="Run a bounded Operations Runtime loop")
     q.add_argument("--max-cycles", type=int, default=1)
     q.add_argument("--interval-seconds", type=float, default=30.0)
     q.add_argument("--json", action="store_true")
     q.add_argument("--dry-run", action="store_true")
+    q.add_argument("--process-audits", action="store_true")
+    q.add_argument("--process-audits-and-ring2", action="store_true")
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("status", help="Show Operations Runtime status")
     q.add_argument("--json", action="store_true")
