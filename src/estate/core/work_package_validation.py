@@ -53,6 +53,42 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0503": {
+        "recipe_id": "wp-0503-governed-dispatch-to-adapter-handoff",
+        "title": "WP-0503 — Governed Dispatch-to-Adapter Handoff Runtime",
+        "description": "Validates the dispatch-to-adapter handoff runtime, CLI, docs, tests, and receipt without live provider calls.",
+        "required_checks": [
+            "Runtime, tests, documentation, and receipt exist",
+            "Runtime compiles",
+            "Focused handoff and adapter tests pass",
+            "Receipt records boundary claims",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/execution_adapter_handoff_runtime.py",
+            "tests/test_execution_adapter_handoff_runtime.py",
+            "docs/integration/execution_dispatch_to_adapter_handoff.md",
+            "collaboration/work_packages/completions/WP-0503_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live provider calls or modified authorization/acceptance behavior",
+        ],
+        "success_criteria": [
+            "Ready authorized dispatch items can produce adapter handoff artifacts",
+            "Unauthorized or incomplete dispatch items are blocked deterministically",
+            "No live provider call is reported",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_adapter_handoff_runtime.py','tests/test_execution_adapter_handoff_runtime.py','docs/integration/execution_dispatch_to_adapter_handoff.md','collaboration/work_packages/completions/WP-0503_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/execution_adapter_handoff_runtime.py"),
+            _cmd("pytest -q tests/test_execution_adapter_handoff_runtime.py tests/test_execution_provider_adapter.py tests/test_execution_provider_adapter_runtime.py"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0503_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0503'; assert data.get('live_provider_calls_made') is False; assert data.get('authorization_behavior_modified') is False; assert data.get('institutional_acceptance_behavior_modified') is False; assert data.get('ready_for_ca_review') is True\""),
+        ],
+    },
+
+
     "WP-0502": {
         "recipe_id": "wp-0502-institutional-operations-doctrine",
         "title": "WP-0502 — Institutional Operations Doctrine",

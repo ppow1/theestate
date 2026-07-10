@@ -56,6 +56,7 @@ from estate.core.production_readiness_validation import generate_production_read
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
 from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
+from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepare_handoff, validate_handoff, dry_run_handoff
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
 from estate.core.execution_dispatch import (
@@ -1596,6 +1597,34 @@ def cmd_execution_provider_adapter(args):
         print(f"Execution provider adapter {args.execution_provider_adapter_action}: {status}")
 
 
+
+def cmd_execution_adapter_handoff(args):
+    import json
+    try:
+        if args.execution_adapter_handoff_action == "inspect":
+            payload = inspect_handoff(args.dispatch_id)
+        elif args.execution_adapter_handoff_action == "prepare":
+            payload = prepare_handoff(args.dispatch_id)
+        elif args.execution_adapter_handoff_action == "validate":
+            payload = validate_handoff(args.dispatch_id)
+        elif args.execution_adapter_handoff_action == "dry-run":
+            payload = dry_run_handoff(args.dispatch_id)
+        else:
+            raise SystemExit(f"Unknown execution-adapter-handoff action: {args.execution_adapter_handoff_action}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        payload = {"status": "failed", "error": str(exc), "live_provider_called": False}
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"Execution adapter handoff failed: {exc}")
+        raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"Execution adapter handoff {args.execution_adapter_handoff_action}: {payload.get('status')}")
+    if payload.get("errors"):
+        raise SystemExit(1)
+
 def cmd_provider_routing_recommendation(args):
     import json
     try:
@@ -2191,6 +2220,15 @@ def main(argv=None):
     q.add_argument("--request", required=True, help="Path to adapter request JSON")
     q.add_argument("--json", action="store_true", help="Print dry-run result JSON")
     q.set_defaults(func=cmd_execution_provider_adapter)
+
+
+    p = sub.add_parser("execution-adapter-handoff", help="Prepare and validate dispatch-to-adapter handoffs without live provider calls")
+    handoff_sub = p.add_subparsers(dest="execution_adapter_handoff_action", required=True)
+    for action in ("prepare", "inspect", "validate", "dry-run"):
+        q = handoff_sub.add_parser(action, help=f"{action} a dispatch-to-adapter handoff")
+        q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
+        q.add_argument("--json", action="store_true", help="Print handoff JSON")
+        q.set_defaults(func=cmd_execution_adapter_handoff)
 
     p = sub.add_parser("execution-activity", help="Generate the shared local execution activity snapshot")
     p.add_argument("--json", action="store_true", help="Print execution activity current snapshot JSON")
