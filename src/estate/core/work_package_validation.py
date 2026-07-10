@@ -53,6 +53,24 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0521": {
+        "recipe_id": "wp-0521-office-end-to-end-regression-recovery-operational-acceptance",
+        "title": "WP-0521 — Office End-to-End Regression, Recovery, and Operational Acceptance",
+        "description": "Runs deterministic Office browser-contract and HTTP/action-transport regression evidence, recovery checks, readiness output checks, and authority-boundary assertions.",
+        "required_checks": ["Office end-to-end regression module compiles", "Focused WP-0521 regression tests pass", "Required readiness artifacts exist", "Completion receipt preserves institutional acceptance boundary"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/office_end_to_end_regression.py", "tests/test_office_end_to_end_regression.py", "runtime/steward/office_end_to_end_regression.json", "runtime/steward/office_operational_readiness.json", "operations/steward/office_operational_readiness.md", "runtime/steward/office_remaining_defects.json", "collaboration/work_packages/completions/WP-0521_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Regression grants institutional acceptance", "Regression creates a parallel Office, provider router, queue, registry, or event system", "Recovery paths fail to return truthful outcomes"],
+        "success_criteria": ["Primary repaired control surfaces reach canonical handlers", "Durable evidence or legitimate state changes are visible", "Reload/restart persistence and recovery contracts are represented", "Remaining defects are explicit and narrow"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/office_end_to_end_regression.py src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py"),
+            _cmd("pytest -q tests/test_office_end_to_end_regression.py"),
+            _cmd("python -c \"from pathlib import Path; paths=['runtime/steward/office_end_to_end_regression.json','runtime/steward/office_operational_readiness.json','operations/steward/office_operational_readiness.md','runtime/steward/office_remaining_defects.json','collaboration/work_packages/completions/WP-0521_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0521_codex_done.json').read_text()); r=json.loads(Path('runtime/steward/office_operational_readiness.json').read_text()); assert d['work_package_id']=='WP-0521'; assert d['institutional_acceptance_granted'] is False; assert r['institutional_acceptance_granted'] is False; assert d['parallel_office_created'] is False; assert d['provider_router_created'] is False; assert d['validation_recipe_registered'] is True\""),
+        ],
+    },
+
     "WP-0518": {
         "recipe_id": "wp-0518-validation-audit-verdict-control-center",
         "title": "WP-0518 — Validation, Audit, and Verdict Control Center",
