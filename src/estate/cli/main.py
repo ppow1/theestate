@@ -120,12 +120,30 @@ from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
+from estate.cli.helen_workforce import run as run_helen_workforce_cli
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
 
 
 
+
+def cmd_helen_workforce(args):
+    argv = []
+    if getattr(args, "root", None):
+        argv += ["--root", args.root]
+    if getattr(args, "json", False):
+        argv.append("--json")
+    argv.append(args.helen_workforce_action)
+    if getattr(args, "file", None):
+        argv += ["--file", args.file]
+    if getattr(args, "request_id", None):
+        argv += ["--request-id", args.request_id]
+    try:
+        run_helen_workforce_cli(argv)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Helen workforce command failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_operational_targets(args):
     try:
@@ -2966,6 +2984,26 @@ def main(argv=None):
 
 
 
+
+
+    p = sub.add_parser("helen-workforce", help="Create and inspect governed Helen workforce-development artifacts")
+    hw = p.add_subparsers(dest="helen_workforce_action", required=True)
+    for name in ["request-create", "assessment-create"]:
+        q = hw.add_parser(name)
+        q.add_argument("--file", required=True)
+        q.add_argument("--root")
+        q.add_argument("--json", action="store_true")
+        q.set_defaults(func=cmd_helen_workforce)
+    q = hw.add_parser("request-show")
+    q.add_argument("--request-id", required=True)
+    q.add_argument("--root")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_helen_workforce)
+    for name in ["requests-list", "assessments-list", "status"]:
+        q = hw.add_parser(name)
+        q.add_argument("--root")
+        q.add_argument("--json", action="store_true")
+        q.set_defaults(func=cmd_helen_workforce)
 
     p = sub.add_parser("operational-targets", help="List and control Background Operations operational targets")
     ot = p.add_subparsers(dest="operational_targets_action", required=True)

@@ -140,12 +140,27 @@ def generate_steward_presence_state(*, root: str | Path | None = None, write: bo
     else:
         state["warnings"].append({"type": "unknown_state", "message": "No approved local evidence establishes Steward presence or recall lifecycle state.", "path": None})
 
+    workforce_summary_path = root_path / "runtime/workforce_development/status/summary.json"
+    workforce_summary = None
+    if workforce_summary_path.exists():
+        try:
+            loaded = json.loads(workforce_summary_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                workforce_summary = loaded
+        except Exception as exc:
+            state["warnings"].append({"type": "unreadable_workforce_status", "path": str(workforce_summary_path), "message": str(exc)})
+
     state["summary"] = {
         "state": state["current_state"],
         "warning_count": len(state["warnings"]),
         "transition_count": len(state["transition_history"]),
         "alfred_guidance": "request_or_continue_recall_path" if state["current_state"] in {"recall_requested", "recall_sent"} else ("resume_or_confirm_operations" if state["current_state"] in {"recall_acknowledged", "resumed", "present"} else "treat_as_unknown_until_evidence_refresh"),
     }
+    state["summary"]["helen_workforce"] = workforce_summary or {"available": False}
+    state["summary"]["provider_execution_performed"] = False
+    state["summary"]["operational_queue_control_performed"] = False
+    state["summary"]["constitutional_authority_granted"] = False
+
     if write:
         json_path = root_path / PRESENCE_JSON
         json_path.parent.mkdir(parents=True, exist_ok=True)
@@ -163,6 +178,7 @@ def format_steward_presence_state(payload: dict[str, Any]) -> str:
         f"Generated: {payload.get('generated_at')}",
         f"Current state: {payload.get('current_state')}",
         f"Alfred guidance: {(payload.get('summary') or {}).get('alfred_guidance')}",
+        f"Helen workforce open requests: {((payload.get('summary') or {}).get('helen_workforce') or {}).get('open_requests', 0)}",
         "",
         "This report is evidence-only. It does not track the Steward outside Estate-approved local artifacts and does not send notifications.",
         "",
