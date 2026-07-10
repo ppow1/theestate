@@ -1,0 +1,15 @@
+{
+  "schema": "estate.operational_workflow_catalog.v1",
+  "staged_not_installed": true,
+  "authority_boundary": "Existing Office authority gates remain required for every state-changing handler.",
+  "families": [
+    "work-package review and promotion",
+    "validation request, evidence review, and next action",
+    "resident onboarding preparation",
+    "project intake and assignment",
+    "local service readiness and approved launch",
+    "incident or failure triage",
+    "operational handoff and follow-up"
+  ],
+  "prohibited_automation": ["approval", "acceptance", "merge", "retry", "provider_selection"]
+}

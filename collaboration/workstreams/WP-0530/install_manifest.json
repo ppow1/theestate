@@ -1,0 +1,15 @@
+{
+  "schema": "estate.staged_install_manifest.v1",
+  "work_package": "WP-0530",
+  "staged_not_installed": true,
+  "installing_work_package": "WP-0531",
+  "files": [
+    "staged/office_operational_workflows.py",
+    "staged/test_office_operational_workflows.py",
+    "operational_workflow_catalog.json",
+    "operational_workflow_contract.md",
+    "validation_notes.md",
+    "rollback_notes.md"
+  ],
+  "active_office_files_modified": false
+}
