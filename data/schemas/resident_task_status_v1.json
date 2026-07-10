@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/resident_task_status.v1",
+  "title": "Resident Task Status v1",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "residents"],
+  "properties": {
+    "schema_version": {"const": "resident_task_status.v1"},
+    "updated_at": {"type": "string"},
+    "residents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["resident_id", "name", "goal", "current_task", "last_meaningful_movement", "availability_state", "escalation_state"],
+        "properties": {
+          "resident_id": {"type": "string"},
+          "name": {"type": "string"},
+          "goal": {"type": "string"},
+          "current_task": {"type": "string"},
+          "last_meaningful_movement": {"type": "string"},
+          "waiting_on": {"type": ["string", "null"]},
+          "blocker": {"type": ["string", "null"]},
+          "next_action": {"type": ["string", "null"]},
+          "next_checkpoint": {"type": ["string", "null"]},
+          "availability_state": {"type": "string"},
+          "escalation_state": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

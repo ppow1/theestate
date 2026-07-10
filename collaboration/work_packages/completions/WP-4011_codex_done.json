@@ -1,0 +1,14 @@
+{
+  "completed_at": "2026-07-10T00:00:00+00:00",
+  "completed_by": "Codex",
+  "outputs": [
+    "data/schemas/resident_task_status_v1.json",
+    "runtime/residents/task_status.json",
+    "src/estate/core/resident_task_visibility.py",
+    "docs/collaboration/Resident_Communications_and_Task_Visibility_v1.md",
+    "operations/validation/reports/WP-4011_resident_communications_task_visibility.md",
+    "runtime/office/steward_participant_board.json"
+  ],
+  "status": "done",
+  "work_package_id": "WP-4011"
+}
