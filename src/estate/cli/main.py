@@ -125,6 +125,7 @@ from estate.core.operational_target_validation_binding import OperationalTargetV
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
 from estate.core.operations_runtime_host import OperationsRuntimeHost, OperationsRuntimeHostError
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
+from estate.core.character_continuity import create_cycle as continuity_create_cycle, prepare_reflection as continuity_prepare_reflection, create_continuity as continuity_create_artifact, start_next_cycle as continuity_start_next_cycle, status as continuity_status
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 
 def _repo_path(rel):
@@ -133,6 +134,29 @@ def _repo_path(rel):
 
 
 
+
+def cmd_character_continuity(args):
+    try:
+        root = Path(args.root) if getattr(args, "root", None) else None
+        action = args.character_continuity_action
+        if action == "init":
+            payload = continuity_create_cycle(args.resident_id, args.resident_name, root=root, classification=args.classification)
+        elif action == "status":
+            payload = continuity_status(args.resident_id, root=root)
+        elif action == "prepare-reflection":
+            evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8"))
+            payload = continuity_prepare_reflection(args.resident_id, evidence, root=root)
+        elif action == "create-continuity":
+            outcome = json.loads(Path(args.outcome).read_text(encoding="utf-8"))
+            payload = continuity_create_artifact(args.resident_id, outcome, root=root, public=not args.include_private)
+        elif action == "start-cycle":
+            payload = continuity_start_next_cycle(args.resident_id, root=root)
+        else:
+            raise SystemExit(1)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Character continuity failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_helen_readiness(args):
     try:
@@ -3394,6 +3418,34 @@ def main(argv=None):
     p = sub.add_parser("operations-decisions-list", help="List recorded operations decisions")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_operations_decisions_list)
+
+    p = sub.add_parser("character-continuity", help="Inspect and advance resident character continuity cycles")
+    cc = p.add_subparsers(dest="character_continuity_action", required=True)
+    q = cc.add_parser("init")
+    q.add_argument("--resident-id", required=True)
+    q.add_argument("--resident-name", required=True)
+    q.add_argument("--classification", default="Estate Internal", choices=["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only"])
+    q.add_argument("--root")
+    q.set_defaults(func=cmd_character_continuity)
+    q = cc.add_parser("status")
+    q.add_argument("--resident-id", required=True)
+    q.add_argument("--root")
+    q.set_defaults(func=cmd_character_continuity)
+    q = cc.add_parser("prepare-reflection")
+    q.add_argument("--resident-id", required=True)
+    q.add_argument("--evidence", required=True)
+    q.add_argument("--root")
+    q.set_defaults(func=cmd_character_continuity)
+    q = cc.add_parser("create-continuity")
+    q.add_argument("--resident-id", required=True)
+    q.add_argument("--outcome", required=True)
+    q.add_argument("--include-private", action="store_true")
+    q.add_argument("--root")
+    q.set_defaults(func=cmd_character_continuity)
+    q = cc.add_parser("start-cycle")
+    q.add_argument("--resident-id", required=True)
+    q.add_argument("--root")
+    q.set_defaults(func=cmd_character_continuity)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

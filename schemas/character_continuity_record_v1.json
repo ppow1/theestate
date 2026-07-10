@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/character_continuity_record_v1.json",
+  "title": "Character Continuity Record v1",
+  "type": "object",
+  "required": ["schema_version", "resident_identity", "cycle", "working_journal_summary", "lessons_retained", "contradictions_unresolved_drift", "reflection_outcome", "continuity_artifact_ref", "next_cycle_initialization", "classification", "review_hooks", "audit"],
+  "properties": {
+    "schema_version": {"const": "character-continuity-record-v1"},
+    "resident_identity": {"type": "object", "required": ["resident_id", "resident_name"]},
+    "cycle": {"type": "object", "required": ["cycle_id", "cycle_number", "state", "started_at"], "properties": {"state": {"enum": ["active", "reflection_due", "in_reflection", "continuity_ready", "new_cycle_ready", "archived"]}}},
+    "working_journal_summary": {"type": "array", "items": {"type": "string"}},
+    "lessons_retained": {"type": "array", "items": {"type": "string"}},
+    "contradictions_unresolved_drift": {"type": "array", "items": {"type": "string"}},
+    "reflection_outcome": {"type": "object"},
+    "continuity_artifact_ref": {"type": ["string", "null"]},
+    "next_cycle_initialization": {"type": "object", "properties": {"carry_full_transcript": {"const": false}}},
+    "classification": {"type": "object", "required": ["level", "protected_private", "public_output_allowed"]},
+    "review_hooks": {"type": "object", "required": ["helen_review_required", "helen_review_status", "ingrid_classification_required", "ingrid_classification_status"]},
+    "audit": {"type": "object", "required": ["created_at", "updated_at", "predecessor_cycle_id", "successor_cycle_id"]}
+  }
+}

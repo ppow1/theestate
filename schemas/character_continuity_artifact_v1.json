@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/character_continuity_artifact_v1.json",
+  "title": "Character Continuity Artifact v1",
+  "type": "object",
+  "required": ["schema_version", "artifact_id", "resident_identity", "source_cycle_id", "stable_identity", "lessons_retained", "unresolved_drift", "reflection_outcome", "next_cycle_initialization", "classification", "audit"],
+  "properties": {
+    "schema_version": {"const": "character-continuity-artifact-v1"},
+    "artifact_id": {"type": "string"},
+    "resident_identity": {"type": "object", "required": ["resident_id", "resident_name"]},
+    "source_cycle_id": {"type": "string"},
+    "stable_identity": {"type": "object"},
+    "lessons_retained": {"type": "array", "items": {"type": "string"}},
+    "unresolved_drift": {"type": "array", "items": {"type": "string"}},
+    "reflection_outcome": {"type": "object"},
+    "next_cycle_initialization": {"type": "object", "properties": {"carry_full_transcript": {"const": false}}},
+    "classification": {"type": "object", "required": ["level", "private_content_excluded"]},
+    "audit": {"type": "object", "required": ["source_cycle_id", "successor_cycle_id"]}
+  }
+}
