@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate_knowledge_index_v1.json",
+  "title": "Estate Knowledge Index v1",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "index_path", "local_only", "record_count", "records"],
+  "properties": {
+    "schema_version": {"const": "estate.knowledge_index.v1"},
+    "generated_at": {"type": "string"},
+    "index_path": {"const": "runtime/search/estate_knowledge_index.json"},
+    "local_only": {"const": true},
+    "record_count": {"type": "integer", "minimum": 0},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "title", "artifact_type", "owner", "classification", "modified_time", "source_hash", "provenance"],
+        "properties": {
+          "path": {"type": "string"},
+          "title": {"type": "string"},
+          "artifact_type": {"type": "string"},
+          "owner": {"type": "string"},
+          "classification": {"type": "string"},
+          "modified_time": {"type": "string"},
+          "source_hash": {"type": "string"},
+          "provenance": {"type": "object"}
+        }
+      }
+    }
+  }
+}

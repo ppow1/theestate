@@ -41,6 +41,14 @@ from estate.core.onboarding_manifest import check_onboarding_manifests, format_o
 from estate.core.hr_onboarding import run_employee_onboarding, format_onboarding_result
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.institutional_search import search_institutional_index, format_search_report
+from estate.core.estate_knowledge_index import (
+    format_query_report as format_knowledge_query_report,
+    incremental_update as update_knowledge_index,
+    inspect_index as inspect_knowledge_index,
+    query_index as query_knowledge_index,
+    rebuild_index as rebuild_knowledge_index,
+    status as knowledge_index_status,
+)
 from estate.core.global_search_command_palette import search_global_palette, execute_registered_command, format_palette_report
 from estate.core.document_registry import load_document_registry, format_document_registry
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
@@ -1595,6 +1603,36 @@ def cmd_estate_search(args):
     else:
         print(format_search_report(result))
 
+def cmd_knowledge_index(args):
+    root = Path(args.root) if getattr(args, "root", None) else Path.cwd()
+    action = args.knowledge_index_action
+    if action == "rebuild":
+        payload = rebuild_knowledge_index(root, write=True)
+    elif action == "update":
+        payload = update_knowledge_index(root)
+    elif action == "status":
+        payload = knowledge_index_status(root)
+    elif action == "inspect":
+        payload = inspect_knowledge_index(root)
+    elif action == "query":
+        payload = query_knowledge_index(
+            args.query or "",
+            root=root,
+            artifact_type=args.artifact_type,
+            owner=args.owner,
+            classification=args.classification,
+            include_private=args.include_private,
+            limit=args.limit,
+            refresh=getattr(args, "refresh", False),
+        )
+    else:
+        raise SystemExit(1)
+    if getattr(args, "json", False) or action != "query":
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_knowledge_query_report(payload))
+
+
 def cmd_global_search(args):
     result = search_global_palette(args.query, refresh=not getattr(args, "no_refresh", False))
     if getattr(args, "json", False):
@@ -3117,6 +3155,24 @@ def main(argv=None):
     p.add_argument("--root", help="Estate root path to search; defaults to the current working directory")
     p.add_argument("--no-refresh", action="store_true", help="Use existing runtime search index if present")
     p.set_defaults(func=cmd_estate_search)
+
+    p = sub.add_parser("knowledge-index", help="Build, inspect, and query the governed Estate knowledge index")
+    p.add_argument("--root", help="Estate root path; defaults to the current working directory")
+    p.add_argument("--json", action="store_true", help="Print JSON output")
+    sp = p.add_subparsers(dest="knowledge_index_action", required=True)
+    sp.add_parser("rebuild", help="Rebuild the knowledge index from local artifacts").set_defaults(func=cmd_knowledge_index)
+    sp.add_parser("update", help="Incrementally refresh changed index entries").set_defaults(func=cmd_knowledge_index)
+    sp.add_parser("status", help="Print index status").set_defaults(func=cmd_knowledge_index)
+    sp.add_parser("inspect", help="Detect stale or missing index entries").set_defaults(func=cmd_knowledge_index)
+    q = sp.add_parser("query", help="Query indexed Estate artifacts")
+    q.add_argument("query", nargs="?", default="", help="Keyword query")
+    q.add_argument("--artifact-type", help="Filter by normalized artifact type")
+    q.add_argument("--owner", help="Filter by owner")
+    q.add_argument("--classification", help="Filter by classification")
+    q.add_argument("--include-private", action="store_true", help="Include protected private records")
+    q.add_argument("--limit", type=int, default=20, help="Maximum results")
+    q.add_argument("--refresh", action="store_true", help="Rebuild before querying")
+    q.set_defaults(func=cmd_knowledge_index)
 
     p = sub.add_parser("global-search", help="Search artifacts and registered command palette entries")
     p.add_argument("query", nargs="?", default="", help="Keyword query to search for")
