@@ -1,0 +1,13 @@
+{
+  "work_package_id": "WP-0512",
+  "status": "completed",
+  "agent": "codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "artifacts": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_command_surface.py",
+    "tests/test_office_shell_functional.py",
+    "docs/integration/office_shell_action_transport.md"
+  ],
+  "validation_recipe": "pytest tests/test_office_shell_functional.py tests/test_office_command_surface.py tests/test_steward_command_center.py"
+}

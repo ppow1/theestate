@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import traceback
+import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -35,6 +36,7 @@ RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
 class OfficeActionResult:
     action_id: str
     action_label: str
+    request_id: str
     target_tab: str
     outcome: str
     steward_message: str
@@ -78,11 +80,15 @@ def _diagnostic(root: Path, action_id: str, exc: BaseException) -> str:
     return rel
 
 
-def _completed(action_id, label, tab, handler, msg, *, read=(), written=(), state=()):
-    return OfficeActionResult(action_id, label, tab, 'completed', msg, handler, list(read), list(written), list(state))
+def _request_id(params: dict[str, Any] | None = None) -> str:
+    value = (params or {}).get('request_id')
+    return str(value) if value else f'office-{uuid.uuid4().hex[:12]}'
 
-def _blocked(action_id, label, tab, handler, reason, *, read=()):
-    return OfficeActionResult(action_id, label, tab, 'blocked', reason, handler, list(read), [], [], 'gated_or_missing_requirement')
+def _completed(action_id, label, tab, handler, msg, *, read=(), written=(), state=(), request_id: str | None = None):
+    return OfficeActionResult(action_id, label, request_id or _request_id(), tab, 'completed', msg, handler, list(read), list(written), list(state))
+
+def _blocked(action_id, label, tab, handler, reason, *, read=(), request_id: str | None = None):
+    return OfficeActionResult(action_id, label, request_id or _request_id(), tab, 'blocked', reason, handler, list(read), [], [], 'gated_or_missing_requirement')
 
 
 def refresh_ai_services(root=None, **_: Any) -> OfficeActionResult:
@@ -171,7 +177,7 @@ def settings_save_apply(root=None, settings_json: str | None = None, **params: A
             raise ValueError('settings_json must be a settings object or export document.')
         save_settings_document(base, settings, backup=True)
     except Exception as exc:
-        return OfficeActionResult('settings.save_apply', 'Save and apply settings', 'settings', 'failed', f'Settings were not saved: {exc}', 'estate.core.operations_center_settings.save_settings_document')
+        return OfficeActionResult('settings.save_apply', 'Save and apply settings', _request_id(params), 'settings', 'failed', f'Settings were not saved: {exc}', 'estate.core.operations_center_settings.save_settings_document')
     return _completed('settings.save_apply', 'Save and apply settings', 'settings', 'estate.core.operations_center_settings.save_settings_document', 'Settings saved atomically and will be applied by the refreshed Office payload.', read=[SETTINGS_OUTPUT], written=[SETTINGS_OUTPUT], state=['settings persisted', 'office payload configuration changed'])
 
 def settings_reset_defaults(root=None, **_: Any) -> OfficeActionResult:
@@ -189,7 +195,7 @@ def settings_import(root=None, settings_json: str | None = None, **_: Any) -> Of
     try:
         document=json.loads(settings_json); payload=import_operations_center_settings(base, document)
     except Exception as exc:
-        return OfficeActionResult('settings.import', 'Import settings', 'settings', 'failed', f'Import rejected without changing active settings: {exc}', 'estate.core.operations_center_settings.import_operations_center_settings')
+        return OfficeActionResult('settings.import', 'Import settings', _request_id(), 'settings', 'failed', f'Import rejected without changing active settings: {exc}', 'estate.core.operations_center_settings.import_operations_center_settings')
     written=[SETTINGS_OUTPUT] + ([payload.get('import_backup_path')] if payload.get('import_backup_path') else [])
     return _completed('settings.import', 'Import settings', 'settings', 'estate.core.operations_center_settings.import_operations_center_settings', 'Settings import validated, previous settings backed up, and new settings applied.', read=[SETTINGS_OUTPUT], written=written, state=['settings persisted', 'office payload configuration changed'])
 
@@ -217,21 +223,21 @@ def execution_session_preview(root=None, dispatch_id: str | None = None, authori
     if blocked := _require('execution_session.preview', label, handler, data, ['dispatch_id','authorization_path']): return blocked
     base=_root(root); payload=ExecutionSessionController(root=base).preview(str(dispatch_id), str(authorization_path)); read,written=_session_refs(base,payload)
     outcome='blocked' if payload.get('state')=='blocked' else 'completed'
-    return OfficeActionResult('execution_session.preview', label, 'execution-control', outcome, f"Preview session {payload.get('execution_session_id')} state={payload.get('state')} readiness={'ready' if not payload.get('blocking_reasons') else 'blocked'} reasons={payload.get('blocking_reasons') or []}.", handler, read, written, ['execution session preview artifact written'], 'governed_preview_no_provider_call')
+    return OfficeActionResult('execution_session.preview', label, _request_id(params), 'execution-control', outcome, f"Preview session {payload.get('execution_session_id')} state={payload.get('state')} readiness={'ready' if not payload.get('blocking_reasons') else 'blocked'} reasons={payload.get('blocking_reasons') or []}.", handler, read, written, ['execution session preview artifact written'], 'governed_preview_no_provider_call')
 
 def execution_session_start(root=None, dispatch_id: str | None = None, authorization_path: str | None = None, confirm_live_execution: Any = None, **params: Any) -> OfficeActionResult:
     label='Start execution session'; handler='estate.core.execution_session_controller.ExecutionSessionController.start'; data={'dispatch_id':dispatch_id,'authorization_path':authorization_path}
     if blocked := _require('execution_session.start', label, handler, data, ['dispatch_id','authorization_path']): return blocked
     base=_root(root); payload=ExecutionSessionController(root=base).start(str(dispatch_id), str(authorization_path), confirm_live_execution=_truthy(confirm_live_execution)); read,written=_session_refs(base,payload)
     outcome='completed' if payload.get('state') in {'completed_execution','validation_ready'} else 'blocked' if payload.get('state')=='blocked' else 'failed' if payload.get('state')=='failed' else 'completed'
-    return OfficeActionResult('execution_session.start', label, 'execution-control', outcome, f"Start session {payload.get('execution_session_id')} state={payload.get('state')} stage={payload.get('current_stage')} reasons={payload.get('blocking_reasons') or []}.", handler, read, written, ['execution session start advanced runtime state'] if outcome=='completed' else [], 'steward_and_traffic_controller_gated')
+    return OfficeActionResult('execution_session.start', label, _request_id(params), 'execution-control', outcome, f"Start session {payload.get('execution_session_id')} state={payload.get('state')} stage={payload.get('current_stage')} reasons={payload.get('blocking_reasons') or []}.", handler, read, written, ['execution session start advanced runtime state'] if outcome=='completed' else [], 'steward_and_traffic_controller_gated')
 
 def execution_session_resume(root=None, session_id: str | None = None, **params: Any) -> OfficeActionResult:
     label='Resume execution session'; handler='estate.core.execution_session_controller.ExecutionSessionController.resume'
     if blocked := _require('execution_session.resume', label, handler, {'session_id':session_id}, ['session_id']): return blocked
     base=_root(root); payload=ExecutionSessionController(root=base).resume(str(session_id)); read,written=_session_refs(base,payload)
     outcome='failed' if payload.get('state')=='failed' else 'completed'
-    return OfficeActionResult('execution_session.resume', label, 'execution-control', outcome, f"Resume inspected session {session_id}; state={payload.get('state')} stage={payload.get('current_stage')}.", handler, read, written, ['session resume/reconciliation evidence updated'], 'duplicate_provider_call_protection_preserved')
+    return OfficeActionResult('execution_session.resume', label, _request_id(params), 'execution-control', outcome, f"Resume inspected session {session_id}; state={payload.get('state')} stage={payload.get('current_stage')}.", handler, read, written, ['session resume/reconciliation evidence updated'], 'duplicate_provider_call_protection_preserved')
 
 def execution_session_status(root=None, session_id: str | None = None, **params: Any) -> OfficeActionResult:
     label='Refresh execution-session status'; handler='estate.core.execution_session_controller.ExecutionSessionController.status'
@@ -367,16 +373,19 @@ def controls_for_tab(tab: str) -> list[dict[str, Any]]:
 
 def execute_office_action(action_id: str, *, root=None, **params: Any) -> dict[str, Any]:
     base = _root(root)
+    request_id = _request_id(params)
+    params['request_id'] = request_id
     control = next((c for c in ACTION_CONTROLS if c['action_id'] == action_id), None)
     if not control:
-        result = _blocked(action_id, action_id, 'unknown', 'office_command_surface.execute_office_action', f'No Office action is registered for {action_id}.')
+        result = _blocked(action_id, action_id, 'unknown', 'office_command_surface.execute_office_action', f'No Office action is registered for {action_id}.', request_id=request_id)
         return _write_result(base, result).to_dict()
     if control.get('availability') != 'available':
-        result = _blocked(action_id, control['label'], control['target_tab'], control.get('handler', 'gated_control'), control.get('disabled_reason') or 'Action is gated.')
+        result = _blocked(action_id, control['label'], control['target_tab'], control.get('handler', 'gated_control'), control.get('disabled_reason') or 'Action is gated.', request_id=request_id)
         return _write_result(base, result).to_dict()
     try:
         result = HANDLERS[action_id](root=base, **params)
+        result.request_id = request_id
     except Exception as exc:
         diag = _diagnostic(base, action_id, exc)
-        result = OfficeActionResult(action_id, control['label'], control['target_tab'], 'failed', f'Action attempted and failed: {type(exc).__name__}: {exc}', control.get('handler') or action_id, diagnostics_path=diag)
+        result = OfficeActionResult(action_id, control['label'], request_id, control['target_tab'], 'failed', f'Action attempted and failed: {type(exc).__name__}: {exc}', control.get('handler') or action_id, diagnostics_path=diag)
     return _write_result(base, result).to_dict()
