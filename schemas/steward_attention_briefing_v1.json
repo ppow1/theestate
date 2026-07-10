@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Steward Attention Briefing v1",
+  "type": "object",
+  "required": ["schema_version", "briefing_type", "generated_at", "owner", "steward_must_decide", "steward_should_know", "routine_batch", "summary"],
+  "properties": {
+    "schema_version": {"const": "steward_attention_briefing.v1"},
+    "briefing_type": {"enum": ["morning", "on_demand", "exception"]},
+    "generated_at": {"type": "string"},
+    "owner": {"const": "Alfred"},
+    "steward_must_decide": {"type": "array"},
+    "steward_should_know": {"type": "array"},
+    "routine_batch": {"type": "array"},
+    "summary": {"type": "object"}
+  }
+}
