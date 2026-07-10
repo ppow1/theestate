@@ -1,0 +1,8 @@
+{
+  "work_package_id": "WP-0629",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented governed Operational Watch catalog and runtime control over existing Background Operations watches, including CLI, dry-run evaluation, tests, documentation, and runtime-state persistence outside committed defaults.",
+  "provider_execution_performed": false,
+  "institutional_acceptance_performed": false
+}

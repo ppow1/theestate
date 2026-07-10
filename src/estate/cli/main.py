@@ -120,6 +120,7 @@ from estate.core.operations_control_runtime import OperationsControlRuntime, for
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.operational_watch_runtime import OperationalWatchRuntime
 from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
@@ -213,6 +214,29 @@ def cmd_operational_targets(args):
         print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Operational targets failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_operations_watch(args):
+    try:
+        runtime = OperationalWatchRuntime()
+        action = args.operations_watch_action
+        if action == "list":
+            payload = runtime.list()
+        elif action == "show":
+            payload = runtime.show(args.watch)
+        elif action == "enable":
+            payload = runtime.set_enabled(args.watch, True)
+        elif action == "disable":
+            payload = runtime.set_enabled(args.watch, False)
+        elif action == "pause":
+            payload = runtime.pause(args.watch)
+        elif action == "evaluate":
+            payload = runtime.evaluate(args.watch, dry_run=True)
+        else:
+            raise ValueError(f"unknown operations-watch action {action}")
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+        print(f"Operations watch failed: {exc}")
         raise SystemExit(1)
 
 def cmd_background_operations(args):
@@ -3202,6 +3226,12 @@ def main(argv=None):
     q = ot.add_parser("aliases"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
     for name in ["enable", "pause", "resume", "disable", "retire", "import-candidate"]:
         q = ot.add_parser(name); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
+
+    p = sub.add_parser("operations-watch", help="List and control governed Background Operations watch catalog")
+    ow = p.add_subparsers(dest="operations_watch_action", required=True)
+    q = ow.add_parser("list"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_watch)
+    for name in ["show", "enable", "disable", "pause", "evaluate"]:
+        q = ow.add_parser(name); q.add_argument("watch"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_watch)
 
     p = sub.add_parser("background-operations", help="Evaluate and inspect event-driven background operation requests")
     bo = p.add_subparsers(dest="background_operations_action", required=True)
