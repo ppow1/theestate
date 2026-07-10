@@ -1,0 +1,105 @@
+{
+  "authorization_behavior_modified": false,
+  "background_operations_behavior_modified": false,
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T01:35:00Z",
+  "dispatch_behavior_modified": true,
+  "files_changed": [
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "tests/test_execution_adapter_handoff_runtime.py",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "collaboration/work_packages/completions/WP-0503_codex_done.json",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "tests/test_execution_adapter_handoff_runtime.py",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "collaboration/work_packages/completions/WP-0503_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/execution_provider_adapter_contract.md",
+    "docs/integration/provider_routing_recommendations.md",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/execution_provider_adapter_runtime.py",
+    "src/estate/core/codex_bridge.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_dispatch.py",
+    "tests/test_execution_provider_adapter.py",
+    "tests/test_execution_provider_adapter_runtime.py"
+  ],
+  "handoff_eligibility_requirements": [
+    "dispatch item exists",
+    "dispatch state is Ready",
+    "provider is present",
+    "classification is present",
+    "prompt/work-package source is present",
+    "read scope is present",
+    "write scope is present for workspace-write operations",
+    "authorization or decision reference is present",
+    "provider is not forbidden",
+    "provider is compatible with allowed providers"
+  ],
+  "handoff_states_implemented": [
+    "not_ready",
+    "blocked",
+    "authorized_for_handoff",
+    "handoff_prepared",
+    "handoff_validated",
+    "dry_run_completed",
+    "accepted_for_provider_submission"
+  ],
+  "institutional_acceptance_behavior_modified": false,
+  "known_limitations": [
+    "Only Ready is documented as handoff-eligible for WP-0503.",
+    "The runtime prepares and validates handoff artifacts but does not submit to live providers."
+  ],
+  "live_provider_calls_made": false,
+  "merge_authority_equivalent": "Chief Architect / Steward review required before institutional acceptance.",
+  "orchestrator_behavior_modified": false,
+  "owner": "Chief Architect #5",
+  "provider_adapter_behavior_modified": false,
+  "pull_request_not_applicable_reason": "PR will be created by automation after local commit via make_pr tool.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_written": [
+    "runtime/execution_adapters/requests",
+    "runtime/execution_adapters/results",
+    "runtime/execution_adapters/status",
+    "runtime/execution_adapters/reports"
+  ],
+  "status": "implemented",
+  "summary": "Implemented governed dispatch-to-adapter handoff runtime, CLI, tests, documentation, validation recipe, and completion receipt.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/execution_adapter_handoff_runtime.py src/estate/cli/main.py src/estate/core/work_package_validation.py",
+    "pytest -q tests/test_execution_adapter_handoff_runtime.py tests/test_execution_provider_adapter.py tests/test_execution_provider_adapter_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0503 --json",
+    "ESTATE_ROOT=$(mktemp -d) PYTHONPATH=src python -m estate.cli.main execution-adapter-handoff dry-run --dispatch-id cli-handoff-001 --json (temp deterministic dispatch root)"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/execution_adapter_handoff_runtime.py src/estate/cli/main.py src/estate/core/work_package_validation.py",
+    "pytest -q tests/test_execution_adapter_handoff_runtime.py tests/test_execution_provider_adapter.py tests/test_execution_provider_adapter_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0503 --json",
+    "ESTATE_ROOT=$(mktemp -d) PYTHONPATH=src python -m estate.cli.main execution-adapter-handoff dry-run --dispatch-id cli-handoff-001 --json (temp deterministic dispatch root)"
+  ],
+  "validation_results": {
+    "ESTATE_ROOT=$(mktemp -d) PYTHONPATH=src python -m estate.cli.main execution-adapter-handoff dry-run --dispatch-id cli-handoff-001 --json (temp deterministic dispatch root)": "passed",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0503 --json": "passed",
+    "pytest -q tests/test_execution_adapter_handoff_runtime.py tests/test_execution_provider_adapter.py tests/test_execution_provider_adapter_runtime.py": "passed",
+    "python -m py_compile src/estate/core/execution_adapter_handoff_runtime.py src/estate/cli/main.py src/estate/core/work_package_validation.py": "passed"
+  },
+  "work_package_id": "WP-0503"
+}

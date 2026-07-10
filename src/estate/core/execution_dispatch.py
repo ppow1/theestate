@@ -50,6 +50,8 @@ REQUIRED_EVENT_TYPES = {
     "dispatch_completed",
     "dispatch_failed",
     "dispatch_handoff_prepared",
+    "dispatch_handoff_blocked",
+    "dispatch_handoff_validated",
 }
 EVENT_TYPES = REQUIRED_EVENT_TYPES | {
     "dispatch_state_updated",
