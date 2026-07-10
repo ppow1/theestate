@@ -1,0 +1,23 @@
+{
+  "work_package_id": "WP-4014",
+  "status": "completed",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T19:54:30+00:00",
+  "deliverables": [
+    "src/estate/core/historian.py",
+    "src/estate/cli/historian.py",
+    "data/schemas/historian_event_v1.json",
+    "data/schemas/historian_source_citation_v1.json",
+    "data/schemas/historian_timeline_v1.json",
+    "data/schemas/historian_summary_v1.json",
+    "runtime/historian/events.json",
+    "runtime/historian/timeline.json",
+    "runtime/office/historian_timeline.json",
+    "tests/test_historian_runtime.py",
+    "operations/validation/reports/WP-4014_historian_office_runtime.md"
+  ],
+  "validation": {
+    "command": "PYTHONPATH=src pytest -q tests/test_historian_runtime.py tests/test_estate_knowledge_index.py",
+    "result": "passed"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "date": "2026-07-10",
+  "title": "Historian Office runtime implementation requested",
+  "office": "historian",
+  "project": "WP-4014",
+  "resident": "codex",
+  "artifact_type": "work_package",
+  "significance": "high",
+  "source_paths": ["collaboration/work_packages/pending/WP-4014_Historian_Office_Runtime_and_Institutional_Timeline.md"],
+  "claims": [
+    {
+      "text": "WP-4014 requests a local Historian Office service with auditable historical timelines and cited summaries.",
+      "claim_type": "source_fact",
+      "citation_paths": ["collaboration/work_packages/pending/WP-4014_Historian_Office_Runtime_and_Institutional_Timeline.md"]
+    }
+  ]
+}
