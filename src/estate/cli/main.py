@@ -96,6 +96,7 @@ from estate.core.resident_presence import build_resident_presence, filter_reside
 from estate.core.resident_conversation_sessions import create_session, list_sessions, load_session, format_session_list
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
+from estate.core.helen_readiness import build_readiness
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
 from estate.core.resident_gateway import serve as serve_resident_gateway, gateway_status
@@ -122,6 +123,9 @@ from estate.core.operational_targets_runtime import OperationalTargetRuntime
 from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
+from estate.core.operations_runtime_host import OperationsRuntimeHost, OperationsRuntimeHostError
+from estate.core.operations_scheduler import format_scheduler
+from estate.core.operations_scheduler_runtime import OperationsSchedulerRuntime
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 
@@ -130,6 +134,15 @@ def _repo_path(rel):
 
 
 
+
+
+def cmd_helen_readiness(args):
+    try:
+        payload = build_readiness(root=Path(args.root) if getattr(args, "root", None) else None, write=True)
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else f"Helen readiness: {payload['overall_status']}\nGrace hiring gate: {payload['grace_hiring_gate']}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Helen readiness failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_helen_workforce(args):
     argv = []
@@ -274,8 +287,66 @@ def cmd_post_merge_audit(args):
         raise SystemExit(1)
     print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
 
+def _operations_runtime_mode(args):
+    if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
+        return "discover-merges-and-process-audits-and-ring2"
+    if getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
+        return "discover-merges-and-process-audits"
+    if getattr(args, "discover_merges", False):
+        return "discover-merges"
+    if getattr(args, "process_audits_and_ring2", False):
+        return "process-audits-and-ring2"
+    if getattr(args, "process_audits", False):
+        return "process-audits"
+    return "observe-only"
+
+
+def cmd_operations_scheduler(args):
+    try:
+        runtime = OperationsSchedulerRuntime()
+        action = args.operations_scheduler_action
+        if action == "list":
+            payload = runtime.list()
+        elif action == "show":
+            payload = runtime.show(args.job)
+        elif action == "enable":
+            payload = runtime.enable(args.job)
+        elif action == "disable":
+            payload = runtime.disable(args.job)
+        elif action == "run-due":
+            payload = runtime.run_due()
+        elif action == "trigger":
+            payload = runtime.trigger(args.event)
+        else:
+            raise SystemExit(1)
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else format_scheduler(payload) if action in {"list", "show", "enable", "disable"} else json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operations scheduler failed: {exc}")
+        raise SystemExit(1)
+
 def cmd_operations_runtime(args):
     try:
+        if args.operations_runtime_action == "host":
+            host = OperationsRuntimeHost()
+            action = args.operations_runtime_host_action
+            if action == "install":
+                payload = host.install()
+            elif action == "uninstall":
+                payload = host.uninstall()
+            elif action == "start":
+                payload = host.start()
+            elif action == "stop":
+                payload = host.stop()
+            elif action == "restart":
+                payload = host.restart()
+            elif action == "status":
+                payload = host.status()
+            elif action == "run-foreground":
+                payload = host.run_foreground(interval_seconds=args.interval_seconds, max_cycles=args.max_cycles, dry_run=getattr(args, "dry_run", False), mode=_operations_runtime_mode(args), max_audit_requests=getattr(args, "max_audit_requests", 1))
+            else:
+                raise SystemExit(1)
+            print(json.dumps(payload, indent=2, sort_keys=True))
+            return
         service = OperationsRuntimeService()
         action = args.operations_runtime_action
         if action == "run-once":
@@ -316,7 +387,7 @@ def cmd_operations_runtime(args):
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else "Operations Runtime stop requested")
         elif action == "report":
             print(service.report())
-    except OperationsRuntimeLockError as exc:
+    except (OperationsRuntimeLockError, OperationsRuntimeHostError) as exc:
         print(f"Operations runtime blocked: {exc}")
         raise SystemExit(2)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
@@ -3081,9 +3152,10 @@ def main(argv=None):
     p.set_defaults(func=cmd_estate_validate_local)
 
 
-
-
-
+    p = sub.add_parser("helen-readiness", help="Generate Helen operational readiness and Grace hiring gate JSON")
+    p.add_argument("--root")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_helen_readiness)
 
 
     p = sub.add_parser("helen-workforce", help="Create and inspect governed Helen workforce-development artifacts")
@@ -3184,6 +3256,16 @@ def main(argv=None):
     q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_post_merge_audit)
 
+
+    p = sub.add_parser("operations-scheduler", help="Schedule bounded Operations Runtime jobs")
+    osch = p.add_subparsers(dest="operations_scheduler_action", required=True)
+    q = osch.add_parser("list"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("show"); q.add_argument("job"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("enable"); q.add_argument("job"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("disable"); q.add_argument("job"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("run-due"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("trigger"); q.add_argument("event"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+
     p = sub.add_parser("operations-runtime", help="Run and inspect the bounded Operations Runtime service loop")
     ort = p.add_subparsers(dest="operations_runtime_action", required=True)
     q = ort.add_parser("run-once", help="Run one Operations Runtime cycle")
@@ -3214,6 +3296,22 @@ def main(argv=None):
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("report", help="Render Operations Runtime report")
     q.set_defaults(func=cmd_operations_runtime)
+
+    q = ort.add_parser("host", help="Install and control durable Operations Runtime host")
+    host_sub = q.add_subparsers(dest="operations_runtime_host_action", required=True)
+    for name in ["install", "uninstall", "start", "stop", "restart", "status"]:
+        h = host_sub.add_parser(name)
+        h.set_defaults(func=cmd_operations_runtime)
+    h = host_sub.add_parser("run-foreground", help="Run host loop in the foreground for debugging")
+    h.add_argument("--max-cycles", type=int, default=1000000)
+    h.add_argument("--interval-seconds", type=float, default=30.0)
+    h.add_argument("--dry-run", action="store_true")
+    h.add_argument("--process-audits", action="store_true")
+    h.add_argument("--process-audits-and-ring2", action="store_true")
+    h.add_argument("--discover-merges", action="store_true")
+    h.add_argument("--auto-admit", action="store_true")
+    h.add_argument("--max-audit-requests", type=int, default=1)
+    h.set_defaults(func=cmd_operations_runtime)
 
     p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
     p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")

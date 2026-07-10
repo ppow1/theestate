@@ -1,0 +1,229 @@
+{
+  "authority_flags": {
+    "constitutional_authority_granted": false,
+    "grace_appointed_or_activated": false,
+    "operational_queue_control_performed": false,
+    "provider_execution_performed": false
+  },
+  "gates": [
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "data/registry/residents.json"
+        }
+      ],
+      "gate_id": "G1",
+      "missing_evidence": [],
+      "name": "Helen resident identity resolves",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "docs/residents/helen/platform-exports/textgen-4_9-helen-v0_2.yaml"
+        },
+        {
+          "exists": true,
+          "path": "docs/residents/helen/Helen_Resident_Profile_v0_2.md"
+        }
+      ],
+      "gate_id": "G2",
+      "missing_evidence": [],
+      "name": "Helen chat uses Helen-specific prompt",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "fallback_active": true,
+          "llm_state": "no",
+          "path": "runtime/model_control/registry.json"
+        }
+      ],
+      "gate_id": "G3",
+      "missing_evidence": [],
+      "name": "Local provider or truthful fallback state is visible",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "runtime/workforce_development/status/latest.json"
+        }
+      ],
+      "gate_id": "G4",
+      "missing_evidence": [],
+      "name": "Workforce request and assessment commands operate",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "src/estate/core/helen_workforce.py"
+        }
+      ],
+      "gate_id": "G5",
+      "missing_evidence": [],
+      "name": "Privacy and classification boundaries remain intact",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "data/registry/personnel.json"
+        },
+        {
+          "exists": true,
+          "path": "data/registry/mailboxes.json"
+        }
+      ],
+      "gate_id": "G6",
+      "missing_evidence": [],
+      "name": "Employee identity, mailbox, office, reporting line, and security rating resolve",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "src/estate/core/resident_authority.py"
+        },
+        {
+          "exists": true,
+          "path": "docs/residents/helen/Helen_Hiring_Onboarding_Workflow_v0_1.md"
+        }
+      ],
+      "gate_id": "G7",
+      "missing_evidence": [],
+      "name": "Helen can produce governed hiring recommendation without granting authority",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "docs/residents/grace/Grace_Resident_Profile_v0_1.md"
+        },
+        {
+          "exists": true,
+          "path": "docs/residents/helen/Helen_Hiring_Onboarding_Workflow_v0_1.md"
+        }
+      ],
+      "gate_id": "G8",
+      "missing_evidence": [],
+      "name": "Grace office and role authorization evidence exists",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "docs/residents/grace/Grace_Resident_Profile_v0_1.md"
+        },
+        {
+          "exists": true,
+          "path": "docs/residents/grace/Grace_Resident_Validation_v0_1.md"
+        },
+        {
+          "exists": true,
+          "path": "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml"
+        }
+      ],
+      "gate_id": "G9",
+      "missing_evidence": [],
+      "name": "Grace resident package and validation artifacts exist",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    },
+    {
+      "evidence": [
+        {
+          "exists": true,
+          "path": "data/registry/residents.json"
+        }
+      ],
+      "gate_id": "G10",
+      "missing_evidence": [],
+      "name": "Steward-reserved appointment remains unperformed",
+      "next_action": null,
+      "passed": true,
+      "status": "passed"
+    }
+  ],
+  "generated_at": "2026-07-10T18:17:33Z",
+  "grace_hiring_gate": "eligible_for_steward_review",
+  "grace_registered_or_active": false,
+  "helen_identity": {
+    "canonical": "estate://residents/res-000003",
+    "classification": "Estate Internal",
+    "created": "2026-06-29 20:26:35",
+    "department": "Human Resources",
+    "id": "RES-000003",
+    "name": "Helen",
+    "office": "Manager of Human Resources",
+    "palace": "Estate / Residents / Helen",
+    "registered_at": "2026-06-29 20:26:35",
+    "role": "Manages resident and worker assignment fit, performance, health, capability, and reassignment.",
+    "status": "Active",
+    "type": "resident"
+  },
+  "helen_personnel_resolution": {
+    "actor": "Helen",
+    "canonical_destination": "mailbox.6",
+    "destination_type": "personnel",
+    "display_name": "Helen",
+    "employee_id": 6,
+    "mailbox_id": 6,
+    "normalized_actor": "helen",
+    "resident_id": "RES-000003",
+    "resolved": true,
+    "warnings": [],
+    "worker": null
+  },
+  "llm_status": {
+    "fallback_active": true,
+    "provider_reachable": "no",
+    "selection_source": "bootstrap_fallback"
+  },
+  "missing_evidence": [],
+  "next_actions": [],
+  "overall_status": "ready",
+  "resident": "Helen",
+  "schema_version": "helen_operational_readiness.v1",
+  "workforce_status_summary": {
+    "assessment_count": 0,
+    "blocked_requests": 0,
+    "boundary_review_count": 0,
+    "in_review_requests": 0,
+    "latest_assessment_id": null,
+    "latest_request_id": null,
+    "open_requests": 0,
+    "private_assessment_count": 0,
+    "ready_for_action_requests": 0,
+    "schema_version": "workforce_status_summary.v1",
+    "steward_attention_count": 0
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "work_package_id": "WP-0628",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented event-driven Operations Scheduler, runtime adapter, CLI, tests, documentation, and completion receipt.",
+  "artifacts": [
+    "src/estate/core/operations_scheduler.py",
+    "src/estate/core/operations_scheduler_runtime.py",
+    "tests/test_operations_scheduler.py",
+    "tests/test_operations_scheduler_runtime.py",
+    "docs/integration/event_driven_operations_scheduler.md"
+  ]
+}
