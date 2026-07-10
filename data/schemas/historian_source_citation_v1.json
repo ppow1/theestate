@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"Estate Historian Source Citation v1","type":"object","required":["schema_version","path","source_hash","exists"],"properties":{"schema_version":{"const":"estate.historian.v1"},"path":{"type":"string"},"source_hash":{"type":"string"},"artifact_type":{"type":["string","null"]},"exists":{"type":"boolean"}}}

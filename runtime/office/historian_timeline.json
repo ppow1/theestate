@@ -1,0 +1,59 @@
+{
+  "read_only": true,
+  "schema_version": "estate.historian.v1",
+  "surface": "historian_timeline",
+  "timeline": {
+    "events": [
+      {
+        "artifact_type": "work_package",
+        "citations": [
+          {
+            "artifact_type": "work_package",
+            "exists": true,
+            "path": "collaboration/work_packages/pending/WP-4012_Estate_Knowledge_Index_and_Retrieval_Service.md",
+            "schema_version": "estate.historian.v1",
+            "source_hash": "1ddc55631542198d31908f5dffd50e842a80e86d7ae4eea747b327794c92e8bf"
+          }
+        ],
+        "claims": [
+          {
+            "citation_paths": [
+              "collaboration/work_packages/pending/WP-4012_Estate_Knowledge_Index_and_Retrieval_Service.md"
+            ],
+            "claim_type": "source_fact",
+            "text": "WP-4012 describes the Estate Knowledge Index and Retrieval Service as a pending work package dependency for historian integration."
+          },
+          {
+            "citation_paths": [
+              "collaboration/work_packages/pending/WP-4012_Estate_Knowledge_Index_and_Retrieval_Service.md"
+            ],
+            "claim_type": "interpretation",
+            "text": "The Historian runtime should reuse the knowledge index rather than duplicate search infrastructure."
+          },
+          {
+            "citation_paths": [
+              "collaboration/work_packages/pending/WP-4012_Estate_Knowledge_Index_and_Retrieval_Service.md"
+            ],
+            "claim_type": "uncertainty",
+            "text": "This event does not assert implementation acceptance for WP-4012."
+          }
+        ],
+        "created_at": "2026-07-10T19:54:02+00:00",
+        "date": "2026-07-10",
+        "event_id": "HE-06E615FD04A3",
+        "office": "historian",
+        "project": "WP-4014",
+        "resident": "codex",
+        "schema_version": "estate.historian.v1",
+        "significance": "high",
+        "superseded_by": null,
+        "title": "Estate Knowledge Index and Retrieval Service pending package recorded"
+      }
+    ],
+    "filters": {},
+    "generated_at": "2026-07-10T19:54:22+00:00",
+    "schema_version": "estate.historian.v1",
+    "source_store": "runtime/historian/events.json",
+    "uses_knowledge_index": true
+  }
+}
