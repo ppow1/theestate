@@ -1,0 +1,20 @@
+{
+  "work_package_id": "WP-0514",
+  "codex_status": "done",
+  "employee_detail_control_functional": true,
+  "org_chart_nodes_functional": true,
+  "manager_navigation_verified": true,
+  "direct_report_navigation_verified": true,
+  "mailbox_routing_verified": true,
+  "conversation_routing_verified": true,
+  "search_filter_sort_verified": true,
+  "refresh_verified": true,
+  "duplicate_detection_verified": true,
+  "orphan_detection_verified": true,
+  "cycle_detection_verified": true,
+  "new_personnel_registry_introduced": false,
+  "new_mailbox_system_introduced": false,
+  "ready_for_ca_review": true,
+  "provider_execution_performed": false,
+  "dispatch_execution_performed": false
+}

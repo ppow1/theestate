@@ -53,7 +53,25 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
-    "WP-0627": {
+    "WP-0514": {
+        "recipe_id": "wp-0514-personnel-directory-org-chart-control-surface",
+        "title": "WP-0514 — Personnel Directory, Org Chart, and Employee File Control Surface",
+        "description": "Validates canonical Office personnel directory aggregation, employee details, org-chart controls, routing, structural warnings, documentation, and completion receipt.",
+        "required_checks": ["Personnel modules compile", "Focused personnel and org-chart tests pass", "Documentation and completion receipt exist", "Receipt assertions report no new registry or mailbox system"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/office_personnel_directory.py", "tests/test_office_personnel_directory.py", "tests/test_office_org_chart_controls.py", "docs/integration/office_personnel_org_chart_control_surface.md", "collaboration/work_packages/completions/WP-0514_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Employee/org chart controls are decorative-only", "Receipt reports a new personnel registry or mailbox system"],
+        "success_criteria": ["Employee detail, manager/direct-report navigation, routing, search/filter/sort surface, refresh, duplicate/orphan/cycle detection, and malformed record handling are covered"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/office_personnel_directory.py src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py"),
+            _cmd("pytest -q tests/test_office_personnel_directory.py tests/test_office_org_chart_controls.py"),
+            _cmd("python -c \"from pathlib import Path; paths=['docs/integration/office_personnel_org_chart_control_surface.md','collaboration/work_packages/completions/WP-0514_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0514_codex_done.json').read_text()); assert d['employee_detail_control_functional'] is True; assert d['org_chart_nodes_functional'] is True; assert d['manager_navigation_verified'] is True; assert d['direct_report_navigation_verified'] is True; assert d['search_filter_sort_verified'] is True; assert d['refresh_verified'] is True; assert d['new_personnel_registry_introduced'] is False; assert d['new_mailbox_system_introduced'] is False\""),
+        ],
+    },
+
+"WP-0627": {
         "recipe_id": "wp-0627-operations-runtime-host-and-autostart",
         "title": "WP-0627 — Operations Runtime Host and Autostart",
         "description": "Validates durable host lifecycle controls for the existing Operations Runtime service loop without provider or dispatch execution.",
@@ -73,7 +91,7 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
-"WP-0513": {
+    "WP-0513": {
         "recipe_id": "wp-0513-parking-lot-roadmap-priority-control-surface",
         "title": "WP-0513 — Parking Lot, Roadmap, and Priority Control Surface",
         "description": "Validates canonical Office planning controls for Parking Lot and Roadmap artifacts.",

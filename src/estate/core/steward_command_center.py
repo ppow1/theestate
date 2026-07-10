@@ -37,6 +37,7 @@ from estate.core.operations_center_settings import load_operations_center_settin
 from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation, alfred_llm_diagnostic
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
+from estate.core.office_personnel_directory import build_office_personnel_directory
 from urllib.parse import urlparse
 
 
@@ -55,6 +56,7 @@ OFFICE_NAVIGATION = [
     {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
     {"id": "work-packages", "label": "Work Packages", "panel": "work_package_pipeline", "tab": "work-packages"},
     {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_operations_center", "tab": "mailboxes"},
+    {"id": "personnel", "label": "Personnel", "panel": "office_personnel_directory", "tab": "personnel"},
     {"id": "recalls", "label": "Recalls", "panel": "steward_recall_operations", "tab": "recalls"},
     {"id": "notifications", "label": "Notifications", "panel": "operations_notification_center", "tab": "notifications"},
     {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
@@ -79,6 +81,7 @@ OFFICE_TABS = [
     {"id": "parking", "label": "Parking Lot"},
     {"id": "work-packages", "label": "Work Packages"},
     {"id": "mailboxes", "label": "Mailboxes"},
+    {"id": "personnel", "label": "Personnel"},
     {"id": "recalls", "label": "Recalls"},
     {"id": "notifications", "label": "Notifications"},
     {"id": "validation", "label": "Validation"},
@@ -993,6 +996,7 @@ def generate_command_center(root=None, write=True):
         "steward_decision_queue": _decision_queue_artifact(root),
         "mailbox_summary": _read_artifact(root, ARTIFACTS["mailbox_summary"]),
         "mailbox_operations_center": _mailbox_operations_center_artifact(root),
+        "office_personnel_directory": {"available": True, "path": "runtime/steward/office_personnel_directory.json", "kind": "office_personnel_directory", "data": build_office_personnel_directory(root, write=write)},
         "resident_conversations_workspace": build_resident_conversations_workspace(root),
         "ai_services_models": build_steward_ai_services_panel(root),
         "steward_recall_operations": _build_steward_recall_operations(root),
@@ -1665,6 +1669,40 @@ def _mailbox_operations_center_html(artifact):
 
 
 
+def _office_personnel_directory_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}
+    summary = data.get("summary") or {}
+    filters = data.get("available_filters") or {}
+    employees = data.get("employees") or []
+    nodes = ((data.get("org_chart") or {}).get("nodes") or [])
+    actions_json = html.escape(json.dumps(data.get("actions") or [], sort_keys=True), quote=False)
+    out = ["<div class='personnel-directory' data-personnel-directory>"]
+    out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(k.replace('_',' ').title())}</strong><span>{html.escape(str(v))}</span></span>" for k,v in summary.items()) + "</div>")
+    out.append("<div class='personnel-controls'><input id='personnel-search' data-personnel-search placeholder='Search name, title, employee ID, mailbox ID, office, or capability'>")
+    out.append("<select data-personnel-filter='office'><option value=''>All offices</option>" + "".join(f"<option>{html.escape(str(x))}</option>" for x in filters.get('office', [])) + "</select>")
+    out.append("<select data-personnel-filter='status'><option value=''>All statuses</option>" + "".join(f"<option>{html.escape(str(x))}</option>" for x in filters.get('status', [])) + "</select>")
+    out.append("<select data-personnel-filter='worker_resident_classification'><option value=''>All types</option>" + "".join(f"<option>{html.escape(str(x))}</option>" for x in filters.get('worker_resident_classification', [])) + "</select>")
+    out.append("<select data-personnel-sort><option value='display_name'>Sort by name</option><option value='role'>Sort by role</option><option value='office'>Sort by office</option><option value='status'>Sort by status</option><option value='employee_id'>Sort by employee ID</option></select><button type='button' data-office-action='personnel.refresh'>Refresh Personnel</button><button type='button' data-personnel-reset>Reset org chart</button></div>")
+    out.append("<table class='personnel-table'><thead><tr><th>Name</th><th>Role</th><th>Office</th><th>Status</th><th>Employee ID</th><th>Mailbox</th><th>Actions</th></tr></thead><tbody>")
+    for e in employees:
+        eid = html.escape(str(e.get('employee_id')), quote=True); blob = html.escape(json.dumps(e, sort_keys=True), quote=True)
+        out.append(f"<tr tabindex='0' data-personnel-row data-personnel-employee='{eid}' data-personnel-json='{blob}'><td><button type='button' data-personnel-open='{eid}'>{html.escape(str(e.get('display_name')))}</button></td><td>{html.escape(str(e.get('role') or 'Unavailable'))}</td><td>{html.escape(str(e.get('office') or 'Unavailable'))}</td><td>{html.escape(str(e.get('status') or 'Unavailable'))}</td><td><code>{eid}</code> <button type='button' data-copy-value='{eid}'>Copy</button></td><td><code>{html.escape(str(e.get('mailbox_id') or 'Unavailable'))}</code> <button type='button' data-copy-value='{html.escape(str(e.get('mailbox_id') or ''), quote=True)}'>Copy</button></td><td><button type='button' data-personnel-open='{eid}'>Details</button> <button type='button' data-personnel-mailbox='{eid}'>Open Mailbox</button> <button type='button' data-personnel-conversation='{eid}'>Open Conversation</button></td></tr>")
+    out.append("</tbody></table><h3>Serviceable org chart</h3><div class='org-chart' role='tree'>")
+    for n in nodes:
+        if n.get('type') == 'office':
+            out.append(f"<button type='button' class='org-node office-node' data-org-office='{html.escape(str((n.get('filter') or {}).get('office') or ''), quote=True)}'>🏢 {html.escape(str(n.get('label')))}</button>")
+        else:
+            eid = html.escape(str(n.get('employee_id')), quote=True)
+            warn = ' ⚠' if n.get('warnings') else ''
+            out.append(f"<button type='button' class='org-node employee-node' role='treeitem' tabindex='0' data-org-employee='{eid}'>👤 {html.escape(str(n.get('label')))}{warn}</button>")
+    out.append("</div><aside id='personnel-detail' class='personnel-detail' hidden></aside>")
+    if data.get('warnings'):
+        out.append("<h3>Structural warnings</h3><ul>" + "".join(f"<li>{html.escape(str(w.get('type')))}: {html.escape(str(w.get('message')))} {html.escape(str(w.get('employee_id') or ''))}</li>" for w in data.get('warnings', [])) + "</ul>")
+    out.append(f"<script type='application/json' id='personnel-action-contracts'>{actions_json}</script><p class='source'>Sources: {html.escape('; '.join(data.get('source_artifacts') or []))}. This surface reuses canonical artifacts and does not create a personnel registry or mailbox system.</p></div>")
+    return "".join(out)
+
 def _planning_item_controls(surface, item_id):
     safe_surface = html.escape(str(surface), quote=True)
     safe_id = html.escape(str(item_id or ''), quote=True)
@@ -2335,6 +2373,7 @@ def render_command_center_html(payload):
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
         ("work-packages", "Work Packages", _office_action_controls_html(payload, "work-packages") + _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
+        ("personnel", "Personnel Directory / Org Chart", _office_action_controls_html(payload, "personnel") + _office_personnel_directory_html(p.get("office_personnel_directory", {}))),
         ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
         ("notifications", "Operations Center Notification Center", _office_action_controls_html(payload, "notifications") + _operations_notification_center_html(p.get("operations_notification_center", {}))),
         ("validation", "Validation and Estate Health", _office_action_controls_html(payload, "validation") + _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
@@ -2384,7 +2423,7 @@ function normalizeNavigationState(value){ return value === 'expanded' ? 'collaps
 function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); prefs.left_navigation = normalizeNavigationState(prefs.left_navigation || prefs.navigation_state); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); const hashTab = decodeURIComponent((location.hash || '').replace(/^#/, '')); if(hashTab && validOfficeTab(hashTab)) activateOfficeTab(hashTab, true, false); else if(prefs.active_tab && validOfficeTab(prefs.active_tab)) activateOfficeTab(prefs.active_tab, false, false); }
 function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab, true, true); const drawer = button.closest('#office-navigation details'); if(drawer) drawer.open = false; } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
 window.addEventListener('popstate', () => { const hashTab = decodeURIComponent((location.hash || '').replace(/^#/, '')); if(hashTab) activateOfficeTab(hashTab, true, false); });
-function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); bindOfficeActions(); bindSettingsSurface(); startOfficeAutoRefresh(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
+function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); bindOfficeActions(); bindSettingsSurface(); bindPersonnelDirectory(); startOfficeAutoRefresh(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
 
 function collectSettingsFromForm(){
   const raw = JSON.parse(document.querySelector('#settings-json')?.value || '{}');
@@ -2469,6 +2508,34 @@ async function runOfficeAction(button){
 }
 async function targetedRefresh(tabId){ try{ const response = await fetch('/api/office/payload?tab=' + encodeURIComponent(tabId), {cache:'no-store'}); const payload = await response.json(); if(payload.stale) updateUiRuntimeDiagnostic('error', 'Stale payload/version detected; refreshed tab ' + tabId); return payload; }catch(error){ updateUiRuntimeDiagnostic('error', 'Recoverable targeted refresh failure: ' + error.message); return null; } }
 function bindOfficeActions(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-office-action]'); if(button){ event.preventDefault(); runOfficeAction(button); } }); }
+
+
+function personnelRows(){ return [...document.querySelectorAll('[data-personnel-row]')]; }
+function personnelDataById(id){ const row = document.querySelector(`[data-personnel-row][data-personnel-employee="${CSS.escape(String(id))}"]`); if(!row) return null; try{return JSON.parse(row.dataset.personnelJson || '{}');}catch(error){return null;} }
+function renderPersonnelDetail(id, push=true){
+  const emp = personnelDataById(id); const panel = document.querySelector('#personnel-detail'); if(!emp || !panel) return false;
+  const unavailable = v => (v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length)) ? '<span class="placeholder">Unavailable from indexed source artifact</span>' : escapeHtml(Array.isArray(v) ? v.join(', ') : String(v));
+  const reports = (emp.direct_reports || []).map(r => `<button type="button" data-personnel-open="${escapeHtml(r.employee_id)}">${escapeHtml(r.display_name)} (${escapeHtml(r.employee_id)})</button>`).join(' ') || '<span class="placeholder">No indexed direct reports.</span>';
+  const manager = emp.manager_employee_id ? `<button type="button" data-personnel-open="${escapeHtml(emp.manager_employee_id)}">${escapeHtml(emp.manager || emp.manager_employee_id)}</button>` : '<span class="placeholder">Unavailable from personnel registry.</span>';
+  const wps = (emp.related_work_packages || []).map(w => `<li><a href="${escapeHtml(w.path || '#')}">${escapeHtml(w.work_package_id || 'work package')}</a> ${escapeHtml(w.state || '')}</li>`).join('') || '<li class="placeholder">No indexed related work packages.</li>';
+  const warn = (emp.warnings || []).map(w => `<li>${escapeHtml(w.type || 'warning')}: ${escapeHtml(w.message || '')}</li>`).join('') || '<li>No employee-specific warnings.</li>';
+  panel.hidden = false; panel.innerHTML = `<h3>${escapeHtml(emp.display_name)} (${escapeHtml(emp.employee_id)})</h3><div class="personnel-detail-actions"><button type="button" data-personnel-file="${escapeHtml(emp.employee_id)}">Open personnel file</button> <button type="button" data-personnel-mailbox="${escapeHtml(emp.employee_id)}">Open Mailbox</button> <button type="button" data-personnel-conversation="${escapeHtml(emp.employee_id)}">Open Conversation</button> <button type="button" data-personnel-close>Close (Esc)</button></div><dl><dt>employee_id</dt><dd>${unavailable(emp.employee_id)}</dd><dt>mailbox_id</dt><dd>${unavailable(emp.mailbox_id)}</dd><dt>current_title</dt><dd>${unavailable(emp.current_title)}</dd><dt>office / organizational unit</dt><dd>${unavailable(emp.office)}</dd><dt>worker/resident classification</dt><dd>${unavailable(emp.worker_resident_classification)}</dd><dt>manager</dt><dd>${manager}</dd><dt>direct_reports</dt><dd>${reports}</dd><dt>status</dt><dd>${unavailable(emp.status)}</dd><dt>active assignments</dt><dd>${(emp.active_assignments || []).length}</dd><dt>capabilities</dt><dd>${unavailable(emp.capabilities)}</dd><dt>capability dependencies</dt><dd>${unavailable(emp.capability_dependencies)}</dd><dt>mailbox path and unread/attention summary</dt><dd>${unavailable(emp.mailbox_path)} · open=${escapeHtml(emp.mailbox_unread_attention_summary?.open_count ?? 'unavailable')} attention=${escapeHtml(emp.mailbox_unread_attention_summary?.attention_count ?? 'unavailable')}</dd><dt>resident card/profile path</dt><dd>${unavailable(emp.resident_profile_path)}</dd><dt>worker card/profile path</dt><dd>${unavailable(emp.worker_profile_path)}</dd><dt>related work packages</dt><dd><ul>${wps}</ul></dd><dt>related validation or operational evidence</dt><dd>${unavailable(emp.related_evidence)}</dd><dt>source artifact references</dt><dd>${unavailable(emp.source_artifact_references)}</dd><dt>last refreshed timestamp</dt><dd>${unavailable(emp.last_refreshed)}</dd><dt>warnings</dt><dd><ul>${warn}</ul></dd></dl>`;
+  document.querySelectorAll('[data-personnel-row]').forEach(r => r.classList.toggle('selected', r.dataset.personnelEmployee === String(id)));
+  if(push){ history.pushState({office_tab:'personnel', employee_id:String(id)}, '', '#personnel?employee_id=' + encodeURIComponent(id)); }
+  return true;
+}
+function applyPersonnelFilters(){
+  const q = (document.querySelector('[data-personnel-search]')?.value || '').toLowerCase(); const sort = document.querySelector('[data-personnel-sort]')?.value || 'display_name';
+  const filters = {}; document.querySelectorAll('[data-personnel-filter]').forEach(f => { if(f.value) filters[f.dataset.personnelFilter] = f.value; });
+  const rows = personnelRows(); rows.forEach(row => { const e=personnelDataById(row.dataset.personnelEmployee) || {}; const hay=[e.display_name,e.current_title,e.employee_id,e.mailbox_id,e.office,(e.capabilities||[]).join(' ')].join(' ').toLowerCase(); const okSearch=!q || hay.includes(q); const okFilters=Object.entries(filters).every(([k,v]) => String(e[k] || '') === v); row.hidden = !(okSearch && okFilters); });
+  const tbody = document.querySelector('.personnel-table tbody'); rows.sort((a,b)=>{ const ea=personnelDataById(a.dataset.personnelEmployee)||{}, eb=personnelDataById(b.dataset.personnelEmployee)||{}; return String(ea[sort] || '').localeCompare(String(eb[sort] || ''), undefined, {numeric:true}); }).forEach(r => tbody && tbody.appendChild(r));
+}
+function bindPersonnelDirectory(){
+  document.addEventListener('click', event => { const open=event.target.closest('[data-personnel-open],[data-org-employee]'); if(open){ event.preventDefault(); activateOfficeTab('personnel'); renderPersonnelDetail(open.dataset.personnelOpen || open.dataset.orgEmployee); } const office=event.target.closest('[data-org-office]'); if(office){ event.preventDefault(); const sel=document.querySelector('[data-personnel-filter="office"]'); if(sel){ sel.value=office.dataset.orgOffice || ''; applyPersonnelFilters(); } } const close=event.target.closest('[data-personnel-close]'); if(close){ event.preventDefault(); const p=document.querySelector('#personnel-detail'); if(p) p.hidden=true; } const copy=event.target.closest('[data-copy-value]'); if(copy){ event.preventDefault(); navigator.clipboard?.writeText(copy.dataset.copyValue || ''); } const mb=event.target.closest('[data-personnel-mailbox]'); if(mb){ event.preventDefault(); const e=personnelDataById(mb.dataset.personnelMailbox); if(e && e.mailbox_id){ activateOfficeTab('mailboxes'); history.pushState({office_tab:'mailboxes', mailbox_id:e.mailbox_id, employee_id:e.employee_id}, '', '#mailboxes?mailbox_id=' + encodeURIComponent(e.mailbox_id) + '&employee_id=' + encodeURIComponent(e.employee_id)); } else alert('Open Mailbox blocked: missing mailbox_id.'); } const conv=event.target.closest('[data-personnel-conversation]'); if(conv){ event.preventDefault(); const e=personnelDataById(conv.dataset.personnelConversation); if(e && (e.resident_id || e.worker_id)){ activateOfficeTab('resident-conversations'); history.pushState({office_tab:'resident-conversations', employee_id:e.employee_id}, '', '#resident-conversations?employee_id=' + encodeURIComponent(e.employee_id)); } else alert('Open Conversation blocked: no resident/worker conversation capability is indexed for this employee.'); } });
+  document.addEventListener('input', event => { if(event.target.matches('[data-personnel-search],[data-personnel-filter],[data-personnel-sort]')) applyPersonnelFilters(); });
+  document.addEventListener('keydown', event => { if(event.key === 'Enter'){ const row=event.target.closest('[data-personnel-row]'); const node=event.target.closest('[data-org-employee]'); if(row || node){ event.preventDefault(); renderPersonnelDetail((row && row.dataset.personnelEmployee) || node.dataset.orgEmployee); } } if(event.key === 'Escape'){ const p=document.querySelector('#personnel-detail'); if(p && !p.hidden){ event.preventDefault(); p.hidden=true; } } });
+  const params = new URLSearchParams((location.hash.split('?')[1] || '')); if(location.hash.startsWith('#personnel') && params.get('employee_id')) renderPersonnelDetail(params.get('employee_id'), false);
+}
 
 function whenDomReady(callback){ if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', callback, {once:true}); else callback(); }
 whenDomReady(initOfficeRuntime);
