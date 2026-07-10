@@ -20,6 +20,7 @@ from estate.core.background_operations import (
     validate_iso_timestamp,
 )
 from estate.core.paths import ESTATE_ROOT
+from estate.core.operational_events import OperationalEvent, append_event_artifact
 
 WORKFORCE_BASE = Path("runtime/workforce_development")
 REQUESTS = WORKFORCE_BASE / "requests"
@@ -88,7 +89,10 @@ def _require_string_list(value: Any, field_name: str) -> list[str]:
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -307,25 +311,34 @@ class HelenWorkforceStore:
         for relative in [REQUESTS, ASSESSMENTS, STATUS]:
             (self.root / relative).mkdir(parents=True, exist_ok=True)
 
-    def save_request(self, request: WorkforceRequest) -> Path:
+    def save_request(self, request: WorkforceRequest, *, emit_event: bool = True) -> Path:
         self.ensure_dirs()
+        payload = request.to_dict()
         path = self.root / REQUESTS / f"{request.request_id}.json"
-        _write_json(path, request.to_dict())
+        wrote = self._write_new_or_idempotent(path, payload, "request")
+        if emit_event and wrote:
+            self.emit_request_event(request, path)
         self.write_status()
         return path
 
     def load_request(self, request_id: str) -> WorkforceRequest:
-        return WorkforceRequest.from_dict(_read_json(self.root / REQUESTS / f"{request_id}.json"))
+        path = self.root / REQUESTS / f"{request_id}.json"
+        if not path.exists():
+            raise ValueError(f"workforce request not found: {request_id}")
+        return WorkforceRequest.from_dict(_read_json(path))
 
-    def save_assessment(self, assessment: WorkforceAssessment) -> Path:
+    def save_assessment(self, assessment: WorkforceAssessment, *, emit_event: bool = True) -> Path:
         self.ensure_dirs()
         request = self.load_request(assessment.request_id)
         if request.subject_id != assessment.subject_id:
             raise ValueError("assessment subject must match workforce request subject")
+        payload = assessment.to_dict()
         path = self.root / ASSESSMENTS / f"{assessment.assessment_id}.json"
-        _write_json(path, assessment.to_dict())
+        wrote = self._write_new_or_idempotent(path, payload, "assessment")
         request.status = "in_review" if assessment.missing_evidence else "ready_for_action"
         _write_json(self.root / REQUESTS / f"{request.request_id}.json", request.to_dict())
+        if emit_event and wrote and self.assessment_requires_attention(assessment, request):
+            self.emit_assessment_attention_event(assessment, request, path)
         self.write_status()
         return path
 
@@ -333,13 +346,25 @@ class HelenWorkforceStore:
         directory = self.root / REQUESTS
         if not directory.exists():
             return []
-        return [WorkforceRequest.from_dict(_read_json(path)) for path in sorted(directory.glob("*.json"))]
+        requests: list[WorkforceRequest] = []
+        for path in sorted(directory.glob("*.json")):
+            try:
+                requests.append(WorkforceRequest.from_dict(_read_json(path)))
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+        return requests
 
     def list_assessments(self) -> list[WorkforceAssessment]:
         directory = self.root / ASSESSMENTS
         if not directory.exists():
             return []
-        return [WorkforceAssessment.from_dict(_read_json(path)) for path in sorted(directory.glob("*.json"))]
+        assessments: list[WorkforceAssessment] = []
+        for path in sorted(directory.glob("*.json")):
+            try:
+                assessments.append(WorkforceAssessment.from_dict(_read_json(path)))
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+        return assessments
 
     def build_status(self) -> dict[str, Any]:
         requests = self.list_requests()
@@ -348,6 +373,7 @@ class HelenWorkforceStore:
             "available": True,
             "generated_at": utc_now_iso(),
             "summary": {
+                "schema_version": "workforce_status_summary.v1",
                 "open_requests": sum(request.status == "open" for request in requests),
                 "blocked_requests": sum(request.status == "blocked" for request in requests),
                 "in_review_requests": sum(request.status == "in_review" for request in requests),
@@ -356,13 +382,55 @@ class HelenWorkforceStore:
                 "steward_attention_count": sum(request.requires_steward_attention for request in requests),
                 "boundary_review_count": sum(request.requires_boundary_review for request in requests),
                 "private_assessment_count": sum(assessment.private_detail_included for assessment in assessments),
+                "latest_request_id": requests[-1].request_id if requests else None,
+                "latest_assessment_id": assessments[-1].assessment_id if assessments else None,
             },
             "requests": [request.to_dict() for request in requests],
             "assessments": [assessment.to_dict() for assessment in assessments],
             "operational_queue_control_performed": False,
             "provider_execution_performed": False,
             "constitutional_authority_granted": False,
+            "grace_appointed_or_activated": False,
         }
+
+
+    def _write_new_or_idempotent(self, path: Path, payload: dict[str, Any], kind: str) -> bool:
+        if path.exists():
+            existing = _read_json(path)
+            if existing != payload:
+                raise ValueError(f"duplicate {kind} identifier with different payload: {path.stem}")
+            return False
+        _write_json(path, payload)
+        return True
+
+    def _rel(self, path: Path) -> str:
+        try:
+            return str(path.relative_to(self.root)).replace("\\", "/")
+        except ValueError:
+            return str(path).replace("\\", "/")
+
+    def emit_request_event(self, request: WorkforceRequest, path: Path) -> Path:
+        event = OperationalEvent.create(
+            event_type="Checkpoint Reached", state="Waiting", classification="Estate Internal",
+            message=f"Helen workforce request exists: {request.request_id}", request_id=request.request_id,
+            requires_attention=request.requires_steward_attention or request.requires_boundary_review,
+            artifact_paths=[self._rel(path)],
+            metadata={"source":"helen_workforce", "subject_id": request.subject_id, "subject_type": request.subject_type, "requires_boundary_review": request.requires_boundary_review, "provider_execution_performed": False, "operational_queue_control_performed": False, "constitutional_authority_granted": False},
+        )
+        return append_event_artifact(event, root=self.root)
+
+    def assessment_requires_attention(self, assessment: WorkforceAssessment, request: WorkforceRequest) -> bool:
+        return bool(request.requires_steward_attention or request.requires_boundary_review or assessment.private_detail_included or set(assessment.recommendations) & {"temporary_stand_down", "succession_review", "governance_review"})
+
+    def emit_assessment_attention_event(self, assessment: WorkforceAssessment, request: WorkforceRequest, path: Path) -> Path:
+        event = OperationalEvent.create(
+            event_type="Boundary Review Required" if request.requires_boundary_review or assessment.private_detail_included else "Waiting for Approval",
+            state="Awaiting Approval", classification="Estate Internal",
+            message=f"Helen workforce assessment requires governed attention: {assessment.assessment_id}",
+            request_id=request.request_id, requires_attention=True, artifact_paths=[self._rel(path)],
+            metadata={"source":"helen_workforce", "assessment_id": assessment.assessment_id, "subject_id": assessment.subject_id, "recommendations": assessment.recommendations, "requires_boundary_review": request.requires_boundary_review or assessment.private_detail_included, "requires_steward_attention": request.requires_steward_attention, "provider_execution_performed": False, "operational_queue_control_performed": False, "constitutional_authority_granted": False},
+        )
+        return append_event_artifact(event, root=self.root)
 
     def write_status(self) -> dict[str, Any]:
         self.ensure_dirs()

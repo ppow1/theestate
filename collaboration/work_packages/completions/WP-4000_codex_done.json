@@ -1,0 +1,47 @@
+{
+  "completed_at": "2026-07-10T03:25:00Z",
+  "constitutional_authority_granted": false,
+  "files_changed": [
+    "src/estate/cli/main.py",
+    "src/estate/core/helen_workforce.py",
+    "src/estate/core/steward_presence.py",
+    "docs/schemas/workforce_development/workforce_request_v1.schema.json",
+    "docs/schemas/workforce_development/workforce_assessment_v1.schema.json",
+    "docs/schemas/workforce_development/workforce_status_summary_v1.schema.json",
+    "tests/test_helen_workforce_runtime_integration.py",
+    "operations/validation/reports/WP-4000_helen_workforce_runtime_integration.md",
+    "collaboration/work_packages/completions/WP-4000_codex_done.json"
+  ],
+  "grace_appointed_or_activated": false,
+  "known_limitations": [
+    "Full pytest collection is blocked by pre-existing duplicate test module basenames under proposed workstream directories."
+  ],
+  "live_provider_called": false,
+  "operational_queue_control_performed": false,
+  "provider_execution_performed": false,
+  "status": "completed_with_full_focused_validation_and_preexisting_full_suite_collection_limitation",
+  "summary": "Integrated Helen workforce artifacts into the main Estate CLI, added schemas, governed event emission, status-surface integration, store semantics, focused tests, validation report, and receipt.",
+  "validation_commands": [
+    "PYTHONPATH=src python -m pytest tests/test_helen_workforce.py tests/test_helen_workforce_cli.py tests/character_architecture/test_helen_resident_package.py tests/test_helen_workforce_runtime_integration.py -q",
+    "python -m pytest -q",
+    "Manual CLI demonstration using temporary repository root"
+  ],
+  "validation_results": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_helen_workforce.py tests/test_helen_workforce_cli.py tests/character_architecture/test_helen_resident_package.py tests/test_helen_workforce_runtime_integration.py -q",
+      "details": "30 passed in 1.28s",
+      "status": "passed"
+    },
+    {
+      "command": "python -m pytest -q",
+      "details": "9 import-file mismatch collection errors involving tests/test_office_*.py and collaboration/workstreams/WP-*/proposed/tests/test_office_*.py duplicate basenames.",
+      "status": "failed_preexisting_collection_limitation"
+    },
+    {
+      "command": "Manual CLI demonstration using temporary repository root",
+      "details": "Request create/list, assessment create, request status transition, workforce status, event artifact creation, and non-execution/non-authority flags demonstrated; temporary root removed.",
+      "status": "passed"
+    }
+  ],
+  "work_package_id": "WP-4000"
+}

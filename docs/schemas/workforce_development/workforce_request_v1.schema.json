@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/workforce_development/workforce_request_v1.schema.json",
+  "title": "Helen Workforce Request v1",
+  "type": "object",
+  "required": ["schema_version", "request_id", "request_type", "subject_id", "subject_type", "requesting_office", "summary", "requested_outcome", "classification", "source_artifacts", "requires_steward_attention", "requires_boundary_review", "created_at", "status", "metadata"],
+  "properties": {
+    "schema_version": {"const": "workforce_request.v1"},
+    "request_id": {"type": "string", "pattern": "^wfr-"},
+    "request_type": {"enum": ["staffing_request", "onboarding_request", "role_fit_review", "worker_health_review", "coaching_request", "reflection_cycle_request", "continuity_review", "stand_down_review", "reassignment_review", "lessons_learned_intake", "institutional_improvement_review"]},
+    "subject_id": {"type": "string", "minLength": 1},
+    "subject_type": {"type": "string", "minLength": 1},
+    "requesting_office": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1, "description": "Classification-appropriate summary only; unrestricted private journal bodies are prohibited."},
+    "requested_outcome": {"type": "string", "minLength": 1},
+    "classification": {"enum": ["Public", "Estate Internal", "Restricted", "Steward Only", "Local Only", "Sensitive", "Private"]},
+    "source_artifacts": {"type": "array", "items": {"type": "string"}},
+    "requires_steward_attention": {"type": "boolean"},
+    "requires_boundary_review": {"type": "boolean", "description": "Must be true for private, sensitive, continuity, resident identity, connector, or protected-source subjects."},
+    "created_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["open", "blocked", "in_review", "ready_for_action", "closed", "declined"]},
+    "metadata": {"type": "object"},
+    "provider_execution_performed": {"const": false},
+    "operational_queue_control_performed": {"const": false},
+    "constitutional_authority_granted": {"const": false}
+  },
+  "not": {"required": ["journal_body"]},
+  "additionalProperties": true,
+  "examples": [{"schema_version":"workforce_request.v1","request_id":"wfr-example","request_type":"worker_health_review","subject_id":"worker-42","subject_type":"worker","requesting_office":"Engineering","summary":"Repeated mistakes and context strain require review.","requested_outcome":"Assess worker and institutional causes.","classification":"Estate Internal","source_artifacts":[],"requires_steward_attention":false,"requires_boundary_review":false,"created_at":"2026-07-10T00:00:00Z","status":"open","metadata":{},"provider_execution_performed":false,"operational_queue_control_performed":false,"constitutional_authority_granted":false}]
+}
