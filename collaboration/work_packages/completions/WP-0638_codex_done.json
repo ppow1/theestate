@@ -1,0 +1,65 @@
+{
+  "active_checkout_modifications_performed": false,
+  "bootstrap_remote_revision": "0aef300351c2841a81ececda2dd39008dcf01b9a",
+  "bootstrap_runtime_revision": "0aef300351c2841a81ececda2dd39008dcf01b9a",
+  "branch": "work",
+  "codex_status": "done",
+  "codex_status_done": true,
+  "completed_at": "2026-07-10T19:59:21Z",
+  "dispatch_execution_performed": false,
+  "existing_pending_not_readmitted": true,
+  "files_changed": [
+    "src/estate/core/post_merge_audit_lifecycle.py",
+    "src/estate/core/merge_discovery_admission.py",
+    "src/estate/core/post_merge_audit_processor.py",
+    "src/estate/core/operations_runtime.py",
+    "src/estate/core/operations_runtime_host.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_merge_discovery_admission.py",
+    "docs/integration/automatic_audit_queue_and_runtime_host_integrity.md",
+    "collaboration/work_packages/completions/WP-0638_codex_done.json"
+  ],
+  "host_status_semantics_verified": true,
+  "installation_manifest_path": null,
+  "known_limitations": [
+    "Live Windows Scheduled Task demonstration was not run in this Linux validation environment; deterministic unit/runtime tests cover the status, launcher, bootstrap, queue, and same-cycle processing semantics."
+  ],
+  "launcher_pythonpath_verified": true,
+  "live_cycles_observed": 0,
+  "merge_authority": "chief_architect_review_required_codex_no_acceptance_authority",
+  "merge_authority_or_equivalent": "Chief Architect review required; Codex does not grant merge or institutional acceptance authority.",
+  "provider_execution_performed": false,
+  "pull_request_not_applicable_reason": "PR URL will be assigned by repository hosting after local commit; make_pr metadata records the proposed PR text.",
+  "pull_request_url": null,
+  "pull_request_url_or_not_applicable_reason": "PR will be created from this committed branch by automation; local make_pr metadata is recorded separately.",
+  "queue_forward_progress_verified": true,
+  "ready_for_ca_review": true,
+  "runtime_matches_remote": true,
+  "same_cycle_processing_verified": true,
+  "shared_hot_files_changed": [
+    "src/estate/core/merge_discovery_admission.py",
+    "src/estate/core/post_merge_audit_processor.py",
+    "src/estate/core/operations_runtime.py",
+    "src/estate/core/operations_runtime_host.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "staged_install_mechanism_used": false,
+  "stashes_created": 0,
+  "summary": [
+    "Added shared post-merge audit lifecycle classification constants.",
+    "Repaired admission idempotency and active queue capacity accounting.",
+    "Added same-cycle zero-throughput reason reporting.",
+    "Repaired bootstrap revision verification, launcher environment, and host status semantics.",
+    "Registered WP-0638 validation recipe and documentation."
+  ],
+  "terminal_requests_excluded_from_capacity": true,
+  "tests_run": [
+    "python -m py_compile src/estate/core/merge_discovery_admission.py src/estate/core/post_merge_audit_processor.py src/estate/core/operations_runtime.py src/estate/core/operations_runtime_host.py",
+    "python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\"",
+    "pytest -q tests/test_merge_discovery_admission.py tests/test_post_merge_audit_processor.py tests/test_operations_runtime.py tests/test_operations_runtime_host.py tests/test_merge_discovery_runtime.py --basetemp Temp/pytest-wp0638",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0638 --json"
+  ],
+  "validation_recipe_registered": true,
+  "validation_status": "passed",
+  "work_package_id": "WP-0638"
+}

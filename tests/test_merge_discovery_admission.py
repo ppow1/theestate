@@ -12,7 +12,7 @@ def write_json(path: Path, data):
 
 
 def candidate(root, wp="WP-0999", **kw):
-    data={"target_id":"estate-main","work_package_id":wp,"state":"quarantined","canonical_discovery_id":f"mc-estate-main-{wp}-abc","source_kind":"merge","source_reference":"abc","source_commit":"abc","completion_receipt_path":f"collaboration/work_packages/completions/{wp}_codex_done.json","created_at":datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z"),"metadata":{"receipt":{"work_package_id":wp}},"provider_execution_performed":False,"dispatch_execution_performed":False}
+    data={"target_id":"estate-main","work_package_id":wp,"state":"discovered","canonical_discovery_id":f"mc-estate-main-{wp}-abc","source_kind":"merge","source_reference":"abc","source_commit":"abc","completion_receipt_path":f"collaboration/work_packages/completions/{wp}_codex_done.json","created_at":datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z"),"metadata":{"receipt":{"work_package_id":wp}},"provider_execution_performed":False,"dispatch_execution_performed":False}
     data.update(kw)
     write_json(root/"runtime/merge_discovery/canonical"/f"{data['canonical_discovery_id']}.json", data)
     return data
@@ -67,3 +67,33 @@ def test_runtime_processes_no_more_than_configured_max(monkeypatch, tmp_path):
     assert payload["audits_started"] == 2
     assert payload["audits_ring2_required"] == 2
     assert payload["audits_verdicts_published"] == 2
+
+
+def test_existing_pending_is_not_counted_as_new_admission(tmp_path):
+    c = candidate(tmp_path, "WP-2001")
+    result1 = MergeDiscoveryAdmission(tmp_path).auto_admit(max_requests=5)
+    assert result1["summary"]["new_requests_created"] == 1
+    result2 = MergeDiscoveryAdmission(tmp_path).auto_admit(max_requests=5)
+    assert result2["summary"]["new_requests_created"] == 0
+    assert result2["summary"]["existing_pending_requests"] == 1
+    assert len(list((tmp_path/"runtime/post_merge_audit/requests").glob("*.json"))) == 1
+
+
+def test_running_consumes_capacity_and_terminal_does_not(tmp_path):
+    c1 = candidate(tmp_path, "WP-2002")
+    c2 = candidate(tmp_path, "WP-2003")
+    write_json(tmp_path/"runtime/post_merge_audit/requests/running.json", {"audit_id":"running","target_id":"estate-main","work_package_id":"WP-2002","state":"running_validation","metadata":{"canonical_discovery_id":c1["canonical_discovery_id"]}})
+    write_json(tmp_path/"runtime/post_merge_audit/requests/done.json", {"audit_id":"done","target_id":"estate-main","work_package_id":"WP-OLD","state":"ring2_required","verdict":"ring2_required","metadata":{"canonical_discovery_id":"old"}})
+    result = MergeDiscoveryAdmission(tmp_path).auto_admit(max_requests=1)
+    assert result["summary"]["active_request_count"] == 1
+    assert result["summary"]["terminal_request_count"] == 1
+    assert result["summary"]["new_requests_created"] == 0
+    assert result["summary"]["queue_limit_reached"] is True
+
+
+def test_failed_without_final_verdict_is_retryable_not_pending(tmp_path):
+    c = candidate(tmp_path, "WP-2004")
+    write_json(tmp_path/"runtime/post_merge_audit/requests/failed.json", {"audit_id":"failed","target_id":"estate-main","work_package_id":"WP-2004","state":"failed","metadata":{"canonical_discovery_id":c["canonical_discovery_id"]}})
+    result = MergeDiscoveryAdmission(tmp_path).auto_admit(max_requests=5)
+    assert result["summary"]["retryable_failed_requests"] == 1
+    assert result["summary"]["new_requests_created"] == 0
