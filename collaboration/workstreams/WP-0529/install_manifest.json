@@ -1,0 +1,39 @@
+{
+  "work_package_id": "WP-0529",
+  "schema": "estate.staged_install_manifest.v1",
+  "staged_not_installed": true,
+  "summary": "Staged deterministic Office decision-support recommendations that explain blockers, dependencies, evidence gaps, alternatives, freshness, confidence, and governance boundaries for later WP-0531 installation.",
+  "files": [
+    "collaboration/workstreams/WP-0529/staged/office_decision_support.py",
+    "collaboration/workstreams/WP-0529/staged/test_office_decision_support.py",
+    "collaboration/workstreams/WP-0529/decision_support_contract.md",
+    "collaboration/workstreams/WP-0529/validation_notes.md",
+    "collaboration/workstreams/WP-0529/rollback_notes.md"
+  ],
+  "expected_final_targets": [
+    "dedicated decision-support module",
+    "Office rendering/action hooks",
+    "active tests",
+    "operator documentation"
+  ],
+  "declared_overlaps": [
+    {
+      "target": "Mission Control",
+      "reason": "Decision support may summarize mission-level blockers and governed next actions without replacing mission authority."
+    },
+    {
+      "target": "Operations Manager",
+      "reason": "Operational recommendations may surface queue and validation readiness but remain advisory."
+    },
+    {
+      "target": "Traffic Controller",
+      "reason": "Dependency and blocker traces may reference routing constraints without changing dispatch state."
+    },
+    {
+      "target": "executive workspace work",
+      "reason": "Executive views may render recommendations and alternatives, while authorization and acceptance remain separate controls."
+    }
+  ],
+  "install_owner": "WP-0531",
+  "no_active_office_files_modified": true
+}
