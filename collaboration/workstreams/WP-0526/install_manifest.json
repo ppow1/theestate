@@ -1,0 +1,39 @@
+{
+  "work_package": "WP-0526",
+  "status": "staged_not_installed",
+  "required_install_handoff": "WP-0531",
+  "staged_artifacts": [
+    "collaboration/workstreams/WP-0526/install_manifest.json",
+    "collaboration/workstreams/WP-0526/staged/office_workspace_personalization.py",
+    "collaboration/workstreams/WP-0526/staged/test_office_workspace_personalization.py",
+    "collaboration/workstreams/WP-0526/workspace_personalization_contract.md",
+    "collaboration/workstreams/WP-0526/validation_notes.md",
+    "collaboration/workstreams/WP-0526/rollback_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_workspace_personalization.py",
+    "tests/test_office_workspace_personalization.py",
+    "docs/office/workspace_personalization_contract.md"
+  ],
+  "shared_integration_targets_deferred": [
+    "Office workspace layout registry",
+    "Settings/schema persistence integration",
+    "Office rendering hooks for pins, favorites, ordering, quick actions, and preferences",
+    "Import/export controls",
+    "Restore-defaults controls"
+  ],
+  "declared_overlaps": [
+    "WP-0511 Settings and workspace profiles",
+    "Future workspace profile schema and settings migration work",
+    "Office rendering hooks and resident/work-package/project/artifact launch surfaces"
+  ],
+  "validation_commands": [
+    "python -m pytest collaboration/workstreams/WP-0526/staged/test_office_workspace_personalization.py"
+  ],
+  "authority_boundaries": [
+    "Staged artifacts are not installed work",
+    "No shared active Office files were modified",
+    "Personalization state is structured JSON only",
+    "Malformed state recovers to safe defaults"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "work_package_id": "WP-0526",
+  "codex_status": "done",
+  "staged_work_not_installed_work": true,
+  "saved_workspace_layouts_staged": true,
+  "pinned_projects_work_packages_residents_artifacts_staged": true,
+  "favorite_residents_staged": true,
+  "favorite_actions_and_quick_launch_controls_staged": true,
+  "per_workspace_visibility_and_ordering_staged": true,
+  "restore_defaults_verified": true,
+  "malformed_state_recovery_verified": true,
+  "persistence_across_reload_restart_via_export_import_verified": true,
+  "safe_structured_import_export_verified": true,
+  "declared_overlap_wp_0511_settings_workspace_profiles": true,
+  "shared_active_office_files_modified": false,
+  "ready_for_wp_0531_install_handoff": true
+}
