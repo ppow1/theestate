@@ -19,6 +19,8 @@ def _git_repo(path: Path):
 def _receipt(repo: Path, wp: str = "WP-X"):
     d = repo / "collaboration/work_packages/completions"; d.mkdir(parents=True, exist_ok=True)
     (d / f"{wp}_codex_done.json").write_text('{"work_package_id":"WP-X","codex_status":"done","completed_at":"now","branch":"main","summary":"done","files_changed":["file.txt"],"tests_run":["test"],"known_limitations":[],"ready_for_ca_review":true,"pull_request_url":"https://example.invalid/pr/1","merge_authority":"test"}', encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "receipt"], cwd=repo, check=True, capture_output=True)
 
 
 def _target(repo: Path):
@@ -26,7 +28,7 @@ def _target(repo: Path):
 
 
 def test_clean_workspace_validator_prompt_and_ring2_required(tmp_path):
-    repo = tmp_path / "repo"; rev = _git_repo(repo); _receipt(repo)
+    repo = tmp_path / "repo"; _git_repo(repo); _receipt(repo); rev = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, check=True, text=True, capture_output=True).stdout.strip()
     calls = []
     def validator(wp, workspace):
         calls.append((wp, workspace)); assert workspace != repo; assert (workspace / "file.txt").exists()
@@ -35,7 +37,7 @@ def test_clean_workspace_validator_prompt_and_ring2_required(tmp_path):
     result = PostMergeValidationPipeline(PipelineConfig(tmp_path, tmp_path / "ws", tmp_path / "evidence"), validator=validator).run(req, _target(repo))
     assert result["verdict"] == "ring2_required"
     assert result["production_ready"] is True
-    assert calls and Path(result["workspace"]).exists()
+    assert calls and not Path(result["workspace"]).exists()
     assert (tmp_path / result["artifacts"]["ring2_prompt"]).exists()
     assert result["provider_execution_performed"] is False
     assert result["dispatch_execution_performed"] is False

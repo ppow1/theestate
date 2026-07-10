@@ -22,6 +22,8 @@ def _repo(path: Path):
 def _receipt(repo: Path, wp: str = "WP-X"):
     d = repo / "collaboration/work_packages/completions"; d.mkdir(parents=True, exist_ok=True)
     (d / f"{wp}_codex_done.json").write_text('{"work_package_id":"WP-X","codex_status":"done","completed_at":"now","branch":"main","summary":"done","files_changed":["file.txt"],"tests_run":["test"],"known_limitations":[],"ready_for_ca_review":true,"pull_request_url":"https://example.invalid/pr/1","merge_authority":"test"}', encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "receipt"], cwd=repo, check=True, capture_output=True)
 
 
 def _setup(tmp_path):
