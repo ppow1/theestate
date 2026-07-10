@@ -61,6 +61,7 @@ from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepa
 from estate.core.codex_live_execution_gate import CodexLiveExecutionGate
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
+from estate.core.execution_session_controller import ExecutionSessionController
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
 from estate.core.execution_dispatch import (
@@ -143,6 +144,32 @@ def cmd_helen_workforce(args):
         run_helen_workforce_cli(argv)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Helen workforce command failed: {exc}")
+        raise SystemExit(1)
+
+
+def cmd_execution_session(args):
+    controller = ExecutionSessionController()
+    action = args.execution_session_action
+    if action == "preview":
+        payload = controller.preview(args.dispatch_id, args.authorization)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif action == "start":
+        payload = controller.start(
+            args.dispatch_id,
+            args.authorization,
+            confirm_live_execution=getattr(args, "confirm_live_execution", False),
+        )
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif action == "resume":
+        payload = controller.resume(args.session_id)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif action == "status":
+        payload = controller.status(args.session_id)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif action == "report":
+        print(controller.report(args.session_id))
+    else:
+        raise SystemExit(1)
         raise SystemExit(1)
 
 def cmd_operational_targets(args):
@@ -3004,6 +3031,14 @@ def main(argv=None):
         q.add_argument("--root")
         q.add_argument("--json", action="store_true")
         q.set_defaults(func=cmd_helen_workforce)
+
+    p = sub.add_parser("execution-session", help="Preview, start, resume, inspect, and report governed execution sessions")
+    es = p.add_subparsers(dest="execution_session_action", required=True)
+    q = es.add_parser("preview"); q.add_argument("--dispatch-id", required=True); q.add_argument("--authorization", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_execution_session)
+    q = es.add_parser("start"); q.add_argument("--dispatch-id", required=True); q.add_argument("--authorization", required=True); q.add_argument("--confirm-live-execution", action="store_true"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_execution_session)
+    q = es.add_parser("resume"); q.add_argument("--session-id", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_execution_session)
+    q = es.add_parser("status"); q.add_argument("--session-id", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_execution_session)
+    q = es.add_parser("report"); q.add_argument("--session-id", required=True); q.set_defaults(func=cmd_execution_session)
 
     p = sub.add_parser("operational-targets", help="List and control Background Operations operational targets")
     ot = p.add_subparsers(dest="operational_targets_action", required=True)

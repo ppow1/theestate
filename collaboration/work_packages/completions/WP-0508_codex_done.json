@@ -1,0 +1,128 @@
+{
+  "activity_surface_behavior_modified": false,
+  "authorization_behavior_modified": false,
+  "automatic_retry_implemented": false,
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T03:08:55Z",
+  "dispatch_behavior_modified": false,
+  "execution_attempt_behavior_modified": false,
+  "failure_classifications": [
+    "pre-execution block",
+    "lease acquisition failure",
+    "provider start failure",
+    "provider execution failure",
+    "provider result persistence failure",
+    "reconciliation failure",
+    "lease release failure",
+    "validation readiness publication failure",
+    "ambiguous interrupted execution"
+  ],
+  "fake_process_controller_used": true,
+  "fake_provider_runner_used": true,
+  "files_changed": [
+    "src/estate/core/execution_session_controller.py",
+    "tests/test_execution_session_controller.py",
+    "docs/integration/governed_execution_session_controller.md",
+    "collaboration/work_packages/completions/WP-0508_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "src/estate/core/execution_session_controller.py",
+    "tests/test_execution_session_controller.py",
+    "docs/integration/governed_execution_session_controller.md",
+    "collaboration/work_packages/completions/WP-0508_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "docs/integration/codex_bridge_execution_provider_adapter.md",
+    "docs/integration/execution_result_reconciliation.md",
+    "docs/integration/steward_authorized_live_codex_execution.md",
+    "docs/integration/execution_attempt_lease_cancellation_recovery.md",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "src/estate/core/codex_live_execution_gate.py",
+    "src/estate/core/execution_attempt_runtime.py",
+    "src/estate/core/execution_result_reconciliation_runtime.py",
+    "src/estate/core/execution_activity.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "handoff_runtime_behavior_modified": false,
+  "institutional_acceptance_behavior_modified": false,
+  "known_limitations": [
+    "The controller composes the current live execution gate, which owns concrete provider call and attempt completion semantics."
+  ],
+  "live_execution_gate_behavior_modified": false,
+  "live_provider_calls_made": false,
+  "merge_authority_equivalent": "Chief Architect / Steward review required",
+  "owner": "Chief Architect #5",
+  "provider_call_deduplication_strategy": "Start checks for active leases before calling the existing live execution gate; resume never calls providers and refuses sessions where live_provider_called is true without a result reference.",
+  "pull_request_not_applicable_reason": "not applicable; local work branch PR metadata unavailable in this environment",
+  "ready_for_ca_review": true,
+  "reconciliation_behavior_modified": false,
+  "resume_strategy": "Resume loads durable session records, reconciles only when a result reference exists without reconciliation, and refuses ambiguous provider-call states without repeating provider execution.",
+  "runtime_artifacts_written": [
+    "runtime/execution_adapters/sessions/<execution_session_id>.json",
+    "runtime/execution_adapters/session_stages/<execution_session_id>.jsonl",
+    "runtime/execution_adapters/status/sessions_summary.json",
+    "runtime/execution_adapters/reports/<execution_session_id>_session.md"
+  ],
+  "session_stages_implemented": [
+    "dispatch_inspection",
+    "handoff_validation",
+    "authorization_validation",
+    "workspace_validation",
+    "attempt_lease_acquisition",
+    "provider_execution_preview_or_start",
+    "provider_result_persistence",
+    "result_reconciliation",
+    "lease_release",
+    "validation_readiness_publication",
+    "session_report_publication"
+  ],
+  "session_states_implemented": [
+    "prepared",
+    "previewed",
+    "authorized",
+    "lease_acquired",
+    "provider_starting",
+    "provider_running",
+    "provider_result_received",
+    "reconciling",
+    "validation_ready",
+    "blocked",
+    "cancellation_requested",
+    "cancelled",
+    "failed",
+    "completed_execution"
+  ],
+  "status": "completed",
+  "summary": "Implemented governed execution session controller with deterministic tests, CLI, validation recipe, documentation, and completion receipt.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/execution_session_controller.py",
+    "pytest -q tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_codex_live_execution_gate.py tests/test_execution_result_reconciliation_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0508 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/execution_session_controller.py",
+    "pytest -q tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_codex_live_execution_gate.py tests/test_execution_result_reconciliation_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0508 --json"
+  ],
+  "validation_results": {
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0508 --json": "passed",
+    "pytest -q tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_codex_live_execution_gate.py tests/test_execution_result_reconciliation_runtime.py": "passed",
+    "python -m py_compile src/estate/core/execution_session_controller.py": "passed"
+  },
+  "work_package_id": "WP-0508"
+}
