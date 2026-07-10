@@ -1,0 +1,17 @@
+{
+  "work_package": "WP-4008",
+  "status": "complete",
+  "completed_by": "Codex",
+  "completed_at": "2026-07-10",
+  "artifacts": [
+    "docs/character-architecture/Multi_Resident_Behavioral_Differentiation_Standard_v0_1.md",
+    "data/character-architecture/resident_behavior_profiles_v0_1.json",
+    "tests/fixtures/character_architecture/multi_resident_paired_prompts_v0_1.json",
+    "tests/character_architecture/test_multi_resident_behavioral_differentiation.py",
+    "operations/validation/reports/WP-4008_multi_resident_behavior.md"
+  ],
+  "notes": [
+    "Grace remains candidate_not_active.",
+    "Deterministic mocked paired-prompt tests cover differentiation, generic drift, boundary confusion, copied phrasing, and Grace activation boundary."
+  ]
+}
