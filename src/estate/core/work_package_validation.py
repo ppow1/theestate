@@ -53,7 +53,27 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
-    "WP-0513": {
+    "WP-0627": {
+        "recipe_id": "wp-0627-operations-runtime-host-and-autostart",
+        "title": "WP-0627 — Operations Runtime Host and Autostart",
+        "description": "Validates durable host lifecycle controls for the existing Operations Runtime service loop without provider or dispatch execution.",
+        "required_checks": ["Expected artifacts exist", "Host and CLI modules compile", "Focused host/service tests pass", "Host CLI status works", "Receipt confirms no provider or dispatch execution"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/operations_runtime_host.py", "src/estate/core/operations_runtime_service.py", "src/estate/cli/main.py", "tests/test_operations_runtime_host.py", "docs/integration/operations_runtime_host_and_autostart.md", "collaboration/work_packages/completions/WP-0627_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Host invokes provider or dispatch execution", "Duplicate host lock handling is unsafe"],
+        "success_criteria": ["Host delegates to the existing service loop", "External PID/heartbeat/cycle/startup/shutdown/crash evidence is supported", "Duplicate and stale host locks are handled deterministically"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/operations_runtime_host.py','src/estate/core/operations_runtime_service.py','src/estate/cli/main.py','tests/test_operations_runtime_host.py','docs/integration/operations_runtime_host_and_autostart.md','collaboration/work_packages/completions/WP-0627_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/operations_runtime_host.py src/estate/core/operations_runtime_service.py src/estate/cli/main.py"),
+            _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+            _cmd("pytest -q tests/test_operations_runtime_host.py tests/test_operations_runtime_service.py --basetemp Temp/pytest-operations-runtime-host"),
+            _cmd("PYTHONPATH=src ESTATE_OPERATIONS_RUNTIME_HOST_DIR=Temp/operations-runtime-host-validation python -m estate.cli.main operations-runtime host status"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0627_codex_done.json').read_text()); assert d['work_package_id']=='WP-0627'; assert d['provider_execution_performed'] is False; assert d['dispatch_execution_performed'] is False; assert d['ready_for_ca_review'] is True\""),
+        ],
+    },
+
+"WP-0513": {
         "recipe_id": "wp-0513-parking-lot-roadmap-priority-control-surface",
         "title": "WP-0513 — Parking Lot, Roadmap, and Priority Control Surface",
         "description": "Validates canonical Office planning controls for Parking Lot and Roadmap artifacts.",
