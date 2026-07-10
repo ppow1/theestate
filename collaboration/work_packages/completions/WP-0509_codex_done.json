@@ -1,0 +1,107 @@
+{
+  "active_runtime_modified": false,
+  "authorization_behavior_modified": false,
+  "automatic_merge_implemented": false,
+  "automatic_retry_implemented": false,
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T03:41:00Z",
+  "demonstration_flow": [
+    "Ready dispatch fixture created in isolated root",
+    "session preview completed without provider call",
+    "handoff and execution authorization validated",
+    "execution lease acquired",
+    "injected fake provider runner invoked exactly once",
+    "adapter result persisted",
+    "result reconciled to dispatch Validation",
+    "lease released",
+    "activity and reports published",
+    "status/report/resume-safe inspection performed without duplicate call"
+  ],
+  "demonstration_result": {
+    "fake_provider_runner_used": true,
+    "final_dispatch_state": "Validation",
+    "institutional_acceptance_state": "not_granted",
+    "live_provider_called": false,
+    "provider_call_count": 1
+  },
+  "fake_provider_runner_used": true,
+  "files_changed": [
+    "src/estate/core/execution_chain_demonstration.py",
+    "tests/test_execution_chain_demonstration.py",
+    "docs/integration/end_to_end_execution_chain_demonstration.md",
+    "docs/operations/steward_local_codex_smoke_test.md",
+    "collaboration/work_packages/completions/WP-0509_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "src/estate/core/execution_chain_demonstration.py",
+    "tests/test_execution_chain_demonstration.py",
+    "docs/integration/end_to_end_execution_chain_demonstration.md",
+    "docs/operations/steward_local_codex_smoke_test.md",
+    "collaboration/work_packages/completions/WP-0509_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "docs/integration/codex_bridge_execution_provider_adapter.md",
+    "docs/integration/execution_result_reconciliation.md",
+    "docs/integration/steward_authorized_live_codex_execution.md",
+    "docs/integration/execution_attempt_lease_cancellation_recovery.md",
+    "docs/integration/governed_execution_session_controller.md",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "src/estate/core/codex_live_execution_gate.py",
+    "src/estate/core/execution_attempt_runtime.py",
+    "src/estate/core/execution_result_reconciliation_runtime.py",
+    "src/estate/core/execution_session_controller.py",
+    "src/estate/core/execution_activity.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "final_dispatch_state": "Validation",
+  "institutional_acceptance_behavior_modified": false,
+  "institutional_acceptance_state": "not_granted",
+  "known_limitations": [
+    "The CLI demonstration uses a temporary isolated root; evidence paths are reported for that run and the active repository runtime is not modified.",
+    "Optional Steward-local Codex smoke test is documented but intentionally not executed."
+  ],
+  "lease_acquired_and_released": true,
+  "live_provider_calls_made_during_implementation": false,
+  "merge_authority": "Chief Architect / Steward review required; no merge authority claimed.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward review required; no merge authority claimed.",
+  "owner": "Chief Architect #5",
+  "provider_call_count": 1,
+  "pull_request_url": "not_applicable_until_make_pr_after_commit",
+  "pull_request_url_or_not_applicable_reason": "Not applicable until PR is created by make_pr after commit in this Codex environment.",
+  "ready_for_ca_review": true,
+  "smoke_test_executed": false,
+  "smoke_test_procedure_created": true,
+  "status": "implemented",
+  "summary": "Implemented deterministic WP-0509 end-to-end execution-chain demonstration, CLI command, tests, documentation, smoke-test procedure, validation recipe, and completion receipt.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/execution_chain_demonstration.py src/estate/cli/main.py",
+    "pytest -q tests/test_execution_chain_demonstration.py",
+    "PYTHONPATH=src python -m estate.cli.main execution-chain demonstrate --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/execution_chain_demonstration.py src/estate/cli/main.py",
+    "pytest -q tests/test_execution_chain_demonstration.py",
+    "PYTHONPATH=src python -m estate.cli.main execution-chain demonstrate --json"
+  ],
+  "validation_results": {
+    "cli_demonstration": "passed",
+    "focused_tests": "5 passed",
+    "py_compile": "passed"
+  },
+  "work_package_id": "WP-0509"
+}

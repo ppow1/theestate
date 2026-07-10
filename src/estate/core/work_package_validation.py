@@ -92,6 +92,46 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
 
 
+    "WP-0509": {
+        "recipe_id": "wp-0509-end-to-end-execution-chain-demonstration",
+        "title": "WP-0509 — End-to-End Execution Chain Demonstration",
+        "description": "Validates deterministic execution-chain demonstration, CLI, docs, smoke-test procedure, and receipt without live provider calls.",
+        "required_checks": [
+            "Demonstration module, tests, documentation, smoke-test procedure, and receipt exist",
+            "Demonstration module compiles",
+            "Focused demonstration and dependent execution tests pass",
+            "CLI demonstration passes with fake provider exactly once",
+            "Receipt records no live provider calls, no automatic retry, no automatic merge, and no acceptance mutation",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/execution_chain_demonstration.py",
+            "tests/test_execution_chain_demonstration.py",
+            "docs/integration/end_to_end_execution_chain_demonstration.md",
+            "docs/operations/steward_local_codex_smoke_test.md",
+            "collaboration/work_packages/completions/WP-0509_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Demonstration reports provider_call_count other than 1 or live provider calls",
+            "Receipt reports live smoke test execution, automatic retry, automatic merge, authorization mutation, or acceptance mutation",
+        ],
+        "success_criteria": [
+            "Preview performs no provider call",
+            "Start performs exactly one fake provider call",
+            "Lease is released, result is reconciled to Validation, and institutional acceptance remains not_granted",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_chain_demonstration.py','tests/test_execution_chain_demonstration.py','docs/integration/end_to_end_execution_chain_demonstration.md','docs/operations/steward_local_codex_smoke_test.md','collaboration/work_packages/completions/WP-0509_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/execution_chain_demonstration.py"),
+            _cmd("pytest -q tests/test_execution_chain_demonstration.py tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_execution_result_reconciliation_runtime.py"),
+            _cmd("PYTHONPATH=src python -m estate.cli.main execution-chain demonstrate --json"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0509_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0509'; assert data.get('live_provider_calls_made_during_implementation') is False; assert data.get('fake_provider_runner_used') is True; assert data.get('provider_call_count') == 1; assert data.get('lease_acquired_and_released') is True; assert data.get('final_dispatch_state') == 'Validation'; assert data.get('institutional_acceptance_state') == 'not_granted'; assert data.get('active_runtime_modified') is False; assert data.get('smoke_test_procedure_created') is True; assert data.get('smoke_test_executed') is False; assert data.get('automatic_retry_implemented') is False; assert data.get('automatic_merge_implemented') is False; assert data.get('authorization_behavior_modified') is False; assert data.get('institutional_acceptance_behavior_modified') is False; assert data.get('ready_for_ca_review') is True\""),
+        ],
+    },
+
+
     "WP-0508": {
         "recipe_id": "wp-0508-governed-execution-session-controller",
         "title": "WP-0508 — Governed Execution Session Controller",
