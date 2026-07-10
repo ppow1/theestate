@@ -21,6 +21,8 @@ class OperationalTarget:
     owner_department:str
     repository_full_name:str|None=None
     local_path:str|None=None
+    aliases:list[str]=field(default_factory=list)
+    environment_names:list[str]=field(default_factory=list)
     base_branch:str="main"
     validation_root:str|None=None
     workspace_root:str|None=None
@@ -36,6 +38,8 @@ class OperationalTarget:
         if not self.target_id or not self.display_name: raise ValueError('target_id and display_name are required')
         if self.target_type not in TARGET_TYPES: raise ValueError(f"unknown target_type '{self.target_type}'")
         if self.watch_state not in WATCH_STATES: raise ValueError(f"unknown watch_state '{self.watch_state}'")
+        if self.aliases is None: self.aliases=[]
+        if self.environment_names is None: self.environment_names=[]
         unknown=[c for c in self.capabilities if c not in CAPABILITIES]
         if unknown: raise ValueError(f"unknown capabilities {unknown}")
         if self.watch_state in {"enabled"}: self.watch_enabled=True
@@ -65,8 +69,8 @@ class OperationalTargetStatus:
 
 def default_targets(root_path:str|None=None)->list[OperationalTarget]:
     return [
-        OperationalTarget('estate-main','Estate Main','git_repository','Estate', 'ppow1/theestate', root_path, 'main', capabilities=['git','validation','audit'], watch_state='enabled', watch_enabled=True),
-        OperationalTarget('cue-mastery','CueMastery','engineering_project','Engineering', capabilities=['git','validation','audit'], watch_state='import_candidate'),
+        OperationalTarget('estate-main','Estate Main','git_repository','Estate', 'ppow1/theestate', root_path, aliases=['estate','theestate','ppow1/theestate'], environment_names=['estate-main'], base_branch='main', capabilities=['git','validation','audit'], watch_state='enabled', watch_enabled=True),
+        OperationalTarget('cue-mastery','CueMastery','engineering_project','Engineering', aliases=['cue-mastery','CueMastery'], capabilities=['git','validation','audit'], watch_state='import_candidate'),
         OperationalTarget('ionoge-vps','Ionoge VPS','infrastructure_node','Infrastructure', capabilities=['service-health','deploy'], watch_state='import_candidate'),
         OperationalTarget('ionoge-site','Ionoge Site','service','Infrastructure', capabilities=['service-health','deploy'], watch_state='import_candidate'),
     ]

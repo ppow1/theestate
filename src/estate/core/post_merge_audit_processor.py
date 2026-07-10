@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.operational_target_resolution import OperationalTargetResolver
+from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.paths import ESTATE_ROOT
 from estate.core.post_merge_validation_pipeline import PipelineConfig, PostMergeValidationPipeline, utc_now_iso
 
@@ -31,6 +33,8 @@ class PostMergeAuditProcessor:
     def __init__(self, root: Path | None = None, *, workspace_root: Path | None = None, evidence_root: Path | None = None, validator=None, ollama_enabled: bool = False) -> None:
         self.root = _root(root)
         self.targets = OperationalTargetRuntime(self.root)
+        self.resolver = OperationalTargetResolver(self.root)
+        self.binder = OperationalTargetValidationBinder(self.root)
         self.pipeline = PostMergeValidationPipeline(PipelineConfig(self.root, workspace_root, evidence_root, ollama_enabled), validator=validator)
 
     @property
@@ -73,13 +77,28 @@ class PostMergeAuditProcessor:
         self._write_status(payload); return payload
 
     def demonstrate(self, work_package: str, pr: str | int | None = None) -> dict[str, Any]:
-        req = {"audit_id": f"demo-{work_package.lower()}", "target_id": "estate", "work_package_id": work_package, "source_kind": "demonstration", "source_reference": "HEAD", "expected_files": [], "metadata": {"pr": pr}, "state": "pending"}
+        resolution = self.resolver.resolve("estate")
+        target_id = resolution.canonical_target_id or "estate-main"
+        req = {"audit_id": f"demo-{work_package.lower()}", "target_id": target_id, "requested_target_identifier": "estate", "canonical_target_id": target_id, "target_resolution_method": resolution.resolution_method, "work_package_id": work_package, "source_kind": "demonstration", "source_reference": "HEAD", "expected_files": [], "metadata": {"pr": pr, "target_resolution": resolution.to_dict()}, "state": "pending"}
         self.request_dir.mkdir(parents=True, exist_ok=True); _write_json(self.request_dir / f"{req['audit_id']}.json", req)
         return self.process_next()
 
     def _process_claimed(self, req: dict[str, Any]) -> dict[str, Any]:
         p = Path(req["request_path"])
         try:
+            requested = req.get("requested_target_identifier") or req.get("target_id")
+            resolution = self.resolver.resolve(requested)
+            req["requested_target_identifier"] = requested
+            req["target_resolution_method"] = resolution.resolution_method
+            req["latest_target_resolution"] = resolution.to_dict()
+            if not resolution.resolved or not resolution.canonical_target_id:
+                raise ValueError("unknown target " + str(requested))
+            req["canonical_target_id"] = resolution.canonical_target_id
+            req["target_id"] = resolution.canonical_target_id
+            binding = self.binder.bind(resolution.canonical_target_id)
+            req["target_binding_status"] = binding.to_dict()
+            if not binding.ready:
+                raise ValueError("target binding incomplete: " + ", ".join(binding.missing_requirements))
             req["state"] = "running_validation"; _write_json(p, {k:v for k,v in req.items() if k != "request_path"})
             target = self.targets.get(req["target_id"])
             verdict = self.pipeline.run(req, target)
@@ -95,7 +114,9 @@ class PostMergeAuditProcessor:
         reqs = self.list_requests()
         latest = next((r for r in reversed(reqs) if r.get("state") in {"completed","blocked","ring2_required","failed"}), None)
         running = next((r for r in reqs if r.get("state") in {"claimed","running_validation","running_ring2"}), None)
-        return {"automatic_validation_available": True, "pending_audit_requests": sum(1 for r in reqs if r.get("state") == "pending"), "running_audit_request": running, "latest_completed_audit": latest, "latest_validation_status": (latest or {}).get("validation_result"), "latest_production_ready": (latest or {}).get("production_ready"), "latest_ring2_status": ((latest or {}).get("ring2_paths") or {}).get("prompt"), "latest_verdict": (latest or {}).get("verdict"), "latest_verdict_artifact": (latest or {}).get("verdict_path"), "validation_workspace_health": "configured", "validation_evidence_root": str(self.pipeline.config.resolved_evidence_root()), "provider_execution_performed": False, "dispatch_execution_performed": False}
+        latest_resolution = (latest or {}).get("latest_target_resolution") or ((latest or {}).get("metadata") or {}).get("target_resolution")
+        latest_binding = (latest or {}).get("target_binding_status") or {}
+        return {"automatic_validation_available": True, "pending_audit_requests": sum(1 for r in reqs if r.get("state") == "pending"), "running_audit_request": running, "latest_completed_audit": latest, "latest_validation_status": (latest or {}).get("validation_result"), "latest_production_ready": (latest or {}).get("production_ready"), "latest_ring2_status": ((latest or {}).get("ring2_paths") or {}).get("prompt"), "latest_verdict": (latest or {}).get("verdict"), "latest_verdict_artifact": (latest or {}).get("verdict_path"), "validation_workspace_health": "configured", "validation_evidence_root": str(self.pipeline.config.resolved_evidence_root()), "provider_execution_performed": False, "dispatch_execution_performed": False, "latest_target_resolution": latest_resolution, "latest_target_resolution_status": (latest_resolution or {}).get("resolution_method"), "latest_target_resolution_method": (latest_resolution or {}).get("resolution_method"), "latest_target_binding_ready": latest_binding.get("ready"), "latest_target_binding_gaps": latest_binding.get("missing_requirements", []), "unresolved_target_requests": sum(1 for r in reqs if ((r.get("latest_target_resolution") or {}).get("resolution_method") == "not_found")), "ambiguous_target_requests": sum(1 for r in reqs if ((r.get("latest_target_resolution") or {}).get("resolution_method") == "ambiguous"))}
 
     def _write_status(self, payload: dict[str, Any]) -> None:
         status = {"generated_at": utc_now_iso(), "latest_result": payload, "summary": self.summary()}

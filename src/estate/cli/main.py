@@ -115,6 +115,8 @@ from estate.core.operations_control_runtime import OperationsControlRuntime, for
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.operational_target_resolution import OperationalTargetResolver
+from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
 
 def _repo_path(rel):
@@ -128,6 +130,9 @@ def cmd_operational_targets(args):
         rt = OperationalTargetRuntime()
         action = args.operational_targets_action
         if action == "list": payload = rt.list_payload()
+        elif action == "resolve": payload = OperationalTargetResolver().resolve(args.target).to_dict()
+        elif action == "binding": payload = OperationalTargetValidationBinder().bind(args.target).to_dict()
+        elif action == "aliases": payload = {"aliases": {t.target_id: t.aliases for t in rt.load_targets()}}
         elif action == "show": payload = rt.get(args.target).to_dict()
         elif action == "status": payload = rt.write_status()
         else:
@@ -2887,6 +2892,9 @@ def main(argv=None):
     for name in ["list", "status"]:
         q = ot.add_parser(name); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
     q = ot.add_parser("show"); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
+    q = ot.add_parser("resolve"); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
+    q = ot.add_parser("binding"); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
+    q = ot.add_parser("aliases"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
     for name in ["enable", "pause", "resume", "disable", "retire", "import-candidate"]:
         q = ot.add_parser(name); q.add_argument("--target", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_targets)
 

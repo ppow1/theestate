@@ -1,0 +1,45 @@
+{
+  "aliases_registered": [
+    "estate",
+    "theestate",
+    "ppow1/theestate"
+  ],
+  "branch": "work",
+  "canonical_estate_target": "estate-main",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T02:31:17Z",
+  "demonstration_target_resolution": "estate -> estate-main",
+  "demonstration_verdict": "blocked_after_successful_target_resolution",
+  "demonstration_work_package": "WP-0620",
+  "dispatch_execution_performed": false,
+  "files_changed": [
+    "src/estate/core/operational_target_resolution.py",
+    "src/estate/core/operational_target_validation_binding.py",
+    "src/estate/core/operational_targets.py",
+    "src/estate/core/operational_targets_runtime.py",
+    "src/estate/core/post_merge_audit_processor.py",
+    "src/estate/cli/main.py",
+    "tests/test_operational_target_resolution.py",
+    "tests/test_operational_target_validation_binding.py",
+    "docs/integration/operational_target_resolution_and_validation_binding.md",
+    "collaboration/work_packages/completions/WP-0622_codex_done.json"
+  ],
+  "known_limitations": [
+    "No provider execution performed",
+    "No dispatch execution performed",
+    "WP-0622 has no registered validation recipe, so validate-work-package returns no_recipe until recipe registration exists."
+  ],
+  "merge_authority": "Chief Architect / Steward",
+  "provider_execution_performed": false,
+  "pull_request_not_applicable_reason": "local implementation branch; PR metadata recorded by make_pr tool after commit",
+  "ready_for_ca_review": true,
+  "summary": "Implemented canonical operational target resolution, alias support, validation binding, CLI inspection, post-merge audit canonicalization, tests, and documentation.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/operational_target_resolution.py src/estate/core/operational_target_validation_binding.py src/estate/core/post_merge_audit_processor.py src/estate/cli/main.py",
+    "pytest -q tests/test_operational_target_resolution.py tests/test_operational_target_validation_binding.py tests/test_post_merge_audit_processor.py tests/test_post_merge_validation_pipeline.py --basetemp Temp/pytest-operational-target-resolution",
+    "PYTHONPATH=src python -m estate.cli.main operational-targets resolve --target estate --json",
+    "PYTHONPATH=src python -m estate.cli.main operational-targets binding --target estate-main --json"
+  ],
+  "work_package": "WP-0622",
+  "work_package_id": "WP-0622"
+}

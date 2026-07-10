@@ -24,8 +24,11 @@ class OperationalTargetRuntime:
         self.ensure_registry(); data=_read(self.registry_path); return [OperationalTarget.from_dict(x) for x in data.get('targets',[])]
     def write_targets(self,targets): _write(self.registry_path,{'targets':[t.to_dict() for t in targets],'updated_at':utc_now_iso()})
     def get(self,target_id):
-        for t in self.load_targets():
-            if t.target_id==target_id: return t
+        from estate.core.operational_target_resolution import OperationalTargetResolver
+        res=OperationalTargetResolver(self.root).resolve(target_id)
+        if res.resolved and res.canonical_target_id:
+            for t in self.load_targets():
+                if t.target_id==res.canonical_target_id: return t
         raise ValueError(f'unknown target {target_id}')
     def transition(self,target_id,state):
         targets=self.load_targets(); found=None
