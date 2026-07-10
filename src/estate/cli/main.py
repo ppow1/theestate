@@ -62,6 +62,7 @@ from estate.core.codex_live_execution_gate import CodexLiveExecutionGate
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
 from estate.core.execution_session_controller import ExecutionSessionController
+from estate.core.execution_chain_demonstration import run_execution_chain_demonstration, format_demonstration_report
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
 from estate.core.execution_dispatch import (
@@ -170,6 +171,16 @@ def cmd_execution_session(args):
         print(controller.report(args.session_id))
     else:
         raise SystemExit(1)
+        raise SystemExit(1)
+
+
+def cmd_execution_chain(args):
+    payload = run_execution_chain_demonstration()
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_demonstration_report(payload))
+    if payload.get("failures"):
         raise SystemExit(1)
 
 def cmd_operational_targets(args):
@@ -3031,6 +3042,13 @@ def main(argv=None):
         q.add_argument("--root")
         q.add_argument("--json", action="store_true")
         q.set_defaults(func=cmd_helen_workforce)
+
+
+    p = sub.add_parser("execution-chain", help="Run deterministic end-to-end execution-chain demonstrations")
+    ec = p.add_subparsers(dest="execution_chain_action", required=True)
+    q = ec.add_parser("demonstrate", help="Run the WP-0509 fake-provider end-to-end demonstration")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_execution_chain)
 
     p = sub.add_parser("execution-session", help="Preview, start, resume, inspect, and report governed execution sessions")
     es = p.add_subparsers(dest="execution_session_action", required=True)
