@@ -1,0 +1,13 @@
+{
+  "work_package_id": "WP-0631",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented multi-repository operational target models and runtime with isolated paths, observe-only mode, failure isolation, Office grouping, tests, and integration documentation.",
+  "artifacts": [
+    "src/estate/core/multi_repository_targets.py",
+    "src/estate/core/multi_repository_runtime.py",
+    "tests/test_multi_repository_targets.py",
+    "tests/test_multi_repository_runtime.py",
+    "docs/integration/multi_repository_operational_targets.md"
+  ]
+}
