@@ -152,7 +152,11 @@ class OperationsRuntime:
             cycle.ring2_requests_created = sum(1 for e in background_status.get("events", []) if e.get("event_type") == "ring2_review_needed")
             cycle.warnings.extend(background_status.get("summary", {}).get("warnings") or [])
             if mode in {"discover-merges", "discover-merges-and-process-audits", "discover-merges-and-process-audits-and-ring2"} and not dry_run:
-                discovery = MergeDiscoveryRuntime(self.root).scan("estate-main", backfill_mode="quarantine")
+                try:
+                    discovery = MergeDiscoveryRuntime(self.root).scan("estate-main", backfill_mode="quarantine")
+                except Exception as exc:
+                    discovery = {"summary": {}}
+                    cycle.warnings.append("merge_discovery_unavailable_nonfatal: " + str(exc))
                 ms = discovery.get("summary", {})
                 cycle.merge_commits_scanned = ms.get("merge_commits_scanned", 0)
                 cycle.work_packages_discovered = ms.get("work_packages_discovered", 0)
