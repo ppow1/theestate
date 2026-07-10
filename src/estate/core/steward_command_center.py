@@ -1665,12 +1665,28 @@ def _mailbox_operations_center_html(artifact):
 
 
 
-def _board_rows(items, columns, empty_text):
+def _planning_item_controls(surface, item_id):
+    safe_surface = html.escape(str(surface), quote=True)
+    safe_id = html.escape(str(item_id or ''), quote=True)
+    return ("<div class='planning-item-controls' data-planning-surface='" + safe_surface + "' data-planning-item='" + safe_id + "'>"
+            "<button type='button' data-office-action='" + ("parking_lot.control" if surface == "parking" else "roadmap.control") + "' data-planning-action='move_up' data-item-id='" + safe_id + "'>Move up</button> "
+            "<button type='button' data-office-action='" + ("parking_lot.control" if surface == "parking" else "roadmap.control") + "' data-planning-action='move_down' data-item-id='" + safe_id + "'>Move down</button> "
+            "<button type='button' data-office-action='" + ("parking_lot.control" if surface == "parking" else "roadmap.control") + "' data-planning-action='edit' data-item-id='" + safe_id + "'>Save edit</button> "
+            "<button type='button' data-office-action='" + ("parking_lot.control" if surface == "parking" else "roadmap.control") + "' data-planning-action='set_priority' data-item-id='" + safe_id + "'>Change priority/status</button> "
+            + ("<button type='button' data-office-action='parking_lot.control' data-planning-action='accept' data-item-id='" + safe_id + "'>Accept</button> <button type='button' data-office-action='parking_lot.control' data-planning-action='archive' data-item-id='" + safe_id + "'>Archive</button> <button type='button' data-office-action='parking_lot.control' data-planning-action='restore' data-item-id='" + safe_id + "'>Restore</button> <button type='button' data-office-action='parking_lot.control' data-planning-action='promote' data-destination='operations_control' data-item-id='" + safe_id + "'>Promote</button>" if surface == "parking" else "")
+            + "</div>")
+
+def _board_rows(items, columns, empty_text, surface=None):
     if not items:
         return f"<p class='placeholder'>{html.escape(empty_text)}</p>"
-    out = ["<table><thead><tr>" + "".join(f"<th>{html.escape(c)}</th>" for c in columns) + "</tr></thead><tbody>"]
+    headers = columns + (["Controls"] if surface else [])
+    out = ["<table><thead><tr>" + "".join(f"<th>{html.escape(c)}</th>" for c in headers) + "</tr></thead><tbody>"]
     for item in items[:20]:
-        out.append("<tr>" + "".join(f"<td>{html.escape(str(item.get(c) or item.get(c.lower()) or ''))}</td>" for c in columns) + "</tr>")
+        cells = "".join(f"<td>{html.escape(str(item.get(c) or item.get(c.lower()) or ''))}</td>" for c in columns)
+        if surface:
+            item_id = item.get('ID') or item.get('Capability') or item.get('title')
+            cells += "<td>" + _planning_item_controls(surface, item_id) + "</td>"
+        out.append("<tr>" + cells + "</tr>")
     out.append("</tbody></table>")
     return "".join(out)
 
@@ -1686,7 +1702,7 @@ def _daily_board_workspace_html(artifact, parking_only=False):
         out.append("<h3>Active board items</h3>" + _board_rows(data.get("active_board_items") or [], ["ID", "Item", "Owner", "Status", "Next Action"], "No active board items were found in available artifacts."))
         out.append("<h3>Blocked items</h3>" + _board_rows(data.get("blocked_items") or [], ["ID", "Item", "Blocker", "Owner", "Escalation Needed"], "No blocked items were found in available board or pipeline artifacts."))
         out.append("<h3>Review required</h3>" + _board_rows(data.get("review_required") or [], ["ID", "Item", "Reviewer", "Reason", "Ready Since"], "No Daily Board review-required items were found."))
-    out.append("<h3>Parking Lot items</h3>" + _board_rows(data.get("parking_lot_items") or [], ["ID", "Idea", "Category", "Priority", "Originator", "Status", "Promotion Condition"], "No Parking Lot items were found."))
+    out.append("<h3>Parking Lot items</h3>" + _board_rows(data.get("parking_lot_items") or [], ["ID", "Idea", "Category", "Priority", "Originator", "Status", "Promotion Condition"], "No Parking Lot items were found.", surface="parking"))
     out.append("<h3>Promotion conditions (informational only)</h3>")
     conditions = data.get("promotion_conditions") or []
     out.append("<ul>" + "".join(f"<li>{html.escape(str(item))}</li>" for item in conditions[:20]) + "</ul>" if conditions else "<p class='placeholder'>No documented promotion conditions were found.</p>")
@@ -1706,16 +1722,16 @@ def _expansion_roadmap_html(artifact):
         return _artifact_html(artifact)
     data = artifact.get("data") or {}
     out = ["<div class='expansion-roadmap-workspace'>"]
-    out.append("<p>This workspace keeps expansion planning separate from Active Projects and the Daily Board. It is advisory and does not approve, commit, or promote future work.</p>")
+    out.append("<p>This workspace keeps expansion planning separate from Active Projects and the Daily Board. Its controls write the canonical roadmap artifact and promotions continue through governed pathways.</p>")
     out.append(f"<p><strong>Current roadmap horizon:</strong> {html.escape(str(data.get('current_horizon') or 'Not available yet.'))}</p>")
     def roadmap_table(title, rows, empty):
         buf = [f"<h3>{html.escape(title)}</h3>"]
         if not rows:
             buf.append(f"<p class='placeholder'>{html.escape(empty)}</p>")
             return "".join(buf)
-        buf.append("<table><thead><tr><th>Item</th><th>Status</th><th>Horizon</th><th>Dependency notes</th><th>Next step</th><th>Source</th></tr></thead><tbody>")
+        buf.append("<table><thead><tr><th>Item</th><th>Status</th><th>Horizon</th><th>Dependency notes</th><th>Next step</th><th>Source</th><th>Controls</th></tr></thead><tbody>")
         for item in rows[:20]:
-            buf.append("<tr>" + f"<td>{html.escape(str(item.get('title') or 'Untitled'))}</td><td>{html.escape(str(item.get('status') or 'proposed'))}</td><td>{html.escape(str(item.get('horizon') or 'Not specified'))}</td><td>{html.escape(str(item.get('dependency_notes') or 'None recorded'))}</td><td>{html.escape(str(item.get('next_step') or 'Review source artifact.'))}</td><td>{_artifact_link(item.get('source'))}</td>" + "</tr>")
+            buf.append("<tr>" + f"<td>{html.escape(str(item.get('title') or 'Untitled'))}</td><td>{html.escape(str(item.get('status') or 'proposed'))}</td><td>{html.escape(str(item.get('horizon') or 'Not specified'))}</td><td>{html.escape(str(item.get('dependency_notes') or 'None recorded'))}</td><td>{html.escape(str(item.get('next_step') or 'Review source artifact.'))}</td><td>{_artifact_link(item.get('source'))}</td><td>{_planning_item_controls('roadmap', item.get('title'))}</td>" + "</tr>")
         buf.append("</tbody></table>")
         return "".join(buf)
     out.append(roadmap_table("Roadmap items by evidence-backed state", data.get("items") or [], "No roadmap items were found in available artifacts."))
