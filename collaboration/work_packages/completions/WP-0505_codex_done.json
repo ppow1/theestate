@@ -1,0 +1,95 @@
+{
+  "activity_events_emitted": [
+    "provider_result_received",
+    "provider_result_blocked",
+    "provider_execution_failed",
+    "provider_execution_completed",
+    "provider_result_ready_for_validation",
+    "provider_result_requires_attention"
+  ],
+  "activity_surface_behavior_modified": true,
+  "authorization_behavior_modified": false,
+  "background_operations_behavior_modified": false,
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T02:06:49Z",
+  "dispatch_behavior_modified": true,
+  "files_changed": [
+    "src/estate/core/execution_result_reconciliation_runtime.py",
+    "tests/test_execution_result_reconciliation_runtime.py",
+    "docs/integration/execution_result_reconciliation.md",
+    "collaboration/work_packages/completions/WP-0505_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "src/estate/core/execution_result_reconciliation_runtime.py",
+    "tests/test_execution_result_reconciliation_runtime.py",
+    "docs/integration/execution_result_reconciliation.md",
+    "collaboration/work_packages/completions/WP-0505_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/execution_provider_adapter_contract.md",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "docs/integration/codex_bridge_execution_provider_adapter.md",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/execution_provider_adapter_runtime.py",
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "src/estate/core/execution_activity.py",
+    "src/estate/core/operator_activity_stream.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_dispatch.py",
+    "tests/test_execution_provider_adapter.py",
+    "tests/test_execution_adapter_handoff_runtime.py"
+  ],
+  "idempotency_strategy": "SHA-256 hash of canonical adapter result payload stored per dispatch reconciliation artifact; replay returns status=replayed without duplicate events.",
+  "institutional_acceptance_behavior_modified": false,
+  "known_limitations": [
+    "Reconciliation requires existing dispatch items and local adapter result files; it does not fetch provider artifacts or repair provider output.",
+    "Explicit override authority for terminal-state regression is intentionally not implemented in WP-0505."
+  ],
+  "lifecycle_transitions_implemented": true,
+  "live_provider_calls_made": false,
+  "merge_authority": "Chief Architect / Steward review required; Codex does not merge or institutionally accept.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward review required; Codex does not merge or institutionally accept.",
+  "orchestrator_behavior_modified": false,
+  "owner": "codex_cloud_web",
+  "provider_adapter_behavior_modified": false,
+  "pull_request_not_applicable_reason": "Not applicable until PR is created by automation after commit.",
+  "ready_for_ca_review": true,
+  "result_status_mappings": {
+    "accepted": "preserve non-terminal dispatch state and record evidence",
+    "blocked": "Blocked with attention_required true",
+    "completed": "Validation when validation_required is true; Completed when explicitly false",
+    "dry_run_completed": "record evidence without advancing to Running, Validation, or Completed",
+    "failed": "Failed with attention_required true"
+  },
+  "runtime_artifacts_written": [
+    "runtime/execution_adapters/reconciliation/<dispatch_id>.json",
+    "runtime/execution_adapters/reports/<dispatch_id>_reconciliation.md"
+  ],
+  "status": "completed",
+  "summary": "Implemented deterministic execution result reconciliation linking adapter results to dispatch lifecycle, activity evidence, validation preparation, CLI, documentation, tests, and validation recipe without live provider calls or institutional acceptance.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/execution_result_reconciliation_runtime.py",
+    "pytest -q tests/test_execution_result_reconciliation_runtime.py tests/test_execution_dispatch.py tests/test_execution_provider_adapter.py --basetemp Temp/pytest-execution-result-reconciliation",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0505 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/execution_result_reconciliation_runtime.py",
+    "pytest -q tests/test_execution_result_reconciliation_runtime.py tests/test_execution_dispatch.py tests/test_execution_provider_adapter.py --basetemp Temp/pytest-execution-result-reconciliation",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0505 --json"
+  ],
+  "validation_results": "py_compile passed; focused pytest suite passed (32 passed); WP-0505 validation passed.",
+  "work_package_id": "WP-0505"
+}

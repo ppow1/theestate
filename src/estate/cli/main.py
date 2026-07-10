@@ -58,6 +58,7 @@ from estate.core.execution_activity import generate_execution_activity_surface, 
 from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
 from estate.core.codex_bridge_execution_provider_adapter import run_codex_bridge_adapter_dry_run, CodexBridgeExecutionProviderAdapter
 from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepare_handoff, validate_handoff, dry_run_handoff
+from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
 from estate.core.execution_dispatch import (
@@ -1668,6 +1669,38 @@ def cmd_execution_adapter_handoff(args):
     if payload.get("errors"):
         raise SystemExit(1)
 
+
+def cmd_execution_result_reconciliation(args):
+    import json
+    try:
+        if args.execution_result_reconciliation_action == "inspect":
+            payload = inspect_reconciliation(args.dispatch_id)
+        elif args.execution_result_reconciliation_action == "reconcile":
+            payload = reconcile_result(args.dispatch_id, args.result)
+        elif args.execution_result_reconciliation_action == "report":
+            payload = inspect_reconciliation(args.dispatch_id)
+            if payload.get("reconciliation"):
+                text = format_reconciliation_report(payload["reconciliation"])
+                if getattr(args, "json", False):
+                    print(json.dumps(payload["reconciliation"], indent=2, sort_keys=True))
+                else:
+                    print(text)
+                return
+            raise ValueError("dispatch result has not been reconciled")
+        else:
+            raise SystemExit(f"Unknown execution-result-reconciliation action: {args.execution_result_reconciliation_action}")
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+        payload = {"status": "failed", "error": str(exc), "live_provider_called": False, "institutional_acceptance_state": "not_granted"}
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"Execution result reconciliation failed: {exc}")
+        raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"Execution result reconciliation {args.execution_result_reconciliation_action}: {payload.get('status')}")
+
 def cmd_provider_routing_recommendation(args):
     import json
     try:
@@ -2284,6 +2317,23 @@ def main(argv=None):
         q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
         q.add_argument("--json", action="store_true", help="Print handoff JSON")
         q.set_defaults(func=cmd_execution_adapter_handoff)
+
+
+    p = sub.add_parser("execution-result-reconciliation", help="Inspect and reconcile provider adapter results back into dispatch lifecycle")
+    recon_sub = p.add_subparsers(dest="execution_result_reconciliation_action", required=True)
+    q = recon_sub.add_parser("inspect", help="Inspect reconciliation state for a dispatch item")
+    q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
+    q.add_argument("--json", action="store_true", help="Print reconciliation JSON")
+    q.set_defaults(func=cmd_execution_result_reconciliation)
+    q = recon_sub.add_parser("reconcile", help="Reconcile an adapter result JSON file")
+    q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
+    q.add_argument("--result", required=True, help="Path to adapter result JSON")
+    q.add_argument("--json", action="store_true", help="Print reconciliation JSON")
+    q.set_defaults(func=cmd_execution_result_reconciliation)
+    q = recon_sub.add_parser("report", help="Render a reconciliation report")
+    q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
+    q.add_argument("--json", action="store_true", help="Print reconciliation JSON instead of Markdown")
+    q.set_defaults(func=cmd_execution_result_reconciliation)
 
     p = sub.add_parser("execution-activity", help="Generate the shared local execution activity snapshot")
     p.add_argument("--json", action="store_true", help="Print execution activity current snapshot JSON")
