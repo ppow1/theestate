@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import Any, Callable
 
 from estate.core.paths import ESTATE_ROOT
+from estate.core.audit_workspace_runtime import config_from_target
+from estate.core.audit_workspace_service import AuditWorkspaceService
 from estate.core.production_readiness_validation import calculate_production_readiness, validate_receipt
 
 DEFAULT_STATES = {"pending","claimed","running_validation","ring2_required","running_ring2","completed","blocked","failed"}
@@ -78,81 +80,86 @@ class PostMergeValidationPipeline:
         audit_id = request["audit_id"]
         wp = request["work_package_id"]
         target_id = request["target_id"]
-        evidence = self.config.resolved_evidence_root() / audit_id
-        workspace = self.config.resolved_workspace_root() / target_id / audit_id
-        reports = evidence / "reports"; ring2_dir = evidence / "ring2"
-        reports.mkdir(parents=True, exist_ok=True); ring2_dir.mkdir(parents=True, exist_ok=True)
+        evidence_root = self.config.evidence_root
+        workspace_root = self.config.workspace_root
         warnings: list[str] = []
         errors: list[str] = []
         artifacts: dict[str, str] = {}
-
-        source = Path(getattr(target, "local_path", None) or getattr(target, "workspace_root", None) or self.root)
-        active_status = _git(source, "status", "--porcelain")
-        active_tree_dirty = bool(active_status and active_status.stdout.strip())
-        if active_tree_dirty:
-            warnings.append("active_tree_dirty_reported_not_repaired")
-
-        if workspace.exists():
-            shutil.rmtree(workspace)
-        ignore = shutil.ignore_patterns(".git", "Temp", "runtime")
-        shutil.copytree(source, workspace, ignore=ignore)
-        artifacts["validation_workspace"] = _rel(workspace, self.root)
-
-        blocking: list[str] = []
-        if not workspace.exists():
-            blocking.append("validation_workspace_missing")
-        base_branch = getattr(target, "base_branch", None) or request.get("base_branch")
-        branch_ok = True
-        br = _git(source, "branch", "--show-current")
-        if base_branch and br and br.returncode == 0:
-            branch_ok = br.stdout.strip() == base_branch
-            if not branch_ok: blocking.append("base_branch_mismatch")
+        retain_failed = bool((getattr(target, "metadata", {}) or {}).get("retain_failed_audit_workspaces", True))
+        aw_config = config_from_target(target, self.root, workspace_root=workspace_root, evidence_root=evidence_root, retain_failed_workspaces=retain_failed)
+        service = AuditWorkspaceService(aw_config)
         expected_revision = (request.get("metadata") or {}).get("expected_revision") or request.get("source_reference")
-        revision_ok = True
-        if expected_revision and expected_revision != "HEAD":
-            rev = _git(source, "rev-parse", "HEAD")
-            have = rev.stdout.strip() if rev and rev.returncode == 0 else ""
-            revision_ok = have.startswith(str(expected_revision)) or str(expected_revision).startswith(have)
-            if not revision_ok: blocking.append("expected_revision_mismatch")
+        workspace_record = service.prepare(audit_id, expected_revision)
+        workspace = Path(workspace_record.workspace_path)
+        artifacts["validation_workspace"] = _rel(workspace, self.root)
+        evidence_root = aw_config.evidence_root
+        workspace_root = aw_config.workspace_root
+        evidence = evidence_root / audit_id
+        reports = evidence / "reports"; ring2_dir = evidence / "ring2"
+        reports.mkdir(parents=True, exist_ok=True); ring2_dir.mkdir(parents=True, exist_ok=True)
+        artifacts["workspace_sync_report"] = _rel(evidence_root / "reports" / audit_id / "workspace_sync.json", self.root)
+        warnings.extend(workspace_record.warnings)
+        errors.extend(workspace_record.errors)
+        blocking: list[str] = []
+        if workspace_record.state not in {"synchronized"}:
+            blocking.extend(workspace_record.errors or ["workspace_synchronization_failed"])
+            if "requested_revision_unresolvable" in workspace_record.errors or "requested_revision_not_reachable_from_base" in workspace_record.errors:
+                blocking.append("expected_revision_mismatch")
+        if workspace_record.isolated_workspace_dirty:
+            blocking.append("isolated_workspace_dirty")
         missing = [f for f in request.get("expected_files", []) if not (workspace / f).exists()]
-        if missing: blocking.append("expected_files_missing: " + ", ".join(missing))
+        if missing:
+            blocking.append("expected_files_missing: " + ", ".join(missing))
 
         validation: dict[str, Any] = {"validation_status": "not_run", "failures": [], "findings": [], "warnings": []}
-        if not blocking:
-            try:
+        workspace_success = False
+        try:
+            if not blocking:
+                workspace_record.state = "validating"
                 validation = self.validator(wp, workspace)
                 _write_json(reports / "validation.json", validation)
                 artifacts["validation_report"] = _rel(reports / "validation.json", self.root)
                 if validation.get("validation_status") not in {"passed", "passed_with_findings"}:
                     blocking.append("validation_failed")
-            except Exception as exc:
-                validation = {"validation_status": "failed", "failures": [str(exc)], "findings": [], "warnings": []}
-                errors.append(str(exc)); blocking.append("validation_failed")
-        receipt = validate_receipt(wp, root=workspace)
-        readiness = calculate_production_readiness(validation.get("validation_status", "failed"), receipt)
-        if not readiness.get("production_ready"):
-            blocking.extend(readiness.get("blocking_reasons") or [])
-        prompt = self._write_ring2_prompt(ring2_dir, request, validation, readiness, blocking)
-        artifacts["ring2_prompt"] = _rel(prompt, self.root)
-        ring2_status = "prompt_generated"
-        ring2_verdict = None
-        if self.config.ollama_enabled:
-            ring2_status, ring2_verdict, out = self._run_ollama(prompt)
-            if out:
-                artifacts["ring2_review"] = _rel(out, self.root)
-        verdict = "ring2_required"
-        if blocking:
-            verdict = "validation_failed" if "validation_failed" in blocking else "blocked"
-        elif ring2_verdict:
-            verdict = ring2_verdict
+            receipt = validate_receipt(wp, root=workspace) if workspace.exists() else {"receipt_status": "missing"}
+            readiness = calculate_production_readiness(validation.get("validation_status", "failed"), receipt)
+            if not readiness.get("production_ready"):
+                blocking.extend(readiness.get("blocking_reasons") or [])
+            prompt = self._write_ring2_prompt(ring2_dir, request, validation, readiness, blocking)
+            artifacts["ring2_prompt"] = _rel(prompt, self.root)
+            ring2_status = "prompt_generated"
+            ring2_verdict = None
+            if self.config.ollama_enabled:
+                ring2_status, ring2_verdict, out = self._run_ollama(prompt)
+                if out:
+                    artifacts["ring2_review"] = _rel(out, self.root)
+            verdict = "ring2_required"
+            if blocking:
+                verdict = "validation_failed" if "validation_failed" in blocking else "blocked"
+            elif ring2_verdict:
+                verdict = ring2_verdict
+            workspace_success = verdict in {"ring2_required", "accepted", "accepted_with_notes"}
+        except Exception as exc:
+            validation = {"validation_status": "failed", "failures": [str(exc)], "findings": [], "warnings": []}
+            errors.append(str(exc)); blocking.append("validation_failed")
+            receipt = {"receipt_status": "missing"}; readiness = {"production_ready": False, "non_blocking_findings": []}
+            prompt = self._write_ring2_prompt(ring2_dir, request, validation, readiness, blocking)
+            artifacts["ring2_prompt"] = _rel(prompt, self.root); ring2_status = "prompt_generated"; ring2_verdict = None; verdict = "validation_failed"
+        finally:
+            workspace_record = service.cleanup(workspace_record, success=workspace_success)
+            _write_json(reports / "workspace_lifecycle.json", workspace_record.to_dict())
+            artifacts["workspace_lifecycle"] = _rel(reports / "workspace_lifecycle.json", self.root)
         verdict_payload = {
             "audit_id": audit_id, "target_id": target_id, "work_package_id": wp,
             "state": "completed" if verdict not in {"ring2_required","blocked","validation_failed"} else ("ring2_required" if verdict == "ring2_required" else "blocked"),
             "verdict": verdict, "validation_status": validation.get("validation_status"),
             "production_ready": bool(readiness.get("production_ready")), "receipt_status": receipt.get("receipt_status", "unknown"),
             "ring2_status": ring2_status, "ring2_verdict": ring2_verdict,
-            "workspace": str(workspace), "evidence_root": str(evidence), "active_tree_dirty": active_tree_dirty,
-            "base_branch_verified": branch_ok, "expected_revision_verified": revision_ok, "expected_files_present": not missing,
+            "workspace": str(workspace), "evidence_root": str(evidence), "external_evidence_root": str(evidence_root),
+            "active_tree_dirty": workspace_record.active_checkout_dirty, "active_checkout_dirty": workspace_record.active_checkout_dirty,
+            "isolated_workspace_dirty": workspace_record.isolated_workspace_dirty, "branch_sync_status": workspace_record.branch_sync_status,
+            "revision_reachable": workspace_record.revision_reachable, "workspace_record": workspace_record.to_dict(),
+            "base_branch_verified": workspace_record.revision_reachable, "expected_revision_verified": workspace_record.resolved_commit is not None, "expected_files_present": not missing,
             "failures": validation.get("failures", []), "findings": validation.get("findings", []) + readiness.get("non_blocking_findings", []),
             "warnings": warnings + validation.get("warnings", []), "errors": errors,
             "blocking_reasons": blocking, "artifacts": artifacts,

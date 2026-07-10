@@ -28,6 +28,7 @@ from estate.core.execution_session_controller import ExecutionSessionController
 from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 from estate.core.operations_center_settings import save_settings_document, reset_operations_center_settings, export_operations_center_settings, import_operations_center_settings, SETTINGS_OUTPUT
+from estate.core.office_parking_lot_controls import parking_action, roadmap_action, planning_undo, filter_items
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -299,6 +300,27 @@ def execution_result_report(root=None, dispatch_id: str | None = None, **params:
     payload=json.loads(rec_path.read_text(encoding='utf-8')); report=base/'runtime/execution_adapters/reports'/f'{dispatch_id}_reconciliation.md'; report.parent.mkdir(parents=True, exist_ok=True); report.write_text(format_reconciliation_report(payload)+'\n', encoding='utf-8')
     return _completed('execution_result.report', label, 'execution-control', handler, f"Reconciliation report generated for {dispatch_id}.", read=[_rel(base, rec_path)], written=[_rel(base, report)])
 
+
+def _planning_result(action_id: str, label: str, tab: str, handler: str, payload, request_id: str | None = None) -> OfficeActionResult:
+    return OfficeActionResult(action_id, label, request_id or _request_id(), tab, payload.outcome, payload.message, handler, payload.artifacts_read, payload.artifacts_written, payload.runtime_state_changed, 'safe_local_action' if payload.outcome == 'completed' else 'gated_or_missing_requirement')
+
+def parking_lot_control(root=None, planning_action: str | None = None, item_id: str | None = None, **params: Any) -> OfficeActionResult:
+    payload = parking_action(root=root, action=planning_action or params.get('action') or '', item_id=item_id, **params)
+    return _planning_result('parking_lot.control', 'Parking Lot item control', 'parking', 'estate.core.office_parking_lot_controls.parking_action', payload, params.get('request_id'))
+
+def roadmap_control(root=None, planning_action: str | None = None, item_id: str | None = None, **params: Any) -> OfficeActionResult:
+    payload = roadmap_action(root=root, action=planning_action or params.get('action') or '', item_id=item_id, **params)
+    return _planning_result('roadmap.control', 'Roadmap item control', 'roadmap', 'estate.core.office_parking_lot_controls.roadmap_action', payload, params.get('request_id'))
+
+def planning_control_undo(root=None, **params: Any) -> OfficeActionResult:
+    payload = planning_undo(root=root)
+    tab = (payload.data or {}).get('surface') or 'parking'
+    return _planning_result('planning.undo_last_local_change', 'Undo last planning change', tab, 'estate.core.office_parking_lot_controls.planning_undo', payload, params.get('request_id'))
+
+def planning_filter(root=None, surface: str = 'parking', query: str = '', status: str = '', priority: str = '', owner: str = '', **params: Any) -> OfficeActionResult:
+    payload = filter_items(root=root, surface=surface, query=query, status=status, priority=priority, owner=owner)
+    return _planning_result('planning.filter', 'Filter/search planning items', 'parking' if surface == 'parking' else 'roadmap', 'estate.core.office_parking_lot_controls.filter_items', payload, params.get('request_id'))
+
 def generate_daily_briefing(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); generate_daily_board_integration(root=base, write=True); generate_morning_briefing(root=base, write=True)
     return _completed('daily_board.generate_morning_briefing', 'Generate morning briefing', 'daily-board', 'estate.core.daily_board_integration.generate_daily_board_integration + estate.core.morning_briefing.generate_morning_briefing', 'Daily Board integration and morning briefing generated locally.', written=['runtime/operations/daily_board_integration.json', 'operations/boards/daily_board_integration.md', 'runtime/briefings/morning_briefing.json', 'operations/briefings/morning_briefing.md'], state=['daily board and briefing artifacts refreshed'])
@@ -333,9 +355,20 @@ HANDLERS.update({
  'settings.reset_defaults': settings_reset_defaults,
  'settings.export': settings_export,
  'settings.import': settings_import,
+ 'parking_lot.control': parking_lot_control,
+ 'roadmap.control': roadmap_control,
+ 'planning.undo_last_local_change': planning_control_undo,
+ 'planning.filter': planning_filter,
 })
 
 ACTION_CONTROLS = [
+
+ {'action_id':'parking_lot.control','label':'Parking Lot item control','target_tab':'parking','handler':'parking_lot_control','availability':'available','requires_input':'planning_action,item_id','note':'Actions: create, edit, move_up, move_down, reorder, set_priority, accept, archive, reject, restore, promote.'},
+ {'action_id':'roadmap.control','label':'Roadmap item control','target_tab':'roadmap','handler':'roadmap_control','availability':'available','requires_input':'planning_action,item_id','note':'Actions: create, edit, move_up, move_down, reorder, set_priority.'},
+ {'action_id':'planning.undo_last_local_change','label':'Undo last planning change','target_tab':'parking','handler':'planning_control_undo','availability':'available','note':'Restores the last safe local Parking Lot or Roadmap order/status/content change.'},
+ {'action_id':'planning.filter','label':'Search/filter planning items','target_tab':'parking','handler':'planning_filter','availability':'available','requires_input':'surface,query,status,priority,owner'},
+ {'action_id':'planning.undo_last_local_change','label':'Undo last planning change','target_tab':'roadmap','handler':'planning_control_undo','availability':'available','note':'Restores the last safe local Parking Lot or Roadmap order/status/content change.'},
+ {'action_id':'planning.filter','label':'Search/filter planning items','target_tab':'roadmap','handler':'planning_filter','availability':'available','requires_input':'surface,query,status,priority,owner'},
  {'action_id':'execution_session.preview','label':'Preview execution session','target_tab':'execution-control','handler':'execution_session_preview','availability':'available','requires_input':'dispatch_id,authorization_path','note':'No provider call; writes preview/session evidence.'},
  {'action_id':'execution_session.start','label':'Start execution session','target_tab':'execution-control','handler':'execution_session_start','availability':'available','requires_input':'dispatch_id,authorization_path,confirm_live_execution','note':'Requires explicit confirmation and existing authorization evidence.'},
  {'action_id':'execution_session.resume','label':'Resume execution session','target_tab':'execution-control','handler':'execution_session_resume','availability':'available','requires_input':'session_id','note':'Preserves duplicate-provider-call protection.'},

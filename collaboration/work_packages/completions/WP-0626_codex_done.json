@@ -1,0 +1,36 @@
+{
+  "active_checkout_modifications_performed": false,
+  "audits_attempted": 5,
+  "audits_completed": "covered by OperationsRuntime batch metrics",
+  "audits_failed": "covered by OperationsRuntime batch metrics",
+  "branch": "current",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "dispatch_execution_performed": false,
+  "external_evidence_root": "configured OperationalTarget.validation_root / ESTATE_VALIDATION_EVIDENCE_ROOT",
+  "files_changed": [
+    "src/estate/core/audit_workspace_service.py",
+    "src/estate/core/audit_workspace_runtime.py",
+    "src/estate/core/post_merge_validation_pipeline.py",
+    "tests/test_audit_workspace_service.py",
+    "tests/test_audit_workspace_runtime.py",
+    "tests/test_post_merge_validation_pipeline.py",
+    "tests/test_post_merge_audit_processor.py",
+    "docs/integration/cleanroom_post_merge_audit_service.md"
+  ],
+  "known_limitations": [],
+  "merge_authority_equivalent": "Chief Architect / Steward review required before merge.",
+  "provider_execution_performed": false,
+  "pull_request_not_applicable_reason": "PR will be created by automation after commit.",
+  "ready_for_ca_review": true,
+  "stashes_created": 0,
+  "summary": "Implemented cleanroom post-merge audit workspaces with external evidence, lifecycle records, successful cleanup, configurable failed-workspace retention, and bounded batch processing.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/audit_workspace_service.py src/estate/core/audit_workspace_runtime.py",
+    "python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\"",
+    "pytest -q tests/test_audit_workspace_service.py tests/test_audit_workspace_runtime.py tests/test_post_merge_audit_processor.py tests/test_operations_runtime.py --basetemp Temp/pytest-cleanroom-audit",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0626 --json"
+  ],
+  "work_package_id": "WP-0626",
+  "workspace_method": "git_worktree"
+}

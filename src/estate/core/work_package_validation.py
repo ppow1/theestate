@@ -73,6 +73,42 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+"WP-0513": {
+        "recipe_id": "wp-0513-parking-lot-roadmap-priority-control-surface",
+        "title": "WP-0513 — Parking Lot, Roadmap, and Priority Control Surface",
+        "description": "Validates canonical Office planning controls for Parking Lot and Roadmap artifacts.",
+        "required_checks": ["Focused planning controls tests pass", "Planning adapter compiles", "Office command surface compiles", "Documentation and receipt exist"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/office_parking_lot_controls.py", "tests/test_office_parking_lot_controls.py", "docs/integration/office_parking_lot_control_surface.md", "collaboration/work_packages/completions/WP-0513_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Promotion bypasses operations-control runtime", "Controls render as decorative-only"],
+        "success_criteria": ["Parking Lot and Roadmap mutations persist", "Order survives reload", "Undo restores prior local state", "Invalid promotions remain blocked"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/office_parking_lot_controls.py src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py"),
+            _cmd("pytest -q tests/test_office_parking_lot_controls.py"),
+            _cmd("python -c \"from pathlib import Path; paths=['docs/integration/office_parking_lot_control_surface.md','collaboration/work_packages/completions/WP-0513_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        ],
+    },
+
+    "WP-0626": {
+        "recipe_id": "wp-0626-cleanroom-post-merge-audit-service",
+        "title": "WP-0626 — Cleanroom Post-Merge Audit Service",
+        "description": "Validates isolated audit workspaces, external evidence, cleanup/retention semantics, bounded batch processing, and provider/dispatch boundaries.",
+        "required_checks": ["Expected artifacts exist", "Cleanroom modules compile", "Focused cleanroom/runtime tests pass", "Receipt confirms no active checkout modification, no stashes, and no provider/dispatch execution"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/audit_workspace_service.py", "src/estate/core/audit_workspace_runtime.py", "tests/test_audit_workspace_service.py", "tests/test_audit_workspace_runtime.py", "docs/integration/cleanroom_post_merge_audit_service.md", "collaboration/work_packages/completions/WP-0626_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Active checkout is modified by audit preparation", "Provider or dispatch execution is reported"],
+        "success_criteria": ["Dirty active checkout is visible but non-blocking", "Validation runs from an isolated synchronized workspace", "External Ring 2/verdict evidence is produced", "One failed audit does not stop a bounded batch"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/audit_workspace_service.py','src/estate/core/audit_workspace_runtime.py','tests/test_audit_workspace_service.py','tests/test_audit_workspace_runtime.py','docs/integration/cleanroom_post_merge_audit_service.md','collaboration/work_packages/completions/WP-0626_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/audit_workspace_service.py src/estate/core/audit_workspace_runtime.py"),
+            _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+            _cmd("pytest -q tests/test_audit_workspace_service.py tests/test_audit_workspace_runtime.py tests/test_post_merge_audit_processor.py tests/test_operations_runtime.py --basetemp Temp/pytest-cleanroom-audit"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0626_codex_done.json').read_text()); assert d['work_package_id']=='WP-0626'; assert d['active_checkout_modifications_performed'] is False; assert d['stashes_created']==0; assert d['provider_execution_performed'] is False; assert d['dispatch_execution_performed'] is False; assert d['ready_for_ca_review'] is True\""),
+        ],
+    },
+
     "WP-0625": {
         "recipe_id": "wp-0625-governed-automatic-admission-and-bounded-audit-execution",
         "title": "WP-0625 — Governed Automatic Admission and Bounded Audit Execution",
