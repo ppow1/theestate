@@ -1,0 +1,13 @@
+{
+  "work_package": "WP-0630",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented an Office-integrated Operations Control Surface with canonical controls for runtime host lifecycle, scheduler jobs, watches, bounded cycles, audit holds, and evidence inspection.",
+  "artifacts": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/cli/main.py",
+    "tests/test_operations_control_surface.py",
+    "docs/integration/operations_control_surface.md"
+  ]
+}

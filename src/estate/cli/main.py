@@ -349,6 +349,15 @@ def _operations_runtime_mode(args):
     return "observe-only"
 
 
+def cmd_operations_control_surface(args):
+    try:
+        payload = generate_command_center(root=Path(args.root) if getattr(args, "root", None) else None, write=False)
+        surface = (payload.get("panels") or {}).get("operations_control_surface") or {}
+        print(json.dumps(surface, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operations control surface failed: {exc}")
+        raise SystemExit(1)
+
 def cmd_operations_scheduler(args):
     try:
         runtime = OperationsSchedulerRuntime()
@@ -3310,6 +3319,11 @@ def main(argv=None):
     q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_post_merge_audit)
 
+
+
+    p = sub.add_parser("operations-control-surface", help="Print the Office Operations Control Surface payload")
+    p.add_argument("--root")
+    p.set_defaults(func=cmd_operations_control_surface)
 
     p = sub.add_parser("operations-scheduler", help="Schedule bounded Operations Runtime jobs")
     osch = p.add_subparsers(dest="operations_scheduler_action", required=True)
