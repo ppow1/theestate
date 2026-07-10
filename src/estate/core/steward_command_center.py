@@ -53,6 +53,7 @@ OFFICE_NAVIGATION = [
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
+    {"id": "operational-dashboard", "label": "Operational Dashboard", "panel": "office_operational_command_dashboard", "tab": "operational-dashboard"},
     {"id": "operational-activity", "label": "Operational Activity", "panel": "operational_activity", "tab": "operational-activity"},
     {"id": "execution-control", "label": "Execution Control", "panel": "execution_control", "tab": "execution-control"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
@@ -78,6 +79,7 @@ OFFICE_TABS = [
     {"id": "resident-conversations", "label": "Resident Conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models"},
     {"id": "daily-board", "label": "Daily Board"},
+    {"id": "operational-dashboard", "label": "Operational Dashboard"},
     {"id": "operational-activity", "label": "Operational Activity"},
     {"id": "execution-control", "label": "Execution Control"},
     {"id": "projects", "label": "Projects"},
@@ -1072,6 +1074,7 @@ def generate_command_center(root=None, write=True):
         "about": _about_panel(root),
         "alfred_chat": _alfred_chat_panel(root),
     }
+    panels["office_operational_command_dashboard"] = _office_operational_command_dashboard(root, panels)
     if isinstance(panels.get("mission_control_workspace"), dict) and isinstance(panels["mission_control_workspace"].get("data"), dict):
         panels["mission_control_workspace"]["data"]["capability_dependency_visualization"] = panels.get("capability_dependency_visualization")
     panels["validation_health_dashboard"] = _build_validation_health_dashboard(root)
@@ -1179,6 +1182,99 @@ def _operations_center_layout_framework(panels, generated_at):
             "state_authority": "browser-local layout preferences and local workspace profile artifacts only; expanded legacy left navigation states are interpreted as collapsed; operational records remain in existing local artifacts",
         },
     }
+
+
+def _first_dict(*values):
+    for value in values:
+        if isinstance(value, dict):
+            return value
+    return {}
+
+def _list_len(value):
+    return len(value) if isinstance(value, list) else 0
+
+def _office_operational_command_dashboard(root, panels):
+    """Build a classification-safe executive operations dashboard from durable artifacts."""
+    runtime = _first_dict((panels.get("operations_runtime") or {}).get("data"))
+    background = _first_dict((panels.get("background_operations") or {}).get("data"))
+    traffic = _first_dict((panels.get("traffic_controller_panel") or {}).get("data"))
+    activity = _first_dict((panels.get("operational_activity") or {}).get("data"))
+    pipeline = _first_dict((panels.get("work_package_pipeline") or {}).get("data"))
+    personnel = _first_dict((panels.get("office_personnel_directory") or {}).get("data"))
+    validation = _first_dict((panels.get("validation_health_dashboard") or {}).get("data"), (panels.get("validation_status") or {}).get("data"))
+    notifications = _first_dict((panels.get("operations_notification_center") or {}).get("data"))
+    merge = _first_dict((panels.get("merge_discovery") or {}).get("data"))
+    post_merge = _first_dict((panels.get("post_merge_audit") or {}).get("data"))
+    ai_services = _first_dict((panels.get("ai_services_models") or {}).get("data"))
+    execution = _execution_control_panel(root)
+
+    sections = pipeline.get("sections") or {}
+    active_items = []
+    for key in ("blocked", "active", "review-ready", "pending"):
+        active_items.extend(sections.get(key) or [])
+
+    activities = []
+    for group in (activity.get("groups") or {}).values():
+        if isinstance(group, list):
+            activities.extend(group)
+    exceptions = []
+    for item in activities:
+        if item.get("attention_required") or str(item.get("severity") or item.get("priority") or "").lower() in {"critical", "urgent", "high", "error", "failed"}:
+            exceptions.append(item)
+    for source, data in [("validation", validation), ("traffic_controller", traffic), ("post_merge_audit", post_merge), ("notifications", notifications)]:
+        text = json.dumps(data, sort_keys=True).lower() if data else ""
+        if any(term in text for term in ("failed", "warning", "attention", "blocked", "stale")):
+            exceptions.append({"activity_id": source, "title": f"{source.replace('_',' ').title()} requires review", "severity": "warning", "artifacts": []})
+
+    repositories = []
+    for target in merge.get("repository_targets") or merge.get("targets") or traffic.get("repository_targets") or []:
+        if isinstance(target, dict):
+            repositories.append({"repository": target.get("repository") or target.get("target") or target.get("name"), "state": target.get("state") or target.get("status"), "evidence": target.get("path") or target.get("evidence")})
+    if not repositories:
+        repositories = [{"repository": "estate-main", "state": merge.get("state") or merge.get("status") or "available" if merge else "unknown", "evidence": (panels.get("merge_discovery") or {}).get("path")}]
+
+    departments = []
+    for employee in personnel.get("employees") or personnel.get("personnel") or []:
+        if isinstance(employee, dict):
+            departments.append(employee.get("office") or employee.get("department") or employee.get("organizational_unit") or "unassigned")
+    dept_counts = {name: departments.count(name) for name in sorted(set(departments)) if name}
+
+    provider_warnings = []
+    for source in (ai_services, traffic, activity):
+        text = json.dumps(source, sort_keys=True).lower() if source else ""
+        if "capacity" in text or "provider" in text and "warning" in text:
+            provider_warnings.append("Provider capacity/readiness warning present in durable source artifact.")
+
+    summary = {
+        "runtime_host": runtime.get("state") or runtime.get("host_state") or runtime.get("runtime_state") or "unknown",
+        "scheduler_posture": (runtime.get("scheduler") or {}).get("state") or background.get("scheduler_state") or "unknown",
+        "watch_state": background.get("watch_state") or background.get("state") or "unknown",
+        "repositories": len(repositories),
+        "campaigns_visible": sum(len(sections.get(k) or []) for k in sections),
+        "departments_visible": len(dept_counts),
+        "active_audits": _list_len(post_merge.get("active_audits") or post_merge.get("queue")),
+        "ring_2_queue": _list_len(traffic.get("ring_2_queue") or traffic.get("queue") or post_merge.get("ring_2_queue")),
+        "provider_capacity_warnings": len(provider_warnings),
+        "recovery_state": execution.get("cancellation_state") or execution.get("current_session_state") or "unknown",
+        "exceptions_requiring_attention": len(exceptions),
+    }
+    filters = {"repository": sorted({r.get("repository") for r in repositories if r.get("repository")}), "department": sorted(dept_counts), "campaign": sorted({i.get("work_package_id") for i in active_items if i.get("work_package_id")}), "severity": sorted({str(e.get("severity") or e.get("priority") or "normal") for e in exceptions}), "age": ["<24h", "1-7d", ">7d", "unknown"]}
+    return {"available": True, "path": "runtime/steward/command_center.html#operational-dashboard", "kind": "office_operational_command_dashboard", "data": {"summary": summary, "filters": filters, "exceptions": exceptions[:25], "repositories": repositories, "department_commitments": dept_counts, "campaigns": active_items[:25], "provider_warnings": provider_warnings, "evidence_sources": {k: (panels.get(k) or {}).get("path") for k in ["operations_runtime","background_operations","traffic_controller_panel","operational_activity","work_package_pipeline","office_personnel_directory","validation_health_dashboard","post_merge_audit","merge_discovery","ai_services_models"]}, "classification": "Estate Internal summaries only; drill-down exposes local artifact paths, not secrets.", "authority_boundaries": ["operational progress", "validation evidence", "institutional acceptance remain distinct", "no automatic acceptance or provider bypass"]}}
+
+def _office_operational_command_dashboard_html(artifact):
+    if not artifact.get("available"):
+        return _artifact_html(artifact)
+    data = artifact.get("data") or {}; summary = data.get("summary") or {}
+    kpis = "".join(f"<span class='mailbox-kpi'><strong>{html.escape(str(k).replace('_',' ').title())}</strong><span>{html.escape(str(v))}</span></span>" for k,v in summary.items())
+    filters = data.get("filters") or {}
+    filter_html = "".join(f"<label>{html.escape(str(k).title())} <select data-dashboard-filter='{html.escape(str(k), quote=True)}'><option value=''>All</option>{''.join(f'<option>{html.escape(str(v))}</option>' for v in values[:50])}</select></label>" for k, values in filters.items())
+    exceptions = data.get("exceptions") or []
+    ex_rows = "".join(f"<tr><td>{html.escape(str(e.get('severity') or e.get('priority') or 'normal'))}</td><td>{html.escape(str(e.get('title') or e.get('activity_id') or 'Review item'))}</td><td>{''.join(_artifact_link(str(a)) for a in (e.get('artifacts') or [])[:3]) or 'summary source'}</td><td><button class='office-action' data-office-action='operations_dashboard.inspect_evidence' data-evidence-path='{html.escape(str((e.get('artifacts') or [''])[0]), quote=True)}'>Inspect evidence</button></td></tr>" for e in exceptions) or "<tr><td colspan='4'>No prioritized exceptions found.</td></tr>"
+    repos = "".join(f"<tr><td>{html.escape(str(r.get('repository')))}</td><td>{html.escape(str(r.get('state')))}</td><td>{_artifact_link(r.get('evidence'))}</td></tr>" for r in data.get("repositories") or [])
+    depts = "".join(f"<tr><td>{html.escape(str(k))}</td><td>{html.escape(str(v))}</td></tr>" for k,v in (data.get("department_commitments") or {}).items()) or "<tr><td colspan='2'>No department commitments found.</td></tr>"
+    campaigns = "".join(f"<tr><td>{html.escape(str(c.get('work_package_id')))}</td><td>{html.escape(str(c.get('state')))}</td><td>{html.escape(str(c.get('owner')))}</td><td>{_artifact_link(c.get('path'))}</td></tr>" for c in data.get("campaigns") or [])
+    sources = "".join(f"<li>{html.escape(str(k))}: {_artifact_link(v)}</li>" for k,v in (data.get("evidence_sources") or {}).items())
+    return f"<section class='office-operational-dashboard'><p>Executive command dashboard refreshed from durable runtime artifacts. It separates operational progress, validation evidence, and institutional acceptance.</p><div class='mailbox-kpis'>{kpis}</div><h3>Filters</h3><div class='settings-grid'>{filter_html}</div><h3>Exceptions requiring Steward attention</h3><table><thead><tr><th>Severity</th><th>Item</th><th>Evidence</th><th>Control</th></tr></thead><tbody>{ex_rows}</tbody></table><h3>Repository targets</h3><table><tbody>{repos}</tbody></table><h3>Department commitments</h3><table><tbody>{depts}</tbody></table><h3>Campaign progress</h3><table><tbody>{campaigns}</tbody></table><h3>Provider warnings and recovery</h3><ul>{''.join(f'<li>{html.escape(str(w))}</li>' for w in data.get('provider_warnings') or ['No provider capacity warnings found.'])}</ul><p class='source'>{html.escape(str(data.get('classification')))} Boundaries: {html.escape('; '.join(data.get('authority_boundaries') or []))}</p><details><summary>Canonical evidence sources</summary><ul>{sources}</ul></details></section>"
 
 def _placeholder_panel(panel_id, title, description, source="future Office package"):
     return {"available": False, "path": source, "kind": "placeholder", "panel_id": panel_id, "title": title, "placeholder": description}
@@ -2479,6 +2575,7 @@ def render_command_center_html(payload):
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
+        ("operational-dashboard", "Office Operational Command Dashboard", _office_action_controls_html(payload, "operational-dashboard") + _office_operational_command_dashboard_html(p.get("office_operational_command_dashboard", {}))),
         ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _operations_control_surface_html(p.get("operations_control_surface", {})) + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
         ("execution-control", "Execution Control", _office_action_controls_html(payload, "execution-control") + _execution_control_html(p.get("execution_control", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
