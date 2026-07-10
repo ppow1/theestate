@@ -1,0 +1,41 @@
+{
+  "work_package": "WP-0525",
+  "status": "staged_not_installed",
+  "required_install_handoff": "WP-0531",
+  "staged_artifacts": [
+    "collaboration/workstreams/WP-0525/install_manifest.json",
+    "collaboration/workstreams/WP-0525/staged/office_resident_presence.py",
+    "collaboration/workstreams/WP-0525/staged/test_office_resident_presence.py",
+    "collaboration/workstreams/WP-0525/resident_presence_contract.md",
+    "collaboration/workstreams/WP-0525/validation_notes.md",
+    "collaboration/workstreams/WP-0525/rollback_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_resident_presence.py",
+    "tests/test_office_resident_presence.py",
+    "docs/office/resident_presence_contract.md"
+  ],
+  "shared_integration_targets_deferred": [
+    "Office workspace registration",
+    "Resident card links",
+    "Activity module links",
+    "Assignment, conversation, mailbox, work package, and evidence openers",
+    "Resident, office, status, and attention-state filter controls"
+  ],
+  "declared_overlaps": [
+    "Existing operations/steward/steward_presence_state.md stewardship presence surface",
+    "Existing resident cards and resident duty summaries under operations/residents and operations/*/duty_summary.md",
+    "Existing operator and activity modules such as operations/steward/operator_activity_stream.md"
+  ],
+  "validation_commands": [
+    "python -m pytest collaboration/workstreams/WP-0525/staged/test_office_resident_presence.py"
+  ],
+  "authority_boundaries": [
+    "Presence cards only reflect supplied records and cited evidence",
+    "Missing evidence remains visible and is not backfilled with fabricated activity",
+    "Freshness and stale state are computed from source timestamps",
+    "No hidden monitoring or authority expansion is introduced",
+    "Staged artifacts are not installed work",
+    "No shared active Office files were modified"
+  ]
+}

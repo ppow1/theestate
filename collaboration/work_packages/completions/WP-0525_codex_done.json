@@ -1,0 +1,14 @@
+{
+  "work_package_id": "WP-0525",
+  "codex_status": "done",
+  "staged_work_not_installed_work": true,
+  "current_presence_and_duty_state_staged": true,
+  "active_assignment_last_completed_blocker_attention_staged": true,
+  "drill_down_links_staged": true,
+  "freshness_and_stale_state_verified": true,
+  "truthfulness_guardrails_verified": true,
+  "resident_office_status_attention_filters_verified": true,
+  "missing_evidence_visible": true,
+  "shared_active_office_files_modified": false,
+  "ready_for_wp_0531_install_handoff": true
+}
