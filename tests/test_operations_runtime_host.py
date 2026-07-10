@@ -110,3 +110,44 @@ def test_windows_uninstall_deletes_and_verifies_removal(tmp_path, monkeypatch):
     out=host.uninstall()
     assert calls[0][:3] == ["schtasks","/Delete","/TN"]
     assert out["scheduled_task_removed"] is True
+
+
+def test_host_does_not_recover_live_old_heartbeat_lock(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+
+    state = tmp_path / "state"
+    state.mkdir()
+    (state / "host.lock.json").write_text(json.dumps({"pid": 1234, "acquired_at": "2000-01-01T00:00:00Z", "heartbeat_at": "2000-01-01T00:00:00Z"}), encoding="utf-8")
+    monkeypatch.setattr(mod, "_pid_liveness", lambda pid: "alive")
+
+    with pytest.raises(OperationsRuntimeHostError):
+        OperationsRuntimeHost(tmp_path / "repo", state).acquire_lock()
+
+    assert json.loads((state / "host.lock.json").read_text(encoding="utf-8"))["pid"] == 1234
+
+
+def test_host_does_not_recover_unknown_pid_liveness_lock(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+
+    state = tmp_path / "state"
+    state.mkdir()
+    (state / "host.lock.json").write_text(json.dumps({"pid": 1234, "acquired_at": "2000-01-01T00:00:00Z"}), encoding="utf-8")
+    monkeypatch.setattr(mod, "_pid_liveness", lambda pid: "unknown")
+
+    with pytest.raises(OperationsRuntimeHostError):
+        OperationsRuntimeHost(tmp_path / "repo", state).acquire_lock()
+
+    assert json.loads((state / "host.lock.json").read_text(encoding="utf-8"))["pid"] == 1234
+
+
+def test_host_recovers_only_dead_pid_lock(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+
+    state = tmp_path / "state"
+    state.mkdir()
+    (state / "host.lock.json").write_text(json.dumps({"pid": 1234, "acquired_at": "2000-01-01T00:00:00Z"}), encoding="utf-8")
+    monkeypatch.setattr(mod, "_pid_liveness", lambda pid: "dead")
+
+    payload = OperationsRuntimeHost(tmp_path / "repo", state).acquire_lock()
+
+    assert payload["pid"] != 1234
