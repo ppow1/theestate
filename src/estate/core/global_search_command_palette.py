@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from estate.core.institutional_search import build_institutional_search_index
+from estate.core.office_command_surface import ACTION_CONTROLS
 from estate.core.paths import ESTATE_ROOT
 
 PALETTE_INDEX_PATH = Path("runtime/search/global_command_palette.json")
@@ -118,7 +119,20 @@ def build_global_palette(root: str | Path | None = None, write: bool = True) -> 
                 title = next((line.lstrip("#").strip() for line in text.splitlines() if line.strip().startswith("#")), rel)
             records.append({"path": rel, "title": title, "artifact_type": "artifact", "excerpt": text[:220], "authoritative": True, "policy_classification": "source_artifact"})
     artifacts = [_record_to_item(record) for record in records]
-    commands = [{"kind": "command", "domain": "command", **command} for command in COMMANDS]
+    office_commands = []
+    for control in ACTION_CONTROLS:
+        if control.get('availability') == 'available':
+            office_commands.append({
+                'id': control['action_id'],
+                'title': control.get('label') or control['action_id'],
+                'category': 'office_action',
+                'operation': 'office_action',
+                'target': control.get('target_tab'),
+                'available': True,
+                'handler': control.get('handler'),
+                'requires_input': control.get('requires_input'),
+            })
+    commands = [{"kind": "command", "domain": "command", **command} for command in COMMANDS + office_commands]
     payload = {
         "generated_at": _now(),
         "index_path": str(PALETTE_INDEX_PATH),
@@ -152,6 +166,9 @@ def search_global_palette(query: str, root: str | Path | None = None, refresh: b
 
 
 def execute_registered_command(command_id: str) -> dict[str, Any]:
+    office = next((c for c in ACTION_CONTROLS if c.get("action_id") == command_id and c.get("availability") == "available"), None)
+    if office is not None:
+        return {"ok": True, "command_id": command_id, "status": "ready", "operation": "office_action", "target": office.get("target_tab"), "handler": office.get("handler"), "message": "Registered safe Office action; invoke through execute_office_action."}
     command = next((cmd for cmd in COMMANDS if cmd["id"] == command_id), None)
     if command is None:
         return {"ok": False, "command_id": command_id, "status": "unavailable", "message": "Command is not registered."}

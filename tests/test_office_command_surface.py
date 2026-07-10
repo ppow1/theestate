@@ -64,3 +64,52 @@ def test_operational_activity_controls_write_evidence_and_validate_artifacts(tmp
     filtered = execute_office_action('operational_activity.filter', root=tmp_path, state='Blocked', owner='Steward', priority='high', attention_required='true')
     assert filtered['outcome'] == 'completed'
     assert (tmp_path / 'runtime/operations/status/activity_filter.json').exists()
+import json
+from estate.core.office_command_surface import execute_office_action, controls_for_tab
+from estate.core.global_search_command_palette import build_global_palette, search_global_palette, execute_registered_command
+from estate.ai_services.discovery import rediscover
+
+class Runner:
+    def __init__(self): self.started=[]; self.stopped=[]
+    def start(self, command, cwd=None, log_path=None): self.started.append(command); return {'pid': 1001, 'return_code': None}
+    def stop(self, pid): self.stopped.append(pid); return {'stopped': True, 'pid': pid}
+    def is_alive(self, pid): return True
+    def return_code(self, pid): return None
+
+class Health:
+    def check(self, endpoint, **kwargs): return {'healthy': True, 'status': 'healthy', 'attempts': 1, 'pid_alive': True}
+
+def manifest(root):
+    d=root/'runtime/ai_services/implementations/open_webui'; d.mkdir(parents=True)
+    (d/'service.manifest.json').write_text(json.dumps({'service_id':'open_webui','display_name':'Open WebUI','service_type':'local_interface','local_only':True,'host_policy':{'bind':'127.0.0.1','allow_public_bind':False},'default_endpoint':'http://127.0.0.1:8080','ports':[8080],'paths':{},'operations':{'status':{'api_template':'GET /'},'start':{'command_template':'python -m http.server 8080'},'stop':{'command_template':'stop'},'load_model':{'command_template':'load {model}'}},'approval':{'start':{'required':True},'stop':{'required':True},'load_model':{'required':True}}}))
+
+def test_wp0520_ai_services_controls_use_canonical_handlers_and_block_unsupported(tmp_path):
+    manifest(tmp_path); rediscover(tmp_path)
+    runner=Runner(); health=Health()
+    refresh=execute_office_action('ai_services.refresh_local_inventory', root=tmp_path)
+    assert refresh['outcome']=='completed'
+    start=execute_office_action('ai_services.start', root=tmp_path, service_id='open_webui', runner=runner, health_checker=health)
+    assert start['outcome']=='completed'
+    assert runner.started
+    load=execute_office_action('ai_services.load_model', root=tmp_path, service_id='open_webui', model='qwen3.8b', runner=runner, health_checker=health)
+    assert load['outcome']=='completed'
+    unload=execute_office_action('ai_services.unload_model', root=tmp_path, service_id='open_webui', model='qwen3.8b')
+    assert unload['outcome']=='blocked'
+    inspect=execute_office_action('ai_services.inspect_state', root=tmp_path, service_id='open_webui')
+    assert inspect['outcome']=='completed'
+    route=execute_office_action('ai_services.launch_local_interface', root=tmp_path, service_id='open_webui')
+    assert route['outcome']=='completed'
+    assert (tmp_path/'runtime/ai_services/local_interface_routes.jsonl').exists()
+
+def test_wp0520_search_and_palette_only_registered_safe_actions(tmp_path):
+    (tmp_path/'collaboration/work_packages/pending').mkdir(parents=True)
+    (tmp_path/'collaboration/work_packages/pending/WP-9999_Search_Target.md').write_text('# Search Target\nOffice artifact')
+    palette=build_global_palette(tmp_path)
+    assert any(c['id']=='ai_services.start' for c in palette['commands'])
+    result=search_global_palette('Search Target', tmp_path, refresh=False)
+    assert result['matches'][0]['action']['operation']=='open_artifact'
+    assert result['matches'][0]['action']['target'].endswith('WP-9999_Search_Target.md')
+    safe=execute_registered_command('ai_services.start')
+    assert safe['ok'] and safe['operation']=='office_action'
+    unsafe=execute_registered_command('shell.rm-rf')
+    assert not unsafe['ok']

@@ -16,6 +16,9 @@ from estate.core.production_readiness_validation import generate_production_read
 from estate.core.work_package_validation import validate_work_package
 from estate.core.assignment_queue import generate_assignment_queue, find_work_package, update_work_package_control
 from estate.core.mailbox_index import generate_mailbox_index
+from estate.ai_services.discovery import rediscover as ai_services_rediscover
+from estate.ai_services.control import request as ai_services_request, status as ai_services_status
+from estate.ai_services.execution import load_state as ai_services_load_state
 from estate.core.operations_notification_center import generate_operations_notification_center, acknowledge_operations_notification
 from estate.core.alfred_duty import run_alfred_duty
 from estate.core.daily_board_integration import generate_daily_board_integration
@@ -104,10 +107,60 @@ def _blocked(action_id, label, tab, handler, reason, *, read=(), request_id: str
 
 def refresh_ai_services(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root)
+    registry = ai_services_rediscover(base, actor='office')
     board = generate_service_status_board(root=base, write=True)
-    created, ec_id = sync_ollama_providers()
-    msg = f"AI services refreshed locally; service board has {len(board.get('services') or [])} service rows and provider sync created {len(created)} provider(s). Estate change: {ec_id}."
-    return _completed('ai_services.refresh_local_inventory', 'Refresh local AI service inventory', 'ai-services-models', 'estate.core.service_status_board.generate_service_status_board + estate.core.provider_sync.sync_ollama_providers', msg, read=['data/registry/providers.json', 'data/registry/services.json'], written=['runtime/services/service_status_board.json', 'operations/services/service_status_board.md', 'data/registry/providers.json'], state=['local provider registry may be updated'])
+    msg = f"AI services rediscovered {registry.get('service_count', 0)} approved service(s); service board has {len(board.get('services') or [])} service rows."
+    return _completed('ai_services.refresh_local_inventory', 'Refresh local AI service inventory', 'ai-services-models', 'estate.ai_services.discovery.rediscover + estate.core.service_status_board.generate_service_status_board', msg, read=['runtime/ai_services/implementations', 'data/registry/providers.json', 'data/registry/services.json'], written=['runtime/ai_services/registry.json', 'runtime/ai_services/state.json', 'runtime/ai_services/audit_log.jsonl', 'runtime/services/service_status_board.json', 'operations/services/service_status_board.md'], state=['AI service registry refreshed'])
+
+def _ai_service_action(action_id: str, label: str, operation: str, root=None, service_id: str | None = None, model: str | None = None, approved_by: str | None = 'steward', dry_run: bool | str = False, **params: Any) -> OfficeActionResult:
+    if not service_id:
+        return _blocked(action_id, label, 'ai-services-models', 'estate.ai_services.control.request', 'service_id is required.', request_id=params.get('request_id'))
+    dry = str(dry_run).lower() == 'true' if isinstance(dry_run, str) else bool(dry_run)
+    payload = ai_services_request(operation, service_id, actor='office', approved_by=approved_by, root=_root(root), dry_run=dry, model=model, reason=params.get('reason'), runner=params.get('runner'), health_checker=params.get('health_checker'), health_timeout_seconds=float(params.get('health_timeout_seconds', 1)), health_interval_seconds=float(params.get('health_interval_seconds', 0.1)))
+    outcome = 'completed' if payload.get('result') in {'planned', 'executed'} else 'blocked' if payload.get('result') in {'requires_approval', 'failed'} else 'failed'
+    msg = f"AI service {operation} for {service_id} returned {payload.get('result')} / {payload.get('approval_state')}."
+    result = OfficeActionResult(action_id, label, params.get('request_id') or _request_id(), 'ai-services-models', outcome, msg, 'estate.ai_services.control.request', ['runtime/ai_services/registry.json', 'runtime/ai_services/state.json'], ['runtime/ai_services/state.json', 'runtime/ai_services/approvals.json', 'runtime/ai_services/audit_log.jsonl'], [f'ai service {operation} {payload.get("result")}'])
+    if outcome == 'blocked':
+        result.authority_gating_status = 'gated_or_missing_requirement'
+    return result
+
+def ai_service_start(root=None, **params: Any) -> OfficeActionResult:
+    return _ai_service_action('ai_services.start', 'Start AI service', 'start', root=root, **params)
+
+def ai_service_stop(root=None, **params: Any) -> OfficeActionResult:
+    return _ai_service_action('ai_services.stop', 'Stop AI service', 'stop', root=root, **params)
+
+def ai_service_restart(root=None, service_id: str | None = None, **params: Any) -> OfficeActionResult:
+    if not service_id:
+        return _blocked('ai_services.restart', 'Restart AI service', 'ai-services-models', 'estate.ai_services.control.request', 'service_id is required.', request_id=params.get('request_id'))
+    stop = ai_services_request('stop', service_id, actor='office', approved_by=params.get('approved_by') or 'steward', root=_root(root), dry_run=False, runner=params.get('runner'))
+    start = ai_services_request('start', service_id, actor='office', approved_by=params.get('approved_by') or 'steward', root=_root(root), dry_run=False, runner=params.get('runner'), health_checker=params.get('health_checker'), health_timeout_seconds=float(params.get('health_timeout_seconds', 1)), health_interval_seconds=float(params.get('health_interval_seconds', 0.1)))
+    outcome = 'completed' if start.get('result') in {'executed', 'planned'} else 'blocked'
+    return OfficeActionResult('ai_services.restart', 'Restart AI service', params.get('request_id') or _request_id(), 'ai-services-models', outcome, f"Stop returned {stop.get('result')}; start returned {start.get('result')}.", 'estate.ai_services.control.request', ['runtime/ai_services/registry.json', 'runtime/ai_services/state.json'], ['runtime/ai_services/state.json', 'runtime/ai_services/audit_log.jsonl'], ['AI service restart attempted through canonical control plane'])
+
+def ai_model_load(root=None, **params: Any) -> OfficeActionResult:
+    return _ai_service_action('ai_services.load_model', 'Load supported model', 'load_model', root=root, **params)
+
+def ai_model_unload(root=None, **params: Any) -> OfficeActionResult:
+    return _ai_service_action('ai_services.unload_model', 'Unload supported model', 'unload_model', root=root, **params)
+
+def ai_service_inspect(root=None, service_id: str | None = None, **params: Any) -> OfficeActionResult:
+    st = ai_services_status(_root(root))
+    services = st.get('registry', {}).get('services', [])
+    if service_id and not any(s.get('service_id') == service_id for s in services):
+        return _blocked('ai_services.inspect_state', 'Inspect service logs/readiness/provider state', 'ai-services-models', 'estate.ai_services.control.status', f'Unknown service: {service_id}.', request_id=params.get('request_id'))
+    rel='runtime/ai_services/last_inspection.json'; path=_root(root)/rel; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(st, indent=2, sort_keys=True)+'\n', encoding='utf-8')
+    return _completed('ai_services.inspect_state', 'Inspect service logs/readiness/provider state', 'ai-services-models', 'estate.ai_services.control.status', f"Inspection captured {len(services)} service(s).", read=['runtime/ai_services/registry.json','runtime/ai_services/state.json','runtime/ai_services/audit_log.jsonl'], written=[rel], state=['AI service inspection evidence refreshed'], request_id=params.get('request_id'))
+
+def ai_service_launch_interface(root=None, service_id: str | None = None, **params: Any) -> OfficeActionResult:
+    st = ai_services_status(_root(root)); svc = next((s for s in st.get('registry', {}).get('services', []) if s.get('service_id') == service_id), None)
+    if not svc:
+        return _blocked('ai_services.launch_local_interface', 'Launch approved local interface route', 'ai-services-models', 'estate.ai_services.control.status', 'service_id must identify a registered local interface such as open_webui.', request_id=params.get('request_id'))
+    endpoint = svc.get('default_endpoint')
+    if not endpoint or not str(endpoint).startswith(('http://127.0.0.1', 'http://localhost', 'http://[::1]')):
+        return _blocked('ai_services.launch_local_interface', 'Launch approved local interface route', 'ai-services-models', 'estate.ai_services.control.status', f'Interface endpoint is not approved loopback: {endpoint}.', request_id=params.get('request_id'))
+    rel='runtime/ai_services/local_interface_routes.jsonl'; path=_root(root)/rel; path.parent.mkdir(parents=True, exist_ok=True); path.open('a', encoding='utf-8').write(json.dumps({'service_id':service_id,'endpoint':endpoint,'timestamp':datetime.now(timezone.utc).isoformat(timespec='seconds'),'request_id':params.get('request_id') or _request_id()}, sort_keys=True)+'\n')
+    return _completed('ai_services.launch_local_interface', 'Launch approved local interface route', 'ai-services-models', 'estate.ai_services.control.status', f'Approved local interface route prepared for {service_id}: {endpoint}.', read=['runtime/ai_services/registry.json'], written=[rel], state=['local interface route evidence recorded'], request_id=params.get('request_id'))
 
 def run_production_readiness(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); payload = generate_production_readiness_report(root=base, write=True)
@@ -638,6 +691,13 @@ def mailbox_inspect_failures(root=None, **params: Any) -> OfficeActionResult:
 HANDLERS: dict[str, Callable[..., OfficeActionResult]] = {f.__name__: f for f in []}
 HANDLERS.update({
  'ai_services.refresh_local_inventory': refresh_ai_services,
+ 'ai_services.start': ai_service_start,
+ 'ai_services.stop': ai_service_stop,
+ 'ai_services.restart': ai_service_restart,
+ 'ai_services.load_model': ai_model_load,
+ 'ai_services.unload_model': ai_model_unload,
+ 'ai_services.inspect_state': ai_service_inspect,
+ 'ai_services.launch_local_interface': ai_service_launch_interface,
  'validation.run_production_readiness': run_production_readiness,
  'validation.refresh_center': validation_refresh_center,
  'validation.request': validation_request,
@@ -736,6 +796,13 @@ ACTION_CONTROLS = [
  {'action_id':'settings.export','label':'Export settings','target_tab':'settings','handler':'settings_export','availability':'available'},
  {'action_id':'settings.import','label':'Import settings','target_tab':'settings','handler':'settings_import','availability':'available','requires_input':'settings_json'},
  {'action_id':'ai_services.refresh_local_inventory','label':'Refresh local AI service inventory','target_tab':'ai-services-models','handler':'refresh_ai_services','availability':'available'},
+ {'action_id':'ai_services.start','label':'Start AI service','target_tab':'ai-services-models','handler':'ai_service_start','availability':'available','requires_input':'service_id,approved_by','note':'Starts only registered services through estate.ai_services.control.request.'},
+ {'action_id':'ai_services.stop','label':'Stop AI service','target_tab':'ai-services-models','handler':'ai_service_stop','availability':'available','requires_input':'service_id,approved_by','note':'Stops only tracked registered service processes.'},
+ {'action_id':'ai_services.restart','label':'Restart AI service','target_tab':'ai-services-models','handler':'ai_service_restart','availability':'available','requires_input':'service_id,approved_by','note':'Composes canonical stop then start; unsupported steps are reported truthfully.'},
+ {'action_id':'ai_services.load_model','label':'Load supported model','target_tab':'ai-services-models','handler':'ai_model_load','availability':'available','requires_input':'service_id,model,approved_by','note':'Loads only model names accepted by the registered manifest/policy.'},
+ {'action_id':'ai_services.unload_model','label':'Unload supported model','target_tab':'ai-services-models','handler':'ai_model_unload','availability':'available','requires_input':'service_id,model,approved_by','note':'Blocked unless the manifest declares unload_model.'},
+ {'action_id':'ai_services.inspect_state','label':'Inspect logs/readiness/provider state','target_tab':'ai-services-models','handler':'ai_service_inspect','availability':'available','requires_input':'service_id'},
+ {'action_id':'ai_services.launch_local_interface','label':'Open local interface route','target_tab':'ai-services-models','handler':'ai_service_launch_interface','availability':'available','requires_input':'service_id','note':'Routes only registered loopback interfaces such as Open WebUI.'},
  {'action_id':'validation.refresh_center','label':'Refresh validation/audit center','target_tab':'validation','handler':'validation_refresh_center','availability':'available','requires_input':'result,package,date_from,date_to,owner,attention_state','note':'Inspects pending, running, completed, and failed validation/audit/verdict artifacts without granting acceptance.'},
  {'action_id':'validation.request','label':'Request validation/revalidation','target_tab':'validation','handler':'validation_request','availability':'available','requires_input':'work_package_id,revalidate','note':'Delegates to canonical work-package validation and optional production-readiness refresh.'},
  {'action_id':'validation.acknowledge_failure','label':'Acknowledge failure attention','target_tab':'validation','handler':'validation_acknowledge_failure','availability':'available','requires_input':'artifact_id,acknowledged_by,reason','note':'Local durable acknowledgement only; source evidence remains unchanged.'},
@@ -778,7 +845,7 @@ ACTION_CONTROLS = [
  {'action_id':'operational_activity.open_artifact','label':'Open related artifact','target_tab':'operational-activity','handler':'open_operational_artifact','availability':'available','requires_input':'artifact_path'},
  {'action_id':'operational_activity.filter','label':'Filter operational activity','target_tab':'operational-activity','handler':'filter_operational_activity','availability':'available','requires_input':'state,owner,priority,attention_required'},
  {'action_id':'operations_control.run_provider','label':'Run provider','target_tab':'operational-activity','availability':'gated','disabled_reason':'Provider execution is intentionally outside the Office traffic-controller panel.'},
- {'action_id':'ai_services.start_stop_load','label':'Start/stop/load AI service','target_tab':'ai-services-models','availability':'gated','disabled_reason':'Process-control approval workflow is not implemented for Office controls; use existing governed service approval path first.'},
+ {'action_id':'ai_services.start_stop_load','label':'Legacy combined AI service control','target_tab':'ai-services-models','availability':'gated','disabled_reason':'Legacy approval workflow control is replaced by registered granular controls: ai_services.start, stop, restart, load_model, unload_model, inspect_state, or launch_local_interface.'},
 ]
 
 def controls_for_tab(tab: str) -> list[dict[str, Any]]:
