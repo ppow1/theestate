@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.research_office.v1",
+  "title": "Estate Research Office Records v1",
+  "type": "object",
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {"const": "estate.research_office.v1"},
+    "request_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "finding_id": {"type": "string"},
+    "recommendation_id": {"type": "string"},
+    "monitoring_id": {"type": "string"},
+    "publication_date": {"type": ["string", "null"]},
+    "retrieval_date": {"type": "string"},
+    "provenance": {"type": "string"},
+    "quality_rating": {"enum": ["primary", "secondary", "tertiary", "vendor", "community", "unknown"]},
+    "confidence": {"enum": ["low", "medium", "high"]},
+    "citation_links": {"type": "array", "items": {"type": "string"}},
+    "conflicting_source_ids": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

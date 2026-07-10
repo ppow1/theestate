@@ -142,6 +142,7 @@ from estate.core.character_continuity import create_cycle as continuity_create_c
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 from estate.cli.institutional_learning import run as run_institutional_learning_cli
 from estate.core.personal_journals import PersonalJournalStore
+from estate.core.research_office import ResearchOfficeRuntime, format_summary as format_research_summary
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -151,6 +152,37 @@ def _repo_path(rel):
 
 
 
+
+
+def cmd_research_office(args):
+    rt = ResearchOfficeRuntime(root=getattr(args, "root", None))
+    action = args.research_office_action
+    if action == "request-create":
+        payload = rt.create_request(args.title, args.question, args.requested_by, scope=args.scope, tags=args.tag or [])
+    elif action == "source-intake":
+        payload = rt.intake_source(args.request_id, args.title, args.source_type, args.locator, args.summary, publication_date=args.publication_date, retrieval_date=args.retrieval_date, provenance=args.provenance, quality_rating=args.quality_rating, confidence=args.confidence, citation=args.citation, content_hash=args.content_hash)
+    elif action == "finding-record":
+        payload = rt.record_finding(args.request_id, args.statement, args.source_id or [], claim_type=args.claim_type, confidence=args.confidence, conflicting_source_ids=args.conflicting_source_id or [], inference=args.inference, stale_after_days=args.stale_after_days)
+    elif action == "recommend":
+        payload = rt.recommend(args.request_id, args.recommendation, args.finding_id or [], args.rationale)
+    elif action == "monitor-create":
+        payload = rt.create_monitor(args.request_id, args.topic, args.cadence, args.source_query or [])
+    elif action == "review":
+        payload = rt.review()
+    elif action == "status":
+        payload = rt.review()
+        if not args.json:
+            print(format_research_summary(payload)); return
+    elif action == "inspect-source":
+        payload = rt.inspect_source(args.source_id)
+    elif action == "report":
+        text = rt.report_markdown()
+        out = Path(args.output) if args.output else rt.root / "operations/validation/reports/WP-4015_research_office_runtime.md"
+        out.parent.mkdir(parents=True, exist_ok=True); out.write_text(text, encoding="utf-8")
+        payload = {"report_path": str(out), "summary": rt.review()}
+    else:
+        raise SystemExit(f"unknown research office action: {action}")
+    print(json.dumps(payload, indent=2, sort_keys=True) if args.json else payload)
 
 def cmd_personal_journal(args):
     store = PersonalJournalStore(root=getattr(args, "root", None))
@@ -3608,6 +3640,19 @@ def main(argv=None):
     h.add_argument("--auto-admit", action="store_true")
     h.add_argument("--max-audit-requests", type=int, default=1)
     h.set_defaults(func=cmd_operations_runtime)
+
+
+    p = sub.add_parser("research-office", help="Manage local external research evidence and monitoring records")
+    ro = p.add_subparsers(dest="research_office_action", required=True)
+    q = ro.add_parser("request-create"); q.add_argument("--title", required=True); q.add_argument("--question", required=True); q.add_argument("--requested-by", required=True); q.add_argument("--scope", default="external_research"); q.add_argument("--tag", action="append"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    q = ro.add_parser("source-intake"); q.add_argument("--request-id", required=True); q.add_argument("--title", required=True); q.add_argument("--source-type", required=True, choices=["web", "uploaded_document", "technical_paper", "product_finding", "manual_evidence"]); q.add_argument("--locator", required=True); q.add_argument("--summary", required=True); q.add_argument("--publication-date"); q.add_argument("--retrieval-date"); q.add_argument("--provenance", default="manual_intake"); q.add_argument("--quality-rating", default="unknown", choices=["primary", "secondary", "tertiary", "vendor", "community", "unknown"]); q.add_argument("--confidence", default="medium", choices=["low", "medium", "high"]); q.add_argument("--citation"); q.add_argument("--content-hash"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    q = ro.add_parser("finding-record"); q.add_argument("--request-id", required=True); q.add_argument("--statement", required=True); q.add_argument("--source-id", action="append"); q.add_argument("--claim-type", default="evidence"); q.add_argument("--confidence", default="medium", choices=["low", "medium", "high"]); q.add_argument("--conflicting-source-id", action="append"); q.add_argument("--inference"); q.add_argument("--stale-after-days", type=int, default=180); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    q = ro.add_parser("recommend"); q.add_argument("--request-id", required=True); q.add_argument("--recommendation", required=True); q.add_argument("--finding-id", action="append"); q.add_argument("--rationale", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    q = ro.add_parser("monitor-create"); q.add_argument("--request-id", required=True); q.add_argument("--topic", required=True); q.add_argument("--cadence", required=True); q.add_argument("--source-query", action="append"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    for name in ["review", "status"]:
+        q = ro.add_parser(name); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    q = ro.add_parser("inspect-source"); q.add_argument("--source-id", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+    q = ro.add_parser("report"); q.add_argument("--output"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
 
     p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
     p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")
