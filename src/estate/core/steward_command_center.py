@@ -29,6 +29,9 @@ from estate.core.office_operational_activity import load_office_operational_acti
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
 from estate.core.background_operations_runtime import load_background_operations_status
 from estate.core.operations_runtime import load_operations_runtime_status
+from estate.core.operations_runtime_host import OperationsRuntimeHost
+from estate.core.operations_scheduler_runtime import OperationsSchedulerRuntime
+from estate.core.operational_watch_runtime import OperationalWatchRuntime
 from estate.core.post_merge_audit_processor import load_post_merge_audit_processor_status
 from estate.core.merge_discovery import MergeDiscovery
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
@@ -981,6 +984,51 @@ def _build_steward_recall_operations(root):
     available = True
     return {"available": available, "path": "runtime/audit/recall_audit_log.json; runtime/notifications/notification_router_report.json", "kind": "steward_recall_operations", "placeholder": None, "data": {"summary": {"recall_count": len(recall_list), "active_recall_count": active_count, "missing_source_count": len(missing_sources)}, "recalls": recall_list, "missing_sources": missing_sources, "sources": {name: _source_status(artifact) for name, artifact in sources.items()}, "constraints": {"does_not_send_recalls": True, "does_not_approve_recalls": True, "does_not_bypass_alfred": True}}}
 
+
+def _operations_control_surface_panel(root):
+    def safe(call, fallback):
+        try:
+            return call()
+        except Exception as exc:
+            return {**fallback, "error": f"{type(exc).__name__}: {exc}"}
+    host = safe(lambda: OperationsRuntimeHost(root=root).status(), {"host_state": "unavailable"})
+    runtime = safe(lambda: load_operations_runtime_status(root), {"summary": {}})
+    scheduler = safe(lambda: OperationsSchedulerRuntime(root).list(), {"jobs": []})
+    watches = safe(lambda: OperationalWatchRuntime(root).list(), {"watches": [], "summary": {}})
+    audit = safe(lambda: load_post_merge_audit_processor_status(root), {})
+    discovery = safe(lambda: MergeDiscovery(root).status(), {})
+    bg = safe(lambda: load_background_operations_status(root), {})
+    summary = runtime.get("summary") or {}
+    constraints = {"does_not_grant_final_acceptance": True, "traffic_controller_constraints_preserved": True, "provider_execution_performed": False}
+    return {
+        "available": True,
+        "path": "runtime/operations_runtime/status/latest.json; runtime/operations_scheduler/status.json; runtime/background_operations/watch_state.json",
+        "kind": "operations_control_surface",
+        "data": {
+            "host": host,
+            "runtime": runtime,
+            "scheduler": scheduler,
+            "watches": watches,
+            "post_merge_audit": audit,
+            "merge_discovery": discovery,
+            "background_operations": bg,
+            "summary": {
+                "host_state": host.get("host_state"),
+                "heartbeat_age_seconds": host.get("heartbeat_age_seconds"),
+                "active_cycle": summary.get("last_cycle_id"),
+                "latest_verdict": summary.get("latest_audit_verdict"),
+                "fault": host.get("blocking_fault") or (summary.get("runtime_warnings") or [None])[0],
+                "scheduled_jobs": len(scheduler.get("jobs") or []),
+                "enabled_watches": (watches.get("summary") or {}).get("enabled_watches", 0),
+                "admitted_audits": summary.get("admitted_candidates", 0),
+                "holds": summary.get("held_candidates", 0),
+            },
+            "constraints": constraints,
+        },
+        "constraints": constraints,
+    }
+
+
 def generate_command_center(root=None, write=True):
     root = _root(root)
     resident_cards = build_resident_cards(root)
@@ -991,6 +1039,7 @@ def generate_command_center(root=None, write=True):
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
+        "operations_control_surface": _operations_control_surface_panel(root),
         "execution_control": _execution_control_panel(root),
         "traffic_controller_panel": load_office_traffic_controller_panel(root),
         "orchestrator_intake_decisions": load_office_intake_decision_surface(root),
@@ -1880,6 +1929,29 @@ def _capability_dependency_visualization_html(artifact):
 
 
 
+
+def _operations_control_surface_html(panel):
+    data = (panel or {}).get("data") or {}
+    summary = data.get("summary") or {}
+    out = ["<div class='operations-control-surface'>"]
+    out.append("<h2>Operations Control Surface</h2><p>Real Office controls for the Operations Runtime, scheduler, watches, audit admission holds, evidence, and service health. All buttons dispatch to existing canonical handlers and preserve Traffic Controller constraints.</p>")
+    out.append("<div class='mailbox-kpis'>" + "".join(f"<span class='mailbox-kpi'><strong>{html.escape(label)}</strong><span>{html.escape(str(value))}</span></span>" for label, value in [("Host", summary.get("host_state")), ("Heartbeat age", summary.get("heartbeat_age_seconds")), ("Active/latest cycle", summary.get("active_cycle")), ("Jobs", summary.get("scheduled_jobs")), ("Enabled watches", summary.get("enabled_watches")), ("Admitted audits", summary.get("admitted_audits")), ("Holds", summary.get("holds")), ("Latest verdict", summary.get("latest_verdict")), ("Fault", summary.get("fault") or "none")]) + "</div>")
+    jobs = (data.get("scheduler") or {}).get("jobs") or []
+    out.append("<h3>Scheduled jobs</h3><table><thead><tr><th>Job</th><th>State</th><th>Controls</th></tr></thead><tbody>")
+    for job in jobs[:20]:
+        jid = html.escape(str(job.get('job_id')), quote=True); st = job.get('state') or {}
+        out.append(f"<tr><td>{html.escape(str(job.get('job_id')))}<br><span class='source'>{html.escape(str(job.get('description')))}</span></td><td>enabled={html.escape(str(st.get('enabled')))}<br>next={html.escape(str(st.get('next_run_at')))}<br>last={html.escape(str(st.get('last_run_status')))}</td><td><button data-office-action='operations_surface.scheduler_control' data-scheduler-action='enable' data-job-id='{jid}'>Enable</button> <button data-office-action='operations_surface.scheduler_control' data-scheduler-action='disable' data-job-id='{jid}'>Disable</button></td></tr>")
+    out.append("</tbody></table>")
+    watches = (data.get("watches") or {}).get("watches") or []
+    out.append("<h3>Operational watches</h3><table><thead><tr><th>Watch</th><th>State</th><th>Controls</th></tr></thead><tbody>")
+    for watch in watches[:20]:
+        wid = html.escape(str(watch.get('watch_id')), quote=True)
+        out.append(f"<tr><td>{html.escape(str(watch.get('watch_id')))}<br><span class='source'>{html.escape(str(watch.get('description') or watch.get('target')))}</span></td><td>enabled={html.escape(str(watch.get('enabled')))} paused={html.escape(str(watch.get('paused')))} cadence={html.escape(str(watch.get('effective_cadence_seconds')))}</td><td><button data-office-action='operations_surface.watch_control' data-watch-action='enable' data-watch-id='{wid}'>Enable</button> <button data-office-action='operations_surface.watch_control' data-watch-action='disable' data-watch-id='{wid}'>Disable</button> <button data-office-action='operations_surface.watch_control' data-watch-action='evaluate' data-watch-id='{wid}'>Evaluate</button></td></tr>")
+    out.append("</tbody></table>")
+    out.append("<h3>Latest evidence</h3><pre>" + html.escape(json.dumps({"runtime": data.get("runtime"), "post_merge_audit": data.get("post_merge_audit"), "merge_discovery": data.get("merge_discovery")}, indent=2, sort_keys=True)[:4000]) + "</pre>")
+    out.append("<p class='source'>Sources: " + html.escape(str((panel or {}).get('path') or '')) + ". Constraints: " + html.escape(json.dumps(data.get('constraints') or {}, sort_keys=True)) + "</p></div>")
+    return "".join(out)
+
 def _traffic_controller_html(artifact):
     data = artifact or {}
     summary = data.get("summary") or {}
@@ -2394,7 +2466,7 @@ def render_command_center_html(payload):
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
-        ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
+        ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _operations_control_surface_html(p.get("operations_control_surface", {})) + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
         ("execution-control", "Execution Control", _office_action_controls_html(payload, "execution-control") + _execution_control_html(p.get("execution_control", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),

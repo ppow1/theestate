@@ -23,6 +23,11 @@ from estate.core.mission_control_workspace import build_mission_control_workspac
 from estate.core.morning_briefing import generate_morning_briefing
 from estate.core.orchestrator_intake_decisions import OrchestratorIntakeDecisionRuntime
 from estate.core.operations_control_runtime import OperationsControlRuntime
+from estate.core.operations_runtime_service import OperationsRuntimeService
+from estate.core.operations_runtime_host import OperationsRuntimeHost
+from estate.core.operations_scheduler_runtime import OperationsSchedulerRuntime
+from estate.core.operational_watch_runtime import OperationalWatchRuntime
+from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.core.operations_manager import OperationsDecision
 from estate.core.execution_session_controller import ExecutionSessionController
 from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
@@ -350,6 +355,80 @@ def execution_result_report(root=None, dispatch_id: str | None = None, **params:
     return _completed('execution_result.report', label, 'execution-control', handler, f"Reconciliation report generated for {dispatch_id}.", read=[_rel(base, rec_path)], written=[_rel(base, report)])
 
 
+
+def operations_host_control(root=None, host_action: str | None = None, **params: Any) -> OfficeActionResult:
+    action = str(host_action or params.get('action') or '').strip()
+    label = 'Operations Runtime host control'; handler = 'estate.core.operations_runtime_host.OperationsRuntimeHost'
+    if action not in {'start', 'stop', 'restart', 'status'}:
+        return _blocked('operations_surface.host_control', label, 'operational-activity', handler, 'host_action must be one of start, stop, restart, or status.', request_id=params.get('request_id'))
+    base = _root(root); host = OperationsRuntimeHost(root=base)
+    payload = getattr(host, action)()
+    outcome = 'failed' if payload.get('state') == 'failed' else 'completed'
+    return OfficeActionResult('operations_surface.host_control', label, _request_id(params), 'operational-activity', outcome, f"Operations Runtime host {action} returned state={payload.get('state') or payload.get('host_state') or 'recorded'}.", f'{handler}.{action}', ['runtime/operations_runtime/status/latest.json'], ['runtime/operations_runtime/status/latest.json', 'runtime/operations_runtime/heartbeat.json'], [f'operations runtime host {action} requested'], 'traffic_controller_constraints_preserved')
+
+
+def operations_scheduler_control(root=None, scheduler_action: str | None = None, job_id: str | None = None, event_name: str | None = None, **params: Any) -> OfficeActionResult:
+    action = str(scheduler_action or params.get('action') or '').strip()
+    label = 'Operations Scheduler job control'; handler = 'estate.core.operations_scheduler_runtime.OperationsSchedulerRuntime'
+    base = _root(root); runtime = OperationsSchedulerRuntime(base)
+    if action == 'enable':
+        if not job_id: return _blocked('operations_surface.scheduler_control', label, 'operational-activity', handler + '.enable', 'job_id is required.', request_id=params.get('request_id'))
+        payload = runtime.enable(str(job_id)); h = handler + '.enable'; msg = f"Scheduler job {job_id} enabled={payload.get('state',{}).get('enabled')}."
+    elif action == 'disable':
+        if not job_id: return _blocked('operations_surface.scheduler_control', label, 'operational-activity', handler + '.disable', 'job_id is required.', request_id=params.get('request_id'))
+        payload = runtime.disable(str(job_id)); h = handler + '.disable'; msg = f"Scheduler job {job_id} enabled={payload.get('state',{}).get('enabled')}."
+    elif action == 'trigger':
+        if not event_name: return _blocked('operations_surface.scheduler_control', label, 'operational-activity', handler + '.trigger', 'event_name is required.', request_id=params.get('request_id'))
+        payload = runtime.trigger(str(event_name)); h = handler + '.trigger'; msg = f"Scheduler event {event_name} woke {payload.get('jobs_woken', 0)} job(s)."
+    else:
+        return _blocked('operations_surface.scheduler_control', label, 'operational-activity', handler, 'scheduler_action must be enable, disable, or trigger.', request_id=params.get('request_id'))
+    return _completed('operations_surface.scheduler_control', label, 'operational-activity', h, msg, read=['runtime/operations_scheduler/state.json'], written=['runtime/operations_scheduler/state.json', 'runtime/operations_scheduler/status.json'], state=['operations scheduler state persisted'], request_id=params.get('request_id'))
+
+
+def operations_watch_control(root=None, watch_action: str | None = None, watch_id: str | None = None, **params: Any) -> OfficeActionResult:
+    action = str(watch_action or params.get('action') or '').strip()
+    label = 'Operational Watch control'; handler = 'estate.core.operational_watch_runtime.OperationalWatchRuntime'
+    if action not in {'enable', 'disable', 'pause', 'evaluate'}:
+        return _blocked('operations_surface.watch_control', label, 'operational-activity', handler, 'watch_action must be enable, disable, pause, or evaluate.', request_id=params.get('request_id'))
+    if not watch_id:
+        return _blocked('operations_surface.watch_control', label, 'operational-activity', handler, 'watch_id is required.', request_id=params.get('request_id'))
+    base = _root(root); runtime = OperationalWatchRuntime(base)
+    if action == 'enable': payload = runtime.set_enabled(str(watch_id), True); h = handler + '.set_enabled'
+    elif action == 'disable': payload = runtime.set_enabled(str(watch_id), False); h = handler + '.set_enabled'
+    elif action == 'pause': payload = runtime.pause(str(watch_id)); h = handler + '.pause'
+    else: payload = runtime.evaluate(str(watch_id), dry_run=True); h = handler + '.evaluate'
+    return _completed('operations_surface.watch_control', label, 'operational-activity', h, f"Watch {watch_id} {action} completed; enabled={payload.get('enabled')}.", read=['runtime/background_operations/watch_state.json'], written=['runtime/background_operations/watch_state.json', 'runtime/background_operations/watches.json'], state=['operational watch state persisted or inspected'], request_id=params.get('request_id'))
+
+
+def operations_cycle_control(root=None, dry_run: Any = None, mode: str = 'observe-only', max_audit_requests: Any = 1, **params: Any) -> OfficeActionResult:
+    label = 'Trigger one bounded Operations Runtime cycle'; handler = 'estate.core.operations_runtime_service.OperationsRuntimeService.run_once'
+    base = _root(root)
+    payload = OperationsRuntimeService(base).run_once(dry_run=_truthy(dry_run), mode=str(mode or 'observe-only'), max_audit_requests=int(max_audit_requests or 1))
+    outcome = 'failed' if payload.get('runtime_state') == 'failed' or payload.get('errors') else 'completed'
+    return OfficeActionResult('operations_surface.trigger_cycle', label, _request_id(params), 'operational-activity', outcome, f"Bounded cycle {payload.get('cycle_id')} finished state={payload.get('runtime_state')} errors={len(payload.get('errors') or [])}.", handler, ['runtime/operations_runtime/status/latest.json'], ['runtime/operations_runtime/status/latest.json', 'runtime/operations_runtime/cycles'], ['one bounded operations runtime cycle completed'], 'traffic_controller_constraints_preserved')
+
+
+def operations_hold_control(root=None, hold_action: str | None = None, work_package: str | None = None, target: str = 'estate-main', **params: Any) -> OfficeActionResult:
+    action = str(hold_action or params.get('action') or '').strip()
+    label = 'Merge discovery audit hold control'; handler = 'estate.core.merge_discovery_runtime.MergeDiscoveryRuntime'
+    if action not in {'hold', 'release'}:
+        return _blocked('operations_surface.hold_control', label, 'operational-activity', handler, 'hold_action must be hold or release.', request_id=params.get('request_id'))
+    if not work_package:
+        return _blocked('operations_surface.hold_control', label, 'operational-activity', handler, 'work_package is required.', request_id=params.get('request_id'))
+    runtime = MergeDiscoveryRuntime(_root(root)); payload = getattr(runtime, action)(target=target, work_package=work_package)
+    return _completed('operations_surface.hold_control', label, 'operational-activity', f'{handler}.{action}', f"Hold action {action} recorded for {work_package}; status={payload.get('status') or payload.get('state') or 'recorded'}.", read=['runtime/merge_discovery'], written=['runtime/merge_discovery'], state=['merge discovery admission hold state persisted'], request_id=params.get('request_id'))
+
+
+def operations_inspect_evidence(root=None, evidence_path: str | None = None, **params: Any) -> OfficeActionResult:
+    label = 'Inspect operations evidence'; handler = 'pathlib.Path.read_text'
+    if not evidence_path:
+        return _blocked('operations_surface.inspect_evidence', label, 'operational-activity', handler, 'evidence_path is required.', request_id=params.get('request_id'))
+    base = _root(root); path = (base / evidence_path).resolve(); root_resolved = base.resolve()
+    if not str(path).startswith(str(root_resolved)) or not path.exists() or not path.is_file():
+        return _blocked('operations_surface.inspect_evidence', label, 'operational-activity', handler, 'Evidence path must be an existing file under the Estate root.', read=[str(evidence_path)], request_id=params.get('request_id'))
+    sample = path.read_text(encoding='utf-8', errors='replace')[:500]
+    return _completed('operations_surface.inspect_evidence', label, 'operational-activity', handler, f"Evidence {evidence_path} is readable ({path.stat().st_size} bytes): {sample}", read=[evidence_path], request_id=params.get('request_id'))
+
 def _planning_result(action_id: str, label: str, tab: str, handler: str, payload, request_id: str | None = None) -> OfficeActionResult:
     return OfficeActionResult(action_id, label, request_id or _request_id(), tab, payload.outcome, payload.message, handler, payload.artifacts_read, payload.artifacts_written, payload.runtime_state_changed, 'safe_local_action' if payload.outcome == 'completed' else 'gated_or_missing_requirement')
 
@@ -428,6 +507,12 @@ HANDLERS.update({
  'daily_board.generate_morning_briefing': generate_daily_briefing,
  'orchestrator_intake.record_decision': record_orchestrator_intake_decision,
  'operations_control.record_decision': record_operations_control_decision,
+ 'operations_surface.inspect_evidence': operations_inspect_evidence,
+ 'operations_surface.hold_control': operations_hold_control,
+ 'operations_surface.trigger_cycle': operations_cycle_control,
+ 'operations_surface.watch_control': operations_watch_control,
+ 'operations_surface.scheduler_control': operations_scheduler_control,
+ 'operations_surface.host_control': operations_host_control,
  'operational_activity.refresh': refresh_operational_activity,
  'operational_activity.acknowledge_attention': acknowledge_operational_activity,
  'operational_activity.route_to_workspace': route_operational_activity,
@@ -498,6 +583,12 @@ ACTION_CONTROLS = [
  {'action_id':'alfred.request_briefing','label':'Request Alfred briefing','target_tab':'alfred','handler':'request_alfred_briefing','availability':'available'},
  {'action_id':'mission_control.refresh_payload','label':'Refresh Mission Control payload','target_tab':'mission-control','handler':'refresh_mission_control','availability':'available'},
  {'action_id':'daily_board.generate_morning_briefing','label':'Generate morning briefing','target_tab':'daily-board','handler':'generate_daily_briefing','availability':'available'},
+ {'action_id':'operations_surface.host_control','label':'Start/stop/restart Operations Runtime host','target_tab':'operational-activity','handler':'operations_host_control','availability':'available','requires_input':'host_action','note':'Actions: start, stop, restart, status. Delegates to OperationsRuntimeHost; no provider execution.'},
+ {'action_id':'operations_surface.scheduler_control','label':'Enable/disable scheduler job or trigger event','target_tab':'operational-activity','handler':'operations_scheduler_control','availability':'available','requires_input':'scheduler_action,job_id,event_name','note':'Actions: enable, disable, trigger. State persists in operations scheduler artifacts.'},
+ {'action_id':'operations_surface.watch_control','label':'Enable/disable/evaluate operational watch','target_tab':'operational-activity','handler':'operations_watch_control','availability':'available','requires_input':'watch_action,watch_id','note':'Actions: enable, disable, pause, evaluate. Evaluate is dry-run evidence inspection.'},
+ {'action_id':'operations_surface.trigger_cycle','label':'Trigger one bounded operations cycle','target_tab':'operational-activity','handler':'operations_cycle_control','availability':'available','requires_input':'dry_run,mode,max_audit_requests','note':'Runs one existing OperationsRuntimeService cycle; does not bypass Traffic Controller constraints.'},
+ {'action_id':'operations_surface.hold_control','label':'Place/release audit admission hold','target_tab':'operational-activity','handler':'operations_hold_control','availability':'available','requires_input':'hold_action,work_package,target','note':'Actions: hold, release. Delegates to merge discovery admission runtime.'},
+ {'action_id':'operations_surface.inspect_evidence','label':'Inspect operations evidence','target_tab':'operational-activity','handler':'operations_inspect_evidence','availability':'available','requires_input':'evidence_path','note':'Reads an existing evidence file under the Estate root and returns truthful status.'},
  {'action_id':'orchestrator_intake.record_decision','label':'Record Orchestrator intake decision','target_tab':'operational-activity','handler':'record_orchestrator_intake_decision','availability':'available','requires_input':'intake_id,decision,decided_by','note':'Records a durable decision artifact; does not schedule or execute work.'},
  {'action_id':'operations_control.record_decision','label':'Record operations-control decision','target_tab':'operational-activity','handler':'record_operations_control_decision','availability':'available','requires_input':'decision_type,target_type,decided_by','note':'Writes an operations-control decision artifact; does not execute providers.'},
  {'action_id':'operational_activity.refresh','label':'Refresh operational activity','target_tab':'operational-activity','handler':'refresh_operational_activity','availability':'available'},
