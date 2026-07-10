@@ -231,13 +231,21 @@ def cmd_merge_discovery(args):
     action = args.merge_discovery_action
     target = getattr(args, "target", "estate-main")
     if action == "scan":
-        payload = runtime.scan(target=target, max_commits=getattr(args, "max_commits", 100))
+        payload = runtime.scan(target=target, max_commits=getattr(args, "max_commits", 100), backfill_mode=getattr(args, "backfill_mode", "quarantine"), max_requests_per_cycle=getattr(args, "max_requests_per_cycle", 5))
     elif action == "replay":
         payload = runtime.replay(target=target, max_commits=getattr(args, "max_commits", 50))
     elif action == "status":
         payload = runtime.status(target=target)
     elif action == "candidates":
         payload = runtime.candidates(target=target)
+    elif action == "consolidate":
+        payload = runtime.consolidate(target=target, mode=getattr(args, "backfill_mode", "quarantine"), max_requests_per_cycle=getattr(args, "max_requests_per_cycle", 5))
+    elif action == "quarantine-status":
+        payload = runtime.quarantine_status(target=target)
+    elif action == "admit":
+        payload = runtime.admit(target=target, work_package=args.work_package)
+    elif action == "reconcile-requests":
+        payload = runtime.reconcile_requests(target=target)
     else:
         raise SystemExit(1)
     print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
@@ -3089,12 +3097,19 @@ def main(argv=None):
 
     p = sub.add_parser("merge-discovery", help="Discover local merges/promotions and create post-merge audit requests")
     md = p.add_subparsers(dest="merge_discovery_action", required=True)
-    for name in ["scan", "status", "candidates", "replay"]:
+    for name in ["scan", "status", "candidates", "replay", "consolidate", "quarantine-status", "reconcile-requests"]:
         q = md.add_parser(name)
         q.add_argument("--target", default="estate-main")
         q.add_argument("--max-commits", type=int, default=50 if name == "replay" else 100)
+        q.add_argument("--backfill-mode", choices=["observe","quarantine","admit"], default="quarantine")
+        q.add_argument("--max-requests-per-cycle", type=int, default=5)
         q.add_argument("--json", action="store_true")
         q.set_defaults(func=cmd_merge_discovery)
+    q = md.add_parser("admit")
+    q.add_argument("--target", default="estate-main")
+    q.add_argument("--work-package", required=True)
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_merge_discovery)
 
     p = sub.add_parser("post-merge-audit", help="Process pending automatic post-merge audit requests")
     pma = p.add_subparsers(dest="post_merge_audit_action", required=True)
