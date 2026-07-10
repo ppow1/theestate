@@ -98,6 +98,7 @@ from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
+from estate.core.resident_gateway import serve as serve_resident_gateway, gateway_status
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 from estate.core.planning_provider import PlanningProviderRequest
 from estate.core.planning_provider_registry import default_planning_provider_registry
@@ -676,6 +677,17 @@ def cmd_resident_chat(args):
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
         print(json.dumps(payload, indent=2, sort_keys=True))
+
+def cmd_resident_gateway(args):
+    if args.gateway_action == "start":
+        try:
+            serve_resident_gateway(host=args.host, port=args.port)
+        except OSError as exc:
+            print(json.dumps({"ok": False, "error": "port_unavailable", "detail": str(exc)}, indent=2, sort_keys=True))
+            raise SystemExit(1)
+    elif args.gateway_action == "status":
+        payload = gateway_status(host=args.host, port=args.port)
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
 
 def cmd_resident_interaction_surface(args):
     payload = resident_surface(args.resident)
@@ -3005,6 +3017,18 @@ def main(argv=None):
     p.add_argument("--include-forgotten", action="store_true", help="Include forgotten/redacted content placeholders in history")
     p.add_argument("--json", action="store_true", help="Print resident chat JSON")
     p.set_defaults(func=cmd_resident_chat)
+
+    p = sub.add_parser("resident-gateway", help="Start or inspect the local OpenAI-compatible resident gateway")
+    rg = p.add_subparsers(dest="gateway_action", required=True)
+    q = rg.add_parser("start", help="Start local resident gateway")
+    q.add_argument("--host", default="127.0.0.1")
+    q.add_argument("--port", type=int, default=11435)
+    q.set_defaults(func=cmd_resident_gateway)
+    q = rg.add_parser("status", help="Show local resident gateway status")
+    q.add_argument("--host", default="127.0.0.1")
+    q.add_argument("--port", type=int, default=11435)
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_resident_gateway)
 
     p = sub.add_parser("resident-interaction-surface", help="Inspect resident API/surface")
     p.add_argument("--resident", required=True, help="Resident id or name")

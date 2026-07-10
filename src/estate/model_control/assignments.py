@@ -8,7 +8,7 @@ DEFAULTS={'fallback_text_model':None,'preferred_text_model':None,'preferred_code
 
 def rootp(root=None): return Path(root) if root is not None else Path.cwd()
 def default_assignments():
-    return {'version':'estate-model-assignments-v1','updated_at':now(),'estate_defaults':dict(DEFAULTS),'residents':{'alfred':{'text':'estate_default','vision':None,'fallback_text':'estate_default'}},'workers':{},'authority':{'residents':{'alfred':['text','vision']},'workers':{},'requires_steward_approval':True}}
+    return {'version':'estate-model-assignments-v1','updated_at':now(),'estate_defaults':dict(DEFAULTS),'residents':{'alfred':{'text':'estate_default','vision':None,'fallback_text':'estate_default'},'helen':{'text':'estate_default','vision':None,'fallback_text':'estate_default'}},'workers':{},'authority':{'residents':{'alfred':['text','vision'],'helen':['text']},'workers':{},'requires_steward_approval':True}}
 
 def load_assignments(root=None):
     p=rootp(root)/ASSIGNMENTS_PATH
