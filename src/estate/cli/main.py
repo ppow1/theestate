@@ -141,6 +141,7 @@ from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.core.character_continuity import create_cycle as continuity_create_cycle, prepare_reflection as continuity_prepare_reflection, create_continuity as continuity_create_artifact, start_next_cycle as continuity_start_next_cycle, status as continuity_status
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 from estate.cli.institutional_learning import run as run_institutional_learning_cli
+from estate.core.personal_journals import PersonalJournalStore
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -149,6 +150,30 @@ def _repo_path(rel):
 
 
 
+
+
+def cmd_personal_journal(args):
+    store = PersonalJournalStore(root=getattr(args, "root", None))
+    action = args.personal_journal_action
+    if action == "create":
+        payload = store.create_entry(args.owner, args.author, args.body, entry_type=args.entry_type, title=args.title, classification=args.classification, readers=args.reader or [], writers=args.writer or [])
+    elif action == "list":
+        payload = store.list_entries(args.owner, args.actor)
+    elif action == "read":
+        payload = store.read_entry(args.owner, args.entry_id, args.actor)
+    elif action == "redact":
+        payload = store.redact_entry(args.owner, args.entry_id, args.actor, args.reason, replacement=args.replacement)
+    elif action == "archive":
+        payload = store.archive_entry(args.owner, args.entry_id, args.actor, args.reason)
+    elif action == "export":
+        payload = store.export_entries(args.owner, args.actor, scope=args.scope, entry_ids=args.entry_id or [], include_body=args.include_body)
+    elif action == "summary-approve":
+        payload = store.approve_summary(args.owner, args.entry_id, args.actor, args.summary)
+    elif action == "status":
+        payload = store.privacy_safe_status()
+    else:
+        raise SystemExit(f"unknown personal-journal action: {action}")
+    print(json.dumps(payload, indent=2, sort_keys=True) if args.json else payload)
 
 def cmd_grace_operations(args):
     runtime = GraceOperationsRuntime()
@@ -3366,6 +3391,21 @@ def main(argv=None):
     p.add_argument("--json", action="store_true", help="Run local operational validation and print JSON")
     p.set_defaults(func=cmd_estate_validate_local)
 
+
+
+    p = sub.add_parser("personal-journal", help="Create and inspect protected local personal journals")
+    pj = p.add_subparsers(dest="personal_journal_action", required=True)
+    q = pj.add_parser("create")
+    q.add_argument("--owner", required=True); q.add_argument("--author", required=True); q.add_argument("--body", required=True)
+    q.add_argument("--title", default=""); q.add_argument("--entry-type", default="reflection", choices=["reflection", "cheat_sheet", "working_note"]); q.add_argument("--classification", default="Steward Only")
+    q.add_argument("--reader", action="append"); q.add_argument("--writer", action="append"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("list"); q.add_argument("--owner", required=True); q.add_argument("--actor", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("read"); q.add_argument("--owner", required=True); q.add_argument("--entry-id", required=True); q.add_argument("--actor", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("redact"); q.add_argument("--owner", required=True); q.add_argument("--entry-id", required=True); q.add_argument("--actor", required=True); q.add_argument("--reason", required=True); q.add_argument("--replacement", default="[redacted]"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("archive"); q.add_argument("--owner", required=True); q.add_argument("--entry-id", required=True); q.add_argument("--actor", required=True); q.add_argument("--reason", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("export"); q.add_argument("--owner", required=True); q.add_argument("--actor", required=True); q.add_argument("--scope", default="summaries", choices=["summaries", "evidence"]); q.add_argument("--entry-id", action="append"); q.add_argument("--include-body", action="store_true"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("summary-approve"); q.add_argument("--owner", required=True); q.add_argument("--entry-id", required=True); q.add_argument("--actor", required=True); q.add_argument("--summary", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
+    q = pj.add_parser("status"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_personal_journal)
 
     p = sub.add_parser("helen-readiness", help="Generate Helen operational readiness and Grace hiring gate JSON")
     p.add_argument("--root")

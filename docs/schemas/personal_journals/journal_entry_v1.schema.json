@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.personal_journal_entry.v1",
+  "title": "Protected Personal Journal Entry v1",
+  "type": "object",
+  "required": ["schema_version", "entry_id", "owner_id", "author", "classification", "body", "governance"],
+  "properties": {
+    "schema_version": {"const": "estate.personal_journal_entry.v1"},
+    "entry_id": {"type": "string"},
+    "owner_id": {"type": "string"},
+    "entry_type": {"enum": ["reflection", "cheat_sheet", "working_note"]},
+    "classification": {"enum": ["Restricted", "Steward Only", "Local Only", "Estate Internal"]},
+    "body": {"type": "string"},
+    "readers": {"type": "array", "items": {"type": "string"}},
+    "writers": {"type": "array", "items": {"type": "string"}},
+    "governance": {"type": "object", "required": ["private_working_memory", "institutional_truth", "public_surface_allowed", "cloud_storage_allowed"]}
+  }
+}

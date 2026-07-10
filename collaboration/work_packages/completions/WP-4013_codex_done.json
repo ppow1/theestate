@@ -1,0 +1,13 @@
+{
+  "work_package_id": "WP-4013",
+  "status": "complete",
+  "implemented_by": "Codex",
+  "artifacts": [
+    "src/estate/core/personal_journals.py",
+    "docs/schemas/personal_journals/journal_entry_v1.schema.json",
+    "docs/schemas/personal_journals/journal_summary_v1.schema.json",
+    "tests/test_personal_journals.py",
+    "operations/validation/reports/WP-4013_worker_personal_journals.md"
+  ],
+  "privacy_boundary": "Raw journal bodies remain protected local working memory; approved summaries are distinct and public/operational surfaces receive metadata only."
+}
