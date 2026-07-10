@@ -5,6 +5,7 @@ The host owns process/autostart concerns only. It delegates all runtime work to
 """
 from __future__ import annotations
 
+import ctypes
 import json
 import os
 import signal
@@ -60,18 +61,47 @@ def _read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _pid_alive(pid: int) -> bool:
+def _windows_pid_liveness(pid: int) -> str:
+    """Return ``alive``, ``dead``, or ``unknown`` for a Windows process id."""
     if pid <= 0:
-        return False
+        return "dead"
+    try:
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        process_query_limited_information = 0x1000
+        handle = kernel32.OpenProcess(process_query_limited_information, False, int(pid))
+        if not handle:
+            error = ctypes.get_last_error()
+            return "dead" if error == 87 else "unknown"
+        try:
+            exit_code = ctypes.c_ulong()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return "unknown"
+            still_active = 259
+            return "alive" if exit_code.value == still_active else "dead"
+        finally:
+            kernel32.CloseHandle(handle)
+    except Exception:
+        return "unknown"
+
+
+def _pid_liveness(pid: int) -> str:
+    if pid <= 0:
+        return "dead"
+    if os.name == "nt":
+        return _windows_pid_liveness(pid)
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
-        return False
+        return "dead"
     except PermissionError:
-        return True
+        return "alive"
     except OSError:
-        return False
-    return True
+        return "unknown"
+    return "alive"
+
+
+def _pid_alive(pid: int) -> bool:
+    return _pid_liveness(pid) == "alive"
 
 
 def _iso_age_seconds(value: str | None) -> float | None:
@@ -105,12 +135,9 @@ class OperationsRuntimeHost:
     def _ensure_state_dir(self) -> None:
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
-    def _lock_stale(self, payload: dict[str, Any]) -> bool:
+    def _lock_recoverable(self, payload: dict[str, Any]) -> bool:
         pid = int(payload.get("pid") or 0)
-        if pid and not _pid_alive(pid):
-            return True
-        age = _iso_age_seconds(payload.get("heartbeat_at") or payload.get("acquired_at"))
-        return age is not None and age > STALE_LOCK_SECONDS
+        return _pid_liveness(pid) == "dead"
 
     def acquire_lock(self) -> dict[str, Any]:
         self._ensure_state_dir()
@@ -121,7 +148,7 @@ class OperationsRuntimeHost:
                 _write_json(self.lock_path, payload)
                 _write_json(self.pid_path, payload)
                 return payload
-            if not self._lock_stale(payload):
+            if not self._lock_recoverable(payload):
                 raise OperationsRuntimeHostError(f"operations runtime host already running as pid {payload.get('pid', 'unknown')}")
             self.lock_path.unlink()
         payload = {"pid": os.getpid(), "root": str(self.root), "acquired_at": utc_now_iso(), "heartbeat_at": utc_now_iso(), "state": "running"}
@@ -178,7 +205,7 @@ class OperationsRuntimeHost:
         self._ensure_state_dir()
         if self.lock_path.exists():
             payload = _read_json(self.lock_path)
-            if not self._lock_stale(payload):
+            if not self._lock_recoverable(payload):
                 raise OperationsRuntimeHostError(f"operations runtime host already running as pid {payload.get('pid', 'unknown')}")
             self.lock_path.unlink()
         env = os.environ.copy()
