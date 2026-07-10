@@ -2485,7 +2485,7 @@ def render_command_center_html(payload):
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
         ("work-packages", "Work Packages", _office_action_controls_html(payload, "work-packages") + _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
-        ("mailboxes", "Mailbox Summary / Operations Center", _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
+        ("mailboxes", "Mailbox Summary / Operations Center", _office_action_controls_html(payload, "mailboxes") + _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("personnel", "Personnel Directory / Org Chart", _office_action_controls_html(payload, "personnel") + _office_personnel_directory_html(p.get("office_personnel_directory", {}))),
         ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
         ("notifications", "Operations Center Notification Center", _office_action_controls_html(payload, "notifications") + _operations_notification_center_html(p.get("operations_notification_center", {}))),
