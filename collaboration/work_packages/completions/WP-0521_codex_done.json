@@ -1,0 +1,15 @@
+{
+  "institutional_acceptance_granted": false,
+  "outputs": [
+    "runtime/steward/office_end_to_end_regression.json",
+    "runtime/steward/office_operational_readiness.json",
+    "operations/steward/office_operational_readiness.md",
+    "runtime/steward/office_remaining_defects.json"
+  ],
+  "parallel_office_created": false,
+  "provider_router_created": false,
+  "ready_for_ca_review": true,
+  "status": "completed",
+  "validation_recipe_registered": true,
+  "work_package_id": "WP-0521"
+}

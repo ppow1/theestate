@@ -1,0 +1,461 @@
+{
+  "browser_checks": {
+    "canonical_panels_rendered": true,
+    "duplicate_submit_protection_present": true,
+    "enter_to_send_chat_present": true,
+    "malformed_response_recovery_present": true,
+    "targeted_refresh_recovery_present": true
+  },
+  "files_written": [
+    "runtime/steward/office_end_to_end_regression.json",
+    "runtime/steward/office_operational_readiness.json",
+    "runtime/steward/office_remaining_defects.json",
+    "collaboration/work_packages/completions/WP-0521_codex_done.json",
+    "operations/steward/office_operational_readiness.md"
+  ],
+  "generated_at": "2026-07-10T19:33:56+00:00",
+  "isolated_root": ".",
+  "passed": true,
+  "primary_workflows": [
+    {
+      "action": "settings.save_apply",
+      "expect_persistence": true,
+      "params": {
+        "settings_json": "{\"workspace\": {\"default_active_tab\": \"settings\"}}"
+      },
+      "passed": true,
+      "request_id": "wp0521-primary-01",
+      "result": {
+        "action_id": "settings.save_apply",
+        "action_label": "Save and apply settings",
+        "artifacts_read": [
+          "runtime/steward/operations_center_settings.json"
+        ],
+        "artifacts_written": [
+          "runtime/steward/operations_center_settings.json"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-01",
+        "runtime_state_changed": [
+          "settings persisted",
+          "office payload configuration changed"
+        ],
+        "source_handler": "estate.core.operations_center_settings.save_settings_document",
+        "steward_message": "Settings saved atomically and will be applied by the refreshed Office payload.",
+        "target_tab": "settings",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "settings"
+    },
+    {
+      "action": "execution_session.status",
+      "params": {
+        "session_id": "wp0521-session"
+      },
+      "passed": true,
+      "request_id": "wp0521-primary-02",
+      "result": {
+        "action_id": "execution_session.status",
+        "action_label": "Refresh execution-session status",
+        "artifacts_read": [
+          "runtime/execution_adapters/sessions/wp0521-session.json"
+        ],
+        "artifacts_written": [],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-02",
+        "runtime_state_changed": [],
+        "source_handler": "estate.core.execution_session_controller.ExecutionSessionController.status",
+        "steward_message": "Session wp0521-session state=previewed stage=provider_execution_preview_or_start.",
+        "target_tab": "execution-control",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "execution-session"
+    },
+    {
+      "action": "parking_lot.control",
+      "expect_persistence": true,
+      "params": {
+        "idea": "Office regression recovery",
+        "item_id": "PL-0521",
+        "planning_action": "create",
+        "priority": "High"
+      },
+      "passed": true,
+      "request_id": "wp0521-primary-03",
+      "result": {
+        "action_id": "parking_lot.control",
+        "action_label": "Parking Lot item control",
+        "artifacts_read": [
+          "operations/boards/parking_lot.md"
+        ],
+        "artifacts_written": [
+          "operations/boards/parking_lot.md",
+          "runtime/steward/planning_control_surface_last_change.json",
+          "runtime/steward/planning_control_surface_events.jsonl"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-03",
+        "runtime_state_changed": [
+          "planning artifact updated",
+          "office targeted refresh requested"
+        ],
+        "source_handler": "estate.core.office_parking_lot_controls.parking_action",
+        "steward_message": "Created PL-0030",
+        "target_tab": "parking",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "parking-lot"
+    },
+    {
+      "action": "personnel.refresh",
+      "passed": true,
+      "request_id": "wp0521-primary-04",
+      "result": {
+        "action_id": "personnel.refresh",
+        "action_label": "Refresh Personnel",
+        "artifacts_read": [
+          "data/registry/personnel.json",
+          "data/registry/mailboxes.json",
+          "collaboration/work_packages",
+          "collaboration/messages"
+        ],
+        "artifacts_written": [
+          "runtime/steward/office_personnel_directory.json"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-04",
+        "runtime_state_changed": [
+          "office personnel payload refreshed"
+        ],
+        "source_handler": "estate.core.office_personnel_directory.refresh_personnel_directory",
+        "steward_message": "Personnel refreshed: valid=13, malformed=0, duplicates=0, orphans=0, cycles=0, added=0, changed=0, removed=0.",
+        "target_tab": "personnel",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "personnel"
+    },
+    {
+      "action": "alfred.request_briefing",
+      "expect_persistence": true,
+      "passed": true,
+      "request_id": "wp0521-primary-05",
+      "result": {
+        "action_id": "alfred.request_briefing",
+        "action_label": "Request Alfred briefing",
+        "artifacts_read": [],
+        "artifacts_written": [
+          "runtime/alfred/duty_state.json",
+          "runtime/alfred/duty_runs.jsonl",
+          "operations/alfred/duty_summary.md",
+          "runtime/residents/presence.json"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-05",
+        "runtime_state_changed": [
+          "Alfred local duty status refreshed"
+        ],
+        "source_handler": "estate.core.alfred_duty.run_alfred_duty",
+        "steward_message": "Alfred duty briefing generated locally. Alfred did not approve or execute privileged actions.",
+        "target_tab": "alfred",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "alfred"
+    },
+    {
+      "action": "mission_control.refresh_payload",
+      "passed": true,
+      "request_id": "wp0521-primary-06",
+      "result": {
+        "action_id": "mission_control.refresh_payload",
+        "action_label": "Refresh Mission Control payload",
+        "artifacts_read": [],
+        "artifacts_written": [
+          "runtime/steward/mission_control_workspace.json"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-06",
+        "runtime_state_changed": [
+          "mission control runtime payload refreshed"
+        ],
+        "source_handler": "estate.core.mission_control_workspace.build_mission_control_workspace",
+        "steward_message": "Mission Control payload refreshed from local artifacts.",
+        "target_tab": "mission-control",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "mission-control"
+    },
+    {
+      "action": "work_packages.refresh_assignment_queue",
+      "passed": true,
+      "request_id": "wp0521-primary-07",
+      "result": {
+        "action_id": "work_packages.refresh_assignment_queue",
+        "action_label": "Refresh assignment queue",
+        "artifacts_read": [
+          "collaboration/work_packages"
+        ],
+        "artifacts_written": [
+          "runtime/work_packages/assignment_queue.json",
+          "operations/work_packages/assignment_queue.md"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-07",
+        "runtime_state_changed": [
+          "work package pipeline refreshed"
+        ],
+        "source_handler": "estate.core.assignment_queue.generate_assignment_queue",
+        "steward_message": "Assignment queue refreshed with 255 work package(s).",
+        "target_tab": "work-packages",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "work-packages"
+    },
+    {
+      "action": "validation.refresh_center",
+      "passed": true,
+      "request_id": "wp0521-primary-08",
+      "result": {
+        "action_id": "validation.refresh_center",
+        "action_label": "Refresh validation/audit control center",
+        "artifacts_read": [],
+        "artifacts_written": [
+          "runtime/validation/office_validation_control_center.json"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-08",
+        "runtime_state_changed": [
+          "validation Office payload refreshed"
+        ],
+        "source_handler": "estate.core.office_validation_actions.inspect_validation_control_center",
+        "steward_message": "Validation/audit center refreshed with 280 row(s). Evidence is not institutional acceptance.",
+        "target_tab": "validation",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "validation-audit"
+    },
+    {
+      "action": "notifications.refresh_center",
+      "passed": true,
+      "request_id": "wp0521-primary-09",
+      "result": {
+        "action_id": "notifications.refresh_center",
+        "action_label": "Refresh notification center",
+        "artifacts_read": [],
+        "artifacts_written": [
+          "runtime/notifications/operations_notification_center.json",
+          "operations/notifications/operations_notification_center.md"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-09",
+        "runtime_state_changed": [
+          "notification center refreshed"
+        ],
+        "source_handler": "estate.core.operations_notification_center.generate_operations_notification_center",
+        "steward_message": "Notification center refreshed with 100 visible notification(s).",
+        "target_tab": "notifications",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "mailbox-notifications"
+    },
+    {
+      "action": "ai_services.refresh_local_inventory",
+      "passed": true,
+      "request_id": "wp0521-primary-10",
+      "result": {
+        "action_id": "ai_services.refresh_local_inventory",
+        "action_label": "Refresh local AI service inventory",
+        "artifacts_read": [
+          "runtime/ai_services/implementations",
+          "data/registry/providers.json",
+          "data/registry/services.json"
+        ],
+        "artifacts_written": [
+          "runtime/ai_services/registry.json",
+          "runtime/ai_services/state.json",
+          "runtime/ai_services/audit_log.jsonl",
+          "runtime/services/service_status_board.json",
+          "operations/services/service_status_board.md"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-10",
+        "runtime_state_changed": [
+          "AI service registry refreshed"
+        ],
+        "source_handler": "estate.ai_services.discovery.rediscover + estate.core.service_status_board.generate_service_status_board",
+        "steward_message": "AI services rediscovered 5 approved service(s); service board has 10 service rows.",
+        "target_tab": "ai-services-models",
+        "timestamp": "2026-07-10T19:33:59+00:00"
+      },
+      "surface": "ai-services"
+    },
+    {
+      "action": "work_packages.filter",
+      "params": {
+        "query": "WP-0521"
+      },
+      "passed": true,
+      "request_id": "wp0521-primary-11",
+      "result": {
+        "action_id": "work_packages.filter",
+        "action_label": "Filter/search/sort work packages",
+        "artifacts_read": [
+          "runtime/work_packages/assignment_queue.json",
+          "collaboration/work_packages"
+        ],
+        "artifacts_written": [
+          "runtime/work_packages/last_filter_result.json"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-primary-11",
+        "runtime_state_changed": [
+          "work package filtered result recorded"
+        ],
+        "source_handler": "estate.core.assignment_queue.generate_assignment_queue",
+        "steward_message": "Filter completed with 1 match(es): WP-0521.",
+        "target_tab": "work-packages",
+        "timestamp": "2026-07-10T19:34:00+00:00"
+      },
+      "surface": "search-command"
+    }
+  ],
+  "recovery_workflows": [
+    {
+      "action": "not.registered",
+      "case": "malformed_or_unregistered_action",
+      "passed": true,
+      "request_id": "wp0521-recovery-01",
+      "result": {
+        "action_id": "not.registered",
+        "action_label": "not.registered",
+        "artifacts_read": [],
+        "artifacts_written": [],
+        "authority_gating_status": "gated_or_missing_requirement",
+        "diagnostics_path": null,
+        "outcome": "blocked",
+        "request_id": "wp0521-recovery-01",
+        "runtime_state_changed": [],
+        "source_handler": "office_command_surface.execute_office_action",
+        "steward_message": "No Office action is registered for not.registered.",
+        "target_tab": "unknown",
+        "timestamp": "2026-07-10T19:34:00+00:00"
+      }
+    },
+    {
+      "action": "ai_services.start",
+      "case": "handler_failure_truthful_diagnostic",
+      "params": {},
+      "passed": true,
+      "request_id": "wp0521-recovery-02",
+      "result": {
+        "action_id": "ai_services.start",
+        "action_label": "Start AI service",
+        "artifacts_read": [],
+        "artifacts_written": [],
+        "authority_gating_status": "gated_or_missing_requirement",
+        "diagnostics_path": null,
+        "outcome": "blocked",
+        "request_id": "wp0521-recovery-02",
+        "runtime_state_changed": [],
+        "source_handler": "estate.ai_services.control.request",
+        "steward_message": "service_id is required.",
+        "target_tab": "ai-services-models",
+        "timestamp": "2026-07-10T19:34:00+00:00"
+      }
+    },
+    {
+      "action": "execution_attempt.inspect_recovery",
+      "case": "stale_state_visible",
+      "passed": true,
+      "request_id": "wp0521-recovery-03",
+      "result": {
+        "action_id": "execution_attempt.inspect_recovery",
+        "action_label": "Inspect recovery state",
+        "artifacts_read": [],
+        "artifacts_written": [],
+        "authority_gating_status": "gated_or_missing_requirement",
+        "diagnostics_path": null,
+        "outcome": "blocked",
+        "request_id": "wp0521-recovery-03",
+        "runtime_state_changed": [],
+        "source_handler": "estate.core.execution_attempt_runtime.ExecutionAttemptRuntime.inspect_recovery",
+        "steward_message": "Required input missing: dispatch_id",
+        "target_tab": "execution-control",
+        "timestamp": "2026-07-10T19:34:00+00:00"
+      }
+    },
+    {
+      "action": "ai_services.inspect_state",
+      "case": "unavailable_local_service",
+      "params": {
+        "service_id": "missing-local-service"
+      },
+      "passed": true,
+      "request_id": "wp0521-recovery-04",
+      "result": {
+        "action_id": "ai_services.inspect_state",
+        "action_label": "Inspect service logs/readiness/provider state",
+        "artifacts_read": [],
+        "artifacts_written": [],
+        "authority_gating_status": "gated_or_missing_requirement",
+        "diagnostics_path": null,
+        "outcome": "blocked",
+        "request_id": "wp0521-recovery-04",
+        "runtime_state_changed": [],
+        "source_handler": "estate.ai_services.control.status",
+        "steward_message": "Unknown service: missing-local-service.",
+        "target_tab": "ai-services-models",
+        "timestamp": "2026-07-10T19:34:00+00:00"
+      }
+    },
+    {
+      "action": "notifications.refresh_center",
+      "case": "interrupted_or_duplicate_request",
+      "passed": true,
+      "request_id": "wp0521-duplicate-submit",
+      "result": {
+        "action_id": "notifications.refresh_center",
+        "action_label": "Refresh notification center",
+        "artifacts_read": [],
+        "artifacts_written": [
+          "runtime/notifications/operations_notification_center.json",
+          "operations/notifications/operations_notification_center.md"
+        ],
+        "authority_gating_status": "safe_local_action",
+        "diagnostics_path": null,
+        "outcome": "completed",
+        "request_id": "wp0521-duplicate-submit",
+        "runtime_state_changed": [
+          "notification center refreshed"
+        ],
+        "source_handler": "estate.core.operations_notification_center.generate_operations_notification_center",
+        "steward_message": "Notification center refreshed with 100 visible notification(s).",
+        "target_tab": "notifications",
+        "timestamp": "2026-07-10T19:34:00+00:00"
+      }
+    }
+  ],
+  "validation_status": "passed",
+  "work_package_id": "WP-0521"
+}

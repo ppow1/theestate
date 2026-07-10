@@ -1,0 +1,12 @@
+{
+  "defects": [
+    {
+      "id": "WP-0521-D1",
+      "priority": "low",
+      "summary": "Regression is deterministic HTTP/browser-contract evidence; no screenshot was required because no perceptible UI change was introduced.",
+      "surface": "browser-visual"
+    }
+  ],
+  "generated_at": "2026-07-10T19:33:56+00:00",
+  "work_package_id": "WP-0521"
+}

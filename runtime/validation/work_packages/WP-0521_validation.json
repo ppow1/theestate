@@ -1,0 +1,126 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m py_compile src/estate/core/office_end_to_end_regression.py src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py",
+      "completed_at": "2026-07-10T19:34:29+00:00",
+      "duration_seconds": 0.326,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-10T19:34:29+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_office_end_to_end_regression.py",
+      "completed_at": "2026-07-10T19:34:31+00:00",
+      "duration_seconds": 1.13,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-10T19:34:29+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0521_2026-07-10T193429Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"from pathlib import Path; paths=['runtime/steward/office_end_to_end_regression.json','runtime/steward/office_operational_readiness.json','operations/steward/office_operational_readiness.md','runtime/steward/office_remaining_defects.json','collaboration/work_packages/completions/WP-0521_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
+      "completed_at": "2026-07-10T19:34:31+00:00",
+      "duration_seconds": 0.069,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-10T19:34:31+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0521_codex_done.json').read_text()); r=json.loads(Path('runtime/steward/office_operational_readiness.json').read_text()); assert d['work_package_id']=='WP-0521'; assert d['institutional_acceptance_granted'] is False; assert r['institutional_acceptance_granted'] is False; assert d['parallel_office_created'] is False; assert d['provider_router_created'] is False; assert d['validation_recipe_registered'] is True\"",
+      "completed_at": "2026-07-10T19:34:31+00:00",
+      "duration_seconds": 0.08,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-10T19:34:31+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "python -m py_compile src/estate/core/office_end_to_end_regression.py src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py",
+    "pytest -q tests/test_office_end_to_end_regression.py",
+    "python -c \"from pathlib import Path; paths=['runtime/steward/office_end_to_end_regression.json','runtime/steward/office_operational_readiness.json','operations/steward/office_operational_readiness.md','runtime/steward/office_remaining_defects.json','collaboration/work_packages/completions/WP-0521_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\"",
+    "python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0521_codex_done.json').read_text()); r=json.loads(Path('runtime/steward/office_operational_readiness.json').read_text()); assert d['work_package_id']=='WP-0521'; assert d['institutional_acceptance_granted'] is False; assert r['institutional_acceptance_granted'] is False; assert d['parallel_office_created'] is False; assert d['provider_router_created'] is False; assert d['validation_recipe_registered'] is True\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0521_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0521_validation.md",
+    "runtime/validation/work_packages/WP-0521_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-10T19:34:29+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "69f2111b89932d395e7cbb38ff585425dea61ddb",
+  "production_readiness": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, codex_status, completed_at, branch, summary, files_changed, tests_run, known_limitations"
+    ],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [],
+    "production_ready": false,
+    "receipt_status": "incomplete",
+    "required_followups": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, codex_status, completed_at, branch, summary, files_changed, tests_run, known_limitations"
+    ]
+  },
+  "receipt_gaps": [
+    "pull_request_url_or_not_applicable_reason",
+    "merge_authority_or_equivalent",
+    "codex_status",
+    "completed_at",
+    "branch",
+    "summary",
+    "files_changed",
+    "tests_run",
+    "known_limitations"
+  ],
+  "receipt_validation": {
+    "blocking_reasons": [
+      "Completion artifact is missing required metadata: pull_request_url_or_not_applicable_reason, merge_authority_or_equivalent, codex_status, completed_at, branch, summary, files_changed, tests_run, known_limitations"
+    ],
+    "branch": null,
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0521_codex_done.json",
+    "non_blocking_findings": [],
+    "pr_metadata_status": "unavailable",
+    "pull_request_url": null,
+    "receipt_gaps": [
+      "pull_request_url_or_not_applicable_reason",
+      "merge_authority_or_equivalent",
+      "codex_status",
+      "completed_at",
+      "branch",
+      "summary",
+      "files_changed",
+      "tests_run",
+      "known_limitations"
+    ],
+    "receipt_status": "incomplete",
+    "work_package_id": "WP-0521"
+  },
+  "recipe_id": "wp-0521-office-end-to-end-regression-recovery-operational-acceptance",
+  "recipe_title": "WP-0521 \u2014 Office End-to-End Regression, Recovery, and Operational Acceptance",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 1 command(s).",
+  "validation_id": "WP-0521_2026-07-10T193429Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0521"
+}

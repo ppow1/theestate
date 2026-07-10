@@ -1,0 +1,12 @@
+{
+  "evidence": [
+    "runtime/steward/office_end_to_end_regression.json",
+    "runtime/validation/work_packages/WP-0521_validation.json"
+  ],
+  "generated_at": "2026-07-10T19:33:56+00:00",
+  "institutional_acceptance_granted": false,
+  "remaining_defect_count": 1,
+  "validation_status": "passed",
+  "verdict": "ready_for_chief_architect_and_steward_review",
+  "work_package_id": "WP-0521"
+}
