@@ -53,6 +53,23 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0513": {
+        "recipe_id": "wp-0513-parking-lot-roadmap-priority-control-surface",
+        "title": "WP-0513 — Parking Lot, Roadmap, and Priority Control Surface",
+        "description": "Validates canonical Office planning controls for Parking Lot and Roadmap artifacts.",
+        "required_checks": ["Focused planning controls tests pass", "Planning adapter compiles", "Office command surface compiles", "Documentation and receipt exist"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/office_parking_lot_controls.py", "tests/test_office_parking_lot_controls.py", "docs/integration/office_parking_lot_control_surface.md", "collaboration/work_packages/completions/WP-0513_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Promotion bypasses operations-control runtime", "Controls render as decorative-only"],
+        "success_criteria": ["Parking Lot and Roadmap mutations persist", "Order survives reload", "Undo restores prior local state", "Invalid promotions remain blocked"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/office_parking_lot_controls.py src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py"),
+            _cmd("pytest -q tests/test_office_parking_lot_controls.py"),
+            _cmd("python -c \"from pathlib import Path; paths=['docs/integration/office_parking_lot_control_surface.md','collaboration/work_packages/completions/WP-0513_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        ],
+    },
+
     "WP-0626": {
         "recipe_id": "wp-0626-cleanroom-post-merge-audit-service",
         "title": "WP-0626 — Cleanroom Post-Merge Audit Service",

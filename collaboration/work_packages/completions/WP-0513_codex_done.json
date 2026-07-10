@@ -1,0 +1,34 @@
+{
+  "work_package_id": "WP-0513",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T18:04:00+00:00",
+  "branch": "work",
+  "pull_request_url_or_not_applicable_reason": "Not applicable inside local Codex handoff; PR metadata will be recorded by make_pr tool.",
+  "merge_authority_or_equivalent": "Chief Architect review required before merge.",
+  "summary": [
+    "Added a canonical planning adapter for Parking Lot and Roadmap board mutations.",
+    "Registered Office action handlers and rendered item-adjacent controls.",
+    "Added focused tests, documentation, and a WP-0513 validation recipe."
+  ],
+  "files_changed": [
+    "src/estate/core/office_parking_lot_controls.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_office_parking_lot_controls.py",
+    "docs/integration/office_parking_lot_control_surface.md",
+    "collaboration/work_packages/completions/WP-0513_codex_done.json"
+  ],
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_office_parking_lot_controls.py",
+    "PYTHONPATH=src python - <<'PY'\nfrom estate.core.work_package_validation import validate_work_package\np=validate_work_package('WP-0513', write=True)\nprint(p['validation_status'])\nprint(p['validation_id'])\nPY"
+  ],
+  "known_limitations": [
+    "Drag-and-drop is represented by the canonical reorder handler and complete-order validation; browser drag gestures can be layered over the same action contract later.",
+    "Promotion is intentionally routed to operations-control decision evidence rather than creating or bypassing a work-package queue."
+  ],
+  "validation_recipe_status": "registered",
+  "provider_execution_performed": false,
+  "dispatch_execution_performed": false,
+  "ready_for_ca_review": true
+}
