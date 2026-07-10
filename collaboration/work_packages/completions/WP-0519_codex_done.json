@@ -1,0 +1,17 @@
+{
+  "work_package_id": "WP-0519",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T00:00:00+00:00",
+  "ready_for_ca_review": true,
+  "summary": "Mailbox, notification, and local attention controls were installed on the Office command surface using existing mailbox, Communication Bus, notification center, personnel, delivery, and acknowledgement mechanisms.",
+  "evidence": {
+    "implementation": [
+      "src/estate/core/office_mailbox_control.py",
+      "src/estate/core/office_command_surface.py",
+      "src/estate/core/steward_command_center.py"
+    ],
+    "tests": [
+      "tests/test_wp0519_mailbox_notifications_control.py"
+    ]
+  }
+}

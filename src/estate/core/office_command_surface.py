@@ -36,6 +36,9 @@ from estate.core.operations_center_settings import save_settings_document, reset
 from estate.core.office_parking_lot_controls import parking_action, roadmap_action, planning_undo, filter_items
 from estate.core.office_personnel_directory import refresh_personnel_directory, open_employee_detail, route_personnel_mailbox, route_personnel_conversation
 from estate.core.office_validation_actions import inspect_validation_control_center, request_validation, acknowledge_failure, automatic_validator_status, open_artifact as open_validation_artifact, governed_retry
+from estate.core.office_mailbox_control import refresh_mailbox_control_center, open_message_detail, mark_message_read_state, route_message, local_attention_acknowledge, inspect_delivery_failures
+from estate.core.collaboration_messages import acknowledge_message, create_reply
+from estate.core.office_personnel_directory import open_employee_detail as mailbox_open_employee_detail
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -581,6 +584,57 @@ def personnel_open_conversation(root=None, employee_id: str | None = None, **par
     route = payload.get('route') or {}
     return _completed('personnel.open_conversation', 'Open conversation', 'resident-conversations', 'estate.core.office_personnel_directory.route_personnel_conversation', f"Conversation route ready for employee {route.get('employee_id')} selected {route.get('selected')}.", read=payload.get('artifacts_read') or [], state=['conversation route selected'], request_id=params.get('request_id'))
 
+
+def mailbox_refresh(root=None, query: str = '', status: str = '', mailbox_id: str = '', sort: str = 'created_at', **params: Any) -> OfficeActionResult:
+    base = _root(root); payload = refresh_mailbox_control_center(base, query=query, status=status, mailbox_id=mailbox_id, sort=sort)
+    return _completed('mailboxes.refresh', 'Refresh mailbox and notification state', 'mailboxes', 'estate.core.office_mailbox_control.refresh_mailbox_control_center', f"Mailbox state refreshed with {(payload.get('summary') or {}).get('filtered_message_count', 0)} visible message(s).", written=['collaboration/mailboxes/index.json','runtime/notifications/operations_notification_center.json','runtime/steward/mailbox_control_center.json'], state=['mailbox and notification Office payload refreshed'], request_id=params.get('request_id'))
+
+def mailbox_open_message(root=None, message_id: str | None = None, **params: Any) -> OfficeActionResult:
+    if not message_id:
+        return _blocked('mailboxes.open_message', 'Open message details', 'mailboxes', 'estate.core.office_mailbox_control.open_message_detail', 'message_id is required.', request_id=params.get('request_id'))
+    payload = open_message_detail(message_id, _root(root))
+    return _completed('mailboxes.open_message', 'Open message details', 'mailboxes', 'estate.core.office_mailbox_control.open_message_detail', f"Message {payload.get('message_id')} opened from {payload.get('path')}.", read=[payload.get('path')], written=['runtime/steward/mailbox_control_center.json'], state=['selected message detail resolved'], request_id=params.get('request_id'))
+
+def mailbox_acknowledge(root=None, message_id: str | None = None, actor: str = 'Office', note: str = 'Acknowledged from Office.', **params: Any) -> OfficeActionResult:
+    if not message_id:
+        return _blocked('mailboxes.local_acknowledge', 'Acknowledge message locally', 'mailboxes', 'estate.core.collaboration_messages.acknowledge_message', 'message_id is required.', request_id=params.get('request_id'))
+    payload = acknowledge_message(message_id, actor=actor, note=note, root=_root(root)); refresh_mailbox_control_center(_root(root))
+    return _completed('mailboxes.local_acknowledge', 'Acknowledge message locally', 'mailboxes', 'estate.core.collaboration_messages.acknowledge_message', f"Message {message_id} acknowledged via canonical Communication Bus acknowledgement; source closure semantics remain message-local.", read=[payload.get('message_path')], written=[payload.get('message_path'), payload.get('acknowledgement_path'), 'collaboration/mailboxes/index.json','runtime/steward/mailbox_control_center.json'], state=['message acknowledgement persisted'], request_id=params.get('request_id'))
+
+def mailbox_mark_read(root=None, message_id: str | None = None, read_state: str = 'read', actor: str = 'Office', **params: Any) -> OfficeActionResult:
+    if not message_id:
+        return _blocked('mailboxes.mark_read_state', 'Mark message read/unread', 'mailboxes', 'estate.core.office_mailbox_control.mark_message_read_state', 'message_id is required.', request_id=params.get('request_id'))
+    mark_message_read_state(message_id, read_state, _root(root), actor=actor)
+    return _completed('mailboxes.mark_read_state', 'Mark message read/unread', 'mailboxes', 'estate.core.office_mailbox_control.mark_message_read_state', f"Message {message_id} marked {read_state} in durable Office read-state evidence.", read=['collaboration/messages'], written=['runtime/steward/mailbox_message_read_state.json','runtime/steward/mailbox_control_center.json'], state=['read/unread evidence persisted'], request_id=params.get('request_id'))
+
+def mailbox_reply(root=None, message_id: str | None = None, actor: str = 'Office', body: str = '', route_target: str | None = None, **params: Any) -> OfficeActionResult:
+    if not message_id:
+        return _blocked('mailboxes.reply_or_route', 'Reply or route message', 'mailboxes', 'estate.core.collaboration_messages.create_reply + estate.core.office_mailbox_control.route_message', 'message_id is required.', request_id=params.get('request_id'))
+    base=_root(root)
+    if body:
+        payload=create_reply(message_id, actor=actor, body=body, root=base); refresh_mailbox_control_center(base)
+        return _completed('mailboxes.reply_or_route', 'Reply or route message', 'mailboxes', 'estate.core.collaboration_messages.create_reply', f"Reply created for {message_id} through canonical Communication Bus.", written=[payload.get('reply_path'),'collaboration/mailboxes/index.json','runtime/steward/mailbox_control_center.json'], state=['reply persisted'], request_id=params.get('request_id'))
+    route=route_message(message_id, route_target or 'mailboxes', base, actor=actor)
+    return _completed('mailboxes.reply_or_route', 'Reply or route message', 'mailboxes', 'estate.core.office_mailbox_control.route_message', f"Route evidence recorded for {message_id} to {route.get('route_target')}.", written=['runtime/steward/mailbox_message_routes.jsonl','runtime/steward/mailbox_control_center.json'], state=['route evidence persisted'], request_id=params.get('request_id'))
+
+def mailbox_open_personnel(root=None, employee_id: str | None = None, **params: Any) -> OfficeActionResult:
+    if not employee_id:
+        return _blocked('mailboxes.open_personnel', 'Open sender/recipient personnel', 'mailboxes', 'estate.core.office_personnel_directory.open_employee_detail', 'employee_id is required.', request_id=params.get('request_id'))
+    payload=mailbox_open_employee_detail(employee_id, _root(root))
+    if payload.get('outcome') != 'completed':
+        return _blocked('mailboxes.open_personnel', 'Open sender/recipient personnel', 'mailboxes', 'estate.core.office_personnel_directory.open_employee_detail', payload.get('message') or 'Personnel not found.', request_id=params.get('request_id'))
+    return _completed('mailboxes.open_personnel', 'Open sender/recipient personnel', 'personnel', 'estate.core.office_personnel_directory.open_employee_detail', f"Personnel details opened for employee {employee_id}.", read=payload.get('artifacts_read') or [], state=['personnel detail route resolved'], request_id=params.get('request_id'))
+
+def mailbox_clear_attention(root=None, attention_id: str | None = None, actor: str = 'Office', reason: str = 'Resolved locally', **params: Any) -> OfficeActionResult:
+    if not attention_id:
+        return _blocked('attention.clear_local', 'Clear resolved local attention', 'notifications', 'estate.core.office_mailbox_control.local_attention_acknowledge', 'attention_id is required.', request_id=params.get('request_id'))
+    local_attention_acknowledge(attention_id, _root(root), actor=actor, reason=reason)
+    return _completed('attention.clear_local', 'Clear resolved local attention', 'notifications', 'estate.core.office_mailbox_control.local_attention_acknowledge', f"Attention {attention_id} cleared locally only; authoritative source closure was not changed.", written=['runtime/steward/local_attention_acknowledgements.json','runtime/steward/mailbox_control_center.json'], state=['local attention acknowledgement persisted'], request_id=params.get('request_id'))
+
+def mailbox_inspect_failures(root=None, **params: Any) -> OfficeActionResult:
+    payload=inspect_delivery_failures(_root(root))
+    return _completed('delivery.inspect_failures', 'Inspect delivery failures', 'notifications', 'estate.core.office_mailbox_control.inspect_delivery_failures', f"Delivery failure inspection found {payload.get('failure_count', 0)} actionable failure source(s).", read=payload.get('sources') or [], written=['runtime/steward/delivery_failure_inspection.json'], state=['delivery failure evidence inspected'], request_id=params.get('request_id'))
+
 HANDLERS: dict[str, Callable[..., OfficeActionResult]] = {f.__name__: f for f in []}
 HANDLERS.update({
  'ai_services.refresh_local_inventory': refresh_ai_services,
@@ -598,6 +652,15 @@ HANDLERS.update({
  'work_packages.promote': promote_work_package,
  'work_packages.open_artifact': open_work_package_artifact,
  'work_packages.filter': filter_work_packages,
+
+ 'mailboxes.refresh': mailbox_refresh,
+ 'mailboxes.open_message': mailbox_open_message,
+ 'mailboxes.local_acknowledge': mailbox_acknowledge,
+ 'mailboxes.mark_read_state': mailbox_mark_read,
+ 'mailboxes.reply_or_route': mailbox_reply,
+ 'mailboxes.open_personnel': mailbox_open_personnel,
+ 'attention.clear_local': mailbox_clear_attention,
+ 'delivery.inspect_failures': mailbox_inspect_failures,
  'notifications.refresh_center': refresh_notifications,
  'notifications.local_acknowledge': local_ack_notification,
  'alfred.request_briefing': request_alfred_briefing,
@@ -687,6 +750,15 @@ ACTION_CONTROLS = [
  {'action_id':'work_packages.promote','label':'Promote canonical state','target_tab':'work-packages','handler':'promote_work_package','availability':'available','requires_input':'work_package_id','note':'Advances pending → open → claimed → completed; blocked/completed packages are truthfully blocked.'},
  {'action_id':'work_packages.open_artifact','label':'Open source/evidence','target_tab':'work-packages','handler':'open_work_package_artifact','availability':'available','requires_input':'work_package_id,artifact_kind','note':'artifact_kind may be source, completion_receipt, validation, operations_validation, pr, or commit.'},
  {'action_id':'work_packages.filter','label':'Filter/search/sort','target_tab':'work-packages','handler':'filter_work_packages','availability':'available','requires_input':'query,state,priority,owner'},
+
+ {'action_id':'mailboxes.refresh','label':'Refresh mailbox/notification state','target_tab':'mailboxes','handler':'mailbox_refresh','availability':'available','requires_input':'query,status,mailbox_id,sort'},
+ {'action_id':'mailboxes.open_message','label':'Open message details','target_tab':'mailboxes','handler':'mailbox_open_message','availability':'available','requires_input':'message_id'},
+ {'action_id':'mailboxes.local_acknowledge','label':'Acknowledge message locally','target_tab':'mailboxes','handler':'mailbox_acknowledge','availability':'available','requires_input':'message_id,actor,note','note':'Uses canonical Communication Bus acknowledgement; not authoritative external closure.'},
+ {'action_id':'mailboxes.mark_read_state','label':'Mark read/unread','target_tab':'mailboxes','handler':'mailbox_mark_read','availability':'available','requires_input':'message_id,read_state'},
+ {'action_id':'mailboxes.reply_or_route','label':'Reply or route','target_tab':'mailboxes','handler':'mailbox_reply','availability':'available','requires_input':'message_id,body,route_target','note':'Replies use canonical collaboration messages; routes record local route evidence.'},
+ {'action_id':'mailboxes.open_personnel','label':'Open sender/recipient personnel','target_tab':'mailboxes','handler':'mailbox_open_personnel','availability':'available','requires_input':'employee_id'},
+ {'action_id':'attention.clear_local','label':'Clear resolved local attention','target_tab':'notifications','handler':'mailbox_clear_attention','availability':'available','requires_input':'attention_id,actor,reason','note':'Local acknowledgement only; source closure remains distinct.'},
+ {'action_id':'delivery.inspect_failures','label':'Inspect delivery failures','target_tab':'notifications','handler':'mailbox_inspect_failures','availability':'available'},
  {'action_id':'notifications.refresh_center','label':'Refresh notification center','target_tab':'notifications','handler':'refresh_notifications','availability':'available'},
  {'action_id':'notifications.local_acknowledge','label':'Acknowledge notification locally','target_tab':'notifications','handler':'local_ack_notification','availability':'available','requires_input':'notification_id','note':'Local state only; authoritative closure is unchanged.'},
  {'action_id':'alfred.request_briefing','label':'Request Alfred briefing','target_tab':'alfred','handler':'request_alfred_briefing','availability':'available'},
