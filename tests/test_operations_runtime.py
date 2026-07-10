@@ -54,6 +54,8 @@ def test_run_once_cycle_produces_heartbeat_and_status(tmp_path):
     assert status["summary"]["operations_runtime_available"] is True
     assert status["provider_execution_performed"] is False
     assert status["dispatch_execution_performed"] is False
+    assert "recovery_posture" in status["summary"]
+    assert "recovery_pending_actions" in status["summary"]
 
 
 def test_enabled_targets_evaluated_and_disabled_skipped(tmp_path):
