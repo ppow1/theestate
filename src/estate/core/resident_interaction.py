@@ -626,6 +626,38 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}
 
+
+def retry_failed_response(resident: str, session_id: str, turn_id: str, *, root=None) -> dict[str, Any]:
+    """Retry one failed resident turn by appending a new turn to the same session.
+
+    Successful turns are never duplicated: only turns whose response contract records
+    a local failure/degraded attempted generation are eligible.
+    """
+    rootp = _root(root)
+    path = _session_path(rootp, session_id)
+    data = _read_json(path)
+    if not isinstance(data, dict):
+        return {"ok": False, "error": "session_not_found", "session_id": session_id}
+    if _key(data.get("resident_id")) != _key(resident):
+        return {"ok": False, "error": "resident_session_mismatch", "session_id": session_id, "resident_id": data.get("resident_id")}
+    source = next((t for t in data.get("turns", []) if t.get("turn_id") == turn_id), None)
+    if not source:
+        return {"ok": False, "error": "turn_not_found", "session_id": session_id, "turn_id": turn_id}
+    contract = source.get("response_contract") or {}
+    eligible = bool(contract.get("failed") or contract.get("timed_out") or contract.get("status") == "failed")
+    if not eligible:
+        return {"ok": False, "error": "turn_not_failed", "session_id": session_id, "turn_id": turn_id, "duplicated_successful_turn": False}
+    payload = process_chat(
+        resident,
+        str(source.get("user_message") or ""),
+        session_id=session_id,
+        participant_role=str(source.get("participant_role") or "Steward"),
+        action=str((contract.get("intent") or "conversation")),
+        root=rootp,
+    )
+    payload["retry"] = {"retried_turn_id": turn_id, "duplicated_successful_turn": False, "retry_policy": "failed_turns_only_append_new_turn"}
+    return payload
+
 def load_history(resident=None, session_id=None, root=None, include_forgotten=False):
     rootp=_root(root); sessions=[]
     for p in sorted((rootp/CHAT_STORE).glob("*.json")):
