@@ -54,6 +54,42 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
 
+    "WP-0507": {
+        "recipe_id": "wp-0507-execution-attempt-lease-cancellation-recovery",
+        "title": "WP-0507 — Execution Attempt Lease, Cancellation, and Recovery",
+        "description": "Validates execution-attempt lease, cancellation, recovery, CLI, documentation, and receipt without live provider calls.",
+        "required_checks": [
+            "Attempt module, tests, documentation, and receipt exist",
+            "Attempt module compiles",
+            "Focused attempt, live gate, and reconciliation tests pass",
+            "Receipt records no live provider calls, no real process termination, and no automatic retry"
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/execution_attempt_runtime.py",
+            "tests/test_execution_attempt_runtime.py",
+            "docs/integration/execution_attempt_lease_cancellation_recovery.md",
+            "collaboration/work_packages/completions/WP-0507_codex_done.json"
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live provider calls, real process termination, automatic retry, or retry authorization"
+        ],
+        "success_criteria": [
+            "One active lease is enforced per dispatch item",
+            "Cancellation and stale release are explicit and deterministic",
+            "Retry eligibility evidence does not start provider execution"
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "from pathlib import Path; paths=[\'src/estate/core/execution_attempt_runtime.py\',\'tests/test_execution_attempt_runtime.py\',\'docs/integration/execution_attempt_lease_cancellation_recovery.md\',\'collaboration/work_packages/completions/WP-0507_codex_done.json\']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"'),
+            _cmd("python -m py_compile src/estate/core/execution_attempt_runtime.py"),
+            _cmd("pytest -q tests/test_execution_attempt_runtime.py tests/test_codex_live_execution_gate.py tests/test_execution_result_reconciliation_runtime.py"),
+            _cmd('python -c "import json; from pathlib import Path; data=json.loads(Path(\'collaboration/work_packages/completions/WP-0507_codex_done.json\').read_text(encoding=\'utf-8\')); assert data.get(\'work_package_id\') == \'WP-0507\'; assert data.get(\'live_provider_calls_made_during_implementation\') is False; assert data.get(\'deterministic_tests_use_fake_process_controller\') is True; assert data.get(\'real_process_termination_performed\') is False; assert data.get(\'automatic_retry_introduced\') is False; assert data.get(\'retry_authorization_introduced\') is False; assert data.get(\'stale_release_requires_explicit_confirmation\') is True; assert data.get(\'ready_for_ca_review\') is True"'),
+        ],
+    },
+
+
     "WP-0506": {
         "recipe_id": "wp-0506-steward-authorized-live-codex-execution-gate",
         "title": "WP-0506 — Steward-Authorized Live Codex Execution Gate",
