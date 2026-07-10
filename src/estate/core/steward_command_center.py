@@ -1023,7 +1023,7 @@ def generate_command_center(root=None, write=True):
     settings_manager = load_operations_center_settings(root)
     default_profile = settings_manager["settings"].get("workspace", {}).get("default_profile", "mission-control")
     workspace_profile = resolve_workspace_profile(root, profile_name=default_profile, available_panels={tab["id"] for tab in OFFICE_TABS})
-    payload = {"version": 1, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels, settings_manager), "tabs": _office_tabs(panels, settings_manager), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager, "office_actions": {tab["id"]: controls_for_tab(tab["id"]) for tab in OFFICE_TABS}}
+    payload = {"version": 1, "payload_version": generated_at, "generated_at": generated_at, "local_only": True, "panels": panels, "navigation": _office_navigation(panels, settings_manager), "tabs": _office_tabs(panels, settings_manager), "layout_framework": panels["operations_center_layout"], "workspace_profile": workspace_profile, "settings_manager": settings_manager, "office_actions": {tab["id"]: controls_for_tab(tab["id"]) for tab in OFFICE_TABS}}
     payload["status_bar"] = _build_status_bar(root, panels, generated_at)
     payload["activity_console"] = _build_activity_console(root, panels, generated_at)
     if write:
@@ -1141,7 +1141,7 @@ def _office_navigation(panels, settings_manager=None):
     visible = workspace.get("visible_panels") or {}
     order = {tab_id: i for i, tab_id in enumerate(workspace.get("navigation_order") or [])}
     items = []
-    for item in sorted(OFFICE_NAVIGATION, key=lambda item: order.get(item["id"], 999)):
+    for item in sorted(OFFICE_NAVIGATION, key=lambda item: order.get(item.get("tab") or item["id"], 999)):
         if visible.get(item["id"], True) is False and item["id"] != "settings":
             continue
         panel = panels.get(item["panel"], {})
@@ -2090,7 +2090,7 @@ def _settings_html(artifact):
         "<p class='source'>Local-first persistent settings. Enabled controls submit to the canonical Office action endpoint and are persisted atomically; unsupported capabilities are named below instead of faked.</p>"
         f"<p><strong>Settings version:</strong> {html.escape(str(data.get('settings_schema_version', 'unknown/unavailable')))} · <strong>UI config:</strong> {html.escape(str(data.get('ui_version', 'unknown/unavailable')))} · <code>{html.escape(str(data.get('path')))}</code></p>"
         "<section class='panel'><h3>Appearance</h3>"
-        f"<label>Theme <select id='settings-theme'>{options(THEME_OPTIONS, appearance.get('theme'))}</select></label>"
+        f"<label>Theme <select disabled>{options(THEME_OPTIONS, appearance.get('theme'))}</select></label>"
         f"<label>Accent <select id='settings-accent'>{options(ACCENT_OPTIONS, appearance.get('accent'))}</select></label>"
         f"<label>Layout density <select id='settings-density'>{options(DENSITY_OPTIONS, appearance.get('layout_density'))}</select></label></section>"
         "<section class='panel'><h3>Navigation</h3>"
@@ -2105,7 +2105,7 @@ def _settings_html(artifact):
         f"<label><input id='settings-status-visible' type='checkbox' {'checked' if workspace.get('status_bar_visible') else ''}> Status bar visible</label>"
         f"<label><input id='settings-console-visible' type='checkbox' {'checked' if workspace.get('bottom_activity_stream_visible') else ''}> Action console visible</label>"
         f"<label>Command console mode <select id='settings-command-mode'>{options(['inline','collapsed'], console.get('mode'))}</select></label></section>"
-        "<section class='panel'><h3>Verbosity</h3>"
+        "<section class='panel'><h3>Verbosity</h3><p class='source'>Per-topic verbosity placeholders remain local settings until richer controls are implemented.</p>"
         f"<label>Global verbosity <select id='settings-global-verbosity'>{options(['quiet','normal','detailed','diagnostic'], operator.get('global_verbosity'))}</select></label>"
         f"<label>Topic verbosity overrides JSON <textarea id='settings-topic-overrides'>{html.escape(json.dumps(operator.get('topic_overrides') or {}, sort_keys=True))}</textarea></label>"
         f"<label>Resident verbosity overrides JSON <textarea id='settings-resident-overrides'>{html.escape(json.dumps(operator.get('resident_overrides') or {}, sort_keys=True))}</textarea></label></section>"
@@ -2345,24 +2345,29 @@ def render_command_center_html(payload):
     script = """<script>
 const LAYOUT_PREF_KEY = 'estate.operations_center.layout.v1';
 const WORKSPACE_PROFILE = __PROFILE_JSON__;
+const OFFICE_PAYLOAD_VERSION = '__PAYLOAD_VERSION__';
+const pendingOfficeRequests = new Set();
 function readLayoutPreferences(){ try{return JSON.parse(localStorage.getItem(LAYOUT_PREF_KEY) || '{}');}catch(error){return {};} }
 function writeLayoutPreferences(update){ try{ const next = {...readLayoutPreferences(), ...update}; localStorage.setItem(LAYOUT_PREF_KEY, JSON.stringify(next)); return next; }catch(error){ updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / local preferences unavailable / active tab: ' + getActiveOfficeTab()); return readLayoutPreferences(); } }
 function getActiveOfficeTab(){ const active = document.querySelector('.workspace-tab.active') || document.querySelector('.nav-item.active'); return active && active.dataset ? active.dataset.tab : 'unknown'; }
 function getCommandCenterMode(){ return location.protocol === 'file:' ? 'file safe static' : 'served'; }
 function updateUiRuntimeDiagnostic(state, message){ const el = document.querySelector('#ui-runtime-diagnostic'); if(!el) return; el.dataset.state = state; el.textContent = message + ' / mode: ' + getCommandCenterMode(); }
-function activateOfficeTab(id, persist=true){
+function validOfficeTab(id){ return !!document.getElementById('workspace-' + id); }
+function activateOfficeTab(id, persist=true, push=true){
   const target = document.getElementById('workspace-' + id);
   if(!target){ updateUiRuntimeDiagnostic('error', 'UI runtime: navigation bound / missing workspace for tab: ' + id); return false; }
   document.querySelectorAll('.workspace-view').forEach(view => { const active = view.id === 'workspace-' + id; view.hidden = !active; view.classList.toggle('active', active); });
   document.querySelectorAll('[data-tab]').forEach(button => { const active = button.dataset.tab === id; if(button.classList.contains('workspace-tab')) button.setAttribute('aria-selected', active ? 'true' : 'false'); if(button.classList.contains('nav-item')){ if(active) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); } button.classList.toggle('active', active); });
   updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + id);
   if(persist) writeLayoutPreferences({active_tab: id});
+  if(push && location.hash !== '#' + id) history.pushState({office_tab:id}, '', '#' + id);
   return true;
 }
 function applyWorkspaceProfile(profile){ if(!profile) return; if(profile.panel_arrangements && profile.panel_arrangements.activity_console_visible === false){ const consoleEl = document.querySelector('#activity-console'); if(consoleEl) consoleEl.setAttribute('hidden',''); } if(profile.active_tab) activateOfficeTab(profile.active_tab, false); }
 function normalizeNavigationState(value){ return value === 'expanded' ? 'collapsed' : (value || 'collapsed'); }
-function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); prefs.left_navigation = normalizeNavigationState(prefs.left_navigation || prefs.navigation_state); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); if(prefs.active_tab) activateOfficeTab(prefs.active_tab, false); }
-function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab); const drawer = button.closest('#office-navigation details'); if(drawer) drawer.open = false; } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
+function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); prefs.left_navigation = normalizeNavigationState(prefs.left_navigation || prefs.navigation_state); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); const hashTab = decodeURIComponent((location.hash || '').replace(/^#/, '')); if(hashTab && validOfficeTab(hashTab)) activateOfficeTab(hashTab, true, false); else if(prefs.active_tab && validOfficeTab(prefs.active_tab)) activateOfficeTab(prefs.active_tab, false, false); }
+function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab, true, true); const drawer = button.closest('#office-navigation details'); if(drawer) drawer.open = false; } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
+window.addEventListener('popstate', () => { const hashTab = decodeURIComponent((location.hash || '').replace(/^#/, '')); if(hashTab) activateOfficeTab(hashTab, true, false); });
 function initOfficeRuntime(){ bindOfficeNavigation(); restoreLayoutPreferences(); renderGlobalPaletteResults(); bindOfficeActions(); bindSettingsSurface(); startOfficeAutoRefresh(); if(getCommandCenterMode() === 'served') loadAlfredHistory(); renderPendingAttachments(); }
 
 function collectSettingsFromForm(){
@@ -2395,14 +2400,18 @@ function collectSettingsFromForm(){
 }
 async function submitSettingsAction(actionId, settingsDocument){
   const resultEl = document.querySelector('#office-action-result-settings');
-  if(resultEl){ resultEl.className='office-action-result running'; resultEl.textContent='Running ' + actionId + ' locally...'; }
+  if(pendingOfficeRequests.has(actionId)) return;
+  const requestId = 'office-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+  pendingOfficeRequests.add(actionId);
+  if(resultEl){ resultEl.className='office-action-result running'; resultEl.textContent='Running ' + actionId + ' locally with request ' + requestId + '...'; }
   try{
     if(getCommandCenterMode() !== 'served') throw new Error('Settings actions require served local mode.');
-    const response = await fetch('/api/office/actions/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action_id: actionId, settings_json: JSON.stringify(settingsDocument)})});
+    const response = await fetch('/api/office/actions/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action_id: actionId, request_id: requestId, payload_version: OFFICE_PAYLOAD_VERSION, settings_json: JSON.stringify(settingsDocument)})});
     const payload = await response.json();
     if(resultEl){ resultEl.className='office-action-result ' + (payload.outcome || 'unknown'); resultEl.textContent=JSON.stringify(payload,null,2); }
-    if(payload.outcome === 'completed') setTimeout(() => location.reload(), 450);
+    if(payload.outcome === 'completed') targetedRefresh(payload.target_tab || getActiveOfficeTab())
   }catch(error){ if(resultEl){ resultEl.className='office-action-result failed'; resultEl.textContent=JSON.stringify({outcome:'failed', steward_message:String(error)},null,2); } }
+  finally{ pendingOfficeRequests.delete(actionId); }
 }
 function bindSettingsSurface(){
   const save = document.querySelector('#settings-save-apply');
@@ -2424,20 +2433,25 @@ async function runOfficeAction(button){
   const actionId = button.dataset.officeAction;
   const panel = button.closest('.office-actions');
   const resultEl = panel ? panel.querySelector('.office-action-result') : null;
-  const body = {action_id: actionId};
+  if(pendingOfficeRequests.has(actionId)) return;
+  const requestId = 'office-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+  pendingOfficeRequests.add(actionId);
+  const body = {action_id: actionId, request_id: requestId, payload_version: OFFICE_PAYLOAD_VERSION};
   Object.entries(button.dataset).forEach(([key, value]) => { if(key !== 'officeAction') body[key.replace(/[A-Z]/g, m => '_' + m.toLowerCase())] = value; });
   if(panel){ panel.querySelectorAll('[data-action-input]').forEach(input => { body[input.dataset.actionInput] = input.value; }); }
   button.disabled = true;
-  if(resultEl){ resultEl.className = 'office-action-result running'; resultEl.textContent = 'Running ' + actionId + ' locally...'; }
+  if(resultEl){ resultEl.className = 'office-action-result running'; resultEl.textContent = 'Running ' + actionId + ' locally with request ' + requestId + '...'; }
   try{
     if(getCommandCenterMode() !== 'served') throw new Error('Office action execution requires served local mode; static file mode cannot POST to local handlers.');
     const response = await fetch('/api/office/actions/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
-    const payload = await response.json();
+    let payload; try{ payload = await response.json(); }catch(error){ throw new Error('Malformed action response from /api/office/actions/execute: ' + error.message); }
+    if(payload.payload_version && payload.payload_version !== OFFICE_PAYLOAD_VERSION) payload.stale_warning = 'Browser payload was stale; targeted refresh was requested.';
     if(resultEl){ resultEl.className = 'office-action-result ' + (payload.outcome || 'unknown'); resultEl.textContent = JSON.stringify(payload, null, 2); }
-    if(payload && payload.outcome === 'completed' && payload.runtime_state_changed && payload.runtime_state_changed.length){ setTimeout(() => location.reload(), 450); }
+    if(payload && payload.outcome === 'completed' && payload.runtime_state_changed && payload.runtime_state_changed.length){ targetedRefresh(payload.target_tab || getActiveOfficeTab()) }
   }catch(error){ if(resultEl){ resultEl.className = 'office-action-result failed'; resultEl.textContent = JSON.stringify({outcome:'failed', steward_message:String(error), authority_gating_status:'served_mode_required'}, null, 2); } }
-  finally{ button.disabled = false; }
+  finally{ pendingOfficeRequests.delete(actionId); button.disabled = false; }
 }
+async function targetedRefresh(tabId){ try{ const response = await fetch('/api/office/payload?tab=' + encodeURIComponent(tabId), {cache:'no-store'}); const payload = await response.json(); if(payload.stale) updateUiRuntimeDiagnostic('error', 'Stale payload/version detected; refreshed tab ' + tabId); return payload; }catch(error){ updateUiRuntimeDiagnostic('error', 'Recoverable targeted refresh failure: ' + error.message); return null; } }
 function bindOfficeActions(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-office-action]'); if(button){ event.preventDefault(); runOfficeAction(button); } }); }
 
 function whenDomReady(callback){ if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', callback, {once:true}); else callback(); }
@@ -2552,16 +2566,22 @@ document.addEventListener('click', event => { if(event.target.closest('#office-s
 
 window.addEventListener('load', () => { updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); });
 </script>"""
-    script = script.replace("__PROFILE_JSON__", _js_json_literal(payload.get("workspace_profile", {})))
+    script = script.replace("__PROFILE_JSON__", _js_json_literal(payload.get("workspace_profile", {}))).replace("__PAYLOAD_VERSION__", html.escape(str(payload.get("payload_version") or payload.get("generated_at") or ""), quote=True))
     settings_for_body = ((payload.get('settings_manager') or {}).get('settings') or {})
     appearance_for_body = settings_for_body.get('appearance') or {}
     workspace_for_body = settings_for_body.get('workspace') or {}
     refresh_for_body = settings_for_body.get('refresh') or {}
-    body_attrs = f"data-theme='{html.escape(str(appearance_for_body.get('theme') or 'system'), quote=True)}' data-accent='{html.escape(str(appearance_for_body.get('accent') or 'estate-gold'), quote=True)}' data-density='{html.escape(str(appearance_for_body.get('layout_density') or 'comfortable'), quote=True)}' data-refresh-enabled='{str(bool(refresh_for_body.get('enabled'))).lower()}' data-refresh-seconds='{html.escape(str(refresh_for_body.get('quiet_refresh_seconds') or 30), quote=True)}'"
+    script += "<script>document.body.dataset.theme='{}';document.body.dataset.accent='{}';document.body.dataset.density='{}';document.body.dataset.refreshEnabled='{}';document.body.dataset.refreshSeconds='{}';</script>".format(
+        html.escape(str(appearance_for_body.get('theme') or 'system'), quote=True),
+        html.escape(str(appearance_for_body.get('accent') or 'estate-gold'), quote=True),
+        html.escape(str(appearance_for_body.get('layout_density') or 'comfortable'), quote=True),
+        str(bool(refresh_for_body.get('enabled'))).lower(),
+        html.escape(str(refresh_for_body.get('quiet_refresh_seconds') or 30), quote=True),
+    )
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
-        f'<body {body_attrs}><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
+        f'<body><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
@@ -2570,7 +2590,8 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
 
     class Handler(SimpleHTTPRequestHandler):
         def do_GET(self):
-            if self.path in ("/", "/index.html", "/command-center"):
+            parsed = urlparse(self.path)
+            if parsed.path in ("/", "/index.html", "/command-center"):
                 html_doc = render_command_center_html(generate_command_center(root=root, write=True)).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -2578,6 +2599,10 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 self.end_headers()
                 self.wfile.write(html_doc)
                 return
+            if parsed.path == "/api/office/payload":
+                payload = generate_command_center(root=root, write=False)
+                body = json.dumps({"payload_version": payload.get("payload_version"), "generated_at": payload.get("generated_at"), "stale": False, "tabs": payload.get("tabs"), "navigation": payload.get("navigation")}, indent=2, sort_keys=True).encode("utf-8")
+                self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
             if self.path == "/status.json":
                 payload = generate_command_center(root=root, write=False)
                 body = json.dumps({
@@ -2593,7 +2618,6 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 self.end_headers()
                 self.wfile.write(body)
                 return
-            parsed = urlparse(self.path)
             parts = [p for p in parsed.path.split("/") if p]
             if len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "surface":
                 body = json.dumps(resident_surface(parts[2], root=root), indent=2, sort_keys=True).encode("utf-8")
@@ -2620,6 +2644,8 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
             if parts == ["api", "office", "actions", "execute"]:
                 action_id = data.pop("action_id", "")
                 payload = execute_office_action(action_id, root=root, **data)
+                latest = generate_command_center(root=root, write=False)
+                payload["payload_version"] = latest.get("payload_version")
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
                 payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root, attachments=data.get("attachments") or [])
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "forget":
