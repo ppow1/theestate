@@ -8,6 +8,7 @@ from typing import Any
 from estate.core.operational_status import SENSITIVE_CLASSIFICATIONS, summary_message
 from estate.core.paths import ESTATE_ROOT
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
+from estate.core.grace_operations_runtime import GraceOperationsRuntime
 
 STATUS_FILES = {
     "latest": "runtime/operations/status/latest.json",
@@ -157,6 +158,7 @@ def load_office_operational_activity(root: Path | None = None, *, now: datetime 
             groups["active"].append(item)
     any_available = any(artifacts[k].get("available") for k in ("latest", "active", "recent", "summary"))
     intake_surface = load_office_intake_decision_surface(root)
+    grace_status = GraceOperationsRuntime(root).status()
     return {
         "available": any_available or bool((intake_surface.get("items") or [])),
         "runtime_directory_accessible": status_dir.exists() and status_dir.is_dir(),
@@ -173,4 +175,5 @@ def load_office_operational_activity(root: Path | None = None, *, now: datetime 
         "stale_thresholds": {"active_seconds": ACTIVE_STALE_SECONDS, "recent_terminal_seconds": RECENT_STALE_SECONDS},
         "classification_behavior": "Restricted, Steward Only, and Local Only messages are redacted unless metadata.summary_safe is true.",
         "orchestrator_intake_decisions": intake_surface,
+        "grace_operations_status": grace_status,
     }

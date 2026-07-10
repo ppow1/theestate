@@ -116,6 +116,7 @@ from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 from estate.core.operations_manager import OperationsDecision
+from estate.core.grace_operations_runtime import GraceObjective, GraceOperationsRuntime, format_grace_action
 from estate.core.operations_control_runtime import OperationsControlRuntime, format_operations_review, format_operations_decisions
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
@@ -137,6 +138,38 @@ def _repo_path(rel):
 
 
 
+
+
+def cmd_grace_operations(args):
+    runtime = GraceOperationsRuntime()
+    if args.grace_action == "status":
+        payload = runtime.status()
+        print(json.dumps(payload, indent=2, sort_keys=True) if args.json else payload.get("message", json.dumps(payload, indent=2, sort_keys=True)))
+        return
+    if args.grace_action == "conduct":
+        objective = GraceObjective.create(
+            requested_by=args.requested_by,
+            title=args.title,
+            summary=args.summary,
+            work_package_id=args.work_package_id,
+            classification=args.classification,
+            priority=args.priority,
+            authority=args.authority,
+            dependencies=args.dependency or [],
+            blockers=args.blocker or [],
+            owner=args.owner,
+            checkpoint=args.checkpoint,
+            evidence=args.evidence or [],
+            metadata={"summary_safe": args.summary_safe},
+        )
+        action, paths = runtime.conduct_objective(objective, request_dispatch=args.request_dispatch)
+        print(json.dumps({"action": action.to_dict(), "paths": paths}, indent=2, sort_keys=True) if args.json else format_grace_action(action, paths))
+        return
+    if args.grace_action == "close":
+        paths = runtime.close_objective(args.objective_id, reviewed_by=args.reviewed_by, result=args.result, accepted=args.accepted)
+        print(json.dumps(paths, indent=2, sort_keys=True) if args.json else "Grace closure recorded: " + paths["closure"])
+        return
+    raise SystemExit(1)
 
 def cmd_character_continuity(args):
     try:
@@ -2360,6 +2393,18 @@ def main(argv=None):
     sp = ai_sub.add_parser("write-report")
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_ai_services)
+
+
+    p = sub.add_parser("grace-operations", help="Conduct governed Grace operations without creating a second command center")
+    go = p.add_subparsers(dest="grace_action", required=True)
+    sp = go.add_parser("status"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
+    sp = go.add_parser("conduct")
+    sp.add_argument("--title", required=True); sp.add_argument("--summary", required=True); sp.add_argument("--requested-by", default="Steward")
+    sp.add_argument("--work-package-id"); sp.add_argument("--classification", default="Estate Internal"); sp.add_argument("--priority", default="normal")
+    sp.add_argument("--authority", choices=["delegated", "requires_steward", "unauthorized"], default="delegated")
+    sp.add_argument("--dependency", action="append"); sp.add_argument("--blocker", action="append"); sp.add_argument("--owner"); sp.add_argument("--checkpoint")
+    sp.add_argument("--evidence", action="append"); sp.add_argument("--request-dispatch", action="store_true"); sp.add_argument("--summary-safe", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
+    sp = go.add_parser("close"); sp.add_argument("objective_id"); sp.add_argument("--reviewed-by", required=True); sp.add_argument("--result", required=True); sp.add_argument("--accepted", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
 
     p = sub.add_parser("change")
     p.add_argument("--title", required=True)
