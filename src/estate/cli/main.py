@@ -58,6 +58,7 @@ from estate.core.execution_activity import generate_execution_activity_surface, 
 from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
 from estate.core.codex_bridge_execution_provider_adapter import run_codex_bridge_adapter_dry_run, CodexBridgeExecutionProviderAdapter
 from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepare_handoff, validate_handoff, dry_run_handoff
+from estate.core.codex_live_execution_gate import CodexLiveExecutionGate
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
@@ -1670,6 +1671,41 @@ def cmd_execution_adapter_handoff(args):
         raise SystemExit(1)
 
 
+
+def cmd_codex_live_execution(args):
+    import json
+    try:
+        gate = CodexLiveExecutionGate()
+        action = args.codex_live_execution_action
+        if action == "preview":
+            payload = gate.preview(args.dispatch_id, args.authorization)
+        elif action == "execute":
+            payload = gate.execute(args.dispatch_id, args.authorization, confirm_live_execution=getattr(args, "confirm_live_execution", False))
+        elif action == "status":
+            payload = gate.status(args.dispatch_id)
+        elif action == "report":
+            text = gate.report(args.dispatch_id)
+            if getattr(args, "json", False):
+                print(json.dumps(gate.status(args.dispatch_id), indent=2, sort_keys=True))
+            else:
+                print(text)
+            return
+        else:
+            raise SystemExit(f"Unknown codex-live-execution action: {action}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        payload = {"status": "failed", "error": str(exc), "live_provider_called": False}
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"Codex live execution gate failed: {exc}")
+        raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"Codex live execution {action}: {payload.get('status')}")
+    if payload.get("errors"):
+        raise SystemExit(1)
+
 def cmd_execution_result_reconciliation(args):
     import json
     try:
@@ -2317,6 +2353,23 @@ def main(argv=None):
         q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
         q.add_argument("--json", action="store_true", help="Print handoff JSON")
         q.set_defaults(func=cmd_execution_adapter_handoff)
+
+
+    p = sub.add_parser("codex-live-execution", help="Preview or execute Steward-authorized local Codex execution")
+    live_sub = p.add_subparsers(dest="codex_live_execution_action", required=True)
+    for action in ("preview", "execute"):
+        q = live_sub.add_parser(action, help=f"{action} a Steward-authorized live Codex execution")
+        q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
+        q.add_argument("--authorization", required=True, help="Path to live execution authorization JSON")
+        if action == "execute":
+            q.add_argument("--confirm-live-execution", action="store_true", help="Deliberate operator confirmation required for provider call")
+        q.add_argument("--json", action="store_true", help="Print live execution JSON")
+        q.set_defaults(func=cmd_codex_live_execution)
+    for action in ("status", "report"):
+        q = live_sub.add_parser(action, help=f"{action} live execution state")
+        q.add_argument("--dispatch-id", required=True, help="Execution dispatch item id")
+        q.add_argument("--json", action="store_true", help="Print live execution JSON")
+        q.set_defaults(func=cmd_codex_live_execution)
 
 
     p = sub.add_parser("execution-result-reconciliation", help="Inspect and reconcile provider adapter results back into dispatch lifecycle")
