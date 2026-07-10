@@ -29,6 +29,7 @@ from estate.core.office_traffic_controller_panel import load_office_traffic_cont
 from estate.core.background_operations_runtime import load_background_operations_status
 from estate.core.operations_runtime import load_operations_runtime_status
 from estate.core.post_merge_audit_processor import load_post_merge_audit_processor_status
+from estate.core.merge_discovery import MergeDiscovery
 from estate.core.orchestrator_intake_decisions import load_office_intake_decision_surface
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
@@ -472,6 +473,7 @@ def _build_status_bar(root, panels, generated_at):
     dispatch_summary = (((panels.get("execution_dispatch") or {}).get("data") or {}).get("summary") or {})
     background_summary = (((panels.get("background_operations") or {}).get("data") or {}).get("summary") or {})
     post_merge_summary = (((panels.get("post_merge_audit") or {}).get("data") or {}).get("summary") or {})
+    merge_summary = (((panels.get("merge_discovery") or {}).get("data") or {}).get("summary") or {})
     active_workers = _active_worker_count(root)
     steward_presence = (((panels.get("steward_presence") or {}).get("data") or {}).get("summary") or {})
     missing = sum(1 for value in panels.values() if isinstance(value, dict) and not value.get("available"))
@@ -522,6 +524,16 @@ def _build_status_bar(root, panels, generated_at):
         "latest_verdict_artifact": post_merge_summary.get("latest_verdict_artifact"),
         "validation_workspace_health": post_merge_summary.get("validation_workspace_health"),
         "validation_evidence_root": post_merge_summary.get("validation_evidence_root"),
+        "merge_discovery_available": merge_summary.get("merge_discovery_available"),
+        "last_merge_scan_at": merge_summary.get("last_merge_scan_at"),
+        "last_scanned_commit": merge_summary.get("last_scanned_commit"),
+        "merge_commits_scanned": merge_summary.get("merge_commits_scanned"),
+        "work_packages_discovered": merge_summary.get("work_packages_discovered"),
+        "pending_discovery_candidates": merge_summary.get("pending_discovery_candidates"),
+        "ambiguous_discoveries": merge_summary.get("ambiguous_discoveries"),
+        "latest_discovered_work_package": merge_summary.get("latest_discovered_work_package"),
+        "latest_created_audit_request": merge_summary.get("latest_created_audit_request"),
+        "duplicate_requests_suppressed": merge_summary.get("duplicate_requests_suppressed"),
         "active_workers": active_workers,
         "steward_presence_state": steward_presence.get("state"),
         "version": "Operations Center v1 / Status Console v1",
@@ -979,6 +991,7 @@ def generate_command_center(root=None, write=True):
         "background_operations": {"available": True, "path": "runtime/background_operations/status/latest.json", "kind": "json", "data": load_background_operations_status(root)},
         "operations_runtime": {"available": True, "path": "runtime/operations_runtime/status/latest.json", "kind": "json", "data": load_operations_runtime_status(root)},
         "post_merge_audit": {"available": True, "path": "runtime/post_merge_audit/status/latest.json", "kind": "json", "data": load_post_merge_audit_processor_status(root)},
+        "merge_discovery": {"available": True, "path": "runtime/merge_discovery/status/latest.json", "kind": "json", "data": MergeDiscovery(root).status()},
         "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
         "expansion_roadmap": _expansion_roadmap_artifact(root),
         "parking_lot": _read_artifact(root, ["operations/boards/parking_lot.md"]),
