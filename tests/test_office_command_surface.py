@@ -38,3 +38,29 @@ def test_refresh_notification_center_invokes_real_handler(tmp_path):
     assert result['outcome'] == 'completed'
     assert result['artifacts_written']
     assert (tmp_path / 'runtime/notifications/operations_notification_center.json').exists()
+
+
+def test_operational_activity_controls_write_evidence_and_validate_artifacts(tmp_path):
+    evidence = tmp_path / 'runtime/example.json'
+    evidence.parent.mkdir(parents=True)
+    evidence.write_text('{"ok": true}', encoding='utf-8')
+
+    refresh = execute_office_action('operational_activity.refresh', root=tmp_path)
+    assert refresh['outcome'] == 'completed'
+    assert (tmp_path / 'runtime/operations/status/office_operational_activity_payload.json').exists()
+
+    ack = execute_office_action('operational_activity.acknowledge_attention', root=tmp_path, activity_id='act-1', acknowledged_by='Steward')
+    assert ack['outcome'] == 'completed'
+    assert (tmp_path / 'runtime/operations/status/attention_acknowledgements.json').exists()
+
+    route = execute_office_action('operational_activity.route_to_workspace', root=tmp_path, activity_id='act-1', route_target='execution-control')
+    assert route['outcome'] == 'completed'
+    assert route['target_tab'] == 'execution-control'
+
+    opened = execute_office_action('operational_activity.open_artifact', root=tmp_path, artifact_path='runtime/example.json')
+    assert opened['outcome'] == 'completed'
+    assert 'runtime/example.json' in opened['artifacts_read']
+
+    filtered = execute_office_action('operational_activity.filter', root=tmp_path, state='Blocked', owner='Steward', priority='high', attention_required='true')
+    assert filtered['outcome'] == 'completed'
+    assert (tmp_path / 'runtime/operations/status/activity_filter.json').exists()
