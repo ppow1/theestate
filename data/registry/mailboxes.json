@@ -58,5 +58,15 @@
     "status": "active",
     "purpose": "Functional office mailbox for HR/personnel questions, onboarding status awareness, and personnel identity routing.",
     "notes": "Functional HR intake surface; does not create final HR authority, clearance policy, or lifecycle-state changes."
+  },
+  {
+    "mailbox_id": 12,
+    "mailbox_type": "personnel",
+    "display_name": "Grace",
+    "owning_office": "Office of Operations",
+    "responsible_employee_id": 12,
+    "status": "proposed_appointment_pending",
+    "purpose": "Proposed personal mailbox for Grace if the Steward-reserved Director of Operations appointment occurs.",
+    "notes": "WP-4005 proposal only; do not route active operational authority here until appointment and activation are separately recorded."
   }
 ]

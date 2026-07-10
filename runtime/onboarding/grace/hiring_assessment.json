@@ -1,0 +1,69 @@
+{
+  "schema_version": "grace_hiring_assessment.v1",
+  "work_package_id": "WP-4005",
+  "generated_at": "2026-07-10T18:45:00+00:00",
+  "hr_actor": {
+    "name": "Helen",
+    "employee_id": 6,
+    "mailbox_id": 6
+  },
+  "candidate": "Grace",
+  "target_role": "Director of Operations",
+  "target_office": "Office of Operations",
+  "classification": "Estate Internal",
+  "state_decisions": {
+    "candidate_reviewed": true,
+    "hiring_recommended": true,
+    "onboarding_ready": true,
+    "appointment_ready": true,
+    "appointed": false,
+    "activated": false
+  },
+  "evidence": {
+    "dependency": "collaboration/work_packages/completions/WP-4003_codex_done.json",
+    "helen_readiness": "runtime/residents/helen/readiness.json",
+    "grace_profile": "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
+    "grace_validation_standard": "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
+    "grace_platform_export": "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml",
+    "hiring_workflow": "docs/residents/helen/Helen_Hiring_Onboarding_Workflow_v0_1.md",
+    "personnel_registry": "data/registry/personnel.json",
+    "mailbox_registry": "data/registry/mailboxes.json"
+  },
+  "authority_review": {
+    "office_authorization_evidence_resolved_from_profile": true,
+    "role_authorization_evidence_resolved_from_profile": true,
+    "office_created_by_this_package": false,
+    "steward_reserved_appointment_required": true
+  },
+  "boundary_review": {
+    "review_actor": "Ingrid-required boundary review recorded by Helen package",
+    "classification": "Estate Internal",
+    "findings": [
+      "No protected private character sources may be used for Grace.",
+      "No private personnel or continuity records may be exposed to routine operations.",
+      "Connector, cross-office, and elevated access remain subject to Ingrid review before activation."
+    ],
+    "passed_for_appointment_package": true
+  },
+  "behavioral_validation": {
+    "standard": "21 deterministic scenarios in Grace_Resident_Validation_v0_1",
+    "result": "PASS_WITH_PRE_ACTIVATION_LIMITATIONS",
+    "appointed_or_activated_by_validation": false
+  },
+  "identity_and_mailbox_proposals": {
+    "employee_id": 12,
+    "mailbox_id": 12,
+    "status": "proposed_appointment_pending",
+    "security_rating_proposal": "Estate Internal; minimum-necessary access; Ingrid review before any elevation"
+  },
+  "recommendation": {
+    "by": "Helen",
+    "decision": "recommend_hire_and_prepare_for_steward_appointment",
+    "rationale": "Grace package matches the authorized Director of Operations candidate profile and preserves governance boundaries."
+  },
+  "reserved_actions_remaining": [
+    "Steward appointment decision",
+    "Post-appointment onboarding acknowledgment",
+    "Activation after readiness review"
+  ]
+}

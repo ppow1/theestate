@@ -1,0 +1,27 @@
+{
+  "schema_version": "grace_appointment_readiness.v1",
+  "work_package_id": "WP-4005",
+  "generated_at": "2026-07-10T18:45:00+00:00",
+  "candidate": "Grace",
+  "target_role": "Director of Operations",
+  "target_office": "Office of Operations",
+  "status": "appointment_ready",
+  "appointment_authority": "Steward reserved",
+  "appointed": false,
+  "activated": false,
+  "helen_recommendation": "hire_recommended",
+  "onboarding_ready": true,
+  "evidence_paths": [
+    "collaboration/work_packages/completions/WP-4003_codex_done.json",
+    "runtime/residents/helen/readiness.json",
+    "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
+    "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
+    "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml",
+    "docs/residents/helen/Helen_Hiring_Onboarding_Workflow_v0_1.md",
+    "data/registry/personnel.json",
+    "data/registry/mailboxes.json",
+    "runtime/onboarding/grace/hiring_assessment.json",
+    "runtime/onboarding/grace/onboarding_plan.json"
+  ],
+  "required_steward_action": "Record explicit appointment decision before any onboarding or activation state change."
+}

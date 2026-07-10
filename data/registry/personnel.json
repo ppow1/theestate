@@ -124,5 +124,18 @@
     "security_clearance": "Estate Internal",
     "status": "onboarding",
     "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence and WP-0136 character architecture governance."
+  },
+  {
+    "employee_id": 12,
+    "display_name": "Grace",
+    "current_title": "Director of Operations (appointment pending)",
+    "current_office": "Office of Operations",
+    "department": "Operations",
+    "mailbox_id": 12,
+    "security_clearance": "Estate Internal (proposed; Ingrid review required before elevation)",
+    "status": "proposed_appointment_pending",
+    "resident_id": null,
+    "reporting_line": "Reports to Steward through governed Estate channels; coordinates with Alfred for Steward attention.",
+    "notes": "Created by WP-4005 as a proposed employee identity for Helen-led hiring/onboarding readiness. This is not an appointment, activation, resident registration, constitutional office creation, or authority grant."
   }
 ]
