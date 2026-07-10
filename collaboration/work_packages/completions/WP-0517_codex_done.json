@@ -1,0 +1,24 @@
+{
+  "work_package_id": "WP-0517",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T19:02:30Z",
+  "summary": "Implemented operational Office Projects and Work Packages control surfaces using the canonical assignment queue and Office command surface handlers. Actions persist assignment, status, priority, promotion, filter results, and evidence-routing events, then refresh Office payload artifacts.",
+  "artifacts_changed": [
+    "src/estate/core/assignment_queue.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "tests/test_wp0517_work_package_control.py",
+    "runtime/work_packages/assignment_queue.json",
+    "operations/work_packages/assignment_queue.md",
+    "runtime/steward/command_center.html"
+  ],
+  "validation": {
+    "tests": "PYTHONPATH=src pytest -q tests/test_wp0517_work_package_control.py",
+    "office_payload": "PYTHONPATH=src python -m estate.cli.main steward-command-center --json",
+    "wp_validation": "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0517 --json (no_recipe warning)"
+  },
+  "notes": [
+    "Validation evidence remains labeled as validation evidence, not institutional acceptance.",
+    "Promotion is constrained to the supported canonical local workflow pending -> open -> claimed -> completed and reports blocked/failed truthfully."
+  ]
+}
