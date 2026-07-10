@@ -2742,6 +2742,37 @@ VALIDATION_RECIPES["WP-EXECUTION-DISPATCH-QUEUE-001"] = {
 }
 
 
+
+VALIDATION_RECIPES["WP-0505"] = {
+    "recipe_id": "wp-0505-execution-result-reconciliation",
+    "title": "WP-0505 - Execution Result Reconciliation and Dispatch Lifecycle Closure",
+    "description": "Validates deterministic provider-result reconciliation into dispatch lifecycle, activity evidence, CLI, documentation, and completion receipt without live providers.",
+    "required_checks": [
+        "Reconciliation module compiles",
+        "Focused reconciliation tests pass",
+        "Existing dispatch and adapter tests pass",
+        "CLI reconcile path works on synthetic artifacts",
+        "Documentation and completion receipt exist",
+    ],
+    "observational_checks": [],
+    "expected_artifacts": [
+        "src/estate/core/execution_result_reconciliation_runtime.py",
+        "tests/test_execution_result_reconciliation_runtime.py",
+        "docs/integration/execution_result_reconciliation.md",
+        "collaboration/work_packages/completions/WP-0505_codex_done.json",
+    ],
+    "failure_criteria": ["Any required command exits non-zero", "Validation requires live provider, network, GPU, Ollama, ChatGPT, or Codex CLI access"],
+    "success_criteria": ["Provider results reconcile conservatively and never grant institutional acceptance"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m py_compile src/estate/core/execution_result_reconciliation_runtime.py"),
+        _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+        _cmd("pytest -q tests/test_execution_result_reconciliation_runtime.py tests/test_execution_dispatch.py tests/test_execution_provider_adapter.py --basetemp Temp/pytest-execution-result-reconciliation"),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_result_reconciliation_runtime.py','tests/test_execution_result_reconciliation_runtime.py','docs/integration/execution_result_reconciliation.md','collaboration/work_packages/completions/WP-0505_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0505_codex_done.json').read_text()); assert data['work_package_id']=='WP-0505'; assert data['live_provider_calls_made'] is False; assert data['authorization_behavior_modified'] is False; assert data['institutional_acceptance_behavior_modified'] is False; assert data['ready_for_ca_review'] is True\""),
+    ],
+}
+
 VALIDATION_RECIPES["WP-0613"] = {
     "recipe_id": "wp-0613-execution-provider-adapter-contract",
     "title": "WP-0613 - Execution Provider Adapter Contract",
