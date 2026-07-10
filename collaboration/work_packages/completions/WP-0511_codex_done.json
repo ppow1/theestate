@@ -1,0 +1,54 @@
+{
+  "artifacts": [
+    "src/estate/core/office_functional_audit.py",
+    "runtime/steward/office_functional_audit.json",
+    "runtime/steward/office_functional_audit_summary.json",
+    "runtime/steward/office_repair_waves.json",
+    "operations/steward/office_functional_audit.md",
+    "docs/integration/office_functional_audit.md",
+    "docs/integration/office_settings_control_surface.md"
+  ],
+  "auto_refresh_verified": true,
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T05:03:20+00:00",
+  "files_changed": [
+    "src/estate/core/operations_center_settings.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_functional_audit.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_office_functional_audit.py",
+    "tests/test_office_settings_functional.py",
+    "tests/test_operations_center_settings.py",
+    "docs/integration/office_functional_audit.md",
+    "docs/integration/office_settings_control_surface.md",
+    "collaboration/work_packages/completions/WP-0511_codex_done.json"
+  ],
+  "import_export_verified": true,
+  "known_limitations": [
+    "The audit reports remaining non-Settings Office defects honestly; WP-0511 does not repair every Office tab.",
+    "Settings browser actions require served local mode for POST; static file mode displays a truthful failure."
+  ],
+  "live_provider_calls_made": false,
+  "merge_authority_or_equivalent": "Chief Architect review required; no institutional acceptance granted by Codex.",
+  "navigation_order_verified": true,
+  "navigation_visibility_verified": true,
+  "new_command_bus_introduced": false,
+  "new_web_framework_introduced": false,
+  "pull_request_url_or_not_applicable_reason": "PR will be created by Codex make_pr after local commit per repository workflow.",
+  "ready_for_ca_review": true,
+  "settings_persistence_verified": true,
+  "settings_reload_verified": true,
+  "summary": "Implemented deterministic Office functional audit artifacts and repaired Settings as a persistent Office control surface using the existing settings subsystem and Office action endpoint.",
+  "tests": [
+    "python -m pytest tests/test_office_functional_audit.py tests/test_office_settings_functional.py tests/test_operations_center_settings.py tests/test_office_command_surface.py"
+  ],
+  "tests_run": [
+    "python -m pytest tests/test_office_functional_audit.py tests/test_office_settings_functional.py tests/test_operations_center_settings.py tests/test_office_command_surface.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0511 --json"
+  ],
+  "theme_application_verified": true,
+  "verbosity_application_verified": true,
+  "work_package_id": "WP-0511"
+}

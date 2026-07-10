@@ -3303,3 +3303,21 @@ VALIDATION_RECIPES["WP-0222"] = {
         _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0222_codex_cloud_web_done.json').read_text(encoding='utf-8')); assert data['work_package_id']=='WP-0222'; assert data['manual_validation_status']=='pending_steward_local_textgen'; assert data['skipped_live_calls'] is True\""),
     ],
 }
+
+
+VALIDATION_RECIPES["WP-0511"] = {
+    "recipe_id": "wp-0511-office-functional-audit-settings-repair",
+    "title": "WP-0511 — Office Functional Audit and Settings Repair",
+    "description": "Validates the Office functional audit artifacts, repaired persistent Settings surface, and completion receipt.",
+    "required_checks": ["Audit tests pass", "Settings functional tests pass", "Settings/audit artifacts exist", "Completion receipt assertions exist"],
+    "observational_checks": ["Existing Office command and operations settings tests pass"],
+    "expected_artifacts": ["src/estate/core/office_functional_audit.py", "docs/integration/office_functional_audit.md", "docs/integration/office_settings_control_surface.md", "collaboration/work_packages/completions/WP-0511_codex_done.json"],
+    "failure_criteria": ["Any required command exits non-zero"],
+    "success_criteria": ["Required commands exit zero"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m pytest tests/test_office_functional_audit.py tests/test_office_settings_functional.py"),
+        _cmd("python -m pytest tests/test_operations_center_settings.py tests/test_office_command_surface.py", required=False),
+        _cmd("python -c \"import json; from pathlib import Path; from estate.core.office_functional_audit import run_office_functional_audit; run_office_functional_audit(); required=['runtime/steward/office_functional_audit.json','runtime/steward/office_functional_audit_summary.json','runtime/steward/office_repair_waves.json','operations/steward/office_functional_audit.md']; missing=[p for p in required if not Path(p).is_file()]; assert not missing, missing; r=json.loads(Path('collaboration/work_packages/completions/WP-0511_codex_done.json').read_text()); assert r['settings_persistence_verified'] and r['import_export_verified'] and not r['live_provider_calls_made']\""),
+    ],
+}

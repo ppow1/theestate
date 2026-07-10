@@ -58,7 +58,9 @@ def test_invalid_settings_fail_safely_and_report_warnings(tmp_path):
     assert settings["workspace"]["default_profile"] == "mission-control"
     assert settings["operator_visibility"]["default_verbosity_profile"] == "default"
     assert settings["operator_visibility"]["global_verbosity"] == "normal"
-    assert settings["refresh"] == {"mode": "quiet", "quiet_refresh_seconds": 30}
+    assert settings["refresh"]["mode"] == "quiet"
+    assert settings["refresh"]["quiet_refresh_seconds"] == 30
+    assert settings["refresh"]["enabled"] is True
     assert settings["command_console"]["mode"] == "inline"
     assert settings["command_console"]["open_on_start"] is False
     assert len([w for w in payload["warnings"] if w["type"] in {"invalid_setting", "settings_version_mismatch"}]) >= 8
