@@ -53,6 +53,23 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0518": {
+        "recipe_id": "wp-0518-validation-audit-verdict-control-center",
+        "title": "WP-0518 — Validation, Audit, and Verdict Control Center",
+        "description": "Validates Office-facing validation/audit/verdict controls that delegate to canonical runtimes and never grant institutional acceptance.",
+        "required_checks": ["Validation action modules compile", "Focused validation Office tests pass", "Documentation and completion receipt exist"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/office_validation_actions.py", "src/estate/core/office_command_surface.py", "tests/test_office_validation_actions.py", "docs/integration/office_validation_audit_verdict_control_center.md", "collaboration/work_packages/completions/WP-0518_codex_done.json"],
+        "failure_criteria": ["Controls create a second validator, acceptance authority, verdict registry, or retry queue", "Any control grants institutional acceptance", "Any required command exits non-zero"],
+        "success_criteria": ["Inspection, request/revalidation, failure acknowledgement, automatic-validator status, artifact opening, filtering, and governed retry are covered"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/office_validation_actions.py src/estate/core/office_command_surface.py"),
+            _cmd("pytest -q tests/test_office_validation_actions.py"),
+            _cmd("python -c \"from pathlib import Path; paths=['docs/integration/office_validation_audit_verdict_control_center.md','collaboration/work_packages/completions/WP-0518_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        ],
+    },
+
     "WP-0514": {
         "recipe_id": "wp-0514-personnel-directory-org-chart-control-surface",
         "title": "WP-0514 — Personnel Directory, Org Chart, and Employee File Control Surface",

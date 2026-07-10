@@ -1,0 +1,51 @@
+{
+  "branch": "work",
+  "canonical_handlers_reused": [
+    "estate.core.work_package_validation.validate_work_package",
+    "estate.core.production_readiness_validation.generate_production_readiness_report",
+    "estate.core.post_merge_audit_processor.PostMergeAuditProcessor"
+  ],
+  "codex_status": "done",
+  "completed_at": "2026-07-10T19:10:00Z",
+  "files_changed": [
+    "src/estate/core/office_validation_actions.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_office_validation_actions.py",
+    "docs/integration/office_validation_audit_verdict_control_center.md",
+    "collaboration/work_packages/completions/WP-0518_codex_done.json"
+  ],
+  "implemented_controls": [
+    "validation.refresh_center",
+    "validation.request",
+    "validation.acknowledge_failure",
+    "validation.automatic_validator_status",
+    "validation.open_artifact",
+    "validation.governed_retry"
+  ],
+  "institutional_acceptance_granted_by_controls": false,
+  "known_limitations": [
+    "Controls expose and advance existing local artifacts only; they do not grant institutional acceptance."
+  ],
+  "merge_authority": "Chief Architect review required before merge or institutional acceptance.",
+  "merge_authority_or_equivalent": "Chief Architect review required before merge or institutional acceptance.",
+  "new_acceptance_authority_created": false,
+  "new_retry_queue_created": false,
+  "new_validator_created": false,
+  "new_verdict_registry_created": false,
+  "pull_request_url": "not_applicable_until_codex_creates_pr_after_commit",
+  "pull_request_url_or_not_applicable_reason": "Pull request will be created by Codex after committing the WP-0518 implementation.",
+  "ready_for_ca_review": true,
+  "status": "completed",
+  "summary": [
+    "Added Office validation/audit/verdict control center helpers and command-surface controls.",
+    "Reused canonical work-package validation, production-readiness, and post-merge audit processor runtimes.",
+    "Added focused browser-to-handler-style command-surface tests and WP-0518 validation recipe."
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/office_validation_actions.py src/estate/core/office_command_surface.py src/estate/core/work_package_validation.py",
+    "pytest -q tests/test_office_validation_actions.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0518 --json"
+  ],
+  "work_package_id": "WP-0518"
+}
