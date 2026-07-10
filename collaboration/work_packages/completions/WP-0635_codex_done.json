@@ -1,0 +1,12 @@
+{
+  "work_package_id": "WP-0635",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T19:46:18+00:00",
+  "summary": "Implemented Office Operational Command Dashboard from durable runtime artifacts with real Office handlers, drill-down evidence, filters, tests, and integration docs.",
+  "artifacts": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_command_surface.py",
+    "tests/test_office_operational_command_dashboard.py",
+    "docs/integration/office_operational_command_dashboard.md"
+  ]
+}

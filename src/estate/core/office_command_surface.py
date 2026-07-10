@@ -572,6 +572,21 @@ def operations_inspect_evidence(root=None, evidence_path: str | None = None, **p
     sample = path.read_text(encoding='utf-8', errors='replace')[:500]
     return _completed('operations_surface.inspect_evidence', label, 'operational-activity', handler, f"Evidence {evidence_path} is readable ({path.stat().st_size} bytes): {sample}", read=[evidence_path], request_id=params.get('request_id'))
 
+
+def operations_dashboard_refresh(root=None, **params: Any) -> OfficeActionResult:
+    base = _root(root)
+    # Regenerate the existing local Office payload/HTML; the dashboard itself reads durable artifacts only.
+    from estate.core.steward_command_center import generate_command_center
+    generate_command_center(root=base, write=True)
+    return _completed('operations_dashboard.refresh', 'Refresh operational command dashboard', 'operational-dashboard', 'estate.core.steward_command_center.generate_command_center', 'Operational command dashboard refreshed from durable runtime artifacts.', read=['runtime/operations_runtime/status/latest.json','runtime/background_operations/status/latest.json','runtime/work_packages/assignment_queue.json','runtime/post_merge_audit/status/latest.json'], written=['runtime/steward/command_center.html'], state=['office operational command dashboard refreshed'], request_id=params.get('request_id'))
+
+def operations_dashboard_inspect_evidence(root=None, evidence_path: str | None = None, **params: Any) -> OfficeActionResult:
+    result = operations_inspect_evidence(root=root, evidence_path=evidence_path, **params)
+    result.action_id = 'operations_dashboard.inspect_evidence'
+    result.action_label = 'Inspect dashboard evidence'
+    result.target_tab = 'operational-dashboard'
+    return result
+
 def _planning_result(action_id: str, label: str, tab: str, handler: str, payload, request_id: str | None = None) -> OfficeActionResult:
     return OfficeActionResult(action_id, label, request_id or _request_id(), tab, payload.outcome, payload.message, handler, payload.artifacts_read, payload.artifacts_written, payload.runtime_state_changed, 'safe_local_action' if payload.outcome == 'completed' else 'gated_or_missing_requirement')
 
@@ -739,6 +754,8 @@ HANDLERS.update({
  'operational_activity.route_to_workspace': route_operational_activity,
  'operational_activity.open_artifact': open_operational_artifact,
  'operational_activity.filter': filter_operational_activity,
+ 'operations_dashboard.refresh': operations_dashboard_refresh,
+ 'operations_dashboard.inspect_evidence': operations_dashboard_inspect_evidence,
  'execution_session.preview': execution_session_preview,
  'execution_session.start': execution_session_start,
  'execution_session.resume': execution_session_resume,
@@ -831,6 +848,8 @@ ACTION_CONTROLS = [
  {'action_id':'alfred.request_briefing','label':'Request Alfred briefing','target_tab':'alfred','handler':'request_alfred_briefing','availability':'available'},
  {'action_id':'mission_control.refresh_payload','label':'Refresh Mission Control payload','target_tab':'mission-control','handler':'refresh_mission_control','availability':'available'},
  {'action_id':'daily_board.generate_morning_briefing','label':'Generate morning briefing','target_tab':'daily-board','handler':'generate_daily_briefing','availability':'available'},
+ {'action_id':'operations_dashboard.refresh','label':'Refresh operational command dashboard','target_tab':'operational-dashboard','handler':'operations_dashboard_refresh','availability':'available','note':'Rebuilds the Office dashboard from durable local runtime artifacts.'},
+ {'action_id':'operations_dashboard.inspect_evidence','label':'Inspect dashboard evidence','target_tab':'operational-dashboard','handler':'operations_dashboard_inspect_evidence','availability':'available','requires_input':'evidence_path','note':'Drill-down only; reads existing local evidence under Estate root.'},
  {'action_id':'operations_surface.host_control','label':'Start/stop/restart Operations Runtime host','target_tab':'operational-activity','handler':'operations_host_control','availability':'available','requires_input':'host_action','note':'Actions: start, stop, restart, status. Delegates to OperationsRuntimeHost; no provider execution.'},
  {'action_id':'operations_surface.scheduler_control','label':'Enable/disable scheduler job or trigger event','target_tab':'operational-activity','handler':'operations_scheduler_control','availability':'available','requires_input':'scheduler_action,job_id,event_name','note':'Actions: enable, disable, trigger. State persists in operations scheduler artifacts.'},
  {'action_id':'operations_surface.watch_control','label':'Enable/disable/evaluate operational watch','target_tab':'operational-activity','handler':'operations_watch_control','availability':'available','requires_input':'watch_action,watch_id','note':'Actions: enable, disable, pause, evaluate. Evaluate is dry-run evidence inspection.'},
