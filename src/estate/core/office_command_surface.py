@@ -35,6 +35,7 @@ from estate.core.execution_result_reconciliation_runtime import inspect_reconcil
 from estate.core.operations_center_settings import save_settings_document, reset_operations_center_settings, export_operations_center_settings, import_operations_center_settings, SETTINGS_OUTPUT
 from estate.core.office_parking_lot_controls import parking_action, roadmap_action, planning_undo, filter_items
 from estate.core.office_personnel_directory import refresh_personnel_directory, open_employee_detail, route_personnel_mailbox, route_personnel_conversation
+from estate.core.office_validation_actions import inspect_validation_control_center, request_validation, acknowledge_failure, automatic_validator_status, open_artifact as open_validation_artifact, governed_retry
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -270,6 +271,39 @@ def filter_operational_activity(root=None, state: str = '', owner: str = '', pri
     base=_root(root); rel='runtime/operations/status/activity_filter.json'; payload={'state':state,'owner':owner,'priority':priority,'attention_required':attention_required,'timestamp':datetime.now(timezone.utc).isoformat(timespec='seconds')}
     path=base/rel; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(payload, indent=2, sort_keys=True)+'\n', encoding='utf-8')
     return _completed('operational_activity.filter', 'Filter operational activity', 'operational-activity', 'office_command_surface.filter_operational_activity', 'Operational activity filter persisted for the local Office render.', written=[rel], state=['operational activity filter state changed'], request_id=params.get('request_id'))
+
+
+def validation_refresh_center(root=None, **params: Any) -> OfficeActionResult:
+    base = _root(root); payload = inspect_validation_control_center(base, **{k: v for k, v in params.items() if k in {'result','package','date_from','date_to','owner','attention_state'}})
+    return _completed('validation.refresh_center', 'Refresh validation/audit control center', 'validation', 'estate.core.office_validation_actions.inspect_validation_control_center', f"Validation/audit center refreshed with {(payload.get('summary') or {}).get('row_count', 0)} row(s). Evidence is not institutional acceptance.", written=['runtime/validation/office_validation_control_center.json'], state=['validation Office payload refreshed'], request_id=params.get('request_id'))
+
+def validation_request(root=None, work_package_id: str | None = None, revalidate: Any = None, **params: Any) -> OfficeActionResult:
+    if not work_package_id:
+        return _blocked('validation.request', 'Request validation/revalidation', 'validation', 'estate.core.office_validation_actions.request_validation', 'work_package_id is required.', request_id=params.get('request_id'))
+    base = _root(root); payload = request_validation(base, work_package_id, revalidate=_truthy(revalidate))
+    return _completed('validation.request', 'Request validation/revalidation', 'validation', 'estate.core.work_package_validation.validate_work_package', f"Validation {'re' if _truthy(revalidate) else ''}run for {work_package_id} produced status {payload.get('validation_status')}; institutional acceptance not granted.", written=[f"runtime/validation/work_packages/{payload.get('validation_id')}.json", f"operations/validation/work_packages/{payload.get('validation_id')}.md", 'runtime/validation/office_validation_control_center.json'], state=['validation evidence generated'], request_id=params.get('request_id'))
+
+def validation_acknowledge_failure(root=None, artifact_id: str | None = None, acknowledged_by: str | None = None, reason: str | None = None, **params: Any) -> OfficeActionResult:
+    if not artifact_id or not acknowledged_by:
+        return _blocked('validation.acknowledge_failure', 'Acknowledge validation failure', 'validation', 'estate.core.office_validation_actions.acknowledge_failure', 'artifact_id and acknowledged_by are required.', request_id=params.get('request_id'))
+    base = _root(root); acknowledge_failure(base, artifact_id, acknowledged_by, reason)
+    return _completed('validation.acknowledge_failure', 'Acknowledge validation failure', 'validation', 'estate.core.office_validation_actions.acknowledge_failure', f"Failure attention for {artifact_id} acknowledged locally; evidence remains unchanged.", written=['runtime/validation/failure_acknowledgements.jsonl','runtime/validation/office_validation_control_center.json'], state=['failure acknowledgement recorded'], request_id=params.get('request_id'))
+
+def validation_auto_status(root=None, **params: Any) -> OfficeActionResult:
+    payload = automatic_validator_status(_root(root))
+    return _completed('validation.automatic_validator_status', 'Inspect automatic-validator status', 'validation', 'estate.core.office_validation_actions.automatic_validator_status', f"Automatic validator available={payload.get('available')} pending={payload.get('pending')} latest_verdict={payload.get('latest_verdict')}.", read=['runtime/post_merge_audit/status/latest.json','runtime/post_merge_audit/status/summary.json'], state=['automatic validator status inspected'], request_id=params.get('request_id'))
+
+def validation_open_artifact(root=None, artifact_path: str | None = None, **params: Any) -> OfficeActionResult:
+    if not artifact_path:
+        return _blocked('validation.open_artifact', 'Open validation/audit/verdict artifact', 'validation', 'estate.core.office_validation_actions.open_artifact', 'artifact_path is required.', request_id=params.get('request_id'))
+    payload = open_validation_artifact(_root(root), artifact_path)
+    if payload.get('outcome') != 'completed':
+        return _blocked('validation.open_artifact', 'Open validation/audit/verdict artifact', 'validation', 'estate.core.office_validation_actions.open_artifact', payload.get('message'), read=[artifact_path], request_id=params.get('request_id'))
+    return _completed('validation.open_artifact', 'Open validation/audit/verdict artifact', 'validation', 'estate.core.office_validation_actions.open_artifact', payload.get('message'), read=[artifact_path], state=['artifact route verified'], request_id=params.get('request_id'))
+
+def validation_governed_retry(root=None, max_count: Any = 1, **params: Any) -> OfficeActionResult:
+    base = _root(root); payload = governed_retry(base, max_count=int(max_count or 1)); processed = payload.get('processed_count', 0)
+    return _completed('validation.governed_retry', 'Run governed audit retry', 'validation', 'estate.core.post_merge_audit_processor.PostMergeAuditProcessor.process_all', f"Governed retry processed {processed} request(s); institutional acceptance not granted.", read=['runtime/post_merge_audit/requests'], written=['runtime/post_merge_audit/status/latest.json','runtime/post_merge_audit/status/summary.json'], state=['existing audit processor queue advanced'], request_id=params.get('request_id'))
 
 def settings_load_current(root=None, **_: Any) -> OfficeActionResult:
     return _completed('settings.load_current', 'Load current settings', 'settings', 'estate.core.operations_center_settings.load_operations_center_settings', 'Current settings are loaded in the refreshed Office payload.', read=[SETTINGS_OUTPUT], state=['settings payload refreshed'])
@@ -551,6 +585,12 @@ HANDLERS: dict[str, Callable[..., OfficeActionResult]] = {f.__name__: f for f in
 HANDLERS.update({
  'ai_services.refresh_local_inventory': refresh_ai_services,
  'validation.run_production_readiness': run_production_readiness,
+ 'validation.refresh_center': validation_refresh_center,
+ 'validation.request': validation_request,
+ 'validation.acknowledge_failure': validation_acknowledge_failure,
+ 'validation.automatic_validator_status': validation_auto_status,
+ 'validation.open_artifact': validation_open_artifact,
+ 'validation.governed_retry': validation_governed_retry,
  'work_packages.validate_selected': validate_selected_work_package,
  'work_packages.refresh_assignment_queue': refresh_work_package_queue,
  'work_packages.assign': assign_work_package,
@@ -633,6 +673,12 @@ ACTION_CONTROLS = [
  {'action_id':'settings.export','label':'Export settings','target_tab':'settings','handler':'settings_export','availability':'available'},
  {'action_id':'settings.import','label':'Import settings','target_tab':'settings','handler':'settings_import','availability':'available','requires_input':'settings_json'},
  {'action_id':'ai_services.refresh_local_inventory','label':'Refresh local AI service inventory','target_tab':'ai-services-models','handler':'refresh_ai_services','availability':'available'},
+ {'action_id':'validation.refresh_center','label':'Refresh validation/audit center','target_tab':'validation','handler':'validation_refresh_center','availability':'available','requires_input':'result,package,date_from,date_to,owner,attention_state','note':'Inspects pending, running, completed, and failed validation/audit/verdict artifacts without granting acceptance.'},
+ {'action_id':'validation.request','label':'Request validation/revalidation','target_tab':'validation','handler':'validation_request','availability':'available','requires_input':'work_package_id,revalidate','note':'Delegates to canonical work-package validation and optional production-readiness refresh.'},
+ {'action_id':'validation.acknowledge_failure','label':'Acknowledge failure attention','target_tab':'validation','handler':'validation_acknowledge_failure','availability':'available','requires_input':'artifact_id,acknowledged_by,reason','note':'Local durable acknowledgement only; source evidence remains unchanged.'},
+ {'action_id':'validation.automatic_validator_status','label':'Inspect automatic-validator status','target_tab':'validation','handler':'validation_auto_status','availability':'available'},
+ {'action_id':'validation.open_artifact','label':'Open validation/audit/verdict artifact','target_tab':'validation','handler':'validation_open_artifact','availability':'available','requires_input':'artifact_path'},
+ {'action_id':'validation.governed_retry','label':'Run governed audit retry','target_tab':'validation','handler':'validation_governed_retry','availability':'available','requires_input':'max_count','note':'Uses existing PostMergeAuditProcessor queue; no second retry queue.'},
  {'action_id':'validation.run_production_readiness','label':'Run production readiness refresh','target_tab':'validation','handler':'run_production_readiness','availability':'available','note':'Evidence is not institutional acceptance.'},
  {'action_id':'work_packages.refresh_assignment_queue','label':'Refresh assignment queue','target_tab':'work-packages','handler':'refresh_work_package_queue','availability':'available'},
  {'action_id':'work_packages.validate_selected','label':'Validate selected work package','target_tab':'work-packages','handler':'validate_selected_work_package','availability':'available','requires_input':'work_package_id'},
