@@ -1,0 +1,13 @@
+{
+  "work_package": "WP-4010",
+  "status": "completed",
+  "completed_by": "Codex",
+  "summary": "Implemented governed institutional learning intake, duplicate detection, privacy-safe Office summaries, owner routing, workforce integration, CLI support, schemas, tests, and validation report.",
+  "artifacts": [
+    "src/estate/core/institutional_learning.py",
+    "src/estate/cli/institutional_learning.py",
+    "docs/schemas/institutional_learning/institutional_lesson_v1.schema.json",
+    "tests/test_institutional_learning.py",
+    "operations/validation/reports/WP-4010_institutional_learning.md"
+  ]
+}
