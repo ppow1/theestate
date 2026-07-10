@@ -14,7 +14,7 @@ from estate.core.service_status_board import generate_service_status_board
 from estate.core.provider_sync import sync_ollama_providers
 from estate.core.production_readiness_validation import generate_production_readiness_report
 from estate.core.work_package_validation import validate_work_package
-from estate.core.assignment_queue import generate_assignment_queue
+from estate.core.assignment_queue import generate_assignment_queue, find_work_package, update_work_package_control
 from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.operations_notification_center import generate_operations_notification_center, acknowledge_operations_notification
 from estate.core.alfred_duty import run_alfred_duty
@@ -115,6 +115,59 @@ def validate_selected_work_package(root=None, work_package_id: str | None = None
 def refresh_work_package_queue(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); payload = generate_assignment_queue(root=base, write=True)
     return _completed('work_packages.refresh_assignment_queue', 'Refresh assignment queue', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', f"Assignment queue refreshed with {len(payload.get('work_packages') or [])} work package(s).", read=['collaboration/work_packages'], written=['runtime/work_packages/assignment_queue.json', 'operations/work_packages/assignment_queue.md'], state=['work package pipeline refreshed'])
+
+def assign_work_package(root=None, work_package_id: str | None = None, owner: str | None = None, actor: str = "Office", reason: str = "Office assignment update", **params: Any) -> OfficeActionResult:
+    if not work_package_id or not owner:
+        return _blocked('work_packages.assign', 'Assign/reassign work package', 'work-packages', 'estate.core.assignment_queue.update_work_package_control', 'work_package_id and owner are required.', request_id=params.get('request_id'))
+    base = _root(root)
+    payload = update_work_package_control(work_package_id, root=base, owner=owner, actor=actor, reason=reason)
+    wp = payload.get('work_package') or {}
+    return _completed('work_packages.assign', 'Assign/reassign work package', 'work-packages', 'estate.core.assignment_queue.update_work_package_control', f"Assignment persisted for {work_package_id}: owner={wp.get('owner')}.", read=['collaboration/work_packages', 'runtime/work_packages/control_state.json'], written=['runtime/work_packages/control_state.json', 'runtime/work_packages/control_events.jsonl', 'runtime/work_packages/assignment_queue.json', 'operations/work_packages/assignment_queue.md'], state=['work package assignment persisted', 'Office payload refreshed'], request_id=params.get('request_id'))
+
+def update_work_package_state(root=None, work_package_id: str | None = None, state: str | None = None, priority: str | None = None, actor: str = "Office", reason: str = "Office state update", **params: Any) -> OfficeActionResult:
+    if not work_package_id or not (state or priority):
+        return _blocked('work_packages.update_state', 'Change work package status/priority', 'work-packages', 'estate.core.assignment_queue.update_work_package_control', 'work_package_id plus state or priority are required.', request_id=params.get('request_id'))
+    base = _root(root)
+    payload = update_work_package_control(work_package_id, root=base, state=state, priority=priority, actor=actor, reason=reason)
+    wp = payload.get('work_package') or {}
+    return _completed('work_packages.update_state', 'Change work package status/priority', 'work-packages', 'estate.core.assignment_queue.update_work_package_control', f"Status/priority persisted for {work_package_id}: state={wp.get('state')} priority={wp.get('priority')}.", read=['collaboration/work_packages', 'runtime/work_packages/control_state.json'], written=['runtime/work_packages/control_state.json', 'runtime/work_packages/control_events.jsonl', 'runtime/work_packages/assignment_queue.json', 'operations/work_packages/assignment_queue.md'], state=['work package status or priority persisted', 'Office payload refreshed'], request_id=params.get('request_id'))
+
+def promote_work_package(root=None, work_package_id: str | None = None, actor: str = "Office", reason: str = "Office canonical promotion", **params: Any) -> OfficeActionResult:
+    if not work_package_id:
+        return _blocked('work_packages.promote', 'Promote work package', 'work-packages', 'estate.core.assignment_queue.update_work_package_control', 'work_package_id is required.', request_id=params.get('request_id'))
+    base = _root(root)
+    payload = update_work_package_control(work_package_id, root=base, promote=True, actor=actor, reason=reason)
+    wp = payload.get('work_package') or {}
+    return _completed('work_packages.promote', 'Promote work package', 'work-packages', 'estate.core.assignment_queue.update_work_package_control', f"{work_package_id} promoted to canonical workflow state {wp.get('state')}.", read=['collaboration/work_packages', 'runtime/work_packages/control_state.json'], written=['runtime/work_packages/control_state.json', 'runtime/work_packages/control_events.jsonl', 'runtime/work_packages/assignment_queue.json', 'operations/work_packages/assignment_queue.md'], state=['work package canonical workflow state advanced', 'Office payload refreshed'], request_id=params.get('request_id'))
+
+def open_work_package_artifact(root=None, work_package_id: str | None = None, artifact_kind: str = "source", **params: Any) -> OfficeActionResult:
+    if not work_package_id:
+        return _blocked('work_packages.open_artifact', 'Open work-package artifact/evidence', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', 'work_package_id is required.', request_id=params.get('request_id'))
+    base = _root(root)
+    queue = generate_assignment_queue(root=base, write=False)
+    wp = find_work_package(queue, work_package_id)
+    if not wp:
+        return _blocked('work_packages.open_artifact', 'Open work-package artifact/evidence', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', f'Unknown work package: {work_package_id}.', request_id=params.get('request_id'))
+    evidence = wp.get('evidence') or {}
+    rel = evidence.get(artifact_kind) or (wp.get('related_references') or {}).get(artifact_kind)
+    if not rel:
+        return _blocked('work_packages.open_artifact', 'Open work-package artifact/evidence', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', f'No {artifact_kind} reference is recorded for {work_package_id}.', request_id=params.get('request_id'))
+    if not (base / rel).exists():
+        return _blocked('work_packages.open_artifact', 'Open work-package artifact/evidence', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', f'{artifact_kind} reference is recorded but not available: {rel}.', read=[rel], request_id=params.get('request_id'))
+    return _completed('work_packages.open_artifact', 'Open work-package artifact/evidence', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', f"{artifact_kind} available for {work_package_id}: {rel}.", read=[rel], state=['work package evidence route verified'], request_id=params.get('request_id'))
+
+def filter_work_packages(root=None, query: str = '', state: str = '', priority: str = '', owner: str = '', **params: Any) -> OfficeActionResult:
+    base = _root(root)
+    queue = generate_assignment_queue(root=base, write=False)
+    rows = queue.get('work_packages') or []
+    def match(wp):
+        hay = ' '.join(str(wp.get(k, '')) for k in ['work_package_id', 'title', 'owner', 'state', 'priority', 'next_action']).lower()
+        return (not query or query.lower() in hay) and (not state or wp.get('state') == state) and (not priority or wp.get('priority') == priority) and (not owner or owner.lower() in str(wp.get('owner','')).lower())
+    matches = [wp['work_package_id'] for wp in rows if match(wp)]
+    rel = 'runtime/work_packages/last_filter_result.json'
+    (base / rel).parent.mkdir(parents=True, exist_ok=True)
+    (base / rel).write_text(json.dumps({'query': query, 'state': state, 'priority': priority, 'owner': owner, 'matches': matches}, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    return _completed('work_packages.filter', 'Filter/search/sort work packages', 'work-packages', 'estate.core.assignment_queue.generate_assignment_queue', f"Filter completed with {len(matches)} match(es): {', '.join(matches[:10])}.", read=['runtime/work_packages/assignment_queue.json', 'collaboration/work_packages'], written=[rel], state=['work package filtered result recorded'], request_id=params.get('request_id'))
 
 def refresh_notifications(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); payload = generate_operations_notification_center(root=base, write=True)
@@ -421,6 +474,11 @@ HANDLERS.update({
  'validation.run_production_readiness': run_production_readiness,
  'work_packages.validate_selected': validate_selected_work_package,
  'work_packages.refresh_assignment_queue': refresh_work_package_queue,
+ 'work_packages.assign': assign_work_package,
+ 'work_packages.update_state': update_work_package_state,
+ 'work_packages.promote': promote_work_package,
+ 'work_packages.open_artifact': open_work_package_artifact,
+ 'work_packages.filter': filter_work_packages,
  'notifications.refresh_center': refresh_notifications,
  'notifications.local_acknowledge': local_ack_notification,
  'alfred.request_briefing': request_alfred_briefing,
@@ -493,6 +551,11 @@ ACTION_CONTROLS = [
  {'action_id':'validation.run_production_readiness','label':'Run production readiness refresh','target_tab':'validation','handler':'run_production_readiness','availability':'available','note':'Evidence is not institutional acceptance.'},
  {'action_id':'work_packages.refresh_assignment_queue','label':'Refresh assignment queue','target_tab':'work-packages','handler':'refresh_work_package_queue','availability':'available'},
  {'action_id':'work_packages.validate_selected','label':'Validate selected work package','target_tab':'work-packages','handler':'validate_selected_work_package','availability':'available','requires_input':'work_package_id'},
+ {'action_id':'work_packages.assign','label':'Assign/reassign','target_tab':'work-packages','handler':'assign_work_package','availability':'available','requires_input':'work_package_id,owner','note':'Persists assignment through the canonical local assignment-queue runtime and refreshes the Office payload.'},
+ {'action_id':'work_packages.update_state','label':'Change status/priority','target_tab':'work-packages','handler':'update_work_package_state','availability':'available','requires_input':'work_package_id,state,priority','note':'Supported states: pending, open, claimed, blocked, completed. Supported priorities: low, normal, high, urgent.'},
+ {'action_id':'work_packages.promote','label':'Promote canonical state','target_tab':'work-packages','handler':'promote_work_package','availability':'available','requires_input':'work_package_id','note':'Advances pending → open → claimed → completed; blocked/completed packages are truthfully blocked.'},
+ {'action_id':'work_packages.open_artifact','label':'Open source/evidence','target_tab':'work-packages','handler':'open_work_package_artifact','availability':'available','requires_input':'work_package_id,artifact_kind','note':'artifact_kind may be source, completion_receipt, validation, operations_validation, pr, or commit.'},
+ {'action_id':'work_packages.filter','label':'Filter/search/sort','target_tab':'work-packages','handler':'filter_work_packages','availability':'available','requires_input':'query,state,priority,owner'},
  {'action_id':'notifications.refresh_center','label':'Refresh notification center','target_tab':'notifications','handler':'refresh_notifications','availability':'available'},
  {'action_id':'notifications.local_acknowledge','label':'Acknowledge notification locally','target_tab':'notifications','handler':'local_ack_notification','availability':'available','requires_input':'notification_id','note':'Local state only; authoritative closure is unchanged.'},
  {'action_id':'alfred.request_briefing','label':'Request Alfred briefing','target_tab':'alfred','handler':'request_alfred_briefing','availability':'available'},

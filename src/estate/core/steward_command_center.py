@@ -665,9 +665,12 @@ def _work_package_pipeline_artifact(root):
                 "state": state,
                 "source_state": entry.get("state"),
                 "mode": str(entry.get("mode") or "missing").lower(),
+                "priority": entry.get("priority") or "normal",
                 "dependency_notes": "; ".join(entry.get("dependencies") or entry.get("blockers") or []) or "None recorded",
+                "blockers": entry.get("blockers") or [],
                 "owner": entry.get("owner") or "unassigned",
                 "next_action": entry.get("next_action") or "Review missing work package metadata.",
+                "evidence": entry.get("evidence") or {},
                 "completion_status": "ready_for_ca_review" if completion.get("ready_for_ca_review") else (completion.get("codex_status") or "not completed"),
                 "review_status": "review recorded" if review else "review not recorded",
                 "codex_command": command,
@@ -1586,20 +1589,30 @@ def _work_package_pipeline_html(artifact):
         if not items:
             out.append("<p class='placeholder'>No work packages in this state.</p></section>")
             continue
-        out.append("<table><thead><tr><th>ID</th><th>Title</th><th>Mode</th><th>Owner</th><th>Dependencies</th><th>Next action</th><th>Completion / Review</th></tr></thead><tbody>")
+        out.append("<table><thead><tr><th>ID</th><th>Title</th><th>Mode / Priority</th><th>Owner</th><th>Dependencies / Blockers</th><th>Next action</th><th>Completion / Review</th><th>Controls</th></tr></thead><tbody>")
         for item in items[:12]:
             command = item.get("codex_command")
             action = html.escape(str(item.get("next_action") or ""))
             if command:
                 action += f"<br><textarea readonly rows='4' aria-label='Codex command for {html.escape(str(item.get('work_package_id')))}'>{html.escape(command)}</textarea>"
+            wp_id = html.escape(str(item.get('work_package_id')), quote=True)
+            evidence = item.get("evidence") or {}
+            links = " ".join("<button class='office-action' data-office-action='work_packages.open_artifact' data-work-package-id='" + wp_id + "' data-artifact-kind='" + html.escape(kind, quote=True) + "'>" + html.escape(kind.replace("_", " ")) + "</button>" for kind in ["source", "completion_receipt", "validation"] if evidence.get(kind))
+            controls = (
+                "<button class='office-action' data-office-action='work_packages.promote' data-work-package-id='" + wp_id + "'>Promote</button> "
+                "<button class='office-action' data-office-action='work_packages.validate_selected' data-work-package-id='" + wp_id + "'>Validate</button><br>"
+                + links
+            )
+            blockers = "<br>".join(html.escape(str(b)) for b in (item.get("blockers") or [])) or "None recorded"
             out.append("<tr>"
                 f"<td>{html.escape(str(item.get('work_package_id')))}</td>"
                 f"<td>{html.escape(str(item.get('title')))}<br><span class='source'>{html.escape(str(item.get('path') or 'missing path'))}</span></td>"
-                f"<td>{html.escape(str(item.get('mode')))}</td>"
+                f"<td>{html.escape(str(item.get('mode')))}<br><span class='severity'>{html.escape(str(item.get('priority')))}</span></td>"
                 f"<td>{html.escape(str(item.get('owner')))}</td>"
-                f"<td>{html.escape(str(item.get('dependency_notes')))}</td>"
+                f"<td>{html.escape(str(item.get('dependency_notes')))}<br><strong>Blockers:</strong><br>{blockers}</td>"
                 f"<td>{action}</td>"
                 f"<td>{html.escape(str(item.get('completion_status')))} / {html.escape(str(item.get('review_status')))}</td>"
+                f"<td>{controls}</td>"
                 "</tr>")
         out.append("</tbody></table></section>")
     out.append(f"<p class='source'>Source: {html.escape(artifact.get('path', ''))}; {html.escape(str(data.get('source') or 'local artifacts'))}</p></div>")
