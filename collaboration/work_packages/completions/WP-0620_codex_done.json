@@ -1,0 +1,38 @@
+{
+  "work_package_id": "WP-0620",
+  "provider": "codex_cloud_web",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T00:59:00Z",
+  "branch": "work",
+  "summary": "Registered local validation recipes for WP-0619 and WP-0620 so WP-0619 validates through the standard validate-work-package path and no longer returns no_recipe.",
+  "files_changed": [
+    "src/estate/core/work_package_validation.py",
+    "collaboration/work_packages/completions/WP-0620_codex_done.json"
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/work_package_validation.py",
+    "python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\"",
+    "pytest -q tests/test_operations_runtime.py tests/test_operations_runtime_service.py --basetemp Temp/pytest-operations-runtime",
+    "PYTHONPATH=src python -m estate.cli.main operations-runtime run-once --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-runtime status --json",
+    "PYTHONPATH=src python -m estate.cli.main operations-runtime report",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0619 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/work_package_validation.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0619 --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0620 --json"
+  ],
+  "known_limitations": [],
+  "ready_for_ca_review": true,
+  "pull_request_not_applicable_reason": "Local completion receipt before repository PR publication.",
+  "merge_authority": "Chief Architect / Steward",
+  "merge_authority_equivalent": "Chief Architect / Steward",
+  "provider_execution_performed": false,
+  "dispatch_execution_performed": false,
+  "wp_0619_validation_result": {
+    "validation_status": "passed",
+    "production_readiness": true,
+    "recipe_id": "wp-0619-operations-runtime-service-loop"
+  }
+}
