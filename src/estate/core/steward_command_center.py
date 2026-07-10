@@ -8,6 +8,7 @@ new business logic; missing support artifacts become visible placeholders.
 import html
 import json
 import re
+import os
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -34,7 +35,7 @@ from estate.core.orchestrator_intake_decisions import load_office_intake_decisio
 from estate.core.estate_service_catalog import COMMAND_SURFACES, generate_estate_service_catalog
 from estate.core.operations_center_workspace_profiles import resolve_workspace_profile, PROFILES_OUTPUT as WORKSPACE_PROFILES_OUTPUT
 from estate.core.operations_center_settings import load_operations_center_settings, SETTINGS_OUTPUT, THEME_OPTIONS, ACCENT_OPTIONS, DENSITY_OPTIONS, STARTUP_TAB_OPTIONS
-from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation, alfred_llm_diagnostic
+from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation, retry_failed_response, alfred_llm_diagnostic
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
 from estate.core.office_personnel_directory import build_office_personnel_directory
@@ -1350,6 +1351,21 @@ def _alfred_chat_panel(root):
         "memory_message": "Conversation turns are persisted locally through the WP-0126 resident interaction framework and can be reloaded from runtime/resident_interactions/sessions. Steward-directed forget/redaction remains available through the resident API.",
         "local_first_message": "Local-first operation: local LLM is used when available through the WP-0126 adapter path; deterministic fallback is used when no local model is available.",
         "diagnostics_message": "Adapter diagnostics are shown per response: provider/model, fallback state, safe adapter error, request/response timestamps, and transport/timeout status. Secrets are redacted.",
+        "runtime_capabilities": {
+            "send": True,
+            "enter_to_send": True,
+            "shift_enter_newline": True,
+            "stop_cancel": False,
+            "stop_cancel_reason": "The current resident interaction API is request/response and exposes no truthful generation cancellation primitive.",
+            "forget": True,
+            "history": True,
+            "retry_failed_only": True,
+        },
+        "open_webui": {
+            "available": bool(os.environ.get("ESTATE_OPEN_WEBUI_URL")),
+            "url": os.environ.get("ESTATE_OPEN_WEBUI_URL"),
+            "message": "Set ESTATE_OPEN_WEBUI_URL to expose a launch link; Office text chat remains available here." if not os.environ.get("ESTATE_OPEN_WEBUI_URL") else "Open WebUI launch link is configured; Office text chat remains available here.",
+        },
     }
 
 
@@ -1385,6 +1401,7 @@ def _alfred_chat_html(panel):
     return f"""
 <section class="alfred-chat" aria-label="Alfred Operations Center chat">
   <h3>Chat with Alfred</h3>
+  <p class="source">Primary control surface: Enter sends, Shift+Enter inserts a new line. Stop/cancel is not shown because this runtime does not truthfully support cancellation.</p>
   <p>{html.escape(str(panel.get('authority_message') or ''))}</p>
   <p class="source">{html.escape(str(panel.get('memory_message') or ''))}</p>
   <p class="source">{html.escape(str(panel.get('local_first_message') or ''))}</p>
@@ -1401,6 +1418,7 @@ def _alfred_chat_html(panel):
     <dt>Recovery hint</dt><dd>{html.escape(str((panel.get('llm_diagnostic') or {}).get('recovery_hint') or 'No recovery hint available.'))}</dd>
     <dt>Diagnostic artifact</dt><dd><code>{html.escape(str((panel.get('llm_diagnostic') or {}).get('diagnostic_path') or 'runtime/residents/alfred/llm_diagnostics.json'))}</code></dd>
     <dt>Surface endpoint</dt><dd><code>/api/residents/alfred/surface</code></dd>
+    <dt>Open WebUI</dt><dd>{html.escape(str((panel.get('open_webui') or {}).get('url') or (panel.get('open_webui') or {}).get('message') or 'not configured'))}</dd>
   </dl>
   <form id="alfred-chat-form" data-resident-chat="alfred">
     <label for="alfred-chat-input">Message Alfred</label>
@@ -1408,6 +1426,9 @@ def _alfred_chat_html(panel):
     <div id="alfred-paste-help" class="source">Paste screenshots/images or text snippets here. Attachments stay local under runtime/resident_interactions/attachments.</div>
     <div id="alfred-pending-attachments" class="alfred-attachments" aria-live="polite"></div>
     <button id="alfred-chat-send" type="submit">Send to Alfred</button>
+    <button type="button" data-alfred-action="history">Open history</button>
+    <button type="button" data-alfred-action="forget">Forget conversation</button>
+    <button type="button" data-office-action="alfred.request_briefing">Request Alfred briefing</button>
   </form>
   <div id="alfred-chat-response" data-state="idle" role="status" aria-live="polite"></div>
   <h4>Recent Alfred conversation history</h4>
@@ -2361,7 +2382,7 @@ def render_command_center_html(payload):
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
         ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {}))),
-        ("alfred", "Alfred Resident Card", _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {})) + _alfred_chat_html(p.get("alfred_chat", {}))),
+        ("alfred", "Alfred Office", _alfred_chat_html(p.get("alfred_chat", {})) + _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
@@ -2566,7 +2587,7 @@ async function loadAlfredHistory(){
     const response = await fetch('/api/residents/alfred/chat');
     const data = await response.json();
     const turns = (data.sessions || []).flatMap(session => (session.turns || []).map(turn => ({...turn, session_id: session.session_id}))).slice(-8).reverse();
-    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p>${attachmentHtml(turn.attachments || [])}<p class="source">${llmSourceLine(turn)} · Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
+    const html = turns.length ? turns.map(turn => `<article class="alfred-chat-turn"><p><strong>Steward:</strong> ${escapeHtml(turn.user_message || '')}</p><p><strong>Alfred:</strong> ${escapeHtml(turn.resident_response || '')}</p>${attachmentHtml(turn.attachments || [])}${turn.response_contract && (turn.response_contract.failed || turn.response_contract.timed_out) ? `<button type="button" data-alfred-retry-session="${escapeHtml(turn.session_id || '')}" data-alfred-retry-turn="${escapeHtml(turn.turn_id || '')}">Retry failed response</button>` : ''}<p class="source">${llmSourceLine(turn)} · Session ${escapeHtml(turn.session_id || '')} · ${escapeHtml(turn.created_at || '')}</p></article>`).join('') : '<p class="placeholder">No prior Alfred chat turns are recorded yet.</p>';
     history.forEach(el => el.innerHTML = html);
   }catch(error){ history.forEach(el => el.innerHTML = '<p class="placeholder">Unable to reload Alfred history from the local endpoint.</p>'); }
 }
@@ -2580,6 +2601,19 @@ document.addEventListener('click', event => { const btn = event.target.closest('
 
 function llmSourceLine(turn){ const llm = turn.llm || {}; const diag = turn.diagnostics || {}; const contract = turn.response_contract || {}; const degraded = (contract.failed || contract.timed_out || llm.fallback_used) ? 'DEGRADED ' : ''; const fallback = (diag.fallback_reason || llm.fallback_reason) ? ` / fallback: ${escapeHtml(diag.fallback_reason || llm.fallback_reason)}` : ''; const err = (diag.sanitized_error || diag.last_adapter_error) ? ` / adapter error: ${escapeHtml(diag.sanitized_error || diag.last_adapter_error)}` : ''; return `${degraded}Mode: ${escapeHtml(llm.mode || 'unknown')} / Type: ${escapeHtml(contract.response_type || 'unknown')} / Status: ${escapeHtml(contract.status || 'unknown')} / Adapter: ${escapeHtml(diag.local_llm_adapter_available === false ? 'unavailable' : 'available')} / provider: ${escapeHtml(diag.selected_provider || llm.provider || 'unknown')} / model: ${escapeHtml(diag.selected_model || llm.model || 'unknown')} / generation attempted: ${escapeHtml(String(diag.generation_attempted ?? llm.generation_attempted ?? false))} / generation result: ${escapeHtml(diag.generation_result_state || llm.generation_result_state || 'unknown')} / timeout seconds: ${escapeHtml(String(diag.timeout_seconds ?? llm.timeout_seconds ?? 'unknown'))} / prompt size: ${escapeHtml(JSON.stringify(diag.prompt_size || llm.prompt_size || {}))} / recovery hint: ${escapeHtml(diag.recovery_hint || llm.recovery_hint || 'none')} / generation endpoint: ${escapeHtml(diag.generation_endpoint || llm.generation_endpoint || 'none')} / discovered models: ${escapeHtml(String(diag.discovered_models_count ?? llm.discovered_models_count ?? 'unknown'))} / request: ${escapeHtml(diag.last_request_timestamp || 'unknown')} / response: ${escapeHtml(diag.last_response_timestamp || 'unknown')}${fallback}${err}`; }
 function escapeHtml(value){ return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+
+document.addEventListener('keydown', event => {
+  const input = event.target && event.target.closest && event.target.closest('#alfred-chat-input');
+  if(!input) return;
+  if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); input.form?.requestSubmit(); }
+});
+document.addEventListener('click', async event => {
+  const action = event.target.closest('[data-alfred-action]');
+  if(action && action.dataset.alfredAction === 'history'){ event.preventDefault(); await loadAlfredHistory(); document.querySelector('#alfred-chat-history')?.scrollIntoView({block:'nearest'}); }
+  if(action && action.dataset.alfredAction === 'forget'){ event.preventDefault(); const session = prompt('Session id to forget/redact using governed resident API:'); if(session){ const r = await fetch('/api/residents/alfred/forget', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({session_id:session, reason:'Steward Office forget control'})}); document.querySelectorAll('#alfred-chat-response').forEach(el => el.textContent = r.ok ? 'Forget/redaction recorded. Refreshing history.' : 'Forget/redaction request failed.'); await loadAlfredHistory(); } }
+  const retry = event.target.closest('[data-alfred-retry-session]');
+  if(retry){ event.preventDefault(); const r = await fetch('/api/residents/alfred/retry', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({session_id:retry.dataset.alfredRetrySession, turn_id:retry.dataset.alfredRetryTurn})}); const data = await r.json(); document.querySelectorAll('#alfred-chat-response').forEach(el => el.textContent = data.turn ? `Retry completed: ${data.turn.resident_response}` : `Retry blocked: ${data.error || r.statusText}`); await loadAlfredHistory(); }
+});
 document.addEventListener('submit', async event => {
   const form = event.target.closest('#alfred-chat-form');
   if(!form) return;
@@ -2600,6 +2634,7 @@ document.addEventListener('submit', async event => {
   }
 });
 
+window.addEventListener('DOMContentLoaded', () => { const active = location.hash.replace('#','') || 'home'; if(active.startsWith('alfred') || active === 'home') setTimeout(() => document.querySelector('#alfred-chat-input')?.focus(), 0); renderPendingAttachments(); });
 function utf8Bytes(text){ return new TextEncoder().encode(String(text)); }
 function crc32(bytes){ let c = ~0; for(const b of bytes){ c ^= b; for(let k=0;k<8;k++) c = (c >>> 1) ^ (0xEDB88320 & -(c & 1)); } return ~c >>> 0; }
 function dosDateTime(date){ const y=Math.max(1980,date.getFullYear()); return {time:(date.getHours()<<11)|(date.getMinutes()<<5)|(date.getSeconds()>>1), date:((y-1980)<<9)|((date.getMonth()+1)<<5)|date.getDate()}; }
@@ -2733,6 +2768,8 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root, attachments=data.get("attachments") or [])
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "forget":
                 payload = forget_conversation(data.get("session_id") or "", turn_id=data.get("turn_id"), memory_status=data.get("memory_status") or "forgotten", reason=data.get("reason") or "Steward-directed redaction", root=root)
+            elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "retry":
+                payload = retry_failed_response(parts[2], data.get("session_id") or "", data.get("turn_id") or "", root=root)
             else:
                 self.send_error(404, "Unknown local Office API endpoint."); return
             body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")

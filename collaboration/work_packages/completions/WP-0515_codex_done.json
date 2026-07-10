@@ -1,0 +1,59 @@
+{
+  "alfred_chat_primary_interaction": true,
+  "branch": "work",
+  "briefing_uses_canonical_office_action": true,
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T18:31:00Z",
+  "completed_by": "codex",
+  "composer_position": "top_of_alfred_office_page_before_secondary_controls",
+  "enter_to_send_supported": true,
+  "fabricated_cancellation_or_streaming": false,
+  "fabricated_model_state": false,
+  "files_changed": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_wp0515_alfred_primary_chat.py",
+    "collaboration/work_packages/completions/WP-0515_codex_done.json"
+  ],
+  "focus_on_page_entry_supported": true,
+  "governed_forget_control_used": true,
+  "history_inspection_supported": true,
+  "known_limitations": [
+    "Stop/cancel is intentionally not rendered because the current resident runtime has no truthful cancellation primitive.",
+    "Open WebUI launch link is only available when ESTATE_OPEN_WEBUI_URL is configured."
+  ],
+  "live_external_provider_calls_made": false,
+  "merge_authority": "chief_architect_review_required_no_merge_claimed",
+  "merge_authority_or_equivalent": "Chief Architect review required; no merge authority claimed.",
+  "model_runtime_provider_status_truthful": true,
+  "open_webui_launch_path": "ESTATE_OPEN_WEBUI_URL when configured; Office text access retained regardless.",
+  "pull_request_url": "not_applicable_local_codex_make_pr_pending",
+  "pull_request_url_or_not_applicable_reason": "PR will be recorded by make_pr after local commit in this Codex environment.",
+  "ready_for_ca_review": true,
+  "retry_failed_turns_without_success_duplication": true,
+  "second_runtime_or_router_created": false,
+  "send_button_uses_same_submit_handler_as_enter": true,
+  "shift_enter_newline_supported": true,
+  "status": "ready_for_ca_review",
+  "stop_cancel_supported": false,
+  "stop_cancel_truthful_reason": "Current resident interaction API has no streaming or cancellation primitive, so no stop/cancel control is rendered.",
+  "summary": [
+    "Made Alfred chat the first control on Alfred Office page.",
+    "Added truthful history, forget, failed-turn retry, briefing, runtime/provider status, and Open WebUI integration path controls."
+  ],
+  "tests_added": [
+    "tests/test_wp0515_alfred_primary_chat.py"
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/steward_command_center.py src/estate/core/resident_interaction.py src/estate/core/work_package_validation.py",
+    "python -m pytest tests/test_wp0515_alfred_primary_chat.py tests/test_resident_interaction.py tests/test_office_shell_functional.py -q",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0515 --json"
+  ],
+  "validation_commands": [
+    "python -m pytest tests/test_wp0515_alfred_primary_chat.py tests/test_resident_interaction.py tests/test_office_shell_functional.py -q",
+    "python -m py_compile src/estate/core/steward_command_center.py src/estate/core/resident_interaction.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0515 --json"
+  ],
+  "work_package_id": "WP-0515"
+}

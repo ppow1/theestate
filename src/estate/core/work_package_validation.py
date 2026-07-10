@@ -220,6 +220,42 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
     },
 
 
+    "WP-0515": {
+        "recipe_id": "wp-0515-alfred-primary-interaction-chat-control-surface",
+        "title": "WP-0515 — Alfred Primary Interaction and Resident Chat Control Surface",
+        "description": "Validates Alfred's Office page as the primary resident chat surface with truthful runtime controls, persisted history, governed forget, failed-turn retry, briefing action access, and no live external provider calls.",
+        "required_checks": [
+            "Alfred chat controls, resident interaction retry seam, focused tests, and receipt exist",
+            "Command center and resident interaction modules compile",
+            "Focused WP-0515 browser-to-handler-to-state tests pass",
+            "Receipt records no second runtime/router/registry/service and no fabricated streaming/cancellation/model state",
+        ],
+        "observational_checks": ["Open the served Office Alfred tab and confirm the composer is first, Enter sends, Shift+Enter creates a newline, history/forget/retry/briefing controls are visible, and stop/cancel is absent."],
+        "expected_artifacts": [
+            "src/estate/core/steward_command_center.py",
+            "src/estate/core/resident_interaction.py",
+            "tests/test_wp0515_alfred_primary_chat.py",
+            "collaboration/work_packages/completions/WP-0515_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live external provider calls, fabricated cancellation/streaming/model state, or a second resident runtime/router/registry/service",
+        ],
+        "success_criteria": [
+            "Alfred chat is first on the Alfred Office page",
+            "Enter/Shift+Enter, send, history, forget, failed-turn retry, and briefing controls route to existing resident/Office handlers",
+            "Failed-turn retry appends a recovery turn and refuses to duplicate successful turns",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/steward_command_center.py','src/estate/core/resident_interaction.py','tests/test_wp0515_alfred_primary_chat.py','collaboration/work_packages/completions/WP-0515_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd('python -m py_compile src/estate/core/steward_command_center.py src/estate/core/resident_interaction.py'),
+            _cmd('pytest -q tests/test_wp0515_alfred_primary_chat.py tests/test_resident_interaction.py tests/test_office_shell_functional.py'),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0515_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0515'; assert data.get('alfred_chat_primary_interaction') is True; assert data.get('enter_to_send_supported') is True; assert data.get('shift_enter_newline_supported') is True; assert data.get('retry_failed_turns_without_success_duplication') is True; assert data.get('governed_forget_control_used') is True; assert data.get('briefing_uses_canonical_office_action') is True; assert data.get('live_external_provider_calls_made') is False; assert data.get('second_runtime_or_router_created') is False; assert data.get('fabricated_cancellation_or_streaming') is False; assert data.get('ready_for_ca_review') is True\""),
+        ],
+    },
+
+
     "WP-0510": {
         "recipe_id": "wp-0510-office-execution-session-control-surface",
         "title": "WP-0510 — Office Execution Session Control Surface",
