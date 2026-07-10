@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,7 @@ from estate.core.operational_targets import default_targets
 from estate.core.paths import ESTATE_ROOT
 
 BASE = Path("runtime/background_operations/extensions")
-CONFIG = Path("config/background_operations/extensions.json")
+CONFIG = Path("configuration/background_operations/extensions.json")
 STATUS = BASE / "status.json"
 STATE = BASE / "state.json"
 
@@ -34,7 +35,11 @@ class BackgroundOperationsExtensionRuntime:
         self.root = _root(root)
 
     @property
-    def config_path(self) -> Path: return self.root / CONFIG
+    def config_path(self) -> Path:
+        state_root = os.environ.get("ESTATE_RUNTIME_STATE_ROOT")
+        if state_root:
+            return Path(state_root) / CONFIG
+        return self.root / "runtime" / "background_operations" / CONFIG
     @property
     def state_path(self) -> Path: return self.root / STATE
     @property

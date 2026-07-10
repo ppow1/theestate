@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import time
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,22 @@ from estate.core.paths import ESTATE_ROOT
 def _root(root: Path | None = None) -> Path:
     return root or (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
 
+
+
+def _pid_liveness(pid: int) -> str:
+    if pid <= 0:
+        return "dead"
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return "dead"
+    except PermissionError:
+        return "alive"
+    except OSError:
+        if os.name == "nt":
+            return "unknown"
+        return "dead"
+    return "alive"
 
 class OperationsRuntimeLockError(RuntimeError):
     pass
@@ -28,8 +45,20 @@ class OperationsRuntimeService:
     def acquire_lock(self) -> dict[str, Any]:
         self.lock_path.parent.mkdir(parents=True, exist_ok=True)
         if self.lock_path.exists():
-            data = _read_json(self.lock_path)
-            raise OperationsRuntimeLockError(f"operations runtime already locked by {data.get('pid', 'unknown')}")
+            try:
+                data = _read_json(self.lock_path)
+            except Exception as exc:
+                raise OperationsRuntimeLockError(f"operations runtime lock malformed: {exc}")
+            pid = int(data.get("pid") or 0)
+            live = _pid_liveness(pid)
+            if live == "dead":
+                recovery = {"pid": pid, "recovered_at": utc_now_iso(), "reason": "dead_owner_lock", "lock": data}
+                _write_json(self.root / STATUS_DIR / "stale_lock_recovery_latest.json", recovery)
+                self.lock_path.unlink()
+            elif live == "alive":
+                raise OperationsRuntimeLockError(f"operations runtime already locked by live pid {data.get('pid', 'unknown')}")
+            else:
+                raise OperationsRuntimeLockError(f"operations runtime lock owner liveness uncertain for pid {data.get('pid', 'unknown')}")
         payload = {"pid": os.getpid(), "acquired_at": utc_now_iso(), "state": "running"}
         _write_json(self.lock_path, payload)
         return payload
