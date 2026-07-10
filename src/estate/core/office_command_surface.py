@@ -528,6 +528,28 @@ def operations_scheduler_control(root=None, scheduler_action: str | None = None,
     return _completed('operations_surface.scheduler_control', label, 'operational-activity', h, msg, read=['runtime/operations_scheduler/state.json'], written=['runtime/operations_scheduler/state.json', 'runtime/operations_scheduler/status.json'], state=['operations scheduler state persisted'], request_id=params.get('request_id'))
 
 
+def operations_extension_control(root=None, extension_action: str | None = None, extension_id: str | None = None, **params: Any) -> OfficeActionResult:
+    from estate.core.background_operations_extension_runtime import BackgroundOperationsExtensionRuntime
+    action = str(extension_action or params.get('action') or '').strip()
+    label = 'Background Operations extension control'; handler = 'estate.core.background_operations_extension_runtime.BackgroundOperationsExtensionRuntime'
+    base = _root(root); runtime = BackgroundOperationsExtensionRuntime(base)
+    try:
+        if action == 'inspect': payload = runtime.inspect(); h = handler + '.inspect'
+        elif action == 'validate': payload = runtime.validate(); h = handler + '.validate'
+        elif action == 'dry-run': payload = runtime.dry_run(); h = handler + '.dry_run'
+        elif action == 'enable':
+            if not extension_id: return _blocked('operations_surface.extension_control', label, 'operational-activity', handler + '.enable', 'extension_id is required.', request_id=params.get('request_id'))
+            payload = runtime.enable(str(extension_id)); h = handler + '.enable'
+        elif action == 'disable':
+            if not extension_id: return _blocked('operations_surface.extension_control', label, 'operational-activity', handler + '.disable', 'extension_id is required.', request_id=params.get('request_id'))
+            payload = runtime.disable(str(extension_id)); h = handler + '.disable'
+        else:
+            return _blocked('operations_surface.extension_control', label, 'operational-activity', handler, 'extension_action must be inspect, validate, dry-run, enable, or disable.', request_id=params.get('request_id'))
+    except Exception as exc:
+        return OfficeActionResult('operations_surface.extension_control', label, _request_id(params), 'operational-activity', 'failed', f'Extension control failed: {exc}', handler)
+    return _completed('operations_surface.extension_control', label, 'operational-activity', h, f"Extension action {action} completed; valid={payload.get('valid', payload.get('validation',{}).get('valid'))}.", read=['config/background_operations/extensions.json'], written=['runtime/background_operations/extensions/status.json', 'runtime/background_operations/extensions/state.json'], state=['background operations extension state visible in Office'], request_id=params.get('request_id'))
+
+
 def operations_watch_control(root=None, watch_action: str | None = None, watch_id: str | None = None, **params: Any) -> OfficeActionResult:
     action = str(watch_action or params.get('action') or '').strip()
     label = 'Operational Watch control'; handler = 'estate.core.operational_watch_runtime.OperationalWatchRuntime'
@@ -746,6 +768,7 @@ HANDLERS.update({
  'operations_surface.inspect_evidence': operations_inspect_evidence,
  'operations_surface.hold_control': operations_hold_control,
  'operations_surface.trigger_cycle': operations_cycle_control,
+ 'operations_surface.extension_control': operations_extension_control,
  'operations_surface.watch_control': operations_watch_control,
  'operations_surface.scheduler_control': operations_scheduler_control,
  'operations_surface.host_control': operations_host_control,
@@ -852,6 +875,7 @@ ACTION_CONTROLS = [
  {'action_id':'operations_dashboard.inspect_evidence','label':'Inspect dashboard evidence','target_tab':'operational-dashboard','handler':'operations_dashboard_inspect_evidence','availability':'available','requires_input':'evidence_path','note':'Drill-down only; reads existing local evidence under Estate root.'},
  {'action_id':'operations_surface.host_control','label':'Start/stop/restart Operations Runtime host','target_tab':'operational-activity','handler':'operations_host_control','availability':'available','requires_input':'host_action','note':'Actions: start, stop, restart, status. Delegates to OperationsRuntimeHost; no provider execution.'},
  {'action_id':'operations_surface.scheduler_control','label':'Enable/disable scheduler job or trigger event','target_tab':'operational-activity','handler':'operations_scheduler_control','availability':'available','requires_input':'scheduler_action,job_id,event_name','note':'Actions: enable, disable, trigger. State persists in operations scheduler artifacts.'},
+ {'action_id':'operations_surface.extension_control','label':'Inspect/validate/enable background extension','target_tab':'operational-activity','handler':'operations_extension_control','availability':'available','requires_input':'extension_action,extension_id','note':'Actions: inspect, validate, dry-run, enable, disable. Uses committed extension configuration only.'},
  {'action_id':'operations_surface.watch_control','label':'Enable/disable/evaluate operational watch','target_tab':'operational-activity','handler':'operations_watch_control','availability':'available','requires_input':'watch_action,watch_id','note':'Actions: enable, disable, pause, evaluate. Evaluate is dry-run evidence inspection.'},
  {'action_id':'operations_surface.trigger_cycle','label':'Trigger one bounded operations cycle','target_tab':'operational-activity','handler':'operations_cycle_control','availability':'available','requires_input':'dry_run,mode,max_audit_requests','note':'Runs one existing OperationsRuntimeService cycle; does not bypass Traffic Controller constraints.'},
  {'action_id':'operations_surface.hold_control','label':'Place/release audit admission hold','target_tab':'operational-activity','handler':'operations_hold_control','availability':'available','requires_input':'hold_action,work_package,target','note':'Actions: hold, release. Delegates to merge discovery admission runtime.'},
