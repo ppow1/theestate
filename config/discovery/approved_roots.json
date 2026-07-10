@@ -1,0 +1,16 @@
+{
+  "schema_version": "estate.discovery.v1",
+  "approved_roots": [
+    {"path": "src/estate", "category": "estate_code", "owner": "estate"},
+    {"path": "runtime/ai_services/implementations", "category": "ai_services", "owner": "ai_services"},
+    {"path": "runtime/model_control", "category": "models", "owner": "steward"},
+    {"path": "docs", "category": "documents", "owner": "estate"},
+    {"path": "operations", "category": "operations", "owner": "operations"},
+    {"path": "tools", "category": "tools", "owner": "estate"},
+    {"path": "collaboration/work_packages", "category": "workflows", "owner": "collaboration"},
+    {"path": "data/registry", "category": "registries", "owner": "estate"},
+    {"path": "config", "category": "configuration", "owner": "estate"}
+  ],
+  "ignored_path_parts": [".git", ".pytest_cache", "__pycache__", "node_modules", ".venv", "venv"],
+  "protected_path_parts": ["private", "protected", "secrets", ".ssh", ".gnupg"]
+}

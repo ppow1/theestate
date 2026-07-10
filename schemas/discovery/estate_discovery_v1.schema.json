@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Estate Discovery Evidence v1",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "items"],
+  "properties": {
+    "schema_version": {"const": "estate.discovery.v1"},
+    "generated_at": {"type": "string"},
+    "items": {"type": "array"},
+    "duplicates": {"type": "array"},
+    "diff": {"type": "object"},
+    "truth_notice": {"type": "string"}
+  }
+}
