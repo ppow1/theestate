@@ -123,6 +123,8 @@ from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
 from estate.core.operations_runtime_service import OperationsRuntimeService, OperationsRuntimeLockError
 from estate.core.operations_runtime_host import OperationsRuntimeHost, OperationsRuntimeHostError
+from estate.core.operations_scheduler import format_scheduler
+from estate.core.operations_scheduler_runtime import OperationsSchedulerRuntime
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 
@@ -288,6 +290,29 @@ def _operations_runtime_mode(args):
         return "process-audits"
     return "observe-only"
 
+
+def cmd_operations_scheduler(args):
+    try:
+        runtime = OperationsSchedulerRuntime()
+        action = args.operations_scheduler_action
+        if action == "list":
+            payload = runtime.list()
+        elif action == "show":
+            payload = runtime.show(args.job)
+        elif action == "enable":
+            payload = runtime.enable(args.job)
+        elif action == "disable":
+            payload = runtime.disable(args.job)
+        elif action == "run-due":
+            payload = runtime.run_due()
+        elif action == "trigger":
+            payload = runtime.trigger(args.event)
+        else:
+            raise SystemExit(1)
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else format_scheduler(payload) if action in {"list", "show", "enable", "disable"} else json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Operations scheduler failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_operations_runtime(args):
     try:
@@ -3219,6 +3244,16 @@ def main(argv=None):
     q = pma.add_parser("status", help="Show post-merge audit processor status")
     q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_post_merge_audit)
+
+
+    p = sub.add_parser("operations-scheduler", help="Schedule bounded Operations Runtime jobs")
+    osch = p.add_subparsers(dest="operations_scheduler_action", required=True)
+    q = osch.add_parser("list"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("show"); q.add_argument("job"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("enable"); q.add_argument("job"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("disable"); q.add_argument("job"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("run-due"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
+    q = osch.add_parser("trigger"); q.add_argument("event"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operations_scheduler)
 
     p = sub.add_parser("operations-runtime", help="Run and inspect the bounded Operations Runtime service loop")
     ort = p.add_subparsers(dest="operations_runtime_action", required=True)
