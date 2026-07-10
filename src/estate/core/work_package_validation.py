@@ -53,6 +53,38 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0502": {
+        "recipe_id": "wp-0502-institutional-operations-doctrine",
+        "title": "WP-0502 — Institutional Operations Doctrine",
+        "description": "Validates the institutional operations doctrine artifact, completion receipt, required principles, and non-execution boundary claims.",
+        "required_checks": [
+            "Doctrine artifact exists",
+            "Required principles are recorded exactly",
+            "Completion receipt exists",
+            "Receipt records non-execution boundary claims",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "docs/governance/Institutional_Operations_Doctrine.md",
+            "collaboration/work_packages/completions/WP-0502_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Doctrine artifact is missing",
+            "Any required principle text is missing",
+            "Receipt is missing or reports live provider or behavior modification",
+        ],
+        "success_criteria": [
+            "Doctrine is present and records the institutional layer boundaries",
+            "Receipt confirms documentation and validation-recipe-only implementation",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['docs/governance/Institutional_Operations_Doctrine.md','collaboration/work_packages/completions/WP-0502_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -c \"from pathlib import Path; text=Path('docs/governance/Institutional_Operations_Doctrine.md').read_text(encoding='utf-8'); required=['Runtime computes.','Operations conducts.','Traffic Controller constrains.','Execution Providers implement.','Steward governs.','Operations conducts movement.','Traffic Controller authorizes movement according to governance.','Authority flows downward.','Evidence flows upward.','The runtime never becomes the resident.','The resident never becomes the runtime.','Recommendations are evidence, not decisions.','Validation results are evidence, not institutional acceptance.','Dispatch remains the governed implementation path.']; missing=[item for item in required if item not in text]; assert not missing, missing\""),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0502_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0502'; assert data.get('live_provider_calls_made') is False; assert data.get('runtime_behavior_modified') is False; assert data.get('operations_behavior_modified') is False; assert data.get('traffic_controller_behavior_modified') is False; assert data.get('dispatch_behavior_modified') is False; assert data.get('provider_behavior_modified') is False; assert data.get('governance_behavior_modified') is False; assert data.get('ready_for_ca_review') is True\""),
+        ],
+    },
+
     "WP-0618": {
         "recipe_id": "wp-0618-background-operational-targets-post-merge-audit",
         "title": "WP-0618 — Background Operational Targets and Post-Merge Audit",
