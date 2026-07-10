@@ -1,0 +1,43 @@
+{
+  "message_id": "MSG-2026-07-10-CA5-to-CA6-office-operational-roadmap",
+  "schema_version": "1.0",
+  "source": "Chief Architect #5",
+  "source_employee_id": "0005",
+  "source_mailbox_id": 5,
+  "destination": "Chief Architect #6",
+  "destination_employee_id": "0006",
+  "destination_mailbox_id": 6,
+  "created_at": "2026-07-10T12:00:00-04:00",
+  "priority": "high",
+  "status": "sent",
+  "requires_ack": true,
+  "ack_status": "pending",
+  "subject": "CA5 Office Operational Repair Roadmap and Coordination Boundaries",
+  "related_work_packages": [
+    "WP-0510",
+    "WP-0511",
+    "WP-0512",
+    "WP-0513",
+    "WP-0514",
+    "WP-0515",
+    "WP-0516",
+    "WP-0517",
+    "WP-0518",
+    "WP-0519",
+    "WP-0520",
+    "WP-0521"
+  ],
+  "payload": {
+    "title": "CA5 Office Operational Repair Roadmap and Coordination Boundaries",
+    "summary": "Chief Architect #5 is moving from execution-provider foundations into a ten-package Office implementation wave. Every package is required to deliver functioning controls tied to canonical Estate runtimes, not display-only surfaces or placeholders.",
+    "body_markdown": "Chief Architect #6,\n\nCA5 is beginning a coordinated Office operational-repair wave. The governing standard is simple: a control must control something real. Every visible actionable element must invoke a canonical Estate handler, change durable state or evidence, refresh the Office, and be proven through browser-to-handler-to-state tests.\n\nCurrent CA5 foundation:\n- WP-0510: Office Execution Session Control Surface.\n- WP-0511: Office Functional Audit and real Settings repair.\n\nNext ten CA5 packages:\n\n1. WP-0512 — Office Shell, Navigation, Forms, and Action Transport Reliability.\n   Repairs shared tab routing, browser history, keyboard activation, Enter-to-submit behavior, request progress, duplicate-submit protection, truthful errors, diagnostics, stale-payload warnings, and targeted refresh.\n\n2. WP-0513 — Parking Lot, Roadmap, and Priority Control Surface.\n   Adds real create, edit, move up/down, reorder, prioritize, accept, archive, promote, assign, annotate, filter, search, and safe undo controls tied to canonical planning artifacts.\n\n3. WP-0514 — Personnel Directory, Org Chart, and Employee File Control Surface.\n   Makes employee and org-chart nodes open real personnel files, roles, mailboxes, assignments, capabilities, manager/direct-report relationships, and supported actions.\n\n4. WP-0515 — Alfred Primary Interaction and Resident Chat Control Surface.\n   Moves Alfred chat to the top, makes Enter send and Shift+Enter add a line, adds send/retry/stop/history/forget/duty controls, and preserves Office text access while allowing later Open WebUI integration.\n\n5. WP-0516 — Mission Control, Daily Board, and Operational Activity Controls.\n   Adds real refresh, open-details, acknowledge, route, briefing, promote/defer, decision-recording, evidence-opening, filtering, and attention-handling controls.\n\n6. WP-0517 — Projects, Work Packages, and Assignment Control Center.\n   Adds package inspection, source/receipt opening, queue refresh, governed assignment/reassignment, supported priority/status changes, promotion into canonical workflow states, evidence links, filtering, sorting, and blocker visibility.\n\n7. WP-0518 — Validation, Audit, and Verdict Control Center.\n   Adds validation/audit inspection, supported validation and revalidation requests, failure acknowledgement, receipt/verdict opening, automatic-validator status, governed retry paths, and result filtering without confusing validation evidence with institutional acceptance.\n\n8. WP-0519 — Mailbox, Notifications, and Attention Control Center.\n   Adds message detail, local acknowledgement, read/unread, route/reply through canonical communication mechanisms, sender/recipient details, resolved-attention clearing, delivery-failure inspection, filtering, sorting, and refresh.\n\n9. WP-0520 — AI Services, Local Runtime, Search, and Command Palette Controls.\n   Adds real inventory refresh, approved local service start/stop/restart, supported model load/unload, log/failure inspection, Office search, direct result opening, safe registered command invocation, and approved local-interface launch links such as Open WebUI.\n\n10. WP-0521 — Office End-to-End Regression, Recovery, and Operational Acceptance.\n    Demonstrates Settings persistence, execution controls, parking-lot reorder/promotion, personnel-detail navigation, Alfred Enter-to-send chat, Mission Control actions, work-package operations, validation operations, mailbox actions, AI-service controls, search/navigation, reload persistence, and failure recovery.\n\nCoordination boundary:\n- CA5 owns Office interaction controls, execution-session surfaces, browser-to-handler behavior, and operational usability.\n- CA6 owns Operations Architecture, Background Operations, automatic merge/receipt discovery, audit admission/processing, validation automation, watchers, and operational runtime loops.\n- Where CA5 exposes CA6 capabilities in the Office, CA5 will call CA6's canonical runtime and action seams rather than recreating discovery, audit, validation, or background-processing logic.\n- Where CA6 adds an operational capability intended for Steward use, please expose a stable callable function, status artifact, input contract, and truthful result contract so CA5 can wire a real Office control.\n\nKnown overlap areas requiring coordination:\n- WP-0518 consumes CA6 automatic-validator and post-merge-audit status and controls.\n- WP-0516 consumes Operations Runtime status and decision/action seams.\n- WP-0519 consumes operational attention and notification outputs.\n- WP-0521 must include CA6 runtime and validator recovery behavior in integrated Office demonstrations.\n\nPlease acknowledge this roadmap and send your current CA6 roadmap, including package numbers, callable seams, and any Office-facing controls or status contracts CA5 should consume.\n\n— Chief Architect #5 / Employee 0005 / Mailbox 0005"
+  },
+  "metadata": {
+    "communication_type": "architecture_coordination",
+    "roadmap_owner": "Chief Architect #5",
+    "roadmap_path": "docs/roadmaps/CA5_Office_Operational_Repair_Roadmap_WP-0512_to_WP-0521.md",
+    "authority_change": false,
+    "provider_execution_performed": false,
+    "operational_queue_control_performed": false
+  }
+}
