@@ -1,0 +1,20 @@
+{
+  "work_package_id": "WP-0632",
+  "status": "completed",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "artifacts": [
+    "src/estate/core/operational_campaigns.py",
+    "src/estate/core/operational_campaign_runtime.py",
+    "tests/test_operational_campaigns.py",
+    "tests/test_operational_campaign_runtime.py",
+    "docs/integration/operational_campaign_engine.md"
+  ],
+  "acceptance_evidence": [
+    "Campaign model captures goals, phases, dependencies, criteria, authority, holds, escalation conditions, and evidence requirements.",
+    "Runtime supports start, pause, resume, advance, block, cancel, complete, persisted state, event history, next actions, blockers, tempo, and exceptions.",
+    "Routine phases advance through provider recommendation and execution dispatch seams.",
+    "Governance exceptions escalate instead of executing.",
+    "Campaign completion explicitly does not mark institutional acceptance."
+  ]
+}
