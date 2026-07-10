@@ -96,6 +96,7 @@ from estate.core.resident_presence import build_resident_presence, filter_reside
 from estate.core.resident_conversation_sessions import create_session, list_sessions, load_session, format_session_list
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
+from estate.core.helen_readiness import build_readiness
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
 from estate.core.resident_gateway import serve as serve_resident_gateway, gateway_status
@@ -130,6 +131,15 @@ def _repo_path(rel):
 
 
 
+
+
+def cmd_helen_readiness(args):
+    try:
+        payload = build_readiness(root=Path(args.root) if getattr(args, "root", None) else None, write=True)
+        print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else f"Helen readiness: {payload['overall_status']}\nGrace hiring gate: {payload['grace_hiring_gate']}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Helen readiness failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_helen_workforce(args):
     argv = []
@@ -3081,9 +3091,10 @@ def main(argv=None):
     p.set_defaults(func=cmd_estate_validate_local)
 
 
-
-
-
+    p = sub.add_parser("helen-readiness", help="Generate Helen operational readiness and Grace hiring gate JSON")
+    p.add_argument("--root")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_helen_readiness)
 
 
     p = sub.add_parser("helen-workforce", help="Create and inspect governed Helen workforce-development artifacts")
