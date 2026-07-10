@@ -1,0 +1,17 @@
+{
+  "work_package_id": "WP-0520",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T19:25:00Z",
+  "status": "completed",
+  "summary": [
+    "AI Services / Models now exposes canonical Office actions for rediscovery, service start/stop/restart, model load/unload, inspection, and local interface routing.",
+    "Unsupported AI-service operations are blocked through policy/manifest checks instead of faked.",
+    "Global search and command palette indexes registered safe Office actions and continues to open artifact results directly.",
+    "WP-0520 focused tests cover browser-facing Office action handlers, AI-service state evidence, search navigation, and safe command registration."
+  ],
+  "evidence": [
+    "tests/test_office_command_surface.py::test_wp0520_ai_services_controls_use_canonical_handlers_and_block_unsupported",
+    "tests/test_office_command_surface.py::test_wp0520_search_and_palette_only_registered_safe_actions",
+    "pytest -q tests/test_office_command_surface.py tests/test_global_search_command_palette.py tests/test_ai_services_control_plane.py"
+  ]
+}
