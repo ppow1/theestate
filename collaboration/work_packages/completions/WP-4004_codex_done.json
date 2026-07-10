@@ -1,0 +1,16 @@
+{
+  "work_package": "WP-4004",
+  "status": "done",
+  "implemented_by": "Codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "artifacts": [
+    "src/estate/core/character_continuity.py",
+    "schemas/character_continuity_record_v1.json",
+    "schemas/character_continuity_artifact_v1.json",
+    "tests/test_character_continuity.py",
+    "operations/residents/continuity/examples/alfred_evidence_public.json",
+    "operations/residents/continuity/examples/helen_evidence_public.json",
+    "operations/validation/reports/WP-4004_character_continuity.md"
+  ],
+  "notes": "Implements finite character continuity cycles, reflection preparation, privacy-filtered continuity artifacts, safe successor-cycle initialization, and CLI inspection surfaces."
+}
