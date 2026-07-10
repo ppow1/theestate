@@ -29,6 +29,7 @@ from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
 from estate.core.operations_center_settings import save_settings_document, reset_operations_center_settings, export_operations_center_settings, import_operations_center_settings, SETTINGS_OUTPUT
 from estate.core.office_parking_lot_controls import parking_action, roadmap_action, planning_undo, filter_items
+from estate.core.office_personnel_directory import refresh_personnel_directory, open_employee_detail, route_personnel_mailbox, route_personnel_conversation
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -325,6 +326,47 @@ def generate_daily_briefing(root=None, **_: Any) -> OfficeActionResult:
     base = _root(root); generate_daily_board_integration(root=base, write=True); generate_morning_briefing(root=base, write=True)
     return _completed('daily_board.generate_morning_briefing', 'Generate morning briefing', 'daily-board', 'estate.core.daily_board_integration.generate_daily_board_integration + estate.core.morning_briefing.generate_morning_briefing', 'Daily Board integration and morning briefing generated locally.', written=['runtime/operations/daily_board_integration.json', 'operations/boards/daily_board_integration.md', 'runtime/briefings/morning_briefing.json', 'operations/briefings/morning_briefing.md'], state=['daily board and briefing artifacts refreshed'])
 
+def personnel_refresh(root=None, selected_employee_id: str | None = None, filters_json: str | None = None, **params: Any) -> OfficeActionResult:
+    base = _root(root)
+    filters = {}
+    if filters_json:
+        try:
+            filters = json.loads(filters_json)
+        except Exception:
+            filters = {}
+    payload = refresh_personnel_directory(base, selected_employee_id=selected_employee_id, filters=filters)
+    summary = payload.get('summary') or {}
+    msg = (f"Personnel refreshed: valid={summary.get('valid_record_count', 0)}, malformed={summary.get('malformed_record_count', 0)}, "
+           f"duplicates={summary.get('duplicate_employee_id_count', 0)}, orphans={summary.get('orphaned_manager_count', 0)}, cycles={summary.get('cycle_count', 0)}, "
+           f"added={summary.get('added_count', 0)}, changed={summary.get('changed_count', 0)}, removed={summary.get('removed_count', 0)}.")
+    return _completed('personnel.refresh', 'Refresh Personnel', 'personnel', 'estate.core.office_personnel_directory.refresh_personnel_directory', msg, read=['data/registry/personnel.json', 'data/registry/mailboxes.json', 'collaboration/work_packages', 'collaboration/messages'], written=['runtime/steward/office_personnel_directory.json'], state=['office personnel payload refreshed'], request_id=params.get('request_id'))
+
+def personnel_open_detail(root=None, employee_id: str | None = None, **params: Any) -> OfficeActionResult:
+    if not employee_id:
+        return _blocked('personnel.open_employee_detail', 'Open employee details', 'personnel', 'estate.core.office_personnel_directory.open_employee_detail', 'employee_id is required.', request_id=params.get('request_id'))
+    payload = open_employee_detail(employee_id, root)
+    if payload.get('outcome') != 'completed':
+        return _blocked('personnel.open_employee_detail', 'Open employee details', 'personnel', 'estate.core.office_personnel_directory.open_employee_detail', payload.get('message') or 'Employee unavailable.', read=payload.get('artifacts_read') or [], request_id=params.get('request_id'))
+    return _completed('personnel.open_employee_detail', 'Open employee details', 'personnel', 'estate.core.office_personnel_directory.open_employee_detail', f"Employee {employee_id} detail resolved.", read=payload.get('artifacts_read') or [], state=['selected employee detail resolved'], request_id=params.get('request_id'))
+
+def personnel_open_mailbox(root=None, employee_id: str | None = None, **params: Any) -> OfficeActionResult:
+    if not employee_id:
+        return _blocked('personnel.open_mailbox', 'Open mailbox', 'personnel', 'estate.core.office_personnel_directory.route_personnel_mailbox', 'employee_id is required.', request_id=params.get('request_id'))
+    payload = route_personnel_mailbox(employee_id, root)
+    if payload.get('outcome') != 'completed':
+        return _blocked('personnel.open_mailbox', 'Open mailbox', 'personnel', 'estate.core.office_personnel_directory.route_personnel_mailbox', payload.get('message') or 'Mailbox route blocked.', read=payload.get('artifacts_read') or [], request_id=params.get('request_id'))
+    route = payload.get('route') or {}
+    return _completed('personnel.open_mailbox', 'Open mailbox', 'mailboxes', 'estate.core.office_personnel_directory.route_personnel_mailbox', f"Mailbox route ready for employee {route.get('employee_id')} mailbox {route.get('mailbox_id')}.", read=payload.get('artifacts_read') or [], state=['mailbox route selected'], request_id=params.get('request_id'))
+
+def personnel_open_conversation(root=None, employee_id: str | None = None, **params: Any) -> OfficeActionResult:
+    if not employee_id:
+        return _blocked('personnel.open_conversation', 'Open conversation', 'personnel', 'estate.core.office_personnel_directory.route_personnel_conversation', 'employee_id is required.', request_id=params.get('request_id'))
+    payload = route_personnel_conversation(employee_id, root)
+    if payload.get('outcome') != 'completed':
+        return _blocked('personnel.open_conversation', 'Open conversation', 'personnel', 'estate.core.office_personnel_directory.route_personnel_conversation', payload.get('message') or 'Conversation route blocked.', read=payload.get('artifacts_read') or [], request_id=params.get('request_id'))
+    route = payload.get('route') or {}
+    return _completed('personnel.open_conversation', 'Open conversation', 'resident-conversations', 'estate.core.office_personnel_directory.route_personnel_conversation', f"Conversation route ready for employee {route.get('employee_id')} selected {route.get('selected')}.", read=payload.get('artifacts_read') or [], state=['conversation route selected'], request_id=params.get('request_id'))
+
 HANDLERS: dict[str, Callable[..., OfficeActionResult]] = {f.__name__: f for f in []}
 HANDLERS.update({
  'ai_services.refresh_local_inventory': refresh_ai_services,
@@ -359,10 +401,18 @@ HANDLERS.update({
  'roadmap.control': roadmap_control,
  'planning.undo_last_local_change': planning_control_undo,
  'planning.filter': planning_filter,
+ 'personnel.refresh': personnel_refresh,
+ 'personnel.open_employee_detail': personnel_open_detail,
+ 'personnel.open_mailbox': personnel_open_mailbox,
+ 'personnel.open_conversation': personnel_open_conversation,
 })
 
 ACTION_CONTROLS = [
 
+ {'action_id':'personnel.refresh','label':'Refresh Personnel','target_tab':'personnel','handler':'personnel_refresh','availability':'available','note':'Rebuilds the Office personnel/org-chart payload from canonical artifacts.'},
+ {'action_id':'personnel.open_employee_detail','label':'Open employee details','target_tab':'personnel','handler':'personnel_open_detail','availability':'available','requires_input':'employee_id'},
+ {'action_id':'personnel.open_mailbox','label':'Open mailbox','target_tab':'personnel','handler':'personnel_open_mailbox','availability':'available','requires_input':'employee_id'},
+ {'action_id':'personnel.open_conversation','label':'Open conversation','target_tab':'personnel','handler':'personnel_open_conversation','availability':'available','requires_input':'employee_id'},
  {'action_id':'parking_lot.control','label':'Parking Lot item control','target_tab':'parking','handler':'parking_lot_control','availability':'available','requires_input':'planning_action,item_id','note':'Actions: create, edit, move_up, move_down, reorder, set_priority, accept, archive, reject, restore, promote.'},
  {'action_id':'roadmap.control','label':'Roadmap item control','target_tab':'roadmap','handler':'roadmap_control','availability':'available','requires_input':'planning_action,item_id','note':'Actions: create, edit, move_up, move_down, reorder, set_priority.'},
  {'action_id':'planning.undo_last_local_change','label':'Undo last planning change','target_tab':'parking','handler':'planning_control_undo','availability':'available','note':'Restores the last safe local Parking Lot or Roadmap order/status/content change.'},
