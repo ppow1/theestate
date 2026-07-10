@@ -54,6 +54,42 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
 
+    "WP-0508": {
+        "recipe_id": "wp-0508-governed-execution-session-controller",
+        "title": "WP-0508 — Governed Execution Session Controller",
+        "description": "Validates the governed execution session controller, CLI, docs, tests, and receipt without live provider calls.",
+        "required_checks": [
+            "Session controller module, tests, documentation, and receipt exist",
+            "Session controller module compiles",
+            "Focused session and dependent execution tests pass",
+            "Receipt records fake runner/process controller use, no live provider calls, no automatic retry, and no authorization or acceptance mutation",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/execution_session_controller.py",
+            "tests/test_execution_session_controller.py",
+            "docs/integration/governed_execution_session_controller.md",
+            "collaboration/work_packages/completions/WP-0508_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live provider calls, automatic retry, authorization mutation, or institutional acceptance mutation",
+        ],
+        "success_criteria": [
+            "Preview writes evidence without provider calls",
+            "Start composes handoff, gate, attempt, adapter, and reconciliation seams",
+            "Resume refuses ambiguous duplicate provider calls",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/execution_session_controller.py','tests/test_execution_session_controller.py','docs/integration/governed_execution_session_controller.md','collaboration/work_packages/completions/WP-0508_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/execution_session_controller.py"),
+            _cmd("pytest -q tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_codex_live_execution_gate.py tests/test_execution_result_reconciliation_runtime.py"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0508_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0508'; assert data.get('live_provider_calls_made') is False; assert data.get('fake_provider_runner_used') is True; assert data.get('fake_process_controller_used') is True; assert data.get('automatic_retry_implemented') is False; assert data.get('authorization_behavior_modified') is False; assert data.get('institutional_acceptance_behavior_modified') is False; assert data.get('ready_for_ca_review') is True\""),
+        ],
+    },
+
+
     "WP-0507": {
         "recipe_id": "wp-0507-execution-attempt-lease-cancellation-recovery",
         "title": "WP-0507 — Execution Attempt Lease, Cancellation, and Recovery",
