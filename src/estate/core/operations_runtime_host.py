@@ -23,6 +23,7 @@ from estate.core.paths import ESTATE_ROOT
 HOST_ENV = "ESTATE_OPERATIONS_RUNTIME_HOST_DIR"
 ROOT_ENV = "ESTATE_OPERATIONS_RUNTIME_ROOT"
 TASK_NAME = "Estate Operations Runtime Host"
+TASK_NAME_ENV = "ESTATE_OPERATIONS_RUNTIME_TASK_NAME"
 DEFAULT_RUNTIME_CODE_ROOT = Path("A:/EstateRuntime/host/estate-main/current")
 DEFAULT_INTERVAL_SECONDS = 30.0
 DEFAULT_MAX_CYCLES = 1_000_000
@@ -119,9 +120,10 @@ class OperationsRuntimeHostError(RuntimeError):
 
 
 class OperationsRuntimeHost:
-    def __init__(self, root: Path | None = None, state_dir: Path | None = None) -> None:
+    def __init__(self, root: Path | None = None, state_dir: Path | None = None, task_name: str | None = None) -> None:
         self.root = _root(root)
         self.state_dir = _state_dir(state_dir)
+        self.task_name = task_name or os.environ.get(TASK_NAME_ENV) or TASK_NAME
         self.lock_path = self.state_dir / "host.lock.json"
         self.pid_path = self.state_dir / "host.pid.json"
         self.heartbeat_path = self.state_dir / "heartbeat.json"
@@ -278,7 +280,7 @@ class OperationsRuntimeHost:
         return launcher
 
     def _query_windows_task(self) -> dict[str, Any]:
-        query = ["schtasks", "/Query", "/TN", TASK_NAME, "/FO", "LIST", "/V"]
+        query = ["schtasks", "/Query", "/TN", self.task_name, "/FO", "LIST", "/V"]
         result = _run_command(query)
         exists = result.returncode == 0
         state = None
@@ -295,11 +297,11 @@ class OperationsRuntimeHost:
     def install(self) -> dict[str, Any]:
         self._ensure_state_dir()
         command = [sys.executable, "-m", "estate.cli.main", "operations-runtime", "host", "start"]
-        payload = {"installed_at": utc_now_iso(), "installed": True, "method": "scheduled-task" if os.name == "nt" else "manual-launch-manifest", "command": command, "root": str(self.root), "state_dir": str(self.state_dir), "scheduled_task_name": TASK_NAME, "scheduled_task_exists": False, "scheduled_task_verified": False}
+        payload = {"installed_at": utc_now_iso(), "installed": True, "method": "scheduled-task" if os.name == "nt" else "manual-launch-manifest", "command": command, "root": str(self.root), "state_dir": str(self.state_dir), "scheduled_task_name": self.task_name, "scheduled_task_exists": False, "scheduled_task_verified": False}
         if os.name == "nt":
             launcher = self._write_windows_launcher()
             task_command = f'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "{launcher}"'
-            create_cmd = ["schtasks", "/Create", "/SC", "ONLOGON", "/TN", TASK_NAME, "/TR", task_command, "/F"]
+            create_cmd = ["schtasks", "/Create", "/SC", "ONLOGON", "/TN", self.task_name, "/TR", task_command, "/F"]
             result = _run_command(create_cmd)
             if result.returncode != 0:
                 raise OperationsRuntimeHostError(result.stderr or result.stdout or "failed to create scheduled task")
@@ -314,7 +316,7 @@ class OperationsRuntimeHost:
     def uninstall(self) -> dict[str, Any]:
         existed = self.install_path.exists()
         if os.name == "nt":
-            delete_cmd = ["schtasks", "/Delete", "/TN", TASK_NAME, "/F"]
+            delete_cmd = ["schtasks", "/Delete", "/TN", self.task_name, "/F"]
             result = _run_command(delete_cmd)
             if result.returncode not in {0, 1}:
                 raise OperationsRuntimeHostError(result.stderr or result.stdout or "failed to delete scheduled task")
@@ -328,7 +330,7 @@ class OperationsRuntimeHost:
             task_state = {"scheduled_task_exists": False, "scheduled_task_state": None}
         if existed:
             self.install_path.unlink()
-        return {"uninstalled_at": utc_now_iso(), "removed_manifest": existed, "scheduled_task": TASK_NAME if os.name == "nt" else None, "scheduled_task_removed": removed, "delete_command": delete_cmd, **task_state}
+        return {"uninstalled_at": utc_now_iso(), "removed_manifest": existed, "scheduled_task": self.task_name if os.name == "nt" else None, "scheduled_task_removed": removed, "delete_command": delete_cmd, **task_state}
 
     @classmethod
     def bootstrap(cls, target: str = "estate-main", *, runtime_code_root: Path | None = None, source_root: Path | None = None) -> dict[str, Any]:
@@ -374,4 +376,4 @@ class OperationsRuntimeHost:
                 break
             time.sleep(0.1)
         status = host.status()
-        return {"target": target, "remote_ref_used": "origin/main", "source_checkout_revision": source_rev, "remote_main_revision": remote_rev, "runtime_workspace_revision": runtime_rev, "runtime_matches_remote": runtime_matches_remote, "runtime_code_workspace": str(code_root), "scheduled_task_name": TASK_NAME, "scheduled_task_installed": bool(installed.get("installed")), "scheduled_task_verified": bool(installed.get("scheduled_task_verified") or os.name != "nt"), "host_started": bool(started.get("pid")), "heartbeat_verified": heartbeat_verified or status.get("host_state") == "running", "active_checkout_modifications_performed": False, "pending_only_commits_suppressed": True, "eligible_completed_work_detected": None, "provider_execution_performed": False, "dispatch_execution_performed": False, "install": installed, "start": started, "status": status}
+        return {"target": target, "remote_ref_used": "origin/main", "source_checkout_revision": source_rev, "remote_main_revision": remote_rev, "runtime_workspace_revision": runtime_rev, "runtime_matches_remote": runtime_matches_remote, "runtime_code_workspace": str(code_root), "scheduled_task_name": host.task_name, "scheduled_task_installed": bool(installed.get("installed")), "scheduled_task_verified": bool(installed.get("scheduled_task_verified") or os.name != "nt"), "host_started": bool(started.get("pid")), "heartbeat_verified": heartbeat_verified or status.get("host_state") == "running", "active_checkout_modifications_performed": False, "pending_only_commits_suppressed": True, "eligible_completed_work_detected": None, "provider_execution_performed": False, "dispatch_execution_performed": False, "install": installed, "start": started, "status": status}

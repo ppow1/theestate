@@ -1,0 +1,29 @@
+{
+  "active_checkout_modifications_performed": true,
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "dispatch_execution_performed": false,
+  "eligible_completed_work_detected": true,
+  "files_changed": [
+    "src/estate/core/operations_runtime_host.py",
+    "tests/test_operations_runtime_host.py",
+    "collaboration/work_packages/completions/WP-0641_codex_done.json"
+  ],
+  "known_limitations": [
+    "Live Windows Scheduled Task creation was not executed in this Linux container; deterministic tests mock schtasks behavior."
+  ],
+  "merge_authority": "Chief Architect review required before merge.",
+  "merge_authority_or_equivalent": "Chief Architect review required before merge.",
+  "pending_only_commits_suppressed": true,
+  "provider_execution_performed": false,
+  "pull_request_url_or_not_applicable_reason": "Not applicable until Codex creates the PR from this branch.",
+  "ready_for_ca_review": true,
+  "scheduled_task_name": "Estate Operations Runtime Host",
+  "summary": "Isolated Operations Runtime Host Windows Scheduled Task tests from the production task name while preserving the production default for runtime installation.",
+  "test_scheduled_task_name": "Estate Operations Runtime Host Test Isolation",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_operations_runtime_host.py -q"
+  ],
+  "work_package_id": "WP-0641"
+}

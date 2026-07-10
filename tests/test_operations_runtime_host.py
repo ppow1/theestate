@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from estate.core.operations_runtime_host import OperationsRuntimeHost, OperationsRuntimeHostError
+from estate.core.operations_runtime_host import TASK_NAME, OperationsRuntimeHost, OperationsRuntimeHostError
 from estate.core.operations_runtime_service import OperationsRuntimeService
 
 
@@ -86,8 +86,12 @@ def test_windows_install_executes_and_verifies_scheduled_task(tmp_path, monkeypa
         return R(0, "ok", "")
     monkeypatch.setattr(mod.os, "name", "nt")
     monkeypatch.setattr(mod, "_run_command", fake)
-    installed = OperationsRuntimeHost(tmp_path/"repo", tmp_path/"state").install()
+    test_task_name = "Estate Operations Runtime Host Test Isolation"
+    installed = OperationsRuntimeHost(tmp_path/"repo", tmp_path/"state", task_name=test_task_name).install()
     assert calls[0][:4] == ["schtasks","/Create","/SC","ONLOGON"]
+    assert calls[0][5] == test_task_name
+    assert calls[0][5] != TASK_NAME
+    assert installed["scheduled_task_name"] == test_task_name
     assert installed["scheduled_task_verified"] is True
     assert installed["scheduled_task_exists"] is True
 
@@ -105,10 +109,14 @@ def test_windows_uninstall_deletes_and_verifies_removal(tmp_path, monkeypatch):
         return R(0)
     monkeypatch.setattr(mod.os, "name", "nt")
     monkeypatch.setattr(mod, "_run_command", fake)
-    host=OperationsRuntimeHost(tmp_path/"repo", tmp_path/"state")
+    test_task_name = "Estate Operations Runtime Host Test Isolation"
+    host=OperationsRuntimeHost(tmp_path/"repo", tmp_path/"state", task_name=test_task_name)
     host.install_path.parent.mkdir(parents=True); host.install_path.write_text("{}")
     out=host.uninstall()
     assert calls[0][:3] == ["schtasks","/Delete","/TN"]
+    assert calls[0][3] == test_task_name
+    assert calls[0][3] != TASK_NAME
+    assert out["scheduled_task"] == test_task_name
     assert out["scheduled_task_removed"] is True
 
 
