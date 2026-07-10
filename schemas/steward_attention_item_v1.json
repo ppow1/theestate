@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Steward Attention Item v1",
+  "type": "object",
+  "required": ["schema_version", "id", "dedupe_key", "title", "classification", "owner", "requested_steward_action", "timestamp", "source_links", "should_know", "must_decide", "status"],
+  "properties": {
+    "schema_version": {"const": "steward_attention_item.v1"},
+    "id": {"type": "string"},
+    "dedupe_key": {"type": "string"},
+    "title": {"type": "string"},
+    "summary": {"type": "string"},
+    "classification": {"enum": ["routine", "watch", "attention_soon", "decision_required", "urgent", "informational"]},
+    "owner": {"type": "string"},
+    "requested_steward_action": {"type": "string"},
+    "deadline": {"type": ["string", "null"]},
+    "timestamp": {"type": "string"},
+    "source_links": {"type": "array", "items": {"type": "string"}},
+    "should_know": {"type": "boolean"},
+    "must_decide": {"type": "boolean"},
+    "status": {"type": "string"}
+  }
+}

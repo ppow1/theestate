@@ -54,6 +54,7 @@ from estate.core.global_search_command_palette import search_global_palette, exe
 from estate.core.document_registry import load_document_registry, format_document_registry
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
+from estate.core.steward_attention import aggregate_attention, create_briefing as create_steward_attention_briefing, record_action as record_steward_attention_action, format_briefing as format_steward_attention_briefing
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, format_worker_runtime_monitor
@@ -1976,6 +1977,24 @@ def cmd_steward_presence(args):
     else:
         print(format_steward_presence_state(payload))
 
+
+
+def cmd_steward_attention(args):
+    import json
+    if args.steward_attention_action == "aggregate":
+        payload = aggregate_attention(root=getattr(args, "root", None), write=True)
+    elif args.steward_attention_action == "briefing":
+        payload = create_steward_attention_briefing(kind=args.kind, root=getattr(args, "root", None), write=True)
+    elif args.steward_attention_action == "action":
+        payload = record_steward_attention_action(args.item_id, args.action, actor=args.actor, root=getattr(args, "root", None), until=args.until, delegate_to=args.delegate_to, note=args.note)
+    else:
+        raise SystemExit(f"Unknown steward-attention action: {args.steward_attention_action}")
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif args.steward_attention_action == "briefing":
+        print(format_steward_attention_briefing(payload))
+    else:
+        print(json.dumps(payload.get("summary", payload), indent=2, sort_keys=True))
 
 def cmd_morning_briefing(args):
     briefing = generate_morning_briefing()
@@ -3930,6 +3949,16 @@ def main(argv=None):
     q.add_argument("--resident-id", required=True)
     q.add_argument("--root")
     q.set_defaults(func=cmd_character_continuity)
+
+
+    p = sub.add_parser("steward-attention", help="Aggregate Alfred-owned Steward attention and briefing items")
+    sa = p.add_subparsers(dest="steward_attention_action", required=True)
+    q = sa.add_parser("aggregate", help="Aggregate attention items from existing Estate artifacts")
+    q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
+    q = sa.add_parser("briefing", help="Generate morning, on-demand, or exception briefing")
+    q.add_argument("--kind", default="on_demand", choices=["morning", "on_demand", "exception"]); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
+    q = sa.add_parser("action", help="Persist an Office-transport attention action")
+    q.add_argument("--item-id", required=True); q.add_argument("--action", required=True, choices=["snooze", "acknowledge", "delegate", "dismiss", "resolve"]); q.add_argument("--actor", default="steward"); q.add_argument("--until"); q.add_argument("--delegate-to"); q.add_argument("--note"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

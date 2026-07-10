@@ -1,0 +1,19 @@
+{
+  "work_package_id": "WP-4018",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T23:33:06+00:00",
+  "summary": "Implemented Alfred-owned Steward attention aggregation, decision-ready briefings, persistent Office-transport attention actions, CLI integration, schemas, tests, and validation report.",
+  "artifacts": [
+    "src/estate/core/steward_attention.py",
+    "schemas/steward_attention_item_v1.json",
+    "schemas/steward_attention_briefing_v1.json",
+    "docs/integration/steward_attention_office_panel.md",
+    "tests/test_steward_attention.py",
+    "operations/validation/reports/WP-4018_steward_attention_management.md"
+  ],
+  "validation_commands": [
+    "PYTHONPATH=src pytest -q tests/test_steward_attention.py tests/test_office_actions.py",
+    "PYTHONPATH=src python -m estate.cli.main steward-attention briefing --kind exception --json"
+  ],
+  "ready_for_review": true
+}
