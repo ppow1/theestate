@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 from estate.core.merge_discovery import MergeDiscovery
 from estate.core.merge_discovery_consolidation import MergeDiscoveryConsolidator
+from estate.core.merge_discovery_admission import MergeDiscoveryAdmission
 
 class MergeDiscoveryRuntime:
     def __init__(self, root:Path|None=None): self.discovery=MergeDiscovery(root)
@@ -14,4 +15,8 @@ class MergeDiscoveryRuntime:
     def consolidate(self, target:str="estate-main", **kw)->dict[str,Any]: return MergeDiscoveryConsolidator(self.discovery.root).consolidate(target, **kw)
     def quarantine_status(self, target:str="estate-main")->dict[str,Any]: return MergeDiscoveryConsolidator(self.discovery.root).quarantine_status(target)
     def admit(self, target:str="estate-main", work_package:str="")->dict[str,Any]: return MergeDiscoveryConsolidator(self.discovery.root).admit(target, work_package)
+    def admission_status(self, target:str="estate-main")->dict[str,Any]: return MergeDiscoveryAdmission(self.discovery.root).status(target)
+    def auto_admit(self, target:str="estate-main", max_requests:int=5)->dict[str,Any]: return MergeDiscoveryAdmission(self.discovery.root).auto_admit(target, max_requests=max_requests)
+    def hold(self, target:str="estate-main", work_package:str="")->dict[str,Any]: return MergeDiscoveryAdmission(self.discovery.root).hold(target, work_package)
+    def release(self, target:str="estate-main", work_package:str="")->dict[str,Any]: return MergeDiscoveryAdmission(self.discovery.root).release(target, work_package)
     def reconcile_requests(self, target:str="estate-main")->dict[str,Any]: return MergeDiscoveryConsolidator(self.discovery.root).reconcile_requests(target)

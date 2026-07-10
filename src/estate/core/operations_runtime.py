@@ -16,6 +16,7 @@ from estate.core.background_operations_runtime import BackgroundOperationsRuntim
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
 from estate.core.post_merge_audit_processor import PostMergeAuditProcessor
 from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
+from estate.core.merge_discovery_admission import MergeDiscoveryAdmission
 from estate.core.paths import ESTATE_ROOT
 
 RUNTIME_BASE = Path("runtime/operations_runtime")
@@ -66,6 +67,22 @@ class OperationsRuntimeCycle:
     git_hygiene_findings: int = 0
     ring2_requests_created: int = 0
     audits_claimed: int = 0
+    candidates_evaluated: int = 0
+    candidates_auto_admitted: int = 0
+    candidates_held: int = 0
+    historical_candidates_quarantined: int = 0
+    current_candidates: int = 0
+    historical_candidates: int = 0
+    admitted_candidates: int = 0
+    held_candidates: int = 0
+    active_audit_limit: int = 0
+    latest_admitted_work_package: str | None = None
+    latest_audit_verdict: str | None = None
+    audits_started: int = 0
+    audits_failed: int = 0
+    audits_ring2_required: int = 0
+    audits_verdicts_published: int = 0
+    queue_limit_reached: bool = False
     audits_completed: int = 0
     audits_blocked: int = 0
     audit_validation_pass: int = 0
@@ -115,7 +132,7 @@ class OperationsRuntime:
         for rel in [STATUS_DIR, REPORTS_DIR, CYCLES_DIR]:
             (self.root / rel).mkdir(parents=True, exist_ok=True)
 
-    def run_cycle(self, *, dry_run: bool = False, mode: str = "observe-only") -> dict[str, Any]:
+    def run_cycle(self, *, dry_run: bool = False, mode: str = "observe-only", max_audit_requests: int = 1) -> dict[str, Any]:
         self.ensure_dirs()
         cycle = OperationsRuntimeCycle.start()
         try:
@@ -135,7 +152,7 @@ class OperationsRuntime:
             cycle.ring2_requests_created = sum(1 for e in background_status.get("events", []) if e.get("event_type") == "ring2_review_needed")
             cycle.warnings.extend(background_status.get("summary", {}).get("warnings") or [])
             if mode in {"discover-merges", "discover-merges-and-process-audits", "discover-merges-and-process-audits-and-ring2"} and not dry_run:
-                discovery = MergeDiscoveryRuntime(self.root).scan("estate-main", backfill_mode="admit")
+                discovery = MergeDiscoveryRuntime(self.root).scan("estate-main", backfill_mode="quarantine")
                 ms = discovery.get("summary", {})
                 cycle.merge_commits_scanned = ms.get("merge_commits_scanned", 0)
                 cycle.work_packages_discovered = ms.get("work_packages_discovered", 0)
@@ -149,18 +166,38 @@ class OperationsRuntime:
                 cycle.admitted_requests = ms.get("admitted_requests", 0)
                 cycle.requests_suppressed_by_grouping = ms.get("requests_suppressed_by_grouping", 0)
                 cycle.backfill_limit_reached = bool(ms.get("backfill_limit_reached", False))
+                if "auto-admit" in mode or "discover-merges" in mode:
+                    admission = MergeDiscoveryAdmission(self.root).auto_admit("estate-main", max_requests=max_audit_requests)
+                    ads = admission.get("summary", {})
+                    cycle.candidates_evaluated = ads.get("candidates_evaluated", 0)
+                    cycle.current_candidates = ads.get("current_candidates", 0)
+                    cycle.historical_candidates = ads.get("historical_candidates", 0)
+                    cycle.admitted_candidates = ads.get("admitted_candidates", 0)
+                    cycle.held_candidates = ads.get("held_candidates", 0)
+                    cycle.active_audit_limit = max_audit_requests
+                    cycle.latest_admitted_work_package = ads.get("latest_admitted_work_package")
+                    cycle.candidates_auto_admitted = ads.get("candidates_auto_admitted", 0)
+                    cycle.candidates_held = ads.get("candidates_held", 0)
+                    cycle.historical_candidates_quarantined = ads.get("historical_candidates_quarantined", 0)
+                    cycle.admitted_requests = ads.get("admitted_candidates", cycle.admitted_requests)
+                    cycle.queue_limit_reached = bool(ads.get("queue_limit_reached", False))
             if mode in {"process-audits", "process-audits-and-ring2", "discover-merges-and-process-audits", "discover-merges-and-process-audits-and-ring2"} and not dry_run:
-                audit_result = PostMergeAuditProcessor(self.root, ollama_enabled=(mode in {"process-audits-and-ring2", "discover-merges-and-process-audits-and-ring2"})).process_next()
-                if audit_result.get("processed"):
-                    v = audit_result.get("verdict") or {}
-                    cycle.audits_claimed = 1
-                    cycle.audits_completed = 1 if v.get("state") in {"completed", "ring2_required"} else 0
-                    cycle.audits_blocked = 1 if v.get("state") == "blocked" else 0
-                    cycle.audit_validation_pass = 1 if v.get("validation_status") in {"passed", "passed_with_findings"} else 0
-                    cycle.audit_validation_fail = 1 if v.get("validation_status") in {"failed", "no_recipe"} or v.get("verdict") == "validation_failed" else 0
-                    cycle.ring2_prompts_generated = 1 if (v.get("artifacts") or {}).get("ring2_prompt") else 0
-                    cycle.ring2_reviews_captured = 1 if v.get("ring2_status") == "review_captured" else 0
-                    cycle.audit_verdicts_published = 1 if v.get("verdict_path") else 0
+                audit_result = PostMergeAuditProcessor(self.root, ollama_enabled=(mode in {"process-audits-and-ring2", "discover-merges-and-process-audits-and-ring2"})).process_all(max_count=max_audit_requests)
+                results = audit_result.get("results", [])
+                cycle.audits_claimed = len(results); cycle.audits_started = len(results)
+                for res in results:
+                    v = res.get("verdict") or {}
+                    cycle.audits_completed += 1 if v.get("state") in {"completed", "ring2_required"} else 0
+                    cycle.audits_failed += 1 if res.get("error") else 0
+                    cycle.audits_blocked += 1 if v.get("state") == "blocked" else 0
+                    cycle.audit_validation_pass += 1 if v.get("validation_status") in {"passed", "passed_with_findings"} else 0
+                    cycle.audit_validation_fail += 1 if v.get("validation_status") in {"failed", "no_recipe"} or v.get("verdict") == "validation_failed" else 0
+                    cycle.ring2_prompts_generated += 1 if (v.get("artifacts") or {}).get("ring2_prompt") else 0
+                    cycle.audits_ring2_required += 1 if v.get("verdict") == "ring2_required" else 0
+                    cycle.ring2_reviews_captured += 1 if v.get("ring2_status") == "review_captured" else 0
+                    cycle.audit_verdicts_published += 1 if v.get("verdict_path") else 0
+                    cycle.latest_audit_verdict = v.get("verdict") or cycle.latest_audit_verdict
+                cycle.audits_verdicts_published = cycle.audit_verdicts_published
             cycle.artifacts = {
                 "background_status": "runtime/background_operations/status/latest.json",
                 "operational_targets_status": "runtime/operational_targets/status/latest.json",
@@ -211,10 +248,10 @@ class OperationsRuntime:
             p.unlink()
 
     def empty_summary(self, state: str) -> dict[str, Any]:
-        return {"operations_runtime_available": True, "operations_runtime_state": state, "last_cycle_id": None, "last_cycle_at": None, "active_targets_count": 0, "enabled_watches_count": 0, "requests_created_last_cycle": 0, "audits_requested_last_cycle": 0, "git_hygiene_findings_count": 0, "ring2_requests_count": 0, "audits_claimed_last_cycle": 0, "audits_completed_last_cycle": 0, "audits_blocked_last_cycle": 0, "audit_validation_pass_last_cycle": 0, "audit_validation_fail_last_cycle": 0, "ring2_prompts_generated_last_cycle": 0, "ring2_reviews_captured_last_cycle": 0, "audit_verdicts_published_last_cycle": 0, "runtime_warnings": [], "merge_commits_scanned": 0, "work_packages_discovered": 0, "discoveries_ambiguous": 0, "discoveries_ignored": 0, "audit_requests_created_from_merges": 0, "duplicate_audit_requests_suppressed": 0, "canonical_candidates": 0, "superseded_discoveries": 0, "quarantined_discoveries": 0, "admitted_requests": 0, "requests_suppressed_by_grouping": 0, "backfill_limit_reached": False}
+        return {"operations_runtime_available": True, "operations_runtime_state": state, "last_cycle_id": None, "last_cycle_at": None, "active_targets_count": 0, "enabled_watches_count": 0, "requests_created_last_cycle": 0, "audits_requested_last_cycle": 0, "git_hygiene_findings_count": 0, "ring2_requests_count": 0, "audits_claimed_last_cycle": 0, "audits_completed_last_cycle": 0, "audits_blocked_last_cycle": 0, "audit_validation_pass_last_cycle": 0, "audit_validation_fail_last_cycle": 0, "ring2_prompts_generated_last_cycle": 0, "ring2_reviews_captured_last_cycle": 0, "audit_verdicts_published_last_cycle": 0, "runtime_warnings": [], "merge_commits_scanned": 0, "work_packages_discovered": 0, "discoveries_ambiguous": 0, "discoveries_ignored": 0, "audit_requests_created_from_merges": 0, "duplicate_audit_requests_suppressed": 0, "canonical_candidates": 0, "superseded_discoveries": 0, "quarantined_discoveries": 0, "admitted_requests": 0, "requests_suppressed_by_grouping": 0, "backfill_limit_reached": False, "candidates_evaluated": 0, "candidates_auto_admitted": 0, "candidates_held": 0, "historical_candidates_quarantined": 0, "active_audit_limit": 0, "audits_processed_last_cycle": 0, "queue_limit_reached": False, "current_candidates": 0, "historical_candidates": 0, "admitted_candidates": 0, "held_candidates": 0, "latest_admitted_work_package": None, "latest_audit_verdict": None}
 
     def summary_from_cycle(self, cycle: dict[str, Any], *, state: str | None = None) -> dict[str, Any]:
-        return {"operations_runtime_available": True, "operations_runtime_state": state or cycle.get("runtime_state", "stopped"), "last_cycle_id": cycle.get("cycle_id"), "last_cycle_at": cycle.get("finished_at") or cycle.get("started_at"), "active_targets_count": cycle.get("targets_evaluated", 0), "enabled_watches_count": cycle.get("watches_evaluated", 0), "requests_created_last_cycle": cycle.get("requests_created", 0), "audits_requested_last_cycle": cycle.get("audits_requested", 0), "git_hygiene_findings_count": cycle.get("git_hygiene_findings", 0), "ring2_requests_count": cycle.get("ring2_requests_created", 0), "audits_claimed_last_cycle": cycle.get("audits_claimed", 0), "audits_completed_last_cycle": cycle.get("audits_completed", 0), "audits_blocked_last_cycle": cycle.get("audits_blocked", 0), "audit_validation_pass_last_cycle": cycle.get("audit_validation_pass", 0), "audit_validation_fail_last_cycle": cycle.get("audit_validation_fail", 0), "ring2_prompts_generated_last_cycle": cycle.get("ring2_prompts_generated", 0), "ring2_reviews_captured_last_cycle": cycle.get("ring2_reviews_captured", 0), "audit_verdicts_published_last_cycle": cycle.get("audit_verdicts_published", 0), "runtime_warnings": cycle.get("warnings", []) + cycle.get("errors", []), "merge_commits_scanned": cycle.get("merge_commits_scanned", 0), "work_packages_discovered": cycle.get("work_packages_discovered", 0), "discoveries_ambiguous": cycle.get("discoveries_ambiguous", 0), "discoveries_ignored": cycle.get("discoveries_ignored", 0), "audit_requests_created_from_merges": cycle.get("audit_requests_created_from_merges", 0), "duplicate_audit_requests_suppressed": cycle.get("duplicate_audit_requests_suppressed", 0), "canonical_candidates": cycle.get("canonical_candidates", 0), "superseded_discoveries": cycle.get("superseded_discoveries", 0), "quarantined_discoveries": cycle.get("quarantined_discoveries", 0), "admitted_requests": cycle.get("admitted_requests", 0), "requests_suppressed_by_grouping": cycle.get("requests_suppressed_by_grouping", 0), "backfill_limit_reached": cycle.get("backfill_limit_reached", False)}
+        return {"operations_runtime_available": True, "operations_runtime_state": state or cycle.get("runtime_state", "stopped"), "last_cycle_id": cycle.get("cycle_id"), "last_cycle_at": cycle.get("finished_at") or cycle.get("started_at"), "active_targets_count": cycle.get("targets_evaluated", 0), "enabled_watches_count": cycle.get("watches_evaluated", 0), "requests_created_last_cycle": cycle.get("requests_created", 0), "audits_requested_last_cycle": cycle.get("audits_requested", 0), "git_hygiene_findings_count": cycle.get("git_hygiene_findings", 0), "ring2_requests_count": cycle.get("ring2_requests_created", 0), "audits_claimed_last_cycle": cycle.get("audits_claimed", 0), "audits_completed_last_cycle": cycle.get("audits_completed", 0), "audits_blocked_last_cycle": cycle.get("audits_blocked", 0), "audit_validation_pass_last_cycle": cycle.get("audit_validation_pass", 0), "audit_validation_fail_last_cycle": cycle.get("audit_validation_fail", 0), "ring2_prompts_generated_last_cycle": cycle.get("ring2_prompts_generated", 0), "ring2_reviews_captured_last_cycle": cycle.get("ring2_reviews_captured", 0), "audit_verdicts_published_last_cycle": cycle.get("audit_verdicts_published", 0), "runtime_warnings": cycle.get("warnings", []) + cycle.get("errors", []), "merge_commits_scanned": cycle.get("merge_commits_scanned", 0), "work_packages_discovered": cycle.get("work_packages_discovered", 0), "discoveries_ambiguous": cycle.get("discoveries_ambiguous", 0), "discoveries_ignored": cycle.get("discoveries_ignored", 0), "audit_requests_created_from_merges": cycle.get("audit_requests_created_from_merges", 0), "duplicate_audit_requests_suppressed": cycle.get("duplicate_audit_requests_suppressed", 0), "canonical_candidates": cycle.get("canonical_candidates", 0), "superseded_discoveries": cycle.get("superseded_discoveries", 0), "quarantined_discoveries": cycle.get("quarantined_discoveries", 0), "admitted_requests": cycle.get("admitted_requests", 0), "requests_suppressed_by_grouping": cycle.get("requests_suppressed_by_grouping", 0), "backfill_limit_reached": cycle.get("backfill_limit_reached", False), "auto_admission_enabled": True, "candidates_evaluated": cycle.get("candidates_evaluated", 0), "candidates_auto_admitted": cycle.get("candidates_auto_admitted", 0), "candidates_held": cycle.get("candidates_held", 0), "historical_candidates_quarantined": cycle.get("historical_candidates_quarantined", 0), "active_audit_limit": cycle.get("active_audit_limit", 0), "audits_processed_last_cycle": cycle.get("audits_claimed", 0), "queue_limit_reached": cycle.get("queue_limit_reached", False), "current_candidates": cycle.get("current_candidates", 0), "historical_candidates": cycle.get("historical_candidates", 0), "admitted_candidates": cycle.get("admitted_candidates", 0), "held_candidates": cycle.get("held_candidates", 0), "latest_admitted_work_package": cycle.get("latest_admitted_work_package"), "latest_audit_verdict": cycle.get("latest_audit_verdict")}
 
 
 def format_operations_runtime_report(status: dict[str, Any]) -> str:
