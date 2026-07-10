@@ -1,0 +1,151 @@
+{
+  "generated_at": "2026-07-10T19:36:02+00:00",
+  "participants": [
+    {
+      "availability_state": "working",
+      "blocker": null,
+      "current_task": "Summarize resident work, unread communication, and escalation needs.",
+      "employee_id": 7,
+      "escalation_state": "attention_needed",
+      "goal": "Protect Steward attention while coordinating Estate operational flow.",
+      "last_meaningful_movement": "2026-07-10T00:00:00+00:00",
+      "mailbox_id": 7,
+      "next_action": "Review concise attention summary and route only authorized follow-up.",
+      "next_checkpoint": "Next Office status inspection",
+      "resident_id": "RES-000001",
+      "resident_name": "Alfred",
+      "schema_version": "resident_task_status.v1",
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": false,
+      "unread_message_count": 0,
+      "waiting_on": "Mailbox and runtime status evidence"
+    },
+    {
+      "availability_state": "unknown",
+      "blocker": "status stale or missing",
+      "current_task": null,
+      "employee_id": 10,
+      "escalation_state": "attention_needed",
+      "goal": "Protects privacy, clearance, boundaries, and all external crossings.",
+      "last_meaningful_movement": null,
+      "mailbox_id": 10,
+      "next_action": null,
+      "next_checkpoint": null,
+      "resident_id": "RES-000002",
+      "resident_name": "Ingrid",
+      "schema_version": "resident_task_status.v1",
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": true,
+      "unread_message_count": 0,
+      "waiting_on": null
+    },
+    {
+      "availability_state": "working",
+      "blocker": null,
+      "current_task": "Consume resident availability states without exposing private assessment detail.",
+      "employee_id": 6,
+      "escalation_state": "none",
+      "goal": "Maintain privacy-safe workforce availability constraints.",
+      "last_meaningful_movement": "2026-07-10T00:00:00+00:00",
+      "mailbox_id": 6,
+      "next_action": "Flag unavailable or blocked residents for assignment planning.",
+      "next_checkpoint": "Next workforce readiness review",
+      "resident_id": "RES-000003",
+      "resident_name": "Helen",
+      "schema_version": "resident_task_status.v1",
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": false,
+      "unread_message_count": 0,
+      "waiting_on": "Current resident status records"
+    },
+    {
+      "availability_state": "unknown",
+      "blocker": "status stale or missing",
+      "current_task": null,
+      "employee_id": null,
+      "escalation_state": "attention_needed",
+      "goal": "Preserves institutional memory, lineage, provenance, revisions, Palace Memory, and the Estate Ledger.",
+      "last_meaningful_movement": null,
+      "mailbox_id": null,
+      "next_action": null,
+      "next_checkpoint": null,
+      "resident_id": "RES-000004",
+      "resident_name": "Eleanor",
+      "schema_version": "resident_task_status.v1",
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": true,
+      "unread_message_count": 0,
+      "waiting_on": null
+    },
+    {
+      "availability_state": "unknown",
+      "blocker": "status stale or missing",
+      "current_task": null,
+      "employee_id": null,
+      "escalation_state": "attention_needed",
+      "goal": "Discovers, investigates, validates, and contextualizes knowledge relevant to the Estate and its projects.",
+      "last_meaningful_movement": null,
+      "mailbox_id": null,
+      "next_action": null,
+      "next_checkpoint": null,
+      "resident_id": "RES-000005",
+      "resident_name": "Marie",
+      "schema_version": "resident_task_status.v1",
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": true,
+      "unread_message_count": 0,
+      "waiting_on": null
+    },
+    {
+      "availability_state": "unknown",
+      "blocker": "status stale or missing",
+      "current_task": null,
+      "employee_id": null,
+      "escalation_state": "attention_needed",
+      "goal": "Reviews legal risk, contracts, claims, compliance, licensing, and gray-area exposure.",
+      "last_meaningful_movement": null,
+      "mailbox_id": null,
+      "next_action": null,
+      "next_checkpoint": null,
+      "resident_id": "RES-000006",
+      "resident_name": "Judy",
+      "schema_version": "resident_task_status.v1",
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime/residents/task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": true,
+      "unread_message_count": 0,
+      "waiting_on": null
+    }
+  ],
+  "privacy": "participant board omits private journals and detailed workforce assessments",
+  "schema_version": "resident_task_status.v1"
+}

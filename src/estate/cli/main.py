@@ -93,6 +93,7 @@ from estate.core.operations_center_workspace_profiles import resolve_workspace_p
 from estate.core.operations_center_settings import load_operations_center_settings, save_operations_center_settings
 from estate.core.decision_queue import generate_decision_queue, format_decision_queue_markdown
 from estate.core.resident_presence import build_resident_presence, filter_resident, format_resident_presence
+from estate.core.resident_task_visibility import build_resident_task_board, write_resident_task_board, create_resident_message, alfred_attention_summary, grace_operational_status, helen_availability_constraints
 from estate.core.resident_conversation_sessions import create_session, list_sessions, load_session, format_session_list
 from estate.core.alfred_duty import run_alfred_duty, format_alfred_duty
 from estate.core.helen_duty import run_helen_duty, format_helen_duty
@@ -1745,6 +1746,23 @@ def cmd_resident_presence(args):
         print(format_resident_presence(payload))
 
 
+
+def cmd_resident_task_visibility(args):
+    action = getattr(args, "task_visibility_action", "board")
+    if action == "board":
+        payload = write_resident_task_board()["board"] if getattr(args, "write", False) else build_resident_task_board()
+    elif action == "send":
+        payload = create_resident_message(args.sender, args.recipient, args.summary)
+    elif action == "alfred-summary":
+        payload = alfred_attention_summary()
+    elif action == "grace-status":
+        payload = grace_operational_status()
+    elif action == "helen-constraints":
+        payload = helen_availability_constraints()
+    else:
+        raise SystemExit(f"Unsupported resident-task-visibility action: {action}")
+    print(json.dumps(payload, indent=2, sort_keys=True))
+
 def cmd_operations_center(args):
     if args.action == "start":
         payload = operations_center_start(host=args.host, port=args.port)
@@ -3176,6 +3194,21 @@ def main(argv=None):
     p.add_argument("--json", action="store_true", help="Print resident presence JSON")
     p.set_defaults(func=cmd_resident_presence)
 
+
+
+    p = sub.add_parser("resident-task-visibility", help="Inspect resident task visibility and governed resident messages")
+    tv = p.add_subparsers(dest="task_visibility_action", required=True)
+    q = tv.add_parser("board", help="Build privacy-safe Office participant board")
+    q.add_argument("--write", action="store_true", help="Write runtime/office/steward_participant_board.json")
+    q.set_defaults(func=cmd_resident_task_visibility)
+    q = tv.add_parser("send", help="Create governed resident-to-resident mailbox message")
+    q.add_argument("--sender", required=True)
+    q.add_argument("--recipient", required=True)
+    q.add_argument("--summary", required=True)
+    q.set_defaults(func=cmd_resident_task_visibility)
+    for name in ("alfred-summary", "grace-status", "helen-constraints"):
+        q = tv.add_parser(name)
+        q.set_defaults(func=cmd_resident_task_visibility)
 
     p = sub.add_parser("resident-authority", help="Check or list resident action authority boundaries")
     p.add_argument("action", choices=["check", "list"], help="Authority action")

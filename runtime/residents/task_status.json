@@ -1,0 +1,32 @@
+{
+  "schema_version": "resident_task_status.v1",
+  "updated_at": "2026-07-10T00:00:00+00:00",
+  "residents": [
+    {
+      "resident_id": "RES-000001",
+      "name": "Alfred",
+      "goal": "Protect Steward attention while coordinating Estate operational flow.",
+      "current_task": "Summarize resident work, unread communication, and escalation needs.",
+      "last_meaningful_movement": "2026-07-10T00:00:00+00:00",
+      "waiting_on": "Mailbox and runtime status evidence",
+      "blocker": null,
+      "next_action": "Review concise attention summary and route only authorized follow-up.",
+      "next_checkpoint": "Next Office status inspection",
+      "availability_state": "working",
+      "escalation_state": "monitoring"
+    },
+    {
+      "resident_id": "RES-000003",
+      "name": "Helen",
+      "goal": "Maintain privacy-safe workforce availability constraints.",
+      "current_task": "Consume resident availability states without exposing private assessment detail.",
+      "last_meaningful_movement": "2026-07-10T00:00:00+00:00",
+      "waiting_on": "Current resident status records",
+      "blocker": null,
+      "next_action": "Flag unavailable or blocked residents for assignment planning.",
+      "next_checkpoint": "Next workforce readiness review",
+      "availability_state": "working",
+      "escalation_state": "none"
+    }
+  ]
+}
