@@ -1,0 +1,8 @@
+{
+  "schema": "estate.work_package_completion_receipt.v1",
+  "work_package": "WP-0530",
+  "completed_by": "codex",
+  "staged_not_installed": true,
+  "statement": "WP-0530 staged guided operational workflows under collaboration/workstreams/WP-0530/. Staged work is not installed work; WP-0531 performs installation.",
+  "active_office_files_modified": false
+}
