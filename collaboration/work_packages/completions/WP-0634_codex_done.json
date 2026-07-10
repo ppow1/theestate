@@ -1,0 +1,13 @@
+{
+  "work_package_id": "WP-0634",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented durable runtime persistence, recovery planning, corruption isolation, backup rotation, and idempotent replay support.",
+  "artifacts": [
+    "src/estate/core/runtime_recovery.py",
+    "src/estate/core/runtime_replay.py",
+    "tests/test_runtime_recovery.py",
+    "tests/test_runtime_replay.py",
+    "docs/integration/runtime_persistence_recovery_and_replay.md"
+  ]
+}
