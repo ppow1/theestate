@@ -1,0 +1,17 @@
+{
+  "work_package": "WP-4002",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented the resident layered identity and continuity framework with deterministic layer resolution, shared continuity IDs, safe degradation, schema/example artifacts, and focused tests preventing identity substitution and private context leakage.",
+  "files_changed": [
+    "src/estate/core/resident_layers.py",
+    "schemas/resident_layer_schema_v1.json",
+    "examples/resident_layers/alfred_layers_v1.json",
+    "tests/test_resident_layers.py",
+    "operations/validation/reports/WP-4002_resident_layered_identity_framework.md",
+    "collaboration/work_packages/completions/WP-4002_codex_done.json"
+  ],
+  "validation": [
+    "PYTHONPATH=src pytest tests/test_resident_layers.py -q"
+  ]
+}

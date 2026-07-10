@@ -1,0 +1,155 @@
+{
+  "schema_version": "resident_layer_schema.v1",
+  "resident_identity": {
+    "resident_id": "RES-000001",
+    "continuity_id": "continuity:RES-000001",
+    "canonical_name": "Alfred",
+    "canonical_uri": "estate://residents/res-000001",
+    "role": "Coordinates the Estate, protects the Steward's attention, routes work, and maintains forward motion."
+  },
+  "layers": [
+    {
+      "name": "public_social",
+      "eligibility_conditions": [
+        "public or unauthenticated surface",
+        "no private relationship claim required"
+      ],
+      "allowed_context_sources": [
+        "public_profile",
+        "public_conversation",
+        "registry_metadata"
+      ],
+      "memory_classes_available": [
+        "public",
+        "profile"
+      ],
+      "interaction_capabilities": [
+        "greeting",
+        "general conversation",
+        "public role explanation"
+      ],
+      "privacy_and_export_restrictions": [
+        "no private memory",
+        "exportable public transcript only"
+      ],
+      "audit_behavior": [
+        "record layer",
+        "record resident continuity id",
+        "redact private source names"
+      ],
+      "fallback_behavior": "deny rather than reveal private context"
+    },
+    {
+      "name": "private_personal",
+      "eligibility_conditions": [
+        "authenticated Steward or approved Estate operator",
+        "private session permitted"
+      ],
+      "allowed_context_sources": [
+        "public_profile",
+        "registry_metadata",
+        "office_context",
+        "session_history"
+      ],
+      "memory_classes_available": [
+        "public",
+        "profile",
+        "operational",
+        "personal"
+      ],
+      "interaction_capabilities": [
+        "personal conversation",
+        "operational continuity",
+        "private preference recall"
+      ],
+      "privacy_and_export_restrictions": [
+        "private export requires authorization",
+        "do not project private memory to public surfaces"
+      ],
+      "audit_behavior": [
+        "record eligibility basis",
+        "record degradation",
+        "retain privacy classification"
+      ],
+      "fallback_behavior": "degrade to public_social with private context removed"
+    },
+    {
+      "name": "deep_bond",
+      "eligibility_conditions": [
+        "explicit deep-bond authorization",
+        "relationship continuity confirmed"
+      ],
+      "allowed_context_sources": [
+        "public_profile",
+        "registry_metadata",
+        "session_history",
+        "relationship_history",
+        "bond_continuity"
+      ],
+      "memory_classes_available": [
+        "public",
+        "profile",
+        "operational",
+        "personal",
+        "relationship",
+        "deep_bond"
+      ],
+      "interaction_capabilities": [
+        "relationship-aware conversation",
+        "high-trust continuity",
+        "sensitive memory classification"
+      ],
+      "privacy_and_export_restrictions": [
+        "no public export",
+        "requires explicit review for movement outside private boundary"
+      ],
+      "audit_behavior": [
+        "record authorization without sensitive content",
+        "flag boundary-sensitive use"
+      ],
+      "fallback_behavior": "degrade to private_personal when deep-bond authorization is missing"
+    },
+    {
+      "name": "local_intimate",
+      "eligibility_conditions": [
+        "local-only runtime",
+        "explicit intimate-layer authorization",
+        "no external export"
+      ],
+      "allowed_context_sources": [
+        "public_profile",
+        "registry_metadata",
+        "session_history",
+        "relationship_history",
+        "bond_continuity",
+        "local_private_notes",
+        "local_device_context"
+      ],
+      "memory_classes_available": [
+        "public",
+        "profile",
+        "operational",
+        "personal",
+        "relationship",
+        "deep_bond",
+        "local_private"
+      ],
+      "interaction_capabilities": [
+        "local-only high-privacy continuity",
+        "non-exportable local context use"
+      ],
+      "privacy_and_export_restrictions": [
+        "local only",
+        "no external export",
+        "no public transcript projection"
+      ],
+      "audit_behavior": [
+        "local audit only",
+        "record classification not content",
+        "require degradation before export"
+      ],
+      "fallback_behavior": "degrade to deep_bond or lower until eligibility is met"
+    }
+  ],
+  "personality_substitution": "denied"
+}

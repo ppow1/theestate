@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/resident_layer_schema_v1.json",
+  "title": "Estate Resident Layer Schema v1",
+  "type": "object",
+  "required": ["schema_version", "resident_identity", "layers"],
+  "properties": {
+    "schema_version": {"const": "resident_layer_schema.v1"},
+    "resident_identity": {
+      "type": "object",
+      "required": ["resident_id", "continuity_id", "canonical_name", "canonical_uri"],
+      "properties": {
+        "resident_id": {"type": "string"},
+        "continuity_id": {"type": "string"},
+        "canonical_name": {"type": "string"},
+        "canonical_uri": {"type": "string"},
+        "role": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["name", "eligibility_conditions", "allowed_context_sources", "memory_classes_available", "interaction_capabilities", "privacy_and_export_restrictions", "audit_behavior", "fallback_behavior"],
+        "properties": {
+          "name": {"enum": ["public_social", "private_personal", "deep_bond", "local_intimate"]},
+          "eligibility_conditions": {"type": "array", "items": {"type": "string"}},
+          "allowed_context_sources": {"type": "array", "items": {"type": "string"}},
+          "memory_classes_available": {"type": "array", "items": {"type": "string"}},
+          "interaction_capabilities": {"type": "array", "items": {"type": "string"}},
+          "privacy_and_export_restrictions": {"type": "array", "items": {"type": "string"}},
+          "audit_behavior": {"type": "array", "items": {"type": "string"}},
+          "fallback_behavior": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "personality_substitution": {"const": "denied"}
+  },
+  "additionalProperties": false
+}
