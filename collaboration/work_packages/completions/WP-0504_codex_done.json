@@ -1,0 +1,92 @@
+{
+  "authorization_behavior_modified": false,
+  "background_operations_behavior_modified": false,
+  "branch": "work",
+  "codex_bridge_behavior_modified": false,
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T01:54:12Z",
+  "dispatch_behavior_modified": false,
+  "dry_run_live_provider_called": false,
+  "fake_runner_used_for_submit_tests": true,
+  "files_changed": [
+    "src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "tests/test_codex_bridge_execution_provider_adapter.py",
+    "docs/integration/codex_bridge_execution_provider_adapter.md",
+    "collaboration/work_packages/completions/WP-0504_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_created": [
+    "src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "tests/test_codex_bridge_execution_provider_adapter.py",
+    "docs/integration/codex_bridge_execution_provider_adapter.md",
+    "collaboration/work_packages/completions/WP-0504_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/execution_provider_adapter_contract.md",
+    "docs/integration/execution_dispatch_to_adapter_handoff.md",
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/execution_provider_adapter_runtime.py",
+    "src/estate/core/execution_adapter_handoff_runtime.py",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/codex_bridge.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_provider_adapter.py",
+    "tests/test_execution_provider_adapter_runtime.py",
+    "tests/test_execution_adapter_handoff_runtime.py",
+    "tests/test_codex_bridge.py"
+  ],
+  "institutional_acceptance_behavior_modified": false,
+  "known_limitations": [
+    "Live Codex CLI execution is intentionally not exercised by deterministic tests.",
+    "Submit requires an injected bridge runner; no live submit CLI is exposed."
+  ],
+  "live_provider_calls_made": false,
+  "merge_authority_equivalent": "Chief Architect / Steward review",
+  "orchestrator_behavior_modified": false,
+  "owner": "Codex",
+  "provider_adapter_behavior_modified": true,
+  "pull_request_not_applicable_reason": "PR will be created by make_pr tool after commit.",
+  "ready_for_ca_review": true,
+  "runtime_artifacts_written": [
+    "runtime/execution_adapters/requests/<adapter_request_id>.json",
+    "runtime/execution_adapters/results/<adapter_request_id>.json",
+    "runtime/execution_adapters/status/latest.json",
+    "runtime/execution_adapters/reports/<adapter_request_id>.md"
+  ],
+  "status": "completed_pending_chief_architect_review",
+  "summary": "Implemented Codex Bridge as a concrete execution provider adapter with deterministic dry-run, fake-runner submit tests, CLI validate/dry-run commands, docs, validation recipe, and completion receipt.",
+  "supported_provider_ids": [
+    "codex-cli-openai",
+    "codex-cli-ollama"
+  ],
+  "supported_provider_types": [
+    "codex-cli",
+    "codex_bridge"
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "pytest -q tests/test_codex_bridge_execution_provider_adapter.py tests/test_codex_bridge.py tests/test_execution_provider_adapter.py tests/test_execution_adapter_handoff_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0504 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/codex_bridge_execution_provider_adapter.py",
+    "pytest -q tests/test_codex_bridge_execution_provider_adapter.py tests/test_codex_bridge.py tests/test_execution_provider_adapter.py tests/test_execution_adapter_handoff_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0504 --json"
+  ],
+  "validation_results": {
+    "focused_pytest": "46 passed",
+    "py_compile": "passed",
+    "work_package_validation": "passed"
+  },
+  "work_package_id": "WP-0504"
+}

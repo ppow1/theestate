@@ -53,6 +53,42 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+
+    "WP-0504": {
+        "recipe_id": "wp-0504-codex-bridge-execution-provider-adapter",
+        "title": "WP-0504 — Codex Bridge Execution Provider Adapter",
+        "description": "Validates the concrete Codex Bridge execution provider adapter, CLI, docs, tests, and completion receipt without live provider calls.",
+        "required_checks": [
+            "Adapter module, tests, documentation, and receipt exist",
+            "Adapter module compiles",
+            "Focused adapter, bridge, contract, and handoff tests pass",
+            "Receipt records no live provider calls and fake-runner submit coverage",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/codex_bridge_execution_provider_adapter.py",
+            "tests/test_codex_bridge_execution_provider_adapter.py",
+            "docs/integration/codex_bridge_execution_provider_adapter.md",
+            "collaboration/work_packages/completions/WP-0504_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports live provider calls or modified authorization/acceptance behavior",
+        ],
+        "success_criteria": [
+            "Codex Bridge is available through a concrete ExecutionProviderAdapter",
+            "Dry-run records no live provider calls",
+            "Submit is covered by an injectable fake runner",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd('python -c "from pathlib import Path; paths=[\'src/estate/core/codex_bridge_execution_provider_adapter.py\',\'tests/test_codex_bridge_execution_provider_adapter.py\',\'docs/integration/codex_bridge_execution_provider_adapter.md\',\'collaboration/work_packages/completions/WP-0504_codex_done.json\']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing"'),
+            _cmd("python -m py_compile src/estate/core/codex_bridge_execution_provider_adapter.py"),
+            _cmd("pytest -q tests/test_codex_bridge_execution_provider_adapter.py tests/test_codex_bridge.py tests/test_execution_provider_adapter.py tests/test_execution_adapter_handoff_runtime.py"),
+            _cmd('python -c "import json; from pathlib import Path; data=json.loads(Path(\'collaboration/work_packages/completions/WP-0504_codex_done.json\').read_text(encoding=\'utf-8\')); assert data.get(\'work_package_id\') == \'WP-0504\'; assert data.get(\'live_provider_calls_made\') is False; assert data.get(\'dry_run_live_provider_called\') is False; assert data.get(\'fake_runner_used_for_submit_tests\') is True; assert data.get(\'authorization_behavior_modified\') is False; assert data.get(\'institutional_acceptance_behavior_modified\') is False; assert data.get(\'ready_for_ca_review\') is True"'),
+        ],
+    },
+
     "WP-0503": {
         "recipe_id": "wp-0503-governed-dispatch-to-adapter-handoff",
         "title": "WP-0503 — Governed Dispatch-to-Adapter Handoff Runtime",

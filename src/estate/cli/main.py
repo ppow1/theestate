@@ -56,6 +56,7 @@ from estate.core.production_readiness_validation import generate_production_read
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
 from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
+from estate.core.codex_bridge_execution_provider_adapter import run_codex_bridge_adapter_dry_run, CodexBridgeExecutionProviderAdapter
 from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepare_handoff, validate_handoff, dry_run_handoff
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
@@ -1616,6 +1617,30 @@ def cmd_execution_provider_adapter(args):
 
 
 
+def cmd_codex_bridge_adapter(args):
+    import json
+    try:
+        request = load_adapter_contract_request(args.request)
+        if args.codex_bridge_adapter_action == "validate":
+            adapter = CodexBridgeExecutionProviderAdapter()
+            payload = {"request": request.to_dict(), "validation": adapter.validate_request(request).to_dict()}
+        elif args.codex_bridge_adapter_action == "dry-run":
+            payload = run_codex_bridge_adapter_dry_run(request)
+        else:
+            raise SystemExit(f"Unknown codex-bridge-adapter action: {args.codex_bridge_adapter_action}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        if getattr(args, "json", False):
+            print(json.dumps({"status": "failed", "error": str(exc)}, indent=2, sort_keys=True))
+        else:
+            print(f"Codex Bridge adapter failed: {exc}")
+        raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        status = payload.get("status") or (payload.get("validation") or {}).get("status")
+        print(f"Codex Bridge adapter {args.codex_bridge_adapter_action}: {status}")
+
+
 def cmd_execution_adapter_handoff(args):
     import json
     try:
@@ -2226,6 +2251,18 @@ def main(argv=None):
     p.add_argument("--dry-run", action="store_true", help="Validate and emit visibility artifacts without invoking Codex")
     p.add_argument("--json", action="store_true", help="Print Codex Bridge result JSON")
     p.set_defaults(func=cmd_codex_bridge)
+
+
+    p = sub.add_parser("codex-bridge-adapter", help="Validate and dry-run Codex Bridge adapter requests without live provider calls")
+    cba_sub = p.add_subparsers(dest="codex_bridge_adapter_action", required=True)
+    q = cba_sub.add_parser("validate", help="Validate a Codex Bridge adapter request JSON file")
+    q.add_argument("--request", required=True, help="Path to adapter request JSON")
+    q.add_argument("--json", action="store_true", help="Print adapter validation JSON")
+    q.set_defaults(func=cmd_codex_bridge_adapter)
+    q = cba_sub.add_parser("dry-run", help="Run Codex Bridge adapter dry-run and write artifacts")
+    q.add_argument("--request", required=True, help="Path to adapter request JSON")
+    q.add_argument("--json", action="store_true", help="Print dry-run result JSON")
+    q.set_defaults(func=cmd_codex_bridge_adapter)
 
 
     p = sub.add_parser("execution-provider-adapter", help="Validate provider-neutral adapter requests and deterministic dry runs")
