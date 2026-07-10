@@ -1,10 +1,19 @@
 {
-  "generated_at": "2026-07-10T19:36:02+00:00",
+  "filters": {},
+  "generated_at": "2026-07-10T20:14:10+00:00",
   "participants": [
     {
       "availability_state": "working",
       "blocker": null,
+      "current_goal": "Protect Steward attention while coordinating Estate operational flow.",
       "current_task": "Summarize resident work, unread communication, and escalation needs.",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "RES-000001",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": 72850,
+      "elapsed_time": "20:14:10",
       "employee_id": 7,
       "escalation_state": "attention_needed",
       "goal": "Protect Steward attention while coordinating Estate operational flow.",
@@ -12,9 +21,13 @@
       "mailbox_id": 7,
       "next_action": "Review concise attention summary and route only authorized follow-up.",
       "next_checkpoint": "Next Office status inspection",
+      "office": "Administration",
+      "related_work_package_or_project": "unknown",
       "resident_id": "RES-000001",
       "resident_name": "Alfred",
-      "schema_version": "resident_task_status.v1",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime/residents/task_status.json",
+      "source_last_updated": "2026-07-10T00:00:00+00:00",
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
@@ -22,13 +35,23 @@
         "runtime/residents/presence.json"
       ],
       "stale_status": false,
+      "status": "waiting",
+      "task_owner": "Alfred",
       "unread_message_count": 0,
       "waiting_on": "Mailbox and runtime status evidence"
     },
     {
       "availability_state": "unknown",
       "blocker": "status stale or missing",
-      "current_task": null,
+      "current_goal": "Protects privacy, clearance, boundaries, and all external crossings.",
+      "current_task": "unknown",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "RES-000002",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": null,
+      "elapsed_time": null,
       "employee_id": 10,
       "escalation_state": "attention_needed",
       "goal": "Protects privacy, clearance, boundaries, and all external crossings.",
@@ -36,9 +59,13 @@
       "mailbox_id": 10,
       "next_action": null,
       "next_checkpoint": null,
+      "office": "Office of Security and Boundary",
+      "related_work_package_or_project": "unknown",
       "resident_id": "RES-000002",
       "resident_name": "Ingrid",
-      "schema_version": "resident_task_status.v1",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime/residents/task_status.json",
+      "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
@@ -46,13 +73,23 @@
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
+      "status": "stale",
+      "task_owner": "Ingrid",
       "unread_message_count": 0,
       "waiting_on": null
     },
     {
       "availability_state": "working",
       "blocker": null,
+      "current_goal": "Maintain privacy-safe workforce availability constraints.",
       "current_task": "Consume resident availability states without exposing private assessment detail.",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "RES-000003",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": 72850,
+      "elapsed_time": "20:14:10",
       "employee_id": 6,
       "escalation_state": "none",
       "goal": "Maintain privacy-safe workforce availability constraints.",
@@ -60,9 +97,13 @@
       "mailbox_id": 6,
       "next_action": "Flag unavailable or blocked residents for assignment planning.",
       "next_checkpoint": "Next workforce readiness review",
+      "office": "Human Resources",
+      "related_work_package_or_project": "unknown",
       "resident_id": "RES-000003",
       "resident_name": "Helen",
-      "schema_version": "resident_task_status.v1",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime/residents/task_status.json",
+      "source_last_updated": "2026-07-10T00:00:00+00:00",
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
@@ -70,13 +111,23 @@
         "runtime/residents/presence.json"
       ],
       "stale_status": false,
-      "unread_message_count": 0,
+      "status": "waiting",
+      "task_owner": "Helen",
+      "unread_message_count": 1,
       "waiting_on": "Current resident status records"
     },
     {
       "availability_state": "unknown",
       "blocker": "status stale or missing",
-      "current_task": null,
+      "current_goal": "Preserves institutional memory, lineage, provenance, revisions, Palace Memory, and the Estate Ledger.",
+      "current_task": "unknown",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "RES-000004",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": null,
+      "elapsed_time": null,
       "employee_id": null,
       "escalation_state": "attention_needed",
       "goal": "Preserves institutional memory, lineage, provenance, revisions, Palace Memory, and the Estate Ledger.",
@@ -84,9 +135,13 @@
       "mailbox_id": null,
       "next_action": null,
       "next_checkpoint": null,
+      "office": "Manager of Archives / Registrar",
+      "related_work_package_or_project": "unknown",
       "resident_id": "RES-000004",
       "resident_name": "Eleanor",
-      "schema_version": "resident_task_status.v1",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime/residents/task_status.json",
+      "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
@@ -94,13 +149,23 @@
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
+      "status": "stale",
+      "task_owner": "Eleanor",
       "unread_message_count": 0,
       "waiting_on": null
     },
     {
       "availability_state": "unknown",
       "blocker": "status stale or missing",
-      "current_task": null,
+      "current_goal": "Discovers, investigates, validates, and contextualizes knowledge relevant to the Estate and its projects.",
+      "current_task": "unknown",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "RES-000005",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": null,
+      "elapsed_time": null,
       "employee_id": null,
       "escalation_state": "attention_needed",
       "goal": "Discovers, investigates, validates, and contextualizes knowledge relevant to the Estate and its projects.",
@@ -108,9 +173,13 @@
       "mailbox_id": null,
       "next_action": null,
       "next_checkpoint": null,
+      "office": "Manager of Research",
+      "related_work_package_or_project": "unknown",
       "resident_id": "RES-000005",
       "resident_name": "Marie",
-      "schema_version": "resident_task_status.v1",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime/residents/task_status.json",
+      "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
@@ -118,13 +187,23 @@
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
+      "status": "stale",
+      "task_owner": "Marie",
       "unread_message_count": 0,
       "waiting_on": null
     },
     {
       "availability_state": "unknown",
       "blocker": "status stale or missing",
-      "current_task": null,
+      "current_goal": "Reviews legal risk, contracts, claims, compliance, licensing, and gray-area exposure.",
+      "current_task": "unknown",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "RES-000006",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": null,
+      "elapsed_time": null,
       "employee_id": null,
       "escalation_state": "attention_needed",
       "goal": "Reviews legal risk, contracts, claims, compliance, licensing, and gray-area exposure.",
@@ -132,9 +211,13 @@
       "mailbox_id": null,
       "next_action": null,
       "next_checkpoint": null,
+      "office": "General Counsel",
+      "related_work_package_or_project": "unknown",
       "resident_id": "RES-000006",
       "resident_name": "Judy",
-      "schema_version": "resident_task_status.v1",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime/residents/task_status.json",
+      "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
@@ -142,10 +225,12 @@
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
+      "status": "stale",
+      "task_owner": "Judy",
       "unread_message_count": 0,
       "waiting_on": null
     }
   ],
   "privacy": "participant board omits private journals and detailed workforce assessments",
-  "schema_version": "resident_task_status.v1"
+  "schema_version": "office_resident_task_board.v1"
 }

@@ -1,0 +1,12 @@
+{
+  "artifacts": [
+    "operations/validation/reports/WP-4017_office_resident_task_board.md",
+    "schemas/office_resident_task_board_v1.json",
+    "runtime/office/steward_participant_board.json"
+  ],
+  "codex_status": "done",
+  "completed_at": "2026-07-10T20:13:29+00:00",
+  "ready_for_ca_review": true,
+  "summary": "Implemented Office Resident Task Board aggregation, schema, Office UI integration, CLI filtering, action transport refresh/detail navigation, tests, and validation report.",
+  "work_package_id": "WP-4017"
+}

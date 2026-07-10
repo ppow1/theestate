@@ -1871,7 +1871,8 @@ def cmd_resident_presence(args):
 def cmd_resident_task_visibility(args):
     action = getattr(args, "task_visibility_action", "board")
     if action == "board":
-        payload = write_resident_task_board()["board"] if getattr(args, "write", False) else build_resident_task_board()
+        filters = {k: getattr(args, k, None) for k in ("resident", "office", "project", "status", "blocker", "staleness") if getattr(args, k, None) not in (None, "")}
+        payload = write_resident_task_board(**filters)["board"] if getattr(args, "write", False) else build_resident_task_board(**filters)
     elif action == "send":
         payload = create_resident_message(args.sender, args.recipient, args.summary)
     elif action == "alfred-summary":
@@ -3383,6 +3384,12 @@ def main(argv=None):
     tv = p.add_subparsers(dest="task_visibility_action", required=True)
     q = tv.add_parser("board", help="Build privacy-safe Office participant board")
     q.add_argument("--write", action="store_true", help="Write runtime/office/steward_participant_board.json")
+    q.add_argument("--resident", help="Filter by resident name or id")
+    q.add_argument("--office", help="Filter by office")
+    q.add_argument("--project", help="Filter by related project or work package")
+    q.add_argument("--status", help="Filter by active, waiting, blocked, paused, completed, stale, or availability state")
+    q.add_argument("--blocker", help="Filter by blocker presence: true/false")
+    q.add_argument("--staleness", help="Filter by stale status: true/false")
     q.set_defaults(func=cmd_resident_task_visibility)
     q = tv.add_parser("send", help="Create governed resident-to-resident mailbox message")
     q.add_argument("--sender", required=True)

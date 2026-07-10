@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://estate.local/schemas/office_resident_task_board_v1.json",
+  "title": "Office Resident Task Board v1",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "privacy", "participants"],
+  "properties": {
+    "schema_version": {"const": "office_resident_task_board.v1"},
+    "generated_at": {"type": "string"},
+    "privacy": {"type": "string"},
+    "filters": {"type": "object"},
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["resident_id", "resident_name", "current_goal", "current_task", "task_owner", "last_meaningful_movement", "waiting_on", "blocker", "next_action", "next_checkpoint", "elapsed_seconds", "availability_state", "status", "related_work_package_or_project", "source_artifact", "source_last_updated", "source_links"],
+        "properties": {
+          "status": {"enum": ["active", "waiting", "blocked", "paused", "completed", "stale", "unknown"]},
+          "source_links": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
