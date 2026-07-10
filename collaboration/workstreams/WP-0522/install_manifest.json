@@ -1,0 +1,44 @@
+{
+  "work_package": "WP-0522",
+  "status": "staged_not_installed",
+  "required_install_handoff": "WP-0531",
+  "staged_artifacts": [
+    "collaboration/workstreams/WP-0522/staged/office_executive_workspace.py",
+    "collaboration/workstreams/WP-0522/staged/test_office_executive_workspace.py",
+    "collaboration/workstreams/WP-0522/executive_workspace_contract.md",
+    "collaboration/workstreams/WP-0522/validation_notes.md",
+    "collaboration/workstreams/WP-0522/rollback_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_executive_workspace.py",
+    "tests/test_office_executive_workspace.py",
+    "docs/office/executive_workspace_contract.md"
+  ],
+  "shared_integration_targets_deferred": [
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/cli/main.py",
+    "Office tab registration",
+    "command-surface registration"
+  ],
+  "dependency_assumptions": [
+    "Python standard library only for staged module",
+    "pytest for staged validation",
+    "Existing Estate evidence remains in repository-relative Markdown and JSON artifacts"
+  ],
+  "conflict_risks": [
+    "Office UI tab registration may conflict with concurrent Steward Command Center changes",
+    "Command-surface registration must not imply autonomous approval or execution",
+    "Readiness semantics must be reconciled with existing operational readiness dashboards"
+  ],
+  "validation_commands": [
+    "python -m pytest collaboration/workstreams/WP-0522/staged/test_office_executive_workspace.py"
+  ],
+  "rollback": "Remove collaboration/workstreams/WP-0522/ staged artifacts; no shared active Office files were modified.",
+  "authority_boundaries": [
+    "Recommendations are evidence, not decisions",
+    "No autonomous approval",
+    "No autonomous execution",
+    "Shared-file integration requires WP-0531 INSTALL-HANDOFF"
+  ]
+}
