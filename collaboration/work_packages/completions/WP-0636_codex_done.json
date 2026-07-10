@@ -1,0 +1,20 @@
+{
+  "work_package_id": "WP-0636",
+  "status": "completed",
+  "completed_by": "codex",
+  "summary": "Implemented declarative Background Operations extension contracts, runtime controls, Office control surface integration, deterministic tests, and integration documentation.",
+  "acceptance": {
+    "built_in_estate_and_cue_mastery_monitoring_expressed_as_extensions": true,
+    "canonical_boundaries_preserved": true,
+    "invalid_or_failing_extensions_quarantined_and_reported": true,
+    "extension_state_visible_in_office_control_surface": true,
+    "deterministic_tests_and_validation_recipe_added": true
+  },
+  "artifacts": [
+    "src/estate/core/background_operations_extensions.py",
+    "src/estate/core/background_operations_extension_runtime.py",
+    "tests/test_background_operations_extensions.py",
+    "tests/test_background_operations_extension_runtime.py",
+    "docs/integration/background_operations_extension_framework.md"
+  ]
+}

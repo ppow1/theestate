@@ -13,6 +13,7 @@ from estate.core.background_operations import (
 from estate.core.operational_events import OperationalEvent, append_event_artifact
 from estate.core.paths import ESTATE_ROOT
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.background_operations_extension_runtime import BackgroundOperationsExtensionRuntime
 from estate.core.post_merge_audit_runtime import PostMergeAuditRuntime
 
 BASE = Path("runtime/background_operations")
@@ -64,10 +65,14 @@ class BackgroundOperationsRuntime:
         if not self.watches_path.exists():
             watches = default_background_operation_watches()
             self.write_watches(watches)
-            return watches
-        data = _read_json(self.watches_path)
-        raw = data.get("watches", data) if isinstance(data, dict) else data
-        return [BackgroundOperationWatch.from_dict(item) for item in raw]
+        else:
+            data = _read_json(self.watches_path)
+            raw = data.get("watches", data) if isinstance(data, dict) else data
+            watches = [BackgroundOperationWatch.from_dict(item) for item in raw]
+        ext_watches, failures = BackgroundOperationsExtensionRuntime(self.root).extension_watches()
+        existing = {w.watch_id for w in watches}
+        watches.extend(w for w in ext_watches if w.watch_id not in existing)
+        return watches
 
     def write_watches(self, watches: list[BackgroundOperationWatch]) -> None:
         self.ensure_dirs(); _write_json(self.watches_path, {"watches": [w.to_dict() for w in watches]})
@@ -253,6 +258,14 @@ class BackgroundOperationsRuntime:
             s.update(ots.get("summary", {}))
         except Exception as exc:
             warnings.append(f"operational target status unavailable: {exc}")
+        try:
+            ext_status = BackgroundOperationsExtensionRuntime(self.root).inspect()
+            status["extensions"] = ext_status
+            s["background_operations_extensions_count"] = ext_status.get("summary", {}).get("extension_count", 0)
+            s["background_operations_extensions_enabled_count"] = ext_status.get("summary", {}).get("enabled_count", 0)
+            s["background_operations_extensions_quarantined_count"] = ext_status.get("summary", {}).get("quarantined_count", 0)
+        except Exception as exc:
+            warnings.append(f"background operations extension status unavailable: {exc}")
         s["warnings"] = warnings
         return status
 
@@ -260,7 +273,7 @@ class BackgroundOperationsRuntime:
 def format_background_operations_report(status: dict[str, Any]) -> str:
     s = status.get("summary", {})
     lines = ["# Background Operations Runtime", "", f"Generated: {status.get('generated_at')}", "", "## Summary"]
-    for key in ["active_watches_count", "generated_requests_count", "stale_validation_count", "ring2_review_needed_count", "pending_movement_decision_count", "provider_capacity_warning_count", "worker_assignment_gap_count", "operational_targets_available", "watched_targets_count", "paused_targets_count", "blocked_targets_count", "import_candidates_count"]:
+    for key in ["active_watches_count", "generated_requests_count", "stale_validation_count", "ring2_review_needed_count", "pending_movement_decision_count", "provider_capacity_warning_count", "worker_assignment_gap_count", "operational_targets_available", "watched_targets_count", "paused_targets_count", "blocked_targets_count", "import_candidates_count", "background_operations_extensions_count", "background_operations_extensions_enabled_count", "background_operations_extensions_quarantined_count"]:
         lines.append(f"- {key}: {s.get(key, 0)}")
     lines += ["", "Boundary: generated requests only; no live provider, GPU, network, dispatch, or authority execution is performed."]
     return "\n".join(lines).rstrip() + "\n"
