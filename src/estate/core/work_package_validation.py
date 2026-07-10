@@ -85,6 +85,76 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
         ],
     },
 
+
+    "WP-0619": {
+        "recipe_id": "wp-0619-operations-runtime-service-loop",
+        "title": "WP-0619 — Operations Runtime Service Loop",
+        "description": "Validates operations runtime service loop, CLI, heartbeat/status/report artifacts, documentation, and completion receipt without live providers.",
+        "required_checks": [
+            "Required files exist",
+            "Operations runtime modules compile",
+            "Deterministic tests pass",
+            "CLI run-once/status/report works",
+            "Receipt exists and reports no provider/dispatch execution",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/operations_runtime.py",
+            "src/estate/core/operations_runtime_service.py",
+            "tests/test_operations_runtime.py",
+            "tests/test_operations_runtime_service.py",
+            "docs/integration/operations_runtime_service_loop.md",
+            "collaboration/work_packages/completions/WP-0619_codex_done.json",
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Provider or dispatch execution is reported",
+        ],
+        "success_criteria": [
+            "Operations runtime produces governed cycles, heartbeat/status/report artifacts, and no authority execution",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/operations_runtime.py','src/estate/core/operations_runtime_service.py','tests/test_operations_runtime.py','tests/test_operations_runtime_service.py','docs/integration/operations_runtime_service_loop.md','collaboration/work_packages/completions/WP-0619_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/operations_runtime.py src/estate/core/operations_runtime_service.py"),
+            _cmd("pytest -q tests/test_operations_runtime.py tests/test_operations_runtime_service.py --basetemp Temp/pytest-operations-runtime"),
+            _cmd("PYTHONPATH=src python -m estate.cli.main operations-runtime run-once --json"),
+            _cmd("PYTHONPATH=src python -m estate.cli.main operations-runtime status --json"),
+            _cmd("PYTHONPATH=src python -m estate.cli.main operations-runtime report"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0619_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0619'; assert data.get('provider_execution_performed') is False; assert data.get('dispatch_execution_performed') is False\""),
+        ],
+    },
+
+    "WP-0620": {
+        "recipe_id": "wp-0620-repair-wp0619-validation-recipe",
+        "title": "WP-0620 — Repair WP-0619 Validation Recipe",
+        "description": "Validates that WP-0619 has a local validation recipe and that the WP-0620 completion receipt exists without provider or dispatch execution.",
+        "required_checks": [
+            "WP-0619 validation recipe is registered",
+            "WP-0619 validation passes",
+            "WP-0620 completion receipt exists",
+            "Receipt reports no provider or dispatch execution",
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/work_package_validation.py",
+            "collaboration/work_packages/completions/WP-0620_codex_done.json",
+        ],
+        "failure_criteria": [
+            "WP-0619 validation returns no_recipe or fails",
+            "WP-0620 receipt is missing or reports provider/dispatch execution",
+        ],
+        "success_criteria": [
+            "WP-0619 validates through the standard work-package validation path",
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/work_package_validation.py"),
+            _cmd("python -c \"from estate.core.work_package_validation import get_validation_recipe; recipe=get_validation_recipe('WP-0619'); assert recipe is not None; assert recipe.get('recipe_id') == 'wp-0619-operations-runtime-service-loop'\""),
+            _cmd("PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0619 --json"),
+            _cmd("python -c \"import json; from pathlib import Path; data=json.loads(Path('collaboration/work_packages/completions/WP-0620_codex_done.json').read_text(encoding='utf-8')); assert data.get('work_package_id') == 'WP-0620'; assert data.get('provider_execution_performed') is False; assert data.get('dispatch_execution_performed') is False; assert data.get('ready_for_ca_review') is True\""),
+        ],
+    },
     "WP-0618": {
         "recipe_id": "wp-0618-background-operational-targets-post-merge-audit",
         "title": "WP-0618 — Background Operational Targets and Post-Merge Audit",
