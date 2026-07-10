@@ -1,0 +1,48 @@
+{
+  "work_package": "WP-0523",
+  "status": "staged_not_installed",
+  "required_install_handoff": "WP-0531",
+  "staged_artifacts": [
+    "collaboration/workstreams/WP-0523/install_manifest.json",
+    "collaboration/workstreams/WP-0523/staged/office_guided_actions.py",
+    "collaboration/workstreams/WP-0523/staged/test_office_guided_actions.py",
+    "collaboration/workstreams/WP-0523/guided_action_contract.md",
+    "collaboration/workstreams/WP-0523/validation_notes.md",
+    "collaboration/workstreams/WP-0523/rollback_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_guided_actions.py",
+    "tests/test_office_guided_actions.py",
+    "docs/office/guided_action_contract.md"
+  ],
+  "shared_integration_targets_deferred": [
+    "src/estate/core/office_action_registry.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "Office guided-action runtime registration",
+    "Office browser/UI guided workflow rendering hooks",
+    "Office action registration for validate/review/promote",
+    "Installed test suite and documentation index entries"
+  ],
+  "dependency_assumptions": [
+    "Python standard library only for staged runtime",
+    "pytest for staged validation",
+    "Existing Office authority gates remain external controlling checks"
+  ],
+  "conflict_risks": [
+    "Office action registration may conflict with concurrent command-surface work",
+    "UI rendering hooks must not bypass existing approval gates",
+    "Promotion semantics must be reconciled with active Office promotion files during WP-0531 installation"
+  ],
+  "validation_commands": [
+    "python -m pytest collaboration/workstreams/WP-0523/staged/test_office_guided_actions.py"
+  ],
+  "rollback": "Remove collaboration/workstreams/WP-0523 staged artifacts and completion receipt; no shared active Office files were modified.",
+  "authority_boundaries": [
+    "Declarative steps are guidance, not authorization",
+    "No hidden authorization",
+    "No automatic approval",
+    "No shared active Office files modified by staged work",
+    "Shared-file integration requires WP-0531 INSTALL-HANDOFF"
+  ]
+}

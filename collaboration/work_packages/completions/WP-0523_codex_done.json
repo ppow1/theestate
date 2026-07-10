@@ -1,0 +1,26 @@
+{
+  "work_package": "WP-0523",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "status": "done_staged_not_installed",
+  "explicit_statement": "WP-0523 staged work is not installed work. WP-0531 performs installation and shared Office integration.",
+  "artifacts": [
+    "collaboration/workstreams/WP-0523/install_manifest.json",
+    "collaboration/workstreams/WP-0523/staged/office_guided_actions.py",
+    "collaboration/workstreams/WP-0523/staged/test_office_guided_actions.py",
+    "collaboration/workstreams/WP-0523/guided_action_contract.md",
+    "collaboration/workstreams/WP-0523/validation_notes.md",
+    "collaboration/workstreams/WP-0523/rollback_notes.md"
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-0523/staged/test_office_guided_actions.py",
+    "result": "passed",
+    "tests": 7
+  },
+  "shared_active_office_files_modified": false,
+  "authority_boundary": {
+    "hidden_authorization": false,
+    "automatic_approval": false,
+    "existing_authority_gates_preserved": true
+  }
+}
