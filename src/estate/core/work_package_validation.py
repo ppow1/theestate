@@ -53,6 +53,44 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
 
+    "WP-0623": {
+        "recipe_id": "wp-0623-automatic-merge-and-receipt-discovery",
+        "title": "WP-0623 — Automatic Merge and Receipt Discovery",
+        "description": "Validates merge discovery artifacts, CLI/runtime integration, deterministic tests, documentation, and receipt boundaries.",
+        "required_checks": [
+            "Merge discovery implementation, runtime wrapper, tests, documentation, and receipt exist",
+            "Merge discovery modules compile",
+            "Focused discovery and runtime tests pass",
+            "Receipt confirms no provider or dispatch execution"
+        ],
+        "observational_checks": [],
+        "expected_artifacts": [
+            "src/estate/core/merge_discovery.py",
+            "src/estate/core/merge_discovery_runtime.py",
+            "tests/test_merge_discovery.py",
+            "tests/test_merge_discovery_runtime.py",
+            "docs/integration/automatic_merge_and_receipt_discovery.md",
+            "collaboration/work_packages/completions/WP-0623_codex_done.json"
+        ],
+        "failure_criteria": [
+            "Any required command exits non-zero",
+            "Receipt reports provider or dispatch execution"
+        ],
+        "success_criteria": [
+            "Discovery creates governed post-merge audit requests from local evidence",
+            "Cursoring, ambiguity handling, duplicate suppression, runtime metrics, CLI, and Office visibility are covered"
+        ],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/merge_discovery.py','src/estate/core/merge_discovery_runtime.py','tests/test_merge_discovery.py','tests/test_merge_discovery_runtime.py','docs/integration/automatic_merge_and_receipt_discovery.md','collaboration/work_packages/completions/WP-0623_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+            _cmd("python -m py_compile src/estate/core/merge_discovery.py src/estate/core/merge_discovery_runtime.py"),
+            _cmd("python -c \"from pathlib import Path; Path('Temp').mkdir(exist_ok=True)\""),
+            _cmd("pytest -q tests/test_merge_discovery.py tests/test_merge_discovery_runtime.py --basetemp Temp/pytest-merge-discovery"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0623_codex_done.json').read_text()); assert d['work_package_id']=='WP-0623'; assert d['provider_execution_performed'] is False; assert d['dispatch_execution_performed'] is False; assert d['ready_for_ca_review'] is True\""),
+        ],
+
+    },
+
 
     "WP-0507": {
         "recipe_id": "wp-0507-execution-attempt-lease-cancellation-recovery",
