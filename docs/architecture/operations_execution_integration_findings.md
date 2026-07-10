@@ -1,80 +1,59 @@
 # Operations / Execution Integration Findings
 
-Status: Completed with consolidation recommended
+Status: completed with findings
+Date: 2026-07-10
 Work package: WP-0612
-Classification: Estate Internal
 
-## Current Architecture as Implemented
+## Current architecture as implemented
 
-The local operations/execution wave currently implements a staged operational chain:
+The repository implements a layered operations chain:
 
-1. Planning/provider request artifacts are written under `runtime/planning_provider`.
-2. Orchestrator intake stores requests and queue state under `runtime/orchestrator/intake`.
-3. Intake decisions and scheduling move approved work into `runtime/orchestrator/schedule`.
-4. Orchestrator Runtime Core runs a bounded cycle and writes dispatch records under `runtime/orchestrator/dispatch`.
-5. Traffic Controller / Operations Manager inspects intake, schedule, dispatch, assignments, and provider health under `runtime/operations/control` without executing provider work.
-6. Execution Dispatch Queue stores provider-adapter queue items under `runtime/execution_dispatch`.
-7. Codex Bridge acts as a bounded provider-specific adapter shell under `runtime/codex_bridge` when explicitly invoked or when a handoff is prepared.
-8. Execution Activity normalizes execution/Codex visibility under `runtime/execution_activity`.
-9. Office panels currently read operations status/control artifacts, not provider execution directly.
+1. **Traffic Controller / Operations Manager** records operational posture, recommendations, and durable movement decisions under `runtime/operations/control/*`.
+2. **Orchestrator intake, decisions, scheduler, and runtime core** convert approved intake into scheduled work and then pre-provider dispatch records under `runtime/orchestrator/*`.
+3. **Execution Dispatch Queue** stores provider-neutral execution intent under `runtime/execution_dispatch/*`.
+4. **Execution Provider Adapter Contract / Codex Bridge Adapter** translates adapter requests into provider-specific requests under `runtime/execution_adapters/*` and `runtime/codex_bridge/*`.
+5. **Execution Activity Surface** aggregates execution-provider lifecycle visibility under `runtime/execution_activity/*`.
+6. **Office panels/hooks** read summaries and current snapshots rather than owning runtime truth.
 
-## Confirmed Coherent Chain
+## Confirmed coherent chain
 
-The following links are coherent:
+The major boundaries are preserved:
 
-- Orchestrator intake, scheduling, runtime cycle, and dispatch records are internally compatible.
-- Operations Manager remains distinct from Orchestrator; it reviews and records decisions but does not dispatch providers.
-- Orchestrator Runtime Core stops before provider execution.
-- Codex Bridge is not coupled directly to Orchestrator; it is adapter-like and reachable through explicit bridge requests or Execution Dispatch handoff preparation.
-- Worker Assignment Board preserves A2C/assignment labels and related provider/seat/profile metadata without observed hardcoded seat limits.
+- Traffic Controller / Operations Manager does not replace Orchestrator.
+- Orchestrator Runtime Core stops at dispatch records and does not execute providers.
+- Execution Dispatch Queue does not schedule or auto-select providers.
+- Codex Bridge is available behind an adapter seam in the current checkout.
+- Office surfaces consume local artifacts and do not become execution authority.
 
-## Duplicate Mechanisms
+## Duplicate mechanisms
 
-| Area | Duplicate mechanism | Finding |
-| --- | --- | --- |
-| Provider catalog | `data/registry/providers.json` and `config/providers/catalog.json` | Operational provider execution should standardize on `config/providers/catalog.json`; legacy registry should be documented or synchronized. |
-| Dispatch queues | `runtime/orchestrator/dispatch/status/queue.json` and `runtime/execution_dispatch/queue.json` | Distinct layers, but names overlap and need an adapter-boundary mapping contract. |
-| Events/activity | `runtime/operations/status/*`, `runtime/execution_activity/*`, `runtime/codex_bridge/*/events.jsonl` | Distinct scopes, but consumer guidance is required. |
-| Provider health/capacity | Health and capacity records share `runtime/providers/health/records` | Functional but semantically crowded. |
-| Provider CLI naming | Legacy `providers` and operational `providers-list/show/find` | Operational commands are clearer; legacy command remains a naming risk. |
+| Area | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Event feeds | `runtime/operations/events/`, `runtime/execution_dispatch/events.jsonl`, `runtime/execution_activity/events.jsonl`, and Codex Bridge event logs coexist. | medium | Define event hierarchy and aggregation rules. |
+| Dispatch queues | Orchestrator dispatch records and Execution Dispatch Queue records both use dispatch/queue terminology. | high | Add canonical state mapping and handoff package. |
+| Provider identity | Provider catalog, provider routing, Codex Bridge, adapter profiles, health, and capacity all carry provider identity. | high | Provider catalog should be identity/capability source of truth. |
+| CLI naming | Flat Orchestrator/provider commands coexist with grouped execution/adapter commands. | low | Document current names; add aliases only in a later package. |
+| Validation/audit portability | Audit internals assume `.estate.bat`, which fails in Linux shell. | medium | Repair audit command portability separately. |
 
-## Conflict Risks
+## Conflict risks
 
-1. Future implementers may connect Orchestrator directly to Codex Bridge, bypassing the Execution Provider Adapter Contract.
-2. Future implementers may treat Execution Dispatch Queue as a replacement for Orchestrator dispatch rather than the next layer after an adapter contract.
-3. Scheduling and assignment may diverge from provider health/capacity if no authoritative capacity-consumption contract is introduced.
-4. Office visibility may split between Operational Activity and Execution Activity unless read-only integration rules are documented.
-5. Linux validation remains noisy because the broad audit command assumes `.estate.bat` Windows command shapes.
+1. A consumer may mistake Orchestrator dispatch records for executable provider queue items.
+2. Provider routing or adapter logic may drift from provider catalog if catalog ownership is not made explicit.
+3. Office panels may imply authority if action controls are not clearly limited to decision-record creation.
+4. Event aggregation may double-count lifecycle events unless each feed has a scoped meaning.
+5. Audit receipts can look inconsistent when Linux audit runs fail Windows wrapper checks.
 
-## Required Repair Packages
+## Required repair packages
 
-Recommended next package: **Consolidation Repair**.
+1. **Operations/Execution Handoff Consolidation Repair**: define and test how Orchestrator dispatch records become execution dispatch items and adapter requests.
+2. **Provider Catalog Source-of-Truth Repair**: make provider catalog the canonical identity/capability authority and require routing, bridge, health, and capacity to reference it.
+3. **Event Feed Scope Repair**: document operational events vs provider lifecycle events and update reports to identify source feed and event scope.
+4. **Audit Portability Repair**: make `audit` use the active Python entry point on POSIX systems rather than `.estate.bat`.
 
-Minimum repair scope:
+## Recommended next implementation package
 
-- Declare operational provider catalog source of truth and legacy registry relationship.
-- Document the transformation boundary from `OrchestratorDispatchRecord` to `ExecutionDispatchRequest`.
-- Document event feed scopes: operational lifecycle, provider execution lifecycle, normalized execution activity.
-- Clarify provider health/capacity namespaces and how future scheduling may consume them without implementing policy.
-- Repair broad audit command portability or document platform-specific validation commands.
+Recommend **Consolidation Repair** next. Do not add routing policy, priority policy, scheduling policy, or autonomous execution until the Orchestrator-dispatch to Execution-dispatch/adapter seam is explicit and provider catalog ownership is settled.
 
-## Recommended Next Implementation Package
+## Execution Provider Adapter Contract recommendation
 
-The next implementation package should be:
-
-**Consolidation Repair: Operations / Execution Boundary and Source-of-Truth Repair**
-
-It should be documentation/schema/test focused. It should not add provider execution, routing policy, scheduling priority policy, or new Office features.
-
-## Execution Provider Adapter Contract Dispatch Recommendation
-
-The Execution Provider Adapter Contract is **not safe to dispatch immediately next**. The chain is close, and the correct connection point is clear, but duplicate dispatch/provider/event mechanisms need a consolidation repair first so the adapter contract does not accidentally bless ambiguous sources of truth.
-
-Future adapter contract connection point:
-
-```text
-runtime/orchestrator/dispatch/status/queue.json
-  -> Execution Provider Adapter Contract mapping
-  -> runtime/execution_dispatch/queue.json
-  -> provider-specific adapter handoff, such as runtime/execution_dispatch/handoffs/*_codex_bridge_request.json
-```
+The **Execution Provider Adapter Contract is architecturally the right seam** between execution dispatch/handoff records and provider-specific adapters. However, because this checkout already contains adapter-contract and Codex Bridge adapter artifacts, the safest next dispatch is not another adapter implementation package; it is a consolidation package that locks down the handoff mapping and source-of-truth rules. After that repair, provider routing recommendations can safely consume catalog, health, capacity, assignment, and adapter evidence without bypassing the adapter boundary.
