@@ -15,6 +15,7 @@ from estate.core.alfred import plan_goal, create_job, list_jobs, format_plan, fo
 from estate.core.audit import print_audit_report
 from estate.core.collaboration_ops import run_routing_engine, watch_worker_inboxes, format_routing_report, format_inbox_summary
 from estate.core.collaboration_messages import acknowledge_message, create_reply
+from estate.core.resident_mail_bus import send_message as bus_send_message, list_mailbox as bus_list_mailbox, inspect_thread as bus_inspect_thread, notification_summary as bus_notification_summary, acknowledge_bus_message, reply_bus_message, office_integrations as bus_office_integrations
 from estate.core.collaboration_events import generate_event_summary, format_event_summary
 from estate.core.operations_board import generate_operations_board, format_operations_board_summary
 from estate.core.daily_board_integration import generate_daily_board_integration, format_daily_board_integration_summary
@@ -1417,6 +1418,31 @@ def cmd_message_reply(args):
         print(f"Replied to {args.message_id}: {result['reply_path']}")
 
 
+
+def cmd_resident_mail(args):
+    action = args.resident_mail_action
+    if action == "send":
+        payload = bus_send_message(args.sender, args.recipient, args.subject, args.body, classification=args.classification, message_type=args.message_type, priority=args.priority, thread_id=args.thread_id, source_artifacts=args.source_artifact or [], requires_ack=not args.no_ack)
+    elif action in {"inbox", "sent", "archive", "unread", "acknowledgments"}:
+        folder = "acknowledgment" if action == "acknowledgments" else action
+        payload = bus_list_mailbox(args.actor, folder, include_body=args.include_body)
+    elif action == "ack":
+        payload = acknowledge_bus_message(args.message_id, actor=args.actor, note=args.note)
+    elif action == "reply":
+        payload = reply_bus_message(args.message_id, actor=args.actor, body=args.body, title=args.title)
+    elif action == "thread":
+        payload = bus_inspect_thread(args.thread_id, include_body=args.include_body)
+    elif action == "summary":
+        payload = bus_notification_summary(args.actor)
+    elif action == "office":
+        payload = bus_office_integrations()
+    else:
+        raise SystemExit(f"unknown resident-mail action: {action}")
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+
 def cmd_collaboration_events(args):
     summary = generate_event_summary()
     if getattr(args, "json", False):
@@ -2647,6 +2673,50 @@ def main(argv=None):
     p.add_argument("--body", default="", help="Reply body/summary")
     p.add_argument("--json", action="store_true", help="Print reply result JSON")
     p.set_defaults(func=cmd_message_reply)
+
+
+    p = sub.add_parser("resident-mail", help="Governed local resident/office conversation bus over existing mailboxes")
+    mb = p.add_subparsers(dest="resident_mail_action", required=True)
+    q = mb.add_parser("send", help="Send an idempotent governed message")
+    q.add_argument("--sender", required=True)
+    q.add_argument("--recipient", action="append", required=True)
+    q.add_argument("--subject", required=True)
+    q.add_argument("--body", required=True)
+    q.add_argument("--classification", default="Estate Internal")
+    q.add_argument("--message-type", default="resident_mail")
+    q.add_argument("--priority", default="normal")
+    q.add_argument("--thread-id")
+    q.add_argument("--source-artifact", action="append")
+    q.add_argument("--no-ack", action="store_true")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_resident_mail)
+    for name in ("inbox", "sent", "archive", "unread", "acknowledgments", "summary"):
+        q = mb.add_parser(name)
+        q.add_argument("--actor", required=True)
+        q.add_argument("--include-body", action="store_true")
+        q.add_argument("--json", action="store_true")
+        q.set_defaults(func=cmd_resident_mail)
+    q = mb.add_parser("ack")
+    q.add_argument("message_id")
+    q.add_argument("--actor", default="Alfred")
+    q.add_argument("--note", default="Acknowledged.")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_resident_mail)
+    q = mb.add_parser("reply")
+    q.add_argument("message_id")
+    q.add_argument("--actor", default="Alfred")
+    q.add_argument("--title")
+    q.add_argument("--body", default="")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_resident_mail)
+    q = mb.add_parser("thread")
+    q.add_argument("thread_id")
+    q.add_argument("--include-body", action="store_true")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_resident_mail)
+    q = mb.add_parser("office")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_resident_mail)
 
     p = sub.add_parser("collaboration-events")
     p.add_argument("--json", action="store_true", help="Summarize Collaboration Layer events and print JSON")

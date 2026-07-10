@@ -1,8 +1,8 @@
 {
   "functional_mailbox_registry_path": "data/registry/mailboxes.json",
-  "generated_at": "2026-07-10T18:29:23+00:00",
+  "generated_at": "2026-07-10T20:06:29+00:00",
   "index_version": 1,
-  "message_count": 21,
+  "message_count": 22,
   "message_source_of_truth": "collaboration/messages/*.json",
   "messages": [
     {
@@ -43,6 +43,25 @@
       "thread_id": null,
       "title": "Example implementation routing message",
       "warning": "unresolved destination: queue"
+    },
+    {
+      "ack_status": "pending",
+      "acknowledges": null,
+      "created_at": "2026-07-10T20:06:29+00:00",
+      "destination": "mailbox.6",
+      "destination_employee_id": 6,
+      "destination_mailbox_id": 6,
+      "message_id": "msg_bus_20260710200629_b722522915",
+      "message_type": "resident_mail",
+      "path": "collaboration/messages/msg_bus_20260710200629_b722522915.json",
+      "priority": "normal",
+      "reply_to": null,
+      "requires_ack": true,
+      "source": "mailbox.7",
+      "source_employee_id": null,
+      "status": "open",
+      "thread_id": "msg_bus_20260710200629_b722522915",
+      "title": "WP-4016-demo"
     },
     {
       "ack_status": null,

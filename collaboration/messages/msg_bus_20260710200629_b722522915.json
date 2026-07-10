@@ -1,0 +1,64 @@
+{
+  "ack_status": "pending",
+  "classification": "Estate Internal",
+  "created_at": "2026-07-10T20:06:29+00:00",
+  "created_by": "Alfred",
+  "delivery": {
+    "dedupe_key": "b722522915737513aafb1a4302d3ce456303d658e980e2f0e5d7dd77b7dc2010",
+    "delivered_at": "2026-07-10T20:06:29+00:00",
+    "destination_mailbox_ids": [
+      6
+    ],
+    "status": "delivered"
+  },
+  "destination": "mailbox.6",
+  "destination_identity": {
+    "display_name": "Helen",
+    "employee_id": 6,
+    "identity_type": "personnel",
+    "mailbox_id": 6,
+    "resident_id": "RES-000003"
+  },
+  "id": "msg_bus_20260710200629_b722522915",
+  "message_type": "resident_mail",
+  "payload": {
+    "artifact_refs": [
+      "collaboration/work_packages/pending/WP-4016_Resident_Mail_and_Conversation_Bus.md"
+    ],
+    "body": "Local conversation bus demonstration.",
+    "summary": "Local conversation bus demonstration.",
+    "title": "WP-4016-demo"
+  },
+  "priority": "normal",
+  "recipients": [
+    {
+      "display_name": "Helen",
+      "employee_id": 6,
+      "label": "Helen",
+      "mailbox_id": 6
+    }
+  ],
+  "requires_ack": true,
+  "routing": {
+    "authority": "delivery does not grant authority",
+    "supports": [
+      "resident-to-resident",
+      "resident-to-office",
+      "office-to-resident",
+      "steward-directed"
+    ],
+    "transport": "existing collaboration/messages and collaboration/mailboxes index"
+  },
+  "schema_version": "estate.communication_bus.v1",
+  "source": "mailbox.7",
+  "source_identity": {
+    "display_name": "Alfred",
+    "employee_id": 7,
+    "identity_type": "personnel",
+    "mailbox_id": 7,
+    "resident_id": "RES-000001"
+  },
+  "status": "open",
+  "thread_id": "msg_bus_20260710200629_b722522915",
+  "version": 1
+}
