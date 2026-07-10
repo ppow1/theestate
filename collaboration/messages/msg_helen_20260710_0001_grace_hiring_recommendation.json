@@ -1,0 +1,26 @@
+{
+  "id": "msg_helen_20260710_0001_grace_hiring_recommendation",
+  "version": 1,
+  "created_at": "2026-07-10T18:45:00+00:00",
+  "created_by": "Helen",
+  "from_employee_id": 6,
+  "from_mailbox_id": 6,
+  "source": "employee.6",
+  "destination": "steward.appointment_queue",
+  "destination_mailbox_id": 1,
+  "classification": "Estate Internal",
+  "message_type": "hiring_recommendation",
+  "priority": "high",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Grace Director of Operations Hiring Recommendation",
+    "summary": "Helen recommends Grace for Steward-reserved appointment as Director of Operations and confirms onboarding readiness without appointment or activation.",
+    "candidate": "Grace",
+    "recommended_role": "Director of Operations",
+    "appointment_readiness": "runtime/onboarding/grace/appointment_readiness.json",
+    "hiring_assessment": "runtime/onboarding/grace/hiring_assessment.json",
+    "onboarding_plan": "runtime/onboarding/grace/onboarding_plan.json",
+    "authority_boundary": "This message does not appoint, activate, or grant operational authority to Grace."
+  }
+}

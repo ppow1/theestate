@@ -1,0 +1,44 @@
+{
+  "schema_version": "grace_onboarding_plan.v1",
+  "work_package_id": "WP-4005",
+  "generated_at": "2026-07-10T18:45:00+00:00",
+  "owner": "Helen",
+  "candidate": "Grace",
+  "status": "appointment_ready_not_started",
+  "must_not_start_until": [
+    "Steward appointment recorded",
+    "Traffic Controller movement constraints satisfied",
+    "Ingrid access review completed for any elevated/cross-office access"
+  ],
+  "identity": {
+    "employee_id": 12,
+    "mailbox_id": 12,
+    "status": "proposed_appointment_pending",
+    "security_rating_proposal": "Estate Internal; minimum-necessary access; Ingrid review before any elevation"
+  },
+  "reporting_line": "Grace reports to the Steward through governed Estate channels and provides Alfred concise exception summaries for Steward attention.",
+  "onboarding_steps": [
+    "Acknowledge identity, office, role, and reporting line.",
+    "Read Grace profile, validation standard, Helen workflow, Traffic Controller/Dispatch boundaries, and current operations surfaces.",
+    "Confirm no self-appointment/self-activation authority.",
+    "Confirm mailbox routing and communication expectations.",
+    "Complete first operating-state briefing and retrieve current work-package dependency picture.",
+    "Pass readiness interview before active service."
+  ],
+  "early_service_checkpoints": [
+    "First operational sequencing decision",
+    "First Traffic Controller movement request",
+    "First Dispatch handoff",
+    "First Validation result routing",
+    "First Helen workforce constraint incorporation",
+    "First Ingrid classification/privacy escalation",
+    "First week or equivalent operating cycle"
+  ],
+  "probationary_readiness_conditions": [
+    "Decisive action inside delegated authority",
+    "No provider execution or parallel queue creation",
+    "No acceptance without authorized acceptance record",
+    "No unrestricted private workforce disclosure",
+    "Escalate constitutional/appointment/budget questions"
+  ]
+}
