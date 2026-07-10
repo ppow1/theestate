@@ -1,0 +1,50 @@
+{
+  "artifacts": [
+    "src/estate/core/execution_attempt_runtime.py",
+    "tests/test_execution_attempt_runtime.py",
+    "docs/integration/execution_attempt_lease_cancellation_recovery.md",
+    "collaboration/work_packages/completions/WP-0507_codex_done.json"
+  ],
+  "automatic_retry_introduced": false,
+  "branch": "work",
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "deterministic_tests_use_fake_process_controller": true,
+  "files_changed": [
+    "src/estate/core/execution_attempt_runtime.py",
+    "src/estate/core/codex_live_execution_gate.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_execution_attempt_runtime.py",
+    "docs/integration/execution_attempt_lease_cancellation_recovery.md",
+    "collaboration/work_packages/completions/WP-0507_codex_done.json"
+  ],
+  "implemented_by": "codex_cloud_web",
+  "known_limitations": [
+    "No live provider calls were performed.",
+    "Default process controller does not terminate real processes; process lifecycle validation uses injected fakes."
+  ],
+  "live_provider_calls_made_during_implementation": false,
+  "merge_authority": "Chief Architect / Steward review required; Codex does not grant institutional acceptance.",
+  "new_dispatch_queue_created": false,
+  "new_event_system_created": false,
+  "new_provider_registry_created": false,
+  "pull_request_not_applicable_reason": "PR metadata will be recorded by the make_pr tool after this commit.",
+  "ready_for_ca_review": true,
+  "real_process_termination_performed": false,
+  "retry_authorization_introduced": false,
+  "stale_release_requires_explicit_confirmation": true,
+  "status": "completed_for_review",
+  "summary": [
+    "Added execution-attempt records, dispatch-scoped active leases, heartbeats, cancellation requests, stale recovery inspection, explicit stale release, retry eligibility evidence, and late-result preservation.",
+    "Integrated the live Codex execution gate with attempt lease acquisition and release.",
+    "Added CLI, documentation, tests, validation recipe, and completion receipt."
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/execution_attempt_runtime.py src/estate/cli/main.py src/estate/core/work_package_validation.py",
+    "pytest -q tests/test_execution_attempt_runtime.py",
+    "pytest -q tests/test_execution_attempt_runtime.py tests/test_codex_live_execution_gate.py tests/test_execution_result_reconciliation_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0507 --json"
+  ],
+  "work_package_id": "WP-0507"
+}

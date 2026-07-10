@@ -60,6 +60,7 @@ from estate.core.codex_bridge_execution_provider_adapter import run_codex_bridge
 from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepare_handoff, validate_handoff, dry_run_handoff
 from estate.core.codex_live_execution_gate import CodexLiveExecutionGate
 from estate.core.execution_result_reconciliation_runtime import inspect_reconciliation, reconcile_result, format_reconciliation_report
+from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
 from estate.core.provider_routing_recommendations import explain_provider_routing_recommendation, evaluate_provider_routing_recommendation
 from estate.core.provider_routing_recommendations_runtime import evaluate_recommendation_file, load_recommendation_request
 from estate.core.execution_dispatch import (
@@ -1706,6 +1707,36 @@ def cmd_codex_live_execution(args):
     if payload.get("errors"):
         raise SystemExit(1)
 
+
+def cmd_execution_attempt(args):
+    import json
+    runtime = ExecutionAttemptRuntime()
+    action = args.execution_attempt_action
+    try:
+        if action == "status":
+            payload = runtime.status(getattr(args, "dispatch_id", None))
+        elif action == "cancel-request":
+            payload = runtime.request_cancellation(args.dispatch_id, args.attempt_id, requested_by=getattr(args, "requested_by", "operator"), reason=args.reason, cooperative=True)
+        elif action == "inspect-recovery":
+            payload = runtime.inspect_recovery(args.dispatch_id)
+        elif action == "release-stale":
+            payload = runtime.release_stale(args.dispatch_id, args.attempt_id, confirm_stale_release=args.confirm_stale_release, released_by=getattr(args, "released_by", "operator"), reason=getattr(args, "reason", "explicit stale release"))
+        elif action == "retry-eligibility":
+            payload = runtime.retry_eligibility(args.dispatch_id)
+        else:
+            raise SystemExit(f"Unknown execution-attempt action: {action}")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        payload = {"status": "failed", "error": str(exc), "live_provider_called": False}
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"Execution attempt runtime failed: {exc}")
+        raise SystemExit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(f"Execution attempt {action}: {payload.get('status') or payload.get('retry_eligible')}")
+
 def cmd_execution_result_reconciliation(args):
     import json
     try:
@@ -2371,6 +2402,38 @@ def main(argv=None):
         q.add_argument("--json", action="store_true", help="Print live execution JSON")
         q.set_defaults(func=cmd_codex_live_execution)
 
+
+
+
+    p = sub.add_parser("execution-attempt", help="Inspect execution attempt leases, cancellation, recovery, and retry evidence")
+    attempt_sub = p.add_subparsers(dest="execution_attempt_action", required=True)
+    q = attempt_sub.add_parser("status", help="Show execution attempt status")
+    q.add_argument("--dispatch-id", help="Execution dispatch item id")
+    q.add_argument("--json", action="store_true", help="Print attempt status JSON")
+    q.set_defaults(func=cmd_execution_attempt)
+    q = attempt_sub.add_parser("cancel-request", help="Record a cancellation request and use cooperative process-control seam")
+    q.add_argument("--dispatch-id", required=True)
+    q.add_argument("--attempt-id", required=True)
+    q.add_argument("--reason", required=True)
+    q.add_argument("--requested-by", default="operator")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_execution_attempt)
+    q = attempt_sub.add_parser("inspect-recovery", help="Classify active execution attempt recovery state")
+    q.add_argument("--dispatch-id", required=True)
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_execution_attempt)
+    q = attempt_sub.add_parser("release-stale", help="Explicitly release a proven stale execution lease")
+    q.add_argument("--dispatch-id", required=True)
+    q.add_argument("--attempt-id", required=True)
+    q.add_argument("--confirm-stale-release", action="store_true")
+    q.add_argument("--released-by", default="operator")
+    q.add_argument("--reason", default="explicit stale release")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_execution_attempt)
+    q = attempt_sub.add_parser("retry-eligibility", help="Generate retry eligibility evidence without starting retry")
+    q.add_argument("--dispatch-id", required=True)
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_execution_attempt)
 
     p = sub.add_parser("execution-result-reconciliation", help="Inspect and reconcile provider adapter results back into dispatch lifecycle")
     recon_sub = p.add_subparsers(dest="execution_result_reconciliation_action", required=True)

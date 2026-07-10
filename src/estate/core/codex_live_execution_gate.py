@@ -19,6 +19,7 @@ from estate.core.codex_bridge import ALLOWED_PROVIDER_PROFILES, CodexBridgeResul
 from estate.core.codex_bridge_execution_provider_adapter import CodexBridgeExecutionProviderAdapter
 from estate.core.execution_dispatch import inspect_dispatch_item, update_dispatch_state
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterRequest, ExecutionProviderAdapterResult, utc_now
+from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
 from estate.core.execution_provider_adapter_runtime import load_adapter_request, write_adapter_request, write_adapter_result, write_status_artifacts
 from estate.core.paths import ESTATE_ROOT
 
@@ -243,6 +244,9 @@ class CodexLiveExecutionGate:
             decision.live_provider_called = False
             self._persist_decision(decision, authorization, request, "blocked")
             return decision.to_dict()
+        attempt_runtime = ExecutionAttemptRuntime(root=self.root)
+        lease = attempt_runtime.acquire_lease(dispatch_id=dispatch_id, adapter_request_id=request.adapter_request_id, provider_id=request.provider_id, provider_type=request.provider_type, work_package_id=request.work_package_id, execution_authorization_id=authorization.execution_authorization_id, workspace_commit=authorization.workspace_commit, metadata={"source": "codex_live_execution_gate"})
+        attempt_id = lease["attempt"]["execution_attempt_id"]
         write_adapter_request(request, root=self.root)
         self._persist_decision(decision, authorization, request, "started")
         update_dispatch_state(dispatch_id, "Running", self.root, summary="Codex live execution gate approved provider call.")
@@ -253,6 +257,8 @@ class CodexLiveExecutionGate:
         result_path = write_adapter_result(result, root=self.root)
         status_paths = write_status_artifacts(result, root=self.root)
         decision.artifacts.update({"result_path": _rel(result_path, self.root), **{k: _rel(Path(v), self.root) for k, v in status_paths.items()}})
+        attempt_status = "completed" if result.status == "completed" else "failed" if result.status in {"failed", "blocked"} else "completed"
+        attempt_runtime.complete_attempt(attempt_id, status=attempt_status, result_reference=decision.artifacts.get("result_path"))
         self._persist_decision(decision, authorization, request, "completed")
         return decision.to_dict()
 
