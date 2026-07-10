@@ -416,6 +416,10 @@ def cmd_operations_scheduler(args):
 
 def cmd_operations_runtime(args):
     try:
+        if args.operations_runtime_action == "bootstrap":
+            payload = OperationsRuntimeHost.bootstrap(target=getattr(args, "target", "estate-main"))
+            print(json.dumps(payload, indent=2, sort_keys=True))
+            return
         if args.operations_runtime_action == "host":
             host = OperationsRuntimeHost()
             action = args.operations_runtime_host_action
@@ -3408,6 +3412,11 @@ def main(argv=None):
     q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("report", help="Render Operations Runtime report")
+    q.set_defaults(func=cmd_operations_runtime)
+
+    q = ort.add_parser("bootstrap", help="Install and start durable host from an external clean runtime workspace")
+    q.add_argument("--target", default="estate-main")
+    q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_operations_runtime)
 
     q = ort.add_parser("host", help="Install and control durable Operations Runtime host")

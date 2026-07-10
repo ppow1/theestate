@@ -59,3 +59,44 @@ def test_existing_final_verdict_suppresses_and_canonical_target_used(tmp_path):
     out=MergeDiscovery(tmp_path).scan("estate")
     rec=out["records"][-1]
     assert rec["target_id"]=="estate-main"; assert rec["state"]=="already_processed"
+
+
+def test_pending_only_work_package_commit_is_not_admitted(tmp_path):
+    r=repo(tmp_path); target(tmp_path,r)
+    d=r/"collaboration/work_packages/pending"; d.mkdir(parents=True,exist_ok=True)
+    (d/"WP-0637_plan.md").write_text("plan")
+    git(r,"add","."); git(r,"commit","-m","Plan WP-0637")
+    out=MergeDiscovery(tmp_path).scan("estate-main")
+    assert out["records"] == []
+
+
+def test_origin_main_source_of_truth_with_local_main_behind_and_dirty(tmp_path):
+    remote=tmp_path/"remote.git"; git(tmp_path,"init","--bare",str(remote))
+    work=tmp_path/"work"; git(tmp_path,"clone",str(remote),str(work)); git(work,"checkout","-b","main"); git(work,"config","user.email","t@example.com"); git(work,"config","user.name","T")
+    (work/"README.md").write_text("init"); git(work,"add","."); git(work,"commit","-m","init"); git(work,"push","-u","origin","main")
+    local=tmp_path/"local"; git(tmp_path,"clone",str(remote),str(local)); git(local,"checkout","main"); git(local,"config","user.email","t@example.com"); git(local,"config","user.name","T")
+    receipt_commit(work,"WP-0637"); git(work,"push","origin","main")
+    (local/"dirty.txt").write_text("active edits")
+    target(tmp_path,local)
+    out=MergeDiscovery(tmp_path).scan("estate-main")
+    assert out["summary"]["watched_remote_ref"] == "origin/main"
+    assert out["records"][-1]["work_package_id"] == "WP-0637"
+    assert out["cursor"]["last_scanned_commit"] == git(local,"rev-parse","origin/main")
+    assert not (local/"collaboration/work_packages/completions/WP-0637_codex_done.json").exists()
+
+
+def test_failed_fetch_preserves_cursor(tmp_path, monkeypatch):
+    r=repo(tmp_path); receipt_commit(r,"WP-0637"); target(tmp_path,r)
+    first=MergeDiscovery(tmp_path).scan("estate-main")
+    from estate.core import merge_discovery as md
+    real=md._git_ok
+    def fake(repo_path,*args):
+        if args[:2] == ("remote","get-url"):
+            return ("bad", "", 0)
+        if args[:2] == ("fetch","--quiet"):
+            return ("", "network down", 1)
+        return real(repo_path,*args)
+    monkeypatch.setattr(md,"_git_ok",fake)
+    second=MergeDiscovery(tmp_path).scan("estate-main")
+    assert second["summary"]["fetch_failed"] is True
+    assert second["cursor"]["last_scanned_commit"] == first["cursor"]["last_scanned_commit"]

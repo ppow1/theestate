@@ -181,6 +181,7 @@ class OperationsRuntime:
                     cycle.active_audit_limit = max_audit_requests
                     cycle.latest_admitted_work_package = ads.get("latest_admitted_work_package")
                     cycle.candidates_auto_admitted = ads.get("candidates_auto_admitted", 0)
+                    cycle.audit_requests_created_from_merges = max(cycle.audit_requests_created_from_merges, cycle.candidates_auto_admitted)
                     cycle.candidates_held = ads.get("candidates_held", 0)
                     cycle.historical_candidates_quarantined = ads.get("historical_candidates_quarantined", 0)
                     cycle.admitted_requests = ads.get("admitted_candidates", cycle.admitted_requests)
