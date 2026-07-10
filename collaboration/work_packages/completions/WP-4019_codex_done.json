@@ -1,0 +1,29 @@
+{
+  "work_package_id": "WP-4019",
+  "status": "done",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T23:51:16+00:00",
+  "summary": [
+    "Implemented bounded local Estate discovery and rediscovery engine with versioned evidence schema.",
+    "Added configurable approved roots and CLI commands for scan, dry-run, diff, apply, status, and inspect.",
+    "Integrated apply with existing AI service catalog, model control, knowledge index, and Office service status board projections.",
+    "Added focused tests for moves, duplicates, stale/missing entries, ignored/protected paths, malformed artifacts, changed artifacts, inspect, and idempotent rediscovery."
+  ],
+  "artifacts": [
+    "src/estate/core/estate_discovery_engine.py",
+    "config/discovery/approved_roots.json",
+    "schemas/discovery/estate_discovery_v1.schema.json",
+    "tests/test_estate_discovery_engine.py",
+    "operations/validation/reports/WP-4019_estate_discovery_engine.md",
+    "runtime/discovery/estate_discovery_evidence.json",
+    "runtime/discovery/estate_discovery_state.json",
+    "runtime/discovery/estate_discovery_status.json"
+  ],
+  "validation": [
+    "python -m pytest tests/test_estate_discovery_engine.py",
+    "python -m pytest tests/test_estate_discovery_engine.py tests/test_estate_knowledge_index.py tests/test_ai_services_control_plane.py tests/test_model_control.py tests/test_service_status_board.py",
+    "PYTHONPATH=src python -m estate.cli.main estate-discovery apply",
+    "PYTHONPATH=src python -m estate.cli.main estate-discovery status"
+  ],
+  "ready_for_review": true
+}

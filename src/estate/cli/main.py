@@ -52,6 +52,7 @@ from estate.core.estate_knowledge_index import (
 )
 from estate.core.global_search_command_palette import search_global_palette, execute_registered_command, format_palette_report
 from estate.core.document_registry import load_document_registry, format_document_registry
+from estate.core import estate_discovery_engine
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
 from estate.core.steward_attention import aggregate_attention, create_briefing as create_steward_attention_briefing, record_action as record_steward_attention_action, format_briefing as format_steward_attention_briefing
@@ -411,6 +412,24 @@ def cmd_background_operations(args):
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Background operations failed: {exc}")
         raise SystemExit(1)
+
+def cmd_estate_discovery(args):
+    root = Path(args.root) if getattr(args, "root", None) else None
+    action = args.estate_discovery_action
+    if action in {"scan", "dry-run"}:
+        payload = estate_discovery_engine.apply(root, dry_run=True) if action == "dry-run" else estate_discovery_engine.scan(root)
+    elif action == "diff":
+        payload = estate_discovery_engine.diff(root)
+    elif action == "apply":
+        payload = estate_discovery_engine.apply(root)
+    elif action == "status":
+        payload = estate_discovery_engine.status(root)
+    elif action == "inspect":
+        payload = estate_discovery_engine.inspect(root, discovery_id=args.discovery_id, path=args.path)
+    else:
+        payload = {"error": "unknown_action"}
+    print(json.dumps(payload, indent=2, sort_keys=True))
+
 
 def cmd_merge_discovery(args):
     runtime = MergeDiscoveryRuntime()
@@ -3805,6 +3824,12 @@ def main(argv=None):
     p.add_argument("--request", required=True, help="Path to provider routing recommendation request JSON")
     p.add_argument("--json", action="store_true", help="Print recommendation JSON")
     p.set_defaults(func=cmd_provider_routing_recommendation)
+
+    p = sub.add_parser("estate-discovery", help="Scan approved Estate roots and republish normalized discovery evidence")
+    ed = p.add_subparsers(dest="estate_discovery_action", required=True)
+    for name in ["scan", "dry-run", "diff", "apply", "status"]:
+        q = ed.add_parser(name); q.add_argument("--root"); q.set_defaults(func=cmd_estate_discovery)
+    q = ed.add_parser("inspect"); q.add_argument("--root"); q.add_argument("--discovery-id"); q.add_argument("--path"); q.set_defaults(func=cmd_estate_discovery)
 
     p = sub.add_parser("providers-list", help="List registered provider descriptors")
     p.add_argument("--json", action="store_true", help="Print provider catalog status JSON")
