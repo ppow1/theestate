@@ -49,6 +49,7 @@ OFFICE_NAVIGATION = [
     {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
     {"id": "operational-activity", "label": "Operational Activity", "panel": "operational_activity", "tab": "operational-activity"},
+    {"id": "execution-control", "label": "Execution Control", "panel": "execution_control", "tab": "execution-control"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
     {"id": "expansion-roadmap", "label": "Expansion Roadmap", "panel": "expansion_roadmap", "tab": "roadmap"},
     {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
@@ -72,6 +73,7 @@ OFFICE_TABS = [
     {"id": "ai-services-models", "label": "AI Services / Models"},
     {"id": "daily-board", "label": "Daily Board"},
     {"id": "operational-activity", "label": "Operational Activity"},
+    {"id": "execution-control", "label": "Execution Control"},
     {"id": "projects", "label": "Projects"},
     {"id": "roadmap", "label": "Roadmap"},
     {"id": "parking", "label": "Parking Lot"},
@@ -107,6 +109,8 @@ ARTIFACTS = {
     "steward_presence": ["runtime/steward/steward_presence_state.json", "operations/steward/steward_presence_state.md"],
     "execution_activity": ["runtime/execution_activity/current.json", "runtime/execution_activity/report.md"],
     "execution_dispatch": ["runtime/execution_dispatch/current.json", "runtime/execution_dispatch/report.md"],
+    "execution_sessions": ["runtime/execution_adapters/status/sessions_summary.json"],
+    "execution_attempts": ["runtime/execution_adapters/status/attempts_summary.json"],
     "background_operations": ["runtime/background_operations/status/latest.json", "runtime/background_operations/status/summary.json"],
 }
 
@@ -983,6 +987,7 @@ def generate_command_center(root=None, write=True):
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
+        "execution_control": _execution_control_panel(root),
         "traffic_controller_panel": load_office_traffic_controller_panel(root),
         "orchestrator_intake_decisions": load_office_intake_decision_surface(root),
         "steward_decision_queue": _decision_queue_artifact(root),
@@ -1029,6 +1034,54 @@ def generate_command_center(root=None, write=True):
 
 
 
+
+
+def _execution_control_panel(root):
+    sessions = _read_artifact(root, ARTIFACTS["execution_sessions"])
+    attempts = _read_artifact(root, ARTIFACTS["execution_attempts"])
+    latest_session = None
+    if sessions.get("available") and isinstance(sessions.get("data"), dict):
+        rows = sessions["data"].get("sessions") or []
+        latest_session = rows[-1] if rows else None
+    latest_attempt = None
+    if attempts.get("available") and isinstance(attempts.get("data"), dict):
+        rows = attempts["data"].get("attempts") or []
+        latest_attempt = rows[-1] if rows else None
+    return {
+        "available": True,
+        "path": "runtime/execution_adapters/status",
+        "selected_dispatch_id": (latest_session or latest_attempt or {}).get("dispatch_id"),
+        "selected_session_id": (latest_session or {}).get("execution_session_id"),
+        "selected_attempt_id": (latest_session or latest_attempt or {}).get("execution_attempt_id"),
+        "selected_adapter_request_id": (latest_session or latest_attempt or {}).get("adapter_request_id"),
+        "authorization_record_path": None,
+        "current_session_state": (latest_session or {}).get("state"),
+        "current_stage": (latest_session or {}).get("current_stage"),
+        "provider": (latest_session or latest_attempt or {}).get("provider_id"),
+        "workspace_commit": (latest_session or latest_attempt or {}).get("workspace_commit"),
+        "lease_state": (latest_attempt or {}).get("state"),
+        "cancellation_state": "requested" if (latest_session or latest_attempt or {}).get("cancellation_requested") else "not_requested",
+        "result_state": (latest_session or latest_attempt or {}).get("result_reference"),
+        "reconciliation_state": (latest_session or latest_attempt or {}).get("reconciliation_reference"),
+        "validation_reference": (latest_session or {}).get("validation_reference"),
+        "attention_required": (latest_session or latest_attempt or {}).get("attention_required"),
+        "blocking_failure_reason": (latest_session or latest_attempt or {}).get("attention_reason") or (latest_session or {}).get("failure_summary"),
+        "last_office_action_result": _read_artifact(root, ["runtime/steward/office_command_surface_action_results.jsonl"]),
+        "sessions": sessions,
+        "attempts": attempts,
+    }
+
+def _execution_control_html(panel):
+    fields = ["selected_dispatch_id","selected_session_id","selected_attempt_id","selected_adapter_request_id","authorization_record_path","current_session_state","current_stage","provider","workspace_commit","lease_state","cancellation_state","result_state","reconciliation_state","validation_reference","attention_required","blocking_failure_reason"]
+    rows = ''.join(f"<dt>{html.escape(k.replace('_',' ').title())}</dt><dd><code>{html.escape(str(panel.get(k) if panel.get(k) is not None else ''))}</code></dd>" for k in fields)
+    last = panel.get("last_office_action_result") or {}
+    last_html = ""
+    if last.get("available") and last.get("kind") == "text":
+        lines = [l for l in str(last.get("text") or "").splitlines() if l.strip()]
+        last_html = "<h3>Last Office action result</h3><pre>" + html.escape(lines[-1] if lines else "No action result yet.") + "</pre>"
+    else:
+        last_html = "<h3>Last Office action result</h3><p class='placeholder'>No durable Office action result has been recorded yet.</p>"
+    return _panel("Execution Control Workspace", "<p class='source'>Use the controls above to invoke governed execution-session, attempt, and reconciliation runtimes. Enter IDs and authorization/result references in the labeled fields; confirmations must be explicit.</p><dl>" + rows + "</dl>" + last_html, "ready")
 
 def _operations_center_layout_framework(panels, generated_at):
     regions = [
@@ -2209,7 +2262,8 @@ def _office_action_controls_html(payload, tab_id):
         req = c.get("requires_input")
         input_html = ""
         if req:
-            input_html = f"<input type='text' data-action-input='{html.escape(str(req), quote=True)}' placeholder='{html.escape(str(req))}'>"
+            fields = [part.strip() for part in str(req).split(',') if part.strip()]
+            input_html = ''.join(f"<label class='source'>{html.escape(field)} <input type='text' data-action-input='{html.escape(field, quote=True)}' placeholder='{html.escape(field)}'></label><br>" for field in fields)
         disabled = " disabled" if availability != "available" else ""
         button = f"<button type='button' data-office-action='{aid}'{disabled}>{label}</button>"
         rows.append(f"<tr><td>{button}<br>{input_html}</td><td>{html.escape(str(availability))}</td><td>{note}</td><td><code>{html.escape(str(c.get('handler') or 'gated'))}</code></td></tr>")
@@ -2226,6 +2280,7 @@ def render_command_center_html(payload):
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
+        ("execution-control", "Execution Control", _office_action_controls_html(payload, "execution-control") + _execution_control_html(p.get("execution_control", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
@@ -2278,13 +2333,16 @@ async function runOfficeAction(button){
   const body = {action_id: actionId};
   Object.entries(button.dataset).forEach(([key, value]) => { if(key !== 'officeAction') body[key.replace(/[A-Z]/g, m => '_' + m.toLowerCase())] = value; });
   if(panel){ panel.querySelectorAll('[data-action-input]').forEach(input => { body[input.dataset.actionInput] = input.value; }); }
-  if(resultEl) resultEl.textContent = 'Running ' + actionId + ' locally...';
+  button.disabled = true;
+  if(resultEl){ resultEl.className = 'office-action-result running'; resultEl.textContent = 'Running ' + actionId + ' locally...'; }
   try{
     if(getCommandCenterMode() !== 'served') throw new Error('Office action execution requires served local mode; static file mode cannot POST to local handlers.');
     const response = await fetch('/api/office/actions/execute', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const payload = await response.json();
-    if(resultEl) resultEl.textContent = JSON.stringify(payload, null, 2);
-  }catch(error){ if(resultEl) resultEl.textContent = JSON.stringify({outcome:'blocked', steward_message:String(error), authority_gating_status:'served_mode_required'}, null, 2); }
+    if(resultEl){ resultEl.className = 'office-action-result ' + (payload.outcome || 'unknown'); resultEl.textContent = JSON.stringify(payload, null, 2); }
+    if(payload && payload.outcome === 'completed' && payload.runtime_state_changed && payload.runtime_state_changed.length){ setTimeout(() => location.reload(), 450); }
+  }catch(error){ if(resultEl){ resultEl.className = 'office-action-result failed'; resultEl.textContent = JSON.stringify({outcome:'failed', steward_message:String(error), authority_gating_status:'served_mode_required'}, null, 2); } }
+  finally{ button.disabled = false; }
 }
 function bindOfficeActions(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-office-action]'); if(button){ event.preventDefault(); runOfficeAction(button); } }); }
 

@@ -1,0 +1,93 @@
+{
+  "action_handlers_added": true,
+  "attempt_runtime_called_directly": true,
+  "automatic_authorization_implemented": false,
+  "automatic_retry_implemented": false,
+  "branch": "work",
+  "browser_endpoint_modified": false,
+  "codex_status": "completed",
+  "completed_at": "2026-07-10T04:22:06Z",
+  "fake_provider_runner_used": true,
+  "files_changed": [
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py",
+    "tests/test_office_execution_session_controls.py",
+    "docs/integration/office_execution_session_control_surface.md",
+    "collaboration/work_packages/completions/WP-0510_codex_done.json"
+  ],
+  "files_created": [
+    "tests/test_office_execution_session_controls.py",
+    "docs/integration/office_execution_session_control_surface.md",
+    "collaboration/work_packages/completions/WP-0510_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/work_package_validation.py"
+  ],
+  "files_reviewed": [
+    "AI_START_HERE.md",
+    "AI_HINTS.md",
+    "docs/governance/Estate_Manual.md",
+    "docs/governance/Institutional_Operations_Doctrine.md",
+    "docs/integration/governed_execution_session_controller.md",
+    "docs/integration/execution_attempt_lease_cancellation_recovery.md",
+    "docs/integration/execution_result_reconciliation.md",
+    "docs/integration/steward_authorized_live_codex_execution.md",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/execution_session_controller.py",
+    "src/estate/core/execution_attempt_runtime.py",
+    "src/estate/core/execution_result_reconciliation_runtime.py",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/cli/main.py",
+    "tests/test_office_command_surface.py",
+    "tests/test_steward_command_center.py",
+    "tests/test_execution_session_controller.py",
+    "tests/test_execution_attempt_runtime.py",
+    "tests/test_execution_result_reconciliation_runtime.py"
+  ],
+  "functional_controls_added": true,
+  "institutional_acceptance_behavior_modified": false,
+  "known_limitations": [
+    "The browser endpoint path remains the existing /api/office/actions/execute endpoint; validation and unknown-action rejection are enforced by the registered control dispatcher.",
+    "The UI reloads after successful state-changing actions rather than applying a partial DOM patch."
+  ],
+  "live_provider_calls_made": false,
+  "merge_authority_equivalent": "Chief Architect review required; no merge authority claimed.",
+  "merge_authority_or_equivalent": "Chief Architect review required; no merge authority claimed.",
+  "office_tab_added": true,
+  "owner": "codex_cloud_web",
+  "pull_request_not_applicable_reason": "PR will be created by make_pr tool after local commit in this workflow.",
+  "pull_request_url_or_not_applicable_reason": "PR will be created by make_pr tool after local commit in this workflow.",
+  "ready_for_ca_review": true,
+  "reconciliation_runtime_called_directly": true,
+  "runtime_artifacts_written": [
+    "runtime/steward/office_command_surface_action_results.jsonl",
+    "runtime/execution_adapters/sessions/*.json",
+    "runtime/execution_adapters/session_stages/*.jsonl",
+    "runtime/execution_adapters/reports/*_session.md",
+    "runtime/execution_adapters/cancellations/*.json",
+    "runtime/execution_adapters/recovery/*.json",
+    "runtime/execution_adapters/reconciliation/*.json",
+    "runtime/execution_adapters/reports/*_reconciliation.md"
+  ],
+  "session_controller_called_directly": true,
+  "status": "completed",
+  "summary": "Added a real Office Execution Control workspace with governed local action handlers for execution sessions, attempts, and result reconciliation.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py",
+    "pytest -q tests/test_office_execution_session_controls.py",
+    "pytest -q tests/test_office_execution_session_controls.py tests/test_office_command_surface.py tests/test_steward_command_center.py tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_execution_result_reconciliation_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0510 --json"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/office_command_surface.py src/estate/core/steward_command_center.py",
+    "pytest -q tests/test_office_execution_session_controls.py",
+    "pytest -q tests/test_office_execution_session_controls.py tests/test_office_command_surface.py tests/test_steward_command_center.py tests/test_execution_session_controller.py tests/test_execution_attempt_runtime.py tests/test_execution_result_reconciliation_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0510 --json"
+  ],
+  "validation_results": "py_compile passed; focused and dependent pytest suite passed (84 tests); WP-0510 validation recipe passed.",
+  "work_package_id": "WP-0510"
+}
