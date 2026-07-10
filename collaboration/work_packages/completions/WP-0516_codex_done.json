@@ -1,0 +1,22 @@
+{
+  "work_package_id": "WP-0516",
+  "status": "completed",
+  "completed_by": "codex",
+  "completed_at": "2026-07-10T00:00:00Z",
+  "summary": "Mission Control, Daily Board, and Operational Activity now expose canonical Office controls for refresh, briefings, decisions, acknowledgement, routing, artifact opening, filtering, and defer/promotion evidence without creating a second operations authority layer.",
+  "evidence": {
+    "code": [
+      "src/estate/core/office_command_surface.py",
+      "src/estate/core/steward_command_center.py"
+    ],
+    "tests": [
+      "tests/test_office_command_surface.py",
+      "tests/test_office_operational_activity.py",
+      "tests/test_mission_control_workspace.py"
+    ]
+  },
+  "validation": {
+    "command": "python -m pytest tests/test_office_command_surface.py tests/test_office_operational_activity.py tests/test_mission_control_workspace.py -q",
+    "result": "passed"
+  }
+}
