@@ -71,3 +71,42 @@ def test_install_uninstall_write_manifest_without_infrastructure(tmp_path):
     assert installed["command"][-3:] == ["operations-runtime", "host", "start"]
     assert (tmp_path / "state" / "autostart.json").exists()
     assert host.uninstall()["removed_manifest"] is True
+
+
+def test_windows_install_executes_and_verifies_scheduled_task(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+    calls=[]
+    class R:
+        def __init__(self, rc=0, out="", err=""):
+            self.returncode=rc; self.stdout=out; self.stderr=err
+    def fake(cmd, cwd=None):
+        calls.append(cmd)
+        if cmd[:2] == ["schtasks","/Query"]:
+            return R(0, "Status: Ready\n")
+        return R(0, "ok", "")
+    monkeypatch.setattr(mod.os, "name", "nt")
+    monkeypatch.setattr(mod, "_run_command", fake)
+    installed = OperationsRuntimeHost(tmp_path/"repo", tmp_path/"state").install()
+    assert calls[0][:4] == ["schtasks","/Create","/SC","ONLOGON"]
+    assert installed["scheduled_task_verified"] is True
+    assert installed["scheduled_task_exists"] is True
+
+
+def test_windows_uninstall_deletes_and_verifies_removal(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+    calls=[]
+    class R:
+        def __init__(self, rc=0):
+            self.returncode=rc; self.stdout=""; self.stderr=""
+    def fake(cmd, cwd=None):
+        calls.append(cmd)
+        if cmd[:2] == ["schtasks","/Query"]:
+            return R(1)
+        return R(0)
+    monkeypatch.setattr(mod.os, "name", "nt")
+    monkeypatch.setattr(mod, "_run_command", fake)
+    host=OperationsRuntimeHost(tmp_path/"repo", tmp_path/"state")
+    host.install_path.parent.mkdir(parents=True); host.install_path.write_text("{}")
+    out=host.uninstall()
+    assert calls[0][:3] == ["schtasks","/Delete","/TN"]
+    assert out["scheduled_task_removed"] is True

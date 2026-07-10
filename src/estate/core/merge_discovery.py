@@ -34,6 +34,10 @@ def _git(repo:Path, *args:str) -> str:
     if r.returncode: raise RuntimeError((r.stderr or r.stdout).strip())
     return r.stdout.strip()
 
+def _git_ok(repo:Path, *args:str) -> tuple[str, str, int]:
+    r=subprocess.run(["git", *args], cwd=repo, text=True, capture_output=True, check=False)
+    return r.stdout.strip(), r.stderr.strip(), r.returncode
+
 @dataclass
 class MergeDiscoveryRecord:
     discovery_id:str; target_id:str; source_kind:str; source_commit:str; source_reference:str
@@ -51,9 +55,21 @@ class MergeDiscovery:
     def scan(self, target="estate-main", max_commits:int=100, replay:bool=False, backfill_mode:str="quarantine", max_candidates:int=20, max_requests_per_cycle:int=5, minimum_evidence_level:str="implementation") -> dict[str,Any]:
         res=self.resolver.resolve(target); target_id=res.canonical_target_id or target
         t=self.targets.get(target_id); repo=Path(t.local_path or self.root)
+        remote=getattr(t,"remote",None) or "origin"
+        branch=getattr(t,"base_branch",None) or "main"
+        watched_ref=f"{remote}/{branch}"
         curp=self.cursor_path(target_id); cursor=_read(curp) if curp.exists() and not replay else {}
+        remote_check_out, _, remote_check_rc = _git_ok(repo,"remote","get-url",remote)
+        remote_available = remote_check_rc == 0
+        fetch_out, fetch_err, fetch_rc = _git_ok(repo,"fetch","--quiet",remote) if remote_available else ("", "", 0)
+        if fetch_rc != 0:
+            failure={"target_id":target_id,"watched_remote_ref":watched_ref,"last_fetch_at":utc_now_iso(),"status":"fetch_failed","errors":[fetch_err or fetch_out or "git fetch failed"],"last_scanned_commit":cursor.get("last_scanned_commit")}
+            _write(self.root/STATUS/"latest.json", {"target_id":target_id,"cursor":cursor,"records":[],"summary":{"merge_discovery_available":True,"watched_remote_ref":watched_ref,"last_fetch_at":failure["last_fetch_at"],"last_scanned_commit":cursor.get("last_scanned_commit"),"fetch_failed":True,"errors":failure["errors"]},"provider_execution_performed":False,"dispatch_execution_performed":False})
+            _write(self.root/STATUS/"fetch_failure.json", failure)
+            return {"target_id":target_id,"cursor":cursor,"records":[],"summary":{"merge_discovery_available":True,"watched_remote_ref":watched_ref,"last_fetch_at":failure["last_fetch_at"],"last_scanned_commit":cursor.get("last_scanned_commit"),"fetch_failed":True,"errors":failure["errors"]},"provider_execution_performed":False,"dispatch_execution_performed":False}
         last=cursor.get("last_scanned_commit")
-        revs=_git(repo,"rev-list",f"--max-count={max_commits}",t.base_branch).splitlines()
+        scan_ref = watched_ref if remote_available else branch
+        revs=_git(repo,"rev-list",f"--max-count={max_commits}",scan_ref).splitlines()
         if last and last in revs: revs=revs[:revs.index(last)]
         revs=list(reversed(revs))
         metrics={"merge_commits_scanned":0,"work_packages_discovered":0,"discoveries_ambiguous":0,"discoveries_ignored":0,"audit_requests_created_from_merges":0,"duplicate_audit_requests_suppressed":0}
@@ -70,14 +86,14 @@ class MergeDiscovery:
             if rec.state=="ignored": metrics["discoveries_ignored"]+=1
             _write(self.records_dir()/f"{rec.discovery_id}.json", rec.to_dict())
             if rec.state in {"discovered","ambiguous","blocked","failed"}: _write(self.root/CANDIDATES/f"{rec.discovery_id}.json", rec.to_dict())
-        head=_git(repo,"rev-parse",t.base_branch) if repo.exists() else None
-        cursor={"target_id":target_id,"base_branch":t.base_branch,"last_scanned_commit":head,"last_scanned_at":utc_now_iso(),"last_discovery_count":len(records),"last_request_count":metrics["audit_requests_created_from_merges"],"status":"ok","warnings":[],"errors":[]}
+        head=_git(repo,"rev-parse",scan_ref) if repo.exists() else None
+        cursor={"target_id":target_id,"base_branch":branch,"watched_remote_ref":watched_ref,"last_fetch_at":utc_now_iso(),"last_scanned_commit":head,"last_scanned_at":utc_now_iso(),"last_discovery_count":len(records),"last_request_count":metrics["audit_requests_created_from_merges"],"status":"ok","warnings":[],"errors":[]}
         _write(curp,cursor)
         consolidation=MergeDiscoveryConsolidator(self.root).consolidate(target_id, records=records, mode=backfill_mode, max_candidates=max_candidates, max_requests_per_cycle=max_requests_per_cycle, minimum_evidence_level=minimum_evidence_level)
         cs=consolidation.get("summary", {})
         metrics["audit_requests_created_from_merges"]=cs.get("admitted_requests",0)
         metrics["duplicate_audit_requests_suppressed"]=cs.get("requests_suppressed_by_grouping",0)
-        summary={"merge_discovery_available":True, **metrics, **cs, "last_merge_scan_at":cursor["last_scanned_at"], "last_scanned_commit":head, "pending_discovery_candidates":self._candidate_count(), "ambiguous_discoveries":self._ambiguous_count(), "latest_discovered_work_package":next((r.get("work_package_id") for r in reversed(records) if r.get("work_package_id")), None), "latest_created_audit_request":next((r.get("audit_request_id") for r in reversed(consolidation.get("admitted_requests", [])) if r.get("audit_request_id")), None), "duplicate_requests_suppressed":metrics["duplicate_audit_requests_suppressed"]}
+        summary={"merge_discovery_available":True, **metrics, **cs, "last_merge_scan_at":cursor["last_scanned_at"], "last_fetch_at":cursor["last_fetch_at"], "watched_remote_ref":watched_ref, "last_scanned_commit":head, "pending_discovery_candidates":self._candidate_count(), "ambiguous_discoveries":self._ambiguous_count(), "latest_discovered_work_package":next((r.get("work_package_id") for r in reversed(records) if r.get("work_package_id")), None), "latest_created_audit_request":next((r.get("audit_request_id") for r in reversed(consolidation.get("admitted_requests", [])) if r.get("audit_request_id")), None), "duplicate_requests_suppressed":metrics["duplicate_audit_requests_suppressed"]}
         payload={"target_id":target_id,"cursor":cursor,"records":records,"consolidation":consolidation,"summary":summary,"provider_execution_performed":False,"dispatch_execution_performed":False}
         _write(self.root/STATUS/"latest.json", payload); _write(self.root/STATUS/"summary.json", summary)
         return payload
@@ -85,6 +101,9 @@ class MergeDiscovery:
         parents=_git(repo,"rev-list","--parents","-n","1",sha).split(); files=_git(repo,"diff-tree","--no-commit-id","--name-only","-r",sha).splitlines(); msg=_git(repo,"log","-n","1","--format=%B",sha)
         source_kind="merge" if len(parents)>2 else "promotion"
         receipt_paths=[f for f in files if f.startswith("collaboration/work_packages/completions/") and f.endswith(".json")]
+        pending_only=bool(files) and all(f.startswith("collaboration/work_packages/pending/") for f in files)
+        if pending_only:
+            return None
         if source_kind!="merge" and not receipt_paths and not WP_RE.search(msg): return None
         evidence=[]; receipt_path=None; warnings=[]; metadata={"changed_paths":files}
         for rp in receipt_paths:

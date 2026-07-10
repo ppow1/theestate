@@ -21,6 +21,8 @@ from estate.core.paths import ESTATE_ROOT
 
 HOST_ENV = "ESTATE_OPERATIONS_RUNTIME_HOST_DIR"
 ROOT_ENV = "ESTATE_OPERATIONS_RUNTIME_ROOT"
+TASK_NAME = "Estate Operations Runtime Host"
+DEFAULT_RUNTIME_CODE_ROOT = Path("A:/EstateRuntime/host/estate-main/current")
 DEFAULT_INTERVAL_SECONDS = 30.0
 DEFAULT_MAX_CYCLES = 1_000_000
 STALE_LOCK_SECONDS = 6 * 60 * 60
@@ -41,6 +43,13 @@ def _state_dir(state_dir: Path | None = None) -> Path:
         return Path(os.environ[HOST_ENV]).expanduser().resolve()
     return (Path.home() / ".estate" / "operations_runtime_host").resolve()
 
+
+
+def _run_command(cmd: list[str], *, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(cmd, cwd=str(cwd) if cwd else None, text=True, capture_output=True, check=False)
+
+def _quote_ps(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
 
 def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -207,21 +216,112 @@ class OperationsRuntimeHost:
         pid = int((lock.get("pid") or heartbeat.get("pid") or 0) or 0)
         running = bool(pid and _pid_alive(pid) and self.lock_path.exists())
         summary = runtime.get("summary", {})
-        return {"host_state": "running" if running else "stopped", "pid": pid or None, "state_dir": str(self.state_dir), "heartbeat_age_seconds": _iso_age_seconds(heartbeat.get("heartbeat_at")), "cycle_state": summary.get("operations_runtime_state"), "last_verdict": summary.get("latest_audit_verdict"), "blocking_fault": (summary.get("runtime_warnings") or [None])[0], "runtime_status": runtime, "lock_present": self.lock_path.exists()}
+        install = _read_json(self.install_path) if self.install_path.exists() else {}
+        md_summary = {}
+        md_status = self.root / "runtime/merge_discovery/status/latest.json"
+        if md_status.exists():
+            try:
+                md_summary = (_read_json(md_status).get("summary") or {})
+            except Exception:
+                md_summary = {}
+        task_state = self._query_windows_task() if os.name == "nt" else {"scheduled_task_exists": bool(install), "scheduled_task_state": None}
+        return {"installed": bool(install), **task_state, "host_state": "running" if running else "stopped", "pid": pid or None, "state_dir": str(self.state_dir), "heartbeat_age_seconds": _iso_age_seconds(heartbeat.get("heartbeat_at")), "runtime_code_revision": self._runtime_revision(), "watched_remote_ref": md_summary.get("watched_remote_ref", "origin/main"), "last_fetch_at": md_summary.get("last_fetch_at"), "last_scanned_commit": md_summary.get("last_scanned_commit"), "last_processed_work_package": summary.get("latest_admitted_work_package"), "cycle_state": summary.get("operations_runtime_state"), "last_verdict": summary.get("latest_audit_verdict"), "blocking_fault": (summary.get("runtime_warnings") or md_summary.get("errors") or [None])[0], "runtime_status": runtime, "lock_present": self.lock_path.exists()}
+
+    def _launcher_path(self) -> Path:
+        return self.state_dir / "run_operations_runtime_host.ps1"
+
+    def _write_windows_launcher(self) -> Path:
+        launcher = self._launcher_path()
+        launcher.parent.mkdir(parents=True, exist_ok=True)
+        launcher.write_text(
+            "$ErrorActionPreference = 'Stop'\n"
+            f"$env:{ROOT_ENV} = {_quote_ps(str(self.root))}\n"
+            f"$env:{HOST_ENV} = {_quote_ps(str(self.state_dir))}\n"
+            f"Set-Location {_quote_ps(str(self.root))}\n"
+            f"& {_quote_ps(sys.executable)} -m estate.cli.main operations-runtime host run-foreground --discover-merges --auto-admit\n",
+            encoding="utf-8",
+        )
+        return launcher
+
+    def _query_windows_task(self) -> dict[str, Any]:
+        query = ["schtasks", "/Query", "/TN", TASK_NAME, "/FO", "LIST", "/V"]
+        result = _run_command(query)
+        exists = result.returncode == 0
+        state = None
+        for line in result.stdout.splitlines():
+            if line.lower().startswith("status:") or line.lower().startswith("scheduled task state:"):
+                state = line.split(":", 1)[1].strip()
+                break
+        return {"scheduled_task_exists": exists, "scheduled_task_state": state, "query_command": query, "query_returncode": result.returncode, "query_stdout": result.stdout, "query_stderr": result.stderr}
+
+    def _runtime_revision(self) -> str | None:
+        result = _run_command(["git", "rev-parse", "HEAD"], cwd=self.root)
+        return result.stdout.strip() if result.returncode == 0 else None
 
     def install(self) -> dict[str, Any]:
         self._ensure_state_dir()
         command = [sys.executable, "-m", "estate.cli.main", "operations-runtime", "host", "start"]
-        payload = {"installed_at": utc_now_iso(), "method": "scheduled-task" if os.name == "nt" else "manual-launch-manifest", "command": command, "root": str(self.root), "state_dir": str(self.state_dir)}
+        payload = {"installed_at": utc_now_iso(), "installed": True, "method": "scheduled-task" if os.name == "nt" else "manual-launch-manifest", "command": command, "root": str(self.root), "state_dir": str(self.state_dir), "scheduled_task_name": TASK_NAME, "scheduled_task_exists": False, "scheduled_task_verified": False}
         if os.name == "nt":
-            payload["scheduled_task"] = "Estate Operations Runtime Host"
-            # Document the native command instead of requiring elevated privileges during tests.
-            payload["windows_command"] = ["schtasks", "/Create", "/SC", "ONLOGON", "/TN", payload["scheduled_task"], "/TR", " ".join(command), "/F"]
+            launcher = self._write_windows_launcher()
+            task_command = f'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "{launcher}"'
+            create_cmd = ["schtasks", "/Create", "/SC", "ONLOGON", "/TN", TASK_NAME, "/TR", task_command, "/F"]
+            result = _run_command(create_cmd)
+            if result.returncode != 0:
+                raise OperationsRuntimeHostError(result.stderr or result.stdout or "failed to create scheduled task")
+            task_state = self._query_windows_task()
+            if not task_state["scheduled_task_exists"]:
+                raise OperationsRuntimeHostError("scheduled task creation could not be verified")
+            payload.update(task_state)
+            payload.update({"launcher": str(launcher), "windows_command": create_cmd, "scheduled_task_verified": True})
         _write_json(self.install_path, payload)
         return payload
 
     def uninstall(self) -> dict[str, Any]:
         existed = self.install_path.exists()
+        if os.name == "nt":
+            delete_cmd = ["schtasks", "/Delete", "/TN", TASK_NAME, "/F"]
+            result = _run_command(delete_cmd)
+            if result.returncode not in {0, 1}:
+                raise OperationsRuntimeHostError(result.stderr or result.stdout or "failed to delete scheduled task")
+            task_state = self._query_windows_task()
+            removed = not task_state["scheduled_task_exists"]
+            if not removed:
+                raise OperationsRuntimeHostError("scheduled task removal could not be verified")
+        else:
+            delete_cmd = []
+            removed = True
+            task_state = {"scheduled_task_exists": False, "scheduled_task_state": None}
         if existed:
             self.install_path.unlink()
-        return {"uninstalled_at": utc_now_iso(), "removed_manifest": existed, "scheduled_task": "Estate Operations Runtime Host" if os.name == "nt" else None}
+        return {"uninstalled_at": utc_now_iso(), "removed_manifest": existed, "scheduled_task": TASK_NAME if os.name == "nt" else None, "scheduled_task_removed": removed, "delete_command": delete_cmd, **task_state}
+
+    @classmethod
+    def bootstrap(cls, target: str = "estate-main", *, runtime_code_root: Path | None = None, source_root: Path | None = None) -> dict[str, Any]:
+        source = _root(source_root)
+        code_root = (runtime_code_root or DEFAULT_RUNTIME_CODE_ROOT).resolve()
+        _run_command(["git", "fetch", "--quiet", "origin"], cwd=source)
+        if code_root.exists():
+            _run_command(["git", "fetch", "--quiet", "origin"], cwd=code_root)
+            _run_command(["git", "checkout", "--quiet", "-B", "main", "origin/main"], cwd=code_root)
+        else:
+            code_root.parent.mkdir(parents=True, exist_ok=True)
+            clone = _run_command(["git", "clone", "--quiet", "--branch", "main", str(source), str(code_root)])
+            if clone.returncode != 0:
+                raise OperationsRuntimeHostError(clone.stderr or clone.stdout or "failed to create runtime code workspace")
+            origin = _run_command(["git", "remote", "get-url", "origin"], cwd=source)
+            if origin.returncode == 0 and origin.stdout.strip():
+                _run_command(["git", "remote", "set-url", "origin", origin.stdout.strip()], cwd=code_root)
+        state_dir = code_root.parent / "state"
+        host = cls(code_root, state_dir)
+        installed = host.install()
+        started = host.start()
+        deadline = time.time() + 5
+        heartbeat_verified = False
+        while time.time() < deadline:
+            if host.heartbeat_path.exists():
+                heartbeat_verified = True
+                break
+            time.sleep(0.1)
+        status = host.status()
+        return {"target": target, "remote_ref_used": "origin/main", "runtime_code_workspace": str(code_root), "scheduled_task_name": TASK_NAME, "scheduled_task_installed": bool(installed.get("installed")), "scheduled_task_verified": bool(installed.get("scheduled_task_verified") or os.name != "nt"), "host_started": bool(started.get("pid")), "heartbeat_verified": heartbeat_verified or status.get("host_state") == "running", "active_checkout_modifications_performed": False, "pending_only_commits_suppressed": True, "eligible_completed_work_detected": None, "provider_execution_performed": False, "dispatch_execution_performed": False, "install": installed, "start": started, "status": status}

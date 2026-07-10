@@ -1,0 +1,45 @@
+{
+  "active_checkout_modifications_performed": true,
+  "branch": "work",
+  "codex_status": "done",
+  "completed_at": "2026-07-10T19:18:00Z",
+  "dispatch_execution_performed": false,
+  "eligible_completed_work_detected": true,
+  "files_changed": [
+    "src/estate/core/operations_runtime_host.py",
+    "src/estate/core/merge_discovery.py",
+    "src/estate/core/operations_runtime.py",
+    "src/estate/cli/main.py",
+    "tests/test_operations_runtime_host.py",
+    "tests/test_merge_discovery.py",
+    "docs/integration/merge_gated_runtime_host_activation.md",
+    "collaboration/work_packages/completions/WP-0637_codex_done.json"
+  ],
+  "heartbeat_verified": false,
+  "host_started": false,
+  "known_limitations": [
+    "Live Windows workstation bootstrap and Scheduled Task creation were not executed in this Linux container; deterministic tests mock schtasks behavior.",
+    "No validation recipe is registered for WP-0637, so validate-work-package reports no_recipe."
+  ],
+  "merge_authority": "Chief Architect review required before merge.",
+  "merge_authority_or_equivalent": "Chief Architect review required before merge.",
+  "not_applicable_reason": "Pull request URL is not available until Codex creates the PR.",
+  "notes": "Windows workstation bootstrap is implemented and covered with mocked Scheduled Task tests; live Windows installation was not executed from this Linux CI container.",
+  "pending_only_commits_suppressed": true,
+  "provider_execution_performed": false,
+  "pull_request_not_applicable_reason": "Pull request URL is not available until Codex creates the PR.",
+  "pull_request_url_or_not_applicable_reason": "Not applicable until Codex creates the PR from this branch.",
+  "ready_for_ca_review": true,
+  "remote_ref_used": "origin/main",
+  "runtime_code_workspace": "A:/EstateRuntime/host/estate-main/current",
+  "scheduled_task_installed": false,
+  "scheduled_task_name": "Estate Operations Runtime Host",
+  "scheduled_task_verified": false,
+  "summary": "Activated remote merge-gated runtime discovery, Windows Scheduled Task host installation, bootstrap command, status reporting, documentation, and tests.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/operations_runtime_host.py src/estate/core/merge_discovery.py src/estate/core/merge_discovery_runtime.py src/estate/core/merge_discovery_admission.py",
+    "pytest -q tests/test_operations_runtime_host.py tests/test_merge_discovery.py tests/test_merge_discovery_runtime.py tests/test_merge_discovery_admission.py tests/test_operations_runtime.py --basetemp Temp/pytest-runtime-activation",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0637 --json"
+  ],
+  "work_package_id": "WP-0637"
+}
