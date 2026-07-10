@@ -1,0 +1,39 @@
+{
+  "work_package": "WP-0524",
+  "status": "staged_not_installed",
+  "required_install_handoff": "WP-0531",
+  "staged_artifacts": [
+    "collaboration/workstreams/WP-0524/install_manifest.json",
+    "collaboration/workstreams/WP-0524/staged/office_actionable_notifications.py",
+    "collaboration/workstreams/WP-0524/staged/test_office_actionable_notifications.py",
+    "collaboration/workstreams/WP-0524/actionable_notification_contract.md",
+    "collaboration/workstreams/WP-0524/validation_notes.md",
+    "collaboration/workstreams/WP-0524/rollback_notes.md"
+  ],
+  "intended_final_install_paths": [
+    "src/estate/core/office_actionable_notifications.py",
+    "tests/test_office_actionable_notifications.py",
+    "docs/office/actionable_notification_contract.md"
+  ],
+  "shared_integration_targets_deferred": [
+    "Office notification tab/action registration",
+    "Existing notification runtime refresh loop",
+    "Canonical routing/action registry integration",
+    "Source evidence opener UI hooks",
+    "Delivery failure telemetry panels"
+  ],
+  "declared_overlaps": [
+    "WP-0519 notification runtime and notification evidence surfaces",
+    "Existing notification runtimes that own delivery state and source closure",
+    "WP-0531 install handoff for shared active Office files"
+  ],
+  "validation_commands": [
+    "python -m pytest collaboration/workstreams/WP-0524/staged/test_office_actionable_notifications.py"
+  ],
+  "authority_boundaries": [
+    "Local acknowledgement is never represented as authoritative source closure",
+    "Authoritative closure requires a source receipt",
+    "Staged artifacts are not installed work",
+    "No shared active Office files were modified"
+  ]
+}
