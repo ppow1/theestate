@@ -16,6 +16,7 @@ from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.paths import ESTATE_ROOT
+from estate.core.resident_lifecycle import office_lifecycle_summary
 
 PERSONNEL_SOURCE = "data/registry/personnel.json"
 MAILBOX_SOURCE = "data/registry/mailboxes.json"
@@ -207,8 +208,16 @@ def build_office_personnel_directory(root: Path | str | None = None, *, write: b
         if e.get("manager_employee_id"):
             org_edges.append({"source": f"employee:{e['manager_employee_id']}", "target": node["id"], "relationship": "manager_direct_report", "orphaned": e.get("manager_employee_id") not in by_id})
 
+    lifecycle_summary = office_lifecycle_summary(root)
+    lifecycle_by_resident = {r["resident_id"]: r for r in lifecycle_summary.get("records", [])}
+    for employee in employees:
+        if employee.get("resident_id") in lifecycle_by_resident:
+            employee["resident_lifecycle"] = lifecycle_by_resident[employee["resident_id"]]
+            employee["source_artifact_references"].append(lifecycle_summary["source"])
+
     payload = {
         "version": 1, "generated_at": _now(), "kind": "office_personnel_directory",
+        "resident_lifecycle_status": lifecycle_summary,
         "selected_employee_id": _as_id(selected_employee_id) if _as_id(selected_employee_id) in by_id else None,
         "filters": filters or {}, "employees": sorted(employees, key=lambda e: (str(e.get("display_name") or ""), e["employee_id"])),
         "employees_by_id": by_id, "org_chart": {"nodes": org_nodes, "edges": org_edges, "cycles": cycles, "disconnected_nodes": [n for n in org_nodes if n["type"] == "employee" and not any(ed["target"] == n["id"] for ed in org_edges)]},
@@ -218,7 +227,7 @@ def build_office_personnel_directory(root: Path | str | None = None, *, write: b
         "search_fields": ["display_name", "current_title", "employee_id", "mailbox_id", "office", "capabilities"],
         "actions": personnel_action_contracts(),
         "warnings": warnings,
-        "source_artifacts": [PERSONNEL_SOURCE, MAILBOX_SOURCE, RESIDENT_SOURCE, "collaboration/messages", "collaboration/work_packages", "data/registry/capabilities.json"],
+        "source_artifacts": [PERSONNEL_SOURCE, MAILBOX_SOURCE, RESIDENT_SOURCE, "collaboration/messages", "collaboration/work_packages", "data/registry/capabilities.json", lifecycle_summary["source"]],
         "new_personnel_registry_introduced": False, "new_mailbox_system_introduced": False,
     }
     if write:

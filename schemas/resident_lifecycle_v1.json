@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/resident_lifecycle_v1.json",
+  "title": "Resident Lifecycle Record v1",
+  "type": "object",
+  "required": ["schema_version", "resident_id", "status", "history", "identity_lineage"],
+  "properties": {
+    "schema_version": {"const": "resident_lifecycle.v1"},
+    "resident_id": {"type": "string"},
+    "resident_name": {"type": "string"},
+    "classification": {"type": "string"},
+    "status": {"enum": ["candidate", "under_review", "approved_for_hire", "onboarding", "ready_for_service", "active", "reflection_due", "in_reflection", "stand_down", "reassignment_review", "retirement_review", "retired", "archived", "successor_review"]},
+    "pending_gate": {"type": ["string", "null"]},
+    "next_action": {"type": "string"},
+    "identity_lineage": {"type": "object"},
+    "history": {"type": "array"}
+  }
+}
