@@ -1,0 +1,31 @@
+{
+  "work_package": "WP-4026",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4026/staged/local_model_assignment.py",
+    "collaboration/workstreams/WP-4026/staged/test_local_model_assignment.py",
+    "collaboration/workstreams/WP-4026/model_assignment_contract.md"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "model-control registry, policy, and assignments",
+      "owner_work_package": "WP-4031",
+      "intent": "Install resident-to-model and capability-to-model assignment selection while preserving existing model-control authority."
+    },
+    {
+      "path": "resident interaction adapters",
+      "owner_work_package": "WP-4031",
+      "intent": "Use deterministic resident-aware local model selection and truthful fallback diagnostics during resident chat."
+    },
+    {
+      "path": "AI-service controls and Office model surfaces",
+      "owner_work_package": "WP-4031",
+      "intent": "Expose local availability, cold-start, timeout, no-cloud policy, and model-change audit status without installing this staged module directly."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4026/staged/test_local_model_assignment.py",
+    "expected": "all tests pass"
+  }
+}
