@@ -1,0 +1,36 @@
+{
+  "work_package": "WP-4025",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4025/staged/resident_session_manager.py",
+    "collaboration/workstreams/WP-4025/staged/test_resident_session_manager.py",
+    "collaboration/workstreams/WP-4025/session_management_contract.md"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "src/estate/core/resident_interaction.py",
+      "owner_work_package": "WP-4031",
+      "intent": "Use resident session creation, resume, checkpoint, archive, forget, and recovery semantics during resident chat operations."
+    },
+    {
+      "path": "resident gateway/session APIs",
+      "owner_work_package": "WP-4031",
+      "intent": "Expose private resident session lifecycle endpoints with identity validation."
+    },
+    {
+      "path": "Open WebUI mapping",
+      "owner_work_package": "WP-4031",
+      "intent": "Map Open WebUI conversations to resident sessions without merging resident identities."
+    },
+    {
+      "path": "continuity records and Office conversation surfaces",
+      "owner_work_package": "WP-4031",
+      "intent": "Show deterministic status metadata without treating archived or forgotten content as active memory."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4025/staged/test_resident_session_manager.py",
+    "expected": "all tests pass"
+  }
+}
