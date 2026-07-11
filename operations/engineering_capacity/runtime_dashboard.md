@@ -1,6 +1,6 @@
 # Engineering Capacity Runtime Dashboard
 
-Generated: 2026-07-10T23:25:08Z
+Generated: 2026-07-11T22:35:32Z
 
 Advisory only: this dashboard does not launch workers, consume Codex seats, or schedule work.
 
