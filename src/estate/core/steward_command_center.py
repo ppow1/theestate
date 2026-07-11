@@ -21,6 +21,7 @@ from estate.core.decision_queue import generate_decision_queue
 from estate.core.assignment_queue import generate_assignment_queue
 from estate.core.mailbox_index import generate_mailbox_index
 from estate.core.global_search_command_palette import build_global_palette
+from estate.core.unified_institutional_search import search_institutional
 from estate.core.mission_control_workspace import build_mission_control_workspace
 from estate.core.steward_presence import generate_steward_presence_state
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
@@ -1292,7 +1293,8 @@ def _placeholder_panel(panel_id, title, description, source="future Office packa
 def _global_search_panel(root):
     try:
         palette = build_global_palette(root, write=True)
-        return {"available": True, "path": palette.get("index_path"), "kind": "global_search_command_palette", "data": palette}
+        unified = search_institutional({"query": "", "limit": 100}, root=root, refresh=False)
+        return {"available": True, "path": palette.get("index_path"), "kind": "global_search_command_palette", "data": {**palette, "unified_institutional_results": unified.get("results", []), "unified_diagnostics": unified.get("diagnostics", {})}}
     except Exception as exc:
         return {"available": False, "path": "runtime/search/global_command_palette.json", "kind": "global_search_command_palette", "placeholder": f"Global search palette is unavailable: {exc}"}
 
@@ -1473,14 +1475,15 @@ def _global_search_html(artifact):
     if not artifact.get("available"):
         return _office_placeholder_html("Search", artifact.get("placeholder", "Search is unavailable."), artifact.get("path", "runtime/search/global_command_palette.json"))
     data = artifact.get("data") or {}
-    records = (data.get("commands") or []) + (data.get("artifacts") or [])
+    unified_records = [{"kind": "institutional", "domain": r.get("source_type"), "title": r.get("title"), "path": r.get("path"), "excerpt": r.get("snippet"), "policy_classification": r.get("classification"), "action": {"operation": "open_artifact", "target": r.get("path"), "available": True}, "navigation": r.get("navigation"), "owning_office": r.get("owning_office")} for r in (data.get("unified_institutional_results") or [])]
+    records = (data.get("commands") or []) + (data.get("artifacts") or []) + unified_records
     safe_records = _script_json(records)
     domains = ", ".join(data.get("domains") or [])
     return f"""<section class="global-search-palette" aria-label="Global Search and Command Palette">
-<p>Search updates incrementally across Work Packages, Missions, Mailboxes, Residents, Daily Board, Parking Lot, Validation artifacts, Documentation, and registered commands. Press <kbd>/</kbd> to focus search.</p>
+<p>Search updates incrementally across doctrine, manuals, work packages, validation, residents, mail, history, research, services, projects, operations, and registered commands. Press <kbd>/</kbd> to focus search.</p>
 <label for="global-search-input">Global search / command</label>
 <input id="global-search-input" type="search" autocomplete="off" placeholder="Search artifacts or commands" aria-describedby="global-search-help" />
-<p id="global-search-help" class="source">Local-only. Commands are explicit registrations; unavailable commands report why they cannot run. Domains: {html.escape(domains)}</p>
+<p id="global-search-help" class="source">Local-only. Results use unified institutional search diagnostics and canonical Office navigation. Commands are explicit registrations; unavailable commands report why they cannot run. Domains: {html.escape(domains)}</p>
 <div id="global-search-results" role="list" aria-live="polite"></div>
 <script id="global-palette-data" type="application/json">{safe_records}</script>
 <p class="source">Source: {html.escape(str(artifact.get("path") or "runtime/search/global_command_palette.json"))}</p>

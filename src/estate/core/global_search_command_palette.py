@@ -26,6 +26,7 @@ COMMANDS = [
     {"id": "navigate.settings", "title": "Navigate: Settings", "category": "navigation", "operation": "activate_tab", "target": "settings", "available": True},
     {"id": "command.refresh-status", "title": "Refresh status and activity console", "category": "command", "operation": "refresh_chrome", "available": True},
     {"id": "cli.estate-search", "title": "Run Estate institutional search", "category": "command", "operation": "existing_cli", "cli": "estate-search <query>", "available": True},
+    {"id": "cli.institutional-search", "title": "Run unified institutional search", "category": "command", "operation": "existing_cli", "cli": "institutional-search <query>", "available": True},
     {"id": "cli.assignment-queue", "title": "Generate assignment queue", "category": "command", "operation": "existing_cli", "cli": "assignment-queue", "available": True},
     {"id": "cli.worker-runtime-summary", "title": "Generate worker runtime summary", "category": "command", "operation": "existing_cli", "cli": "worker-runtime-summary", "available": True},
     {"id": "command.ai-interpret", "title": "Interpret this request with AI", "category": "unavailable", "operation": "unavailable", "available": False, "unavailable_reason": "WP-0054 forbids invented AI interpretation; use explicit registered commands only."},
