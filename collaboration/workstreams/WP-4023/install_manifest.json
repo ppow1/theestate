@@ -1,0 +1,85 @@
+{
+  "work_package": "WP-4023",
+  "title": "Resident Work Delegation and Handoff Runtime",
+  "staged_work_is_installed": false,
+  "classification": "Estate Internal",
+  "staged_artifacts": [
+    {
+      "path": "collaboration/workstreams/WP-4023/src/wp4023_delegation_runtime/runtime.py",
+      "type": "python_module",
+      "purpose": "Isolated delegation and handoff state machine with authority metadata, evidence, idempotent retry, ownership transfer, and receipt contracts."
+    },
+    {
+      "path": "collaboration/workstreams/WP-4023/tests/test_delegation_runtime.py",
+      "type": "pytest_tests",
+      "purpose": "Focused staged coverage for deterministic states, authorized ownership transfer, visibility, receipts, and idempotency."
+    },
+    {
+      "path": "collaboration/workstreams/WP-4023/README.md",
+      "type": "integration_notes",
+      "purpose": "Staged workstream overview and shared-file isolation boundary."
+    }
+  ],
+  "intended_install_paths": [
+    {
+      "source": "collaboration/workstreams/WP-4023/src/wp4023_delegation_runtime/runtime.py",
+      "target": "src/estate/core/resident_delegation_runtime.py",
+      "install_mode": "new active runtime module or merge into selected assignment/work-package runtime module"
+    },
+    {
+      "source": "collaboration/workstreams/WP-4023/tests/test_delegation_runtime.py",
+      "target": "tests/test_resident_delegation_runtime.py",
+      "install_mode": "adapt imports from staged module to active module"
+    }
+  ],
+  "files_expected_to_change_during_wp_4031_install": [
+    "src/estate/model_control/assignments.py",
+    "src/estate/cli/main.py",
+    "Dispatch and Traffic Controller integration points",
+    "Office task and resident surfaces",
+    "active mailbox and audit adapters",
+    "tests/test_resident_delegation_runtime.py"
+  ],
+  "active_files_not_modified_by_this_stage": [
+    "src/estate/model_control/assignments.py",
+    "src/estate/cli/main.py",
+    "Dispatch and Traffic Controller integration points",
+    "Office task and resident surfaces"
+  ],
+  "install_steps": [
+    "Review active assignment, work-package, Dispatch, Traffic Controller, mailbox, audit, and Office surfaces for conflict windows.",
+    "Install or merge the staged runtime into the selected active runtime module without creating a second queue, assignment registry, Dispatch path, or authority layer.",
+    "Map AuthorityMetadata fields to existing source authority and approval systems; do not treat delegated messages as authority.",
+    "Wire delegation requests through existing assignment/work-package records and existing mailbox/Dispatch visibility mechanisms.",
+    "Persist handoff receipts through existing audit and provenance mechanisms while preserving evidence references.",
+    "Adapt staged tests into active tests and run focused plus affected assignment, Dispatch, mailbox, audit, Office, and CLI tests."
+  ],
+  "validation": {
+    "staged_command": "PYTHONPATH=collaboration/workstreams/WP-4023/src pytest collaboration/workstreams/WP-4023/tests",
+    "post_install_commands": [
+      "PYTHONPATH=src pytest tests/test_resident_delegation_runtime.py tests/test_worker_assignment_runtime.py tests/test_wp0517_work_package_control.py",
+      "PYTHONPATH=src python -m estate.cli.main --help"
+    ],
+    "acceptance_checks": [
+      "Delegation states are deterministic for the same state, actor, authority metadata, and idempotency key.",
+      "Ownership cannot change without an authorized transfer transition.",
+      "Rejected and stalled work remains visible through existing active surfaces.",
+      "Completion receipts preserve evidence and provenance.",
+      "Idempotent retries do not duplicate history, receipts, or ownership changes.",
+      "Source authority and approval metadata are caller-provided from existing mechanisms."
+    ]
+  },
+  "dependencies": [
+    "Existing assignment and work-package runtime records for work item identity and ownership persistence.",
+    "Existing Traffic Controller and Dispatch paths for routing and visibility.",
+    "Existing mailbox mechanisms for resident notification and handoff messages.",
+    "Existing audit mechanisms for receipt persistence and provenance.",
+    "Existing authority and approval mechanisms for transition authorization."
+  ],
+  "rollback": [
+    "Remove installed resident delegation runtime module or revert merged active runtime changes.",
+    "Revert assignment, Dispatch, Traffic Controller, Office, mailbox, and audit wiring from WP-4031.",
+    "Remove active tests adapted from WP-4023 staged tests.",
+    "Re-run the affected assignment, work-package, CLI, Office, mailbox, audit, and Dispatch test subset."
+  ]
+}
