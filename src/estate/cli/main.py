@@ -559,7 +559,7 @@ def cmd_operations_runtime(args):
             print(json.dumps(payload, indent=2, sort_keys=True))
             return
         if args.operations_runtime_action == "host":
-            host = OperationsRuntimeHost()
+            host = OperationsRuntimeHost(task_name=getattr(args, "task_name", None))
             action = args.operations_runtime_host_action
             if action == "install":
                 payload = host.install()
@@ -3861,6 +3861,7 @@ def main(argv=None):
     host_sub = q.add_subparsers(dest="operations_runtime_host_action", required=True)
     for name in ["install", "uninstall", "start", "stop", "restart", "status"]:
         h = host_sub.add_parser(name)
+        h.add_argument("--task-name", help="Windows Scheduled Task name to manage; defaults to production host task")
         h.set_defaults(func=cmd_operations_runtime)
     h = host_sub.add_parser("run-foreground", help="Run host loop in the foreground for debugging")
     h.add_argument("--max-cycles", type=int, default=1000000)

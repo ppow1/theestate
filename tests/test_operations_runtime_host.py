@@ -96,6 +96,40 @@ def test_windows_install_executes_and_verifies_scheduled_task(tmp_path, monkeypa
     assert installed["scheduled_task_exists"] is True
 
 
+def test_cli_host_install_accepts_isolated_task_name(tmp_path, monkeypatch, capsys):
+    import estate.cli.main as cli
+    from estate.cli.main import main
+
+    created = []
+    test_task_name = "Estate Operations Runtime Host Test Isolation"
+
+    class FakeHost:
+        def __init__(self, task_name=None):
+            created.append(task_name)
+            self.task_name = task_name
+
+        def install(self):
+            return {"scheduled_task_name": self.task_name}
+
+    monkeypatch.setattr(cli, "OperationsRuntimeHost", FakeHost)
+    monkeypatch.chdir(tmp_path)
+    main(
+        [
+            "operations-runtime",
+            "host",
+            "install",
+            "--task-name",
+            test_task_name,
+        ],
+    )
+    output = capsys.readouterr()
+
+    installed = json.loads(output.out)
+    assert created == [test_task_name]
+    assert created[0] != TASK_NAME
+    assert installed["scheduled_task_name"] == test_task_name
+
+
 def test_windows_uninstall_deletes_and_verifies_removal(tmp_path, monkeypatch):
     import estate.core.operations_runtime_host as mod
     calls=[]
