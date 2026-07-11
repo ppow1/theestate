@@ -1,4 +1,4 @@
-from estate.core.resident_gateway import models_payload, chat_completion
+from estate.core.resident_gateway import models_payload, chat_completion, chat_completion_stream
 
 
 def test_models_expose_alfred_and_helen_only():
@@ -20,7 +20,19 @@ def test_chat_completion_rejects_unknown_and_stream(tmp_path):
     code, body = chat_completion({'model':'estate/grace','messages':[]}, root=tmp_path)
     assert code == 404 and body['error']['code'] == 'unsupported_model'
     code, body = chat_completion({'model':'estate/helen','messages':[], 'stream': True}, root=tmp_path)
-    assert code == 400 and body['error']['code'] == 'streaming_unsupported'
+    assert code == 200
+    assert body['object'] == 'chat.completion.chunk'
+    assert body['choices'][0]['delta']['role'] == 'assistant'
+
+
+def test_chat_completion_stream_returns_openai_sse_chunks(tmp_path):
+    code, chunks = chat_completion_stream({'model':'estate/alfred','messages':[{'role':'user','content':'hello'}], 'stream': True}, root=tmp_path)
+    chunks = list(chunks)
+    assert code == 200
+    assert chunks[0]['object'] == 'chat.completion.chunk'
+    assert chunks[0]['choices'][0]['delta']['content']
+    assert chunks[1]['choices'][0]['delta'] == {}
+    assert chunks[1]['choices'][0]['finish_reason'] == 'stop'
 
 
 def test_gateway_session_persistence(tmp_path):
