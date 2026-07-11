@@ -1,0 +1,72 @@
+{
+  "schema": "estate.office_intelligence_install_plan.v1",
+  "phases": [
+    {
+      "phase": 1,
+      "name": "shared guided-action contracts",
+      "workstreams": [
+        "WP-0523"
+      ],
+      "installed": true,
+      "validation": "active focused pytest passed"
+    },
+    {
+      "phase": 2,
+      "name": "personalization and unified search",
+      "workstreams": [
+        "WP-0526",
+        "WP-0527"
+      ],
+      "installed": true,
+      "validation": "active focused pytest passed"
+    },
+    {
+      "phase": 3,
+      "name": "timeline, presence, and notifications",
+      "workstreams": [
+        "WP-0524",
+        "WP-0525",
+        "WP-0528"
+      ],
+      "installed": true,
+      "validation": "active focused pytest passed"
+    },
+    {
+      "phase": 4,
+      "name": "executive workspace and decision support",
+      "workstreams": [
+        "WP-0522",
+        "WP-0529"
+      ],
+      "installed": true,
+      "validation": "active focused pytest passed"
+    },
+    {
+      "phase": 5,
+      "name": "guided operational workflows",
+      "workstreams": [
+        "WP-0530"
+      ],
+      "installed": true,
+      "validation": "active focused pytest passed"
+    },
+    {
+      "phase": 6,
+      "name": "integrated Office regression and acceptance",
+      "workstreams": [
+        "WP-0522",
+        "WP-0523",
+        "WP-0524",
+        "WP-0525",
+        "WP-0526",
+        "WP-0527",
+        "WP-0528",
+        "WP-0529",
+        "WP-0530"
+      ],
+      "installed": true,
+      "validation": "full Office regression passed"
+    }
+  ],
+  "deviations": []
+}
