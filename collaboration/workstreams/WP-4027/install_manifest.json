@@ -1,0 +1,17 @@
+{
+  "work_package": "WP-4027",
+  "status": "staged_uninstalled",
+  "installed": false,
+  "staged_root": "collaboration/workstreams/WP-4027/",
+  "artifacts": [
+    "README.md",
+    "src/resident_evaluator.py",
+    "schemas/evaluation_record.schema.json",
+    "fixtures/sample_evaluation_record.json",
+    "tests/test_resident_evaluator.py",
+    "reports/sample_report.json",
+    "notes/integration_notes.md"
+  ],
+  "future_install_handoff": "WP-4031 installs only approved reporting and evidence-consumption integrations.",
+  "active_runtime_changes": []
+}

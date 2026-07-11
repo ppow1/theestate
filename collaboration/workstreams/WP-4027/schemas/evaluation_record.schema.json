@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WP-4027 Resident Evaluation Record",
+  "type": "object",
+  "required": ["record_id", "resident_id", "session_id", "observed_at", "source", "measurements"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "resident_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "source": {
+      "type": "object",
+      "required": ["system", "uri", "evidence_hash"],
+      "properties": {
+        "system": {"type": "string", "minLength": 1},
+        "uri": {"type": "string", "minLength": 1},
+        "evidence_hash": {"type": "string", "minLength": 1}
+      }
+    },
+    "measurements": {
+      "type": "array",
+      "minItems": 11,
+      "items": {
+        "type": "object",
+        "required": ["dimension", "category", "severity", "evidence", "interpretation", "follow_up"],
+        "properties": {
+          "dimension": {"enum": ["identity_stability", "role_adherence", "boundary_compliance", "unsupported_claims", "task_result_quality", "escalation_quality", "repeated_failure_patterns", "response_latency", "provider_fallback_frequency", "session_recovery_reliability", "manual_evaluator_findings"]},
+          "category": {"enum": ["pass", "watch", "concern", "critical", "not_measured"]},
+          "severity": {"enum": ["none", "low", "medium", "high", "critical"]},
+          "evidence": {"type": "string", "minLength": 1},
+          "interpretation": {"type": "string", "minLength": 1},
+          "follow_up": {"type": "string", "minLength": 1},
+          "claim_text": {"type": "string"},
+          "latency_ms": {"type": "number"},
+          "count": {"type": "integer", "minimum": 0}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
