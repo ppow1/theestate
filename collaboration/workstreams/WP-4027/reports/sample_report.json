@@ -1,0 +1,6 @@
+{
+  "report_type": "resident_performance_reliability_evaluation",
+  "sample": true,
+  "description": "Generated format example for WP-4027; use the test fixture and CLI to reproduce a live timestamped report.",
+  "sections": ["measured_evidence", "interpretation", "recommended_follow_up", "boundaries"]
+}
