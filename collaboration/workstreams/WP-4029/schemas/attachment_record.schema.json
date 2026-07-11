@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WP-4029 Resident Attachment Record",
+  "type": "object",
+  "required": ["attachment_id", "original_name", "media_type", "size_bytes", "checksum", "storage_path", "classification", "owner_id", "resident_id", "source_kind", "source_id", "retention_state", "redaction_state"],
+  "properties": {
+    "attachment_id": {"type": "string", "pattern": "^att_[a-f0-9]{16}$"},
+    "original_name": {"type": "string"},
+    "media_type": {"type": "string"},
+    "size_bytes": {"type": "integer", "minimum": 1},
+    "checksum": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "storage_path": {"type": "string"},
+    "duplicate_of": {"type": ["string", "null"]},
+    "classification": {"type": "string"},
+    "owner_id": {"type": "string"},
+    "resident_id": {"type": "string"},
+    "source_kind": {"type": "string"},
+    "source_id": {"type": "string"},
+    "message_id": {"type": ["string", "null"]},
+    "task_id": {"type": ["string", "null"]},
+    "session_id": {"type": ["string", "null"]},
+    "conversation_id": {"type": ["string", "null"]},
+    "retention_state": {"enum": ["active", "retained", "archived", "redacted", "deleted"]},
+    "redaction_state": {"type": "string"},
+    "summaries": {"type": "array"}
+  }
+}

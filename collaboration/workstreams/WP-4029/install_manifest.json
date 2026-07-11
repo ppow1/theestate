@@ -1,0 +1,62 @@
+{
+  "work_package": "WP-4029",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4029/src/resident_attachment_exchange.py",
+    "collaboration/workstreams/WP-4029/tests/test_resident_attachment_exchange.py",
+    "collaboration/workstreams/WP-4029/schemas/attachment_record.schema.json",
+    "collaboration/workstreams/WP-4029/fixtures/sample_attachment_record.json",
+    "collaboration/workstreams/WP-4029/sample_files/readme.txt",
+    "collaboration/workstreams/WP-4029/notes/integration_notes.md"
+  ],
+  "required_capabilities_staged": [
+    "attachment intake and metadata",
+    "deterministic storage paths",
+    "classification and ownership",
+    "size, type, and extension validation",
+    "image and document summary adapters",
+    "task, message, and session linkage",
+    "redaction and retention states",
+    "controlled read, download, export, and archive behavior",
+    "checksum and duplicate detection",
+    "bounded Office and Open WebUI compatibility",
+    "audit events for sensitive access"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "existing attachment storage and resident interaction attachments",
+      "owner_work_package": "WP-4031",
+      "intent": "Install source-linked, checksummed attachment records using the existing storage authority."
+    },
+    {
+      "path": "mailbox and conversation bus integrations",
+      "owner_work_package": "WP-4031",
+      "intent": "Preserve message and conversation links when attachments move through resident mail and conversation surfaces."
+    },
+    {
+      "path": "delegated task records and resident session manager",
+      "owner_work_package": "WP-4031",
+      "intent": "Bind task and session identifiers to resident attachment records without creating a second task store."
+    },
+    {
+      "path": "classification and audit mechanisms",
+      "owner_work_package": "WP-4031",
+      "intent": "Route sensitive reads, downloads, exports, retention changes, and redactions through existing audit and classification services."
+    },
+    {
+      "path": "Office upload/download surfaces and Open WebUI compatibility",
+      "owner_work_package": "WP-4031",
+      "intent": "Expose metadata-safe cards and bounded download handles without public protected attachment exposure."
+    },
+    {
+      "path": "src/estate/cli/main.py",
+      "owner_work_package": "WP-4031",
+      "intent": "Add CLI intake/read/export/archive commands during active installation."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4029/tests/test_resident_attachment_exchange.py",
+    "expected": "all staged tests pass deterministically without live models or installed integrations"
+  }
+}

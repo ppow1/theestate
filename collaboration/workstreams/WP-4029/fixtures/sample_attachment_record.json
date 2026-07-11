@@ -1,0 +1,21 @@
+{
+  "attachment_id": "att_e56409c1e521e202",
+  "original_name": "Report Final.pdf",
+  "media_type": "application/pdf",
+  "size_bytes": 11,
+  "checksum": "e56409c1e521e2020467138b3e3a04522520f888d0f14d6272db9dcbcfccd302",
+  "storage_path": "resident_attachments/estate/alfred/mail/inbox-1/e5/att_e56409c1e521e202.pdf",
+  "duplicate_of": null,
+  "classification": "confidential",
+  "owner_id": "estate",
+  "resident_id": "alfred",
+  "source_kind": "mail",
+  "source_id": "inbox-1",
+  "message_id": "msg-1",
+  "task_id": "task-9",
+  "session_id": "sess-3",
+  "conversation_id": "conv-7",
+  "retention_state": "active",
+  "redaction_state": "none",
+  "summaries": []
+}
