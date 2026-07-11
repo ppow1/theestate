@@ -1,0 +1,50 @@
+{
+  "work_package": "WP-4028",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4028/staged/local_ai_service_supervision.py",
+    "collaboration/workstreams/WP-4028/tests/test_local_ai_service_supervision.py",
+    "collaboration/workstreams/WP-4028/fake_runners/fake_service_facts.py",
+    "collaboration/workstreams/WP-4028/notes/integration_notes.md"
+  ],
+  "required_capabilities_staged": [
+    "service health checks",
+    "dependency ordering",
+    "approved start/stop/restart/status plans",
+    "occupied-port detection",
+    "stale-process detection",
+    "bounded recovery policy",
+    "startup timeout and cold-load handling",
+    "diagnostics and logs metadata",
+    "service-specific recovery hints",
+    "resident-impact reporting",
+    "Office-safe control payloads"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "src/estate/ai_services/*",
+      "owner_work_package": "WP-4031",
+      "intent": "Install shared AI-service supervision while preserving the existing AI Services authority."
+    },
+    {
+      "path": "src/estate/core/background_operations_extension_runtime.py",
+      "owner_work_package": "WP-4031",
+      "intent": "Connect approved recovery plans to the existing background operations runtime without creating a second scheduler or event loop."
+    },
+    {
+      "path": "src/estate/cli/main.py",
+      "owner_work_package": "WP-4031",
+      "intent": "Expose service status and approval-bound control commands through the existing CLI."
+    },
+    {
+      "path": "Office AI Services and resident gateway surfaces",
+      "owner_work_package": "WP-4031",
+      "intent": "Display truthful resident availability, diagnostics, logs metadata, recovery hints, and Office-safe action payloads."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4028/tests/test_local_ai_service_supervision.py",
+    "expected": "all tests pass using deterministic fake facts; no services auto-start"
+  }
+}
