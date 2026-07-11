@@ -1,0 +1,41 @@
+{
+  "work_package": "WP-4024",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4024/staged/resident_context_assembler.py",
+    "collaboration/workstreams/WP-4024/staged/test_resident_context_assembler.py",
+    "collaboration/workstreams/WP-4024/context_assembly_contract.md"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "resident runtime prompt construction",
+      "owner_work_package": "WP-4031",
+      "intent": "Call resident context assembler before chat and task prompts."
+    },
+    {
+      "path": "knowledge retrieval service / runtime/search/estate_knowledge_index.json",
+      "owner_work_package": "WP-4012/WP-4031",
+      "intent": "Supply relevant knowledge-index records as SourceItem inputs."
+    },
+    {
+      "path": "resident mail and conversation bus",
+      "owner_work_package": "WP-4016/WP-4031",
+      "intent": "Supply recent relevant communications as SourceItem inputs."
+    },
+    {
+      "path": "continuity/session stores",
+      "owner_work_package": "WP-4004/WP-4025/WP-4031",
+      "intent": "Supply only approved continuity artifacts as SourceItem inputs."
+    },
+    {
+      "path": "Office resident surfaces",
+      "owner_work_package": "WP-4031",
+      "intent": "Expose included and omitted source metadata for operator inspection."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4024/staged/test_resident_context_assembler.py",
+    "expected": "all tests pass"
+  }
+}
