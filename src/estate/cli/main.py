@@ -127,6 +127,8 @@ from estate.core.provider_catalog import load_provider_catalog, write_office_sta
 from estate.core.provider_health import ProviderHealthRecord, write_health_record, generate_provider_health_summary, format_provider_health_summary
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard, format_engineering_capacity_dashboard
+from estate.core.codex_status_cost_characterization import characterize_codex_status_cost, format_codex_status_cost_characterization
+from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider, format_engineering_provider_routing
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 from estate.core.operations_manager import OperationsDecision
@@ -2375,6 +2377,22 @@ def cmd_provider_routing_recommendation(args):
             print(f"Provider routing recommendation failed: {exc}")
         raise SystemExit(1)
 
+def cmd_codex_status_cost_characterization(args):
+    payload = characterize_codex_status_cost(probe=not getattr(args, "no_probe", False), timeout_seconds=args.timeout_seconds)
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(format_codex_status_cost_characterization(payload), end="")
+
+
+def cmd_engineering_provider_routing(args):
+    payload = json.loads(Path(args.request).read_text(encoding="utf-8"))
+    result = recommend_engineering_provider(payload, stale_after_minutes=args.stale_after_minutes)
+    if getattr(args, "json", False):
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_engineering_provider_routing(result), end="")
+
 def cmd_execution_activity(args):
     import json
     payload = generate_execution_activity_surface()
@@ -3947,6 +3965,18 @@ def main(argv=None):
     p.add_argument("--json", action="store_true")
     p.add_argument("--stale-after-minutes", type=int, default=30)
     p.set_defaults(func=cmd_engineering_capacity_dashboard)
+
+    p = sub.add_parser("codex-status-cost-characterization", help="Characterize Codex CLI status polling cost evidence")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--no-probe", action="store_true")
+    p.add_argument("--timeout-seconds", type=int, default=10)
+    p.set_defaults(func=cmd_codex_status_cost_characterization)
+
+    p = sub.add_parser("engineering-provider-routing", help="Recommend engineering provider using capacity evidence")
+    p.add_argument("--request", required=True, help="Path to provider routing request JSON")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--stale-after-minutes", type=int, default=30)
+    p.set_defaults(func=cmd_engineering_provider_routing)
 
 
     p = sub.add_parser("worker-assignment-create", help="Create a file-backed worker assignment record")
