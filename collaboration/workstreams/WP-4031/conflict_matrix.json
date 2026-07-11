@@ -1,0 +1,16 @@
+{
+  "work_package": "WP-4031",
+  "summary": "Shared-file conflicts were avoided by installing canonical active modules and adapted active tests; no competing active queue, scheduler, authority layer, model registry, or public attachment store was created.",
+  "surfaces": [
+    {"surface": "src/estate/core/resident_interaction.py", "packages": ["WP-4022", "WP-4024", "WP-4025", "WP-4026", "WP-4029"], "classification": "ready_with_conditions", "resolution": "No direct edit in this install; resident runtime modules expose thin contracts for future controlled interaction wiring."},
+    {"surface": "src/estate/core/resident_authority.py", "packages": ["WP-4022", "WP-4023"], "classification": "ready_with_conditions", "resolution": "Capability resolver imports existing authority when available and preserves denial defaults; delegation requires caller-provided authority metadata."},
+    {"surface": "model-control modules", "packages": ["WP-4026", "WP-4023"], "classification": "ready", "resolution": "Installed resident model assignment as src/estate/model_control/resident_model_assignment.py without altering existing registries."},
+    {"surface": "AI-service control modules", "packages": ["WP-4028", "WP-4026"], "classification": "ready", "resolution": "Installed local service supervision as an additive module under src/estate/ai_services; no service auto-start."},
+    {"surface": "assignment, Dispatch, and Traffic Controller modules", "packages": ["WP-4023", "WP-4027"], "classification": "ready_with_conditions", "resolution": "Delegation runtime installed as a contract module; existing queues and Dispatch paths untouched."},
+    {"surface": "mailbox and conversation modules", "packages": ["WP-4023", "WP-4024", "WP-4025", "WP-4029"], "classification": "ready_with_conditions", "resolution": "Session, context, delegation, and attachment modules preserve link fields but do not replace existing buses."},
+    {"surface": "src/estate/cli/main.py", "packages": ["WP-4022", "WP-4023", "WP-4028", "WP-4029"], "classification": "ready_with_conditions", "resolution": "CLI was not edited because manifest-authorized installable modules and tests validate independently; future CLI registration should be one controlled edit."},
+    {"surface": "Office resident/model/service/task/attachment surfaces", "packages": ["WP-4022", "WP-4026", "WP-4028", "WP-4023", "WP-4029"], "classification": "ready_with_conditions", "resolution": "Installed modules provide display/status payloads for Office integration without modifying current Office surfaces."},
+    {"surface": "shared tests and validation registration", "packages": ["WP-4022", "WP-4023", "WP-4024", "WP-4025", "WP-4026", "WP-4027", "WP-4028", "WP-4029"], "classification": "ready", "resolution": "Adapted staged tests into active tests with active imports."},
+    {"surface": "backup and recovery", "packages": ["WP-4030"], "classification": "blocked", "resolution": "Manifest lacks installable files and validation; staged root left untouched."}
+  ]
+}

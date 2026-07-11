@@ -1,0 +1,9 @@
+{
+  "work_package": "WP-4031",
+  "order_basis": "Actual manifests were inspected; WP-4030 is blocked because its manifest has no installable artifacts and only a staged root handoff.",
+  "installed_order": ["WP-4022", "WP-4024", "WP-4025", "WP-4026", "WP-4023", "WP-4027", "WP-4028", "WP-4029"],
+  "blocked": ["WP-4030"],
+  "changes_from_expected_order": [
+    {"package": "WP-4030", "reason": "Manifest has installs: [] and no validation command; left staged."}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "work_package": "WP-4031",
+  "status": "completed_with_blocked_dependency",
+  "completed_at": "2026-07-11T00:00:00+00:00",
+  "staged_inspected": ["WP-4022", "WP-4023", "WP-4024", "WP-4025", "WP-4026", "WP-4027", "WP-4028", "WP-4029", "WP-4030"],
+  "installed": ["WP-4022", "WP-4023", "WP-4024", "WP-4025", "WP-4026", "WP-4027", "WP-4028", "WP-4029"],
+  "blocked": [{"work_package": "WP-4030", "reason": "install_manifest.json declares installs: [] and lacks validation command or specific install targets."}],
+  "validated_commands": [
+    "PYTHONPATH=src pytest collaboration/workstreams/WP-4022/tests",
+    "PYTHONPATH=collaboration/workstreams/WP-4023/src pytest collaboration/workstreams/WP-4023/tests",
+    "python -m pytest collaboration/workstreams/WP-4024/staged/test_resident_context_assembler.py",
+    "python -m pytest collaboration/workstreams/WP-4025/staged/test_resident_session_manager.py",
+    "python -m pytest collaboration/workstreams/WP-4026/staged/test_local_model_assignment.py",
+    "PYTHONPATH=collaboration/workstreams/WP-4027/src pytest collaboration/workstreams/WP-4027/tests",
+    "python -m pytest collaboration/workstreams/WP-4028/tests/test_local_ai_service_supervision.py",
+    "python -m pytest collaboration/workstreams/WP-4029/tests/test_resident_attachment_exchange.py",
+    "PYTHONPATH=src pytest tests/test_resident_capability_access.py tests/test_resident_delegation_runtime.py tests/test_resident_context_assembler.py tests/test_resident_session_manager.py tests/test_resident_model_assignment.py tests/test_resident_evaluator.py tests/test_local_ai_service_supervision.py tests/test_resident_attachment_exchange.py",
+    "PYTHONPATH=src python -m estate.cli.main --help"
+  ],
+  "required_outputs": [
+    "collaboration/workstreams/WP-4031/conflict_matrix.json",
+    "collaboration/workstreams/WP-4031/install_order.json",
+    "collaboration/workstreams/WP-4031/install_report.md",
+    "runtime/residents/multi_resident_operational_exercise.json",
+    "operations/residents/Multi_Resident_Operational_Exercise.md",
+    "operations/validation/reports/WP-4031_resident_runtime_install_and_acceptance.md"
+  ]
+}
