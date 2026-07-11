@@ -146,6 +146,7 @@ from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.core.validation_reconciliation import ValidationReconciliationService
 from estate.core.validation_reconciliation_runtime import admit_eligible as validation_reconciliation_admit_eligible, drain as validation_reconciliation_drain, write_path_audit as validation_reconciliation_write_path_audit
 from estate.core.character_continuity import create_cycle as continuity_create_cycle, prepare_reflection as continuity_prepare_reflection, create_continuity as continuity_create_artifact, start_next_cycle as continuity_start_next_cycle, status as continuity_status
+from estate.core.resident_lifecycle import transition as lifecycle_transition, status as lifecycle_status, office_lifecycle_summary as lifecycle_office_summary, TRANSITIONS as LIFECYCLE_TRANSITIONS
 from estate.cli.helen_workforce import run as run_helen_workforce_cli
 from estate.cli.institutional_learning import run as run_institutional_learning_cli
 from estate.core.personal_journals import PersonalJournalStore
@@ -244,6 +245,32 @@ def cmd_grace_operations(args):
         print(json.dumps(paths, indent=2, sort_keys=True) if args.json else "Grace closure recorded: " + paths["closure"])
         return
     raise SystemExit(1)
+
+def cmd_resident_lifecycle(args):
+    try:
+        root = Path(args.root) if getattr(args, "root", None) else None
+        action = args.resident_lifecycle_action
+        if action == "transition":
+            evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8")) if args.evidence else {"cli": "manual evidence"}
+            payload = lifecycle_transition(args.resident_id, args.transition, actor=args.actor, evidence=evidence, root=root, resident_name=args.resident_name, classification=args.classification, resume_token=args.resume_token)
+        elif action == "status":
+            payload = lifecycle_status(args.resident_id, root=root)
+        elif action == "history":
+            payload = {"resident_id": args.resident_id, "history": lifecycle_status(args.resident_id, root=root).get("history", [])}
+        elif action == "pending-gate":
+            rec = lifecycle_status(args.resident_id, root=root); payload = {"resident_id": args.resident_id, "pending_gate": rec.get("pending_gate")}
+        elif action == "next-action":
+            rec = lifecycle_status(args.resident_id, root=root); payload = {"resident_id": args.resident_id, "next_action": rec.get("next_action")}
+        elif action == "office-status":
+            payload = lifecycle_office_summary(root=root)
+        elif action == "transitions":
+            payload = {"transitions": LIFECYCLE_TRANSITIONS}
+        else:
+            raise SystemExit(1)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError, PermissionError, json.JSONDecodeError, FileNotFoundError) as exc:
+        print(f"Resident lifecycle failed: {exc}")
+        raise SystemExit(1)
 
 def cmd_character_continuity(args):
     try:
@@ -3986,6 +4013,14 @@ def main(argv=None):
     p = sub.add_parser("operations-decisions-list", help="List recorded operations decisions")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_operations_decisions_list)
+
+    p = sub.add_parser("resident-lifecycle", help="Govern resident lifecycle transitions and status")
+    rl = p.add_subparsers(dest="resident_lifecycle_action", required=True)
+    q = rl.add_parser("transition"); q.add_argument("--resident-id", required=True); q.add_argument("--transition", required=True); q.add_argument("--actor", required=True); q.add_argument("--evidence"); q.add_argument("--resident-name"); q.add_argument("--classification", default="Estate Internal"); q.add_argument("--resume-token"); q.add_argument("--root"); q.set_defaults(func=cmd_resident_lifecycle)
+    for name in ("status", "history", "pending-gate", "next-action"):
+        q = rl.add_parser(name); q.add_argument("--resident-id", required=True); q.add_argument("--root"); q.set_defaults(func=cmd_resident_lifecycle)
+    q = rl.add_parser("office-status"); q.add_argument("--root"); q.set_defaults(func=cmd_resident_lifecycle)
+    q = rl.add_parser("transitions"); q.set_defaults(func=cmd_resident_lifecycle)
 
     p = sub.add_parser("character-continuity", help="Inspect and advance resident character continuity cycles")
     cc = p.add_subparsers(dest="character_continuity_action", required=True)

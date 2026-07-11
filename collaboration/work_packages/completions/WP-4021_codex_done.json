@@ -1,0 +1,18 @@
+{
+  "work_package_id": "WP-4021",
+  "status": "done",
+  "completed_by": "Codex",
+  "summary": "Implemented governed resident lifecycle state machine, schema, CLI, Office source-linked status integration, compatibility projection over existing registries, and deterministic tests.",
+  "artifacts": [
+    "src/estate/core/resident_lifecycle.py",
+    "schemas/resident_lifecycle_v1.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/office_personnel_directory.py",
+    "tests/test_resident_lifecycle.py",
+    "operations/validation/reports/WP-4021_resident_lifecycle_management.md"
+  ],
+  "tests": [
+    {"command": "python -m pytest tests/test_resident_lifecycle.py", "result": "passed"},
+    {"command": "PYTHONPATH=src python -m estate.cli.main resident-lifecycle transitions", "result": "passed"}
+  ]
+}
