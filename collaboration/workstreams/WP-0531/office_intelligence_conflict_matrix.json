@@ -1,0 +1,56 @@
+{
+  "schema": "estate.office_intelligence_conflict_matrix.v1",
+  "shared_hot_files": {
+    "src/estate/core/steward_command_center.py": "reviewed; not modified because staged work provided compatible dedicated modules and tests",
+    "src/estate/core/office_command_surface.py": "reviewed; not modified because staged work provided compatible dedicated modules and tests",
+    "src/estate/cli/main.py": "reviewed; not modified because staged work provided compatible dedicated modules and tests",
+    "src/estate/core/work_package_validation.py": "reviewed; not modified because staged work provided compatible dedicated modules and tests",
+    "src/estate/core/operations_center_settings.py": "reviewed; not modified because staged work provided compatible dedicated modules and tests"
+  },
+  "duplicate_detection": {
+    "runtimes": "none installed; dedicated deterministic modules only",
+    "action_ids": "no duplicate action IDs detected in staged modules",
+    "schemas": "compatible estate.*.v1 snapshots/contracts",
+    "routes": "none added",
+    "tab_ids": "none added",
+    "ui_components": "none added"
+  },
+  "workstreams": {
+    "WP-0522": {
+      "final_module": "src/estate/core/office_executive_workspace.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0523": {
+      "final_module": "src/estate/core/office_guided_actions.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0524": {
+      "final_module": "src/estate/core/office_actionable_notifications.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0525": {
+      "final_module": "src/estate/core/office_resident_presence.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0526": {
+      "final_module": "src/estate/core/office_workspace_personalization.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0527": {
+      "final_module": "src/estate/core/office_unified_search.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0528": {
+      "final_module": "src/estate/core/office_operational_timeline.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0529": {
+      "final_module": "src/estate/core/office_decision_support.py",
+      "conflict": "no blocking file-level conflict"
+    },
+    "WP-0530": {
+      "final_module": "src/estate/core/office_operational_workflows.py",
+      "conflict": "no blocking file-level conflict"
+    }
+  }
+}
