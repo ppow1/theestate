@@ -65,12 +65,27 @@ def test_host_status_reports_truthful_health_fields(tmp_path):
     assert status["blocking_fault"] == "blocked"
 
 
-def test_install_uninstall_write_manifest_without_infrastructure(tmp_path):
+def test_install_uninstall_write_manifest_without_infrastructure(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+
+    def reject_infrastructure_command(cmd, cwd=None):
+        raise AssertionError(f"manifest-only host test attempted infrastructure command: {cmd}")
+
+    monkeypatch.setattr(mod.os, "name", "posix")
+    monkeypatch.setattr(mod, "_run_command", reject_infrastructure_command)
+
     host = OperationsRuntimeHost(tmp_path / "repo", tmp_path / "state")
     installed = host.install()
     assert installed["command"][-3:] == ["operations-runtime", "host", "start"]
+    assert installed["method"] == "manual-launch-manifest"
+    assert installed["scheduled_task_exists"] is False
     assert (tmp_path / "state" / "autostart.json").exists()
-    assert host.uninstall()["removed_manifest"] is True
+
+    uninstalled = host.uninstall()
+
+    assert uninstalled["removed_manifest"] is True
+    assert uninstalled["scheduled_task"] is None
+    assert uninstalled["scheduled_task_removed"] is True
 
 
 def test_windows_install_executes_and_verifies_scheduled_task(tmp_path, monkeypatch):
