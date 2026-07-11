@@ -41,6 +41,7 @@ from estate.core.office_personnel_directory import refresh_personnel_directory, 
 from estate.core.office_validation_actions import inspect_validation_control_center, request_validation, acknowledge_failure, automatic_validator_status, open_artifact as open_validation_artifact, governed_retry
 from estate.core.office_mailbox_control import refresh_mailbox_control_center, open_message_detail, mark_message_read_state, route_message, local_attention_acknowledge, inspect_delivery_failures
 from estate.core.resident_task_visibility import write_resident_task_board, build_resident_task_board
+from estate.core.office_executive_workspace import build_executive_workspace, render_executive_workspace_markdown
 from estate.core.collaboration_messages import acknowledge_message, create_reply
 from estate.core.office_personnel_directory import open_employee_detail as mailbox_open_employee_detail
 
@@ -727,6 +728,21 @@ def mailbox_inspect_failures(root=None, **params: Any) -> OfficeActionResult:
     return _completed('delivery.inspect_failures', 'Inspect delivery failures', 'notifications', 'estate.core.office_mailbox_control.inspect_delivery_failures', f"Delivery failure inspection found {payload.get('failure_count', 0)} actionable failure source(s).", read=payload.get('sources') or [], written=['runtime/steward/delivery_failure_inspection.json'], state=['delivery failure evidence inspected'], request_id=params.get('request_id'))
 
 
+
+def executive_workspace_refresh(root=None, **params: Any) -> OfficeActionResult:
+    base = _root(root)
+    payload = build_executive_workspace(base)
+    json_rel = 'runtime/office/executive_workspace.json'
+    md_rel = 'operations/steward/executive_workspace.md'
+    json_path = base / json_rel
+    md_path = base / md_rel
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    md_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    md_path.write_text(render_executive_workspace_markdown(payload) + '\n', encoding='utf-8')
+    item_count = len(payload.get('items') or [])
+    return _completed('office_intelligence.refresh_executive_workspace', 'Refresh executive workspace', 'mission-control', 'estate.core.office_executive_workspace.build_executive_workspace', f'Executive workspace refreshed with {item_count} prioritized item(s).', read=['collaboration/work_packages', 'runtime', 'operations'], written=[json_rel, md_rel], state=['Office executive workspace advisory payload rebuilt'], request_id=params.get('request_id'))
+
 def resident_task_board_refresh(root=None, **params: Any) -> OfficeActionResult:
     filters = {k: params.get(k) for k in ("resident", "office", "project", "status", "blocker", "staleness") if params.get(k) not in (None, "")}
     payload = write_resident_task_board(_root(root), **filters)
@@ -778,6 +794,7 @@ HANDLERS.update({
  'notifications.local_acknowledge': local_ack_notification,
  'alfred.request_briefing': request_alfred_briefing,
  'mission_control.refresh_payload': refresh_mission_control,
+ 'office_intelligence.refresh_executive_workspace': executive_workspace_refresh,
  'daily_board.generate_morning_briefing': generate_daily_briefing,
  'orchestrator_intake.record_decision': record_orchestrator_intake_decision,
  'operations_control.record_decision': record_operations_control_decision,
@@ -890,6 +907,7 @@ ACTION_CONTROLS = [
  {'action_id':'notifications.local_acknowledge','label':'Acknowledge notification locally','target_tab':'notifications','handler':'local_ack_notification','availability':'available','requires_input':'notification_id','note':'Local state only; authoritative closure is unchanged.'},
  {'action_id':'alfred.request_briefing','label':'Request Alfred briefing','target_tab':'alfred','handler':'request_alfred_briefing','availability':'available'},
  {'action_id':'mission_control.refresh_payload','label':'Refresh Mission Control payload','target_tab':'mission-control','handler':'refresh_mission_control','availability':'available'},
+ {'action_id':'office_intelligence.refresh_executive_workspace','label':'Refresh executive workspace','target_tab':'mission-control','handler':'executive_workspace_refresh','availability':'available','note':'Builds the installed WP-0522 advisory executive workspace through the existing Office action surface.'},
  {'action_id':'daily_board.generate_morning_briefing','label':'Generate morning briefing','target_tab':'daily-board','handler':'generate_daily_briefing','availability':'available'},
  {'action_id':'operations_dashboard.refresh','label':'Refresh operational command dashboard','target_tab':'operational-dashboard','handler':'operations_dashboard_refresh','availability':'available','note':'Rebuilds the Office dashboard from durable local runtime artifacts.'},
  {'action_id':'operations_dashboard.inspect_evidence','label':'Inspect dashboard evidence','target_tab':'operational-dashboard','handler':'operations_dashboard_inspect_evidence','availability':'available','requires_input':'evidence_path','note':'Drill-down only; reads existing local evidence under Estate root.'},
