@@ -123,6 +123,7 @@ class OperationsRuntimeHost:
     def __init__(self, root: Path | None = None, state_dir: Path | None = None, task_name: str | None = None) -> None:
         self.root = _root(root)
         self.state_dir = _state_dir(state_dir)
+        self.task_name_explicit = task_name is not None or os.environ.get(TASK_NAME_ENV) is not None
         self.task_name = task_name or os.environ.get(TASK_NAME_ENV) or TASK_NAME
         self.lock_path = self.state_dir / "host.lock.json"
         self.pid_path = self.state_dir / "host.pid.json"
@@ -279,8 +280,23 @@ class OperationsRuntimeHost:
         )
         return launcher
 
-    def _query_windows_task(self) -> dict[str, Any]:
-        query = ["schtasks", "/Query", "/TN", self.task_name, "/FO", "LIST", "/V"]
+    def _manifest_scheduled_task_name(self) -> str | None:
+        if not self.install_path.exists():
+            return None
+        try:
+            value = _read_json(self.install_path).get("scheduled_task_name")
+        except Exception:
+            return None
+        return value if isinstance(value, str) and value.strip() else None
+
+    def _scheduled_task_name_for_management(self) -> str:
+        if self.task_name_explicit:
+            return self.task_name
+        return self._manifest_scheduled_task_name() or self.task_name
+
+    def _query_windows_task(self, task_name: str | None = None) -> dict[str, Any]:
+        managed_task_name = task_name or self._scheduled_task_name_for_management()
+        query = ["schtasks", "/Query", "/TN", managed_task_name, "/FO", "LIST", "/V"]
         result = _run_command(query)
         exists = result.returncode == 0
         state = None
@@ -288,7 +304,7 @@ class OperationsRuntimeHost:
             if line.lower().startswith("status:") or line.lower().startswith("scheduled task state:"):
                 state = line.split(":", 1)[1].strip()
                 break
-        return {"scheduled_task_exists": exists, "scheduled_task_state": state, "query_command": query, "query_returncode": result.returncode, "query_stdout": result.stdout, "query_stderr": result.stderr}
+        return {"scheduled_task_exists": exists, "scheduled_task_state": state, "scheduled_task_name": managed_task_name, "query_command": query, "query_returncode": result.returncode, "query_stdout": result.stdout, "query_stderr": result.stderr}
 
     def _runtime_revision(self) -> str | None:
         result = _run_command(["git", "rev-parse", "HEAD"], cwd=self.root)
@@ -305,7 +321,7 @@ class OperationsRuntimeHost:
             result = _run_command(create_cmd)
             if result.returncode != 0:
                 raise OperationsRuntimeHostError(result.stderr or result.stdout or "failed to create scheduled task")
-            task_state = self._query_windows_task()
+            task_state = self._query_windows_task(self.task_name)
             if not task_state["scheduled_task_exists"]:
                 raise OperationsRuntimeHostError("scheduled task creation could not be verified")
             payload.update(task_state)
@@ -315,12 +331,13 @@ class OperationsRuntimeHost:
 
     def uninstall(self) -> dict[str, Any]:
         existed = self.install_path.exists()
+        managed_task_name = self._scheduled_task_name_for_management() if os.name == "nt" else None
         if os.name == "nt":
-            delete_cmd = ["schtasks", "/Delete", "/TN", self.task_name, "/F"]
+            delete_cmd = ["schtasks", "/Delete", "/TN", managed_task_name, "/F"]
             result = _run_command(delete_cmd)
             if result.returncode not in {0, 1}:
                 raise OperationsRuntimeHostError(result.stderr or result.stdout or "failed to delete scheduled task")
-            task_state = self._query_windows_task()
+            task_state = self._query_windows_task(managed_task_name)
             removed = not task_state["scheduled_task_exists"]
             if not removed:
                 raise OperationsRuntimeHostError("scheduled task removal could not be verified")
@@ -330,7 +347,7 @@ class OperationsRuntimeHost:
             task_state = {"scheduled_task_exists": False, "scheduled_task_state": None}
         if existed:
             self.install_path.unlink()
-        return {"uninstalled_at": utc_now_iso(), "removed_manifest": existed, "scheduled_task": self.task_name if os.name == "nt" else None, "scheduled_task_removed": removed, "delete_command": delete_cmd, **task_state}
+        return {"uninstalled_at": utc_now_iso(), "removed_manifest": existed, "scheduled_task": managed_task_name if os.name == "nt" else None, "scheduled_task_removed": removed, "delete_command": delete_cmd, **task_state}
 
     @classmethod
     def bootstrap(cls, target: str = "estate-main", *, runtime_code_root: Path | None = None, source_root: Path | None = None) -> dict[str, Any]:

@@ -154,6 +154,37 @@ def test_windows_uninstall_deletes_and_verifies_removal(tmp_path, monkeypatch):
     assert out["scheduled_task_removed"] is True
 
 
+def test_windows_uninstall_uses_manifest_task_name_when_cli_task_name_omitted(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+
+    calls = []
+    class R:
+        def __init__(self, rc=0):
+            self.returncode = rc
+            self.stdout = ""
+            self.stderr = ""
+
+    def fake(cmd, cwd=None):
+        calls.append(cmd)
+        if cmd[:2] == ["schtasks", "/Query"]:
+            return R(1)
+        return R(0)
+
+    monkeypatch.setattr(mod.os, "name", "nt")
+    monkeypatch.setattr(mod, "_run_command", fake)
+    state = tmp_path / "state"
+    state.mkdir()
+    test_task_name = "Estate Operations Runtime Host Test Isolation"
+    (state / "autostart.json").write_text(json.dumps({"scheduled_task_name": test_task_name}), encoding="utf-8")
+
+    out = OperationsRuntimeHost(tmp_path / "repo", state).uninstall()
+
+    assert calls[0][:3] == ["schtasks", "/Delete", "/TN"]
+    assert calls[0][3] == test_task_name
+    assert calls[0][3] != TASK_NAME
+    assert out["scheduled_task"] == test_task_name
+    assert out["scheduled_task_name"] == test_task_name
+
 def test_host_does_not_recover_live_old_heartbeat_lock(tmp_path, monkeypatch):
     import estate.core.operations_runtime_host as mod
 
