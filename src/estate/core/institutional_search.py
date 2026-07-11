@@ -12,7 +12,7 @@ from typing import Any
 from estate.core.estate_knowledge_index import (
     INDEX_PATH,
     artifact_type,
-    classification_for as classify_path,
+    classification_for,
     detect_title,
     estate_root,
     format_query_report,
@@ -21,8 +21,25 @@ from estate.core.estate_knowledge_index import (
 )
 
 
+def _compat_classification(path: str, classification: str | None) -> str | None:
+    if path.startswith("operations/") and ("briefing" in path or "projection" in path or "surface" in path):
+        return "generated_operational_projection"
+    return classification
+
+
+def classify_path(path: str, text: str = "") -> dict[str, Any]:
+    classification = _compat_classification(path, classification_for(path, text))
+    return {"classification": classification, "policy_classification": classification, "authoritative": path.startswith("collaboration/messages/") or path.startswith("data/registry/") or path.startswith("constitution/")}
+
+
 def build_institutional_search_index(root: str | Path | None = None, write: bool = True) -> dict[str, Any]:
     payload = rebuild_index(root, write=write)
+    if write:
+        base = estate_root(root)
+        legacy = base / "runtime/search/institutional_search_index.json"
+        legacy.parent.mkdir(parents=True, exist_ok=True)
+        import json
+        legacy.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     records = []
     for record in payload.get("records", []):
         records.append({
@@ -30,8 +47,8 @@ def build_institutional_search_index(root: str | Path | None = None, write: bool
             "title": record.get("title"),
             "artifact_type": record.get("artifact_type"),
             "excerpt": record.get("search_text", "")[:220],
-            "policy_classification": record.get("classification"),
-            "classification": record.get("classification"),
+            "policy_classification": _compat_classification(str(record.get("path", "")), record.get("classification")),
+            "classification": _compat_classification(str(record.get("path", "")), record.get("classification")),
             "owner": record.get("owner"),
             "provenance": record.get("provenance"),
             "authoritative": False,
@@ -47,7 +64,7 @@ def search_institutional_index(query: str, root: str | Path | None = None, refre
         matches.append({
             **item,
             "excerpt": item.get("snippet", ""),
-            "policy_classification": item.get("classification"),
+            "policy_classification": _compat_classification(str(item.get("path", "")), item.get("classification")),
             "authoritative": False,
             "source_of_truth_rule": "Search result is a local retrieval projection; inspect source and registry provenance for authority.",
         })

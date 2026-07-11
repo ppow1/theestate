@@ -1,0 +1,20 @@
+{
+  "work_package_id": "WP-4020",
+  "status": "completed",
+  "implementation_summary": [
+    "Added unified institutional search service reusing the Estate knowledge index.",
+    "Added stable CLI/API result contract with filters, privacy, provenance, diagnostics, and Office navigation metadata.",
+    "Integrated unified institutional results into the existing Office search panel and command palette compatibility surface.",
+    "Preserved existing institutional search compatibility wrappers and legacy index artifact behavior."
+  ],
+  "deliverables": [
+    "src/estate/core/unified_institutional_search.py",
+    "tests/test_unified_institutional_search.py",
+    "operations/validation/reports/WP-4020_institutional_search.md",
+    "collaboration/work_packages/completions/WP-4020_codex_done.json"
+  ],
+  "tests": [
+    "python -m pytest tests/test_unified_institutional_search.py tests/test_institutional_search.py tests/test_estate_knowledge_index.py tests/test_global_search_command_palette.py -q"
+  ],
+  "ready_for_ca_review": true
+}

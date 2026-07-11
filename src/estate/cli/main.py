@@ -42,6 +42,7 @@ from estate.core.onboarding_manifest import check_onboarding_manifests, format_o
 from estate.core.hr_onboarding import run_employee_onboarding, format_onboarding_result
 from estate.core.work_package_handoff import list_pending_handoffs, format_handoff_list
 from estate.core.institutional_search import search_institutional_index, format_search_report
+from estate.core.unified_institutional_search import search_institutional, format_unified_search_report
 from estate.core.estate_knowledge_index import (
     format_query_report as format_knowledge_query_report,
     incremental_update as update_knowledge_index,
@@ -1751,6 +1752,28 @@ def cmd_knowledge_index(args):
         print(format_knowledge_query_report(payload))
 
 
+def cmd_unified_institutional_search(args):
+    filters = {
+        "query": args.query or "",
+        "source_type": args.source_type,
+        "office": args.office,
+        "resident": args.resident,
+        "project": args.project,
+        "classification": args.classification,
+        "date": args.date,
+        "status": args.status,
+        "limit": args.limit,
+        "include_private": args.include_private,
+        "caller_context": {"role": args.caller_role, "include_private": args.include_private},
+    }
+    result = search_institutional(filters, root=Path(args.root) if getattr(args, "root", None) else Path.cwd(), refresh=not getattr(args, "no_refresh", False))
+    if getattr(args, "json", False):
+        import json
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(format_unified_search_report(result))
+
+
 def cmd_global_search(args):
     result = search_global_palette(args.query, refresh=not getattr(args, "no_refresh", False))
     if getattr(args, "json", False):
@@ -3389,6 +3412,23 @@ def main(argv=None):
     q.add_argument("--limit", type=int, default=20, help="Maximum results")
     q.add_argument("--refresh", action="store_true", help="Rebuild before querying")
     q.set_defaults(func=cmd_knowledge_index)
+
+    p = sub.add_parser("institutional-search", help="Unified institutional search across Estate artifacts")
+    p.add_argument("query", nargs="?", default="", help="Keyword, phrase, path, metadata, or identifier query")
+    p.add_argument("--source-type", help="Filter by source type such as doctrine, work_package, validation, resident, mail, history, research, service, project, operations")
+    p.add_argument("--office", help="Filter by owning office")
+    p.add_argument("--resident", help="Filter by resident name or id")
+    p.add_argument("--project", help="Filter by project text")
+    p.add_argument("--classification", help="Filter by classification")
+    p.add_argument("--date", help="Filter by ISO date substring from freshness metadata")
+    p.add_argument("--status", help="Filter by status metadata/path text")
+    p.add_argument("--caller-role", default="operator", help="Caller privacy context role")
+    p.add_argument("--include-private", action="store_true", help="Include protected private records only for authorized caller roles")
+    p.add_argument("--limit", type=int, default=20, help="Maximum results")
+    p.add_argument("--root", help="Estate root path")
+    p.add_argument("--json", action="store_true", help="Print unified search JSON")
+    p.add_argument("--no-refresh", action="store_true", help="Use existing knowledge index if present")
+    p.set_defaults(func=cmd_unified_institutional_search)
 
     p = sub.add_parser("global-search", help="Search artifacts and registered command palette entries")
     p.add_argument("query", nargs="?", default="", help="Keyword query to search for")
