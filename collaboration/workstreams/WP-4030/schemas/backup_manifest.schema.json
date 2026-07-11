@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Estate backup manifest v1",
+  "type": "object",
+  "required": ["schema", "backup_id", "plan_type", "source_root", "coverage", "retention", "files", "references", "failures", "partial_failure"],
+  "properties": {
+    "schema": {"const": "estate.backup.manifest.v1"},
+    "backup_id": {"type": "string"},
+    "plan_type": {"enum": ["full", "incremental"]},
+    "source_root": {"type": "string"},
+    "base_manifest": {"type": ["string", "null"]},
+    "coverage": {"type": "array", "items": {"type": "string"}},
+    "retention": {"type": "object"},
+    "files": {"type": "array"},
+    "references": {"type": "array"},
+    "failures": {"type": "array"},
+    "partial_failure": {"type": "boolean"}
+  }
+}
