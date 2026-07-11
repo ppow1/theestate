@@ -1,0 +1,111 @@
+{
+  "work_package": "WP-4022",
+  "title": "Resident Capability and Tool Access Integration",
+  "staged_work_is_installed": false,
+  "classification": "Estate Internal",
+  "staged_artifacts": [
+    {
+      "path": "collaboration/workstreams/WP-4022/src/wp4022_resident_capabilities/resolver.py",
+      "type": "python_module",
+      "purpose": "Resident-specific capability and tool-access resolution with approval, denied, and unavailable states."
+    },
+    {
+      "path": "collaboration/workstreams/WP-4022/tests/test_resolver.py",
+      "type": "pytest_tests",
+      "purpose": "Focused staged coverage for Alfred, Helen, Grace candidate, unknown residents, and display payloads."
+    },
+    {
+      "path": "collaboration/workstreams/WP-4022/README.md",
+      "type": "integration_notes",
+      "purpose": "Staged workstream overview and isolation boundary."
+    }
+  ],
+  "intended_install_paths": [
+    {
+      "source": "collaboration/workstreams/WP-4022/src/wp4022_resident_capabilities/resolver.py",
+      "target": "src/estate/core/resident_capability_access.py",
+      "install_mode": "new active runtime module"
+    },
+    {
+      "source": "collaboration/workstreams/WP-4022/tests/test_resolver.py",
+      "target": "tests/test_resident_capability_access.py",
+      "install_mode": "adapt imports from staged module to active module"
+    }
+  ],
+  "files_expected_to_change": [
+    "src/estate/core/resident_capability_access.py",
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/resident_authority.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/office_resident_presence.py",
+    "src/estate/core/office_resident_actions.py",
+    "tests/test_resident_capability_access.py"
+  ],
+  "active_files_not_modified_by_this_stage": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/resident_authority.py",
+    "src/estate/cli/main.py",
+    "src/estate/core/office_resident_presence.py",
+    "src/estate/core/office_resident_actions.py"
+  ],
+  "install_steps": [
+    "Review active resident authority, resident interaction, connector/model-control, and Office resident/status surfaces for conflicts.",
+    "Copy staged resolver into src/estate/core/resident_capability_access.py or merge equivalent functions into the selected active module.",
+    "Wire resident interaction and CLI surfaces to call resolve_resident_capabilities for resident-specific capability payloads.",
+    "Wire Office resident/status surfaces to consume capability_display_payload or office_capability_payload.",
+    "Preserve safe defaults: unknown residents and undeclared tools must remain denied.",
+    "Adapt staged tests into active tests and run focused plus affected Office/resident test suites."
+  ],
+  "validation": {
+    "staged_command": "PYTHONPATH=src pytest collaboration/workstreams/WP-4022/tests",
+    "post_install_commands": [
+      "PYTHONPATH=src pytest tests/test_resident_authority.py tests/test_resident_interaction.py tests/test_office_resident_presence.py tests/test_office_resident_actions.py tests/test_resident_capability_access.py",
+      "PYTHONPATH=src python -m estate.cli.main --help"
+    ],
+    "acceptance_checks": [
+      "Capability resolution is deterministic for the same resident and requested tools.",
+      "No resident silently gains undeclared access.",
+      "Unavailable tools report state=unavailable rather than approved.",
+      "Approval-required operations expose requires_approval metadata and reasons.",
+      "Unknown residents receive no implied capability or tool access."
+    ]
+  },
+  "rollback": [
+    "Remove src/estate/core/resident_capability_access.py if installed as a new module.",
+    "Revert resident interaction, authority, CLI, and Office surface wiring changes from WP-4031.",
+    "Remove or revert active tests adapted from the staged WP-4022 tests.",
+    "Re-run the pre-install resident and Office test subset to confirm restoration."
+  ],
+  "dependencies": [
+    "src/estate/core/resident_authority.py authority decisions",
+    "resident interaction surfaces for display handoff",
+    "model-control and connector availability checks",
+    "Office resident/status surfaces",
+    "data/registry/residents.json",
+    "data/registry/capabilities.json"
+  ],
+  "conflict_risks": [
+    {
+      "surface": "src/estate/core/resident_interaction.py",
+      "risk": "high",
+      "mitigation": "Install only after WP-4031 conflict review; prefer adding a separate module and thin integration calls."
+    },
+    {
+      "surface": "src/estate/core/resident_authority.py",
+      "risk": "high",
+      "mitigation": "Reuse existing authority decisions; avoid changing authority semantics unless reviewed."
+    },
+    {
+      "surface": "src/estate/cli/main.py and Office resident/status surfaces",
+      "risk": "medium-high",
+      "mitigation": "Expose additive display payloads before replacing existing status output."
+    }
+  ],
+  "generated_artifacts": [],
+  "review_requirements": [
+    "WP-4031 conflict review before active installation.",
+    "Steward review of resident-specific tool declarations before production use.",
+    "Office surface review to confirm denied/unavailable/approval-required states display truthfully.",
+    "Runtime environment review for executable and connector probes."
+  ]
+}
