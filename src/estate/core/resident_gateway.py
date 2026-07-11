@@ -3,7 +3,7 @@ from __future__ import annotations
 import json, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 from estate.core.resident_interaction import process_chat, local_llm_status, _root
 
 ACTIVE_RESIDENT_MODELS = {"estate/alfred": "alfred", "estate/helen": "helen"}
@@ -19,15 +19,43 @@ def chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[st
     if model not in ACTIVE_RESIDENT_MODELS:
         return 404, {"error":{"message":f"Unsupported Estate resident model: {model}","type":"invalid_request_error","code":"unsupported_model"}}
     if payload.get("stream") is True:
-        return 400, {"error":{"message":"Streaming chat completions are not supported by the local Estate resident gateway.","type":"invalid_request_error","code":"streaming_unsupported"}}
+        return _streaming_chat_completion(payload, root=root)
+    return _non_streaming_chat_completion(payload, root=root)
+
+
+def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[str, dict[str, Any]]:
+    model = payload.get("model")
     messages = payload.get("messages") or []
     user_message = "\n".join(str(m.get("content") or "") for m in messages if m.get("role") in {"user", "system"}).strip()
     session_id = payload.get("session_id") or (payload.get("metadata") or {}).get("session_id") or payload.get("conversation_id")
     result = process_chat(ACTIVE_RESIDENT_MODELS[model], user_message, session_id=session_id, action="conversation", root=root)
+    return model, result
+
+
+def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
+    model, result = _chat_result(payload, root=root)
     turn = result["turn"]
     created = int(time.time())
     body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False}}
     return 200, body
+
+
+def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
+    model, result = _chat_result(payload, root=root)
+    turn = result["turn"]
+    created = int(time.time())
+    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":turn["resident_response"]},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False}}
+    return 200, body
+
+
+def chat_completion_stream(payload: dict[str, Any], *, root=None) -> tuple[int, Iterable[dict[str, Any]]]:
+    code, body = chat_completion(payload, root=root)
+    if code != 200:
+        return code, [body]
+    if body.get("object") != "chat.completion.chunk":
+        return 200, [body]
+    final = {"id":body["id"],"object":"chat.completion.chunk","created":body["created"],"model":body["model"],"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+    return 200, [body, final]
 
 
 def gateway_status(root=None, host="127.0.0.1", port=11435) -> dict[str, Any]:
@@ -41,6 +69,11 @@ class Handler(BaseHTTPRequestHandler):
     def _send(self, code:int, payload:dict[str,Any]):
         raw=json.dumps(payload, indent=2, sort_keys=True).encode()
         self.send_response(code); self.send_header("Content-Type","application/json"); self.send_header("Content-Length",str(len(raw))); self.end_headers(); self.wfile.write(raw)
+    def _send_sse(self, chunks: Iterable[dict[str, Any]]):
+        self.send_response(200); self.send_header("Content-Type","text/event-stream; charset=utf-8"); self.send_header("Cache-Control","no-cache"); self.send_header("Connection","keep-alive"); self.end_headers()
+        for chunk in chunks:
+            self.wfile.write(f"data: {json.dumps(chunk, sort_keys=True)}\n\n".encode())
+        self.wfile.write(b"data: [DONE]\n\n")
     def do_GET(self):
         if self.path.rstrip("/") == "/v1/models": self._send(200, models_payload(self.root)); return
         if self.path.rstrip("/") == "/status": self._send(200, gateway_status(self.root)); return
@@ -49,7 +82,12 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.rstrip("/") != "/v1/chat/completions": self._send(404,{"error":{"message":"not found","code":"not_found"}}); return
         try:
             length=int(self.headers.get("Content-Length") or "0"); payload=json.loads(self.rfile.read(length) or b"{}")
-            code, body=chat_completion(payload, root=self.root); self._send(code, body)
+            if payload.get("stream") is True:
+                code, chunks=chat_completion_stream(payload, root=self.root)
+                if code == 200: self._send_sse(chunks)
+                else: self._send(code, list(chunks)[0])
+            else:
+                code, body=chat_completion(payload, root=self.root); self._send(code, body)
         except Exception as exc:
             self._send(500,{"error":{"message":f"gateway error: {type(exc).__name__}","code":"gateway_error"}})
     def log_message(self, fmt, *args):
