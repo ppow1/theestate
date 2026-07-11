@@ -1,0 +1,9 @@
+{
+  "work_package": "WP-4030",
+  "status": "staged_not_installed",
+  "installs": [],
+  "handoff": "WP-4031 installs approved CLI, Office, service-status, and lifecycle integrations after staged validation.",
+  "staged_paths": [
+    "collaboration/workstreams/WP-4030/"
+  ]
+}
