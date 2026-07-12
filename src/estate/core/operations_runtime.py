@@ -19,6 +19,7 @@ from estate.core.merge_discovery_runtime import MergeDiscoveryRuntime
 from estate.core.merge_discovery_admission import MergeDiscoveryAdmission
 from estate.core.paths import ESTATE_ROOT
 from estate.core.runtime_recovery import load_recovery_status
+from estate.core.operational_readiness_closure import OperationalReadinessClosureController
 
 RUNTIME_BASE = Path("runtime/operations_runtime")
 STATUS_DIR = RUNTIME_BASE / "status"
@@ -108,6 +109,20 @@ class OperationsRuntimeCycle:
     errors: list[str] = field(default_factory=list)
     provider_execution_performed: bool = False
     dispatch_execution_performed: bool = False
+    readiness_cases_discovered: int = 0
+    readiness_cases_assessed: int = 0
+    readiness_cases_advanced: int = 0
+    readiness_remediations_attempted: int = 0
+    readiness_remediations_succeeded: int = 0
+    readiness_remediations_failed: int = 0
+    readiness_validations_executed: int = 0
+    readiness_cases_entering_observation: int = 0
+    readiness_cases_declared_operationally_ready: int = 0
+    readiness_cases_blocked_for_authority: int = 0
+    readiness_cases_blocked_for_manual_intervention: int = 0
+    readiness_retry_limits_reached: int = 0
+    readiness_current_active_cases: int = 0
+    readiness_oldest_active_case_age: str | None = None
     artifacts: dict[str, str] = field(default_factory=dict)
 
     @classmethod
@@ -125,6 +140,7 @@ class OperationsRuntime:
         self.root = _root(root)
         self.background = BackgroundOperationsRuntime(self.root)
         self.targets = OperationalTargetRuntime(self.root)
+        self.readiness = OperationalReadinessClosureController(self.root)
 
     @property
     def base(self) -> Path:
@@ -188,6 +204,23 @@ class OperationsRuntime:
                     cycle.historical_candidates_quarantined = ads.get("historical_candidates_quarantined", 0)
                     cycle.admitted_requests = ads.get("admitted_candidates", cycle.admitted_requests)
                     cycle.queue_limit_reached = bool(ads.get("queue_limit_reached", False))
+            if mode in {"operational-readiness", "discover-merges-and-operational-readiness", "discover-merges-and-process-audits-and-operational-readiness"} and not dry_run:
+                readiness_result = self.readiness.run_cycle(limit=max_audit_requests)
+                rm = readiness_result.get("metrics", {})
+                cycle.readiness_cases_discovered = rm.get("cases_discovered", 0)
+                cycle.readiness_cases_assessed = rm.get("cases_assessed", 0)
+                cycle.readiness_cases_advanced = rm.get("cases_advanced", 0)
+                cycle.readiness_remediations_attempted = rm.get("remediations_attempted", 0)
+                cycle.readiness_remediations_succeeded = rm.get("remediations_succeeded", 0)
+                cycle.readiness_remediations_failed = rm.get("remediations_failed", 0)
+                cycle.readiness_validations_executed = rm.get("validations_executed", 0)
+                cycle.readiness_cases_entering_observation = rm.get("cases_entering_observation", 0)
+                cycle.readiness_cases_declared_operationally_ready = rm.get("cases_declared_operationally_ready", 0)
+                cycle.readiness_cases_blocked_for_authority = rm.get("cases_blocked_for_authority", 0)
+                cycle.readiness_cases_blocked_for_manual_intervention = rm.get("cases_blocked_for_manual_intervention", 0)
+                cycle.readiness_retry_limits_reached = rm.get("retry_limits_reached", 0)
+                cycle.readiness_current_active_cases = rm.get("current_active_cases", 0)
+                cycle.readiness_oldest_active_case_age = rm.get("oldest_active_case_age")
             if mode in {"process-audits", "process-audits-and-ring2", "discover-merges-and-process-audits", "discover-merges-and-process-audits-and-ring2"} and not dry_run:
                 audit_result = PostMergeAuditProcessor(self.root, ollama_enabled=(mode in {"process-audits-and-ring2", "discover-merges-and-process-audits-and-ring2"})).process_all(max_count=max_audit_requests)
                 results = audit_result.get("results", [])
@@ -211,6 +244,7 @@ class OperationsRuntime:
             cycle.artifacts = {
                 "background_status": "runtime/background_operations/status/latest.json",
                 "operational_targets_status": "runtime/operational_targets/status/latest.json",
+                "operational_readiness_status": "runtime/operational_readiness/status/latest.json",
             }
             if cycle.audits_claimed:
                 cycle.artifacts["post_merge_audit_status"] = "runtime/post_merge_audit/status/latest.json"

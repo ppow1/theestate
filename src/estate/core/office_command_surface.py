@@ -950,3 +950,35 @@ def execute_office_action(action_id: str, *, root=None, **params: Any) -> dict[s
         diag = _diagnostic(base, action_id, exc)
         result = OfficeActionResult(action_id, control['label'], request_id, control['target_tab'], 'failed', f'Action attempted and failed: {type(exc).__name__}: {exc}', control.get('handler') or action_id, diagnostics_path=diag)
     return _write_result(base, result).to_dict()
+
+# WP-0650 Operational Readiness Closure controls. These Office actions invoke the
+# canonical controller directly and do not implement a parallel readiness engine.
+def operational_readiness_list(root=None, **params: Any) -> OfficeActionResult:
+    from estate.core.operational_readiness_closure import OperationalReadinessClosureController
+    ctl = OperationalReadinessClosureController(_root(root)); payload = ctl.report()
+    return _completed('operational_readiness.list', 'List readiness cases', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.report', f"Readiness surface has {len(payload.get('cases') or [])} case(s).", read=['runtime/operational_readiness/cases'], written=['operations/steward/operational_readiness_closure.md'], state=['Operational readiness Office projection refreshed'], request_id=params.get('request_id'))
+
+def operational_readiness_process(root=None, case_id: str | None = None, **params: Any) -> OfficeActionResult:
+    from estate.core.operational_readiness_closure import OperationalReadinessClosureController
+    if not case_id:
+        return _blocked('operational_readiness.process', 'Process readiness case', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.process_one', 'case_id is required.', request_id=params.get('request_id'))
+    ctl = OperationalReadinessClosureController(_root(root)); payload = ctl.process_one(case_id)
+    return _completed('operational_readiness.process', 'Process readiness case', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.process_one', f"Case {case_id} advanced to {payload.get('state')}.", read=['runtime/operational_readiness/cases'], written=['runtime/operational_readiness/evidence','runtime/operational_readiness/verdicts','operations/steward/estate_feature_activation_ledger.md'], state=[f"readiness case {case_id} processed"], request_id=params.get('request_id'))
+
+def operational_readiness_pause(root=None, case_id: str | None = None, **params: Any) -> OfficeActionResult:
+    from estate.core.operational_readiness_closure import OperationalReadinessClosureController
+    if not case_id: return _blocked('operational_readiness.pause', 'Pause readiness case', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.pause', 'case_id is required.', request_id=params.get('request_id'))
+    OperationalReadinessClosureController(_root(root)).pause(case_id)
+    return _completed('operational_readiness.pause', 'Pause readiness case', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.pause', f"Case {case_id} paused.", read=['runtime/operational_readiness/cases'], written=['runtime/operational_readiness/cases'], state=[f"readiness case {case_id} paused"], request_id=params.get('request_id'))
+
+def operational_readiness_resume(root=None, case_id: str | None = None, **params: Any) -> OfficeActionResult:
+    from estate.core.operational_readiness_closure import OperationalReadinessClosureController
+    if not case_id: return _blocked('operational_readiness.resume', 'Resume readiness case', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.resume', 'case_id is required.', request_id=params.get('request_id'))
+    OperationalReadinessClosureController(_root(root)).resume(case_id)
+    return _completed('operational_readiness.resume', 'Resume readiness case', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.resume', f"Case {case_id} resumed.", read=['runtime/operational_readiness/cases'], written=['runtime/operational_readiness/cases'], state=[f"readiness case {case_id} resumed"], request_id=params.get('request_id'))
+
+def operational_readiness_acknowledge(root=None, case_id: str | None = None, note: str = 'manual blocker cleared', **params: Any) -> OfficeActionResult:
+    from estate.core.operational_readiness_closure import OperationalReadinessClosureController
+    if not case_id: return _blocked('operational_readiness.acknowledge', 'Acknowledge blocker cleared', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.acknowledge', 'case_id is required.', request_id=params.get('request_id'))
+    OperationalReadinessClosureController(_root(root)).acknowledge(case_id, note=note)
+    return _completed('operational_readiness.acknowledge', 'Acknowledge blocker cleared', 'operational-readiness', 'estate.core.operational_readiness_closure.OperationalReadinessClosureController.acknowledge', f"Manual blocker acknowledgement recorded for {case_id}.", read=['runtime/operational_readiness/cases'], written=['runtime/operational_readiness/evidence'], state=[f"readiness blocker acknowledged for {case_id}"], request_id=params.get('request_id'))
