@@ -39,3 +39,4 @@ This ledger is the single operational activation record for implemented Estate c
 ## Safety conclusion
 
 WP-0647 activated only an eligible orphan by adding an Office command-surface route for the installed executive workspace. Other implemented capabilities remain truthfully classified without fabricating new orchestration, validation, model-control, resident-gateway, or authority systems.
+| WP-0651 | Live evidence pending Chief Architect acceptance | `runtime/operational_readiness/cases/orc-76a26b52c11c00b9.json` and `runtime/operational_readiness/evidence/orc-76a26b52c11c00b9/events.jsonl` | Activation evidence is work-package specific; institutional acceptance remains separate. |
