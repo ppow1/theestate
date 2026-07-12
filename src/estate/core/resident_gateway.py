@@ -7,6 +7,7 @@ from typing import Any, Iterable
 from estate.core.resident_interaction import process_chat, local_llm_status, _root
 from estate.core.multi_resident_room import create_room, invite_participant, accept_participant, submit_user_turn, plan_resident_turns, record_resident_turn
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
+from estate.core.resident_identity_composition import compose_resident_identity
 
 ACTIVE_RESIDENT_MODELS = {
     "estate/alfred": "alfred",
@@ -78,10 +79,12 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
     user_turn_id = room["pending_questions"][-1]["user_turn_id"]
     resident_turns = []
     for plan in plan_resident_turns(room, user_turn_id, target_resident_ids=targets):
-        participant_session_id = f"{normalized.get("session_id")}_{plan["resident_id"]}" if normalized.get("session_id") else None
+        participant_session_id = f"{normalized.get('session_id')}_{plan['resident_id']}" if normalized.get("session_id") else None
+        composition = compose_resident_identity(plan["resident_id"], surface_id="conference-room-gateway", root=root, task_instructions=user_message, room_context=plan.get("context_packet"))
         result = process_chat(plan["resident_id"], user_message, session_id=participant_session_id, action="conversation", root=root)
+        result["turn"]["identity_composition"] = composition
         turn = result["turn"]
-        resident_turns.append({"resident_id": plan["resident_id"], "display_name": turn.get("resident_display_name") or plan.get("display_name"), "content": turn.get("resident_response", ""), "turn_id": turn.get("turn_id")})
+        resident_turns.append({"resident_id": plan["resident_id"], "display_name": turn.get("resident_display_name") or plan.get("display_name"), "content": turn.get("resident_response", ""), "turn_id": turn.get("turn_id"), "identity_hash": (turn.get("identity_composition") or {}).get("identity_version_or_source_hash")})
         room = record_resident_turn(room, plan, text=turn.get("resident_response", ""), model_metadata=turn.get("llm") or {})
     body = attributed_response_envelope(model=DEFAULT_ROOM_MODEL, room_id=room["room_id"], resident_turns=resident_turns, stream=bool(payload.get("stream") is True))
     body["estate"]["room_snapshot"] = {"room_id": room["room_id"], "participant_count": len(targets), "turn_count": len(room.get("turns", [])), "privileged_action_executed": False}

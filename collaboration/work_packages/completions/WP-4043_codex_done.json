@@ -1,0 +1,21 @@
+{
+  "work_package_id": "WP-4043",
+  "status": "codex_done",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "installed_files": [
+    "src/estate/core/resident_identity_composition.py",
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/resident_gateway.py",
+    "tests/test_resident_identity_composition.py",
+    "docs/architecture/resident_runtime_identity_composition.md"
+  ],
+  "tests": [
+    "pytest -q tests/test_resident_identity_composition.py tests/test_resident_gateway.py tests/test_multi_resident_room_install.py"
+  ],
+  "limitations": [
+    "WP-4044 Character Bible, WP-4045 synchronized registry snapshot, and WP-4046 grounded facts provider are represented by current canonical artifacts and read-only snapshots until those successor packages install their dedicated providers.",
+    "Provider invocation remains local Ollama/deterministic fallback as previously implemented; WP-4043 reuses the same composed identity object before provider selection."
+  ],
+  "follow_on_dependencies": ["WP-4044", "WP-4045", "WP-4046"],
+  "completion_summary": "Single-resident and conference-room gateway paths now compose provider-neutral resident runtime identity with explicit context layers, lineage, diagnostics, privacy filtering, and bounded provider-ready context."
+}

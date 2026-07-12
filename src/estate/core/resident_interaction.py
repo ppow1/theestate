@@ -10,6 +10,7 @@ from typing import Any
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.resident_authority import check_authority, list_authority, ALLOWED, REQUIRES_STEWARD, REQUIRES_ESCALATION
+from estate.core.resident_identity_composition import compose_resident_identity
 
 CHAT_STORE = Path("runtime/resident_interactions/sessions")
 LLM_DIAGNOSTIC_PATH = Path("runtime/residents/alfred/llm_diagnostics.json")
@@ -469,7 +470,7 @@ def _context_packet(root: Path, resident: str, session: dict[str, Any] | None = 
     pending = [str(p.relative_to(root)).replace('\\','/') for p in sorted((root/"collaboration/work_packages/pending").glob("WP-*.md"))[:8]] if (root/"collaboration/work_packages/pending").exists() else []
     return {"artifacts": artifacts, "recent_history": turns, "pending_work_packages": pending}
 
-def resident_prompt(resident: str, message: str, surface: dict[str, Any], authority: dict[str, Any], context: dict[str, Any], llm_metadata: dict[str, Any]) -> str:
+def resident_prompt(resident: str, message: str, surface: dict[str, Any], authority: dict[str, Any], context: dict[str, Any], llm_metadata: dict[str, Any], composition: dict[str, Any] | None = None) -> str:
     rid = _key(resident)
     caps = [c.get("id") for c in surface.get("capabilities", [])]
     if rid == "alfred":
@@ -495,12 +496,13 @@ def resident_prompt(resident: str, message: str, surface: dict[str, Any], author
         f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
         f"Authority status for requested action: {json.dumps(authority, sort_keys=True)}",
         f"Provider/model metadata: {json.dumps(llm_metadata, sort_keys=True)}",
-        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:3000]}",
+        f"Canonical runtime identity composition: {json.dumps(composition or {}, sort_keys=True)[:4500]}",
+        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:1800]}",
         f"Steward message: {message}",
         closing,
     ])[:MAX_RESIDENT_PROMPT_CHARS]
 
-def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], context: dict[str, Any], llm_meta: dict[str, Any]) -> str:
+def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], context: dict[str, Any], llm_meta: dict[str, Any], composition: dict[str, Any] | None = None) -> str:
     caps = [c.get("id") for c in surface.get("capabilities", [])]
     return "\n".join([
         "You are Alfred, resident of the Estate, Office of Operations.",
@@ -513,7 +515,8 @@ def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], 
         f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
         f"Authority status for requested action: {json.dumps(auth, sort_keys=True)}",
         f"Response metadata available to you: {json.dumps(llm_meta, sort_keys=True)}",
-        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:3000]}",
+        f"Canonical runtime identity composition: {json.dumps(composition or {}, sort_keys=True)[:4500]}",
+        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:1800]}",
         f"Steward message: {message}",
         "Respond as Alfred in concise, direct prose.",
     ])[:MAX_ALFRED_PROMPT_CHARS]
@@ -619,7 +622,10 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     governed_action = _governed_action_guidance(rootp, classification) if classification.get("response_type") == "blocked_privileged_execution" else None
     adapter = LocalOllamaAdapter()
     base_meta = _llm_metadata("deterministic_fallback", provider="ollama", model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason="generation not attempted yet", discovered_models_count=len(llm_status.get("models") or []))
+    conversation_turns = [{"user": str(t.get("user_message") or "")[:240], "resident": str(t.get("resident_response") or "")[:240]} for t in existing.get("turns", []) if t.get("memory_status", "active") == "active"]
+    composition = compose_resident_identity(surface["resident_id"], surface_id="single-resident-gateway", root=rootp, conversation_context=conversation_turns, task_instructions=user_message)
     context_packet = _context_packet(rootp, resident, existing)
+    context_packet["runtime_identity_composition"] = {"schema_version": composition.get("schema_version"), "identity_hash": composition.get("identity_version_or_source_hash"), "failed_closed": composition.get("failed_closed"), "layers": [l.get("layer") for l in composition.get("included_context_layers", [])]}
     if attachment_records:
         context_packet["attachments"] = [_safe_attachment_metadata(a) for a in attachment_records]
         summaries = [a.get("summary") for a in attachment_records if a.get("kind") == "image" and a.get("vision_status") == "processed" and a.get("summary")]
@@ -629,7 +635,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
             user_message_for_prompt = user_message + "\nAttachment note: pasted image/text artifacts were received and stored locally; visual inspection is unavailable unless a local vision model processed them."
     else:
         user_message_for_prompt = user_message
-    prompt = resident_prompt(surface["resident_id"], user_message_for_prompt, surface, auth_record, context_packet, base_meta)
+    prompt = resident_prompt(surface["resident_id"], user_message_for_prompt, surface, auth_record, context_packet, base_meta, composition)
     model_control_selection = resolve_model_control_selection(surface["resident_id"], "text", root=rootp)
     selected_model = model_control_selection.get("adapter_model_name") or (llm_status.get("model") if surface["resident_id"] == "alfred" else None)
     generated = adapter.generate(resident=surface["resident_id"], prompt=prompt, model=selected_model) if llm_status.get("available") else {"ok": False, "metadata": _llm_metadata("deterministic_fallback", provider=llm_status.get("provider"), model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason=llm_status.get("discovery") or "Local Ollama unavailable", discovered_models_count=len(llm_status.get("models") or []), generation_result_state="not_attempted", timeout_seconds=alfred_ollama_timeout_seconds(), prompt_summary=_prompt_summary(prompt))}
@@ -645,7 +651,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     request_finished_at = _now()
     resident_llm_diagnostic(surface["resident_id"], rootp, write=True, adapter=adapter)
     diagnostics = {"provider": llm_meta.get("provider") or llm_status.get("provider"), "endpoint": llm_meta.get("endpoint") or llm_status.get("endpoint"), "discovered_models_count": llm_meta.get("discovered_models_count", len(llm_status.get("models") or [])), "local_llm_adapter_available": bool(llm_status.get("available")), "selected_provider": llm_status.get("selected_provider") or llm_status.get("provider"), "selected_model": llm_status.get("selected_model") or llm_status.get("model"), "generation_attempted": bool(llm_meta.get("generation_attempted")), "generation_endpoint": llm_meta.get("generation_endpoint"), "generation_result_state": llm_meta.get("generation_result_state"), "generation_result": llm_meta.get("generation_result"), "timeout_seconds": llm_meta.get("timeout_seconds"), "prompt_size": llm_meta.get("prompt_size"), "recovery_hint": llm_meta.get("recovery_hint") or llm_status.get("recovery_hint"), "fallback_active": bool(llm_meta.get("fallback_used")), "fallback_reason": _safe_diagnostic_text(llm_meta.get("fallback_reason") or (None if llm_meta.get("mode") == "local_llm" else llm_status.get("discovery"))), "sanitized_error": _safe_diagnostic_text(llm_meta.get("sanitized_error") or llm_status.get("last_adapter_error")), "prompt_summary": _safe_diagnostic_text(llm_meta.get("prompt_summary")), "last_adapter_error": _safe_diagnostic_text(llm_status.get("last_adapter_error")), "last_request_timestamp": request_started_at, "last_response_timestamp": request_finished_at, "last_timeout_or_transport_error": _safe_diagnostic_text(llm_meta.get("fallback_reason") if llm_meta.get("fallback_used") else None)}
-    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":("degraded_fallback" if llm_meta.get("fallback_used") and llm_meta.get("generation_attempted") else "completed"),"queued":False,"failed":bool(llm_meta.get("fallback_used") and llm_meta.get("generation_attempted")),"timed_out":llm_meta.get("generation_result_state")=="timeout","fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet"],"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
+    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":("degraded_fallback" if llm_meta.get("fallback_used") and llm_meta.get("generation_attempted") else "completed"),"queued":False,"failed":bool(llm_meta.get("fallback_used") and llm_meta.get("generation_attempted")),"timed_out":llm_meta.get("generation_result_state")=="timeout","fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet", "canonical_runtime_identity_composition"],"identity_composition":composition,"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
     path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}
