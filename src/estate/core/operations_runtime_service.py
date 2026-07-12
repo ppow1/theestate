@@ -1,6 +1,7 @@
 """Bounded service-loop controller for Operations Runtime."""
 from __future__ import annotations
 
+import ctypes
 import json
 import os
 import signal
@@ -17,9 +18,43 @@ def _root(root: Path | None = None) -> Path:
 
 
 
+def _windows_pid_liveness(pid: int) -> str:
+    """Return ``alive``, ``dead``, or ``unknown`` for a Windows process id.
+
+    Windows does not provide POSIX ``kill(pid, 0)`` semantics.  Use the
+    process handle API instead so a PID left in the lock file before a power
+    loss can be identified as dead after reboot without deleting locks for
+    live or access-denied owners.
+    """
+    if pid <= 0:
+        return "dead"
+    try:
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        process_query_limited_information = 0x1000
+        handle = kernel32.OpenProcess(process_query_limited_information, False, int(pid))
+        if not handle:
+            error = ctypes.get_last_error()
+            if error == 87:  # ERROR_INVALID_PARAMETER: no process with that PID.
+                return "dead"
+            if error == 5:  # ERROR_ACCESS_DENIED: process exists but is protected.
+                return "alive"
+            return "unknown"
+        try:
+            exit_code = ctypes.c_ulong()
+            if not kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                return "unknown"
+            return "alive" if exit_code.value == 259 else "dead"  # STILL_ACTIVE
+        finally:
+            kernel32.CloseHandle(handle)
+    except Exception:
+        return "unknown"
+
+
 def _pid_liveness(pid: int) -> str:
     if pid <= 0:
         return "dead"
+    if os.name == "nt":
+        return _windows_pid_liveness(pid)
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
@@ -27,9 +62,7 @@ def _pid_liveness(pid: int) -> str:
     except PermissionError:
         return "alive"
     except OSError:
-        if os.name == "nt":
-            return "unknown"
-        return "dead"
+        return "unknown"
     return "alive"
 
 class OperationsRuntimeLockError(RuntimeError):
@@ -49,10 +82,15 @@ class OperationsRuntimeService:
                 data = _read_json(self.lock_path)
             except Exception as exc:
                 raise OperationsRuntimeLockError(f"operations runtime lock malformed: {exc}")
-            pid = int(data.get("pid") or 0)
+            if not isinstance(data, dict):
+                raise OperationsRuntimeLockError("operations runtime lock malformed: metadata is not an object")
+            try:
+                pid = int(data.get("pid") or 0)
+            except (TypeError, ValueError) as exc:
+                raise OperationsRuntimeLockError(f"operations runtime lock malformed: invalid pid {data.get('pid')!r}") from exc
             live = _pid_liveness(pid)
             if live == "dead":
-                recovery = {"pid": pid, "recovered_at": utc_now_iso(), "reason": "dead_owner_lock", "lock": data}
+                recovery = {"pid": pid, "recovered_at": utc_now_iso(), "reason": "dead_owner_lock", "liveness": live, "lock": data}
                 _write_json(self.root / STATUS_DIR / "stale_lock_recovery_latest.json", recovery)
                 self.lock_path.unlink()
             elif live == "alive":

@@ -87,3 +87,45 @@ def test_status_and_report_include_runtime_health(tmp_path):
     assert summary["operations_runtime_available"] is True
     assert "requests_created_last_cycle" in summary
     assert "Operations Runtime Service Loop" in svc.report()
+
+
+def test_service_recovers_confirmed_dead_owner_lock(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_service as mod
+
+    lock = tmp_path / "runtime/operations_runtime/lock.json"
+    lock.parent.mkdir(parents=True)
+    lock.write_text(json.dumps({"pid": 4720, "acquired_at": "2000-01-01T00:00:00Z"}), encoding="utf-8")
+    monkeypatch.setattr(mod, "_pid_liveness", lambda pid: "dead")
+
+    payload = OperationsRuntimeService(tmp_path).acquire_lock()
+
+    assert payload["pid"] != 4720
+    evidence = json.loads((tmp_path / "runtime/operations_runtime/status/stale_lock_recovery_latest.json").read_text(encoding="utf-8"))
+    assert evidence["pid"] == 4720
+    assert evidence["reason"] == "dead_owner_lock"
+    assert evidence["liveness"] == "dead"
+
+
+def test_service_preserves_lock_when_owner_liveness_unknown(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_service as mod
+
+    lock = tmp_path / "runtime/operations_runtime/lock.json"
+    lock.parent.mkdir(parents=True)
+    original = {"pid": 4720, "acquired_at": "2000-01-01T00:00:00Z"}
+    lock.write_text(json.dumps(original), encoding="utf-8")
+    monkeypatch.setattr(mod, "_pid_liveness", lambda pid: "unknown")
+
+    with pytest.raises(OperationsRuntimeLockError, match="liveness uncertain"):
+        OperationsRuntimeService(tmp_path).acquire_lock()
+
+    assert json.loads(lock.read_text(encoding="utf-8")) == original
+
+
+def test_service_uses_windows_process_api_for_liveness(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_service as mod
+
+    monkeypatch.setattr(mod.os, "name", "nt")
+    monkeypatch.setattr(mod, "_windows_pid_liveness", lambda pid: "dead" if pid == 4720 else "alive")
+
+    assert mod._pid_liveness(4720) == "dead"
+    assert mod._pid_liveness(4721) == "alive"
