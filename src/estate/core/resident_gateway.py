@@ -5,22 +5,29 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Iterable
 from estate.core.resident_interaction import process_chat, local_llm_status, _root
+from estate.core.multi_resident_room import create_room, invite_participant, accept_participant, submit_user_turn, plan_resident_turns, record_resident_turn
+from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 
 ACTIVE_RESIDENT_MODELS = {
     "estate/alfred": "alfred",
     "estate/helen": "helen",
     "estate/ingrid": "ingrid",
     "estate/grace": "grace",
+    "estate/evelyn": "evelyn",
 }
 STATUS_PATH = Path("runtime/resident_gateway/status.json")
 
 
 def models_payload(root=None) -> dict[str, Any]:
-    return {"object":"list","data":[{"id": mid,"object":"model","created":0,"owned_by":"estate","estate":{"resident_id": rid,"privileged_actions_enabled":False}} for mid, rid in ACTIVE_RESIDENT_MODELS.items()]}
+    data = [{"id": mid,"object":"model","created":0,"owned_by":"estate","estate":{"resident_id": rid,"privileged_actions_enabled":False}} for mid, rid in ACTIVE_RESIDENT_MODELS.items()]
+    data.append({"id": DEFAULT_ROOM_MODEL, "object":"model", "created":0, "owned_by":"estate", "estate":{"surface":"multi_resident_room", "multi_resident_gateway_capable": True, "privileged_actions_enabled": False}})
+    return {"object":"list","data":data}
 
 
 def chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
     model = payload.get("model")
+    if model == DEFAULT_ROOM_MODEL:
+        return _room_chat_completion(payload, root=root)
     if model not in ACTIVE_RESIDENT_MODELS:
         return 404, {"error":{"message":f"Unsupported Estate resident model: {model}","type":"invalid_request_error","code":"unsupported_model"}}
     if payload.get("stream") is True:
@@ -52,6 +59,33 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
     body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":turn["resident_response"]},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False}}
     return 200, body
 
+
+
+def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
+    normalized = normalize_open_webui_request(payload)
+    messages = normalized.get("messages") or []
+    user_message = "\n".join(str(m.get("content") or "") for m in messages if m.get("role") in {"user", "system"}).strip()
+    if not user_message:
+        user_message = "Multi-resident room request received."
+    targets = [rid for rid in normalized.get("resident_targets") or [] if rid in ACTIVE_RESIDENT_MODELS.values()]
+    if not targets:
+        targets = ["alfred", "helen", "ingrid", "grace"]
+    room = create_room(display_name="Open WebUI Estate room", created_by="openwebui", session_reference={"session_id": normalized.get("session_id")})
+    for rid in targets:
+        room = invite_participant(room, participant_id=rid, kind="resident", display_name=rid.title())
+        room = accept_participant(room, rid)
+    room = submit_user_turn(room, text=user_message, submitted_by="openwebui", idempotency_key=normalized.get("session_id") or user_message, target_resident_ids=targets)
+    user_turn_id = room["pending_questions"][-1]["user_turn_id"]
+    resident_turns = []
+    for plan in plan_resident_turns(room, user_turn_id, target_resident_ids=targets):
+        participant_session_id = f"{normalized.get("session_id")}_{plan["resident_id"]}" if normalized.get("session_id") else None
+        result = process_chat(plan["resident_id"], user_message, session_id=participant_session_id, action="conversation", root=root)
+        turn = result["turn"]
+        resident_turns.append({"resident_id": plan["resident_id"], "display_name": turn.get("resident_display_name") or plan.get("display_name"), "content": turn.get("resident_response", ""), "turn_id": turn.get("turn_id")})
+        room = record_resident_turn(room, plan, text=turn.get("resident_response", ""), model_metadata=turn.get("llm") or {})
+    body = attributed_response_envelope(model=DEFAULT_ROOM_MODEL, room_id=room["room_id"], resident_turns=resident_turns, stream=bool(payload.get("stream") is True))
+    body["estate"]["room_snapshot"] = {"room_id": room["room_id"], "participant_count": len(targets), "turn_count": len(room.get("turns", [])), "privileged_action_executed": False}
+    return 200, body
 
 def chat_completion_stream(payload: dict[str, Any], *, root=None) -> tuple[int, Iterable[dict[str, Any]]]:
     code, body = chat_completion(payload, root=root)

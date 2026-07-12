@@ -1,0 +1,25 @@
+{
+  "work_package_id": "WP-4042",
+  "status": "completed_installed",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "summary": "Installed and reconciled the resident wave into active Estate runtime using the canonical resident gateway, resident interaction framework, and a single active multi-resident room core without duplicate gateways, registries, memory systems, preference systems, or authority paths.",
+  "installed_components": [
+    "src/estate/core/evelyn_relationship_runtime.py",
+    "src/estate/core/multi_resident_room.py",
+    "src/estate/core/open_webui_multi_resident_gateway.py",
+    "estate/evelyn canonical resident gateway model",
+    "estate/conference-room canonical multi-resident gateway model"
+  ],
+  "reconciled_surfaces": [
+    "src/estate/core/resident_gateway.py",
+    "src/estate/core/resident_interaction.py",
+    "data/registry/residents.json",
+    "operations/residents/surfaces/evelyn.json"
+  ],
+  "duplicate_systems_created": false,
+  "authority_expansion": false,
+  "validation_commands": [
+    "python -m pytest tests/test_multi_resident_room_install.py tests/test_resident_gateway.py",
+    "python -m pytest collaboration/workstreams/WP-4037/staged/test_evelyn_relationship_runtime.py collaboration/workstreams/WP-4039/tests/test_multi_resident_room.py collaboration/workstreams/WP-4040/tests/test_open_webui_multi_resident_gateway.py collaboration/workstreams/WP-4041/tests/test_resident_identity_package_standard.py"
+  ]
+}

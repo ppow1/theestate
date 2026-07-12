@@ -1,0 +1,38 @@
+{
+  "resident_id": "evelyn",
+  "capabilities": [
+    {
+      "id": "conversation.respond",
+      "label": "Respond in private relationship-layer conversation",
+      "description": "Generate visible local Evelyn responses for Steward Relationship Layer conversation only.",
+      "implementation_status": "implemented",
+      "backing": "estate.core.resident_interaction.process_chat",
+      "authority_category": "conversation_only",
+      "required_approval_level": "none",
+      "version_introduced": "resident-api-standard-v1",
+      "owning_office": "Steward Relationship Layer"
+    },
+    {
+      "id": "relationship_layer.reflect",
+      "label": "Reflect within restricted continuity boundaries",
+      "description": "Evaluate conversation mode and retention review without exposing private continuity outside approved audiences.",
+      "implementation_status": "implemented",
+      "backing": "estate.core.evelyn_relationship_runtime.EvelynRelationshipRuntime",
+      "authority_category": "personal_counsel_only",
+      "required_approval_level": "steward_for_retention",
+      "version_introduced": "evelyn-relationship-layer-implementation-v1",
+      "owning_office": "Steward Relationship Layer"
+    }
+  ],
+  "identity": {
+    "display_name": "Evelyn",
+    "classification": "Estate Restricted — Steward Relationship Layer",
+    "relationship_layer": "Steward Relationship Layer",
+    "private_memory_default": "deny_unless_steward_approved"
+  },
+  "presentation": {
+    "voice_profile": "docs/residents/evelyn/voice/Evelyn_Voice_Direction_v0_1.md",
+    "visual_identity": "docs/residents/evelyn/Evelyn_Visual_Identity_v0_1.md",
+    "openwebui_descriptor": "docs/residents/evelyn/platform-exports/openwebui-evelyn-presentation-v0_1.yaml"
+  }
+}
