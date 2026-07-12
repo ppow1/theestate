@@ -13,7 +13,6 @@ ACTIVE_RESIDENT_MODELS = {
     "estate/alfred": "alfred",
     "estate/helen": "helen",
     "estate/ingrid": "ingrid",
-    "estate/grace": "grace",
     "estate/evelyn": "evelyn",
 }
 STATUS_PATH = Path("runtime/resident_gateway/status.json")
@@ -70,7 +69,7 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
         user_message = "Multi-resident room request received."
     targets = [rid for rid in normalized.get("resident_targets") or [] if rid in ACTIVE_RESIDENT_MODELS.values()]
     if not targets:
-        targets = ["alfred", "helen", "ingrid", "grace"]
+        targets = ["alfred", "helen", "ingrid"]
     room = create_room(display_name="Open WebUI Estate room", created_by="openwebui", session_reference={"session_id": normalized.get("session_id")})
     for rid in targets:
         room = invite_participant(room, participant_id=rid, kind="resident", display_name=rid.title())
