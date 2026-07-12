@@ -128,6 +128,7 @@ from estate.core.provider_health import ProviderHealthRecord, write_health_recor
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard, format_engineering_capacity_dashboard
 from estate.core.codex_status_cost_characterization import characterize_codex_status_cost, format_codex_status_cost_characterization
+from estate.core.codex_cli_capability_discovery import discover_codex_cli_capabilities, format_codex_cli_capability_discovery
 from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider, format_engineering_provider_routing
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
@@ -755,6 +756,17 @@ def cmd_providers_find(args):
                 print(f"{provider.provider_id} | {provider.provider_type} | {provider.status}")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"Provider catalog find failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_codex_cli_capability_discovery(args):
+    try:
+        payload = discover_codex_cli_capabilities(probe=not args.no_probe, timeout_seconds=args.timeout_seconds)
+        if getattr(args, "json", False):
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_codex_cli_capability_discovery(payload))
+    except (OSError, json.JSONDecodeError, KeyError, ValueError) as exc:
+        print(f"Codex CLI capability discovery failed: {exc}")
         raise SystemExit(1)
 
 def cmd_providers_health_set(args):
@@ -3971,6 +3983,12 @@ def main(argv=None):
     p.add_argument("--no-probe", action="store_true")
     p.add_argument("--timeout-seconds", type=int, default=10)
     p.set_defaults(func=cmd_codex_status_cost_characterization)
+
+    p = sub.add_parser("codex-cli-capability-discovery", help="Discover local Codex CLI metadata and provider polling policy")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--no-probe", action="store_true")
+    p.add_argument("--timeout-seconds", type=int, default=10)
+    p.set_defaults(func=cmd_codex_cli_capability_discovery)
 
     p = sub.add_parser("engineering-provider-routing", help="Recommend engineering provider using capacity evidence")
     p.add_argument("--request", required=True, help="Path to provider routing request JSON")

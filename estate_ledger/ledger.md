@@ -1029,3 +1029,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented WP-0532 with an advisory Engineering Capacity Runtime dashboard, cloud Codex seat fuel gauges from provider capacity evidence, local worker runtime aggregation, CLI dashboard generation, staged Office handoff artifacts, integration documentation, tests, and completion receipt.
+
+EC-000094 - Added Codex CLI capability discovery policy
+
+Timestamp: 2026-07-12 00:00:00
+Location: A:\theestate
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Implemented WP-0534 with metadata-only Codex CLI capability discovery, provider catalog binding for `codex.execution.cli`, conservative polling policy artifacts, CLI inspection command, tests, and integration documentation without submitting prompts or executing provider work.

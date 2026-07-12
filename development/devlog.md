@@ -737,3 +737,9 @@ Implemented WP-0610 with operations review and decision models, file-backed runt
 EC-000093 - Added Engineering Capacity Runtime dashboard
 
 Implemented WP-0532 with an advisory Engineering Capacity Runtime that combines provider health/capacity evidence, cloud Codex seat fuel gauges, local worker runtime evidence, a CLI dashboard command, staged Office handoff Markdown, tests, and concise integration documentation.
+
+2026-07-12 00:00:00
+
+EC-000094 - Added Codex CLI capability discovery policy
+
+Implemented WP-0534 with a metadata-only Codex CLI capability discovery runtime, `codex-cli-capability-discovery` CLI command, conservative manual/disabled status polling policy, Office handoff artifacts, tests, and concise integration documentation. Discovery binds to the shared provider catalog and does not mutate provider status automatically.

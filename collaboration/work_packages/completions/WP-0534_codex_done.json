@@ -1,0 +1,23 @@
+{
+  "work_package": "WP-0534",
+  "status": "completed",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "summary": "Implemented metadata-only Codex CLI capability discovery bound to the shared provider catalog, with a conservative polling policy, CLI command, artifacts, documentation, and tests.",
+  "provider_catalog_path": "config/providers/catalog.json",
+  "artifacts": [
+    "runtime/providers/codex_cli_capability_discovery.json",
+    "runtime/providers/codex_cli_capability_discovery.md",
+    "operations/engineering_capacity/codex_cli_capability_discovery.md"
+  ],
+  "validation": [
+    "PYTHONPATH=src python -m pytest tests/test_codex_cli_capability_discovery.py tests/test_provider_catalog.py tests/test_provider_capabilities.py -q",
+    "PYTHONPATH=src python -m estate.cli.main codex-cli-capability-discovery --no-probe --json",
+    "PYTHONPATH=src python -m estate.cli.main audit"
+  ],
+  "notes": [
+    "No prompts were submitted.",
+    "No provider work was executed.",
+    "Automated Codex CLI status polling remains manual or disabled until billing/quota deltas are verified.",
+    "Audit has pre-existing environment failures because .estate.bat and discovery runtime artifacts are unavailable in this Linux environment."
+  ]
+}
