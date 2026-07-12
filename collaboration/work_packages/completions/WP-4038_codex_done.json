@@ -1,0 +1,24 @@
+{
+  "work_package_id": "WP-4038",
+  "codex_status": "done",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "branch": "work",
+  "summary": "Staged an uninstalled Evelyn estate/evelyn model entitlement, voice profile, portrait profile, Open WebUI descriptor, contract, install manifest, and deterministic tests while avoiding active shared gateway, registry, scheduler, queue, and authority modifications.",
+  "files_changed": [
+    "collaboration/workstreams/WP-4038/staged/evelyn_exposure_bundle.py",
+    "collaboration/workstreams/WP-4038/staged/test_evelyn_exposure_bundle.py",
+    "collaboration/workstreams/WP-4038/evelyn_exposure_contract.md",
+    "collaboration/workstreams/WP-4038/install_manifest.json",
+    "collaboration/work_packages/completions/WP-4038_codex_done.json"
+  ],
+  "tests_run": [
+    "python -m pytest collaboration/workstreams/WP-4038/staged/test_evelyn_exposure_bundle.py"
+  ],
+  "known_limitations": [
+    "The source work-package file is truncated after the instruction not to modify active shared gateway, registry, scheduler, queue, or authority surfaces; implementation therefore remains staged and isolated.",
+    "No live Open WebUI, gateway, provider, voice, or portrait generation validation was performed.",
+    "Active resident gateway, model registry, scheduler, queue, authority, and shared runtime files were not modified."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}

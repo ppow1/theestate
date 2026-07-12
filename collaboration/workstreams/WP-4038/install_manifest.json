@@ -1,0 +1,26 @@
+{
+  "work_package": "WP-4038",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4038/staged/evelyn_exposure_bundle.py",
+    "collaboration/workstreams/WP-4038/staged/test_evelyn_exposure_bundle.py",
+    "collaboration/workstreams/WP-4038/evelyn_exposure_contract.md"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "active resident gateway and model registry",
+      "owner_work_package": "future install handoff",
+      "intent": "Expose estate/evelyn through the existing OpenAI-compatible Estate gateway after approval."
+    },
+    {
+      "path": "Open WebUI model listing/import documentation",
+      "owner_work_package": "future install handoff",
+      "intent": "Surface the staged descriptor without creating a second gateway or authority plane."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4038/staged/test_evelyn_exposure_bundle.py",
+    "expected": "all tests pass"
+  }
+}
