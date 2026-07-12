@@ -6,7 +6,11 @@ from pathlib import Path
 from typing import Any, Iterable
 from estate.core.resident_interaction import process_chat, local_llm_status, _root
 
-ACTIVE_RESIDENT_MODELS = {"estate/alfred": "alfred", "estate/helen": "helen"}
+ACTIVE_RESIDENT_MODELS = {
+    "estate/alfred": "alfred",
+    "estate/helen": "helen",
+    "estate/ingrid": "ingrid",
+}
 STATUS_PATH = Path("runtime/resident_gateway/status.json")
 
 
