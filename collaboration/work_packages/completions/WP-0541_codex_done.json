@@ -1,0 +1,14 @@
+{
+  "work_package_id": "WP-0541",
+  "status": "implemented",
+  "implemented_at": "2026-07-12T00:00:00Z",
+  "summary": "Implemented governed provider scheduling and queue coordination with idempotent enqueue, deterministic recommendation, capacity reservation leases, release/defer/pause/resume/provider exclusion actions, restart recovery for expired reservations, append-only decision history, CLI operations, Office report output, and tests.",
+  "authority_boundary": "Scheduler prepares recommendations and reservations only; existing Dispatch remains the execution release path.",
+  "artifacts": [
+    "src/estate/core/governed_provider_scheduler.py",
+    "src/estate/cli/main.py",
+    "tests/test_governed_provider_scheduler.py",
+    "docs/integration/governed_provider_scheduler.md"
+  ],
+  "missing_campaign_packages": ["WP-0542", "WP-0543", "WP-0544"]
+}

@@ -132,6 +132,7 @@ from estate.core.codex_cli_capability_discovery import discover_codex_cli_capabi
 from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider, format_engineering_provider_routing
 from estate.core.engineering_provider_health_runtime import collect_provider_health, load_current_provider_health, format_provider_health_report
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
+from estate.core.governed_provider_scheduler import GovernedProviderScheduler, format_scheduler_report
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 from estate.core.operations_manager import OperationsDecision
 from estate.core.grace_operations_runtime import GraceObjective, GraceOperationsRuntime, format_grace_action
@@ -680,6 +681,45 @@ def cmd_operations_decisions_list(args):
             print(format_operations_decisions(decisions))
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Operations decisions list failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_engineering_scheduler(args):
+    try:
+        rt = GovernedProviderScheduler(root=getattr(args, "root", None))
+        action = args.engineering_scheduler_action
+        if action == "enqueue":
+            payload = rt.enqueue(args.assignment_id, actor=args.actor, manual_provider=args.provider_id, force=args.force)
+        elif action == "inspect":
+            payload = rt.report(write=False)
+        elif action == "recommend":
+            payload = rt.recommend(actor=args.actor)
+        elif action == "reserve":
+            payload = rt.reserve(actor=args.actor, ttl_minutes=args.ttl_minutes)
+        elif action == "release":
+            payload = rt.release(args.assignment_id, actor=args.actor, rationale=args.reason)
+        elif action == "defer":
+            payload = rt.defer(args.assignment_id, actor=args.actor, reason=args.reason, retry_after_minutes=args.retry_after_minutes)
+        elif action == "pause":
+            payload = rt.pause(actor=args.actor, reason=args.reason, paused=True)
+        elif action == "resume":
+            payload = rt.pause(actor=args.actor, reason=args.reason, paused=False)
+        elif action == "exclude-provider":
+            payload = rt.exclude_provider(args.provider_id, actor=args.actor, reason=args.reason, excluded=True)
+        elif action == "include-provider":
+            payload = rt.exclude_provider(args.provider_id, actor=args.actor, reason=args.reason, excluded=False)
+        elif action == "explain":
+            report = rt.recommend(actor=args.actor)
+            payload = next((d for d in report.get("decisions", []) if d.get("assignment_id") == args.assignment_id), {"assignment_id": args.assignment_id, "eligible": False, "reasons": ["assignment is not queued"]})
+        elif action == "report":
+            payload = rt.report(write=True)
+        else:
+            raise SystemExit(f"unknown engineering scheduler action: {action}")
+        if getattr(args, "json", False) or action != "report":
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_scheduler_report(payload))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Engineering scheduler failed: {exc}")
         raise SystemExit(1)
 
 def cmd_worker_assignment_create(args):
@@ -4044,6 +4084,21 @@ def main(argv=None):
     p.add_argument("--stale-after-minutes", type=int, default=30)
     p.set_defaults(func=cmd_engineering_provider_routing)
 
+
+
+    p = sub.add_parser("engineering-scheduler", help="Govern provider scheduling queue and reservations without dispatching")
+    esch = p.add_subparsers(dest="engineering_scheduler_action", required=True)
+    q = esch.add_parser("enqueue"); q.add_argument("--assignment-id", required=True); q.add_argument("--provider-id"); q.add_argument("--actor", default="scheduler"); q.add_argument("--force", action="store_true"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_engineering_scheduler)
+    for name in ("inspect", "recommend", "reserve", "report"):
+        q = esch.add_parser(name); q.add_argument("--actor", default="scheduler"); q.add_argument("--json", action="store_true");
+        if name == "reserve": q.add_argument("--ttl-minutes", type=int, default=30)
+        q.set_defaults(func=cmd_engineering_scheduler)
+    for name in ("release", "defer", "explain"):
+        q = esch.add_parser(name); q.add_argument("--assignment-id", required=True); q.add_argument("--actor", default="scheduler"); q.add_argument("--reason", default="Governed scheduling action"); q.add_argument("--retry-after-minutes", type=int, default=60); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_engineering_scheduler)
+    for name in ("pause", "resume"):
+        q = esch.add_parser(name); q.add_argument("--actor", default="scheduler"); q.add_argument("--reason", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_engineering_scheduler)
+    for name in ("exclude-provider", "include-provider"):
+        q = esch.add_parser(name); q.add_argument("--provider-id", required=True); q.add_argument("--actor", default="scheduler"); q.add_argument("--reason", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_engineering_scheduler)
 
     p = sub.add_parser("worker-assignment-create", help="Create a file-backed worker assignment record")
     p.add_argument("--assigned-to", required=True)
