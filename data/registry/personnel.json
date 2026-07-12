@@ -126,7 +126,7 @@
     "status": "onboarding"
   },
   {
-    "activation_status": "not_live",
+    "activation_status": "live_resident_service",
     "appointment_authority": "Steward",
     "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
     "current_office": "Office of Operations",
@@ -135,10 +135,10 @@
     "display_name": "Grace",
     "employee_id": 12,
     "mailbox_id": 12,
-    "notes": "Appointed by Steward in WP-4033 as Director of Operations; Helen-owned onboarding is in progress. Not live, not provider-authorized, and not accepted for full operational service until activation gates complete.",
+    "notes": "Activated for live resident runtime and estate/grace gateway exposure by WP-4035; authority remains bounded by Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, and validation gates.",
     "reporting_line": "Reports to Steward through governed Estate channels; coordinates with Alfred for Steward attention.",
     "resident_id": "grace",
     "security_clearance": "Estate Internal (proposed; Ingrid review required before elevation)",
-    "status": "appointed_onboarding"
+    "status": "active"
   }
 ]

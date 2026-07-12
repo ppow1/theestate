@@ -111,6 +111,62 @@
       "rollback_or_correction": "pause onboarding and retain approved_for_hire gate",
       "to": "onboarding",
       "transition": "start_onboarding"
+    },
+    {
+      "actor": "Helen",
+      "at": "2026-07-12T00:00:00+00:00",
+      "authority": "workforce readiness",
+      "event_id": "WP-4035:mark_ready",
+      "evidence": {
+        "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+        "gateway_model": "estate/grace",
+        "runtime_identity": "runtime/residents/grace/runtime_identity.json",
+        "sources": [
+          "runtime/onboarding/grace/appointment_readiness.json",
+          "runtime/residents/grace/runtime_identity.json",
+          "operations/residents/surfaces/grace.json"
+        ],
+        "transition": "mark_ready",
+        "work_package_id": "WP-4035"
+      },
+      "from": "onboarding",
+      "output": "ready service gate",
+      "prerequisites": [
+        "WP-4033 appointment artifacts",
+        "Grace runtime identity",
+        "gateway exposure package"
+      ],
+      "rollback_or_correction": "stand down through resident lifecycle correction if activation is revoked",
+      "to": "ready_for_service",
+      "transition": "mark_ready"
+    },
+    {
+      "actor": "Steward",
+      "at": "2026-07-12T00:00:00+00:00",
+      "authority": "constitutional appointment and live runtime activation",
+      "event_id": "WP-4035:activate",
+      "evidence": {
+        "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+        "gateway_model": "estate/grace",
+        "runtime_identity": "runtime/residents/grace/runtime_identity.json",
+        "sources": [
+          "runtime/onboarding/grace/appointment_readiness.json",
+          "runtime/residents/grace/runtime_identity.json",
+          "operations/residents/surfaces/grace.json"
+        ],
+        "transition": "activate",
+        "work_package_id": "WP-4035"
+      },
+      "from": "ready_for_service",
+      "output": "live resident service",
+      "prerequisites": [
+        "WP-4033 appointment artifacts",
+        "Grace runtime identity",
+        "gateway exposure package"
+      ],
+      "rollback_or_correction": "stand down through resident lifecycle correction if activation is revoked",
+      "to": "active",
+      "transition": "activate"
     }
   ],
   "identity_lineage": {
@@ -119,11 +175,11 @@
     "resident_id": "grace",
     "successor_resident_id": null
   },
-  "next_action": "mark_ready",
-  "pending_gate": "mark_ready",
+  "next_action": "schedule_reflection",
+  "pending_gate": null,
   "resident_id": "grace",
   "resident_name": "Grace",
   "schema_version": "resident_lifecycle.v1",
-  "status": "onboarding",
-  "updated_at": "2026-07-12T00:05:57+00:00"
+  "status": "active",
+  "updated_at": "2026-07-12T00:00:00+00:00"
 }

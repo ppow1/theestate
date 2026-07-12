@@ -60,14 +60,14 @@
     "status": "active"
   },
   {
-    "activation_status": "not_live",
+    "activation_status": "live_resident_service",
     "display_name": "Grace",
     "mailbox_id": 12,
     "mailbox_type": "personnel",
-    "notes": "Personal mailbox reconciled by WP-4033 for appointed onboarding. Do not route live operational authority here until gateway/runtime activation is separately completed.",
+    "notes": "Activated for live resident runtime and estate/grace gateway exposure by WP-4035; authority remains bounded by Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, and validation gates.",
     "owning_office": "Office of Operations",
     "purpose": "Personal mailbox for Grace during appointed onboarding as Director of Operations.",
     "responsible_employee_id": 12,
-    "status": "onboarding"
+    "status": "active"
   }
 ]
