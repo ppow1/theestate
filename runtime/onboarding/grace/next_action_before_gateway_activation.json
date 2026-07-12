@@ -1,0 +1,23 @@
+{
+  "current_state": "appointed_onboarding_not_live",
+  "deterministic_next_work_package": "Grace Runtime Activation and Gateway Exposure",
+  "generated_at": "2026-07-12T00:00:00+00:00",
+  "prohibited_until_complete": [
+    "Do not add estate/grace to resident gateway",
+    "Do not mark Grace active/live",
+    "Do not authorize provider execution or unrestricted access"
+  ],
+  "required_before_gateway_exposure": [
+    "Helen completes onboarding readiness evidence and mark_ready lifecycle gate",
+    "Ingrid approves any elevated or cross-office access requested for Director of Operations work",
+    "Traffic Controller confirms movement/routing constraints",
+    "Resident runtime surface configuration is added for estate/grace",
+    "Open WebUI/gateway smoke test confirms Grace is reachable without bypassing authority boundaries",
+    "Steward separately authorizes activation if readiness gates pass"
+  ],
+  "resident": "Grace",
+  "resident_id": "grace",
+  "schema_version": "grace_gateway_next_action.v1",
+  "target_surface": "estate/grace",
+  "work_package_id": "WP-4033"
+}

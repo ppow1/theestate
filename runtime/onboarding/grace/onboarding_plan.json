@@ -1,14 +1,30 @@
 {
-  "schema_version": "grace_onboarding_plan.v1",
-  "work_package_id": "WP-4005",
-  "generated_at": "2026-07-10T18:45:00+00:00",
-  "owner": "Helen",
   "candidate": "Grace",
-  "status": "appointment_ready_not_started",
-  "must_not_start_until": [
-    "Steward appointment recorded",
-    "Traffic Controller movement constraints satisfied",
-    "Ingrid access review completed for any elevated/cross-office access"
-  ],
+  "estate_commissioning_tradition": "Voluntary culture after appointment and activation; not a hiring condition or authority gate.",
+  "generated_at": "2026-07-12T00:00:00+00:00",
   "identity": {
-    "employee_id": 
+    "employee_id": 12,
+    "mailbox_id": 12,
+    "resident_id": "grace"
+  },
+  "must_not_start_until": [
+    "Steward appointment recorded"
+  ],
+  "owner": "Helen",
+  "probationary_readiness_conditions": [
+    "No provider execution or parallel queue creation",
+    "No provider execution or parallel queue creation without separate authorization",
+    "No unrestricted access",
+    "No self-appointment, self-activation, or self-expanded authority"
+  ],
+  "remaining_gates_before_activation": [
+    "Helen onboarding execution and readiness evidence",
+    "Traffic Controller movement constraints satisfied",
+    "Ingrid access review completed for any elevated/cross-office access",
+    "resident gateway exposure package for estate/grace",
+    "Open WebUI configuration and smoke validation"
+  ],
+  "schema_version": "grace_onboarding_plan.v1",
+  "status": "appointed_onboarding_not_live",
+  "work_package_id": "WP-4033"
+}

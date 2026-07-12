@@ -1,141 +1,144 @@
 [
   {
-    "employee_id": 0,
-    "display_name": "Reserved / Special Institutional Identity",
-    "current_title": "Reserved / Special Institutional Identity",
     "current_office": "Institutional Reserve",
+    "current_title": "Reserved / Special Institutional Identity",
+    "display_name": "Reserved / Special Institutional Identity",
+    "employee_id": 0,
     "mailbox_id": 0,
+    "notes": "Reserved identity. No operational behavior assigned by Mailbox Infrastructure v1.",
     "security_clearance": "metadata_only",
-    "status": "reserved",
-    "notes": "Reserved identity. No operational behavior assigned by Mailbox Infrastructure v1."
+    "status": "reserved"
   },
   {
-    "employee_id": 1,
-    "display_name": "Steward / Founder",
-    "current_title": "Steward / Founder",
     "current_office": "Stewardship",
+    "current_title": "Steward / Founder",
+    "display_name": "Steward / Founder",
+    "employee_id": 1,
     "mailbox_id": 1,
+    "notes": "Seeded personnel identity for mailbox discovery. Employee ID issued by Steward authority.",
     "security_clearance": "metadata_only",
-    "status": "active",
-    "notes": "Seeded personnel identity for mailbox discovery. Employee ID issued by Steward authority."
+    "status": "active"
   },
   {
-    "employee_id": 2,
-    "display_name": "Chief Architect #1",
+    "current_office": "Office of the Chief Architect",
     "current_title": "Chief Architect #1",
-    "current_office": "Office of the Chief Architect",
+    "display_name": "Chief Architect #1",
+    "employee_id": 2,
     "mailbox_id": 2,
+    "notes": "First historical occupant of the Office of Chief Architect. Employee ID issued by Steward authority.",
     "security_clearance": "metadata_only",
-    "status": "historical",
-    "notes": "First historical occupant of the Office of Chief Architect. Employee ID issued by Steward authority."
+    "status": "historical"
   },
   {
-    "employee_id": 3,
-    "display_name": "Chief Architect #2",
+    "current_office": "Office of the Chief Architect",
     "current_title": "Chief Architect #2",
-    "current_office": "Office of the Chief Architect",
+    "display_name": "Chief Architect #2",
+    "employee_id": 3,
     "mailbox_id": 3,
+    "notes": "Second historical occupant of the Office of Chief Architect; retained as advisory peer reviewer. Employee ID issued by Steward authority.",
     "security_clearance": "metadata_only",
-    "status": "advisory",
-    "notes": "Second historical occupant of the Office of Chief Architect; retained as advisory peer reviewer. Employee ID issued by Steward authority."
+    "status": "advisory"
   },
   {
-    "employee_id": 4,
-    "display_name": "Chief Architect #3",
+    "current_office": "Office of the Chief Architect",
     "current_title": "Chief Architect #3",
-    "current_office": "Office of the Chief Architect",
+    "display_name": "Chief Architect #3",
+    "employee_id": 4,
     "mailbox_id": 4,
+    "notes": "Active occupant of the Office of Chief Architect. Employee ID issued by Steward authority.",
     "security_clearance": "metadata_only",
-    "status": "active",
-    "notes": "Active occupant of the Office of Chief Architect. Employee ID issued by Steward authority."
+    "status": "active"
   },
   {
-    "employee_id": 5,
-    "display_name": "Chief Architect #4",
+    "current_office": "Office of the Chief Architect",
     "current_title": "Chief Architect #4",
-    "current_office": "Office of the Chief Architect",
+    "display_name": "Chief Architect #4",
+    "employee_id": 5,
     "mailbox_id": 5,
+    "notes": "Fourth historical identity in the Office of Chief Architect and second active Chief Architect after onboarding. Employee ID issued by Steward authority.",
     "security_clearance": "metadata_only",
-    "status": "onboarding",
-    "notes": "Fourth historical identity in the Office of Chief Architect and second active Chief Architect after onboarding. Employee ID issued by Steward authority."
+    "status": "onboarding"
   },
   {
-    "employee_id": 6,
-    "display_name": "Helen",
-    "current_title": "Manager of Human Resources",
     "current_office": "Human Resources",
+    "current_title": "Manager of Human Resources",
+    "display_name": "Helen",
+    "employee_id": 6,
     "mailbox_id": 6,
-    "security_clearance": "metadata_only",
-    "status": "active",
+    "notes": "Initial HR/personnel coordination identity. Clearance value is metadata only; no final HR authority or security policy is created by WP-0020.",
     "resident_id": "RES-000003",
-    "notes": "Initial HR/personnel coordination identity. Clearance value is metadata only; no final HR authority or security policy is created by WP-0020."
+    "security_clearance": "metadata_only",
+    "status": "active"
   },
   {
-    "employee_id": 7,
-    "display_name": "Alfred",
-    "current_title": "Manager of Administration",
     "current_office": "Administration",
+    "current_title": "Manager of Administration",
+    "display_name": "Alfred",
+    "employee_id": 7,
     "mailbox_id": 7,
-    "security_clearance": "metadata_only",
-    "status": "active",
+    "notes": "Personnel identity assigned by Steward authority. Personal mailbox remains distinct from Alfred Routing Intake mailbox 10100.",
     "resident_id": "RES-000001",
-    "notes": "Personnel identity assigned by Steward authority. Personal mailbox remains distinct from Alfred Routing Intake mailbox 10100."
-  },
-  {
-    "employee_id": 8,
-    "display_name": "Chief Architect #5",
-    "current_title": "Chief Architect #5",
-    "current_office": "Office of the Chief Architect",
-    "mailbox_id": 8,
     "security_clearance": "metadata_only",
-    "status": "onboarding",
-    "notes": "Fifth historical identity in the Office of Chief Architect and intended active successor peer while preserving Chief Architect #3 history. Employee ID assigned through WP-0124 with Helen as HR/onboarding operational owner; authority remains within established Chief Architect role boundaries."
+    "status": "active"
   },
   {
-    "employee_id": 9,
-    "display_name": "Chief Architect #6",
-    "current_title": "Chief Architect #6",
     "current_office": "Office of the Chief Architect",
+    "current_title": "Chief Architect #5",
+    "display_name": "Chief Architect #5",
+    "employee_id": 8,
+    "mailbox_id": 8,
+    "notes": "Fifth historical identity in the Office of Chief Architect and intended active successor peer while preserving Chief Architect #3 history. Employee ID assigned through WP-0124 with Helen as HR/onboarding operational owner; authority remains within established Chief Architect role boundaries.",
+    "security_clearance": "metadata_only",
+    "status": "onboarding"
+  },
+  {
+    "current_office": "Office of the Chief Architect",
+    "current_title": "Chief Architect #6",
     "department": "Architecture",
+    "display_name": "Chief Architect #6",
+    "employee_id": 9,
     "mailbox_id": 9,
+    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence; employee and mailbox IDs are fixed by the WP-0147 repair package.",
     "security_clearance": "Estate Internal",
-    "status": "onboarding",
-    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence; employee and mailbox IDs are fixed by the WP-0147 repair package."
+    "status": "onboarding"
   },
   {
-    "employee_id": 10,
-    "display_name": "Ingrid",
-    "current_title": "Security Manager / Boundary Guardian",
     "current_office": "Office of Security and Boundary",
+    "current_title": "Security Manager / Boundary Guardian",
     "department": "Security and Boundary",
+    "display_name": "Ingrid",
+    "employee_id": 10,
     "mailbox_id": 10,
-    "security_clearance": "Estate Internal",
-    "status": "onboarding",
+    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence; linked to existing resident RES-000002.",
     "resident_id": "RES-000002",
-    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence; linked to existing resident RES-000002."
-  },
-  {
-    "employee_id": 11,
-    "display_name": "Chief Character Architect",
-    "current_title": "Chief Character Architect",
-    "current_office": "Office of Character Architecture",
-    "department": "Character Architecture",
-    "mailbox_id": 11,
     "security_clearance": "Estate Internal",
-    "status": "onboarding",
-    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence and WP-0136 character architecture governance."
+    "status": "onboarding"
   },
   {
-    "employee_id": 12,
-    "display_name": "Grace",
-    "current_title": "Director of Operations (appointment pending)",
+    "current_office": "Office of Character Architecture",
+    "current_title": "Chief Character Architect",
+    "department": "Character Architecture",
+    "display_name": "Chief Character Architect",
+    "employee_id": 11,
+    "mailbox_id": 11,
+    "notes": "Reconciled by WP-0147 from Helen WP-0146 onboarding evidence and WP-0136 character architecture governance.",
+    "security_clearance": "Estate Internal",
+    "status": "onboarding"
+  },
+  {
+    "activation_status": "not_live",
+    "appointment_authority": "Steward",
+    "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
     "current_office": "Office of Operations",
+    "current_title": "Director of Operations",
     "department": "Operations",
+    "display_name": "Grace",
+    "employee_id": 12,
     "mailbox_id": 12,
-    "security_clearance": "Estate Internal (proposed; Ingrid review required before elevation)",
-    "status": "proposed_appointment_pending",
-    "resident_id": null,
+    "notes": "Appointed by Steward in WP-4033 as Director of Operations; Helen-owned onboarding is in progress. Not live, not provider-authorized, and not accepted for full operational service until activation gates complete.",
     "reporting_line": "Reports to Steward through governed Estate channels; coordinates with Alfred for Steward attention.",
-    "notes": "Created by WP-4005 as a proposed employee identity for Helen-led hiring/onboarding readiness. This is not an appointment, activation, resident registration, constitutional office creation, or authority grant."
+    "resident_id": "grace",
+    "security_clearance": "Estate Internal (proposed; Ingrid review required before elevation)",
+    "status": "appointed_onboarding"
   }
 ]
