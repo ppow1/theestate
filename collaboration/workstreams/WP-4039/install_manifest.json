@@ -1,0 +1,37 @@
+{
+  "work_package_id": "WP-4039",
+  "execution_mode": "PARALLEL-STAGED",
+  "status": "staged_uninstalled",
+  "staged_work_is_installed": false,
+  "staged_artifacts": [
+    "collaboration/workstreams/WP-4039/src/multi_resident_room.py",
+    "collaboration/workstreams/WP-4039/tests/test_multi_resident_room.py",
+    "collaboration/workstreams/WP-4039/schemas/conversation_room_v1.json",
+    "collaboration/workstreams/WP-4039/schemas/conversation_turn_v1.json",
+    "collaboration/workstreams/WP-4039/fixtures/sample_room.json",
+    "collaboration/workstreams/WP-4039/fixtures/sample_turns.json",
+    "collaboration/workstreams/WP-4039/room_contract.md",
+    "collaboration/workstreams/WP-4039/integration_notes.md",
+    "collaboration/workstreams/WP-4039/rollback_notes.md",
+    "collaboration/workstreams/WP-4039/install_manifest.json"
+  ],
+  "proposed_future_active_install_paths": [
+    "src/estate/core/multi_resident_conversation.py",
+    "tests/estate/core/test_multi_resident_conversation.py",
+    "schemas/estate/conversation_room_v1.json",
+    "schemas/estate/conversation_turn_v1.json"
+  ],
+  "shared_file_conflict_risks": [
+    "active gateway routing",
+    "CLI chat dispatch",
+    "Office UI projections",
+    "mailbox and Dispatch runtime",
+    "resident registry",
+    "model-control and provider adapters",
+    "canonical transcript/session storage"
+  ],
+  "required_source_packages": ["WP-4031", "WP-4034", "WP-4035"],
+  "validation_command": "python -m pytest collaboration/workstreams/WP-4039/tests/test_multi_resident_room.py",
+  "rollback_instructions": "Remove collaboration/workstreams/WP-4039/ and collaboration/work_packages/completions/WP-4039_codex_done.json; no active runtime files were modified.",
+  "notes": "Staged work only; future installation requires review and adapter integration."
+}
