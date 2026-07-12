@@ -44,6 +44,7 @@ from estate.core.resident_interaction import resident_surface, process_chat, loa
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
 from estate.core.office_personnel_directory import build_office_personnel_directory
+from estate.core.steward_awareness import generate_steward_awareness_runtime
 from urllib.parse import urlparse
 
 
@@ -1064,6 +1065,7 @@ def generate_command_center(root=None, write=True):
         "resident_conversations_workspace": build_resident_conversations_workspace(root),
         "resident_task_board": {"available": True, "path": "runtime/office/steward_participant_board.json", "kind": "office_resident_task_board", "data": (write_resident_task_board(root)["board"] if write else build_resident_task_board(root))},
         "ai_services_models": build_steward_ai_services_panel(root),
+        "steward_awareness_runtime": generate_steward_awareness_runtime(root=root, write=write),
         "steward_recall_operations": _build_steward_recall_operations(root),
         "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
         "work_package_pipeline": _work_package_pipeline_artifact(root),
@@ -2592,11 +2594,38 @@ def _resident_task_board_html(artifact):
     body.append("</tbody></table>")
     return _panel("Resident Task Board", "".join(body), "ready" if artifact.get("available") else "placeholder")
 
+
+def _steward_awareness_html(panel):
+    if not panel.get("available"):
+        return _artifact_html(panel)
+    data = panel.get("data") or {}
+    profile = data.get("profile") or {}
+    communication = data.get("communication") or {}
+    adaptation = data.get("adaptation") or {}
+    support = data.get("support") or {}
+    review = data.get("relationship_review") or {}
+    prefs = profile.get("preferences") or {}
+    pref_rows = "".join(f"<tr><td>{html.escape(str(k).replace('_',' ').title())}</td><td>{html.escape(str(v))}</td></tr>" for k, v in prefs.items()) or "<tr><td colspan='2'>No learned preferences yet.</td></tr>"
+    adaptations = "".join(f"<li>{html.escape(str(item).replace('_',' '))}</li>" for item in adaptation.get("adaptations") or [])
+    behaviors = "".join(f"<li>{html.escape(str(item).replace('_',' '))}</li>" for item in support.get("recommended_behaviors") or [])
+    recommendations = "".join(f"<li>{html.escape(str(item))}</li>" for item in review.get("recommendations") or [])
+    body = f"""
+    <p>Adaptive Steward awareness is local-only and advisory. It learns working-style signals, shapes communication, adapts interaction surfaces, recommends support behavior, and provides long-term relationship review without taking decisions for the Steward.</p>
+    <div class='mailbox-kpis'><span class='mailbox-kpi'><strong>Observations</strong><span>{html.escape(str(profile.get('observation_count', 0)))}</span></span><span class='mailbox-kpi'><strong>Confidence</strong><span>{html.escape(str(profile.get('confidence')))}</span></span><span class='mailbox-kpi'><strong>Communication</strong><span>{html.escape(str(communication.get('recommended_mode')))}</span></span><span class='mailbox-kpi'><strong>Relationship</strong><span>{html.escape(str(review.get('relationship_health')))}</span></span></div>
+    <h3>Working-style profile</h3><table><tbody>{pref_rows}</tbody></table>
+    <h3>Context-aware communication</h3><p>{html.escape(str(communication.get('rationale')))}</p>
+    <h3>Interaction adaptation</h3><ul>{adaptations}</ul>
+    <h3>Support behavior</h3><ul>{behaviors}</ul>
+    <h3>Long-term relationship review</h3><ul>{recommendations}</ul>
+    <p class='source'>Artifacts: {html.escape(str(panel.get('path')))}. Boundaries: {html.escape('; '.join(review.get('authority_boundaries') or []))}</p>
+    """
+    return _panel("Steward Awareness Runtime", body, "ready")
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
-        ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {}))),
+        ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {})) + _steward_awareness_html(p.get("steward_awareness_runtime", {}))),
         ("alfred", "Alfred Office", "<h3>Alfred Resident Card</h3>" + _alfred_chat_html(p.get("alfred_chat", {})) + _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _office_action_controls_html(payload, "resident-task-board") + _resident_task_board_html(p.get("resident_task_board", {})) + _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
