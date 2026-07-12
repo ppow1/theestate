@@ -1,0 +1,7 @@
+{"schema_version":"character_presentation_pose.v1","work_package":"WP-4076","poses":[
+{"pose_id":"pose-executive-attention","name":"Executive Attention","description":"Upright composed attention with hands relaxed or holding briefing folder."},
+{"pose_id":"pose-boundary-review","name":"Boundary Review","description":"Calm review posture with guarded professional distance."},
+{"pose_id":"pose-workforce-welcome","name":"Workforce Welcome","description":"Open seated or standing posture suited to onboarding."},
+{"pose_id":"pose-operations-handoff","name":"Operations Handoff","description":"Forward-moving posture with checklist, board, or handoff packet."},
+{"pose_id":"pose-private-listening","name":"Private Listening","description":"Quiet listening posture for restricted Steward-private presentation."}
+]}

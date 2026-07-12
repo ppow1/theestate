@@ -1,0 +1,4 @@
+{"schema_version":"dynamic_scene_generation.v1","work_package":"WP-4081","scene_templates":[
+{"scene_id":"scene-alfred-briefing","resident_id":"RES-000001","location_id":"loc-chief-staff-office","wardrobe_id":"wardrobe-executive-service","pose_id":"pose-executive-attention","prompt_contract":"Generate an Estate Internal briefing image preserving Alfred's canonical traits and authority boundaries."},
+{"scene_id":"scene-grace-handoff","resident_id":"grace","location_id":"loc-operations-floor","wardrobe_id":"wardrobe-operations-field","pose_id":"pose-operations-handoff","prompt_contract":"Generate an operations handoff scene with visible sequencing and no Steward authority transfer."}
+]}

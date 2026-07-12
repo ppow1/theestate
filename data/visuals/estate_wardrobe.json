@@ -1,0 +1,7 @@
+{"schema_version":"estate_wardrobe.v1","work_package":"WP-4074","wardrobe_items":[
+{"wardrobe_id":"wardrobe-executive-service","name":"Executive Service Suit","resident_scope":["RES-000001"],"description":"Silver-gray tailored service attire for Alfred.","allowed_contexts":["office","briefing","portrait"]},
+{"wardrobe_id":"wardrobe-boundary-formal","name":"Boundary Formal","resident_scope":["RES-000002"],"description":"Reserved dark formal attire for Ingrid.","allowed_contexts":["security","portrait"]},
+{"wardrobe_id":"wardrobe-hr-warm-professional","name":"Warm Professional","resident_scope":["RES-000003"],"description":"Approachable HR professional wardrobe for Helen.","allowed_contexts":["office","onboarding","portrait"]},
+{"wardrobe_id":"wardrobe-operations-field","name":"Operations Field Executive","resident_scope":["grace"],"description":"Practical operations attire for Grace.","allowed_contexts":["operations","handoff","portrait"]},
+{"wardrobe_id":"wardrobe-private-confidant","name":"Private Confidant","resident_scope":["evelyn"],"description":"Soft private attire for Evelyn in restricted contexts.","allowed_contexts":["private_portrait"]}
+]}
