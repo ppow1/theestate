@@ -139,6 +139,7 @@ from estate.core.operations_control_runtime import OperationsControlRuntime, for
 from estate.core.alfred_runtime import build_alfred_event, render_alfred_briefing
 from estate.core.background_operations_runtime import BackgroundOperationsRuntime, format_background_operations_report
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
+from estate.core.operational_readiness_closure import OperationalReadinessClosureController
 from estate.core.operational_watch_runtime import OperationalWatchRuntime
 from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.operational_target_validation_binding import OperationalTargetValidationBinder
@@ -195,6 +196,36 @@ def cmd_research_office(args):
     else:
         raise SystemExit(f"unknown research office action: {action}")
     print(json.dumps(payload, indent=2, sort_keys=True) if args.json else payload)
+
+def cmd_operational_readiness(args):
+    ctl = OperationalReadinessClosureController(root=getattr(args, "root", None))
+    action = args.readiness_action
+    if action == "intake":
+        payload = ctl.create_or_resume(work_package_id=args.work_package_id, merge_commit=args.merge_commit, target_id=args.target_id, repository=args.repository, base_branch=args.base_branch).to_dict()
+    elif action == "list":
+        payload = {"cases": ctl.list_cases(state=args.state)}
+    elif action == "show":
+        payload = ctl.show(args.case_id)
+    elif action == "process-one":
+        payload = ctl.process_one(args.case_id)
+    elif action == "cycle":
+        payload = ctl.run_cycle(limit=args.limit)
+    elif action == "pause":
+        payload = ctl.pause(args.case_id)
+    elif action == "resume":
+        payload = ctl.resume(args.case_id)
+    elif action == "acknowledge":
+        payload = ctl.acknowledge(args.case_id, note=args.note)
+    elif action == "status":
+        payload = ctl.report().get("status", {})
+    elif action == "report":
+        payload = ctl.report()
+    else:
+        raise SystemExit(f"unknown operational-readiness action: {action}")
+    if args.json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
 
 def cmd_personal_journal(args):
     store = PersonalJournalStore(root=getattr(args, "root", None))
@@ -511,6 +542,12 @@ def cmd_post_merge_audit(args):
     print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
 
 def _operations_runtime_mode(args):
+    if getattr(args, "operational_readiness", False) and getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
+        return "discover-merges-and-process-audits-and-operational-readiness"
+    if getattr(args, "operational_readiness", False) and getattr(args, "discover_merges", False):
+        return "discover-merges-and-operational-readiness"
+    if getattr(args, "operational_readiness", False):
+        return "operational-readiness"
     if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
         return "discover-merges-and-process-audits-and-ring2"
     if getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
@@ -586,33 +623,11 @@ def cmd_operations_runtime(args):
         service = OperationsRuntimeService()
         action = args.operations_runtime_action
         if action == "run-once":
-            if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
-                mode = "discover-merges-and-process-audits-and-ring2"
-            elif getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
-                mode = "discover-merges-and-process-audits"
-            elif getattr(args, "discover_merges", False):
-                mode = "discover-merges"
-            elif getattr(args, "process_audits_and_ring2", False):
-                mode = "process-audits-and-ring2"
-            elif getattr(args, "process_audits", False):
-                mode = "process-audits"
-            else:
-                mode = "observe-only"
+            mode = _operations_runtime_mode(args)
             payload = service.run_once(dry_run=getattr(args, "dry_run", False), mode=mode, max_audit_requests=getattr(args, "max_audit_requests", 1))
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
         elif action == "start":
-            if getattr(args, "discover_merges", False) and getattr(args, "process_audits_and_ring2", False):
-                mode = "discover-merges-and-process-audits-and-ring2"
-            elif getattr(args, "discover_merges", False) and (getattr(args, "process_audits", False) or getattr(args, "auto_admit", False)):
-                mode = "discover-merges-and-process-audits"
-            elif getattr(args, "discover_merges", False):
-                mode = "discover-merges"
-            elif getattr(args, "process_audits_and_ring2", False):
-                mode = "process-audits-and-ring2"
-            elif getattr(args, "process_audits", False):
-                mode = "process-audits"
-            else:
-                mode = "observe-only"
+            mode = _operations_runtime_mode(args)
             payload = service.start(max_cycles=args.max_cycles, interval_seconds=args.interval_seconds, dry_run=getattr(args, "dry_run", False), mode=mode, max_audit_requests=getattr(args, "max_audit_requests", 1))
             print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
         elif action == "status":
@@ -3873,6 +3888,7 @@ def main(argv=None):
     q.add_argument("--process-audits-and-ring2", action="store_true")
     q.add_argument("--discover-merges", action="store_true")
     q.add_argument("--auto-admit", action="store_true")
+    q.add_argument("--operational-readiness", action="store_true")
     q.add_argument("--max-audit-requests", type=int, default=1)
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("start", help="Run a bounded Operations Runtime loop")
@@ -3884,6 +3900,7 @@ def main(argv=None):
     q.add_argument("--process-audits-and-ring2", action="store_true")
     q.add_argument("--discover-merges", action="store_true")
     q.add_argument("--auto-admit", action="store_true")
+    q.add_argument("--operational-readiness", action="store_true")
     q.add_argument("--max-audit-requests", type=int, default=1)
     q.set_defaults(func=cmd_operations_runtime)
     q = ort.add_parser("status", help="Show Operations Runtime status")
@@ -3929,6 +3946,18 @@ def main(argv=None):
         q = ro.add_parser(name); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
     q = ro.add_parser("inspect-source"); q.add_argument("--source-id", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
     q = ro.add_parser("report"); q.add_argument("--output"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_research_office)
+
+
+    p = sub.add_parser("operational-readiness", help="Inspect and advance the canonical Operational Readiness Closure Controller")
+    ro = p.add_subparsers(dest="readiness_action", required=True)
+    q = ro.add_parser("intake"); q.add_argument("--work-package-id", required=True); q.add_argument("--merge-commit", required=True); q.add_argument("--target-id", default="estate-main"); q.add_argument("--repository", default="ppow1/theestate"); q.add_argument("--base-branch", default="main"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_readiness)
+    q = ro.add_parser("list"); q.add_argument("--state"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_readiness)
+    for name in ("show", "process-one", "pause", "resume"):
+        q = ro.add_parser(name); q.add_argument("--case-id", required=True); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_readiness)
+    q = ro.add_parser("cycle"); q.add_argument("--limit", type=int, default=2); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_readiness)
+    q = ro.add_parser("acknowledge"); q.add_argument("--case-id", required=True); q.add_argument("--note", default="manual blocker cleared"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_readiness)
+    for name in ("status", "report"):
+        q = ro.add_parser(name); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_operational_readiness)
 
     p = sub.add_parser("provider-routing-recommendation", help="Evaluate or explain provider routing recommendations without dispatch or provider calls")
     p.add_argument("provider_routing_action", choices=["evaluate", "explain"], help="Recommendation action")
