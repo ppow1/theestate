@@ -1,0 +1,73 @@
+{
+  "branch": "work",
+  "codex_polling_policy_respected": true,
+  "codex_status": "completed",
+  "completed_at": "2026-07-12T01:34:10Z",
+  "files_changed": [
+    "src/estate/core/engineering_provider_health_runtime.py",
+    "tests/test_engineering_provider_health_runtime.py",
+    "tests/test_engineering_provider_health_routing_integration.py",
+    "docs/integration/engineering_provider_health_runtime.md",
+    "collaboration/work_packages/completions/WP-0535_codex_done.json",
+    "src/estate/cli/main.py",
+    "src/estate/core/engineering_provider_routing_runtime.py",
+    "src/estate/core/work_package_validation.py",
+    "runtime/provider_health/current.json",
+    "operations/engineering_capacity/provider_health.md"
+  ],
+  "files_created": [
+    "src/estate/core/engineering_provider_health_runtime.py",
+    "tests/test_engineering_provider_health_runtime.py",
+    "tests/test_engineering_provider_health_routing_integration.py",
+    "docs/integration/engineering_provider_health_runtime.md",
+    "collaboration/work_packages/completions/WP-0535_codex_done.json"
+  ],
+  "files_modified": [
+    "src/estate/cli/main.py",
+    "src/estate/core/engineering_provider_routing_runtime.py",
+    "src/estate/core/work_package_validation.py",
+    "runtime/provider_health/current.json",
+    "operations/engineering_capacity/provider_health.md"
+  ],
+  "health_states_implemented": [
+    "healthy",
+    "degraded",
+    "offline",
+    "maintenance",
+    "unknown"
+  ],
+  "known_limitations": [
+    "Remote Codex health remains unknown unless non-billable polling policy evidence authorizes a live status probe.",
+    "Local executable availability depends on the host environment."
+  ],
+  "live_provider_prompts_submitted": false,
+  "merge_authority": "Chief Architect / Steward review required; not granted by Codex.",
+  "merge_authority_or_equivalent": "Chief Architect / Steward review required; not granted by this receipt.",
+  "office_consumption_verified": true,
+  "providers_supported": [
+    "codex_cloud_web",
+    "codex_cli_openai",
+    "local_ollama_gpu",
+    "local_gpu_runtime"
+  ],
+  "pull_request_url": "not_applicable_local_codex_make_pr_pending",
+  "pull_request_url_or_not_applicable_reason": "Not applicable in local Codex environment before make_pr tool records PR metadata.",
+  "ready_for_ca_review": true,
+  "routing_health_integration_verified": true,
+  "status": "completed",
+  "summary": "Implemented normalized engineering provider health runtime, CLI, routing integration, Office report, validation recipe, tests, documentation, and completion receipt.",
+  "tests_run": [
+    "py_compile health/routing runtime",
+    "pytest focused provider health/routing/capacity tests",
+    "engineering-provider-health collect",
+    "validate-work-package WP-0535"
+  ],
+  "validation_commands_run": [
+    "python -m py_compile src/estate/core/engineering_provider_health_runtime.py src/estate/core/engineering_provider_routing_runtime.py",
+    "pytest -q tests/test_engineering_provider_health_runtime.py tests/test_engineering_provider_health_routing_integration.py tests/test_engineering_provider_routing_runtime.py tests/test_engineering_capacity_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main engineering-provider-health collect --json",
+    "PYTHONPATH=src python -m estate.cli.main validate-work-package --id WP-0535 --json"
+  ],
+  "validation_results": "All required commands passed; validate-work-package reported validation_status=passed with production readiness metadata follow-up resolved in this receipt update.",
+  "work_package_id": "WP-0535"
+}

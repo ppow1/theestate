@@ -1,0 +1,104 @@
+{
+  "command_results": [
+    {
+      "classification": "required",
+      "command": "python -m py_compile src/estate/core/engineering_provider_health_runtime.py src/estate/core/engineering_provider_routing_runtime.py",
+      "completed_at": "2026-07-12T01:34:27+00:00",
+      "duration_seconds": 0.105,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-12T01:34:27+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    },
+    {
+      "classification": "required",
+      "command": "pytest -q tests/test_engineering_provider_health_runtime.py tests/test_engineering_provider_health_routing_integration.py tests/test_engineering_provider_routing_runtime.py tests/test_engineering_capacity_runtime.py",
+      "completed_at": "2026-07-12T01:34:28+00:00",
+      "duration_seconds": 1.372,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-12T01:34:27+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0535_2026-07-12T013427Z0000/command_02_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "PYTHONPATH=src python -m estate.cli.main engineering-provider-health collect --json",
+      "completed_at": "2026-07-12T01:34:29+00:00",
+      "duration_seconds": 0.568,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-12T01:34:28+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_path": "runtime/validation/work_packages/captures/WP-0535_2026-07-12T013427Z0000/command_03_stdout.txt"
+    },
+    {
+      "classification": "required",
+      "command": "python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0535_codex_done.json').read_text()); assert d['live_provider_prompts_submitted'] is False; assert d['codex_polling_policy_respected'] is True; assert d['ready_for_ca_review'] is True\"",
+      "completed_at": "2026-07-12T01:34:29+00:00",
+      "duration_seconds": 0.076,
+      "exit_code": 0,
+      "required": true,
+      "started_at": "2026-07-12T01:34:29+00:00",
+      "status": "passed",
+      "stderr_excerpt": "",
+      "stdout_excerpt": ""
+    }
+  ],
+  "commands_run": [
+    "python -m py_compile src/estate/core/engineering_provider_health_runtime.py src/estate/core/engineering_provider_routing_runtime.py",
+    "pytest -q tests/test_engineering_provider_health_runtime.py tests/test_engineering_provider_health_routing_integration.py tests/test_engineering_provider_routing_runtime.py tests/test_engineering_capacity_runtime.py",
+    "PYTHONPATH=src python -m estate.cli.main engineering-provider-health collect --json",
+    "python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0535_codex_done.json').read_text()); assert d['live_provider_prompts_submitted'] is False; assert d['codex_polling_policy_respected'] is True; assert d['ready_for_ca_review'] is True\""
+  ],
+  "completion_artifact_path": "collaboration/work_packages/completions/WP-0535_codex_done.json",
+  "failures": [],
+  "files_written": [
+    "operations/validation/reports/WP-0535_validation.md",
+    "runtime/validation/work_packages/WP-0535_validation.json",
+    "runtime/validation/work_packages/latest.json"
+  ],
+  "findings": [],
+  "generated_at": "2026-07-12T01:34:27+00:00",
+  "git_branch": "work",
+  "git_commit_after": null,
+  "git_commit_before": "1bafdc0686eabd6e23ac51d36c5292e7ae7dcb01",
+  "production_readiness": {
+    "blocking_reasons": [],
+    "coverage_status": "covered",
+    "execution_status": "passed",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "production_ready": true,
+    "receipt_status": "complete",
+    "required_followups": []
+  },
+  "receipt_gaps": [],
+  "receipt_validation": {
+    "blocking_reasons": [],
+    "branch": "work",
+    "completion_artifact_path": "collaboration/work_packages/completions/WP-0535_codex_done.json",
+    "non_blocking_findings": [
+      "Live PR metadata was not checked by the local-first validator."
+    ],
+    "pr_metadata_status": "available",
+    "pull_request_url": "not_applicable_local_codex_make_pr_pending",
+    "receipt_gaps": [],
+    "receipt_status": "complete",
+    "work_package_id": "WP-0535"
+  },
+  "recipe_id": "wp-0535-engineering-provider-health-runtime",
+  "recipe_title": "WP-0535 \u2014 Engineering Provider Health and Telemetry Runtime",
+  "reviewer_recommendation": "Ready for Chief Architect validation artifact review.",
+  "stderr_summary": "Captured stderr for 0 command(s).",
+  "stdout_summary": "Captured stdout for 2 command(s).",
+  "validation_id": "WP-0535_2026-07-12T013427Z0000",
+  "validation_status": "passed",
+  "warnings": [],
+  "work_package_id": "WP-0535"
+}
