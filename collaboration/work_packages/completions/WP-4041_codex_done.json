@@ -1,0 +1,42 @@
+{
+  "completed_at": "2026-07-12",
+  "completed_by": "Codex",
+  "files": [
+    "collaboration/workstreams/WP-4041/README.md",
+    "collaboration/workstreams/WP-4041/Resident_Identity_Package_Standard_v1.md",
+    "collaboration/workstreams/WP-4041/examples/alfred_identity_package.yaml",
+    "collaboration/workstreams/WP-4041/examples/evelyn_identity_package.yaml",
+    "collaboration/workstreams/WP-4041/examples/grace_identity_package.yaml",
+    "collaboration/workstreams/WP-4041/examples/helen_identity_package.yaml",
+    "collaboration/workstreams/WP-4041/examples/ingrid_identity_package.yaml",
+    "collaboration/workstreams/WP-4041/install_manifest.json",
+    "collaboration/workstreams/WP-4041/notes/integration_notes.md",
+    "collaboration/workstreams/WP-4041/notes/rollback_notes.md",
+    "collaboration/workstreams/WP-4041/schemas/resident_identity_package_v1.json",
+    "collaboration/workstreams/WP-4041/schemas/resident_presentation_binding_v1.json",
+    "collaboration/workstreams/WP-4041/schemas/resident_relationship_profile_v1.json",
+    "collaboration/workstreams/WP-4041/templates/office_environment_template.md",
+    "collaboration/workstreams/WP-4041/templates/portrait_specification_template.md",
+    "collaboration/workstreams/WP-4041/templates/relationship_matrix_template.yaml",
+    "collaboration/workstreams/WP-4041/templates/resident_identity_package_template.yaml",
+    "collaboration/workstreams/WP-4041/templates/voice_identity_template.md",
+    "collaboration/workstreams/WP-4041/templates/wardrobe_preferences_template.md",
+    "collaboration/workstreams/WP-4041/tests/test_resident_identity_package_standard.py",
+    "collaboration/work_packages/completions/WP-4041_codex_done.json"
+  ],
+  "install_handoff": "collaboration/workstreams/WP-4041/install_manifest.json",
+  "limitations": [
+    "Standards package only; no runtime installation, resident activation, provider routing, registry, mailbox, authority, memory, or Open WebUI changes were performed.",
+    "Example YAML files are JSON-compatible YAML to keep focused validation dependency-free in this environment."
+  ],
+  "rollback_notes": "Remove or dereference collaboration/workstreams/WP-4041/ and this receipt; no active runtime rollback is required because no active runtime files were edited.",
+  "status": "completed",
+  "tests": [
+    {
+      "command": "python -m unittest collaboration/workstreams/WP-4041/tests/test_resident_identity_package_standard.py",
+      "result": "pass",
+      "summary": "9 validation tests passed"
+    }
+  ],
+  "work_package": "WP-4041"
+}

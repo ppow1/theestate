@@ -1,0 +1,47 @@
+{
+  "work_package": "WP-4041",
+  "type": "standards_package",
+  "version": "1.0.0",
+  "install_boundary": "Do not install into runtime; WP-4042 must inspect and reference staged artifacts only.",
+  "future_integration_points": [
+    "resident package loader",
+    "prompt identity reference resolver",
+    "portrait/avatar metadata resolver",
+    "voice binding resolver",
+    "relationship profile resolver",
+    "WP-4053 preference evolution evidence resolver",
+    "Open WebUI metadata adapter"
+  ],
+  "conflicts_to_avoid": [
+    "active gateway routing",
+    "runtime activation state",
+    "provider assignments",
+    "Office command surfaces",
+    "live Open WebUI configuration",
+    "personnel registry",
+    "mailbox registry",
+    "authority system",
+    "memory store"
+  ],
+  "artifacts": [
+    "README.md",
+    "Resident_Identity_Package_Standard_v1.md",
+    "schemas/resident_identity_package_v1.json",
+    "schemas/resident_presentation_binding_v1.json",
+    "schemas/resident_relationship_profile_v1.json",
+    "templates/resident_identity_package_template.yaml",
+    "templates/portrait_specification_template.md",
+    "templates/voice_identity_template.md",
+    "templates/wardrobe_preferences_template.md",
+    "templates/office_environment_template.md",
+    "templates/relationship_matrix_template.yaml",
+    "examples/alfred_identity_package.yaml",
+    "examples/helen_identity_package.yaml",
+    "examples/grace_identity_package.yaml",
+    "examples/ingrid_identity_package.yaml",
+    "examples/evelyn_identity_package.yaml",
+    "tests/test_resident_identity_package_standard.py",
+    "notes/integration_notes.md",
+    "notes/rollback_notes.md"
+  ]
+}

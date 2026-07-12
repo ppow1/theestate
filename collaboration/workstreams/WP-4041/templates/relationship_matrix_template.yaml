@@ -1,0 +1,22 @@
+{
+  "profiles": [
+    {
+      "collaboration_tendencies": [
+        "direct support"
+      ],
+      "evolution_hooks": [
+        "source-linked continuity update"
+      ],
+      "healthy_tension": [
+        "challenge assumptions respectfully"
+      ],
+      "scope": "steward",
+      "summary": "Scoped relationship summary",
+      "target": "steward",
+      "trust_boundaries": [
+        "respect privacy"
+      ]
+    }
+  ],
+  "resident_id": "resident.example"
+}

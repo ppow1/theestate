@@ -1,0 +1,34 @@
+{
+  "canonical_identity": {
+    "authority_summary": {
+      "claim": "advisory",
+      "source": "approved registry reference"
+    },
+    "classification": "internal",
+    "employee_id": null,
+    "identity_anchors": [
+      "anchor one",
+      "anchor two",
+      "anchor three"
+    ],
+    "lifecycle_state": "draft",
+    "office": "Office",
+    "prohibited_identity_drift": [
+      "do not genericize"
+    ],
+    "resident_id": "resident.example",
+    "resident_name": "Example",
+    "role": "Role"
+  },
+  "contract": {
+    "name": "estate.resident_identity_package",
+    "version": "1.0.0"
+  },
+  "implementation_bindings": {
+    "interface": "replaceable",
+    "model": "replaceable",
+    "portrait_renderer": "replaceable",
+    "provider": "replaceable",
+    "voice_engine": "replaceable"
+  }
+}
