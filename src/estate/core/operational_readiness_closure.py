@@ -56,6 +56,13 @@ def _git_contains(repo:Path, ancestor:str, descendant:str="HEAD"):
 def _safe_cmd(value):
     return isinstance(value,list) and value and all(isinstance(x,str) and x for x in value)
 
+def _git_status_porcelain(repo:Path):
+    return _run(["git","status","--porcelain"], repo)
+
+def _git_dirty(repo:Path):
+    status=_git_status_porcelain(repo)
+    return bool(status.get("stdout")), status
+
 @dataclass
 class ReadinessCase:
     case_id: str; work_package_id: str; target_id: str; repository: str; base_branch: str; merge_commit: str
@@ -144,7 +151,8 @@ class OperationalReadinessClosureController:
             blockers.append({"class":"runtime_lifecycle_failure","blocker":"declared Scheduled Task is not ready/running/enabled","required_action":"restore Scheduled Task through declared target policy"})
         for d in md.get("runtime_directories",[]):
             if not (self.root/d).exists(): blockers.append({"class":"missing_prerequisite","blocker":f"declared runtime directory missing: {d}","handler":"create_declared_runtime_directories"})
-        if c.activation_requirements.get("ledger") and c.work_package_id not in (self.root/LEDGER).read_text(encoding="utf-8") if (self.root/LEDGER).exists() else True:
+        ledger_text=(self.root/LEDGER).read_text(encoding="utf-8") if (self.root/LEDGER).exists() else ""
+        if c.activation_requirements.get("ledger") and c.work_package_id not in ledger_text:
             blockers.append({"class":"activation_failure","blocker":"activation ledger entry missing","handler":"update_activation_ledger"})
         assessment={"generated_at":self.clock(),"case_id":c.case_id,"state":c.state,"current_merged_revision":c.merge_commit,"current_target_revision":git.get("head"),"required_merge_commit_present":(git.get("required_merge_commit_present") or {}).get("contains",False),"repository_cleanliness":"dirty" if git.get("dirty") else "clean_or_unavailable","branch":git.get("branch"),"runtime_process_state":md.get("runtime_process_state","not_declared"),"scheduled_task_state":md.get("scheduled_task_state","not_declared"),"runtime_lifecycle_checks":runtime_checks,"activation_state":"ledger_current" if not any(b.get("class")=="activation_failure" for b in blockers) else "activation_required","latest_validation_result":c.latest_validation,"blockers":blockers,"available_deterministic_remediation_handlers":c.allowed_remediations,"actions_requiring_authority":[b for b in blockers if not b.get("handler")],"actions_prohibited_by_policy":[],"retry_history":c.retry_history,"next_action":next((b.get("handler") for b in blockers if b.get("handler")),"validate_or_observe")}
         rel=f"runtime/operational_readiness/evidence/{c.case_id}/assessment_{uuid.uuid4().hex[:8]}.json"; _write(self.root/rel,assessment); c.blockers=blockers; self.record(c,"assessment",{"path":rel,"blockers":blockers}); return assessment
@@ -153,24 +161,77 @@ class OperationalReadinessClosureController:
         if handler not in c.allowed_remediations: c.state="blocked_unsafe_action"; self.record(c,"remediation_refused",{"handler":handler,"reason":"not allowed by target policy"}); return c
         if not self._retry_ok(c,handler): c.state="failed_bounded_retries"; self.record(c,"retry_limit",{"handler":handler}); return c
         c.retry_history[handler]=c.retry_history.get(handler,0)+1; c.state="remediation_in_progress"; self.save(c)
-        if handler=="create_declared_runtime_directories":
-            for d in (self._target(c.target_id).metadata or {}).get("runtime_directories",[]): (self.root/d).mkdir(parents=True,exist_ok=True)
-            result={"created_runtime_directories":(self._target(c.target_id).metadata or {}).get("runtime_directories",[])}
-        elif handler=="update_activation_ledger":
-            p=self.root/LEDGER; p.parent.mkdir(parents=True,exist_ok=True)
-            with p.open("a",encoding="utf-8") as f: f.write(f"\n| {c.work_package_id} | Live evidence pending Chief Architect acceptance | `{_rel(self.root,self._case_path(c.case_id))}` and `{_rel(self.root,self._event_path(c.case_id))}` | Activation evidence is work-package specific; institutional acceptance remains separate. |\n")
-            result={"ledger":_rel(self.root,p),"work_package_id":c.work_package_id}
-        elif handler=="fast_forward_checkout":
-            t=self._target(c.target_id); path=Path(t.local_path or self.root); status=_run(["git","status","--porcelain"],path)
-            if status.get("stdout"):
-                c.state="blocked_unsafe_action"; self.record(c,"remediation_refused",{"handler":handler,"reason":"managed checkout dirty","status":status}); return self.save(c)
-            upstream=(t.metadata or {}).get("upstream","origin"); result={"fetch":_run(["git","fetch","--quiet",upstream],path),"merge":_run(["git","merge","--ff-only",f"{upstream}/{c.base_branch}"],path)}
-        else:
-            c.state="blocked_manual_intervention"; self.record(c,"unknown_handler",{"handler":handler}); return c
+        try:
+            if handler=="create_declared_runtime_directories":
+                for d in (self._target(c.target_id).metadata or {}).get("runtime_directories",[]): (self.root/d).mkdir(parents=True,exist_ok=True)
+                result={"created_runtime_directories":(self._target(c.target_id).metadata or {}).get("runtime_directories",[])}
+            elif handler=="update_activation_ledger":
+                result=self._transactional_activation_ledger_update(c)
+            elif handler=="fast_forward_checkout":
+                t=self._target(c.target_id); path=Path(t.local_path or self.root); status=_run(["git","status","--porcelain"],path)
+                if status.get("stdout"):
+                    c.state="blocked_unsafe_action"; self.record(c,"remediation_refused",{"handler":handler,"reason":"managed checkout dirty","status":status}); return self.save(c)
+                upstream=(t.metadata or {}).get("upstream","origin"); result={"fetch":_run(["git","fetch","--quiet",upstream],path),"merge":_run(["git","merge","--ff-only",f"{upstream}/{c.base_branch}"],path)}
+            else:
+                c.state="blocked_manual_intervention"; self.record(c,"unknown_handler",{"handler":handler}); return c
+        except Exception as exc:
+            c.state="blocked_manual_intervention"; self.record(c,"remediation_failed",{"handler":handler,"error":str(exc)}); return self.save(c)
         c.remediations_attempted.append({"handler":handler,"at":self.clock(),"result":result}); self.record(c,"remediation",{"handler":handler,"result":result}); c.state="assessment_required"; return self.save(c)
+
+    def _transactional_activation_ledger_update(self,c:ReadinessCase):
+        """Update and commit the canonical activation ledger as one governed transaction."""
+        t=self._target(c.target_id); repo=Path(t.local_path or self.root); p=self.root/LEDGER
+        if not (repo/".git").exists():
+            raise RuntimeError(f"managed target is not a git repository: {repo}")
+        dirty,status=_git_dirty(repo)
+        if dirty:
+            raise RuntimeError("refusing activation ledger transaction on dirty managed checkout")
+        existed=p.exists()
+        p.parent.mkdir(parents=True,exist_ok=True)
+        before=p.read_text(encoding="utf-8") if existed else "# Estate Feature Activation Ledger\n\n"
+        entry=f"| {c.work_package_id} | Live evidence pending Chief Architect acceptance | `{_rel(self.root,self._case_path(c.case_id))}` and `{_rel(self.root,self._event_path(c.case_id))}` | Activation evidence is work-package specific; institutional acceptance remains separate. |"
+        if c.work_package_id in before and entry in before:
+            clean,verify_status=_git_dirty(repo)
+            if clean:
+                raise RuntimeError("activation ledger entry exists but managed checkout is dirty")
+            return {"ledger":_rel(self.root,p),"work_package_id":c.work_package_id,"idempotent":True,"committed":False,"status":verify_status}
+        after=before.rstrip()+"\n"+entry+"\n"
+        p.write_text(after,encoding="utf-8")
+        rel_ledger=_rel(repo,p)
+        try:
+            add=_run(["git","add","--",rel_ledger],repo)
+            if add["exit_code"]!=0: raise RuntimeError(f"git add failed: {add['stderr']}")
+            commit_msg=f"Record activation ledger evidence for {c.work_package_id}\n\nReadiness case: {c.case_id}\nController remediation: update_activation_ledger\nEvidence: {_rel(self.root,self._event_path(c.case_id))}"
+            commit=_run(["git","commit","-m",commit_msg],repo)
+            if commit["exit_code"]!=0: raise RuntimeError(f"git commit failed: {commit['stderr']}")
+            verify_text=p.read_text(encoding="utf-8")
+            clean,verify_status=_git_dirty(repo)
+            if clean: raise RuntimeError("activation ledger transaction committed but checkout is dirty")
+            if entry not in verify_text: raise RuntimeError("activation ledger transaction missing after commit")
+            head=_run(["git","rev-parse","HEAD"],repo)
+            return {"ledger":_rel(self.root,p),"work_package_id":c.work_package_id,"idempotent":False,"committed":True,"commit":head.get("stdout","").strip(),"git_add":add,"git_commit":commit,"status":verify_status}
+        except Exception:
+            if existed:
+                p.write_text(before,encoding="utf-8")
+            else:
+                p.unlink(missing_ok=True)
+                for parent in [p.parent, p.parent.parent]:
+                    try:
+                        parent.rmdir()
+                    except OSError:
+                        pass
+            _run(["git","reset","--",rel_ledger],repo)
+            clean,verify_status=_git_dirty(repo)
+            if clean:
+                self.record(c,"remediation_rollback_warning",{"handler":"update_activation_ledger","status":verify_status})
+            raise
+
     def validate(self,c):
         fp=json.dumps([c.merge_commit,c.validation_recipe,c.remediations_attempted],sort_keys=True)
-        if c.last_validation_fingerprint==hashlib.sha256(fp.encode()).hexdigest() and c.latest_validation: return c.latest_validation
+        if c.last_validation_fingerprint==hashlib.sha256(fp.encode()).hexdigest() and c.latest_validation:
+            if c.state in {"assessment_required","merged","deployed","live_validation_required","live_validation_failed"}:
+                c.state="observation_required" if c.latest_validation.get("status")=="passed" else "live_validation_failed"; self.save(c)
+            return c.latest_validation
         results=[]; ok=True
         target=Path(self._target(c.target_id).local_path or self.root)
         for cmd in c.validation_recipe:
@@ -200,18 +261,23 @@ class OperationalReadinessClosureController:
         c=ReadinessCase.from_dict(_read(self._case_path(case_id),{}))
         if c.paused or c.state in FINAL_STATES: return c.to_dict()
         c.lease={"holder":"operations_runtime","claimed_at":self.clock()}; self.save(c)
-        assessment=self.assess(c)
-        if c.blockers:
-            unhandled=[b for b in c.blockers if not b.get("handler")]
-            if unhandled:
-                c.state="blocked_manual_intervention"; self.record(c,"escalation",{"blockers":unhandled}); self.save(c)
-            else:
+        for _ in range(4):
+            assessment=self.assess(c)
+            if c.blockers:
+                unhandled=[b for b in c.blockers if not b.get("handler")]
+                if unhandled:
+                    c.state="blocked_manual_intervention"; self.record(c,"escalation",{"blockers":unhandled}); self.save(c); break
                 h=next((b.get("handler") for b in c.blockers if b.get("handler")),None)
-                if h: c=self.remediate(c,h)
-                else: c.state="blocked_manual_intervention"; self.record(c,"escalation",{"blockers":c.blockers}); self.save(c)
-        else:
-            if c.state in {"assessment_required","merged","deployed","live_validation_required","live_validation_failed"}: self.validate(c); c=ReadinessCase.from_dict(_read(self._case_path(case_id)))
-            if c.state in {"observation_required","observation_in_progress"}: c=self.observe(c)
+                if h:
+                    before_state=c.state; c=self.remediate(c,h)
+                    if c.state=="assessment_required" and before_state!="blocked_manual_intervention":
+                        continue
+                    break
+                c.state="blocked_manual_intervention"; self.record(c,"escalation",{"blockers":c.blockers}); self.save(c); break
+            else:
+                if c.state in {"assessment_required","merged","deployed","live_validation_required","live_validation_failed"}: self.validate(c); c=ReadinessCase.from_dict(_read(self._case_path(case_id)))
+                if c.state in {"observation_required","observation_in_progress"}: c=self.observe(c)
+                break
         if c.state in FINAL_STATES: self.write_verdict(c)
         return c.to_dict()
     def run_cycle(self, limit=2):

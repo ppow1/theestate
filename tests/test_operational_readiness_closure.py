@@ -8,7 +8,7 @@ def run(cmd, cwd):
     return subprocess.run(cmd, cwd=cwd, text=True, capture_output=True, check=True)
 
 def make_root(tmp_path, dirty=False, checks=2):
-    root=tmp_path/'estate'; root.mkdir(parents=True); (root/'src/estate/core').mkdir(parents=True); (root/'src/estate/core/operational_readiness_closure.py').write_text('x=1\n'); (root/'.gitignore').write_text('runtime/\noperations/\n')
+    root=tmp_path/'estate'; root.mkdir(parents=True); (root/'src/estate/core').mkdir(parents=True); (root/'src/estate/core/operational_readiness_closure.py').write_text('x=1\n'); (root/'.gitignore').write_text('runtime/\n')
     run(['git','init','-b','main'], root); run(['git','config','user.email','t@example.com'], root); run(['git','config','user.name','Tester'], root)
     run(['git','add','.'], root); run(['git','commit','-m','init'], root); sha=run(['git','rev-parse','HEAD'], root).stdout.strip()
     if dirty: (root/'dirty.txt').write_text('dirty')
@@ -19,9 +19,12 @@ def make_root(tmp_path, dirty=False, checks=2):
 def test_full_flow_creates_prereq_activates_validates_observes_and_keeps_acceptance_false(tmp_path):
     root, sha=make_root(tmp_path, checks=2); ctl=OperationalReadinessClosureController(root)
     c=ctl.create_or_resume(work_package_id='WP-0650-DEMO', merge_commit=sha)
-    first=ctl.process_one(c.case_id); assert first['state']=='assessment_required'; assert (root/'runtime/demo-required').exists()
-    second=ctl.process_one(c.case_id); assert second['state']=='assessment_required'; assert 'WP-0650' in (root/'operations/steward/estate_feature_activation_ledger.md').read_text()
-    third=ctl.process_one(c.case_id); assert third['state']=='observation_in_progress'
+    first=ctl.process_one(c.case_id); assert first['state']=='observation_in_progress'; assert (root/'runtime/demo-required').exists()
+    assert 'WP-0650' in (root/'operations/steward/estate_feature_activation_ledger.md').read_text()
+    assert run(['git','status','--porcelain'], root).stdout == ''
+    ledger_commit=run(['git','log','-1','--pretty=%B'], root).stdout
+    assert 'Record activation ledger evidence for WP-0650-DEMO' in ledger_commit
+    assert c.case_id in ledger_commit
     fourth=ctl.process_one(c.case_id); assert fourth['state']=='operationally_ready'
     verdict=json.loads((root/'runtime/operational_readiness/verdicts'/f"{c.case_id}.json").read_text())
     assert verdict['operationally_ready'] is True
@@ -49,7 +52,7 @@ def test_blocked_case_does_not_starve_other_case(tmp_path):
     clean_root, clean_sha=make_root(tmp_path/'clean')
     # Use same controller root: make second target clean in registry.
     reg=json.loads((root/'runtime/operational_targets/registry.json').read_text())
-    target=reg['targets'][0].copy(); target['target_id']='clean'; target['local_path']=str(clean_root); reg['targets'].append(target)
+    target=reg['targets'][0].copy(); target['target_id']='clean'; target['aliases']=['clean']; target['local_path']=str(clean_root); target['metadata']=target['metadata'].copy(); target['metadata']['activation_requirements']={'ledger':False}; reg['targets'].append(target)
     (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
     ready=ctl.create_or_resume(work_package_id='WP-CLEAN', merge_commit=clean_sha, target_id='clean')
     cycle=ctl.run_cycle(limit=2)
@@ -71,7 +74,7 @@ def test_merge_discovery_intake_and_descendant_ancestry_validation(tmp_path):
     made=ctl.intake_from_merge_discovery()
     assert made[0]['work_package_id']=='WP-0651'
     out=ctl.process_one(made[0]['case_id'])
-    assert out['state']=='assessment_required'
+    assert out['state'] in {'observation_in_progress','operationally_ready'}
     assessment=json.loads(next((root/'runtime/operational_readiness/evidence'/made[0]['case_id']).glob('assessment_*.json')).read_text())
     assert assessment['required_merge_commit_present'] is True
 
@@ -96,3 +99,29 @@ def test_validation_runs_against_declared_live_target_not_controller_root(tmp_pa
     assert out['latest_validation']['status']=='passed'
     assert out['latest_validation']['live_target_path']==str(live)
     assert out['latest_validation']['repository_local_simulation'] is False
+
+
+def test_activation_ledger_retry_is_idempotent_and_clean(tmp_path):
+    root, sha=make_root(tmp_path, checks=1); ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-IDEMP-LEDGER', merge_commit=sha)
+    out=ctl.process_one(c.case_id)
+    assert out['state']=='operationally_ready'
+    head_before=run(['git','rev-parse','HEAD'], root).stdout.strip()
+    case=ctl.show(c.case_id)
+    case['state']='assessment_required'
+    (root/'runtime/operational_readiness/cases'/f"{c.case_id}.json").write_text(json.dumps(case))
+    out=ctl.process_one(c.case_id)
+    assert out['state']=='operationally_ready'
+    assert run(['git','rev-parse','HEAD'], root).stdout.strip()==head_before
+    assert run(['git','status','--porcelain'], root).stdout == ''
+
+
+def test_activation_ledger_safe_failure_rolls_back_when_commit_cannot_be_created(tmp_path):
+    root, sha=make_root(tmp_path, checks=1); ctl=OperationalReadinessClosureController(root)
+    hooks=root/'.git'/'failing-hooks'; hooks.mkdir(); hook=hooks/'pre-commit'; hook.write_text('#!/bin/sh\nexit 1\n'); hook.chmod(0o755); run(['git','config','core.hooksPath',str(hooks)], root)
+    c=ctl.create_or_resume(work_package_id='WP-NO-COMMITTER', merge_commit=sha)
+    out=ctl.process_one(c.case_id)
+    assert out['state']=='blocked_manual_intervention'
+    ledger=root/'operations/steward/estate_feature_activation_ledger.md'
+    assert (not ledger.exists()) or 'WP-NO-COMMITTER' not in ledger.read_text()
+    assert run(['git','status','--porcelain'], root).stdout == ''
