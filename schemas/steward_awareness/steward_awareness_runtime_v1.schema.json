@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/steward_awareness_runtime_v1.schema.json",
+  "title": "Steward Awareness Runtime v1",
+  "type": "object",
+  "required": ["available", "path", "kind", "data"],
+  "properties": {
+    "available": {"const": true},
+    "path": {"type": "string"},
+    "kind": {"const": "steward_awareness_runtime"},
+    "data": {
+      "type": "object",
+      "required": ["profile", "communication", "adaptation", "support", "relationship_review"],
+      "properties": {
+        "profile": {"type": "object", "required": ["schema_version", "preferences", "authority_boundaries"]},
+        "communication": {"type": "object", "required": ["schema_version", "recommended_mode", "message_shape"]},
+        "adaptation": {"type": "object", "required": ["schema_version", "surface", "adaptations", "constraints"]},
+        "support": {"type": "object", "required": ["schema_version", "recommended_behaviors", "prohibited_behaviors"]},
+        "relationship_review": {"type": "object", "required": ["schema_version", "relationship_health", "recommendations", "authority_boundaries"]}
+      }
+    }
+  }
+}
