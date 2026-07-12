@@ -52,6 +52,24 @@ def _cmd(text: str, *, required: bool = True, continue_on_failure: bool | None =
 
 
 VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
+    "WP-0535": {
+        "recipe_id": "wp-0535-engineering-provider-health-runtime",
+        "title": "WP-0535 — Engineering Provider Health and Telemetry Runtime",
+        "description": "Validates normalized provider health artifacts, routing integration, Office consumption, polling-policy boundaries, documentation, and completion receipt.",
+        "required_checks": ["Health runtime compiles", "Focused health and routing tests pass", "CLI collect works", "Receipt confirms no live prompts"],
+        "observational_checks": [],
+        "expected_artifacts": ["src/estate/core/engineering_provider_health_runtime.py", "tests/test_engineering_provider_health_runtime.py", "tests/test_engineering_provider_health_routing_integration.py", "docs/integration/engineering_provider_health_runtime.md", "collaboration/work_packages/completions/WP-0535_codex_done.json"],
+        "failure_criteria": ["Any required command exits non-zero", "Live provider prompts are submitted", "Unknown-cost Codex polling is enabled"],
+        "success_criteria": ["Providers are represented truthfully", "History is append-only", "Routing consumes health evidence"],
+        "continue_on_failure": True,
+        "commands": [
+            _cmd("python -m py_compile src/estate/core/engineering_provider_health_runtime.py src/estate/core/engineering_provider_routing_runtime.py"),
+            _cmd("pytest -q tests/test_engineering_provider_health_runtime.py tests/test_engineering_provider_health_routing_integration.py tests/test_engineering_provider_routing_runtime.py tests/test_engineering_capacity_runtime.py"),
+            _cmd("PYTHONPATH=src python -m estate.cli.main engineering-provider-health collect --json"),
+            _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-0535_codex_done.json').read_text()); assert d['live_provider_prompts_submitted'] is False; assert d['codex_polling_policy_respected'] is True; assert d['ready_for_ca_review'] is True\""),
+        ],
+    },
+
     "WP-0638": {
         "recipe_id": "wp-0638-automatic-audit-queue-runtime-host-integrity",
         "title": "WP-0638 — Automatic Audit Queue and Runtime Host Integrity",

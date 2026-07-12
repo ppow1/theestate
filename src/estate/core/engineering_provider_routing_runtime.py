@@ -13,6 +13,7 @@ from estate.core.paths import ESTATE_ROOT
 from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard
 from estate.core.provider_routing_recommendations import ProviderRoutingRecommendationRequest, evaluate_provider_routing_recommendation
 from estate.core.provider_health import _write_json, utc_now_iso
+from estate.core.engineering_provider_health_runtime import load_current_provider_health
 
 RUNTIME_JSON = Path("runtime/engineering_provider_routing/latest.json")
 RUNTIME_MD = Path("runtime/engineering_provider_routing/latest.md")
@@ -37,6 +38,8 @@ def recommend_engineering_provider(request_payload: dict[str, Any] | ProviderRou
     root_path = _root(root)
     request = request_payload if isinstance(request_payload, ProviderRoutingRecommendationRequest) else ProviderRoutingRecommendationRequest.from_dict(request_payload)
     dashboard = generate_engineering_capacity_dashboard(root=root_path, stale_after_minutes=stale_after_minutes, write=True)
+    health = load_current_provider_health(root=root_path)
+    health_by_id = {p.get("provider_id"): p for p in health.get("providers", [])}
     base = evaluate_provider_routing_recommendation(request).to_dict()
     local_available = _local_available(dashboard)
     cloud_constrained = _cloud_constrained(dashboard)
@@ -48,14 +51,24 @@ def recommend_engineering_provider(request_payload: dict[str, Any] | ProviderRou
         final_provider = "local_ollama_gpu" if local_available else "human_review"
         reason = "Request requires local runtime/GPU evidence; local RTX 4090 lane is preferred when available."
     elif request.requires_repo_write and not cloud_constrained:
-        final_provider = "codex_cloud_web"
-        reason = "Repository write is requested and cloud Codex capacity is not marked constrained by Engineering Capacity Runtime evidence."
+        candidate = health_by_id.get("codex_cloud_web", {})
+        if candidate.get("health_state") in {"offline", "maintenance"} or candidate.get("authentication_state") in {"invalid", "missing", "unauthenticated"}:
+            final_provider = "human_review"
+            reason = "Cloud Codex is excluded by health evidence: " + "; ".join(candidate.get("health_reasons") or ["missing health evidence"])
+        else:
+            final_provider = "codex_cloud_web"
+            reason = "Repository write is requested and cloud Codex capacity/health evidence does not block recommendation."
     elif request.requires_repo_write and local_available:
         final_provider = "local_ollama_gpu"
         reason = "Cloud Codex capacity is constrained; use local RTX 4090 lane for bounded decomposition/review before escalation."
     else:
         final_provider = base["recommended_provider"]
         reason = "Base provider-routing recommendation is consistent with current capacity evidence."
+
+    selected_health = health_by_id.get(final_provider, {}) if final_provider not in {"human_review", "deterministic_local_tooling", "chatgpt_planning"} else {}
+    if selected_health and ((selected_health.get("health_state") == "maintenance" or (selected_health.get("health_state") == "offline" and "runtime/providers/health/records" in (selected_health.get("evidence_refs") or [])) or selected_health.get("authentication_state") in {"invalid", "missing", "unauthenticated"})):
+        reason = f"{final_provider} is excluded by health evidence: " + "; ".join(selected_health.get("health_reasons") or ["unhealthy provider"])
+        final_provider = "human_review"
 
     payload = {
         "version": 1,
@@ -65,6 +78,7 @@ def recommend_engineering_provider(request_payload: dict[str, Any] | ProviderRou
         "base_recommended_provider": base["recommended_provider"],
         "capacity_reason": reason,
         "engineering_capacity_summary": dashboard.get("summary"),
+        "engineering_provider_health": {"providers": health_by_id, "source_artifact": "runtime/provider_health/current.json"},
         "constraints": {"advisory_only": True, "does_not_dispatch": True, "traffic_controller_decides_movement": True},
         "source_artifacts": ["runtime/engineering_capacity/dashboard.json"],
     }

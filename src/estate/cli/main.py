@@ -130,6 +130,7 @@ from estate.core.engineering_capacity_runtime import generate_engineering_capaci
 from estate.core.codex_status_cost_characterization import characterize_codex_status_cost, format_codex_status_cost_characterization
 from estate.core.codex_cli_capability_discovery import discover_codex_cli_capabilities, format_codex_cli_capability_discovery
 from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider, format_engineering_provider_routing
+from estate.core.engineering_provider_health_runtime import collect_provider_health, load_current_provider_health, format_provider_health_report
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
 from estate.core.orchestrator_cycle import OrchestratorCycleRuntime, format_cycle_summary, format_dispatch_queue
 from estate.core.operations_manager import OperationsDecision
@@ -2397,6 +2398,18 @@ def cmd_codex_status_cost_characterization(args):
         print(format_codex_status_cost_characterization(payload), end="")
 
 
+def cmd_engineering_provider_health(args):
+    action = args.engineering_provider_health_action
+    if action == "collect":
+        payload = collect_provider_health(write=True)
+    else:
+        payload = load_current_provider_health()
+    if action == "provider":
+        payload = next((p for p in payload.get("providers", []) if p.get("provider_id") == args.id), {"error": "provider not found", "provider_id": args.id})
+    if action == "report" and not getattr(args, "json", False):
+        print(format_provider_health_report(payload if "providers" in payload else {"providers": [payload]}), end=""); return
+    print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else format_provider_health_report(payload))
+
 def cmd_engineering_provider_routing(args):
     payload = json.loads(Path(args.request).read_text(encoding="utf-8"))
     result = recommend_engineering_provider(payload, stale_after_minutes=args.stale_after_minutes)
@@ -3990,7 +4003,13 @@ def main(argv=None):
     p.add_argument("--timeout-seconds", type=int, default=10)
     p.set_defaults(func=cmd_codex_cli_capability_discovery)
 
-    p = sub.add_parser("engineering-provider-routing", help="Recommend engineering provider using capacity evidence")
+    p = sub.add_parser("engineering-provider-health", help="Collect and inspect engineering provider health")
+    eph = p.add_subparsers(dest="engineering_provider_health_action", required=True)
+    for name in ("collect", "status", "report"):
+        q = eph.add_parser(name); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_engineering_provider_health)
+    q = eph.add_parser("provider"); q.add_argument("--id", required=True); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_engineering_provider_health)
+
+    p = sub.add_parser("engineering-provider-routing", help="Recommend engineering provider using capacity and health evidence")
     p.add_argument("--request", required=True, help="Path to provider routing request JSON")
     p.add_argument("--json", action="store_true")
     p.add_argument("--stale-after-minutes", type=int, default=30)

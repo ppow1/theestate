@@ -1,0 +1,36 @@
+{
+  "active_jobs": 0,
+  "authentication_state": "unknown",
+  "availability": "unknown",
+  "capability_registry_state": "unknown",
+  "capacity_state": "unknown",
+  "consecutive_failures": 0,
+  "evidence_refs": [
+    "PATH:nvidia-smi"
+  ],
+  "health_reasons": [
+    "capacity evidence is missing or stale"
+  ],
+  "health_state": "unknown",
+  "is_stale": true,
+  "last_capacity_snapshot_at": null,
+  "last_discovery_at": null,
+  "last_failure_at": null,
+  "last_success_at": null,
+  "latency_ms": null,
+  "observed_at": "2026-07-12T01:34:29Z",
+  "provider_id": "local_gpu_runtime",
+  "provider_type": "local_gpu",
+  "provider_version": null,
+  "queue_depth": 0,
+  "recent_failure_count": 0,
+  "recent_failure_rate": 0.0,
+  "recent_success_count": 0,
+  "recommended_for_dispatch": false,
+  "runtime_state": "unknown",
+  "schema_version": "1.0",
+  "stale_after_seconds": 1800,
+  "warnings": [
+    "nvidia-smi executable not found"
+  ]
+}
