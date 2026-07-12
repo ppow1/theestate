@@ -1,0 +1,129 @@
+{
+  "classification": "Estate Internal",
+  "history": [
+    {
+      "actor": "Helen",
+      "at": "2026-07-12T00:05:57+00:00",
+      "authority": "HR intake with Steward-reserved appointment protection",
+      "event_id": "WP-4033:intake_candidate",
+      "evidence": {
+        "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+        "authority": "Steward appointment for Director of Operations",
+        "employee_id": 12,
+        "mailbox_id": 12,
+        "sources": [
+          "runtime/onboarding/grace/appointment_readiness.json",
+          "runtime/onboarding/grace/hiring_assessment.json",
+          "runtime/onboarding/grace/onboarding_plan.json"
+        ],
+        "transition": "intake_candidate",
+        "work_package_id": "WP-4033"
+      },
+      "from": null,
+      "output": "local lifecycle record only",
+      "prerequisites": [
+        "candidate evidence",
+        "privacy classification"
+      ],
+      "rollback_or_correction": "archive erroneous candidate lifecycle record; do not delete identity registries",
+      "to": "candidate",
+      "transition": "intake_candidate"
+    },
+    {
+      "actor": "Helen",
+      "at": "2026-07-12T00:05:57+00:00",
+      "authority": "workforce review",
+      "event_id": "WP-4033:begin_review",
+      "evidence": {
+        "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+        "authority": "Steward appointment for Director of Operations",
+        "employee_id": 12,
+        "mailbox_id": 12,
+        "sources": [
+          "runtime/onboarding/grace/appointment_readiness.json",
+          "runtime/onboarding/grace/hiring_assessment.json",
+          "runtime/onboarding/grace/onboarding_plan.json"
+        ],
+        "transition": "begin_review",
+        "work_package_id": "WP-4033"
+      },
+      "from": "candidate",
+      "output": "pending review gate",
+      "prerequisites": [
+        "candidate exists"
+      ],
+      "rollback_or_correction": "return to candidate with correction note",
+      "to": "under_review",
+      "transition": "begin_review"
+    },
+    {
+      "actor": "Steward",
+      "at": "2026-07-12T00:05:57+00:00",
+      "authority": "constitutional personnel approval",
+      "event_id": "WP-4033:approve_for_hire",
+      "evidence": {
+        "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+        "authority": "Steward appointment for Director of Operations",
+        "employee_id": 12,
+        "mailbox_id": 12,
+        "sources": [
+          "runtime/onboarding/grace/appointment_readiness.json",
+          "runtime/onboarding/grace/hiring_assessment.json",
+          "runtime/onboarding/grace/onboarding_plan.json"
+        ],
+        "transition": "approve_for_hire",
+        "work_package_id": "WP-4033"
+      },
+      "from": "under_review",
+      "output": "approved hiring gate",
+      "prerequisites": [
+        "review complete",
+        "no Ingrid privacy block"
+      ],
+      "rollback_or_correction": "correction returns to under_review; no auto-appointment",
+      "to": "approved_for_hire",
+      "transition": "approve_for_hire"
+    },
+    {
+      "actor": "Helen",
+      "at": "2026-07-12T00:05:57+00:00",
+      "authority": "Helen onboarding workflow",
+      "event_id": "WP-4033:start_onboarding",
+      "evidence": {
+        "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+        "authority": "Steward appointment for Director of Operations",
+        "employee_id": 12,
+        "mailbox_id": 12,
+        "sources": [
+          "runtime/onboarding/grace/appointment_readiness.json",
+          "runtime/onboarding/grace/hiring_assessment.json",
+          "runtime/onboarding/grace/onboarding_plan.json"
+        ],
+        "transition": "start_onboarding",
+        "work_package_id": "WP-4033"
+      },
+      "from": "approved_for_hire",
+      "output": "onboarding in progress",
+      "prerequisites": [
+        "steward approval",
+        "employee/mailbox plan"
+      ],
+      "rollback_or_correction": "pause onboarding and retain approved_for_hire gate",
+      "to": "onboarding",
+      "transition": "start_onboarding"
+    }
+  ],
+  "identity_lineage": {
+    "kind": "resident",
+    "predecessor_resident_id": null,
+    "resident_id": "grace",
+    "successor_resident_id": null
+  },
+  "next_action": "mark_ready",
+  "pending_gate": "mark_ready",
+  "resident_id": "grace",
+  "resident_name": "Grace",
+  "schema_version": "resident_lifecycle.v1",
+  "status": "onboarding",
+  "updated_at": "2026-07-12T00:05:57+00:00"
+}

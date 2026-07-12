@@ -1,0 +1,42 @@
+{
+  "activation_status": "not_live",
+  "appointing_authority": "Steward",
+  "appointment_status": "appointed",
+  "authority_boundaries": {
+    "appointment_limits": [
+      "does not authorize provider execution",
+      "does not authorize unrestricted access",
+      "does not authorize constitutional change",
+      "does not constitute institutional acceptance for full operational service"
+    ],
+    "grace": "may not self-appoint, self-activate, or self-expand authority",
+    "helen": "owns onboarding execution and readiness evidence",
+    "ingrid": "review required for elevated or cross-office access",
+    "traffic_controller": "movement constraints remain binding"
+  },
+  "classification": "Estate Internal",
+  "decision": "appoint",
+  "decision_id": "steward-appointment-grace-director-of-operations-20260712",
+  "employee_id": 12,
+  "mailbox_id": 12,
+  "office": "Office of Operations",
+  "onboarding_status": "onboarding_not_activated",
+  "recorded_at": "2026-07-12T00:00:00+00:00",
+  "resident": "Grace",
+  "resident_id": "grace",
+  "role": "Director of Operations",
+  "schema_version": "steward_appointment_decision.v1",
+  "source_evidence": [
+    "runtime/onboarding/grace/appointment_readiness.json",
+    "runtime/onboarding/grace/hiring_assessment.json",
+    "runtime/onboarding/grace/onboarding_plan.json",
+    "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
+    "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
+    "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml",
+    "docs/residents/helen/Helen_Hiring_Onboarding_Workflow_v0_1.md",
+    "data/registry/personnel.json",
+    "data/registry/mailboxes.json",
+    "collaboration/work_packages/pending/WP-4033_Grace_Steward_Appointment_and_Lifecycle_Activation.md"
+  ],
+  "work_package_id": "WP-4033"
+}

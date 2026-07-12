@@ -1,16 +1,11 @@
 {
-  "schema_version": "grace_appointment_readiness.v1",
-  "work_package_id": "WP-4005",
-  "generated_at": "2026-07-10T18:45:00+00:00",
-  "candidate": "Grace",
-  "target_role": "Director of Operations",
-  "target_office": "Office of Operations",
-  "status": "appointment_ready",
-  "appointment_authority": "Steward reserved",
-  "appointed": false,
   "activated": false,
-  "helen_recommendation": "hire_recommended",
-  "onboarding_ready": true,
+  "activation_status": "not_live",
+  "appointed": true,
+  "appointment_authority": "Steward",
+  "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+  "candidate": "Grace",
+  "employee_id": 12,
   "evidence_paths": [
     "collaboration/work_packages/completions/WP-4003_codex_done.json",
     "runtime/residents/helen/readiness.json",
@@ -21,7 +16,37 @@
     "data/registry/personnel.json",
     "data/registry/mailboxes.json",
     "runtime/onboarding/grace/hiring_assessment.json",
-    "runtime/onboarding/grace/onboarding_plan.json"
+    "runtime/onboarding/grace/onboarding_plan.json",
+    "runtime/onboarding/grace/steward_appointment_decision.json"
   ],
-  "required_steward_action": "Record explicit appointment decision before any onboarding or activation state change."
+  "generated_at": "2026-07-12T00:00:00+00:00",
+  "governance_boundaries": {
+    "appointment_limits": [
+      "does not authorize provider execution",
+      "does not authorize unrestricted access",
+      "does not authorize constitutional change",
+      "does not constitute institutional acceptance for full operational service"
+    ],
+    "grace": "may not self-appoint, self-activate, or self-expand authority",
+    "helen": "owns onboarding execution and readiness evidence",
+    "ingrid": "review required for elevated or cross-office access",
+    "traffic_controller": "movement constraints remain binding"
+  },
+  "helen_recommendation": "hire_recommended",
+  "lifecycle_record": "runtime/residents/lifecycle/grace.json",
+  "mailbox_id": 12,
+  "onboarding_ready": true,
+  "required_steward_action": "Completed by WP-4033 Steward appointment decision; activation remains separately gated.",
+  "resident_id": "grace",
+  "schema_version": "grace_appointment_readiness.v1",
+  "state_boundaries": {
+    "accepted_for_full_operational_service": false,
+    "activated_for_live_service": false,
+    "appointed": true,
+    "onboarding": true
+  },
+  "status": "appointed_onboarding",
+  "target_office": "Office of Operations",
+  "target_role": "Director of Operations",
+  "work_package_id": "WP-4033"
 }

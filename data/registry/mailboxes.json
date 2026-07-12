@@ -1,72 +1,73 @@
 [
   {
+    "display_name": "Office of the Chief Architect",
     "mailbox_id": 10001,
     "mailbox_type": "office",
-    "display_name": "Office of the Chief Architect",
+    "notes": "Functional mailbox; personnel accountability remains with a specific employee, worker, or service when required.",
     "owning_office": "Office of the Chief Architect",
-    "responsible_employee_id": 2,
-    "status": "active",
     "purpose": "Functional office mailbox for Chief Architect coordination intake.",
-    "notes": "Functional mailbox; personnel accountability remains with a specific employee, worker, or service when required."
+    "responsible_employee_id": 2,
+    "status": "active"
   },
   {
+    "display_name": "Audit Office",
     "mailbox_id": 10002,
     "mailbox_type": "office",
-    "display_name": "Audit Office",
+    "notes": "No permanent employee accountability assigned by this package.",
     "owning_office": "Audit Office",
-    "responsible_employee_id": null,
-    "status": "active",
     "purpose": "Functional office mailbox for audit-related intake.",
-    "notes": "No permanent employee accountability assigned by this package."
+    "responsible_employee_id": null,
+    "status": "active"
   },
   {
+    "display_name": "Discovery Office",
     "mailbox_id": 10003,
     "mailbox_type": "office",
-    "display_name": "Discovery Office",
+    "notes": "No permanent employee accountability assigned by this package.",
     "owning_office": "Discovery Office",
-    "responsible_employee_id": null,
-    "status": "active",
     "purpose": "Functional office mailbox for discovery-related intake.",
-    "notes": "No permanent employee accountability assigned by this package."
+    "responsible_employee_id": null,
+    "status": "active"
   },
   {
+    "display_name": "Alfred Routing Intake",
     "mailbox_id": 10100,
     "mailbox_type": "queue",
-    "display_name": "Alfred Routing Intake",
+    "notes": "Alfred may consume mailbox state for orchestration but does not own the mailbox system.",
     "owning_office": "Chief of Staff",
-    "responsible_employee_id": null,
-    "status": "active",
     "purpose": "Functional queue for routing-intake visibility.",
-    "notes": "Alfred may consume mailbox state for orchestration but does not own the mailbox system."
+    "responsible_employee_id": null,
+    "status": "active"
   },
   {
+    "display_name": "WP-0005 Discovery Validation",
     "mailbox_id": 10200,
     "mailbox_type": "work_package",
-    "display_name": "WP-0005 Discovery Validation",
+    "notes": "Functional mailbox only; execution accountability must still be claimed when required.",
     "owning_office": "Discovery Office",
-    "responsible_employee_id": null,
-    "status": "active",
     "purpose": "Functional mailbox example for work-package intake.",
-    "notes": "Functional mailbox only; execution accountability must still be claimed when required."
+    "responsible_employee_id": null,
+    "status": "active"
   },
   {
+    "display_name": "Human Resources Office",
     "mailbox_id": 10004,
     "mailbox_type": "office",
-    "display_name": "Human Resources Office",
+    "notes": "Functional HR intake surface; does not create final HR authority, clearance policy, or lifecycle-state changes.",
     "owning_office": "Human Resources",
-    "responsible_employee_id": 6,
-    "status": "active",
     "purpose": "Functional office mailbox for HR/personnel questions, onboarding status awareness, and personnel identity routing.",
-    "notes": "Functional HR intake surface; does not create final HR authority, clearance policy, or lifecycle-state changes."
+    "responsible_employee_id": 6,
+    "status": "active"
   },
   {
+    "activation_status": "not_live",
+    "display_name": "Grace",
     "mailbox_id": 12,
     "mailbox_type": "personnel",
-    "display_name": "Grace",
+    "notes": "Personal mailbox reconciled by WP-4033 for appointed onboarding. Do not route live operational authority here until gateway/runtime activation is separately completed.",
     "owning_office": "Office of Operations",
+    "purpose": "Personal mailbox for Grace during appointed onboarding as Director of Operations.",
     "responsible_employee_id": 12,
-    "status": "proposed_appointment_pending",
-    "purpose": "Proposed personal mailbox for Grace if the Steward-reserved Director of Operations appointment occurs.",
-    "notes": "WP-4005 proposal only; do not route active operational authority here until appointment and activation are separately recorded."
+    "status": "onboarding"
   }
 ]
