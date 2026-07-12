@@ -63,6 +63,15 @@ def _git_dirty(repo:Path):
     status=_git_status_porcelain(repo)
     return bool(status.get("stdout")), status
 
+
+def _git_ref(repo:Path, ref:str):
+    return _run(["git","rev-parse","--verify",ref], repo)
+
+def _git_ahead_behind(repo:Path, left:str, right:str):
+    r=_run(["git","rev-list","--left-right","--count",f"{left}...{right}"],repo)
+    parts=(r.get("stdout") or "0 0").split()
+    return {"ahead":int(parts[0]) if parts and parts[0].isdigit() else 0,"behind":int(parts[1]) if len(parts)>1 and parts[1].isdigit() else 0,"command":r}
+
 @dataclass
 class ReadinessCase:
     case_id: str; work_package_id: str; target_id: str; repository: str; base_branch: str; merge_commit: str
@@ -75,6 +84,7 @@ class ReadinessCase:
     evidence: list[str]=field(default_factory=list); paused: bool=False; created_at: str=field(default_factory=utc_now_iso)
     updated_at: str=field(default_factory=utc_now_iso); lease: dict[str,Any]|None=None; observation: dict[str,Any]=field(default_factory=dict)
     last_validation_fingerprint: str|None=None; latest_validation: dict[str,Any]|None=None; remediations_attempted: list[dict[str,Any]]=field(default_factory=list)
+    publication: dict[str,Any]=field(default_factory=dict); readiness_policy: dict[str,Any]=field(default_factory=dict)
 
     def to_dict(self):
         if self.state not in STATES: raise ValueError(f"unknown readiness state {self.state}")
@@ -119,11 +129,84 @@ class OperationalReadinessClosureController:
             activation_requirements=kw.get("activation_requirements") or md.get("activation_requirements") or {"ledger":True},
             observation_policy=kw.get("observation_policy") or md.get("observation_policy") or {"checks_required":1},
             acceptance_authority=kw.get("acceptance_authority") or t.acceptance_authority)
+        c.readiness_policy=md.get("readiness_policy") or {}
         c.completion_receipt=kw.get("completion_receipt")
         self.record(c,"case_created",{"work_package_id":work_package_id,"merge_commit":merge_commit}); return self.save(c)
     def record(self,c,kind,detail):
         rel=_rel(self.root,self._event_path(c.case_id)); _append_jsonl(self._event_path(c.case_id),{"at":self.clock(),"case_id":c.case_id,"kind":kind,"detail":detail});
         if rel not in c.evidence: c.evidence.append(rel)
+    def _policy_blockers(self,c:ReadinessCase):
+        t=self._target(c.target_id); md=t.metadata or {}; policy=md.get("readiness_policy") or {}
+        env=(policy.get("environment") or md.get("environment") or "").lower()
+        production=bool(policy.get("production") or env in {"production","prod"} or md.get("production_target"))
+        blockers=[]
+        if not production:
+            return blockers
+        required=["validation_recipe","live_target_path","observation_policy","acceptance_authority"]
+        for k in required:
+            if k=="acceptance_authority":
+                missing=not (c.acceptance_authority or t.acceptance_authority)
+            else:
+                missing=not (md.get(k) or getattr(c,k,None))
+            if missing: blockers.append({"class":"missing_production_readiness_policy","blocker":f"production target missing explicit {k}","required_action":"declare canonical target readiness policy"})
+        if not policy.get("compile_only_sufficient",False):
+            flat=" ".join(" ".join(cmd) for cmd in c.validation_recipe if isinstance(cmd,list))
+            if "compileall" in flat and len(c.validation_recipe)<=1:
+                blockers.append({"class":"insufficient_production_validation_policy","blocker":"compile-only validation cannot qualify production readiness without explicit rationale","required_action":"declare live validation recipe or compile-only sufficiency rationale"})
+        obs=c.observation_policy or {}; health=obs.get("health_checks") or []
+        if int(obs.get("checks_required",0) or 0) < int(policy.get("min_runtime_cycles",2) or 2):
+            blockers.append({"class":"insufficient_production_observation_policy","blocker":"observation cycles below explicit production minimum","required_action":"declare sufficient runtime cycles"})
+        if int(obs.get("min_elapsed_seconds",0) or 0) <=0 and not obs.get("elapsed_time_not_applicable_rationale"):
+            blockers.append({"class":"insufficient_production_observation_policy","blocker":"zero elapsed observation time requires explicit non-applicable rationale","required_action":"declare minimum elapsed observation time or rationale"})
+        if not health and not obs.get("health_checks_not_applicable_rationale"):
+            blockers.append({"class":"insufficient_production_observation_policy","blocker":"production observation requires health checks or explicit non-applicable rationale","required_action":"declare health checks"})
+        if policy.get("restart_required") and int(obs.get("restart_events_required",0) or 0) <=0:
+            blockers.append({"class":"insufficient_production_lifecycle_policy","blocker":"restart evidence required but not declared","required_action":"declare restart evidence gate"})
+        return blockers
+
+    def _publication_status(self,c:ReadinessCase):
+        t=self._target(c.target_id); repo=Path(t.local_path or self.root); md=t.metadata or {}; upstream=md.get("upstream","origin"); branch=c.base_branch or t.base_branch
+        out={"required":bool(md.get("publication_required") or md.get("publication",{}).get("required")),"authorized":bool(md.get("publication_authorized") or md.get("publication",{}).get("authorized")),"upstream":upstream,"branch":branch,"status":"not_required"}
+        if not (repo/".git").exists(): out.update(status="unavailable", blocker="managed target is not a git repository"); return out
+        head=_git_ref(repo,"HEAD"); up=_git_ref(repo,f"refs/remotes/{upstream}/{branch}")
+        out["local_head"]=head.get("stdout","").strip(); out["upstream_head"]=up.get("stdout","").strip(); out["fetch"]=_run(["git","fetch","--quiet",upstream],repo)
+        up=_git_ref(repo,f"refs/remotes/{upstream}/{branch}"); out["upstream_head"]=up.get("stdout","").strip()
+        if out["upstream_head"]:
+            out["ahead_behind"]=_git_ahead_behind(repo, branch, f"{upstream}/{branch}")
+            out["head_contained_upstream"]=_git_contains(repo,out["local_head"],f"refs/remotes/{upstream}/{branch}").get("contains") if out["local_head"] else False
+        return out
+
+    def publish_controller_mutation(self,c:ReadinessCase):
+        t=self._target(c.target_id); repo=Path(t.local_path or self.root); md=t.metadata or {}; upstream=md.get("upstream","origin"); branch=c.base_branch or t.base_branch
+        ev={"required":True,"authorized":bool(md.get("publication_authorized") or md.get("publication",{}).get("authorized")),"upstream":upstream,"branch":branch,"started_at":self.clock()}
+        def block(reason, cls="publication_blocked"):
+            ev.update(status="blocked", blocker=reason, completed_at=self.clock()); c.publication=ev; self.record(c,"publication",ev); self.save(c); return ev
+        if not ev["authorized"]: return block("target policy does not authorize publication","publication_authority_required")
+        if not (repo/".git").exists(): return block("managed target is not a git repository")
+        dirty,status=_git_dirty(repo); ev["pre_status"]=status
+        if dirty: return block("dirty checkout refuses publication")
+        cur=_run(["git","branch","--show-current"],repo); ev["branch_current"]=cur.get("stdout","").strip()
+        if ev["branch_current"]!=branch: return block("wrong branch or detached HEAD refuses publication")
+        ev["pre_local_head"]=_git_ref(repo,"HEAD").get("stdout","").strip(); ev["fetch_before"]=_run(["git","fetch","--quiet",upstream],repo)
+        ev["pre_upstream_head"]=_git_ref(repo,f"refs/remotes/{upstream}/{branch}").get("stdout","").strip()
+        if not ev["pre_upstream_head"]: return block("upstream branch is missing or ambiguous")
+        ab=_git_ahead_behind(repo,branch,f"{upstream}/{branch}"); ev["pre_ahead_behind"]=ab
+        if ab["behind"]: return block("local branch is behind upstream; fast-forward-safe publication refused")
+        if _git_contains(repo, ev["pre_local_head"], f"refs/remotes/{upstream}/{branch}").get("contains"):
+            ev.update(status="already_published")
+        else:
+            if ab["ahead"]<1: return block("no attributable local commit to publish")
+            log=_run(["git","log","--format=%B%x00",f"{upstream}/{branch}..{branch}"],repo); ev["unpublished_messages"]=log.get("stdout","")[:4000]
+            if "Controller remediation:" not in log.get("stdout","") and c.case_id not in log.get("stdout",""):
+                return block("unpublished commits are not attributable to this controller case")
+            ev["push"]=_run(["git","push",upstream,f"HEAD:{branch}"],repo,timeout=120)
+            if ev["push"]["exit_code"]!=0: return block("remote rejected publication or credentials are unavailable")
+        ev["fetch_after"]=_run(["git","fetch","--quiet",upstream],repo); ev["verified_upstream_head"]=_git_ref(repo,f"refs/remotes/{upstream}/{branch}").get("stdout","").strip(); ev["head_contained_upstream"]=_git_contains(repo,ev["pre_local_head"],f"refs/remotes/{upstream}/{branch}").get("contains")
+        ev["post_ahead_behind"]=_git_ahead_behind(repo,branch,f"{upstream}/{branch}"); ev["post_status"]=_git_status_porcelain(repo)
+        if not ev["head_contained_upstream"] or ev["post_ahead_behind"].get("ahead") or ev["post_ahead_behind"].get("behind") or ev["post_status"].get("stdout"):
+            return block("publication verification failed after push")
+        ev.update(status="verified", completed_at=self.clock()); c.publication=ev; self.record(c,"publication",ev); self.save(c); return ev
+
     def assess(self,c:ReadinessCase):
         t=self._target(c.target_id); path=Path(t.local_path or self.root); md=t.metadata or {}
         blockers=[]; git={}
@@ -154,7 +237,14 @@ class OperationalReadinessClosureController:
         ledger_text=(self.root/LEDGER).read_text(encoding="utf-8") if (self.root/LEDGER).exists() else ""
         if c.activation_requirements.get("ledger") and c.work_package_id not in ledger_text:
             blockers.append({"class":"activation_failure","blocker":"activation ledger entry missing","handler":"update_activation_ledger"})
-        assessment={"generated_at":self.clock(),"case_id":c.case_id,"state":c.state,"current_merged_revision":c.merge_commit,"current_target_revision":git.get("head"),"required_merge_commit_present":(git.get("required_merge_commit_present") or {}).get("contains",False),"repository_cleanliness":"dirty" if git.get("dirty") else "clean_or_unavailable","branch":git.get("branch"),"runtime_process_state":md.get("runtime_process_state","not_declared"),"scheduled_task_state":md.get("scheduled_task_state","not_declared"),"runtime_lifecycle_checks":runtime_checks,"activation_state":"ledger_current" if not any(b.get("class")=="activation_failure" for b in blockers) else "activation_required","latest_validation_result":c.latest_validation,"blockers":blockers,"available_deterministic_remediation_handlers":c.allowed_remediations,"actions_requiring_authority":[b for b in blockers if not b.get("handler")],"actions_prohibited_by_policy":[],"retry_history":c.retry_history,"next_action":next((b.get("handler") for b in blockers if b.get("handler")),"validate_or_observe")}
+        pub=self._publication_status(c)
+        if pub.get("required") and pub.get("status") != "verified" and not pub.get("head_contained_upstream"):
+            if pub.get("authorized"):
+                blockers.append({"class":"publication_required","blocker":"controller-authored canonical mutation is not verified upstream","handler":"publish_controller_mutation"})
+            else:
+                blockers.append({"class":"publication_authority_required","blocker":"publication is required but not authorized by target policy","required_action":"authorize target-specific publication"})
+        blockers.extend(self._policy_blockers(c))
+        assessment={"generated_at":self.clock(),"case_id":c.case_id,"state":c.state,"current_merged_revision":c.merge_commit,"current_target_revision":git.get("head"),"required_merge_commit_present":(git.get("required_merge_commit_present") or {}).get("contains",False),"repository_cleanliness":"dirty" if git.get("dirty") else "clean_or_unavailable","branch":git.get("branch"),"runtime_process_state":md.get("runtime_process_state","not_declared"),"scheduled_task_state":md.get("scheduled_task_state","not_declared"),"runtime_lifecycle_checks":runtime_checks,"activation_state":"ledger_current" if not any(b.get("class")=="activation_failure" for b in blockers) else "activation_required","latest_validation_result":c.latest_validation,"publication_status":pub,"validation_policy_complete":not any(b.get("class","").startswith(("missing_production","insufficient_production_validation")) for b in blockers),"observation_policy_complete":not any("observation" in b.get("class","") for b in blockers),"blockers":blockers,"available_deterministic_remediation_handlers":c.allowed_remediations,"actions_requiring_authority":[b for b in blockers if not b.get("handler")],"actions_prohibited_by_policy":[],"retry_history":c.retry_history,"next_action":next((b.get("handler") for b in blockers if b.get("handler")),"validate_or_observe")}
         rel=f"runtime/operational_readiness/evidence/{c.case_id}/assessment_{uuid.uuid4().hex[:8]}.json"; _write(self.root/rel,assessment); c.blockers=blockers; self.record(c,"assessment",{"path":rel,"blockers":blockers}); return assessment
     def _retry_ok(self,c,h,limit=2): return c.retry_history.get(h,0)<limit
     def remediate(self,c:ReadinessCase,handler:str):
@@ -167,6 +257,10 @@ class OperationalReadinessClosureController:
                 result={"created_runtime_directories":(self._target(c.target_id).metadata or {}).get("runtime_directories",[])}
             elif handler=="update_activation_ledger":
                 result=self._transactional_activation_ledger_update(c)
+            elif handler=="publish_controller_mutation":
+                result=self.publish_controller_mutation(c)
+                if result.get("status") not in {"verified","already_published"}:
+                    c.state="blocked_manual_intervention"; return self.save(c)
             elif handler=="fast_forward_checkout":
                 t=self._target(c.target_id); path=Path(t.local_path or self.root); status=_run(["git","status","--porcelain"],path)
                 if status.get("stdout"):
@@ -251,11 +345,13 @@ class OperationalReadinessClosureController:
         elapsed=0
         try: elapsed=max(0, int((datetime.fromisoformat(self.clock().replace("Z","+00:00"))-datetime.fromisoformat(start.replace("Z","+00:00"))).total_seconds()))
         except Exception: pass
-        passed=done>=req and elapsed>=min_seconds and ok
-        c.observation={"checks_required":req,"checks_passed":done,"health_checks":checks,"min_elapsed_seconds":min_seconds,"elapsed_seconds":elapsed,"restart_events_observed":c.observation.get("restart_events_observed",0),"runtime_cycles_observed":done,"status":"passed" if passed else "in_progress","started_at":start,"updated_at":self.clock()}
+        restart_required=int(c.observation_policy.get("restart_events_required",0) or 0)
+        restart_ok=int(c.observation.get("restart_events_observed",0) or 0) >= restart_required
+        passed=done>=req and elapsed>=min_seconds and ok and restart_ok
+        c.observation={"checks_required":req,"checks_passed":done,"health_checks":checks,"min_elapsed_seconds":min_seconds,"elapsed_seconds":elapsed,"restart_events_required":restart_required,"restart_events_observed":c.observation.get("restart_events_observed",0),"runtime_cycles_observed":done,"status":"passed" if passed else "in_progress","started_at":start,"updated_at":self.clock()}
         self.record(c,"observation",c.observation); c.state="operationally_ready" if passed else "observation_in_progress"; return self.save(c)
     def write_verdict(self,c):
-        payload={"readiness_case_id":c.case_id,"work_package_id":c.work_package_id,"repository":c.repository,"target_id":c.target_id,"merge_commit":c.merge_commit,"deployed_revision":c.merge_commit if c.state=="operationally_ready" else None,"activation_state":"verified" if c.state=="operationally_ready" else "not_verified","validation_status":(c.latest_validation or {}).get("status"),"validation_evidence":(c.latest_validation or {}).get("path"),"observation_status":c.observation.get("status"),"observation_evidence":c.evidence,"remediations_attempted":c.remediations_attempted,"unresolved_findings":c.blockers if c.state!="operationally_ready" else [],"final_state":c.state,"operationally_ready":c.state=="operationally_ready","institutional_acceptance_granted":False,"acceptance_authority":c.acceptance_authority,"generated_at":self.clock(),"evidence_root":f"runtime/operational_readiness/evidence/{c.case_id}"}
+        payload={"readiness_case_id":c.case_id,"work_package_id":c.work_package_id,"repository":c.repository,"target_id":c.target_id,"merge_commit":c.merge_commit,"deployed_revision":(_git_ref(Path(self._target(c.target_id).local_path or self.root),"HEAD").get("stdout","").strip() if c.state=="operationally_ready" else None),"controller_mutation_commit":c.publication.get("pre_local_head") or next((r.get("result",{}).get("commit") for r in c.remediations_attempted if r.get("handler")=="update_activation_ledger"),None),"publication_required":bool((self._target(c.target_id).metadata or {}).get("publication_required") or (self._target(c.target_id).metadata or {}).get("publication",{}).get("required")),"publication_status":c.publication.get("status"),"upstream_branch":(c.publication.get("upstream")+"/"+c.publication.get("branch") if c.publication.get("upstream") else None),"verified_upstream_commit":c.publication.get("verified_upstream_head"),"local_upstream_ahead_behind":c.publication.get("post_ahead_behind"),"validation_policy":c.readiness_policy,"observation_policy":c.observation_policy,"activation_state":"verified" if c.state=="operationally_ready" else "not_verified","validation_status":(c.latest_validation or {}).get("status"),"validation_evidence":(c.latest_validation or {}).get("path"),"observation_status":c.observation.get("status"),"observation_evidence":c.evidence,"remediations_attempted":c.remediations_attempted,"unresolved_findings":c.blockers if c.state!="operationally_ready" else [],"final_state":c.state,"operationally_ready":c.state=="operationally_ready","institutional_acceptance_granted":False,"acceptance_authority":c.acceptance_authority,"generated_at":self.clock(),"evidence_root":f"runtime/operational_readiness/evidence/{c.case_id}"}
         rel=VERDICTS/f"{c.case_id}.json"; _write(self.root/rel,payload); self.record(c,"verdict",{"path":_rel(self.root,self.root/rel),"state":c.state}); self.save(c); return payload
     def process_one(self, case_id):
         c=ReadinessCase.from_dict(_read(self._case_path(case_id),{}))
@@ -293,7 +389,7 @@ class OperationalReadinessClosureController:
     def acknowledge(self,cid,note="manual blocker cleared"):
         c=ReadinessCase.from_dict(_read(self._case_path(cid))); self.record(c,"manual_blocker_acknowledged",{"note":note}); c.blockers=[]; c.state="assessment_required"; return self.save(c).to_dict()
     def render_office(self):
-        rows=self.list_cases(); text="# Operational Readiness Closure\n\nExisting Office projection for the canonical WP-0650 controller. Controls call `estate.core.operational_readiness_closure`. Keyboard command equivalents: list, show, process-one, cycle, pause, resume, acknowledge, report.\n\n| Case | Work package | State | Target | Next action | Evidence |\n| --- | --- | --- | --- | --- | --- |\n"
-        for r in rows: text+=f"| {r['case_id']} | {r['work_package_id']} | {r['state']} | {r['target_id']} | {(r.get('blockers') or [{}])[0].get('handler','validate/observe')} | runtime/operational_readiness/evidence/{r['case_id']} |\n"
+        rows=self.list_cases(); text="# Operational Readiness Closure\n\nExisting Office projection for the canonical WP-0650 controller. Controls call `estate.core.operational_readiness_closure`. Keyboard command equivalents: list, show, process-one, cycle, pause, resume, acknowledge, report.\n\n| Case | Work package | State | Target | Local HEAD | Upstream HEAD | Publication | Policy | Next action | Evidence |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n"
+        for r in rows: pub=(r.get('publication') or {}); pol='loaded' if r.get('readiness_policy') else 'not declared'; text+=f"| {r['case_id']} | {r['work_package_id']} | {r['state']} | {r['target_id']} | {pub.get('pre_local_head') or pub.get('local_head','')} | {pub.get('verified_upstream_head') or pub.get('upstream_head','')} | {pub.get('status','not_required')} | {pol} | {(r.get('blockers') or [{}])[0].get('handler','validate/observe')} | runtime/operational_readiness/evidence/{r['case_id']} |\n"
         (self.root/OFFICE).parent.mkdir(parents=True,exist_ok=True); (self.root/OFFICE).write_text(text,encoding="utf-8"); return text
     def report(self): self.render_office(); return {"cases":self.list_cases(),"status":_read(self.root/STATUS/"latest.json",{}),"office_projection":str(OFFICE)}
