@@ -48,6 +48,14 @@ def _run(cmd:list[str], cwd:Path, timeout:int=60):
     r=subprocess.run(cmd,cwd=cwd,text=True,capture_output=True,timeout=timeout,check=False)
     return {"command":cmd,"cwd":str(cwd),"exit_code":r.returncode,"stdout":r.stdout,"stderr":r.stderr,"timestamp":utc_now_iso()}
 
+def _git_contains(repo:Path, ancestor:str, descendant:str="HEAD"):
+    if not ancestor: return {"contains":False,"reason":"missing_merge_commit"}
+    r=_run(["git","merge-base","--is-ancestor",ancestor,descendant],repo)
+    return {"contains":r["exit_code"]==0,"command":r["command"],"exit_code":r["exit_code"],"stderr":r["stderr"]}
+
+def _safe_cmd(value):
+    return isinstance(value,list) and value and all(isinstance(x,str) and x for x in value)
+
 @dataclass
 class ReadinessCase:
     case_id: str; work_package_id: str; target_id: str; repository: str; base_branch: str; merge_commit: str
@@ -80,6 +88,19 @@ class OperationalReadinessClosureController:
             if not state or c.state==state or (state=="active" and c.state not in FINAL_STATES): out.append(c.to_dict())
         return out
     def show(self, case_id): return ReadinessCase.from_dict(_read(self._case_path(case_id),{})).to_dict()
+    def intake_from_merge_discovery(self, *, limit:int=20):
+        """Create readiness cases from existing Merge Discovery records/status without a parallel queue."""
+        made=[]; seen=set()
+        dirs=[self.root/"runtime/merge_discovery/discoveries", self.root/"runtime/merge_discovery/candidates"]
+        for d in dirs:
+            for p in sorted(d.glob("*.json")) if d.exists() else []:
+                rec=_read(p,{}) or {}; wp=rec.get("work_package_id"); sha=rec.get("source_commit") or rec.get("source_reference"); target=rec.get("target_id") or "estate-main"
+                key=(wp,sha,target)
+                if not wp or not sha or key in seen or rec.get("state") in {"ignored","ambiguous","blocked","failed"}: continue
+                seen.add(key); made.append(self.create_or_resume(work_package_id=wp, merge_commit=sha, target_id=target, affected_files=(rec.get("metadata") or {}).get("changed_paths") or [], completion_receipt=rec.get("completion_receipt_path")))
+                if len(made)>=limit: break
+        return [c.to_dict() for c in made]
+
     def create_or_resume(self, *, work_package_id:str, merge_commit:str, target_id="estate-main", repository="ppow1/theestate", base_branch="main", **kw):
         raw=f"{repository}|{target_id}|{work_package_id}|{merge_commit}"; cid="orc-"+hashlib.sha256(raw.encode()).hexdigest()[:16]
         if self._case_path(cid).exists(): return ReadinessCase.from_dict(_read(self._case_path(cid)))
@@ -91,6 +112,7 @@ class OperationalReadinessClosureController:
             activation_requirements=kw.get("activation_requirements") or md.get("activation_requirements") or {"ledger":True},
             observation_policy=kw.get("observation_policy") or md.get("observation_policy") or {"checks_required":1},
             acceptance_authority=kw.get("acceptance_authority") or t.acceptance_authority)
+        c.completion_receipt=kw.get("completion_receipt")
         self.record(c,"case_created",{"work_package_id":work_package_id,"merge_commit":merge_commit}); return self.save(c)
     def record(self,c,kind,detail):
         rel=_rel(self.root,self._event_path(c.case_id)); _append_jsonl(self._event_path(c.case_id),{"at":self.clock(),"case_id":c.case_id,"kind":kind,"detail":detail});
@@ -106,14 +128,25 @@ class OperationalReadinessClosureController:
             git={"branch":branch.get("stdout"," ").strip(),"head":head.get("stdout","").strip(),"dirty":bool(status.get("stdout")),"status_evidence":status}
             if git["dirty"]: blockers.append({"class":"stale_repository_or_dirty_checkout","blocker":"repository contains uncommitted work","required_action":"manual clean or commit local work"})
             if git["branch"] and git["branch"]!=c.base_branch: blockers.append({"class":"stale_repository_or_dirty_checkout","blocker":"wrong branch","required_action":f"switch managed checkout to {c.base_branch}"})
-            if c.merge_commit and git["head"] and not git["head"].startswith(c.merge_commit[:12]):
-                if "fast_forward_checkout" in c.allowed_remediations: blockers.append({"class":"stale_runtime_checkout","blocker":"target revision differs from merge commit","handler":"fast_forward_checkout"})
-                else: blockers.append({"class":"deployment_failure","blocker":"target revision differs from merge commit","required_action":"authorize fast_forward_checkout"})
+            contains=_git_contains(path,c.merge_commit,"HEAD") if git["head"] else {"contains":False,"reason":"no_head"}
+            git["required_merge_commit_present"]=contains
+            if c.merge_commit and git["head"] and not contains.get("contains"):
+                if "fast_forward_checkout" in c.allowed_remediations: blockers.append({"class":"stale_runtime_checkout","blocker":"target revision ancestry does not contain required merge commit","handler":"fast_forward_checkout","precondition":"clean managed checkout on declared base branch"})
+                else: blockers.append({"class":"deployment_failure","blocker":"target revision ancestry does not contain required merge commit","required_action":"authorize fast_forward_checkout"})
+        runtime_checks={"executable":None,"root":None,"pid":None,"lock":None,"heartbeat":None,"scheduled_task":md.get("scheduled_task_state","not_declared"),"deployed_revision":git.get("head")}
+        for name,key in [("executable","runtime_executable"),("root","runtime_root"),("pid","pid_file"),("lock","lock_file"),("heartbeat","heartbeat_file")]:
+            declared=md.get(key)
+            if declared:
+                exists=(self.root/declared).exists() if not Path(declared).is_absolute() else Path(declared).exists()
+                runtime_checks[name]={"path":declared,"exists":exists}
+                if not exists: blockers.append({"class":"runtime_lifecycle_failure","blocker":f"declared {name} missing: {declared}","required_action":"restore declared runtime artifact or authorize policy remediation"})
+        if md.get("scheduled_task_required") and md.get("scheduled_task_state") not in {"ready","running","enabled"}:
+            blockers.append({"class":"runtime_lifecycle_failure","blocker":"declared Scheduled Task is not ready/running/enabled","required_action":"restore Scheduled Task through declared target policy"})
         for d in md.get("runtime_directories",[]):
             if not (self.root/d).exists(): blockers.append({"class":"missing_prerequisite","blocker":f"declared runtime directory missing: {d}","handler":"create_declared_runtime_directories"})
-        if c.activation_requirements.get("ledger") and "WP-0650" not in (self.root/LEDGER).read_text(encoding="utf-8") if (self.root/LEDGER).exists() else True:
+        if c.activation_requirements.get("ledger") and c.work_package_id not in (self.root/LEDGER).read_text(encoding="utf-8") if (self.root/LEDGER).exists() else True:
             blockers.append({"class":"activation_failure","blocker":"activation ledger entry missing","handler":"update_activation_ledger"})
-        assessment={"generated_at":self.clock(),"case_id":c.case_id,"state":c.state,"current_merged_revision":c.merge_commit,"current_target_revision":git.get("head"),"repository_cleanliness":"dirty" if git.get("dirty") else "clean_or_unavailable","branch":git.get("branch"),"runtime_process_state":md.get("runtime_process_state","not_declared"),"scheduled_task_state":md.get("scheduled_task_state","not_declared"),"activation_state":"ledger_current" if not any(b.get("class")=="activation_failure" for b in blockers) else "activation_required","latest_validation_result":c.latest_validation,"blockers":blockers,"available_deterministic_remediation_handlers":c.allowed_remediations,"actions_requiring_authority":[b for b in blockers if not b.get("handler")],"actions_prohibited_by_policy":[],"retry_history":c.retry_history,"next_action":next((b.get("handler") for b in blockers if b.get("handler")),"validate_or_observe")}
+        assessment={"generated_at":self.clock(),"case_id":c.case_id,"state":c.state,"current_merged_revision":c.merge_commit,"current_target_revision":git.get("head"),"required_merge_commit_present":(git.get("required_merge_commit_present") or {}).get("contains",False),"repository_cleanliness":"dirty" if git.get("dirty") else "clean_or_unavailable","branch":git.get("branch"),"runtime_process_state":md.get("runtime_process_state","not_declared"),"scheduled_task_state":md.get("scheduled_task_state","not_declared"),"runtime_lifecycle_checks":runtime_checks,"activation_state":"ledger_current" if not any(b.get("class")=="activation_failure" for b in blockers) else "activation_required","latest_validation_result":c.latest_validation,"blockers":blockers,"available_deterministic_remediation_handlers":c.allowed_remediations,"actions_requiring_authority":[b for b in blockers if not b.get("handler")],"actions_prohibited_by_policy":[],"retry_history":c.retry_history,"next_action":next((b.get("handler") for b in blockers if b.get("handler")),"validate_or_observe")}
         rel=f"runtime/operational_readiness/evidence/{c.case_id}/assessment_{uuid.uuid4().hex[:8]}.json"; _write(self.root/rel,assessment); c.blockers=blockers; self.record(c,"assessment",{"path":rel,"blockers":blockers}); return assessment
     def _retry_ok(self,c,h,limit=2): return c.retry_history.get(h,0)<limit
     def remediate(self,c:ReadinessCase,handler:str):
@@ -125,10 +158,13 @@ class OperationalReadinessClosureController:
             result={"created_runtime_directories":(self._target(c.target_id).metadata or {}).get("runtime_directories",[])}
         elif handler=="update_activation_ledger":
             p=self.root/LEDGER; p.parent.mkdir(parents=True,exist_ok=True)
-            with p.open("a",encoding="utf-8") as f: f.write(f"\n| WP-0650 Operational Readiness Closure Controller | Live | `{_rel(self.root,self._case_path(c.case_id))}` and `{_rel(self.root,self._event_path(c.case_id))}` | Connected through existing Operations Runtime, CLI, Office command surface, and Activation Ledger; institutional acceptance remains separate. |\n")
-            result={"ledger":_rel(self.root,p)}
+            with p.open("a",encoding="utf-8") as f: f.write(f"\n| {c.work_package_id} | Live evidence pending Chief Architect acceptance | `{_rel(self.root,self._case_path(c.case_id))}` and `{_rel(self.root,self._event_path(c.case_id))}` | Activation evidence is work-package specific; institutional acceptance remains separate. |\n")
+            result={"ledger":_rel(self.root,p),"work_package_id":c.work_package_id}
         elif handler=="fast_forward_checkout":
-            t=self._target(c.target_id); path=Path(t.local_path or self.root); result={"fetch":_run(["git","fetch","--quiet",(t.metadata or {}).get("upstream","origin")],path),"merge":_run(["git","merge","--ff-only",f"{(t.metadata or {}).get('upstream','origin')}/{c.base_branch}"],path)}
+            t=self._target(c.target_id); path=Path(t.local_path or self.root); status=_run(["git","status","--porcelain"],path)
+            if status.get("stdout"):
+                c.state="blocked_unsafe_action"; self.record(c,"remediation_refused",{"handler":handler,"reason":"managed checkout dirty","status":status}); return self.save(c)
+            upstream=(t.metadata or {}).get("upstream","origin"); result={"fetch":_run(["git","fetch","--quiet",upstream],path),"merge":_run(["git","merge","--ff-only",f"{upstream}/{c.base_branch}"],path)}
         else:
             c.state="blocked_manual_intervention"; self.record(c,"unknown_handler",{"handler":handler}); return c
         c.remediations_attempted.append({"handler":handler,"at":self.clock(),"result":result}); self.record(c,"remediation",{"handler":handler,"result":result}); c.state="assessment_required"; return self.save(c)
@@ -136,12 +172,27 @@ class OperationalReadinessClosureController:
         fp=json.dumps([c.merge_commit,c.validation_recipe,c.remediations_attempted],sort_keys=True)
         if c.last_validation_fingerprint==hashlib.sha256(fp.encode()).hexdigest() and c.latest_validation: return c.latest_validation
         results=[]; ok=True
+        target=Path(self._target(c.target_id).local_path or self.root)
         for cmd in c.validation_recipe:
-            r=_run(cmd,self.root,timeout=120); results.append(r); ok=ok and r["exit_code"]==0
-        rel=f"runtime/operational_readiness/evidence/{c.case_id}/validation_{uuid.uuid4().hex[:8]}.json"; payload={"status":"passed" if ok else "failed","results":results,"revision":c.merge_commit,"path":rel}; _write(self.root/rel,payload)
+            if not _safe_cmd(cmd):
+                r={"command":cmd,"cwd":str(target),"exit_code":126,"stdout":"","stderr":"refused non-declared or unsafe validation command","timestamp":self.clock()}
+            else:
+                r=_run(cmd,target,timeout=120)
+            results.append(r); ok=ok and r["exit_code"]==0
+        rel=f"runtime/operational_readiness/evidence/{c.case_id}/validation_{uuid.uuid4().hex[:8]}.json"; payload={"status":"passed" if ok else "failed","results":results,"revision":c.merge_commit,"target_id":c.target_id,"live_target_path":str(target),"repository_local_simulation":False,"path":rel}; _write(self.root/rel,payload)
         c.latest_validation=payload; c.last_validation_fingerprint=hashlib.sha256(fp.encode()).hexdigest(); self.record(c,"validation",payload); c.state="observation_required" if ok else "live_validation_failed"; self.save(c); return payload
     def observe(self,c):
-        req=int(c.observation_policy.get("checks_required",1)); done=int(c.observation.get("checks_passed",0))+1; c.observation={"checks_required":req,"checks_passed":done,"status":"passed" if done>=req else "in_progress","updated_at":self.clock()}; self.record(c,"observation",c.observation); c.state="operationally_ready" if done>=req else "observation_in_progress"; return self.save(c)
+        req=int(c.observation_policy.get("checks_required",1)); min_seconds=int(c.observation_policy.get("min_elapsed_seconds",0)); start=c.observation.get("started_at") or self.clock(); done=int(c.observation.get("checks_passed",0))
+        checks=[]; ok=True; target=Path(self._target(c.target_id).local_path or self.root)
+        for cmd in c.observation_policy.get("health_checks",[]):
+            r=_run(cmd,target,timeout=60) if _safe_cmd(cmd) else {"command":cmd,"exit_code":126,"stderr":"refused unsafe health check"}; checks.append(r); ok=ok and r.get("exit_code")==0
+        done = done + (1 if ok else 0)
+        elapsed=0
+        try: elapsed=max(0, int((datetime.fromisoformat(self.clock().replace("Z","+00:00"))-datetime.fromisoformat(start.replace("Z","+00:00"))).total_seconds()))
+        except Exception: pass
+        passed=done>=req and elapsed>=min_seconds and ok
+        c.observation={"checks_required":req,"checks_passed":done,"health_checks":checks,"min_elapsed_seconds":min_seconds,"elapsed_seconds":elapsed,"restart_events_observed":c.observation.get("restart_events_observed",0),"runtime_cycles_observed":done,"status":"passed" if passed else "in_progress","started_at":start,"updated_at":self.clock()}
+        self.record(c,"observation",c.observation); c.state="operationally_ready" if passed else "observation_in_progress"; return self.save(c)
     def write_verdict(self,c):
         payload={"readiness_case_id":c.case_id,"work_package_id":c.work_package_id,"repository":c.repository,"target_id":c.target_id,"merge_commit":c.merge_commit,"deployed_revision":c.merge_commit if c.state=="operationally_ready" else None,"activation_state":"verified" if c.state=="operationally_ready" else "not_verified","validation_status":(c.latest_validation or {}).get("status"),"validation_evidence":(c.latest_validation or {}).get("path"),"observation_status":c.observation.get("status"),"observation_evidence":c.evidence,"remediations_attempted":c.remediations_attempted,"unresolved_findings":c.blockers if c.state!="operationally_ready" else [],"final_state":c.state,"operationally_ready":c.state=="operationally_ready","institutional_acceptance_granted":False,"acceptance_authority":c.acceptance_authority,"generated_at":self.clock(),"evidence_root":f"runtime/operational_readiness/evidence/{c.case_id}"}
         rel=VERDICTS/f"{c.case_id}.json"; _write(self.root/rel,payload); self.record(c,"verdict",{"path":_rel(self.root,self.root/rel),"state":c.state}); self.save(c); return payload
@@ -164,8 +215,9 @@ class OperationalReadinessClosureController:
         if c.state in FINAL_STATES: self.write_verdict(c)
         return c.to_dict()
     def run_cycle(self, limit=2):
+        discovered=self.intake_from_merge_discovery(limit=limit)
         cases=[ReadinessCase.from_dict(x) for x in self.list_cases() if x.get("state") not in FINAL_STATES and not x.get("paused")]
-        metrics={"cases_discovered":0,"cases_assessed":0,"cases_advanced":0,"remediations_attempted":0,"remediations_succeeded":0,"remediations_failed":0,"validations_executed":0,"cases_entering_observation":0,"cases_declared_operationally_ready":0,"cases_blocked_for_authority":0,"cases_blocked_for_manual_intervention":0,"retry_limits_reached":0,"current_active_cases":len(cases),"oldest_active_case_age":None}
+        metrics={"cases_discovered":len(discovered),"cases_assessed":0,"cases_advanced":0,"remediations_attempted":0,"remediations_succeeded":0,"remediations_failed":0,"validations_executed":0,"cases_entering_observation":0,"cases_declared_operationally_ready":0,"cases_blocked_for_authority":0,"cases_blocked_for_manual_intervention":0,"retry_limits_reached":0,"current_active_cases":len(cases),"oldest_active_case_age":None}
         results=[]
         for c in cases[:limit]:
             before=c.state; before_rem=len(c.remediations_attempted); r=self.process_one(c.case_id); results.append(r); metrics["cases_assessed"]+=1; metrics["cases_advanced"]+= before!=r.get("state"); metrics["remediations_attempted"]+=max(0,len(r.get("remediations_attempted",[]))-before_rem); metrics["validations_executed"]+=1 if r.get("latest_validation") else 0; metrics["cases_entering_observation"]+=1 if r.get("state") in {"observation_required","observation_in_progress"} else 0; metrics["cases_declared_operationally_ready"]+=1 if r.get("state")=="operationally_ready" else 0; metrics["cases_blocked_for_manual_intervention"]+=1 if r.get("state")=="blocked_manual_intervention" else 0; metrics["cases_blocked_for_authority"]+=1 if r.get("state")=="blocked_authority_required" else 0; metrics["retry_limits_reached"]+=1 if r.get("state")=="failed_bounded_retries" else 0

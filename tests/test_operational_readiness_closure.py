@@ -56,3 +56,43 @@ def test_blocked_case_does_not_starve_other_case(tmp_path):
     states={r['work_package_id']:r['state'] for r in cycle['results']}
     assert states['WP-BLOCK']=='blocked_manual_intervention'
     assert states['WP-CLEAN'] in {'assessment_required','observation_required','observation_in_progress','operationally_ready'}
+
+def test_merge_discovery_intake_and_descendant_ancestry_validation(tmp_path):
+    root, sha = make_root(tmp_path)
+    (root / 'live.txt').write_text('live')
+    run(['git','add','live.txt'], root); run(['git','commit','-m','descendant'], root)
+    discovery_dir = root / 'runtime/merge_discovery/discoveries'; discovery_dir.mkdir(parents=True)
+    discovery_dir.joinpath('md.json').write_text(json.dumps({
+        'target_id':'estate-main','state':'discovered','work_package_id':'WP-0651',
+        'source_commit':sha,'completion_receipt_path':'collaboration/work_packages/completions/WP-0651.json',
+        'metadata':{'changed_paths':['src/estate/core/operational_readiness_closure.py']}
+    }))
+    ctl=OperationalReadinessClosureController(root)
+    made=ctl.intake_from_merge_discovery()
+    assert made[0]['work_package_id']=='WP-0651'
+    out=ctl.process_one(made[0]['case_id'])
+    assert out['state']=='assessment_required'
+    assessment=json.loads(next((root/'runtime/operational_readiness/evidence'/made[0]['case_id']).glob('assessment_*.json')).read_text())
+    assert assessment['required_merge_commit_present'] is True
+
+
+def test_validation_runs_against_declared_live_target_not_controller_root(tmp_path):
+    root, sha=make_root(tmp_path)
+    live=tmp_path/'live-target'; live.mkdir()
+    run(['git','init','-b','main'], live); run(['git','config','user.email','t@example.com'], live); run(['git','config','user.name','Tester'], live)
+    (live/'target_only.txt').write_text('ok')
+    run(['git','add','.'], live); run(['git','commit','-m','target'], live); live_sha=run(['git','rev-parse','HEAD'], live).stdout.strip()
+    reg=json.loads((root/'runtime/operational_targets/registry.json').read_text())
+    reg['targets'][0]['local_path']=str(live)
+    reg['targets'][0]['metadata']['runtime_directories']=[]
+    reg['targets'][0]['metadata']['activation_requirements']={'ledger':False}
+    reg['targets'][0]['metadata']['validation_recipe']=[[sys.executable,'-c','from pathlib import Path; assert Path("target_only.txt").exists()']]
+    (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-LIVE', merge_commit=live_sha)
+    out=ctl.process_one(c.case_id)
+    if out['latest_validation'] is None:
+        out=ctl.process_one(c.case_id)
+    assert out['latest_validation']['status']=='passed'
+    assert out['latest_validation']['live_target_path']==str(live)
+    assert out['latest_validation']['repository_local_simulation'] is False
