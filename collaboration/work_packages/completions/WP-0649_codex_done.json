@@ -25,6 +25,14 @@
   ],
   "validation_executed_in_connector_environment": false,
   "validation_limitation": "The GitHub connector can write and review repository artifacts but cannot execute the Windows-local Estate test suite. Required commands must run in a synchronized local checkout or CI before approval.",
-  "ready_for_ca_review": true,
-  "ready_for_merge": false
+  "ready_for_merge": false,
+  "local_validation_executed": true,
+  "wp0649_regression_passed": true,
+  "wp0618_focused_suite_passed": true,
+  "wp0618_governed_validation_passed": true,
+  "wp0618_resulting_verdict": "passed",
+  "validation_completed_at": "2026-07-12T04:45:15.0748101Z",
+  "validated_branch": "agent/wp-0649-validation-basetemp",
+  "validated_commit": "1f18469dad4ba537450cc9889a5f7caa4780f698",
+  "ready_for_ca_review": true
 }
