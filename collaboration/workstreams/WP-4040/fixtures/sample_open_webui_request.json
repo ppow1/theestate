@@ -1,0 +1,12 @@
+{
+  "model": "estate/conference-room",
+  "stream": true,
+  "messages": [
+    {"role": "user", "content": "Helen and Grace, weigh in."}
+  ],
+  "metadata": {
+    "room_id": "room-sample",
+    "session_id": "open-webui-sample-session",
+    "resident_targets": ["helen", "grace"]
+  }
+}

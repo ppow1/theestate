@@ -1,0 +1,16 @@
+{
+  "work_package_id": "WP-4040",
+  "status": "done",
+  "staged_work_is_installed": false,
+  "summary": "Staged an Open WebUI multi-resident gateway integration contract, deterministic request normalization, model-catalog descriptors, attributed response envelopes, SSE line shaping, schema, fixture, tests, and rollback notes without modifying active gateway/runtime files.",
+  "tests": [
+    "python -m pytest collaboration/workstreams/WP-4040/tests/test_open_webui_multi_resident_gateway.py"
+  ],
+  "live_provider_calls": "none",
+  "open_webui_manual_validation": "not performed",
+  "active_runtime_modified": false,
+  "known_limitations": [
+    "The pending work-package file is truncated after the dependency list, so implementation was constrained to staged artifacts consistent with the title and dependency contract.",
+    "No active Open WebUI instance or Estate gateway server was exercised."
+  ]
+}
