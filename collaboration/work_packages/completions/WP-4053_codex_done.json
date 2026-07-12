@@ -1,0 +1,45 @@
+{
+  "work_package": "WP-4053",
+  "status": "completed_staged",
+  "completed_by": "Codex",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "staged_files": [
+    "collaboration/workstreams/WP-4053/install_manifest.json",
+    "collaboration/workstreams/WP-4053/README.md",
+    "collaboration/workstreams/WP-4053/src/wp4053_preferences/__init__.py",
+    "collaboration/workstreams/WP-4053/src/wp4053_preferences/engine.py",
+    "collaboration/workstreams/WP-4053/schemas/preference_record_v1.json",
+    "collaboration/workstreams/WP-4053/schemas/preference_change_proposal_v1.json",
+    "collaboration/workstreams/WP-4053/fixtures/grace_preferences.json",
+    "collaboration/workstreams/WP-4053/fixtures/ingrid_preferences.json",
+    "collaboration/workstreams/WP-4053/fixtures/evelyn_preferences.json",
+    "collaboration/workstreams/WP-4053/tests/test_preference_engine.py",
+    "collaboration/workstreams/WP-4053/docs/integration_notes.md",
+    "collaboration/workstreams/WP-4053/docs/rollback_notes.md",
+    "collaboration/work_packages/completions/WP-4053_codex_done.json"
+  ],
+  "test_commands_and_results": [
+    {"command": "python -m pytest collaboration/workstreams/WP-4053/tests/test_preference_engine.py -q", "result": "passed", "summary": "11 passed in 0.06s"}
+  ],
+  "remaining_integration_work": [
+    "Create future INSTALL-HANDOFF package before active runtime installation.",
+    "Map staged engine into active resident context assembly with audience filtering.",
+    "Add durable storage adapter and schema registry entry after review.",
+    "Connect proposal review to Steward-approved continuity workflow.",
+    "Wire evaluator and gateway rejection paths for identity-anchor and raw-model-output changes.",
+    "Plan future visual/avatar preference consumers with privacy gating."
+  ],
+  "known_conflicts": [],
+  "required_future_install_handoff_package": {
+    "required": true,
+    "minimum_contents": [
+      "target active runtime paths",
+      "migration/storage adapter plan",
+      "privacy and audience-access matrix",
+      "proposal authority workflow",
+      "rollback and data-minimization procedure",
+      "full regression test plan"
+    ]
+  },
+  "active_runtime_paths_modified": []
+}
