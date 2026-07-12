@@ -18,6 +18,7 @@ from estate.core.character_bible import load_character_context
 from estate.core.resident_registry_snapshot import build_resident_registry_snapshot
 from estate.core.grounded_fact_provider import get_grounded_facts
 from estate.core.relationship_graph import load_relationship_context
+from estate.core.resident_memory_runtime import retrieve_memory_context
 
 SCHEMA_VERSION = "resident_runtime_identity_composition.v1"
 COMPOSITION_ORDER = [
@@ -28,6 +29,7 @@ COMPOSITION_ORDER = [
     "character_context",
     "privacy_and_disclosure_context",
     "relationship_context",
+    "durable_memory_context",
     "conversation_context",
     "task_specific_instructions",
 ]
@@ -127,6 +129,7 @@ def compose_resident_identity(
         excluded.append({"layer": "character_context", "reason": "optional_character_profile_missing", "source": "resident character artifacts"})
     grounded = get_grounded_facts(canonical_key, surface_id=surface_id, root=rootp)
     relationships = load_relationship_context(canonical_key, surface_id=surface_id, root=rootp)
+    memory_context = retrieve_memory_context(canonical_key, surface_id=surface_id, root=rootp, actor="Steward")
 
     active = [{"id": r.get("id"), "name": r.get("name"), "office": OFFICE_CORRECTIONS.get(_key(r.get("name")), r.get("office")), "status": r.get("status"), "classification": r.get("classification")} for r in registry if str(r.get("status", "")).lower() == "active"]
     room_safe_active = [{k: v for k, v in r.items() if not (r.get("classification") in PRIVATE_CLASSES and k == "classification")} for r in active]
@@ -155,6 +158,7 @@ def compose_resident_identity(
         layers.append({"layer": "character_context", "classification": (rec or {}).get("classification") or "Estate Internal", "content": character, "sources": [_source((character.get("sources") or ["resident character artifacts"])[0], (rec or {}).get("classification") or "Estate Internal", reason="canonical character bible context")]})
     layers.append({"layer": "privacy_and_disclosure_context", "classification": "Estate Internal", "content": {"minimum_necessary": True, "ordinary_identity_allowed": True, "private_room_continuity_excluded": surface_id.startswith(("conference", "room"))}, "sources": [_source("src/estate/core/resident_identity_composition.py", reason="runtime privacy filter")]})
     layers.append({"layer": "relationship_context", "classification": "Estate Restricted" if canonical_key == "evelyn" else "Estate Internal", "content": relationships, "sources": [_source("src/estate/core/relationship_graph.py", (rec or {}).get("classification") or "Estate Internal", reason="privacy-filtered relationship graph")]})
+    layers.append({"layer": "durable_memory_context", "classification": "Estate Restricted" if canonical_key == "evelyn" else "Estate Internal", "content": memory_context, "sources": [_source("runtime/resident_memory/memory_store.json", (rec or {}).get("classification") or "Estate Internal", reason="bounded privacy-filtered durable memory; excludes provider memory and raw transcripts")]})
     layers.append({"layer": "conversation_context", "classification": "surface-local", "content": {"turns": list(conversation_context or [])[-4:], "canonical_truth": False}, "sources": [_source("runtime/resident_interactions/sessions", "surface-local", reason="bounded current conversation only")]})
     layers.append({"layer": "task_specific_instructions", "classification": "surface-local", "content": {"instructions": task_instructions or "Respond within composed identity and authority."}, "sources": [_source("request_payload", "surface-local", reason="current request instructions")]})
 
