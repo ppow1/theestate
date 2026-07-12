@@ -1,0 +1,35 @@
+{
+  "authority_boundaries_preserved": [
+    "no force push",
+    "no force reset",
+    "no discarded local work",
+    "no history rewriting",
+    "no arbitrary generated shell execution",
+    "no automatic institutional acceptance"
+  ],
+  "branch": "wp-0653-governed-publication",
+  "controller_module": "src/estate/core/operational_readiness_closure.py",
+  "evidence_paths": [
+    "operations/validation/recipes/WP-0653_governed_publication_readiness_policy.md",
+    "operations/acceptance/WP-0653_live_acceptance_report.md"
+  ],
+  "generated_at": "2026-07-12T23:28:48Z",
+  "policy_enforcement": [
+    "explicit production validation policy",
+    "live target path",
+    "observation cycles",
+    "elapsed time or rationale",
+    "health checks or rationale",
+    "restart gate when applicable",
+    "publication authorization"
+  ],
+  "publication_handlers": [
+    "publish_controller_mutation"
+  ],
+  "status": "implemented_with_environment_blocker_for_live_windows_acceptance",
+  "tests": [
+    "PYTHONPATH=src pytest tests/test_operational_readiness_closure.py -q",
+    "PYTHONPATH=src python -m py_compile src/estate/core/operational_readiness_closure.py src/estate/cli/main.py src/estate/core/office_command_surface.py"
+  ],
+  "work_package_id": "WP-0653"
+}
