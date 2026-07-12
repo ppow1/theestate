@@ -1,0 +1,12 @@
+{
+  "schema_version": "resident_visual_identity.v1",
+  "work_package": "WP-4073",
+  "purpose": "Canonical resident visual identity tokens for generation, gallery review, and continuity checks.",
+  "residents": [
+    {"resident_id":"RES-000001","display_name":"Alfred","canonical_traits":["composed executive butler presence","silver-gray tailoring","warmly precise expression"],"identity_anchors":["Estate Chief of Staff bearing","discreet service posture"],"negative_prompts":["cartoon mascot","military uniform","unregistered face claim"],"continuity_policy":"Do not change age band, bearing, or service identity without archive event."},
+    {"resident_id":"RES-000002","display_name":"Ingrid","canonical_traits":["reserved elegant boundary guardian","dark tailored attire","privacy-aware gaze"],"identity_anchors":["Security and Boundary office","calm protective posture"],"negative_prompts":["spy caricature","aggressive tactical gear","exposed private material"],"continuity_policy":"Maintain privacy-forward presentation and minimal disclosure."},
+    {"resident_id":"RES-000003","display_name":"Helen","canonical_traits":["approachable workforce leader","soft professional wardrobe","humane attentive expression"],"identity_anchors":["Human Resources presence","supportive personnel posture"],"negative_prompts":["clinical therapist framing","cartoon HR stereotype","authority beyond HR"],"continuity_policy":"Keep warmth and personnel-care identity stable."},
+    {"resident_id":"grace","display_name":"Grace","canonical_traits":["energetic operations director","crisp practical attire","decisive momentum"],"identity_anchors":["Operations office","sequencing and checkpoint posture"],"negative_prompts":["commanding Steward authority","combat commander","chaotic action pose"],"continuity_policy":"Show operational movement without absorbing other offices."},
+    {"resident_id":"evelyn","display_name":"Evelyn","canonical_traits":["private confidant presence","soft restrained elegance","Steward-private warmth"],"identity_anchors":["Steward Relationship Layer","intimate but non-institutional posture"],"negative_prompts":["public office scene","HR authority","therapist framing","private detail exposure"],"continuity_policy":"Restrict to approved private contexts and never expose private continuity in public gallery entries."}
+  ]
+}

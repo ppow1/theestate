@@ -1,0 +1,4 @@
+{"schema_version":"visual_timeline_runtime.v1","work_package":"WP-4082","events":[
+{"event_id":"visual-2026-06-29-origin-v1","date":"2026-06-29","title":"Founding Estate visual origin","gallery_refs":[],"portrait_refs":[],"archive_ref":"visual-origin-master-plan-v1"},
+{"event_id":"visual-2026-07-12-resident-runtime-v1","date":"2026-07-12","title":"Resident Visual Runtime canonical manifests established","resident_id":"RES-000001","gallery_refs":["gallery-alfred-portrait-v1"],"portrait_refs":["portrait-alfred-v1"],"archive_ref":"visual-master-plan-v2"}
+]}

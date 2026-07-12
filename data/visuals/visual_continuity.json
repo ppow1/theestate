@@ -1,0 +1,6 @@
+{"schema_version":"visual_continuity_runtime.v1","work_package":"WP-4077","rules":[
+{"rule_id":"continuity-resident-anchor-required","description":"Every gallery, portrait, scene, and timeline resident reference must resolve through resident_visual_identities."},
+{"rule_id":"continuity-no-duplicate-asset-system","description":"Assets are referenced by existing repository paths or runtime paths; this runtime stores manifests only."},
+{"rule_id":"continuity-archive-material-change","description":"Material visual identity changes require an Estate Historical Archive record and Visual Timeline event."},
+{"rule_id":"continuity-restricted-private-gallery","description":"Restricted resident presentation may be indexed but not exposed as public gallery material."}
+]}
