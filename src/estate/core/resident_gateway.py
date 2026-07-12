@@ -10,6 +10,7 @@ ACTIVE_RESIDENT_MODELS = {
     "estate/alfred": "alfred",
     "estate/helen": "helen",
     "estate/ingrid": "ingrid",
+    "estate/grace": "grace",
 }
 STATUS_PATH = Path("runtime/resident_gateway/status.json")
 

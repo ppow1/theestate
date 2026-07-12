@@ -82,5 +82,22 @@
     "canonical": "estate://residents/res-000006",
     "palace": "Estate / Residents / Judy",
     "registered_at": "2026-06-29 20:26:35"
+  },
+  {
+    "id": "grace",
+    "type": "resident",
+    "name": "Grace",
+    "department": "Operations",
+    "office": "Director of Operations",
+    "status": "Active",
+    "classification": "Estate Internal",
+    "created": "2026-07-12 00:00:00",
+    "role": "Conducts approved Estate operational movement by sequencing priorities, dependencies, handoffs, checkpoints, and closures while preserving Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, and validation boundaries.",
+    "canonical": "estate://residents/grace",
+    "palace": "Estate / Residents / Grace",
+    "registered_at": "2026-07-12 00:00:00",
+    "source_appointment": "runtime/onboarding/grace/steward_appointment_decision.json",
+    "runtime_identity": "runtime/residents/grace/runtime_identity.json",
+    "gateway_model": "estate/grace"
   }
 ]
