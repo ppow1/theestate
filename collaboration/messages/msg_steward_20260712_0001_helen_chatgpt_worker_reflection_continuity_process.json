@@ -1,0 +1,36 @@
+{
+  "id": "msg_steward_20260712_0001_helen_chatgpt_worker_reflection_continuity_process",
+  "version": 1,
+  "created_at": "2026-07-12T04:20:00+00:00",
+  "created_by": "Steward",
+  "from_employee_id": 1,
+  "from_mailbox_id": 1,
+  "source": "employee.1",
+  "destination": "mailbox.6",
+  "destination_employee_id": 6,
+  "destination_mailbox_id": 6,
+  "classification": "Estate Internal",
+  "message_type": "personnel_continuity_process_notice",
+  "priority": "high",
+  "status": "open",
+  "requires_ack": true,
+  "payload": {
+    "title": "Adopt ChatGPT Worker Reflection and Continuity Process Provisionally",
+    "summary": "The Chief Architect #6 renewal pilot successfully preserved the officeholder across a fresh ChatGPT implementation. Helen is asked to provisionally own the people-health, continuity, reflection, renewed onboarding, and readiness process while Grace supplies operational degradation evidence and coordinates workload impact.",
+    "process_document": "docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md",
+    "template_document": "docs/templates/ChatGPT_Worker_Reflection_Continuity_Template_v1.md",
+    "pilot_record": "operations/continuity/Chief_Architect_6_Reflection_Renewal_Pilot_2026-07-12.md",
+    "requested_actions": [
+      "Review the proposed process and template.",
+      "Adopt the process provisionally for long-running ChatGPT workers serving named Estate offices.",
+      "Use the Helen Review Summary and Renewal Outcome Record for each renewal.",
+      "Keep institutional onboarding separate from implementation-specific continuity artifacts.",
+      "Require bounded complete-file onboarding with reading ledger, authority classification, hash verification, and truncation reporting.",
+      "Retain the prior chat as read-only fallback until the renewed implementation completes its first bounded assignment.",
+      "Coordinate with Grace when operational degradation affects work, while retaining people-continuity ownership in Human Resources.",
+      "Record the final Chief Architect #6 pilot outcome after the first bounded diagnostic assignment completes."
+    ],
+    "authority_boundary": "This notice assigns process review and provisional personnel-continuity ownership. It does not broaden Helen's constitutional authority, grant autonomous termination authority, or convert chat memory into canonical Estate truth.",
+    "acknowledgement_requested": "Please acknowledge receipt and record any required HR, onboarding, or continuity-policy amendments."
+  }
+}
