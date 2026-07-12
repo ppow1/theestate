@@ -1,0 +1,23 @@
+{
+  "work_package_id": "WP-4037",
+  "codex_status": "done",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "branch": "work",
+  "summary": "Staged an uninstalled Evelyn restricted continuity and Steward Relationship Layer runtime with privacy gates, approval/forget semantics, mode evaluation, denied audience filtering, redacted Ingrid audit context, diagnostics, tests, contract, and install manifest.",
+  "files_changed": [
+    "collaboration/workstreams/WP-4037/staged/evelyn_relationship_runtime.py",
+    "collaboration/workstreams/WP-4037/staged/test_evelyn_relationship_runtime.py",
+    "collaboration/workstreams/WP-4037/evelyn_relationship_runtime_contract.md",
+    "collaboration/workstreams/WP-4037/install_manifest.json",
+    "collaboration/work_packages/completions/WP-4037_codex_done.json"
+  ],
+  "tests_run": [
+    "python -m pytest collaboration/workstreams/WP-4037/staged/test_evelyn_relationship_runtime.py"
+  ],
+  "known_limitations": [
+    "Staged work is intentionally uninstalled and isolated under collaboration/workstreams/WP-4037/.",
+    "Active resident gateway, Office, model-control, and shared continuity stores were not modified."
+  ],
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}
