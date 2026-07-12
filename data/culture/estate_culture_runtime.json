@@ -1,0 +1,21 @@
+{
+  "schema_version": "estate_presence_culture.v1",
+  "traditions": [
+    {"tradition_id":"TRAD-estate-commissioning","name":"Estate commissioning acknowledgment","purpose":"Mark Steward-authorized resident commissioning without making it an authority gate.","participants":["steward","active_residents"],"cadence":"on_commissioning","location_id":"office-steward","origin_evidence":["tests/test_grace_steward_appointment.py"],"privacy_scope":"staff-only","status":"active","revision_history":[{"date":"2026-07-12","change":"Registered as source-lined culture runtime tradition."}],"voluntary_participation":true}
+  ],
+  "culture_memories": [
+    {"memory_id":"CMEM-chief-architect-campaigns","event_identity":"Chief Architect campaign sequence","participants":["chief_architect","resident_architecture"],"date":"2026-07-12","sources":["archive/institutional_memory/chief_architect_memoranda/Chief_Architect_04_Final_Memorandum.md"],"confidence":0.8,"disclosure_scope":"public","cultural_significance":"Preserves implementation continuity between campaigns.","generated_visual_is_proof":false,"dispute_state":"undisputed"}
+  ],
+  "running_jokes": [
+    {"joke_id":"JOKE-tea-before-triage","participants":["RES-000001","RES-000003"],"origin_evidence":["residents/alfred.md","residents/helen.md"],"topic":"Alfred's orderly preference for calm triage before urgency.","tone":"affectionate_professional","consent_state":"approved","audience_scope":"staff-only","sensitivity":"low","expiration":"2026-12-31T00:00:00Z","callback_history":[],"status":"active"}
+  ],
+  "annual_events": [
+    {"event_template_id":"AE-chief-architect-review","purpose":"Annual review of resident architecture memory and open culture proposals.","recurrence":"FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=12","planning_window_days":30,"authority":"Office of Character Architecture","participants":["active_residents","steward"],"location_id":"conference-room","privacy":"staff-only","accessibility":"remote participation permitted","budget_reference":"none","archive_policy":"record actual outcomes only after source evidence exists","status":"planned"}
+  ],
+  "culture_signals": [
+    {"signal_id":"CS-presence-wave","evidence":["collaboration/work_packages/pending/WP-4083_Ambient_Resident_Activity_Runtime.md"],"participants":["resident_architecture"],"scope":"estate","confidence":0.7,"privacy":"public","risks":["provider artifact mistaken for culture"],"classification":"authored_campaign"}
+  ],
+  "culture_change_proposals": [
+    {"proposal_id":"CCP-resident-presence-review","evidence":["CS-presence-wave"],"participants":["active_residents"],"scope":"estate","confidence":0.6,"privacy":"staff-only","risks":["flattening resident individuality"],"review_authority":"Office of Character Architecture","state":"experiment","rollback_history":[]}
+  ]
+}
