@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://estate.local/schemas/character-architecture/resident_affinity_growth_runtime_v1.schema.json",
+  "title": "Resident Affinity and Growth Runtime v1",
+  "type": "object",
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {"const": "estate_resident_affinity_growth.v1"},
+    "authority_effect": {"const": "none"},
+    "dimensions": {"type": "object"},
+    "diagnostics": {"type": "array"}
+  },
+  "additionalProperties": true
+}
