@@ -96,6 +96,27 @@ def _is_invalid_placeholder_residue(root: Path, wp: str) -> bool:
     return data.get("validation_status") == "no_recipe"
 
 
+def _work_package_lifecycle_paths(root: Path, wp: str) -> dict[str, str | None]:
+    paths = {}
+    for state, folder in [("completion", "collaboration/work_packages/completions"), ("pending", "collaboration/work_packages/pending"), ("active", "collaboration/work_packages/active"), ("blocked", "collaboration/work_packages/blocked"), ("deferred", "collaboration/work_packages/deferred")]:
+        d = root / folder
+        match = next((str(p.relative_to(root)).replace("\\", "/") for p in sorted(d.glob(f"{wp}*")) if p.is_file()), None) if d.exists() else None
+        paths[state] = match
+    return paths
+
+def _work_package_lifecycle_state(paths: dict[str, str | None], receipt: dict[str, Any]) -> str:
+    if receipt.get("receipt_status") == "complete" or paths.get("completion"):
+        return "completed_receipt_backed"
+    if paths.get("active"):
+        return "active"
+    if paths.get("blocked"):
+        return "blocked"
+    if paths.get("deferred"):
+        return "deferred"
+    if paths.get("pending"):
+        return "pending_authored_not_completed"
+    return "unknown_no_queue_artifact"
+
 def _discover_wps(root:Path)->set[str]:
     ids=set(VALIDATION_RECIPES)
     for folder in ["collaboration/work_packages/completions","collaboration/work_packages/pending","operations/validation/reports","runtime/validation/work_packages"]:
@@ -113,8 +134,9 @@ def generate_validation_coverage_manifest(root: str|Path|None=None, write:bool=T
         receipt=validate_receipt(wp,base); latest=_latest_report(base,wp); recipe="registered" if get_validation_recipe(wp) else "missing"
         exec_status=latest["status"] if latest["status"]!="missing" else ("no_recipe" if recipe=="missing" else "missing_report")
         prod=calculate_production_readiness(exec_status, receipt, "covered" if recipe=="registered" else "no_recipe")
-        pending=next((str(p.relative_to(base)).replace('\\','/') for p in (base/"collaboration/work_packages/pending").glob(f"{wp}*.md")), None) if (base/"collaboration/work_packages/pending").exists() else None
-        entries.append({"work_package_id":wp,"pending_file_path":pending,"completion_artifact_path":receipt.get("completion_artifact_path"),"receipt_status":receipt.get("receipt_status"),"recipe_status":recipe,"latest_validation_report_path":latest["path"],"latest_validation_status":latest["status"],"production_readiness_status":"ready" if prod["production_ready"] else "blocked","blockers":prod["blocking_reasons"],"required_followups":prod["required_followups"]})
+        lifecycle_paths = _work_package_lifecycle_paths(base, wp)
+        lifecycle_state = _work_package_lifecycle_state(lifecycle_paths, receipt)
+        entries.append({"work_package_id":wp,"lifecycle_state":lifecycle_state,"pending_file_path":lifecycle_paths.get("pending"),"completion_artifact_path":receipt.get("completion_artifact_path") or lifecycle_paths.get("completion"),"receipt_status":receipt.get("receipt_status"),"recipe_status":recipe,"latest_validation_report_path":latest["path"],"latest_validation_status":latest["status"],"production_readiness_status":"ready" if prod["production_ready"] else "blocked","blockers":prod["blocking_reasons"],"required_followups":prod["required_followups"]})
     payload={"generated_at":_now(),"work_packages":entries,"summary":{"total_work_packages_scanned":len(entries),"total_production_ready":sum(e["production_readiness_status"]=="ready" for e in entries),"total_blocked":sum(e["production_readiness_status"]!="ready" for e in entries),"total_missing_recipes":sum(e["recipe_status"]=="missing" for e in entries),"total_missing_receipts":sum(e["receipt_status"]=="missing" for e in entries),"total_incomplete_receipts":sum(e["receipt_status"]=="incomplete" for e in entries)}}
     if write:
         (base/"runtime/validation").mkdir(parents=True,exist_ok=True); (base/"operations/validation").mkdir(parents=True,exist_ok=True)
@@ -148,7 +170,7 @@ def format_coverage_manifest_markdown(payload):
     lines=["# Validation Coverage Manifest","",f"Generated at: {payload['generated_at']}","","## Summary"]
     for k,v in payload["summary"].items(): lines.append(f"- {k}: {v}")
     lines += ["","## Work Packages"]
-    for e in payload["work_packages"]: lines.append(f"- {e['work_package_id']} — receipt: {e['receipt_status']}; recipe: {e['recipe_status']}; validation: {e['latest_validation_status']}; production: {e['production_readiness_status']}; blockers: {len(e['blockers'])}")
+    for e in payload["work_packages"]: lines.append(f"- {e['work_package_id']} — receipt: {e['receipt_status']}; recipe: {e['recipe_status']}; validation: {e['latest_validation_status']}; lifecycle: {e.get('lifecycle_state', 'unknown')}; production: {e['production_readiness_status']}; blockers: {len(e['blockers'])}")
     return "\n".join(lines)
 
 def format_production_readiness_markdown(payload):

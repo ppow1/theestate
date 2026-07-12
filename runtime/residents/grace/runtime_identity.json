@@ -1,5 +1,6 @@
 {
   "authority_boundaries": [
+    "Grace is appointed and onboarding; she is not operational and is not gateway exposed until explicit Steward activation.",
     "Grace conducts approved operational movement; she does not grant authority or create offices.",
     "Provider execution remains behind Dispatch and adapter controls.",
     "Traffic Controller, Engineering, Helen, Ingrid, Validation, Chief Architect, and Steward authorities remain distinct.",
@@ -15,12 +16,12 @@
     "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
     "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml"
   ],
-  "gateway_model": "estate/grace",
+  "gateway_model": null,
   "office": "Office of Operations",
   "open_webui": {
-    "compatible_endpoint": "/v1/chat/completions",
-    "exposed": true,
-    "manual_validation": "pending",
+    "compatible_endpoint": null,
+    "exposed": false,
+    "manual_validation": "blocked_until_steward_activation",
     "models_endpoint": "/v1/models",
     "streaming_supported": true
   },
@@ -28,13 +29,13 @@
   "resident_name": "Grace",
   "runtime_surfaces": {
     "employee_id": 12,
-    "gateway": "src/estate/core/resident_gateway.py",
+    "gateway": null,
     "lifecycle": "runtime/residents/lifecycle/grace.json",
     "mailbox_id": 12,
-    "open_webui_model": "estate/grace",
+    "open_webui_model": null,
     "resident_surface": "operations/residents/surfaces/grace.json"
   },
   "schema_version": "resident_runtime_identity.v1",
-  "status": "active",
+  "status": "appointed_onboarding",
   "title": "Director of Operations"
 }

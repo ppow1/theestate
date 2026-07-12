@@ -1,0 +1,42 @@
+{
+  "branch": "current",
+  "codex_status": "completed",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "dispatch_execution_performed": false,
+  "files_changed": [
+    "pytest.ini",
+    "src/estate/core/resident_gateway.py",
+    "src/estate/core/resident_capability_access.py",
+    "src/estate/core/production_readiness_validation.py",
+    "src/estate/core/visual_runtime.py",
+    "data/registry/residents.json",
+    "data/registry/personnel.json",
+    "data/registry/mailboxes.json",
+    "runtime/residents/grace/runtime_identity.json",
+    "runtime/residents/lifecycle/grace.json",
+    "operations/residents/surfaces/grace.json",
+    "tests/test_grace_live_runtime_exposure.py",
+    "tests/test_grace_steward_appointment.py",
+    "tests/test_resident_gateway.py",
+    "docs/character-architecture/Character_Architecture_Runtime_Hardening_v1.md",
+    "operations/character_architecture/character_architecture_hardening_verification_report.md",
+    "operations/character_architecture/character_architecture_hardening_remaining_issues.md",
+    "collaboration/work_packages/completions/WP-character-architecture-hardening_codex_done.json"
+  ],
+  "known_limitations": [
+    "Broad pytest may still expose existing functional failures beyond collection repair."
+  ],
+  "merge_authority": "Chief Architect review required; no institutional acceptance granted by this receipt.",
+  "provider_execution_performed": false,
+  "pull_request_not_applicable_reason": "PR metadata is created by the local make_pr tool after commit.",
+  "ready_for_ca_review": true,
+  "summary": "Repaired pytest collection scope, reconciled Grace to appointed onboarding/not gateway-exposed state, documented runtime ownership boundaries, and normalized work-package lifecycle reporting away from pending-directory-only inference.",
+  "tests_run": [
+    "python -m py_compile src/estate/core/resident_gateway.py src/estate/core/resident_capability_access.py src/estate/core/production_readiness_validation.py src/estate/core/resident_memory_runtime.py src/estate/core/resident_affinity_growth.py src/estate/core/resident_presence_culture.py",
+    "python -m pytest --collect-only -q",
+    "python -m pytest -q tests/test_grace_hiring_onboarding.py tests/test_grace_live_runtime_exposure.py tests/test_resident_gateway.py tests/test_production_readiness_validation.py tests/test_resident_presence_culture_runtime.py tests/test_resident_memory_runtime.py tests/test_resident_affinity_growth.py",
+    "PYTHONPATH=src python -m pytest -q tests/test_grace_steward_appointment.py tests/test_visual_runtime.py",
+    "python -m pytest -q"
+  ],
+  "work_package_id": "WP-character-architecture-hardening"
+}
