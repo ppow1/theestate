@@ -99,5 +99,22 @@
     "source_appointment": "runtime/onboarding/grace/steward_appointment_decision.json",
     "runtime_identity": "runtime/residents/grace/runtime_identity.json",
     "gateway_model": "estate/grace"
+  },
+  {
+    "id": "evelyn",
+    "type": "resident",
+    "name": "Evelyn",
+    "department": "Steward Relationship Layer",
+    "office": "Steward Confidant",
+    "status": "Active",
+    "classification": "Estate Restricted — Steward Relationship Layer",
+    "created": "2026-07-12 00:00:00",
+    "role": "Provides private Steward Relationship Layer counsel with restricted continuity, explicit retention approval, no institutional authority, and no private context exposure outside approved audiences.",
+    "canonical": "estate://residents/evelyn",
+    "palace": "Estate / Residents / Evelyn",
+    "registered_at": "2026-07-12 00:00:00",
+    "source_identity_package": "docs/residents/evelyn/Evelyn_Identity_Manifest_v0_1.json",
+    "runtime_relationship_layer": "src/estate/core/evelyn_relationship_runtime.py",
+    "gateway_model": "estate/evelyn"
   }
 ]
