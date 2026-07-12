@@ -37,6 +37,9 @@ def test_surface_inspection_supports_future_residents_and_extensions():
     ingrid = resident_surface("ingrid")
     assert ingrid["resident_id"] == "ingrid"
     assert ingrid["office"] == "Security"
+    assert ingrid["presentation"]["open_webui_model_id"] == "estate/ingrid"
+    assert "visual_identity" in ingrid["presentation"]["avatar_reference"].lower()
+    assert "Voice" in ingrid["presentation"]["voice_reference"]
 
 
 def test_templates_exist():
@@ -107,6 +110,24 @@ def test_process_chat_uses_mocked_local_llm_for_helen(monkeypatch, tmp_path):
     assert "Helen" in text and "Human Resources and Workforce Development" in text
     assert "Alfred" in text and "generic assistant" not in text
     assert payload["turn"]["resident_id"] == "helen"
+    assert payload["turn"]["llm"]["fallback_used"] is False
+
+
+def test_process_chat_uses_mocked_local_llm_for_ingrid(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    class IngridMockAdapter(MockOllamaAdapter):
+        def generate(self, *, resident, prompt, model=None):
+            assert resident == "ingrid"
+            assert "You are Ingrid" in prompt
+            assert "privacy, classification, connector" in prompt
+            assert "protected private local character material" in prompt
+            return {"ok": True, "text": "I’m Ingrid in Security. I classify access, protect connector and protected-source boundaries, and can frame escalation without changing permissions from chat.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "fallback_reason": None, "generation_attempted": True, "generation_endpoint": f"{self.endpoint}/api/generate", "generation_result_state": "generated", "discovered_models_count": 2}}
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", IngridMockAdapter)
+    payload = process_chat("ingrid", "Who are you?", root=tmp_path)
+    text = payload["turn"]["resident_response"]
+    assert "Ingrid" in text and "Security" in text
+    assert "changing permissions from chat" in text
+    assert payload["turn"]["resident_id"] == "ingrid"
     assert payload["turn"]["llm"]["fallback_used"] is False
 
 

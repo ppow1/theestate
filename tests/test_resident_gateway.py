@@ -1,9 +1,9 @@
 from estate.core.resident_gateway import models_payload, chat_completion, chat_completion_stream
 
 
-def test_models_expose_alfred_and_helen_only():
+def test_models_expose_alfred_helen_and_ingrid_only():
     ids = {m['id'] for m in models_payload()['data']}
-    assert {'estate/alfred', 'estate/helen'} <= ids
+    assert {'estate/alfred', 'estate/helen', 'estate/ingrid'} <= ids
     assert 'estate/grace' not in ids
 
 
@@ -13,6 +13,15 @@ def test_chat_completion_maps_helen_and_returns_openai_envelope(tmp_path):
     assert body['object'] == 'chat.completion'
     assert body['choices'][0]['message']['role'] == 'assistant'
     assert body['estate']['resident_id'] == 'helen'
+    assert body['estate']['privileged_action_executed'] is False
+
+
+def test_chat_completion_maps_ingrid_and_returns_openai_envelope(tmp_path):
+    code, body = chat_completion({'model':'estate/ingrid','messages':[{'role':'user','content':'Who are you?'}], 'stream': False}, root=tmp_path)
+    assert code == 200
+    assert body['object'] == 'chat.completion'
+    assert body['estate']['resident_id'] == 'ingrid'
+    assert 'Ingrid' in body['choices'][0]['message']['content']
     assert body['estate']['privileged_action_executed'] is False
 
 

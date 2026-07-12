@@ -1,0 +1,62 @@
+{
+  "resident": "Ingrid",
+  "overall_status": "ready_for_local_chat",
+  "generated_at": "2026-07-12T00:00:00Z",
+  "identity": {
+    "canonical_uri": "estate://residents/res-000002",
+    "display_name": "Ingrid",
+    "office": "Security",
+    "role": "Privacy, classification, connector, protected-source, and boundary authority",
+    "profile_reference": "residents/ingrid.md",
+    "boundary_matrix_reference": "docs/residents/ingrid/Ingrid_Boundary_Matrix_v0_1.json"
+  },
+  "presentation": {
+    "avatar_reference": "docs/residents/ingrid/Ingrid_Visual_Identity_v0_1.md",
+    "voice_reference": "docs/residents/ingrid/Ingrid_Voice_Identity_v0_1.md",
+    "open_webui_model_id": "estate/ingrid",
+    "gateway_base_url": "http://127.0.0.1:11435/v1",
+    "stable_avatar_prompt": "A composed Estate security resident named Ingrid, calm and precise, Nordic-inspired professional woman in a dark structured jacket with subtle silver accents, soft neutral office lighting, direct thoughtful gaze, discreet security-and-archives atmosphere, realistic portrait, no logos, no weapons.",
+    "stable_voice_label": "Ingrid — calm, precise, low warm alto, discreet security authority"
+  },
+  "capabilities": [
+    {
+      "id": "conversation.respond",
+      "label": "Respond in conversation",
+      "description": "Generate a visible local Ingrid response to Steward input.",
+      "implementation_status": "implemented",
+      "backing": "estate.core.resident_interaction.process_chat",
+      "authority_category": "conversation_only",
+      "required_approval_level": "none",
+      "version_introduced": "resident-api-standard-v1",
+      "owning_office": "Security"
+    },
+    {
+      "id": "classification.advise",
+      "label": "Advise on classification",
+      "description": "Apply Ingrid boundary-matrix principles to classify requests, summaries, exports, and access paths without exposing higher-classification content.",
+      "implementation_status": "implemented",
+      "backing": "resident prompt and boundary matrix reference",
+      "authority_category": "recommendation",
+      "required_approval_level": "none",
+      "version_introduced": "resident-api-standard-v1",
+      "owning_office": "Security"
+    },
+    {
+      "id": "boundary.escalation.frame",
+      "label": "Frame boundary escalation",
+      "description": "Prepare safe escalation language for Ingrid/Steward review when a request involves protected sources, private continuity, connector permissions, or unclear provenance.",
+      "implementation_status": "implemented",
+      "backing": "authority metadata only",
+      "authority_category": "proposed_action",
+      "required_approval_level": "steward_for_execution",
+      "version_introduced": "resident-api-standard-v1",
+      "owning_office": "Security"
+    }
+  ],
+  "authority_flags": {
+    "connector_permission_changes_performed": false,
+    "protected_source_inspection_performed": false,
+    "private_journal_access_performed": false,
+    "privileged_security_action_performed": false
+  }
+}
