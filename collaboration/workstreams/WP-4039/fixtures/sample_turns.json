@@ -1,0 +1,4 @@
+[
+  {"schema_version":"conversation_turn_v1","turn_id":"uturn_sample","user_turn_id":"uturn_sample","room_id":"room_sample_wp4039","speaker_kind":"human","speaker_id":"steward","text":"Grace, propose a plan; Helen, review privacy after Grace.","target_resident_ids":["grace","helen"],"created_at":"2026-07-12T00:01:00Z"},
+  {"schema_version":"conversation_turn_v1","turn_id":"rturn_grace_sample","room_id":"room_sample_wp4039","source_user_turn_id":"uturn_sample","speaker_kind":"resident","resident_id":"grace","display_name":"Grace","office":"Office of Grace","role":"planning","turn_order":1,"response_status":"responded","text":"Plan provided as a visible resident-attributed response.","model_metadata":{"provider":"adapter-supplied"},"fallback_status":"not_used","context_omissions":[],"authority_disclaimer_metadata":{"disclaimer":"conversation only; no authority expansion","no_authority_expansion":true},"created_at":"2026-07-12T00:02:00Z"}
+]
