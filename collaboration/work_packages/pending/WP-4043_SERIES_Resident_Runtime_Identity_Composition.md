@@ -25,125 +25,173 @@ Live testing after WP-4042 showed that:
 - Helen and Grace failed to recognize Evelyn as an active resident;
 - Alfred described himself as serving the wrong office;
 - Ingrid's privacy guardrail suppressed ordinary self-description;
-- Evelyn could state her assignment without consistently inhabiting her distinct identity;
-- model switching and shared chat history allowed identity and context contamination;
-- institutional facts, private continuity, authority, personality, and conversation history were not consistently separated.
+- conference-room participants did not share one stable institutional cast;
+- model switching and chat history influenced identity more than canonical Estate artifacts.
 
-## Architectural Requirement
+These failures indicate that resident identity is currently assembled inconsistently across prompts, model wrappers, runtime surfaces, and conversation history.
 
-Implement one canonical `ResidentIdentityContext` composition path used by every resident inference and by every attributed conference-room turn.
+## Architectural Principle
 
-The composer must assemble bounded, source-traceable layers in a deterministic order while preserving the authority boundary of each layer.
+The resident is not the model.
 
-At minimum, the composed context shall distinguish:
+A resident's identity must remain stable across:
 
-1. resident identity and office;
-2. character-bible context;
-3. current resident, employee, office, appointment, and lifecycle facts;
-4. authority and delegation limits;
-5. privacy, classification, and disclosure constraints;
-6. relationship-layer context authorized for the active surface;
-7. grounded Estate facts relevant to the request;
-8. active conversation context;
-9. temporary runtime and provider metadata.
+- model changes;
+- provider changes;
+- chat renewal;
+- single-resident and conference-room surfaces;
+- runtime restart;
+- prompt refactoring;
+- implementation-vessel replacement.
 
-## Composition Precedence
-
-The runtime shall apply the following precedence:
-
-1. Steward-ratified governance and authority artifacts;
-2. current canonical registry and appointment state;
-3. Ingrid-governed privacy and disclosure decisions;
-4. canonical resident identity and Character Bible artifacts;
-5. authorized relationship-layer context;
-6. grounded Estate facts;
-7. current conversation context;
-8. provider or model defaults.
-
-Lower layers must not override higher layers. Conversation history, model recollection, and provider defaults must never rewrite canonical identity, authority, appointment state, or privacy classification.
+The identity-composition path shall assemble canonical context on every inference rather than trusting model recollection or accumulated transcript state.
 
 ## Required Work
 
-1. Inspect the existing resident gateway, model-control, onboarding, resident-surface, room, identity-package, relationship, and preference implementations before adding new structures.
-2. Define a typed, read-only `ResidentIdentityContext` with explicit source lineage, classification, freshness, and version metadata.
-3. Implement one composer service consumed by all resident gateway and conference-room inference paths.
-4. Integrate existing canonical identity packages and resident surfaces without creating a parallel resident registry or prompt store.
-5. Establish bounded layer budgets suitable for local-model operation.
-6. Make missing, stale, contradictory, or unauthorized inputs visible through diagnostics rather than silently filling gaps from model memory.
-7. Ensure provider changes do not alter the resident's institutional identity.
-8. Preserve separate conversation histories for separate resident surfaces; do not treat an Open WebUI model switch as identity isolation.
-9. Keep the composer read-only. Resident inference must not write canonical identity, authority, registry, mailbox, or relationship state.
+1. Inspect the existing resident gateway, model-control surfaces, resident interaction runtime, multi-resident room runtime, registry artifacts, resident profiles, prompts, identity packages, and installed workstreams before adding structures.
+2. Define one canonical runtime identity-composition interface used by all resident inference surfaces.
+3. Compose identity from existing canonical Estate artifacts and derived read-only runtime snapshots.
+4. Keep identity, authority, institutional facts, privacy rules, relationship context, conversation history, and presentation data as explicit separate layers.
+5. Ensure every composed context item exposes source lineage, classification, version or timestamp where available, and inclusion reason.
+6. Make missing or contradictory source data visible through diagnostics rather than silently selecting or inventing identity facts.
+7. Integrate the composer with both single-resident gateway calls and the conference-room runtime.
+8. Preserve provider independence: no resident identity may depend on one model's hidden memory, provider-specific system prompt, or one chat transcript.
 
-## Surface Rules
+## Canonical Composition Layers
 
-### Single-Resident Surface
+The runtime identity object shall support, at minimum:
 
-A resident receives only their own canonical identity, authorized relationship context, safe current institutional facts, and the history of that resident conversation.
+1. **Resident Core Identity**
+   - resident ID and canonical name;
+   - office, role, department, lifecycle status, and reporting relationship;
+   - provider-independent identity summary;
+   - stable role boundaries and prohibited role conflations.
 
-### Conference Room
+2. **Character Context**
+   - loaded through the canonical Character Bible mechanism established by WP-4044;
+   - personality, voice, manner, presentation, preferences, boundaries, and relationship expression;
+   - no authority elevation through character traits.
 
-Each attributed resident turn receives that resident's shareable identity context plus the room's own history and disclosure envelope. The room must not inherit private resident-chat history or Evelyn's Steward-only continuity.
+3. **Institutional Registry Context**
+   - loaded through the synchronized registry snapshot established by WP-4045;
+   - active residents, offices, appointments, lifecycle states, public authority facts, and available communication endpoints.
 
-### Unknown or Contradictory State
+4. **Grounded Estate Facts**
+   - loaded through the provider established by WP-4046;
+   - current work-package, message, runtime, repository, and operational facts appropriate to the request and classification.
 
-If a required canonical layer is missing or contradictory, the runtime shall fail closed for the affected claim, state what is unknown, and expose a diagnostic. It shall not invent a convenient answer.
+5. **Authority and Capability Context**
+   - explicit actions the resident may advise on, request, route, or perform;
+   - actions reserved to the Steward or other offices;
+   - no authority inferred from model capability.
 
-## Diagnostics
+6. **Privacy and Disclosure Context**
+   - Ingrid-governed classification and disclosure rules;
+   - surface-specific filtering;
+   - private continuity excluded from unrelated residents and shared rooms.
 
-Provide a machine-readable diagnostic surface containing:
+7. **Relationship Context**
+   - only relationships authorized for the active resident, user, and surface;
+   - Steward-specific or private layers must never become global resident context.
 
-- resident ID and active surface;
-- composer version and context hash;
-- layer order;
-- sources consulted;
-- source classifications and freshness;
-- omitted or redacted layers;
-- missing or contradictory inputs;
-- token or character budget by layer;
-- provider/model selected;
-- conversation-isolation identifier.
+8. **Conversation Context**
+   - bounded transcript context for the current resident and surface only;
+   - never treated as canonical identity or institutional truth;
+   - conversation isolation is implemented in a later package.
 
-Diagnostics must not reproduce protected source content, private message bodies, secrets, or Steward-only continuity.
+## Composition Order
 
-## Validation
+The composer shall apply context in this order:
 
-Add deterministic tests proving at least:
+1. resident identity and lifecycle;
+2. authority and role boundaries;
+3. safe current institutional facts;
+4. character and presentation;
+5. privacy and disclosure constraints;
+6. authorized relationship context;
+7. bounded current conversation context;
+8. task-specific instructions.
 
-1. Alfred, Helen, Grace, Ingrid, and Evelyn receive distinct resident identities through the same composer.
-2. Alfred remains Chief of Staff and does not become Operations.
-3. Grace remains Director of Operations and does not inherit Alfred's office.
-4. Ingrid can describe ordinary safe identity facts without a false privacy refusal.
-5. Evelyn's private relationship context is available only on authorized Steward surfaces.
-6. Conference-room context does not contain private resident-chat history.
-7. Registry and authority facts outrank stale conversation claims.
-8. Unknown data remains unknown rather than becoming a durable invented fact.
-9. Changing the underlying model preserves resident identity.
-10. Every composed layer exposes lineage and remains within the configured context budget.
-11. Resident inference cannot mutate canonical state.
-12. All existing resident gateway and room tests continue to pass.
+Privacy controls shall filter context without erasing the resident's ordinary identity. Character data shall enrich expression without overriding authority or facts.
+
+## Runtime Contract
+
+The composer shall return a typed, inspectable object containing at least:
+
+- resident ID;
+- surface ID;
+- composition timestamp;
+- identity version or source hash;
+- included context layers;
+- excluded context layers with reasons;
+- source artifact paths or identifiers;
+- classification summary;
+- detected contradictions or missing sources;
+- bounded provider-ready context;
+- diagnostic metadata not exposed to ordinary conversation output.
+
+The provider-ready context may be rendered to the format required by a local or remote model adapter, but the canonical composed object must remain provider neutral.
+
+## Failure Behavior
+
+1. Unknown durable identity facts remain unknown.
+2. Conflicting canonical identity records fail closed with a visible diagnostic.
+3. Missing optional character details do not prevent basic resident operation.
+4. Missing required identity, lifecycle, or authority records prevent the resident from claiming an unverified role.
+5. Privacy filtering removes restricted context but does not replace the resident with a generic refusal persona.
+6. Provider or model fallback must reuse the same composed identity object.
+
+## Initial Resident Coverage
+
+Validate at minimum:
+
+- Alfred remains Chief of Staff and does not become Operations or Engineering;
+- Helen remains Workforce Development/HR and does not invent mail or appointments;
+- Grace remains Director of Operations and does not absorb Traffic Controller, Steward, or Engineering authority;
+- Ingrid remains privacy and classification authority while retaining ordinary personality and self-description;
+- Evelyn remains the Steward's Confidant and does not become HR, Operations, Chief of Staff, therapist, or generic romantic assistant;
+- the conference room receives shareable resident identity without inheriting private resident chats.
+
+## Acceptance Tests
+
+1. Every active resident request passes through the same canonical composer.
+2. The same resident retains role, identity, and boundaries when the underlying model changes.
+3. A new chat does not create a new resident identity.
+4. Conversation transcript content cannot silently rewrite canonical identity.
+5. Alfred, Helen, Grace, Ingrid, and Evelyn remain distinguishable and correctly describe their offices.
+6. Authority context does not grant privileged actions to resident inference.
+7. Private Evelyn continuity is absent from conference-room and unrelated resident composition.
+8. Contradictory required identity sources produce a machine-readable failure rather than an improvised answer.
+9. Source lineage and context-layer inclusion can be inspected for every composed request.
+10. Context remains bounded enough for supported local models and does not load the entire Estate indiscriminately.
+11. Automated tests cover single-resident, conference-room, provider-switch, missing-source, conflict, privacy-filtering, and restart scenarios.
 
 ## Deliverables
 
-- typed `ResidentIdentityContext` schema or model;
-- canonical identity-composition service;
-- resident gateway integration;
-- conference-room integration;
-- source-lineage and context-budget diagnostics;
-- conversation-surface isolation identifiers;
+- provider-independent resident identity-composition schema;
+- canonical composition service integrated with existing resident runtime paths;
+- adapters for single-resident and conference-room inference;
+- source-lineage and contradiction diagnostics;
 - fixtures for Alfred, Helen, Grace, Ingrid, and Evelyn;
-- automated tests and regression coverage;
-- implementation documentation;
-- completion receipt with files changed, tests, limitations, and follow-on dependencies.
+- automated unit, integration, and behavioral regression tests;
+- documentation of composition order and source precedence;
+- completion receipt identifying installed files, tests, limitations, and follow-on dependencies.
 
 ## Constraints
 
-- Strengthen existing resident runtime architecture; do not create a new institution, gateway, registry, message bus, or authority system.
-- Do not embed all Estate state in one giant static prompt.
-- Do not use accumulated chat history as canonical memory.
-- Do not grant tools, authority, access, appointments, or privacy exceptions through character context.
-- Do not implement final portrait generation or live TTS in this package.
-- Keep resident-specific patches out of the shared composer unless required as explicit compatibility adapters.
+- Strengthen the existing resident gateway and runtime; do not create a parallel resident system.
+- Do not create a second registry, message bus, relationship store, privacy authority, or preference engine.
+- Do not embed one enormous static prompt as the canonical identity source.
+- Do not treat model memory or conversation history as durable Estate truth.
+- Do not redesign settled resident offices or appointments.
+- Do not implement final portraits, live TTS, conversation isolation, messaging, mailboxes, or relationship-graph runtime in this package.
+
+## Dependency and Sequencing
+
+- WP-4043 depends on the installed resident gateway and WP-4042 activation wave.
+- WP-4044, WP-4045, and WP-4046 are SERIES successors and shall integrate through this canonical composition path.
+- Later conversation-isolation, messaging, relationship, continuity, diagnostics, and monitoring packages must consume this composer rather than bypass it.
 
 ## Completion Standard
 
-WP-4043 is complete only when every active resident and every attributed conference-room turn uses the same canonical, bounded, source-traceable identity-composition path; identity remains stable across providers and conversations; private context remains isolated; contradictory state fails visibly; and no parallel source of institutional truth is introduced.
+WP-4043 is complete only when all active resident and conference-room inference paths use one provider-independent, inspectable identity-composition pipeline; residents retain their correct personhood and office boundaries across model and chat changes; canonical sources outrank conversation memory; and privacy, authority, facts, character, relationships, and conversation context remain explicitly separated.
