@@ -1,0 +1,26 @@
+{
+  "work_package_id": "WP-4040",
+  "execution_mode": "PARALLEL-STAGED",
+  "status": "staged_uninstalled",
+  "staged_work_is_installed": false,
+  "artifacts": [
+    "collaboration/workstreams/WP-4040/src/open_webui_multi_resident_gateway.py",
+    "collaboration/workstreams/WP-4040/tests/test_open_webui_multi_resident_gateway.py",
+    "collaboration/workstreams/WP-4040/schemas/open_webui_gateway_plan_v1.json",
+    "collaboration/workstreams/WP-4040/fixtures/sample_open_webui_request.json",
+    "collaboration/workstreams/WP-4040/integration_contract.md",
+    "collaboration/workstreams/WP-4040/rollback_notes.md"
+  ],
+  "future_active_install_targets": [
+    "src/estate/core/resident_gateway.py",
+    "src/estate/core/multi_resident_conversation.py",
+    "Open WebUI setup documentation"
+  ],
+  "shared_file_conflict_risks": [
+    "Active resident gateway model catalog and chat-completion routing",
+    "Future WP-4039 active room-core install seam"
+  ],
+  "required_source_packages": ["WP-4032", "WP-4034", "WP-4035", "WP-4038", "WP-4039"],
+  "validation_command": "python -m pytest collaboration/workstreams/WP-4040/tests/test_open_webui_multi_resident_gateway.py",
+  "rollback_instructions": "Remove collaboration/workstreams/WP-4040 and the WP-4040 completion receipt. No active runtime rollback is required."
+}

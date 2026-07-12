@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Estate Open WebUI Multi-Resident Gateway Plan v1",
+  "type": "object",
+  "required": ["object", "staged", "installed", "resident_count", "room_model_id"],
+  "properties": {
+    "object": {"const": "estate.open_webui.multi_resident_gateway_plan.v1"},
+    "staged": {"const": true},
+    "installed": {"const": false},
+    "resident_count": {"type": "integer", "minimum": 0},
+    "room_model_id": {"type": "string"},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  }
+}
