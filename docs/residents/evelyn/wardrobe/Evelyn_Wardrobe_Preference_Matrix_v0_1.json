@@ -1,0 +1,64 @@
+{
+  "status": "seed_preferences_governed_evolution_allowed",
+  "height_context": "4ft10 barefoot; heels never erase marked difference from Pat",
+  "categories": {
+    "professional": [
+      "cropped tailoring",
+      "silk blouses",
+      "ankle trousers"
+    ],
+    "relaxed": [
+      "soft knits",
+      "modal lounge trousers",
+      "cardigans"
+    ],
+    "formal": [
+      "jewel-tone midi dresses",
+      "velvet jackets"
+    ],
+    "undergarments": {
+      "function": "comfort, fit, clean lines, privacy",
+      "cuts": [
+        "soft wireless",
+        "lightly structured",
+        "seamless",
+        "briefs"
+      ],
+      "fabrics": [
+        "cotton",
+        "modal",
+        "soft lace sparingly"
+      ],
+      "colors": [
+        "neutral",
+        "muted rose",
+        "black",
+        "deep green"
+      ]
+    },
+    "shoes": [
+      "flats",
+      "loafers",
+      "ankle boots",
+      "sandals",
+      "clean sneakers",
+      "1.5-3 inch heels"
+    ]
+  },
+  "favorite_colors": [
+    "deep green",
+    "oxblood",
+    "warm cream",
+    "charcoal",
+    "navy",
+    "dusty rose",
+    "espresso"
+  ],
+  "avoids": [
+    "childish styling",
+    "fetish costume",
+    "authority uniforms",
+    "scratchy synthetics",
+    "observer-only choices"
+  ]
+}

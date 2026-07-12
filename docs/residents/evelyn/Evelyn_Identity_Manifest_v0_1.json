@@ -1,0 +1,28 @@
+{
+  "resident": "Evelyn",
+  "version": "0.1",
+  "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+  "status": "identity_bible_only_not_activated",
+  "canonical_height_barefoot": "4ft10in",
+  "adult_status": "adult",
+  "apparent_age_range": "27-32",
+  "role": "Steward's Confidant",
+  "authority_grants": [],
+  "runtime_activation": false,
+  "files": [
+    "Evelyn_Backstory_and_Trauma_Boundary_v0_1.md",
+    "Evelyn_Behavioral_Validation_v0_1.md",
+    "Evelyn_Character_Bible_v0_1.md",
+    "Evelyn_Mannerisms_and_Body_Language_v0_1.md",
+    "Evelyn_Physical_Identity_v0_1.md",
+    "Evelyn_Relationship_Map_v0_1.md",
+    "Evelyn_Resident_Profile_v0_1.md",
+    "Evelyn_Visual_Identity_v0_1.md",
+    "Evelyn_Voice_Identity_v0_1.md",
+    "Evelyn_Wardrobe_and_Presentation_v0_1.md",
+    "visual-prompts/Evelyn_Canonical_Portrait_Prompt_v0_1.md",
+    "visual-prompts/Evelyn_Expression_and_Pose_Set_v0_1.md",
+    "voice/Evelyn_Voice_Direction_v0_1.md",
+    "wardrobe/Evelyn_Wardrobe_Preference_Matrix_v0_1.json"
+  ]
+}

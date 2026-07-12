@@ -1,0 +1,33 @@
+{
+  "work_package": "WP-4036",
+  "status": "done",
+  "changed_files": [
+    "docs/residents/evelyn/Evelyn_Backstory_and_Trauma_Boundary_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Behavioral_Validation_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Character_Bible_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Identity_Manifest_v0_1.json",
+    "docs/residents/evelyn/Evelyn_Mannerisms_and_Body_Language_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Physical_Identity_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Relationship_Map_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Visual_Identity_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Voice_Identity_v0_1.md",
+    "docs/residents/evelyn/Evelyn_Wardrobe_and_Presentation_v0_1.md",
+    "docs/residents/evelyn/platform-exports/openwebui-evelyn-presentation-v0_1.yaml",
+    "docs/residents/evelyn/visual-prompts/Evelyn_Canonical_Portrait_Prompt_v0_1.md",
+    "docs/residents/evelyn/visual-prompts/Evelyn_Expression_and_Pose_Set_v0_1.md",
+    "docs/residents/evelyn/voice/Evelyn_Voice_Direction_v0_1.md",
+    "docs/residents/evelyn/wardrobe/Evelyn_Wardrobe_Preference_Matrix_v0_1.json",
+    "operations/validation/reports/WP-4036_evelyn_identity_bible.md"
+  ],
+  "validation_commands": [
+    "python - <<'PY' ... json.load(...) ... PY",
+    "ruby -e \"require 'yaml'; YAML.load_file('docs/residents/evelyn/platform-exports/openwebui-evelyn-presentation-v0_1.yaml'); puts 'yaml ok'\"",
+    "git diff --name-only -- src/estate/core/resident_gateway.py src/estate/core/resident_interaction.py"
+  ],
+  "limitations": [
+    "PyYAML is not installed in the environment, so YAML parsing was validated with Ruby Psych.",
+    "No image files were generated, by package boundary.",
+    "No runtime activation was performed."
+  ],
+  "recommended_next_package": "WP-4037 \u2014 Evelyn Restricted Continuity and Steward Relationship-Layer Runtime"
+}
