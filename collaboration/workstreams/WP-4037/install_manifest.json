@@ -1,0 +1,31 @@
+{
+  "work_package": "WP-4037",
+  "status": "staged_uninstalled",
+  "install_allowed": false,
+  "staged_paths": [
+    "collaboration/workstreams/WP-4037/staged/evelyn_relationship_runtime.py",
+    "collaboration/workstreams/WP-4037/staged/test_evelyn_relationship_runtime.py",
+    "collaboration/workstreams/WP-4037/evelyn_relationship_runtime_contract.md"
+  ],
+  "intended_shared_file_integrations": [
+    {
+      "path": "resident interaction and gateway runtimes",
+      "owner_work_package": "future install handoff",
+      "intent": "Wire Evelyn as a restricted relationship-layer resident without exposing private continuity to ordinary resident context."
+    },
+    {
+      "path": "resident context assembly and continuity stores",
+      "owner_work_package": "future install handoff",
+      "intent": "Supply only Steward-approved Evelyn summaries to Evelyn's private runtime and structural metadata to Ingrid audit."
+    },
+    {
+      "path": "Office and global search surfaces",
+      "owner_work_package": "future install handoff",
+      "intent": "Preserve denial-by-default behavior for relationship-layer private content."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest collaboration/workstreams/WP-4037/staged/test_evelyn_relationship_runtime.py",
+    "expected": "all tests pass"
+  }
+}
