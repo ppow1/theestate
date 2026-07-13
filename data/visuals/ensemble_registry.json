@@ -1,0 +1,669 @@
+{
+  "schema_version": "ensemble_registry.v1",
+  "campaign": "Campaign 09 - Group Photography and Ensemble Identity",
+  "work_packages": [
+    "WP-4188",
+    "WP-4189",
+    "WP-4190",
+    "WP-4191",
+    "WP-4192",
+    "WP-4193",
+    "WP-4194",
+    "WP-4195",
+    "WP-4196",
+    "WP-4197"
+  ],
+  "generated_at": "2026-07-13T00:00:00Z",
+  "commissioned_resident_count": 8,
+  "resident_scope": [
+    {
+      "resident_id": "RES-000001",
+      "display_name": "Alfred",
+      "department": "Administration",
+      "office": "Manager of Administration",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "composed executive butler presence",
+        "silver-gray tailoring",
+        "warmly precise expression"
+      ],
+      "identity_anchors": [
+        "Estate Chief of Staff bearing",
+        "discreet service posture"
+      ]
+    },
+    {
+      "resident_id": "RES-000002",
+      "display_name": "Ingrid",
+      "department": "Security",
+      "office": "Manager of Security",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "reserved elegant boundary guardian",
+        "dark tailored attire",
+        "privacy-aware gaze"
+      ],
+      "identity_anchors": [
+        "Security and Boundary office",
+        "calm protective posture"
+      ]
+    },
+    {
+      "resident_id": "RES-000003",
+      "display_name": "Helen",
+      "department": "Human Resources",
+      "office": "Manager of Human Resources",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "approachable workforce leader",
+        "soft professional wardrobe",
+        "humane attentive expression"
+      ],
+      "identity_anchors": [
+        "Human Resources presence",
+        "supportive personnel posture"
+      ]
+    },
+    {
+      "resident_id": "RES-000004",
+      "display_name": "Eleanor",
+      "department": "Archives",
+      "office": "Manager of Archives / Registrar",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "archival registrar presence",
+        "ordered provenance materials",
+        "quiet exacting expression"
+      ],
+      "identity_anchors": [
+        "Archives and registrar office",
+        "ledger-preserving posture"
+      ]
+    },
+    {
+      "resident_id": "RES-000005",
+      "display_name": "Marie",
+      "department": "Research",
+      "office": "Manager of Research",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "research investigator presence",
+        "practical scholarly attire",
+        "curious focused expression"
+      ],
+      "identity_anchors": [
+        "Research office",
+        "evidence-contextualizing posture"
+      ]
+    },
+    {
+      "resident_id": "RES-000006",
+      "display_name": "Judy",
+      "department": "Legal",
+      "office": "General Counsel",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "general counsel presence",
+        "structured legal attire",
+        "measured risk-aware expression"
+      ],
+      "identity_anchors": [
+        "Legal review office",
+        "contract and compliance posture"
+      ]
+    },
+    {
+      "resident_id": "evelyn",
+      "display_name": "Evelyn",
+      "department": "Steward Relationship Layer",
+      "office": "Steward Confidant",
+      "status": "Active",
+      "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+      "canonical_traits": [
+        "private confidant presence",
+        "soft restrained elegance",
+        "Steward-private warmth"
+      ],
+      "identity_anchors": [
+        "Steward Relationship Layer",
+        "intimate but non-institutional posture"
+      ]
+    },
+    {
+      "resident_id": "grace",
+      "display_name": "Grace",
+      "department": "Operations",
+      "office": "Director of Operations",
+      "status": "Active",
+      "classification": "Estate Internal",
+      "canonical_traits": [
+        "energetic operations director",
+        "crisp practical attire",
+        "decisive momentum"
+      ],
+      "identity_anchors": [
+        "Operations office",
+        "sequencing and checkpoint posture"
+      ]
+    }
+  ],
+  "global_controls": {
+    "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+    "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+    "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+    "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+  },
+  "composition_framework": {
+    "work_package": "WP-4188",
+    "rules": [
+      "place no more than three residents on same depth line unless faces remain separated",
+      "show department tools as contextual anchors, not text labels",
+      "preserve eye-line consistency and adult body scale",
+      "separate Evelyn restricted-layer presentation from institutional authority",
+      "block canonical promotion until caption-hidden validation is complete"
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": "c09-leadership_team_portrait-v1",
+      "work_package": "WP-4189",
+      "title": "Leadership team portrait",
+      "scope": "leadership",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/leadership_team_portrait_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Leadership team portrait. Estate Council leadership portrait in the Council Room; Alfred centered as coordinating administrator, Grace slightly forward with operations folder, Ingrid at boundary side, Helen, Eleanor, Marie, Judy arrayed with departmental balance; Evelyn present only as quiet restricted-layer observer at perimeter when approved. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-department_office_group_portraits-v1",
+      "work_package": "WP-4190",
+      "title": "Department and office group portraits",
+      "scope": "department",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/department_office_group_portraits_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Department and office group portraits. Composite department-and-office group plate: each active department represented by its resident manager in a coordinated gallery grid, office tools visible but no captions. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-strategic_meeting_group_scene-v1",
+      "work_package": "WP-4191",
+      "title": "Strategic meeting group scene",
+      "scope": "estate-wide",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/strategic_meeting_group_scene_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Strategic meeting group scene. Estate Council strategic meeting around a table with shared planning materials; Alfred routes agenda, Grace tracks checkpoints, Ingrid watches boundary implications, Helen monitors workload, Eleanor records provenance, Marie presents research, Judy reviews risk. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-informal_conversation_group_scene-v1",
+      "work_package": "WP-4192",
+      "title": "Informal conversation group scene",
+      "scope": "estate-wide",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/informal_conversation_group_scene_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Informal conversation group scene. Informal Estate lounge conversation after work review; relaxed but professional, warm interpersonal spacing, no romantic framing, no private disclosures. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-walking_movement_group_scene-v1",
+      "work_package": "WP-4193",
+      "title": "Walking and movement group scene",
+      "scope": "estate-wide",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/walking_movement_group_scene_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Walking and movement group scene. Residents walking through the Estate corridor in coordinated movement; Grace sets operational pace, Alfred maintains order, departments visible through gesture and carried materials. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-celebration_milestone_group_scene-v1",
+      "work_package": "WP-4194",
+      "title": "Celebration and milestone group scene",
+      "scope": "estate-wide",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/celebration_milestone_group_scene_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Celebration and milestone group scene. Modest Estate milestone celebration in a shared hall; residents acknowledge completed validated work with restrained professional warmth. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-formal_dinner_event_group_scene-v1",
+      "work_package": "WP-4195",
+      "title": "Formal dinner or event group scene",
+      "scope": "estate-wide",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/formal_dinner_event_group_scene_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Formal dinner or event group scene. Formal Estate dinner event portrait; seated and standing arrangement preserves department identity, elegance, and clear faces without text labels. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    },
+    {
+      "asset_id": "c09-full_estate_ensemble_portrait-v1",
+      "work_package": "WP-4196",
+      "title": "Full Estate ensemble portrait",
+      "scope": "estate-wide",
+      "status": "prompt_ready_pending_generation",
+      "asset_slot": "data/visual_bibles/ensembles/campaign_09/full_estate_ensemble_portrait_v1.png",
+      "approved_residents": [
+        "RES-000001",
+        "RES-000002",
+        "RES-000003",
+        "RES-000004",
+        "RES-000005",
+        "RES-000006",
+        "evelyn",
+        "grace"
+      ],
+      "prompt": "Canonical Estate group image for Full Estate ensemble portrait. Full Estate ensemble portrait of all active residents in the main hall; each resident positioned by department identity and visible enough for caption-hidden recognition. Include active residents as approved for this scope: Alfred, Ingrid, Helen, Eleanor, Marie, Judy, Evelyn, Grace. Preserve identity anchors: Alfred (composed executive butler presence, silver-gray tailoring, warmly precise expression); Ingrid (reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze); Helen (approachable workforce leader, soft professional wardrobe, humane attentive expression); Eleanor (archival registrar presence, ordered provenance materials, quiet exacting expression); Marie (research investigator presence, practical scholarly attire, curious focused expression); Judy (general counsel presence, structured legal attire, measured risk-aware expression); Evelyn (private confidant presence, soft restrained elegance, Steward-private warmth); Grace (energetic operations director, crisp practical attire, decisive momentum). No in-image captions, labels, text, watermarks, or name tags.",
+      "negative_prompt": [
+        "in-image names",
+        "captions",
+        "name tags",
+        "text labels",
+        "watermark",
+        "generic stock faces",
+        "identity drift",
+        "merged faces",
+        "duplicate resident faces",
+        "malformed hands",
+        "childlike proportions",
+        "private Evelyn details"
+      ],
+      "continuity_controls": {
+        "caption_policy": "No in-image labels, name tags, lower thirds, watermarks, or captions; recognition must come from face, wardrobe, posture, department context, and spatial relationships.",
+        "identity_preservation": "Every visible resident must preserve canonical traits, identity anchors, adult proportions, relative scale, office-appropriate wardrobe, and non-caricature realism.",
+        "composition": "Use clear face visibility, separated silhouettes, non-overlapping heads, plausible eye-lines, and department-context props without crowding.",
+        "privacy": "Evelyn may appear only as Steward Relationship Layer presence in Estate-wide approved contexts; no private continuity details, no institutional command posture."
+      }
+    }
+  ],
+  "caption_hidden_recognition_validation": [
+    {
+      "validation_id": "c09-validation-leadership_team_portrait-v1",
+      "asset_id": "c09-leadership_team_portrait-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-department_office_group_portraits-v1",
+      "asset_id": "c09-department_office_group_portraits-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-strategic_meeting_group_scene-v1",
+      "asset_id": "c09-strategic_meeting_group_scene-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-informal_conversation_group_scene-v1",
+      "asset_id": "c09-informal_conversation_group_scene-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-walking_movement_group_scene-v1",
+      "asset_id": "c09-walking_movement_group_scene-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-celebration_milestone_group_scene-v1",
+      "asset_id": "c09-celebration_milestone_group_scene-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-formal_dinner_event_group_scene-v1",
+      "asset_id": "c09-formal_dinner_event_group_scene-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    },
+    {
+      "validation_id": "c09-validation-full_estate_ensemble_portrait-v1",
+      "asset_id": "c09-full_estate_ensemble_portrait-v1",
+      "work_package": "WP-4197",
+      "method": "caption_hidden_steward_recognition_protocol",
+      "caption_hidden": true,
+      "labels_removed_required": true,
+      "expected_residents": [
+        "Alfred",
+        "Ingrid",
+        "Helen",
+        "Eleanor",
+        "Marie",
+        "Judy",
+        "Evelyn",
+        "Grace"
+      ],
+      "acceptance_threshold": "Steward or delegated reviewer identifies every visible resident from identity anchors without captions; any miss, merge, or generic face blocks canonical promotion.",
+      "current_result": "not_run_no_raster_generated",
+      "repository_result": "pass_protocol_defined_pending_local_generation",
+      "notes": "Validation is published as a governed protocol and queue item; no binary raster is represented as generated in this environment."
+    }
+  ],
+  "publication": {
+    "ensemble_registry_status": "published",
+    "campaign_completion_report": "collaboration/reports/visual_campaign_09/campaign_completion_report.md",
+    "canonical_promotion_status": "blocked_until_raster_generation_and_steward_review"
+  }
+}
