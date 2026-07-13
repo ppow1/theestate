@@ -1,0 +1,96 @@
+{
+  "data": [
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "alfred"
+      },
+      "id": "estate/alfred",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "helen"
+      },
+      "id": "estate/helen",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "ingrid"
+      },
+      "id": "estate/ingrid",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "grace"
+      },
+      "id": "estate/grace",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "evelyn"
+      },
+      "id": "estate/evelyn",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "eleanor"
+      },
+      "id": "estate/eleanor",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "marie"
+      },
+      "id": "estate/marie",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "privileged_actions_enabled": false,
+        "resident_id": "judy"
+      },
+      "id": "estate/judy",
+      "object": "model",
+      "owned_by": "estate"
+    },
+    {
+      "created": 0,
+      "estate": {
+        "multi_resident_gateway_capable": true,
+        "privileged_actions_enabled": false,
+        "surface": "multi_resident_room"
+      },
+      "id": "estate/conference-room",
+      "object": "model",
+      "owned_by": "estate"
+    }
+  ],
+  "object": "list"
+}

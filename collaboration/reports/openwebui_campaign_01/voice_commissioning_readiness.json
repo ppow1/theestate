@@ -1,0 +1,154 @@
+{
+  "audit": {
+    "endpoint": "resident_voice_commissioning.synthesize_resident_sample; Open WebUI path uses resident_gateway.chat_completion then local synthesis",
+    "engine": {
+      "argv": [],
+      "available": false,
+      "engine": null,
+      "executable": null,
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+    },
+    "health_check": {
+      "engine": {
+        "argv": [],
+        "available": false,
+        "engine": null,
+        "executable": null,
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+      },
+      "ok": false,
+      "provider": "estate.local.intelligible_tts",
+      "sample_dir": "runtime/voice/listening_samples",
+      "streaming_supported": false,
+      "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+    },
+    "launch_method": "local command discovered from Estate environment",
+    "model": "approved local intelligible text-to-speech engine; no paid external API",
+    "placeholder_waveforms_commissioned_as_speech": false,
+    "provider": "estate.local.intelligible_tts",
+    "repository_placeholders_distinguished": true,
+    "schema_version": "resident-audible-voice-commissioning-v2"
+  },
+  "binding_matrix_path": "runtime/voice/resident_voice_bindings.json",
+  "remaining_issues": [
+    "Human listening acceptance remains pending Steward review.",
+    "Codex environment did not locate an approved local TTS engine; run the local generation workflow on the Steward machine with Kokoro/F5-TTS or ESTATE_TTS_COMMAND."
+  ],
+  "samples": [
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "alfred",
+      "voice_id": "estate-local-alfred-baritone"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "helen",
+      "voice_id": "estate-local-helen-clear-mezzo"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "ingrid",
+      "voice_id": "estate-local-ingrid-low-alto"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "grace",
+      "voice_id": "estate-local-grace-executive-alto"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "evelyn",
+      "voice_id": "estate-local-evelyn-warm-contralto"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "eleanor",
+      "voice_id": "estate-local-eleanor-archival-mezzo"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "marie",
+      "voice_id": "estate-local-marie-research-mezzo"
+    },
+    {
+      "ok": false,
+      "placeholder_generated": false,
+      "provider": "estate.local.intelligible_tts",
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+      "resident_id": "judy",
+      "voice_id": "estate-local-judy-counsel-alto"
+    }
+  ],
+  "schema_version": "resident-audible-voice-commissioning-v2",
+  "steward_review_matrix": [
+    {
+      "resident_id": "alfred",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-alfred-baritone"
+    },
+    {
+      "resident_id": "helen",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-helen-clear-mezzo"
+    },
+    {
+      "resident_id": "ingrid",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-ingrid-low-alto"
+    },
+    {
+      "resident_id": "grace",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-grace-executive-alto"
+    },
+    {
+      "resident_id": "evelyn",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-evelyn-warm-contralto"
+    },
+    {
+      "resident_id": "eleanor",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-eleanor-archival-mezzo"
+    },
+    {
+      "resident_id": "marie",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-marie-research-mezzo"
+    },
+    {
+      "resident_id": "judy",
+      "review_decision": "pending_steward_listening_review",
+      "tune_notes": "",
+      "voice_id": "estate-local-judy-counsel-alto"
+    }
+  ]
+}
