@@ -68,6 +68,16 @@ def _resident_keys(root: Path) -> set[str]:
             keys.add(rid)
         if name:
             keys.add(name)
+    personnel_path = root / "data/registry/personnel.json"
+    if personnel_path.exists():
+        for row in _read_json(personnel_path):
+            if str(row.get("status", "")).lower() in {"appointed_onboarding", "onboarding"}:
+                rid = str(row.get("resident_id", "")).lower()
+                name = str(row.get("display_name", "")).lower()
+                if rid:
+                    keys.add(rid)
+                if name:
+                    keys.add(name)
     return keys
 
 

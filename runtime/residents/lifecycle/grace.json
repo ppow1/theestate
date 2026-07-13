@@ -167,6 +167,24 @@
       "rollback_or_correction": "stand down through resident lifecycle correction if activation is revoked",
       "to": "active",
       "transition": "activate"
+    },
+    {
+      "event_id": "character-architecture-hardening:grace-deactivation-correction",
+      "transition": "correct_lifecycle_boundary",
+      "from": "active",
+      "to": "onboarding",
+      "actor": "Chief Architect",
+      "authority": "post-implementation verification correction; does not activate or de-appoint",
+      "prerequisites": [
+        "Character Architecture post-implementation verification findings",
+        "Steward activation still required"
+      ],
+      "evidence": {
+        "verification_report": "operations/character_architecture/character_architecture_hardening_verification_report.md"
+      },
+      "output": "Grace remains appointed and onboarding, not operational and not gateway exposed",
+      "rollback_or_correction": "Only a future explicit Steward activation package may move Grace to ready_for_service/active and gateway exposure.",
+      "at": "2026-07-12T00:00:00+00:00"
     }
   ],
   "identity_lineage": {
@@ -175,11 +193,11 @@
     "resident_id": "grace",
     "successor_resident_id": null
   },
-  "next_action": "schedule_reflection",
-  "pending_gate": null,
+  "next_action": "complete onboarding package, then request explicit Steward activation",
+  "pending_gate": "steward_activation_required",
   "resident_id": "grace",
   "resident_name": "Grace",
   "schema_version": "resident_lifecycle.v1",
-  "status": "active",
+  "status": "onboarding",
   "updated_at": "2026-07-12T00:00:00+00:00"
 }

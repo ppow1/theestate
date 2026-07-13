@@ -1,0 +1,31 @@
+{
+  "work_package_id": "WP-character-architecture-post-hardening-validation-and-repair",
+  "codex_status": "completed",
+  "completed_at": "2026-07-12T00:00:00Z",
+  "summary": "Repaired post-hardening canonical pytest failures across queue rendering, background operations configuration/watch integration, Office command center rendering/bootstrap, subprocess CLI test import propagation, resident task visibility, and resident interaction mode intent while preserving Grace onboarding boundaries.",
+  "files_changed": [
+    "src/estate/core/assignment_queue.py",
+    "src/estate/core/background_operations_extension_runtime.py",
+    "src/estate/core/background_operations_runtime.py",
+    "src/estate/core/operations_center_bootstrap.py",
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/resident_task_visibility.py",
+    "src/estate/core/steward_command_center.py",
+    "tests/conftest.py",
+    "operations/character_architecture/post_hardening_validation_failure_ledger.md",
+    "operations/character_architecture/post_hardening_validation_health_report.md",
+    "operations/character_architecture/post_hardening_validation_remaining_issues.md"
+  ],
+  "tests_run": [
+    "python -m py_compile src/estate/core/assignment_queue.py src/estate/core/background_operations_extension_runtime.py src/estate/core/background_operations_runtime.py src/estate/core/resident_task_visibility.py src/estate/core/steward_command_center.py src/estate/core/resident_interaction.py src/estate/core/operations_center_bootstrap.py tests/conftest.py",
+    "python -m pytest --collect-only -q",
+    "python -m pytest -q tests/test_grace_hiring_onboarding.py tests/test_grace_live_runtime_exposure.py tests/test_grace_steward_appointment.py tests/test_resident_gateway.py tests/test_resident_memory_runtime.py tests/test_resident_affinity_growth.py tests/test_resident_presence_culture_runtime.py tests/test_visual_runtime.py tests/test_steward_awareness.py",
+    "python -m pytest -q tests/test_assignment_queue.py::test_markdown_output_contains_queue_table tests/test_background_operations_extension_runtime.py tests/test_background_operations_runtime.py tests/test_office_resident_task_board.py::test_board_fields_filtering_source_and_privacy tests/test_office_settings_functional.py::test_settings_e2e_theme_navigation_reload_restart tests/test_operational_events.py::test_cli_record_command_succeeds_for_valid_event tests/test_operational_status.py::test_cli_summary_command_succeeds_with_and_without_activity tests/test_operations_center_bootstrap.py::test_operations_center_start_status_stop_lifecycle tests/test_provider_catalog.py tests/test_resident_cards.py::test_resident_card_html_contains_required_fields tests/test_resident_interaction.py::test_process_chat_uses_mocked_local_llm_and_distinguishes_intents tests/test_steward_command_center.py::test_command_center_office_navigation_and_tabs_cover_initial_areas tests/test_steward_command_center.py::test_wp0214_office_tabs_preserved_and_left_navigation_collapsed_by_default tests/test_steward_command_center.py::test_expansion_roadmap_workspace_shows_states_sources_and_candidates",
+    "python -m pytest -q"
+  ],
+  "known_limitations": [],
+  "provider_execution_performed": false,
+  "dispatch_execution_performed": false,
+  "ready_for_ca_review": true,
+  "review_authority_required": "Chief Architect review"
+}

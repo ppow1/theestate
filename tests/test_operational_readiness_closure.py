@@ -125,3 +125,89 @@ def test_activation_ledger_safe_failure_rolls_back_when_commit_cannot_be_created
     ledger=root/'operations/steward/estate_feature_activation_ledger.md'
     assert (not ledger.exists()) or 'WP-NO-COMMITTER' not in ledger.read_text()
     assert run(['git','status','--porcelain'], root).stdout == ''
+
+
+def add_bare_origin(root):
+    origin=root.parent/'origin.git'
+    origin.mkdir(parents=True)
+    run(['git','init','--bare'], origin)
+    run(['git','remote','add','origin',str(origin)], root)
+    run(['git','push','-u','origin','main'], root)
+    return origin
+
+
+def enable_publication_policy(root, *, authorized=True, production=False):
+    reg=json.loads((root/'runtime/operational_targets/registry.json').read_text())
+    md=reg['targets'][0]['metadata']
+    md['upstream']='origin'; md['publication_required']=True; md['publication_authorized']=authorized
+    md['allowed_remediations']=['create_declared_runtime_directories','update_activation_ledger','publish_controller_mutation']
+    if production:
+        md['production_target']=True
+        md['live_target_path']=str(root)
+        md['readiness_policy']={'production':True,'environment':'production','min_runtime_cycles':2,'compile_only_sufficient':False}
+        md['observation_policy']={'checks_required':2,'min_elapsed_seconds':1,'health_checks':[[sys.executable,'-c','print("healthy")']], 'health_checks_not_applicable_rationale': None}
+        md['validation_recipe']=[[sys.executable,'-c','print("live validation")']]
+    (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
+
+
+def test_authorized_publication_pushes_controller_commit_and_verifies_upstream(tmp_path):
+    root, sha=make_root(tmp_path, checks=1); add_bare_origin(root); enable_publication_policy(root)
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-PUBLISH', merge_commit=sha)
+    out=ctl.process_one(c.case_id)
+    assert out['publication']['status']=='verified'
+    published=run(['git','merge-base','--is-ancestor',out['publication']['pre_local_head'],'origin/main'], root)
+    assert published.returncode == 0
+    assert run(['git','status','--porcelain'], root).stdout == ''
+    assert run(['git','rev-list','--left-right','--count','main...origin/main'], root).stdout.strip() == '0\t0'
+
+
+def test_publication_unauthorized_blocks_local_only_commit_from_readiness(tmp_path):
+    root, sha=make_root(tmp_path, checks=1); add_bare_origin(root); enable_publication_policy(root, authorized=False)
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-NO-PUBLISH', merge_commit=sha)
+    out=ctl.process_one(c.case_id)
+    assert out['state']=='blocked_manual_intervention'
+    assert out['publication'] == {}
+    assert run(['git','rev-list','--left-right','--count','main...origin/main'], root).stdout.split()[0] == '1'
+
+
+def test_missing_production_policy_and_compile_only_zero_observation_blocks(tmp_path):
+    root, sha=make_root(tmp_path, checks=1)
+    reg=json.loads((root/'runtime/operational_targets/registry.json').read_text())
+    md=reg['targets'][0]['metadata']; md['production_target']=True; md['activation_requirements']={'ledger':False}; md['runtime_directories']=[]; md['validation_recipe']=[[sys.executable,'-m','compileall','src/estate/core/operational_readiness_closure.py']]; md['observation_policy']={'checks_required':1,'min_elapsed_seconds':0}
+    (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-PROD-POLICY', merge_commit=sha)
+    out=ctl.process_one(c.case_id)
+    assert out['state']=='blocked_manual_intervention'
+    assert any('production' in b['class'] for b in out['blockers'])
+
+
+def test_explicit_policy_can_declare_gates_not_applicable(tmp_path):
+    root, sha=make_root(tmp_path, checks=1)
+    reg=json.loads((root/'runtime/operational_targets/registry.json').read_text())
+    md=reg['targets'][0]['metadata']; md['production_target']=True; md['activation_requirements']={'ledger':False}; md['runtime_directories']=[]
+    md['live_target_path']=str(root); md['readiness_policy']={'production':True,'environment':'production','min_runtime_cycles':1,'compile_only_sufficient':True,'compile_only_rationale':'repository-only target'}
+    md['observation_policy']={'checks_required':1,'min_elapsed_seconds':0,'elapsed_time_not_applicable_rationale':'repository-only target','health_checks_not_applicable_rationale':'no service'}
+    (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-PROD-EXPLICIT', merge_commit=sha)
+    out=ctl.process_one(c.case_id)
+    assert out['state']=='operationally_ready'
+    verdict=json.loads((root/'runtime/operational_readiness/verdicts'/f"{c.case_id}.json").read_text())
+    assert verdict['publication_required'] is False
+    assert verdict['institutional_acceptance_granted'] is False
+
+
+def test_recovery_publishes_safe_attributable_ahead_commit(tmp_path):
+    root, sha=make_root(tmp_path, checks=1); add_bare_origin(root); enable_publication_policy(root)
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-RECOVER', merge_commit=sha)
+    # Simulate residue: controller-authored local commit already exists, case resumes before publication.
+    ctl.remediate(c,'update_activation_ledger')
+    ahead=run(['git','rev-list','--left-right','--count','main...origin/main'], root).stdout.split()[0]
+    assert ahead == '1'
+    out=ctl.process_one(c.case_id)
+    assert out['publication']['status']=='verified'
+    assert run(['git','rev-list','--left-right','--count','main...origin/main'], root).stdout.strip() == '0\t0'

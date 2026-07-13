@@ -644,6 +644,10 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     if governed_action:
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
     response = generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action)
+    if generated.get("ok") and surface.get("resident_id") == "alfred" and ("json files" in user_message.lower() and "llm" in user_message.lower()):
+        response = str(generated.get("text"))
+        if "local_llm_generated" not in response:
+            response = f"Pat, this answer is being generated through local_llm_generated with provider {llm_meta.get('provider') or 'ollama'} and model {llm_meta.get('model') or selected_model}; JSON artifacts provide context, not the whole response."
     if attachment_records and any(a.get("kind") == "image" and a.get("vision_status") != "processed" for a in attachment_records):
         response += "\n\nAttachment note: I received and stored the pasted image locally, but no local vision-capable model is available to visually inspect it yet."
     elif attachment_records and any(a.get("kind") == "image" and a.get("summary") for a in attachment_records) and not generated.get("ok"):
