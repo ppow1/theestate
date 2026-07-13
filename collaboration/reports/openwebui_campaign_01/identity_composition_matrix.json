@@ -1,0 +1,719 @@
+{
+  "covered_residents": [
+    "alfred",
+    "helen",
+    "ingrid",
+    "grace",
+    "evelyn",
+    "eleanor",
+    "marie",
+    "judy"
+  ],
+  "generated_at": "2026-07-13T02:36:10+00:00",
+  "rows": [
+    {
+      "detected_contradictions": [
+        {
+          "canonical_expectation": "Chief of Staff",
+          "field": "office",
+          "source": "data/registry/residents.json",
+          "value": "Manager of Administration"
+        }
+      ],
+      "failed_closed": true,
+      "identity_hash": "cb75ca7f018dad14",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "alfred",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "residents/alfred.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "d07b8ac696c3e70d",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "helen",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "residents/helen.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "6852ccc472a36d18",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "ingrid",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "residents/ingrid.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "51ef2b6019cd761b",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "grace",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "2a3490e92f2f124e",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "evelyn",
+      "source_artifacts": [
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character bible context",
+          "source": "docs/residents/evelyn/Evelyn_Backstory_and_Trauma_Boundary_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "35cc89848c16a9cc",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "eleanor",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "residents/eleanor.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "08bce20de7d9bfe3",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "marie",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "residents/marie.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    },
+    {
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "0fdc24bdea31f3b7",
+      "layers": [
+        "resident_core_identity",
+        "authority_and_capability_context",
+        "institutional_registry_context",
+        "grounded_estate_facts",
+        "character_context",
+        "privacy_and_disclosure_context",
+        "relationship_context",
+        "durable_memory_context",
+        "conversation_context",
+        "task_specific_instructions"
+      ],
+      "missing_sources": [],
+      "resident_id": "judy",
+      "source_artifacts": [
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "required identity/lifecycle source",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "authority source",
+          "source": "src/estate/core/resident_authority.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "synchronized resident registry snapshot",
+          "source": "data/registry/residents.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical message facts",
+          "source": "collaboration/messages",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded operational facts",
+          "source": "collaboration/work_packages/pending",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character bible context",
+          "source": "residents/judy.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "runtime privacy filter",
+          "source": "src/estate/core/resident_identity_composition.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "privacy-filtered relationship graph",
+          "source": "src/estate/core/relationship_graph.py",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "bounded privacy-filtered durable memory; excludes provider memory and raw transcripts",
+          "source": "runtime/resident_memory/memory_store.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "bounded current conversation only",
+          "source": "runtime/resident_interactions/sessions",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "surface-local",
+          "inclusion_reason": "current request instructions",
+          "source": "request_payload",
+          "version_or_timestamp": null
+        }
+      ]
+    }
+  ],
+  "schema_version": "resident_personality_fidelity_matrix.v1"
+}

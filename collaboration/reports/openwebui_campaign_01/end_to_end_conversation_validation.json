@@ -1,0 +1,114 @@
+{
+  "codex_environment_limitations": [
+    "No running Open WebUI browser/UI process was available in Codex; model exposure was verified through the OpenAI-compatible /v1 models payload used by Open WebUI.",
+    "No approved local intelligible TTS engine was installed in the Codex container, so listening sample generation remains for the Steward machine."
+  ],
+  "conversation_validation": [
+    {
+      "first_sample": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/alfred",
+      "resident_id": "alfred",
+      "second_sample": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-alfred"
+    },
+    {
+      "first_sample": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/helen",
+      "resident_id": "helen",
+      "second_sample": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-helen"
+    },
+    {
+      "first_sample": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/ingrid",
+      "resident_id": "ingrid",
+      "second_sample": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-ingrid"
+    },
+    {
+      "first_sample": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/grace",
+      "resident_id": "grace",
+      "second_sample": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-grace"
+    },
+    {
+      "first_sample": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/evelyn",
+      "resident_id": "evelyn",
+      "second_sample": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-evelyn"
+    },
+    {
+      "first_sample": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/eleanor",
+      "resident_id": "eleanor",
+      "second_sample": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-eleanor"
+    },
+    {
+      "first_sample": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/marie",
+      "resident_id": "marie",
+      "second_sample": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-marie"
+    },
+    {
+      "first_sample": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: The Estate feels noisy. What is the first useful move?",
+      "first_status": 200,
+      "identity_preserved": true,
+      "model": "estate/judy",
+      "resident_id": "judy",
+      "second_sample": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Stay with me for one more turn. What should I watch next?",
+      "second_status": 200,
+      "session_id": "openwebui-campaign01-judy"
+    }
+  ],
+  "models": [
+    "estate/alfred",
+    "estate/helen",
+    "estate/ingrid",
+    "estate/grace",
+    "estate/evelyn",
+    "estate/eleanor",
+    "estate/marie",
+    "estate/judy",
+    "estate/conference-room"
+  ],
+  "schema_version": "openwebui_campaign_01_validation.v1",
+  "tts_health": {
+    "engine": {
+      "argv": [],
+      "available": false,
+      "engine": null,
+      "executable": null,
+      "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+    },
+    "ok": false,
+    "provider": "estate.local.intelligible_tts",
+    "sample_dir": "runtime/voice/listening_samples",
+    "streaming_supported": false,
+    "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+  }
+}

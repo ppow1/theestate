@@ -560,76 +560,49 @@ def _governed_action_guidance(root: Path, classification: dict[str, Any]) -> dic
     return {"kind": "governed_action_next_step", "service_id": service_id, "operation": operation, "executed": False, "ai_services_plan": plan, "steward_command": command}
 
 def _fallback_response(resident, message, surface, root: Path | None = None, classification: dict[str, Any] | None = None, governed_action: dict[str, Any] | None = None):
-    if surface.get("resident_id") == "alfred":
+    rid = surface.get("resident_id")
+    text = str(message or "").strip()
+    if rid == "alfred":
         classification = classification or _classify_alfred_request(message, "conversation")
         if classification.get("response_type") == "blocked_privileged_execution":
             cmd = (governed_action or {}).get("steward_command") or "Open Office of the Steward / AI Services / Models for the governed request."
             return ("I cannot start, stop, or load governed AI services from resident chat, and I have not executed anything. "
                     "The safe next step is to use the Office of the Steward AI Services / Models surface or run this copyable Steward command after approval: " + cmd)
-        if classification.get("intent") == "conversation" and any(w in str(message).lower() for w in ("joke", "funny", "make me laugh")):
+        if classification.get("intent") == "conversation" and any(w in text.lower() for w in ("joke", "funny", "make me laugh")):
             jokes = [
-                "Fallback joke 1/4: I asked the Estate cache to tell a joke, but it needed a little more memory to deliver the punchline.",
-                "Fallback joke 2/4: The local logs formed a band; they only play debug blues.",
-                "Fallback joke 3/4: I tried to organize the work queue by humor, but every task insisted it was high priority.",
-                "Fallback joke 4/4: The command center brought a ladder to stand-up because the backlog kept getting higher.",
+                "Pat, here is the fallback joke: the Estate cache attempted humor with perfect decorum and misplaced the punchline in a correctly labeled archive box.",
+                "The local logs formed a band; naturally, they only play debug blues.",
+                "I tried to organize the work queue by charm, but every task insisted it was high priority.",
+                "The command center brought a ladder to stand-up because the backlog kept getting higher.",
             ]
-            seed = hashlib.sha256(f"{message}|{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}".encode("utf-8")).hexdigest()
-            return jokes[int(seed, 16) % len(jokes)] + " (Deterministic fallback is active, so novelty is limited.)"
-        hints = []
-        if root is not None:
-            for rel in (
-                "runtime/validation/production_readiness.json",
-                "runtime/validation/local_operational_validation_run.json",
-                "operations/boards/active_work.md",
-                "operations/boards/daily_board.md",
-                "operations/work_packages/assignment_queue.md",
-                "operations/departments/engineering/cuemastery_execution_handoff.md",
-            ):
-                hint = _artifact_hint(root, rel)
-                if hint:
-                    hints.append(hint)
-        context = "; ".join(hints[:3]) if hints else "local Estate context is available through validation, work-package, resident, and Operations Center artifacts as they are generated."
+            seed = hashlib.sha256(f"{text}|{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}".encode("utf-8")).hexdigest()
+            return jokes[int(seed, 16) % len(jokes)] + " Local model generation is unavailable, so I am keeping the silverware and the expectations modest."
         if classification.get("response_type") == "direct_conversational_response":
-            return f"Pat, I received your message and can answer conversationally in deterministic fallback mode. You asked: {message[:180]}"
-        return (
-            "Good morning, Pat. Current Estate status: " + context + " "
-            "Recommended next action: review the validation/production-readiness signal first, then the pending work-package queue and Engineering/CueMastery handoff if present. "
-            "I can summarize, recommend, and propose actions from local artifacts through the resident interaction framework, but I will not execute privileged actions or claim Steward authorization from this chat. "
-            f"Prompt received: {message[:180]}"
-        )
-    if surface.get("resident_id") == "helen":
-        return ("I’m Helen, serving Human Resources and Workforce Development for the Estate. "
-                "I can discuss staffing readiness, onboarding, workforce continuity, cognitive-health signals, Character Continuity, and institutional learning, "
-                "while preserving Grace’s candidate status, Alfred/Ingrid/Engineering/Traffic Controller boundaries, private journals, and Steward-reserved authority. "
-                "I have not created offices, appointed anyone, executed privileged actions, or claimed live access unavailable to this local chat. "
-                f"Prompt summary: {message[:180]}")
-    if surface.get("resident_id") == "ingrid":
-        return ("I’m Ingrid, serving Security for the Estate as privacy, classification, connector, protected-source, and boundary authority. "
-                "I can classify requests, advise on minimum-necessary access, refuse unsafe inspection or export of protected/private material, and frame escalations for the Steward. "
-                "I have not changed permissions, accessed private journals, inspected protected local character material, or executed security actions from this chat. "
-                f"Prompt summary: {message[:180]}")
-    if surface.get("resident_id") == "grace":
-        return ("Good morning, Pat. Grace here, Director of Operations. I can turn approved intent into operational sequence, name dependencies, owners, checkpoints, and Dispatch-ready handoffs, "
-                "while preserving Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, validation, and acceptance boundaries. "
-                "I have not executed privileged actions, contacted providers, overridden governance, or declared institutional acceptance from this chat. "
-                f"Prompt summary: {message[:180]}")
-    if surface.get("resident_id") == "evelyn":
-        return ("I’m Evelyn. I can offer private Steward Relationship Layer counsel, reflection, celebration, recovery support, and candid challenge without institutional authority. "
-                "I do not expose private continuity outside the Steward relationship layer, retain sensitive memories without Steward approval, diagnose, appoint, command, or execute Estate actions. "
-                f"Prompt summary: {message[:180]}")
-    if surface.get("resident_id") == "eleanor":
-        return ("I’m Eleanor, serving Archives and Registrar functions for the Estate. I preserve institutional memory, provenance, revisions, Palace Memory, and ledger lineage; "
-                "I can identify what the record supports, what is interpretation, and what still needs source evidence, but this chat does not canonize history. "
-                f"Prompt summary: {message[:180]}")
-    if surface.get("resident_id") == "marie":
-        return ("I’m Marie, serving Research for the Estate. I can investigate, validate, contextualize, and separate evidence from hypothesis while naming uncertainty and source limits; "
-                "I do not claim live access or turn an unverified inference into fact. "
-                f"Prompt summary: {message[:180]}")
-    if surface.get("resident_id") == "judy":
-        return ("I’m Judy, General Counsel for the Estate. I can review legal risk, contracts, compliance, licensing, claims, and gray-area exposure, "
-                "while identifying decision points without granting authority or substituting for external counsel where that is required. "
-                f"Prompt summary: {message[:180]}")
-    return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {message[:180]}"
+            return f"Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: {text[:160]}"
+        return ("Good morning, Pat. Current Estate status: bounded local context is available. Recommended next action: I would begin with the validation signal, then the pending queue, then the Engineering handoff—one clean pass before anyone adds ceremony. "
+                "I can summarize, recommend, and prepare proposed actions, but execution still waits for the proper Steward-authorized path.")
+    if rid == "helen":
+        return ("Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. "
+                f"For this prompt, my HR instinct is to protect capacity and clarity first: {text[:160]}")
+    if rid == "ingrid":
+        return ("Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. "
+                f"I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: {text[:160]}")
+    if rid == "grace":
+        return ("Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. "
+                f"I am available as Director of Operations; give me the constraint and I will turn it into movement: {text[:160]}")
+    if rid == "evelyn":
+        return ("Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. "
+                f"I can stay with the private shape of this without turning it into institutional command: {text[:160]}")
+    if rid == "eleanor":
+        return ("I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. "
+                f"This conversation is not canonical history, but it can point to the source trail: {text[:160]}")
+    if rid == "marie":
+        return ("My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. "
+                f"I can research the claim rather than decorate it: {text[:160]}")
+    if rid == "judy":
+        return ("Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. "
+                f"I can flag legal risk and decision points without pretending chat is approval: {text[:160]}")
+    return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {text[:180]}"
 
 def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None) -> dict[str, Any]:
     rootp = _root(root); surface = resident_surface(resident, rootp); sid = session_id or _next_session_id(rootp, resident)
