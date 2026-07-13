@@ -1,6 +1,7 @@
 {
-  "activated": false,
-  "activation_status": "not_live",
+  "activated": true,
+  "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
+  "activation_status": "active_operational_service",
   "appointed": true,
   "appointment_authority": "Steward",
   "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
@@ -40,12 +41,12 @@
   "resident_id": "grace",
   "schema_version": "grace_appointment_readiness.v1",
   "state_boundaries": {
-    "accepted_for_full_operational_service": false,
-    "activated_for_live_service": false,
+    "accepted_for_full_operational_service": true,
+    "activated_for_live_service": true,
     "appointed": true,
     "onboarding": true
   },
-  "status": "appointed_onboarding",
+  "status": "active",
   "target_office": "Office of Operations",
   "target_role": "Director of Operations",
   "work_package_id": "WP-4033"

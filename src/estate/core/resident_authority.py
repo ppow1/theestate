@@ -68,6 +68,13 @@ RESIDENT_RULES = {
         "escalation_required": ["external-notification-network-action"],
         "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],
     },
+    "grace": {
+        "resident": "Grace",
+        "allowed": ["observe", "summarize", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
+        "approval_required": ["create-work-package-draft", "send-mailbox-message-artifact", "external-notification-network-action"],
+        "escalation_required": [],
+        "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],
+    },
 }
 
 

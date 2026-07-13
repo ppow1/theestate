@@ -169,22 +169,44 @@
       "transition": "activate"
     },
     {
-      "event_id": "character-architecture-hardening:grace-deactivation-correction",
-      "transition": "correct_lifecycle_boundary",
-      "from": "active",
-      "to": "onboarding",
       "actor": "Chief Architect",
+      "at": "2026-07-12T00:00:00+00:00",
       "authority": "post-implementation verification correction; does not activate or de-appoint",
+      "event_id": "character-architecture-hardening:grace-deactivation-correction",
+      "evidence": {
+        "verification_report": "operations/character_architecture/character_architecture_hardening_verification_report.md"
+      },
+      "from": "active",
+      "output": "Grace remains appointed and onboarding, not operational and not gateway exposed",
       "prerequisites": [
         "Character Architecture post-implementation verification findings",
         "Steward activation still required"
       ],
-      "evidence": {
-        "verification_report": "operations/character_architecture/character_architecture_hardening_verification_report.md"
-      },
-      "output": "Grace remains appointed and onboarding, not operational and not gateway exposed",
       "rollback_or_correction": "Only a future explicit Steward activation package may move Grace to ready_for_service/active and gateway exposure.",
-      "at": "2026-07-12T00:00:00+00:00"
+      "to": "onboarding",
+      "transition": "correct_lifecycle_boundary"
+    },
+    {
+      "actor": "Steward",
+      "at": "2026-07-13T00:00:00+00:00",
+      "authority": "operational commissioning through OPS Campaign 01; no authority expansion",
+      "event_id": "OPS-CAMPAIGN-01:steward_activation",
+      "evidence": {
+        "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
+        "commissioning_report": "operations/commissioning/grace/Grace_Operational_Commissioning_Report.md"
+      },
+      "from": "onboarding",
+      "output": "Grace operational service commissioned",
+      "prerequisites": [
+        "Grace appointment evidence",
+        "Helen onboarding reconciliation",
+        "gateway and Open WebUI exposure package",
+        "mailbox and routing validation",
+        "rollback controls"
+      ],
+      "rollback_or_correction": "Steward stand-down and remove estate/grace gateway exposure if activation is revoked.",
+      "to": "active",
+      "transition": "activate"
     }
   ],
   "identity_lineage": {
@@ -193,11 +215,11 @@
     "resident_id": "grace",
     "successor_resident_id": null
   },
-  "next_action": "complete onboarding package, then request explicit Steward activation",
-  "pending_gate": "steward_activation_required",
+  "next_action": "schedule_reflection",
+  "pending_gate": null,
   "resident_id": "grace",
   "resident_name": "Grace",
   "schema_version": "resident_lifecycle.v1",
-  "status": "onboarding",
-  "updated_at": "2026-07-12T00:00:00+00:00"
+  "status": "active",
+  "updated_at": "2026-07-13T00:00:00+00:00"
 }

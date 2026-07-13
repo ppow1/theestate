@@ -21,10 +21,10 @@ def test_grace_hiring_package_separates_review_recommendation_appointment_and_ac
     }
     assert readiness["appointment_authority"] == "Steward"
     assert readiness["appointed"] is True
-    assert readiness["activated"] is False
+    assert readiness["activated"] is True
 
 
-def test_grace_identity_and_mailbox_are_reconciled_for_appointed_onboarding_not_active_service():
+def test_grace_identity_and_mailbox_are_reconciled_for_active_service():
     personnel = read_json("data/registry/personnel.json")
     mailboxes = read_json("data/registry/mailboxes.json")
     residents = read_json("data/registry/residents.json")
@@ -32,13 +32,13 @@ def test_grace_identity_and_mailbox_are_reconciled_for_appointed_onboarding_not_
     grace_personnel = next(entry for entry in personnel if entry.get("display_name") == "Grace")
     grace_mailbox = next(entry for entry in mailboxes if entry.get("display_name") == "Grace")
 
-    assert grace_personnel["status"] == "appointed_onboarding"
+    assert grace_personnel["status"] == "active"
     assert grace_personnel["employee_id"] == 12
     assert grace_personnel["mailbox_id"] == 12
     assert grace_personnel.get("resident_id") == "grace"
-    assert grace_mailbox["status"] == "onboarding"
+    assert grace_mailbox["status"] == "active"
     assert grace_mailbox["mailbox_type"] == "personnel"
-    assert all(entry.get("name") != "Grace" for entry in residents)
+    assert any(entry.get("name") == "Grace" and entry.get("status") == "Active" for entry in residents)
 
 
 def test_grace_onboarding_boundaries_and_message_preserve_reserved_actions():

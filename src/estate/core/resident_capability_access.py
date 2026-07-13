@@ -61,7 +61,7 @@ TOOL_SPECS: dict[str, ToolSpec] = {
 RESIDENT_SPECS: dict[str, ResidentSpec] = {
     "alfred": ResidentSpec("alfred", "Alfred", ("coordination", "routing", "steward_attention_protection", "resident_chat"), ("local_search", "resident_chat", "mailbox_message_draft", "work_package_draft", "runtime_presence_update", "ollama_text"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify")),
     "helen": ResidentSpec("helen", "Helen", ("workforce_fit", "capability_review", "resident_health", "assignment_advice"), ("local_search", "resident_chat", "mailbox_message_draft", "work_package_draft", "runtime_presence_update"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify", "ollama_text")),
-    "grace": ResidentSpec("grace", "Grace", ("appointed_onboarding", "sequence_planning_draft", "dispatch_handoff_request_draft"), (), denied_tools=("local_search", "resident_chat", "runtime_presence_update", "mailbox_message_draft", "work_package_draft", "validation_command", "merge_approval", "personnel_identity_modify", "ollama_text"), candidate=True),
+    "grace": ResidentSpec("grace", "Grace", ("operational_service", "sequence_planning", "dispatch_handoff_request", "resident_chat"), ("resident_chat", "runtime_presence_update", "mailbox_message_draft", "work_package_draft"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify", "ollama_text"), candidate=False),
 }
 
 def _now() -> str:

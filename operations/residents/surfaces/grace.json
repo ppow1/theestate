@@ -1,60 +1,61 @@
 {
-  "resident_id": "grace",
-  "resident_display_name": "Grace",
-  "office": "Office of Operations",
-  "role": "Director of Operations",
-  "resident_api_standard_version": "resident-api-standard-v1",
-  "resident_implementation_version": "grace-appointed-onboarding-not-live-v1",
-  "identity": {
-    "runtime_identity": "runtime/residents/grace/runtime_identity.json",
-    "profile": "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
-    "validation": "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
-    "platform_export": "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml"
-  },
-  "presentation": {
-    "gateway_model": null,
-    "open_webui_label": "Grace \u2014 Director of Operations",
-    "status": "appointed_onboarding_not_gateway_exposed"
+  "activation_boundary": {
+    "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
+    "gateway_exposed": true,
+    "operational": true,
+    "status": "active",
+    "steward_activation_required": false
   },
   "capabilities": [
     {
-      "id": "conversation.respond",
-      "label": "Respond in conversation",
-      "description": "Generate local Grace responses to Steward input through the shared resident chat runtime.",
-      "implementation_status": "staged_requires_steward_activation",
-      "backing": "estate.core.resident_interaction.process_chat",
       "authority_category": "conversation_only",
-      "required_approval_level": "steward_activation_required_before_runtime_use",
-      "version_introduced": "grace-live-runtime-implementation-v1",
-      "owning_office": "Office of Operations"
+      "backing": "estate.core.resident_interaction.process_chat",
+      "description": "Generate local Grace responses to Steward input through the shared resident chat runtime.",
+      "id": "conversation.respond",
+      "implementation_status": "active_governed",
+      "label": "Respond in conversation",
+      "owning_office": "Office of Operations",
+      "required_approval_level": "governed_runtime_boundaries_apply",
+      "version_introduced": "grace-live-runtime-implementation-v1"
     },
     {
-      "id": "operations.sequence.propose",
-      "label": "Propose operational sequence",
-      "description": "Translate approved intent into dependencies, owners, checkpoints, and next operational movement without bypassing governance.",
-      "implementation_status": "staged_requires_steward_activation",
-      "backing": "estate.core.grace_operations_runtime.GraceOperationsRuntime",
       "authority_category": "proposed_action",
-      "required_approval_level": "steward_activation_required_before_runtime_use",
-      "version_introduced": "grace-live-runtime-implementation-v1",
-      "owning_office": "Office of Operations"
+      "backing": "estate.core.grace_operations_runtime.GraceOperationsRuntime",
+      "description": "Translate approved intent into dependencies, owners, checkpoints, and next operational movement without bypassing governance.",
+      "id": "operations.sequence.propose",
+      "implementation_status": "active_governed",
+      "label": "Propose operational sequence",
+      "owning_office": "Office of Operations",
+      "required_approval_level": "governed_runtime_boundaries_apply",
+      "version_introduced": "grace-live-runtime-implementation-v1"
     },
     {
-      "id": "dispatch.handoff.request",
-      "label": "Request dispatch handoff",
-      "description": "Prepare governed Dispatch handoff requests only after movement constraints are satisfied.",
-      "implementation_status": "staged_requires_steward_activation",
-      "backing": "estate.core.grace_operations_runtime.GraceOperationsRuntime.conduct_objective",
       "authority_category": "governed_request",
-      "required_approval_level": "steward_activation_required_before_runtime_use",
-      "version_introduced": "grace-live-runtime-implementation-v1",
-      "owning_office": "Office of Operations"
+      "backing": "estate.core.grace_operations_runtime.GraceOperationsRuntime.conduct_objective",
+      "description": "Prepare governed Dispatch handoff requests only after movement constraints are satisfied.",
+      "id": "dispatch.handoff.request",
+      "implementation_status": "active_governed",
+      "label": "Request dispatch handoff",
+      "owning_office": "Office of Operations",
+      "required_approval_level": "governed_runtime_boundaries_apply",
+      "version_introduced": "grace-live-runtime-implementation-v1"
     }
   ],
-  "activation_boundary": {
-    "status": "appointed_onboarding",
-    "operational": false,
-    "gateway_exposed": false,
-    "steward_activation_required": true
-  }
+  "identity": {
+    "platform_export": "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml",
+    "profile": "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
+    "runtime_identity": "runtime/residents/grace/runtime_identity.json",
+    "validation": "docs/residents/grace/Grace_Resident_Validation_v0_1.md"
+  },
+  "office": "Office of Operations",
+  "presentation": {
+    "gateway_model": "estate/grace",
+    "open_webui_label": "Grace \u2014 Director of Operations",
+    "status": "active_operational_gateway_exposed"
+  },
+  "resident_api_standard_version": "resident-api-standard-v1",
+  "resident_display_name": "Grace",
+  "resident_id": "grace",
+  "resident_implementation_version": "grace-operational-commissioned-v1",
+  "role": "Director of Operations"
 }

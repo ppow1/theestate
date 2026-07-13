@@ -1,0 +1,21 @@
+{
+  "checks": [
+    "activation decision exists",
+    "lifecycle active",
+    "personnel and mailbox active",
+    "resident registry exposes Grace",
+    "gateway exposes estate/grace",
+    "Open WebUI-compatible model endpoint available through gateway",
+    "rollback controls recorded"
+  ],
+  "evidence": [
+    "runtime/onboarding/grace/steward_activation_decision.json",
+    "runtime/residents/lifecycle/grace.json",
+    "runtime/residents/grace/runtime_identity.json",
+    "operations/residents/surfaces/grace.json",
+    "operations/commissioning/grace/Grace_Operational_Commissioning_Report.md"
+  ],
+  "generated_at": "2026-07-13T00:00:00+00:00",
+  "schema_version": "grace_commissioning_validation.v1",
+  "status": "passed"
+}

@@ -1,11 +1,11 @@
 {
   "authority_flags": {
     "constitutional_authority_granted": false,
-    "grace_appointed_or_activated": false,
+    "grace_appointed_or_activated": true,
     "operational_queue_control_performed": false,
     "provider_execution_performed": false
   },
-  "generated_at": "2026-07-10T18:17:33Z",
+  "generated_at": "2026-07-13T02:07:38Z",
   "grace_hiring_gate": "eligible_for_steward_review",
   "overall_status": "ready",
   "readiness_path": "runtime/residents/helen/readiness.json",
