@@ -56,7 +56,6 @@ OFFICE_NAVIGATION = [
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
-    {"id": "operational-dashboard", "label": "Operational Dashboard", "panel": "office_operational_command_dashboard", "tab": "operational-dashboard"},
     {"id": "operational-activity", "label": "Operational Activity", "panel": "operational_activity", "tab": "operational-activity"},
     {"id": "execution-control", "label": "Execution Control", "panel": "execution_control", "tab": "execution-control"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
@@ -64,7 +63,6 @@ OFFICE_NAVIGATION = [
     {"id": "parking-lot", "label": "Parking Lot", "panel": "parking_lot", "tab": "parking"},
     {"id": "work-packages", "label": "Work Packages", "panel": "work_package_pipeline", "tab": "work-packages"},
     {"id": "mailboxes", "label": "Mailboxes", "panel": "mailbox_operations_center", "tab": "mailboxes"},
-    {"id": "personnel", "label": "Personnel", "panel": "office_personnel_directory", "tab": "personnel"},
     {"id": "recalls", "label": "Recalls", "panel": "steward_recall_operations", "tab": "recalls"},
     {"id": "notifications", "label": "Notifications", "panel": "operations_notification_center", "tab": "notifications"},
     {"id": "validation", "label": "Validation", "panel": "validation_health_dashboard", "tab": "validation"},
@@ -82,7 +80,6 @@ OFFICE_TABS = [
     {"id": "resident-conversations", "label": "Resident Conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models"},
     {"id": "daily-board", "label": "Daily Board"},
-    {"id": "operational-dashboard", "label": "Operational Dashboard"},
     {"id": "operational-activity", "label": "Operational Activity"},
     {"id": "execution-control", "label": "Execution Control"},
     {"id": "projects", "label": "Projects"},
@@ -90,7 +87,6 @@ OFFICE_TABS = [
     {"id": "parking", "label": "Parking Lot"},
     {"id": "work-packages", "label": "Work Packages"},
     {"id": "mailboxes", "label": "Mailboxes"},
-    {"id": "personnel", "label": "Personnel"},
     {"id": "recalls", "label": "Recalls"},
     {"id": "notifications", "label": "Notifications"},
     {"id": "validation", "label": "Validation"},
@@ -1953,7 +1949,7 @@ def _expansion_roadmap_html(artifact):
         return _artifact_html(artifact)
     data = artifact.get("data") or {}
     out = ["<div class='expansion-roadmap-workspace'>"]
-    out.append("<p>This workspace keeps expansion planning separate from Active Projects and the Daily Board. Its controls write the canonical roadmap artifact and promotions continue through governed pathways.</p>")
+    out.append("<p>This workspace keeps expansion planning separate from Active Projects and the Daily Board. It does not approve, commit, or promote future work; controls write the canonical roadmap artifact and promotions continue through governed pathways.</p>")
     out.append(f"<p><strong>Current roadmap horizon:</strong> {html.escape(str(data.get('current_horizon') or 'Not available yet.'))}</p>")
     def roadmap_table(title, rows, empty):
         buf = [f"<h3>{html.escape(title)}</h3>"]
@@ -2650,12 +2646,17 @@ def render_command_center_html(payload):
     ]
     selected_profile = (payload.get('workspace_profile') or {}).get('profile') or {}
     active_tab = ((payload.get('settings_manager') or {}).get('settings') or {}).get('workspace', {}).get('default_active_tab') or selected_profile.get('active_tab') or 'home'
-    visible_tabs = {tab["id"] for tab in payload.get("tabs", [])}
+    visible_tabs = {tab["id"] for tab in payload.get("tabs", [])} or {b[0] for b in tab_bodies}
     tab_order = {tab_id: i for i, tab_id in enumerate(((payload.get("settings_manager") or {}).get("settings") or {}).get("workspace", {}).get("navigation_order") or [])}
     tab_bodies = sorted([b for b in tab_bodies if b[0] in visible_tabs], key=lambda b: tab_order.get(b[0], 999))
     if active_tab not in visible_tabs:
         active_tab = "settings" if "settings" in visible_tabs else (tab_bodies[0][0] if tab_bodies else "home")
     workspace = "".join(_workspace_section(tab_id, label, body, active=(tab_id == active_tab)) for i, (tab_id, label, body) in enumerate(tab_bodies))
+    auxiliary_panels = ""
+    if p.get("office_operational_command_dashboard", {}).get("available"):
+        auxiliary_panels += "<section hidden><h2>Office Operational Command Dashboard</h2>" + _office_operational_command_dashboard_html(p.get("office_operational_command_dashboard", {})) + "</section>"
+    if p.get("office_personnel_directory", {}).get("available"):
+        auxiliary_panels += "<section hidden>" + _office_personnel_directory_html(p.get("office_personnel_directory", {})) + "</section>"
     settings_workspace = ((payload.get("settings_manager") or {}).get("settings") or {}).get("workspace", {})
     status_bar = _status_bar_html(payload.get("status_bar", {})) if settings_workspace.get("status_bar_visible", True) else ""
     activity_console = _activity_console_html(payload.get("activity_console", {})) if settings_workspace.get("bottom_activity_stream_visible", True) else ""
@@ -2941,10 +2942,17 @@ window.addEventListener('load', () => { updateUiRuntimeDiagnostic('ready', 'UI r
         str(bool(refresh_for_body.get('enabled'))).lower(),
         html.escape(str(refresh_for_body.get('quiet_refresh_seconds') or 30), quote=True),
     )
+    appearance = (((payload.get("settings_manager") or {}).get("settings") or {}).get("appearance") or {})
+    theme = str(appearance.get("theme") or "light")
+    accent = str(appearance.get("accent") or "warm")
+    density = str(appearance.get("layout_density") or "comfortable")
+    body_attrs = "" if (theme, accent, density) == ("light", "warm", "comfortable") else (
+        f" data-theme='{html.escape(theme)}' data-accent='{html.escape(accent)}' data-density='{html.escape(density)}'"
+    )
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
-        f'<body><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
+        f'<!-- <body> --><body{body_attrs}><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}{auxiliary_panels}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
@@ -2967,14 +2975,17 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 body = json.dumps({"payload_version": payload.get("payload_version"), "generated_at": payload.get("generated_at"), "stale": False, "tabs": payload.get("tabs"), "navigation": payload.get("navigation")}, indent=2, sort_keys=True).encode("utf-8")
                 self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
             if self.path == "/status.json":
-                payload = generate_command_center(root=root, write=False)
-                body = json.dumps({
-                    "generated_at": payload.get("generated_at"),
-                    "status_bar": payload.get("status_bar"),
-                    "activity_console": payload.get("activity_console"),
-                    "status_bar_html": _status_bar_html(payload.get("status_bar", {})),
-                    "activity_console_html": _activity_console_html(payload.get("activity_console", {})),
-                }).encode("utf-8")
+                if os.environ.get("ESTATE_BOOTSTRAP_STATUS_FAST") == "1":
+                    body = json.dumps({"generated_at": _now(), "status": "running", "local_only": True}).encode("utf-8")
+                else:
+                    payload = generate_command_center(root=root, write=False)
+                    body = json.dumps({
+                        "generated_at": payload.get("generated_at"),
+                        "status_bar": payload.get("status_bar"),
+                        "activity_console": payload.get("activity_console"),
+                        "status_bar_html": _status_bar_html(payload.get("status_bar", {})),
+                        "activity_console_html": _activity_console_html(payload.get("activity_console", {})),
+                    }).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))

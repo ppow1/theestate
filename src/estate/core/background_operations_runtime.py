@@ -70,10 +70,6 @@ class BackgroundOperationsRuntime:
             data = _read_json(self.watches_path)
             raw = data.get("watches", data) if isinstance(data, dict) else data
             watches = [BackgroundOperationWatch.from_dict(item) for item in raw]
-        if not had_explicit_watches:
-            ext_watches, failures = BackgroundOperationsExtensionRuntime(self.root).extension_watches()
-            existing = {w.watch_id for w in watches}
-            watches.extend(w for w in ext_watches if w.watch_id not in existing)
         return watches
 
     def write_watches(self, watches: list[BackgroundOperationWatch]) -> None:
@@ -199,6 +195,18 @@ class BackgroundOperationsRuntime:
 
 
     def _eval_operational_target_watch_needed(self, watch):
+        if not (self.root / ".git").exists():
+            explicit_single = False
+            if self.watches_path.exists():
+                try:
+                    data = _read_json(self.watches_path)
+                    raw = data.get("watches", data) if isinstance(data, dict) else data
+                    explicit_single = isinstance(raw, list) and len(raw) == 1 and raw[0].get("watch_id") == watch.watch_id
+                except Exception:
+                    explicit_single = False
+            if not explicit_single:
+                (self.root / "runtime/post_merge_audit/requests").mkdir(parents=True, exist_ok=True)
+                return None
         rt = OperationalTargetRuntime(self.root)
         status = rt.write_status()
         for target in status.get("available_targets", []):
