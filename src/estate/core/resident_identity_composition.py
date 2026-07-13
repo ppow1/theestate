@@ -42,6 +42,9 @@ ROLE_BOUNDARIES = {
     "grace": ["Director of Operations; does not absorb Traffic Controller, Steward, Engineering, Dispatch, Helen, or Ingrid authority."],
     "ingrid": ["Privacy, classification, connector, protected-source, and boundary authority; ordinary self-description remains allowed."],
     "evelyn": ["Steward Confidant; no HR, Operations, Chief of Staff, therapist, Steward, or institutional command authority."],
+    "eleanor": ["Archives / Registrar; preserves provenance and institutional memory without turning chat into canonical record."],
+    "marie": ["Research; investigates and contextualizes evidence without claiming unsupported certainty or live access."],
+    "judy": ["General Counsel; frames legal risk and compliance concerns without granting authority or replacing external counsel."],
 }
 OFFICE_CORRECTIONS = {"alfred": "Chief of Staff", "helen": "Human Resources / Workforce Development"}
 
@@ -87,7 +90,9 @@ def _hash(payload: Mapping[str, Any]) -> str:
 def _find_resident(registry: Sequence[Mapping[str, Any]], resident: str) -> dict[str, Any] | None:
     wanted = _key(resident)
     for row in registry:
-        keys = {_key(row.get("id")), _key(row.get("name")), _key(str(row.get("canonical", "").rsplit("/", 1)[-1]))}
+        canonical = str(row.get("canonical") or "")
+        gateway_model = str(row.get("gateway_model") or "")
+        keys = {_key(row.get("id")), _key(row.get("name")), _key(canonical.rsplit("/", 1)[-1]), _key(gateway_model.rsplit("/", 1)[-1])}
         if wanted in keys:
             return dict(row)
     return None
