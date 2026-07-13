@@ -114,3 +114,89 @@ def test_reruns_create_new_run_ids(monkeypatch, tmp_path):
     first = pb.WorkspaceManager("benchmark-001").run_id
     second = pb.WorkspaceManager("benchmark-001").run_id
     assert first != second
+
+
+def _fixture_run(monkeypatch, tmp_path, run_id, executor="local", status="failed", eligible=True, packet_hash=None):
+    monkeypatch.setattr(pb, "BENCH_ROOT", tmp_path)
+    spec = pb.BenchmarkSpec(pb.benchmark001_spec())
+    ws = pb.WorkspaceManager("benchmark-001", run_id); ws.create(spec)
+    d = ws.executor_dir(executor)
+    (d / "dependency_batcher.py").write_text(pb.mock_benchmark001_code())
+    meta = pb.base_meta(spec, ws, executor, "ollama" if executor == "local" else executor, "qwen2.5-coder:7b", pb.utc_now())
+    meta.update(validation_status=status, canonical_packet_eligible=eligible, canonical_packet_sha256=packet_hash or pb.canonical_packet_hash(spec), wall_clock_seconds=23.810738, prompt_tokens=1566, output_tokens=899, total_tokens=2465, generation_attempts=1, repair_attempts=0, tests_passed=0 if status == "failed" else 3, tests_failed=1 if status == "failed" else 0)
+    pb.atomic_write_json(d / "metadata.json", meta)
+    return spec, ws, d, meta
+
+
+def test_cross_run_import_success_receipt_preserves_source_and_failed_status(monkeypatch, tmp_path):
+    spec, source_ws, source_dir, meta = _fixture_run(monkeypatch, tmp_path, "source", status="failed")
+    dest_ws = pb.WorkspaceManager("benchmark-001", "dest"); dest_ws.create(spec)
+    before = pb._file_hashes(source_dir)
+    receipt = pb.import_executor_result(spec, "source", "local", "dest", command="provider-benchmark import-executor-result benchmark-001 source local dest")
+    assert pb._file_hashes(source_dir) == before
+    assert receipt["source_run_id"] == "source"
+    assert receipt["destination_run_id"] == "dest"
+    assert receipt["source_metadata_sha256"] == pb.sha256_file(source_dir / "metadata.json")
+    imported = json.loads((dest_ws.executor_dir("local") / "metadata.json").read_text())
+    assert imported["validation_status"] == "failed"
+    assert imported["wall_clock_seconds"] == 23.810738
+    assert imported["prompt_tokens"] == 1566
+    assert imported["output_tokens"] == 899
+    assert imported["total_tokens"] == 2465
+    assert imported["generation_attempts"] == 1
+    assert imported["repair_attempts"] == 0
+    assert imported["imported_evidence"] is True
+
+
+def test_cross_run_import_rejects_bad_sources_and_conflicts(monkeypatch, tmp_path):
+    spec, source_ws, source_dir, meta = _fixture_run(monkeypatch, tmp_path, "source")
+    dest_ws = pb.WorkspaceManager("benchmark-001", "dest"); dest_ws.create(spec)
+    with pytest.raises(pb.BenchmarkError, match="missing source result"):
+        pb.import_executor_result(spec, "missing", "local", "dest")
+    meta["canonical_packet_sha256"] = pb.sha256_text("different")
+    pb.atomic_write_json(source_dir / "metadata.json", meta)
+    with pytest.raises(pb.BenchmarkError, match="hash mismatch"):
+        pb.import_executor_result(spec, "source", "local", "dest")
+    meta["canonical_packet_sha256"] = pb.canonical_packet_hash(spec); meta["canonical_packet_eligible"] = False
+    pb.atomic_write_json(source_dir / "metadata.json", meta)
+    with pytest.raises(pb.BenchmarkError, match="not canonical-packet eligible"):
+        pb.import_executor_result(spec, "source", "local", "dest")
+    meta["canonical_packet_eligible"] = True
+    pb.atomic_write_json(source_dir / "metadata.json", meta)
+    (dest_ws.executor_dir("local") / "other.txt").write_text("conflict")
+    with pytest.raises(pb.BenchmarkError, match="already contains"):
+        pb.import_executor_result(spec, "source", "local", "dest")
+
+
+def test_imported_passed_result_and_compare_report_include_native_and_imported(monkeypatch, tmp_path):
+    spec, source_ws, source_dir, meta = _fixture_run(monkeypatch, tmp_path, "source", status="passed")
+    dest_ws = pb.WorkspaceManager("benchmark-001", "dest"); dest_ws.create(spec)
+    codex_dir = dest_ws.executor_dir("codex")
+    codex_meta = pb.base_meta(spec, dest_ws, "codex", "codex", "codex", pb.utc_now())
+    codex_meta.update(validation_status="passed", tests_passed=3, tests_failed=0)
+    pb.atomic_write_json(codex_dir / "metadata.json", codex_meta)
+    pb.import_executor_result(spec, "source", "local", "dest")
+    report = pb.compare(spec, dest_ws)
+    assert {r["executor"] for r in report["results"]} == {"codex", "local"}
+    assert {r["validation_status"] for r in report["results"]} == {"passed"}
+    text = (dest_ws.executor_dir("comparison") / "comparison.md").read_text()
+    assert "| codex |" in text and "| local |" in text
+
+
+def test_windows_style_root_path_import(monkeypatch, tmp_path):
+    monkeypatch.setattr(pb, "BENCH_ROOT", tmp_path / "A:" / "theestate" / "experiments" / "provider_benchmarks")
+    spec, source_ws, source_dir, meta = _fixture_run(monkeypatch, tmp_path / "A:" / "theestate" / "experiments" / "provider_benchmarks", "source")
+    dest_ws = pb.WorkspaceManager("benchmark-001", "dest"); dest_ws.create(spec)
+    receipt = pb.import_executor_result(spec, "source", "local", "dest")
+    assert receipt["destination_executor"] == "local"
+
+
+def test_repeat_import_rejected_without_mutating_destination(monkeypatch, tmp_path):
+    spec, source_ws, source_dir, meta = _fixture_run(monkeypatch, tmp_path, "source")
+    dest_ws = pb.WorkspaceManager("benchmark-001", "dest"); dest_ws.create(spec)
+    pb.import_executor_result(spec, "source", "local", "dest")
+    dest_dir = dest_ws.executor_dir("local")
+    before = pb._file_hashes(dest_dir)
+    with pytest.raises(pb.BenchmarkError, match="already contains"):
+        pb.import_executor_result(spec, "source", "local", "dest")
+    assert pb._file_hashes(dest_dir) == before
