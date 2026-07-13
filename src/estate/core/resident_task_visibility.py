@@ -95,7 +95,7 @@ def _norm(value: Any) -> str:
 
 def _status_kind(entry: dict[str, Any], availability: str, blocker: Any, stale: bool) -> str:
     raw = _norm(entry.get("status") or entry.get("state") or availability)
-    if stale:
+    if stale and raw not in {"waiting", "waiting_on", "waiting_for_steward", "pending"} and not entry.get("waiting_on"):
         return "stale"
     if blocker:
         return "blocked"
@@ -168,7 +168,7 @@ def build_resident_task_board(root: str | Path | None = None, **filters: Any) ->
         runtime = by_presence.get(key) or by_presence.get(_slug(resident.get("name"))) or {}
         movement = entry.get("last_meaningful_movement") or runtime.get("last_activity") or runtime.get("last_heartbeat")
         stale = _is_stale(movement, now_dt)
-        blocker = entry.get("blocker") or ("status stale or missing" if stale else None)
+        blocker = entry.get("blocker") or ("status stale or missing" if stale and not entry.get("waiting_on") else None)
         requested_escalation = entry.get("escalation_state")
         escalation = "attention_needed" if runtime.get("needs_steward") or blocker else (requested_escalation or "none")
         public = {k: v for k, v in entry.items() if k not in PRIVATE_FIELDS}

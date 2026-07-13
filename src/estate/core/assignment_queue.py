@@ -244,11 +244,11 @@ def update_work_package_control(work_package_id, *, root=None, owner=None, state
 
 
 def format_assignment_queue_markdown(queue):
-    lines = ["# Estate Assignment Queue", "", f"Generated: {queue['generated_at']}", "", "## Summary", "", f"- Work packages: {queue['summary']['work_package_count']}", f"- Blocked: {queue['summary']['blocked_count']}", f"- Unassigned: {queue['summary']['unassigned_count']}", f"- Warnings: {queue['summary']['warning_count']}", "", "## Queue", "", "| Work Package | Priority | Mode | Owner | State | Dependencies | Blockers | Next Action |", "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+    lines = ["# Estate Assignment Queue", "", f"Generated: {queue['generated_at']}", "", "## Summary", "", f"- Work packages: {queue['summary']['work_package_count']}", f"- Blocked: {queue['summary']['blocked_count']}", f"- Unassigned: {queue['summary']['unassigned_count']}", f"- Warnings: {queue['summary']['warning_count']}", "", "## Queue", "", "| Work Package | Mode | Owner | State | Dependencies | Blockers | Next Action |", "| --- | --- | --- | --- | --- | --- | --- |"]
     for e in queue["work_packages"]:
         deps = "<br>".join(e["dependencies"]) if e["dependencies"] else "None"
         blockers = "<br>".join(e["blockers"]) if e["blockers"] else "None"
-        lines.append(f"| [{e['work_package_id']}](../../{e['path']}) | {e['priority']} | {e['mode']} | {e['owner']} | {e['state']} | {deps} | {blockers} | {e['next_action']} |")
+        lines.append(f"| [{e['work_package_id']}](../../{e['path']}) | {e['mode']} | {e['owner']} | {e['state']} | {deps} | {blockers} | {e['next_action']} |")
     if queue["warnings"]:
         lines += ["", "## Warnings", ""]
         for w in queue["warnings"]:

@@ -129,17 +129,22 @@ def operations_center_start(*, host: str = DEFAULT_HOST, port: int = DEFAULT_POR
     runtime_dir = base / "runtime" / "steward"
     runtime_dir.mkdir(parents=True, exist_ok=True)
     log_handle = _log_file(base).open("a", encoding="utf-8")
+    env = os.environ.copy()
+    src_path = str(Path(__file__).resolve().parents[2])
+    env["PYTHONPATH"] = src_path + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["ESTATE_BOOTSTRAP_STATUS_FAST"] = "1"
     proc = subprocess.Popen(
         [sys.executable, "-m", "estate.cli.main", "steward-command-center", "--serve", "--host", host, "--port", str(port)],
         cwd=base,
         stdout=log_handle,
         stderr=subprocess.STDOUT,
         start_new_session=True,
+        env=env,
     )
     pid_payload = {"pid": proc.pid, "host": host, "port": port, "started_at": _now(), "command": "steward-command-center --serve", "local_only": True}
     _pid_file(base).write_text(json.dumps(pid_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     status = operations_center_status(root=base)
-    for _ in range(20):
+    for _ in range(80):
         status = operations_center_status(root=base)
         if status.get("running") and (status.get("http_status") or {}).get("reachable"):
             break

@@ -12,7 +12,7 @@ from estate.core.operational_targets import default_targets
 from estate.core.paths import ESTATE_ROOT
 
 BASE = Path("runtime/background_operations/extensions")
-CONFIG = Path("configuration/background_operations/extensions.json")
+CONFIG = Path("runtime/background_operations/configuration/background_operations/extensions.json")
 STATUS = BASE / "status.json"
 STATE = BASE / "state.json"
 
@@ -39,7 +39,10 @@ class BackgroundOperationsExtensionRuntime:
         state_root = os.environ.get("ESTATE_RUNTIME_STATE_ROOT")
         if state_root:
             return Path(state_root) / CONFIG
-        return self.root / "runtime" / "background_operations" / CONFIG
+        compat = self.root / "config/background_operations/extensions.json"
+        if compat.exists():
+            return compat
+        return self.root / CONFIG
     @property
     def state_path(self) -> Path: return self.root / STATE
     @property
@@ -117,6 +120,10 @@ class BackgroundOperationsExtensionRuntime:
 
     def dry_run(self) -> dict[str, Any]:
         report = self.inspect(); watches=[]; failures=[]
+        compat = self.root / "config/background_operations/extensions.json"
+        if not compat.exists():
+            compat.parent.mkdir(parents=True, exist_ok=True)
+            compat.write_text(self.config_path.read_text(encoding="utf-8"), encoding="utf-8")
         for ext in self.load_extensions():
             if ext.effective_state() != "enabled": continue
             try:
