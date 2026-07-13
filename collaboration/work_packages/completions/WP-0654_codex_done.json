@@ -1,0 +1,32 @@
+{
+  "base_commit": "372e94415a23d8fc8e032e077c894b3d37953e2d",
+  "branch": "codex/wp-0654-estate-main-readiness-policy",
+  "codex_status": "implemented_local_validation_passed_live_windows_pending",
+  "false_verdict_supersession_evidence": "test_false_ready_verdict_is_preserved_and_superseded_under_current_policy preserves prior verdict evidence and returns case to assessment/blocking path.",
+  "files_changed": [
+    "src/estate/core/operational_readiness_closure.py",
+    "src/estate/core/operational_targets.py",
+    "tests/test_operational_readiness_closure.py",
+    "operations/validation/recipes/WP-0654_estate_main_production_readiness_policy.md",
+    "operations/validation/reports/WP-0654_estate_main_production_readiness_policy.md",
+    "collaboration/work_packages/completions/WP-0654_codex_done.json"
+  ],
+  "institutional_acceptance_granted": false,
+  "live_windows_acceptance": "not_run_environment_blocker",
+  "policy_hash_source": "controller computes readiness_policy.policy_hash from canonical policy JSON at intake/rehydration time",
+  "policy_source": "src/estate/core/operational_targets.py default_targets estate-main metadata; runtime projection persists through runtime/operational_targets/registry.json",
+  "policy_version": "WP-0654-estate-main-production-readiness-v1",
+  "publication_recovery_evidence": "Focused tests cover attributable ahead controller commit publication, upstream containment, and 0 0 synchronization; live Windows publication recovery not executed in this environment.",
+  "ready_for_chief_architect_review": false,
+  "remaining_blockers": [
+    "Run WP-0654 live Windows acceptance on configured Estate Windows environment before production closure."
+  ],
+  "summary": "Wired canonical estate-main production readiness metadata into the existing Operational Readiness Closure Controller intake, rehydration, publication, and false-verdict supersession paths without creating parallel systems.",
+  "tests_run": [
+    "PYTHONPATH=src pytest -q tests/test_operational_readiness_closure.py",
+    "PYTHONPATH=src pytest -q tests/test_operational_targets.py tests/test_operational_targets_runtime.py tests/test_operational_target_resolution.py tests/test_operational_readiness_closure.py",
+    "PYTHONPATH=src python -m py_compile src/estate/core/operational_readiness_closure.py src/estate/core/operational_targets.py src/estate/core/operational_targets_runtime.py src/estate/cli/main.py",
+    "PYTHONPATH=src python -m estate.cli.main operational-readiness report --json"
+  ],
+  "work_package_id": "WP-0654"
+}
