@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-000003",
+    "display_name": "Helen",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/helen.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:34045476d4736523fb6aa765778bd9d2435c42213225860732ba26a84c9e8e24"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-helen-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-helen-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-helen-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-helen-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-helen-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-helen-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-helen-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-helen-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-helen-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-helen-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-helen-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-office_working-v1.json",
+        "hash": "sha256:416bf37622bd5008f5c3a8b60e874ebe04fd286a65e9e3b7197d33b03b4e3e52",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-coffee_conversation-v1.json",
+        "hash": "sha256:c343900d9ac2b3c688ccbed5b20b34fac6f75138dce174070099ea2ef7b0625b",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-reading_reflective-v1.json",
+        "hash": "sha256:9a626c597290687276bc8d33ad1c00f61e77a2f6e48d84d47c42af6ec6e682d5",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-walking_transitional-v1.json",
+        "hash": "sha256:5118692549464bd2cca775162cc26ae844c49c8b613ecb7ab9eb4be915d6489f",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-laughter_warmth-v1.json",
+        "hash": "sha256:bdaf0dabe9aeae19d104a583e0a947a9331ec24d3016e80b311f1a1bfce4ebf4",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-concern_focus-v1.json",
+        "hash": "sha256:9d74dc028c087dd9ee41f3ea6ba7c03ef8e55cdafe91ad4024305af6e02ce538",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-outdoor_garden-v1.json",
+        "hash": "sha256:9c5ba50c9a6cf95a0cf1b49a151da4124c23f4fe372dcc7bc121e79bc3517586",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-evening_after_hours-v1.json",
+        "hash": "sha256:49f14b78fc2c0e8d9892f00231a543c3ca784dc74f303420762c34a6a19e9bc0",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:88ca21707815f9f75400511dd64b18b91de86bc4b4687afae0b6f3ac6a6cdf6a",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-helen-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c04-helen-recognizability_review-v1.json",
+        "hash": "sha256:d83c3b2ba2015ba8193bebe732a801a4963a84addafb65cc3ce4d5978e7f08d1",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

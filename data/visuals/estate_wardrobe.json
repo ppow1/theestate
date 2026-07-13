@@ -1,7 +1,110 @@
-{"schema_version":"estate_wardrobe.v1","work_package":"WP-4074","wardrobe_items":[
-{"wardrobe_id":"wardrobe-executive-service","name":"Executive Service Suit","resident_scope":["RES-000001"],"description":"Silver-gray tailored service attire for Alfred.","allowed_contexts":["office","briefing","portrait"]},
-{"wardrobe_id":"wardrobe-boundary-formal","name":"Boundary Formal","resident_scope":["RES-000002"],"description":"Reserved dark formal attire for Ingrid.","allowed_contexts":["security","portrait"]},
-{"wardrobe_id":"wardrobe-hr-warm-professional","name":"Warm Professional","resident_scope":["RES-000003"],"description":"Approachable HR professional wardrobe for Helen.","allowed_contexts":["office","onboarding","portrait"]},
-{"wardrobe_id":"wardrobe-operations-field","name":"Operations Field Executive","resident_scope":["grace"],"description":"Practical operations attire for Grace.","allowed_contexts":["operations","handoff","portrait"]},
-{"wardrobe_id":"wardrobe-private-confidant","name":"Private Confidant","resident_scope":["evelyn"],"description":"Soft private attire for Evelyn in restricted contexts.","allowed_contexts":["private_portrait"]}
-]}
+{
+  "schema_version": "estate_wardrobe.v1",
+  "work_package": "WP-4074",
+  "wardrobe_items": [
+    {
+      "wardrobe_id": "wardrobe-executive-service",
+      "name": "Executive Service Suit",
+      "resident_scope": [
+        "RES-000001"
+      ],
+      "description": "Silver-gray tailored service attire for Alfred.",
+      "allowed_contexts": [
+        "office",
+        "briefing",
+        "portrait"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-boundary-formal",
+      "name": "Boundary Formal",
+      "resident_scope": [
+        "RES-000002"
+      ],
+      "description": "Reserved dark formal attire for Ingrid.",
+      "allowed_contexts": [
+        "security",
+        "portrait"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-hr-warm-professional",
+      "name": "Warm Professional",
+      "resident_scope": [
+        "RES-000003"
+      ],
+      "description": "Approachable HR professional wardrobe for Helen.",
+      "allowed_contexts": [
+        "office",
+        "onboarding",
+        "portrait"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-operations-field",
+      "name": "Operations Field Executive",
+      "resident_scope": [
+        "grace"
+      ],
+      "description": "Practical operations attire for Grace.",
+      "allowed_contexts": [
+        "operations",
+        "handoff",
+        "portrait"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-private-confidant",
+      "name": "Private Confidant",
+      "resident_scope": [
+        "evelyn"
+      ],
+      "description": "Soft private attire for Evelyn in restricted contexts.",
+      "allowed_contexts": [
+        "private_portrait"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-archive-registrar",
+      "name": "Archive Registrar Formal",
+      "resident_scope": [
+        "RES-000004"
+      ],
+      "description": "Orderly registrar attire for Eleanor with provenance-safe document handling.",
+      "allowed_contexts": [
+        "archives",
+        "office",
+        "portrait",
+        "reading"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-research-practical",
+      "name": "Research Practical",
+      "resident_scope": [
+        "RES-000005"
+      ],
+      "description": "Practical scholarly attire for Marie suitable for study, evidence review, and field notes.",
+      "allowed_contexts": [
+        "research",
+        "office",
+        "reading",
+        "portrait"
+      ]
+    },
+    {
+      "wardrobe_id": "wardrobe-legal-structured",
+      "name": "Structured Legal Professional",
+      "resident_scope": [
+        "RES-000006"
+      ],
+      "description": "Structured legal attire for Judy supporting counsel, compliance, and contract review scenes.",
+      "allowed_contexts": [
+        "legal",
+        "office",
+        "serious_conversation",
+        "portrait"
+      ]
+    }
+  ]
+}

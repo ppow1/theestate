@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-000001",
+    "display_name": "Alfred",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/alfred.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:8a79ad0c28aed75e606ea8520a199787128724e4e51617526d6e8adfa284c1e9"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-alfred-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-alfred-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-alfred-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-alfred-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-alfred-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-alfred-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-alfred-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-alfred-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-alfred-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-alfred-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-alfred-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-office_working-v1.json",
+        "hash": "sha256:d8a539f01f4b7a3ae454edce8e132b774fabfe5e2a3a66537e95e8122e56402b",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-coffee_conversation-v1.json",
+        "hash": "sha256:2c2ffd8485f1d93674a73ee8f277382bd521bca034305cafaf3fc961a35c8250",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-reading_reflective-v1.json",
+        "hash": "sha256:a9880c7287060cc9259ad0c58b47aad35461bb358b78f4f66c986d9bbec36b40",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-walking_transitional-v1.json",
+        "hash": "sha256:6618c053c94caefd0a08456e922ec65eaffe9e1e64b2c0d493c359f388fe2716",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-laughter_warmth-v1.json",
+        "hash": "sha256:976e860b51b1212f9f45954da1e36ca65800fa6e569f457eacbe22f10c448c1b",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-concern_focus-v1.json",
+        "hash": "sha256:7ad3f3cbf04f2b6dbf222ef8af3bfd9bf4248d0297689e19a1dbd003e3374840",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-outdoor_garden-v1.json",
+        "hash": "sha256:584ef260cad8c572ea365d83060fb61fc06b84610d844fe3306448aeb1edbea1",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-evening_after_hours-v1.json",
+        "hash": "sha256:744a0ff1df97ea097c3e63fd9aa1828850e3996fac3c371c01529dfb3bc4eb3b",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:e086e40182b635e8c4040a4d3ce0d0968211b9165c664b31f15c0f8642dfa522",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-alfred-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-recognizability_review-v1.json",
+        "hash": "sha256:0fe98ee6c0b3074fffc296a17d776c853e79468a3332fd8c011a646e5a829865",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

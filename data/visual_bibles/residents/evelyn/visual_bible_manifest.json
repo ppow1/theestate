@@ -286,7 +286,148 @@
       }
     ],
     "revision_packets": [],
-    "emotional_anchors": []
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-evelyn-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-evelyn-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-evelyn-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-evelyn-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-evelyn-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-evelyn-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-evelyn-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-evelyn-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-evelyn-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-evelyn-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "evelyn",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
   },
   "asset_library": {
     "canonical": [],
@@ -294,13 +435,104 @@
       {
         "asset_id": "CAND-EVELYN-PLACEHOLDER",
         "review_state": "pending_steward_review"
+      },
+      {
+        "asset_id": "c04-evelyn-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-office_working-v1.json",
+        "hash": "sha256:957fa7759e3b2739a02f5ca2ea736467490927c022034c4c5d25e1c3fe748648",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-coffee_conversation-v1.json",
+        "hash": "sha256:d8335f32347d6e65639488f0e3883f85df495224bb9f1d715791269ba56bba0f",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-reading_reflective-v1.json",
+        "hash": "sha256:63b61e47256af574a0f10f0a1b67175afe7f712df6c30580277a8482079c38ff",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-walking_transitional-v1.json",
+        "hash": "sha256:eaf8d44062951bc7bba84a9bf920687cd76c1d898c118d8c924fa77b83065ec2",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-laughter_warmth-v1.json",
+        "hash": "sha256:49e540bdcaf54e5174af7a96262726ac238672d16816fb9afaad6268a81f6f36",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-concern_focus-v1.json",
+        "hash": "sha256:db149df01206055c63d3236892ffdfc5f7f961c634b05d69307ba75ea57e56f4",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-outdoor_garden-v1.json",
+        "hash": "sha256:905a328837b745d7aa96070d016c6a134d724af4003b22ce8d520df91193d382",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-evening_after_hours-v1.json",
+        "hash": "sha256:4a4996745d6c5c067d9e11b02f28bbde0a4ff443bd27d5d970f04fb94a7f3b90",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:4de187d1a6f3252c140edea049f5e00791c065a4b8d34fbeb8aa080eec8021af",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-evelyn-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c04-evelyn-recognizability_review-v1.json",
+        "hash": "sha256:964116f0be0e65b55e08462eff884451c9c0c3b6101ebcbcb19a97fd58f2dda5",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
       }
     ],
     "rejected": [],
     "superseded": [],
     "comparisons": [],
     "thumbnails": [],
-    "group_images": []
+    "group_images": [],
+    "turnarounds": []
   },
   "canonical_lock": {
     "status": "review_candidate",

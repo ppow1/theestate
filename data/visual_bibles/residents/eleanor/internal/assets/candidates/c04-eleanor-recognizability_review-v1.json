@@ -1,0 +1,11 @@
+{
+  "asset_id": "c04-eleanor-recognizability_review-v1",
+  "resident_id": "RES-000004",
+  "campaign": "04",
+  "work_package": "WP-4147",
+  "review_state": "provisionally_approved",
+  "asset_type": "lifestyle_emotional_anchor_manifest",
+  "binary_asset": "not_generated",
+  "title": "Lifestyle recognizability review",
+  "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json"
+}

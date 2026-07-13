@@ -1,0 +1,11 @@
+{
+  "asset_id": "c04-alfred-concern_focus-v1",
+  "resident_id": "RES-000001",
+  "campaign": "04",
+  "work_package": "WP-4143",
+  "review_state": "provisionally_approved",
+  "asset_type": "lifestyle_emotional_anchor_manifest",
+  "binary_asset": "not_generated",
+  "title": "Concern, focus, and serious-conversation scene",
+  "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json"
+}

@@ -1,0 +1,11 @@
+{
+  "asset_id": "c04-helen-outdoor_garden-v1",
+  "resident_id": "RES-000003",
+  "campaign": "04",
+  "work_package": "WP-4144",
+  "review_state": "provisionally_approved",
+  "asset_type": "lifestyle_emotional_anchor_manifest",
+  "binary_asset": "not_generated",
+  "title": "Outdoor and garden scene",
+  "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json"
+}

@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-000002",
+    "display_name": "Ingrid",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/ingrid.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:7f1181c87373834c0def7f80ae3498270f3104efc0042bbb810c46f040a4386c"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-ingrid-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-ingrid-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-ingrid-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-ingrid-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-ingrid-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-ingrid-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-ingrid-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-ingrid-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-ingrid-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-ingrid-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "RES-000002",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-ingrid-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-office_working-v1.json",
+        "hash": "sha256:6e8f009c54d0ad0fdf82c8ed7b60aae67b6d790d21e1801e8b374e45ba54215d",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-coffee_conversation-v1.json",
+        "hash": "sha256:0286157ca3696ba37168439e74295efdf8582abcf8476139887cb1ee5314f29d",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-reading_reflective-v1.json",
+        "hash": "sha256:174f6f50a1947d1369486a3b748598cdca9eb1ebe6f0c78104db5cf14deeace0",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-walking_transitional-v1.json",
+        "hash": "sha256:8def16404408f8905dd5068c8a35bc7c5647614921b9eea80dd8f808f83a5bcf",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-laughter_warmth-v1.json",
+        "hash": "sha256:ae26a28b55dde5b0006e09b2d7362da79ea2a129a1e18d29bc513007af50bdbf",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-concern_focus-v1.json",
+        "hash": "sha256:d752fdb7e93d779c72e9e241deb0650e9d813d42091daafaf85338fa6bf409e2",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-outdoor_garden-v1.json",
+        "hash": "sha256:1ce070261f8b77843a8595c7b75edc6481746d6d5ecdfbacd39366b66579622c",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-evening_after_hours-v1.json",
+        "hash": "sha256:5bd67500e7e7750a19778ca06b878d54b34191eaa6e0bf77b297ef0ad7d47cf2",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:e657af8027862ba9ff625a222cb7e3e4af747d385f5d4f72921fe23d078c1441",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-ingrid-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c04-ingrid-recognizability_review-v1.json",
+        "hash": "sha256:1774e1392d34853a96438a35f5e8919f55cd929e4c9d6d02425d6a56cda55d5d",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

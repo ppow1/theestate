@@ -1,0 +1,149 @@
+{
+  "schema_version": "lifestyle_emotional_anchor_library.v1",
+  "campaign": "Campaign 04",
+  "resident_id": "RES-000001",
+  "display_name": "Alfred",
+  "status": "complete_manifest_library_pending_generated_imagery",
+  "anchors": [
+    {
+      "work_package": "WP-4138",
+      "anchor_id": "c04-alfred-office_working-v1",
+      "title": "Office working scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-office_working-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4139",
+      "anchor_id": "c04-alfred-coffee_conversation-v1",
+      "title": "Coffee and conversation scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-coffee_conversation-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4140",
+      "anchor_id": "c04-alfred-reading_reflective-v1",
+      "title": "Reading and reflective scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-reading_reflective-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4141",
+      "anchor_id": "c04-alfred-walking_transitional-v1",
+      "title": "Walking and transitional scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-walking_transitional-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4142",
+      "anchor_id": "c04-alfred-laughter_warmth-v1",
+      "title": "Laughter and informal warmth scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-laughter_warmth-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4143",
+      "anchor_id": "c04-alfred-concern_focus-v1",
+      "title": "Concern, focus, and serious-conversation scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-concern_focus-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4144",
+      "anchor_id": "c04-alfred-outdoor_garden-v1",
+      "title": "Outdoor and garden scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-outdoor_garden-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4145",
+      "anchor_id": "c04-alfred-evening_after_hours-v1",
+      "title": "Evening and after-hours scene",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-evening_after_hours-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4146",
+      "anchor_id": "c04-alfred-emotional_anchor_gallery-v1",
+      "title": "Emotional anchor gallery",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-emotional_anchor_gallery-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    },
+    {
+      "work_package": "WP-4147",
+      "anchor_id": "c04-alfred-recognizability_review-v1",
+      "title": "Lifestyle recognizability review",
+      "resident_id": "RES-000001",
+      "asset_status": "approved_manifest_placeholder",
+      "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c04-alfred-recognizability_review-v1.json",
+      "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "recognizability_requirements": [
+        "preserve resident visual fingerprint",
+        "preserve office role posture",
+        "do not promote placeholder to canonical imagery without Steward approval"
+      ]
+    }
+  ]
+}
