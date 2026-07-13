@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from estate.core.paths import ESTATE_ROOT
-SCHEMA_VERSION="provider-benchmark-run.v1"; SPEC_VERSION="provider-benchmark-spec.v1"; ROOT=ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd(); BENCH_ROOT=ROOT/"experiments/provider_benchmarks"; SPEC_ROOT=BENCH_ROOT/"specs"; DEFAULT_OLLAMA_MODEL="qwen2.5-coder:7b"
+SCHEMA_VERSION="provider-benchmark-run.v1"; SPEC_VERSION="provider-benchmark-spec.v1"; PACKET_VERSION="provider-benchmark-canonical-packet.v1"; ROOT=ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd(); BENCH_ROOT=ROOT/"experiments/provider_benchmarks"; SPEC_ROOT=BENCH_ROOT/"specs"; DEFAULT_OLLAMA_MODEL="qwen2.5-coder:7b"
 class BenchmarkError(RuntimeError): pass
 class IsolationError(BenchmarkError): pass
 class ProviderUnavailable(BenchmarkError): pass
@@ -24,6 +24,7 @@ def safe_join(base:Path,*parts:str)->Path:
     if target!=base and base not in target.parents: raise IsolationError(f"path traversal rejected: {target}")
     return target
 def sha256_file(path:Path)->str: h=hashlib.sha256(); h.update(path.read_bytes()); return h.hexdigest()
+def sha256_text(text:str)->str: return hashlib.sha256(text.encode('utf-8')).hexdigest()
 class BenchmarkSpec:
     def __init__(self,data:dict): self.data=data
     @property
@@ -39,7 +40,64 @@ class BenchmarkSpec:
         self.validate(); out=dest/'benchmark_spec.snapshot.json'
         if out.exists() and json.loads(out.read_text())!=self.data: raise BenchmarkError('immutable benchmark snapshot conflict')
         if not out.exists(): atomic_write_json(out,self.data)
+        packet=write_canonical_packet(self,dest)
+        atomic_write_json(dest/'canonical_packet.hash.json',{'schema_version':'provider-benchmark-canonical-packet-hash.v1','benchmark_id':self.benchmark_id,'benchmark_version':self.version,'canonical_packet_path':str(packet.relative_to(ROOT)) if packet.is_relative_to(ROOT) else str(packet),'canonical_packet_sha256':sha256_file(packet),'immutability':'content-addressed by SHA-256; executor runs with differing hashes are ineligible for fair comparison'})
         return out
+
+def canonical_packet_text(spec:BenchmarkSpec)->str:
+    spec.validate(); d=spec.data; task=d['task']
+    lines=[
+        f"# Canonical Provider Benchmark Packet — {d['benchmark_id']} v{d['version']}",
+        "",
+        f"Schema: {PACKET_VERSION}",
+        "",
+        "## Public specification",
+        _json(d),
+        "",
+        "## Exact task schema",
+        _json(task.get('task_schema',{})),
+        "",
+        "## Function signature",
+        task.get('function_signature',''),
+        "",
+        "## Scheduling rules",
+        "\n".join(f"- {x}" for x in task.get('scheduling_rules',[])),
+        "",
+        "## Validation rules",
+        "\n".join(f"- {x}" for x in task.get('validation_rules',[])),
+        "",
+        "## CLI contract",
+        "\n".join(f"- {x}" for x in d.get('cli_contract',[])),
+        "",
+        "## Dependency constraints",
+        "\n".join(f"- {x}" for x in d.get('permitted_dependencies',[])),
+        "",
+        "## Required files",
+        "\n".join(f"- {x}" for x in d.get('required_files',[])),
+        "",
+        "## Visible tests",
+        "```python",
+        visible_tests_code().rstrip(),
+        "```",
+        "",
+        "## Isolation rules",
+        "\n".join(f"- {x}" for x in d.get('isolation_rules',[])),
+        "",
+        "## Acceptance criteria",
+        "\n".join(f"- {x}" for x in d.get('acceptance_criteria',[])),
+        "",
+        "## Hidden-review boundary",
+        "Hidden-review tests and criteria beyond the public criteria above are not included in this packet and must not be exposed to executors before finalization.",
+        "",
+    ]
+    return "\n".join(lines)
+def canonical_packet_hash(spec:BenchmarkSpec)->str: return sha256_text(canonical_packet_text(spec))
+def write_canonical_packet(spec:BenchmarkSpec,dest:Path|None=None)->Path:
+    text=canonical_packet_text(spec); path=(dest or SPEC_ROOT)/f"{spec.benchmark_id}.canonical_packet.md"
+    if path.exists() and path.read_text(encoding='utf-8')!=text: raise BenchmarkError(f'immutable canonical packet conflict: {path}')
+    if not path.exists(): atomic_write_text(path,text)
+    return path
+
 def load_spec(benchmark_id:str)->BenchmarkSpec:
     ensure_benchmark001_fixture(); path=SPEC_ROOT/f"{benchmark_id}.json"
     if not path.exists(): raise BenchmarkError(f"unknown benchmark: {benchmark_id}")
@@ -78,7 +136,7 @@ class OllamaAdapter(ExecutorAdapter):
         try:
             disc=self.discover(); atomic_write_json(out/'discovery.json',disc)
             if not mock and (not disc['available'] or model not in disc['models']): raise ProviderUnavailable(f"Ollama model unavailable without download: {model}")
-            req={'model':model,'prompt':build_assignment_prompt(spec),'stream':False,'options':{'temperature':0}}; atomic_write_json(out/'raw_request.json',req)
+            req={'model':model,'prompt':build_assignment_prompt(spec),'canonical_packet_sha256':canonical_packet_hash(spec),'stream':False,'options':{'temperature':0}}; atomic_write_json(out/'raw_request.json',req)
             if mock: resp=mock_benchmark001_response(model)
             else:
                 request=urllib.request.Request(self.host+'/api/generate',data=json.dumps(req).encode(),headers={'Content-Type':'application/json'})
@@ -103,12 +161,14 @@ class ImportAdapter(ExecutorAdapter):
         if found: shutil.copy2(found[0],dest/'dependency_batcher.py'); meta['files_produced'].append('dependency_batcher.py')
         fill_unavailable(meta); atomic_write_json(dest/'metadata.json',meta); return meta
 def env(): return {'python':sys.version.split()[0],'platform':platform.platform(),'cwd':str(Path.cwd())}
-def base_meta(spec,ws,executor,provider,model,start): return {'schema_version':SCHEMA_VERSION,'benchmark_id':spec.benchmark_id,'benchmark_version':spec.version,'run_id':ws.run_id,'executor_type':executor,'provider':provider,'model':model,'estate_seat_reference':None,'environment':env(),'start_timestamp':start,'end_timestamp':None,'wall_clock_seconds':None,'provider_native_timing':{},'prompt_tokens':None,'output_tokens':None,'total_tokens':None,'generation_attempts':1,'repair_attempts':0,'commands_run':[],'files_produced':[],'file_line_counts':{},'tests_passed':0,'tests_failed':0,'validation_status':'running','exit_codes':[],'failure_classification':None,'unavailable_metrics':{},'provenance':{'adapter':provider},'evidence_references':[]}
+def base_meta(spec,ws,executor,provider,model,start):
+    packet_hash=canonical_packet_hash(spec)
+    return {'schema_version':SCHEMA_VERSION,'benchmark_id':spec.benchmark_id,'benchmark_version':spec.version,'run_id':ws.run_id,'canonical_packet_sha256':packet_hash,'canonical_packet_eligible':True,'packet_fair_comparison_status':'eligible','executor_type':executor,'provider':provider,'model':model,'estate_seat_reference':None,'environment':env(),'start_timestamp':start,'end_timestamp':None,'wall_clock_seconds':None,'provider_native_timing':{},'prompt_tokens':None,'output_tokens':None,'total_tokens':None,'generation_attempts':1,'repair_attempts':0,'commands_run':[],'files_produced':[],'file_line_counts':{},'tests_passed':0,'tests_failed':0,'validation_status':'running','exit_codes':[],'failure_classification':None,'unavailable_metrics':{},'provenance':{'adapter':provider},'evidence_references':[]}
 def fill_unavailable(meta):
     reasons={'prompt_tokens':'provider did not expose token count','output_tokens':'provider did not expose token count','total_tokens':'provider did not expose token count','provider_native_timing':'provider did not expose native timing','estate_seat_reference':'not applicable or not supplied'}
     for k,r in reasons.items():
         if meta.get(k) in (None,{}): meta.setdefault('unavailable_metrics',{})[k]=r
-def build_assignment_prompt(spec): return spec.data['task']['prompt']
+def build_assignment_prompt(spec): return canonical_packet_text(spec)
 def extract_code(text):
     if '```' in text:
         for part in text.split('```'):
@@ -129,17 +189,22 @@ class ValidationRunner:
         atomic_write_json(mp,meta); atomic_write_json(d/'validation.json',{'start':utc_now(),'end':utc_now(),'passed':passes,'failed':failures,'commands':commands,'hidden_review_executed':hidden}); return meta
 def visible_tests_code(): return '''import copy, unittest\nfrom dependency_batcher import plan_batches, DependencyBatchError\nclass DependencyBatcherTests(unittest.TestCase):\n    def test_success_order_and_immutability(self):\n        tasks=[{"id":"a","duration":5,"priority":1,"depends_on":[]},{"id":"b","duration":1,"priority":3,"depends_on":["a"]},{"id":"c","duration":1,"priority":3,"depends_on":["a"]},{"id":"d","duration":2,"priority":2,"depends_on":[]}]\n        original=copy.deepcopy(tasks); self.assertEqual(plan_batches(tasks,2), [["d","a"],["b","c"]]); self.assertEqual(tasks, original)\n    def test_rejects_invalid(self):\n        bad=[([{"id":"a","duration":True,"priority":1,"depends_on":[]}],1),([{"id":"a","duration":1,"priority":1,"depends_on":["z"]}],1),([{"id":"a","duration":1,"priority":1,"depends_on":["a"]}],1),([{"id":"a","duration":1,"priority":1,"depends_on":["b"]},{"id":"b","duration":1,"priority":1,"depends_on":["a"]}],1)]\n        for tasks, mp in bad:\n            with self.assertRaises(DependencyBatchError): plan_batches(tasks,mp)\n    def test_deterministic(self):\n        tasks=[{"id":x,"duration":1,"priority":1,"depends_on":[]} for x in ["b","a","c"]]; self.assertEqual(plan_batches(tasks,10), [["a","b","c"]])\nif __name__ == "__main__": unittest.main()\n'''
 def compare(spec,ws):
-    rows=[]
+    expected_hash=canonical_packet_hash(spec); rows=[]; mismatches=[]
     for ex in ['codex','local','chief_architect']:
         mp=ws.executor_dir(ex)/'metadata.json'
         if mp.exists():
-            m=json.loads(mp.read_text()); score=100 if m.get('validation_status')=='passed' else 40 if m.get('validation_status') in ('imported','not_validated') else 0
-            rows.append({'executor':ex,'provider':m.get('provider'),'model':m.get('model'),'validation_status':m.get('validation_status'),'tests_passed':m.get('tests_passed'),'tests_failed':m.get('tests_failed'),'wall_clock_seconds':m.get('wall_clock_seconds'),'prompt_tokens':m.get('prompt_tokens'),'output_tokens':m.get('output_tokens'),'total_tokens':m.get('total_tokens'),'estimated_marginal_cost':None,'estimated_marginal_cost_note':'not estimated without provider price evidence','aggregate_score':score,'missing_evidence':m.get('unavailable_metrics',{})})
-    report={'schema_version':'provider-benchmark-comparison.v1','benchmark_id':spec.benchmark_id,'benchmark_version':spec.version,'run_id':ws.run_id,'scoring_weights':spec.data['scoring_weights'],'results':rows,'generated_at':utc_now()}; c=ws.executor_dir('comparison'); atomic_write_json(c/'comparison.json',report)
-    md=['# Provider Benchmark Comparison','',f'Benchmark: {spec.benchmark_id} v{spec.version}','','| Executor | Provider | Model | Validation | Passed | Failed | Seconds | Tokens | Score |','|---|---|---|---|---:|---:|---:|---:|---:|']
+            m=json.loads(mp.read_text())
+            eligible=m.get('canonical_packet_sha256')==expected_hash and m.get('canonical_packet_eligible', True) is True
+            if not eligible: mismatches.append({'executor':ex,'canonical_packet_sha256':m.get('canonical_packet_sha256'),'canonical_packet_eligible':m.get('canonical_packet_eligible')})
+            score=100 if eligible and m.get('validation_status')=='passed' else 40 if eligible and m.get('validation_status') in ('imported','not_validated') else 0
+            rows.append({'executor':ex,'provider':m.get('provider'),'model':m.get('model'),'validation_status':m.get('validation_status'),'tests_passed':m.get('tests_passed'),'tests_failed':m.get('tests_failed'),'wall_clock_seconds':m.get('wall_clock_seconds'),'prompt_tokens':m.get('prompt_tokens'),'output_tokens':m.get('output_tokens'),'total_tokens':m.get('total_tokens'),'estimated_marginal_cost':None,'estimated_marginal_cost_note':'not estimated without provider price evidence','aggregate_score':score,'canonical_packet_sha256':m.get('canonical_packet_sha256'),'fair_comparison_eligible':eligible,'missing_evidence':m.get('unavailable_metrics',{})})
+    status='refused_mismatched_packet_hashes' if mismatches else 'ranked'
+    report={'schema_version':'provider-benchmark-comparison.v1','benchmark_id':spec.benchmark_id,'benchmark_version':spec.version,'run_id':ws.run_id,'canonical_packet_sha256':expected_hash,'comparison_status':status,'mismatched_packets':mismatches,'scoring_weights':spec.data['scoring_weights'],'results':rows,'generated_at':utc_now()}
+    c=ws.executor_dir('comparison'); atomic_write_json(c/'comparison.json',report)
+    md=['# Provider Benchmark Comparison','',f'Benchmark: {spec.benchmark_id} v{spec.version}',f'Comparison status: {status}',f'Canonical packet SHA-256: {expected_hash}','','| Executor | Provider | Model | Validation | Passed | Failed | Seconds | Tokens | Score |','|---|---|---|---|---:|---:|---:|---:|---:|']
     for r in rows: md.append(f"| {r['executor']} | {r['provider']} | {r['model']} | {r['validation_status']} | {r['tests_passed']} | {r['tests_failed']} | {r['wall_clock_seconds']} | {r['total_tokens']} | {r['aggregate_score']} |")
     atomic_write_text(c/'comparison.md','\n'.join(md)+'\n'); return report
-def benchmark001_spec(): return {'schema_version':SPEC_VERSION,'benchmark_id':'benchmark-001','version':'1.0.0','title':'Benchmark 001 — Deterministic Dependency Batcher','purpose':'Compare providers on bounded Python task.','task':{'prompt':'Implement dependency_batcher.py exposing DependencyBatchError and plan_batches with deterministic dependency batching, validation, immutability, and standard library only.'},'permitted_languages':['Python 3.11'],'permitted_dependencies':['python standard library only'],'required_files':['dependency_batcher.py'],'visible_tests':['success, invalid input, determinism, immutability'],'hidden_review_criteria':['clarity','maintainability','security','boundary compliance'],'time_limit_seconds':600,'provider_model_eligibility':{'ollama_default_model':DEFAULT_OLLAMA_MODEL,'codex_import_allowed':True,'reference_import_allowed':True},'isolation_rules':['executor-specific directories only','no overwrite','path traversal rejected'],'environment_requirements':['Python 3.11','Windows-first A:\\theestate compatible','Ollama loopback only'],'required_metrics':['wall_clock_seconds','prompt_tokens','output_tokens','total_tokens','total_duration','load_duration','prompt_eval_duration','eval_duration'],'acceptance_criteria':['visible tests pass','evidence preserved','missing metrics are null with reason'],'scoring_weights':{'functional_correctness':50,'validation':20,'maintainability':10,'security':10,'evidence_quality':10},'source_provenance':['WP-0545_PARALLEL_INDEPENDENT_Engineering_Provider_Benchmark_001.md']}
+def benchmark001_spec(): return {'schema_version':SPEC_VERSION,'benchmark_id':'benchmark-001','version':'1.0.0','title':'Benchmark 001 — Deterministic Dependency Batcher','purpose':'Compare providers on bounded Python task.','task':{'prompt':'Implement dependency_batcher.py exposing DependencyBatchError and plan_batches with deterministic dependency batching, validation, immutability, and standard library only.','function_signature':'def plan_batches(tasks: list[dict], max_parallel: int) -> list[list[str]]','task_schema':{'task':{'id':'non-empty str','duration':'positive int (bool rejected)','priority':'int (bool rejected)','depends_on':'list of task id strings'},'return':'ordered list of batches; each batch is a list of task ids'},'scheduling_rules':['Only schedule a task after all dependencies are completed in previous batches.','At most max_parallel tasks per batch.','Within each batch order eligible tasks by descending priority, ascending duration, then ascending task id.','Do not mutate the input tasks.','Detect cycles and unknown dependencies.'],'validation_rules':['Raise DependencyBatchError for invalid task collection, task records, duplicate ids, self dependencies, unknown dependencies, cycles, and invalid max_parallel.','Reject bool values where integers are required.','Use deterministic output for equivalent inputs.']},'cli_contract':['CLI may run python -m unittest test_dependency_batcher_visible.py in the executor directory.','Executor must produce dependency_batcher.py at the executor directory root.','No network, package installation, or non-standard-library dependency is required.'],'permitted_languages':['Python 3.11'],'permitted_dependencies':['python standard library only'],'required_files':['dependency_batcher.py'],'visible_tests':['success, invalid input, determinism, immutability'],'hidden_review_criteria':['clarity','maintainability','security','boundary compliance'],'time_limit_seconds':600,'provider_model_eligibility':{'ollama_default_model':DEFAULT_OLLAMA_MODEL,'codex_import_allowed':True,'reference_import_allowed':True},'isolation_rules':['executor-specific directories only','no overwrite','path traversal rejected'],'environment_requirements':['Python 3.11','Windows-first A:\\theestate compatible','Ollama loopback only'],'required_metrics':['wall_clock_seconds','prompt_tokens','output_tokens','total_tokens','total_duration','load_duration','prompt_eval_duration','eval_duration'],'acceptance_criteria':['visible tests pass','evidence preserved','missing metrics are null with reason'],'scoring_weights':{'functional_correctness':50,'validation':20,'maintainability':10,'security':10,'evidence_quality':10},'source_provenance':['WP-0545_PARALLEL_INDEPENDENT_Engineering_Provider_Benchmark_001.md']}
 def ensure_benchmark001_fixture():
     SPEC_ROOT.mkdir(parents=True,exist_ok=True); p=SPEC_ROOT/'benchmark-001.json'
     if not p.exists(): atomic_write_json(p,benchmark001_spec())
@@ -158,7 +223,7 @@ def run_cli(argv=None):
     if ns.cmd=='discover-providers': print(_json({'ollama':OllamaAdapter().discover(),'codex':ImportAdapter('codex','codex').discover(),'chief_architect':ImportAdapter('chief_architect','manual_reference').discover()})); return
     if ns.cmd in ('run-local','prepare-codex'):
         ws=WorkspaceManager(spec.benchmark_id,getattr(ns,'run_id',None)); ws.create(spec)
-        if ns.cmd=='prepare-codex': atomic_write_text(ws.executor_dir('codex')/'ASSIGNMENT.md',build_assignment_prompt(spec)); print(_json({'run_id':ws.run_id,'codex_dir':str(ws.executor_dir('codex'))})); return
+        if ns.cmd=='prepare-codex': atomic_write_text(ws.executor_dir('codex')/'CANONICAL_PACKET.md',build_assignment_prompt(spec)); atomic_write_json(ws.executor_dir('codex')/'metadata.json',base_meta(spec,ws,'codex','codex',None,utc_now())|{'validation_status':'packet_prepared','end_timestamp':utc_now()}); print(_json({'run_id':ws.run_id,'codex_dir':str(ws.executor_dir('codex')),'canonical_packet_sha256':canonical_packet_hash(spec),'canonical_packet':'CANONICAL_PACKET.md'})); return
         print(_json(OllamaAdapter().run(spec,ws,model=ns.model,mock=ns.mock))); return
     ws=WorkspaceManager(spec.benchmark_id,ns.run_id)
     if ns.cmd=='import-codex': print(_json(ImportAdapter('codex','codex').run(spec,ws,ns.result_path,seat_reference=ns.seat_reference,model=ns.model))); return
