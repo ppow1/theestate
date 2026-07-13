@@ -23,9 +23,17 @@ STATUS_PATH = Path("runtime/resident_gateway/status.json")
 
 
 def models_payload(root=None) -> dict[str, Any]:
-    data = [{"id": mid,"object":"model","created":0,"owned_by":"estate","estate":{"resident_id": rid,"privileged_actions_enabled":False}} for mid, rid in ACTIVE_RESIDENT_MODELS.items()]
-    data.append({"id": DEFAULT_ROOM_MODEL, "object":"model", "created":0, "owned_by":"estate", "estate":{"surface":"multi_resident_room", "multi_resident_gateway_capable": True, "privileged_actions_enabled": False}})
-    return {"object":"list","data":data}
+    # Prefer the resident-first Open WebUI catalog when its richer metadata is
+    # available; keep this gateway as the single canonical execution path.
+    try:
+        from estate.core.openwebui_resident_surface import resident_model_catalog
+        payload = resident_model_catalog(root)
+        payload["data"].append({"id": DEFAULT_ROOM_MODEL, "object":"model", "created":0, "owned_by":"estate", "estate":{"surface":"multi_resident_room", "display_name":"Estate multi-resident room", "multi_resident_gateway_capable": True, "privileged_actions_enabled": False}})
+        return payload
+    except Exception:
+        data = [{"id": mid,"object":"model","created":0,"owned_by":"estate","estate":{"resident_id": rid,"privileged_actions_enabled":False}} for mid, rid in ACTIVE_RESIDENT_MODELS.items()]
+        data.append({"id": DEFAULT_ROOM_MODEL, "object":"model", "created":0, "owned_by":"estate", "estate":{"surface":"multi_resident_room", "multi_resident_gateway_capable": True, "privileged_actions_enabled": False}})
+        return {"object":"list","data":data}
 
 
 def chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
@@ -52,7 +60,14 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
     model, result = _chat_result(payload, root=root)
     turn = result["turn"]
     created = int(time.time())
-    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False}}
+    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":(turn.get("identity_composition") or {}).get("identity_version_or_source_hash"),"identity_schema_version":(turn.get("identity_composition") or {}).get("schema_version"),"identity_failed_closed":(turn.get("identity_composition") or {}).get("failed_closed")}}
+    try:
+        from estate.core.resident_voice_commissioning import live_resident_voice_bindings, local_tts_health
+        binding = live_resident_voice_bindings(root).get(turn["resident_id"])
+        tts = local_tts_health(root)
+        body["estate"]["voice"] = {"state":"ready" if tts.get("ok") and binding else ("binding_present_tts_unavailable" if binding else "unavailable"), "voice_id": getattr(binding, "voice_id", None), "traits": getattr(binding, "traits", None)}
+    except Exception as exc:
+        body["estate"]["voice"] = {"state":"unavailable", "reason": f"voice metadata unavailable: {type(exc).__name__}"}
     return 200, body
 
 
@@ -60,7 +75,7 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
     model, result = _chat_result(payload, root=root)
     turn = result["turn"]
     created = int(time.time())
-    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":turn["resident_response"]},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False}}
+    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":turn["resident_response"]},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":(turn.get("identity_composition") or {}).get("identity_version_or_source_hash"),"identity_schema_version":(turn.get("identity_composition") or {}).get("schema_version"),"identity_failed_closed":(turn.get("identity_composition") or {}).get("failed_closed")}}
     return 200, body
 
 

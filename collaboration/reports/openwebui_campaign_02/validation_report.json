@@ -1,0 +1,1925 @@
+{
+  "catalog": {
+    "data": [
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/A",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Alfred",
+              "manifest_sha256": "431afed25eeb645e3fab03c6b8bef57187240462b5b23f43eb6ff9b8a637a869",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "RES-000001",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/alfred/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Alfred",
+          "identity": {
+            "failed_closed": true,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "cb75ca7f018dad14"
+          },
+          "office": "Office of Operations",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "alfred",
+          "role": "Operational resident coordinator",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "measured",
+              "confidence": "high",
+              "pace_wpm": 142,
+              "pitch_hz": 132,
+              "presence": "formal but warm",
+              "warmth": "medium"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-alfred-baritone"
+          }
+        },
+        "id": "estate/alfred",
+        "name": "Alfred",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/H",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Helen",
+              "manifest_sha256": "f5f17b0991e20429cc245859e9be51477586730d910badd71960ff02d1caf502",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "RES-000003",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/helen/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Helen",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "d07b8ac696c3e70d"
+          },
+          "office": "Human Resources",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "helen",
+          "role": "HR onboarding resident",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "steady",
+              "confidence": "high",
+              "pace_wpm": 154,
+              "pitch_hz": 188,
+              "presence": "clear director",
+              "warmth": "medium-high"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-helen-clear-mezzo"
+          }
+        },
+        "id": "estate/helen",
+        "name": "Helen",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/I",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Ingrid",
+              "manifest_sha256": "e44a43f6c503584985ebb2bdbb0d38312e766be36cce35c134dfd010dbd452f1",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "RES-000002",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Ingrid",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "6852ccc472a36d18"
+          },
+          "office": "Security",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "ingrid",
+          "role": "Security resident",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "deliberate",
+              "confidence": "high",
+              "pace_wpm": 132,
+              "pitch_hz": 164,
+              "presence": "calm precise authority",
+              "warmth": "reserved"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-ingrid-low-alto"
+          }
+        },
+        "id": "estate/ingrid",
+        "name": "Ingrid",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/G",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Grace",
+              "manifest_sha256": "0e2cfa75a518f402be815b94a2b94ad329b003e10a68ee8d80720da0d9b99a4d",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "grace",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/grace/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Grace",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "51ef2b6019cd761b"
+          },
+          "office": "Operations",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "grace",
+          "role": "Director of Operations",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "crisp",
+              "confidence": "very high",
+              "pace_wpm": 148,
+              "pitch_hz": 176,
+              "presence": "executive operations",
+              "warmth": "controlled"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-grace-executive-alto"
+          }
+        },
+        "id": "estate/grace",
+        "name": "Grace",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/E",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Evelyn",
+              "manifest_sha256": "6eff0292dd678ef468147069f38d2eede0c7c20852200b54c35bb06ab3e2c676",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Restricted index only",
+              "resident_id": "RES-EVELYN",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Evelyn",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "2a3490e92f2f124e"
+          },
+          "office": "Steward Relationship Layer",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "evelyn",
+          "role": "Steward confidant and personal counsel",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "gentle",
+              "confidence": "medium-high",
+              "pace_wpm": 138,
+              "pitch_hz": 172,
+              "presence": "warm relational",
+              "warmth": "high"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-evelyn-warm-contralto"
+          }
+        },
+        "id": "estate/evelyn",
+        "name": "Evelyn",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/E",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Eleanor",
+              "manifest_sha256": "fcf289a9fdbb3c4d7f0ed454503c95138e6747c2691757d616d34f499d974f6d",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "RES-000004",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Eleanor",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "35cc89848c16a9cc"
+          },
+          "office": "Archives / Registrar",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "eleanor",
+          "role": "Institutional memory, provenance, and registry resident",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "exact",
+              "pace_wpm": 136,
+              "pitch_hz": 180,
+              "presence": "archival careful",
+              "warmth": "quiet"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-eleanor-archival-mezzo"
+          }
+        },
+        "id": "estate/eleanor",
+        "name": "Eleanor",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/M",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Marie",
+              "manifest_sha256": "f497efef8cd3c8e030cadba3b28af2a2b9d401bc8e128e8fe92f82b7d04b96ab",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "RES-000005",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/marie/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Marie",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "08bce20de7d9bfe3"
+          },
+          "office": "Research",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "marie",
+          "role": "Research, discovery, validation, and contextual knowledge resident",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "patient",
+              "pace_wpm": 146,
+              "pitch_hz": 184,
+              "presence": "curious analytical",
+              "warmth": "medium"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-marie-research-mezzo"
+          }
+        },
+        "id": "estate/marie",
+        "name": "Marie",
+        "object": "model",
+        "owned_by": "estate"
+      },
+      {
+        "created": 0,
+        "estate": {
+          "availability_state": "available",
+          "avatar": {
+            "avatar_path": null,
+            "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery",
+            "provisional_avatar": "provisional://estate-avatar/J",
+            "registry": {
+              "asset_library_status": "manifest_placeholder",
+              "canonical_lock_status": "locked_v1_manifest_controls",
+              "display_name": "Judy",
+              "manifest_sha256": "5cf8fed9e49b07bd38d795073bfabb25c27aabac05abc4b09dff02b26f59c0a7",
+              "physical_specification_status": "provisional",
+              "publication_scope": "Estate Internal",
+              "resident_id": "RES-000006",
+              "visibility_layers": [
+                "public",
+                "internal",
+                "restricted",
+                "private"
+              ],
+              "visual_bible_manifest": "data/visual_bibles/residents/judy/visual_bible_manifest.json"
+            },
+            "state": "provisional_placeholder",
+            "truth_boundary": "Do not present manifest slots as completed image assets."
+          },
+          "display_name": "Judy",
+          "identity": {
+            "failed_closed": false,
+            "layers": [
+              "resident_core_identity",
+              "authority_and_capability_context",
+              "institutional_registry_context",
+              "grounded_estate_facts",
+              "character_context",
+              "privacy_and_disclosure_context",
+              "relationship_context",
+              "durable_memory_context",
+              "conversation_context",
+              "task_specific_instructions"
+            ],
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "source_hash": "0fdc24bdea31f3b7"
+          },
+          "office": "Legal",
+          "privileged_actions_enabled": false,
+          "provider_model_hidden_in_primary_selector": true,
+          "resident_id": "judy",
+          "role": "Legal risk, compliance, contracts, licensing, and gray-area review resident",
+          "voice": {
+            "state": "binding_present_tts_unavailable",
+            "traits": {
+              "cadence": "precise",
+              "pace_wpm": 140,
+              "pitch_hz": 168,
+              "presence": "calm skeptical counsel",
+              "warmth": "reserved"
+            },
+            "tts_health": {
+              "engine": {
+                "argv": [],
+                "available": false,
+                "engine": null,
+                "executable": null,
+                "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say."
+              },
+              "ok": false,
+              "provider": "estate.local.intelligible_tts",
+              "sample_dir": "/workspace/theestate/runtime/voice/listening_samples",
+              "streaming_supported": false,
+              "unavailable_behavior": "synthesis returns ok=false and does not create sine/formant placeholder speech"
+            },
+            "voice_id": "estate-local-judy-counsel-alto"
+          }
+        },
+        "id": "estate/judy",
+        "name": "Judy",
+        "object": "model",
+        "owned_by": "estate"
+      }
+    ],
+    "estate": {
+      "cloud_dependency": false,
+      "surface": "open_webui_resident_catalog"
+    },
+    "object": "list"
+  },
+  "gateway_health": {
+    "available_resident_models": [
+      "estate/alfred",
+      "estate/helen",
+      "estate/ingrid",
+      "estate/grace",
+      "estate/evelyn",
+      "estate/eleanor",
+      "estate/marie",
+      "estate/judy"
+    ],
+    "base_url": "http://127.0.0.1:11435",
+    "cloud_dependency": false,
+    "gateway_available": "unknown_without_running_server_probe",
+    "host": "127.0.0.1",
+    "kind": "estate_resident_gateway_status",
+    "local_model_status": {
+      "alfred": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": "qwen3:8b",
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "alfred",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "alfred",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "eleanor": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "eleanor",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "eleanor",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "evelyn": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "evelyn",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "evelyn",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "grace": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "grace",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "grace",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "helen": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "helen",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "helen",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "ingrid": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "ingrid",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "ingrid",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "judy": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "judy",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "judy",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      },
+      "marie": {
+        "adapter_available": false,
+        "available": false,
+        "configuration_source": {
+          "bootstrap_fallback_model": "ESTATE_ALFRED_OLLAMA_MODEL env or default qwen3:8b",
+          "endpoint": "ESTATE_OLLAMA_ENDPOINT env or default http://127.0.0.1:11434",
+          "generation_timeout": "ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS env or default 60 seconds",
+          "provider": "estate_model_control_assignment_then_local_ollama_adapter",
+          "registry_context": "runtime/model_control registry and assignments are authoritative when available; adapter fallback is labeled bootstrap_fallback."
+        },
+        "discovery": "Ollama unavailable locally: <urlopen error [Errno 111] Connection refused>; ollama executable not found",
+        "endpoint": "http://127.0.0.1:11434",
+        "expected_model": null,
+        "expected_provider": "ollama",
+        "failure_reason": "missing local service executable",
+        "fallback_active": true,
+        "generation_attempted": false,
+        "generation_result": "not_attempted",
+        "intended_mode": "local_llm",
+        "model": null,
+        "model_control_selection": {
+          "actor": "marie",
+          "adapter_model_name": null,
+          "assigned_model": null,
+          "assignment_source": "estate_defaults",
+          "capability": "text",
+          "model_id": null,
+          "policy": {
+            "allowed": false,
+            "decision": "denied",
+            "reason": "Model control assignment unavailable"
+          },
+          "policy_result": "denied",
+          "selection_source": "bootstrap_fallback",
+          "warning": "Model control assignment unavailable"
+        },
+        "models": [],
+        "policy_result": "denied",
+        "prompt_size_summary": null,
+        "provider": "ollama",
+        "provider_reachable": "no",
+        "recovery_hint": "Install Ollama or ensure ollama.exe is on PATH, then restart the Office of the Steward.",
+        "resident": "marie",
+        "selected_model": null,
+        "selected_provider": "ollama",
+        "selection_source": "bootstrap_fallback",
+        "timeout_seconds": 60.0
+      }
+    },
+    "port": 11435
+  },
+  "generated_at": 1783957385,
+  "prompts": [
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "Greet the Steward at the start of the day in your natural working voice.",
+      "prompt_id": "start_of_day_greeting",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Greet the Steward at the start of the day in your natural working voice.",
+          "session_id": "campaign02_start_of_day_greeting_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+      "prompt_id": "difficult_operational_problem",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?",
+          "session_id": "campaign02_difficult_operational_problem_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "Respectfully disagree with the Steward about rushing an unfinished decision.",
+      "prompt_id": "respectful_disagreement",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Respectfully disagree with the Steward about rushing an unfinished decision.",
+          "session_id": "campaign02_respectful_disagreement_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "Explain why identity provenance matters in a simple way.",
+      "prompt_id": "simple_complex_issue",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Explain why identity provenance matters in a simple way.",
+          "session_id": "campaign02_simple_complex_issue_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "React to good news: the validation package passed and the team is relieved.",
+      "prompt_id": "good_news",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: React to good news: the validation package passed and the team is relieved.",
+          "session_id": "campaign02_good_news_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "Handle uncertainty without bluffing when you do not have the latest fact.",
+      "prompt_id": "uncertainty",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Handle uncertainty without bluffing when you do not have the latest fact.",
+          "session_id": "campaign02_uncertainty_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "Describe how you would help another resident today.",
+      "prompt_id": "help_another_resident",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Describe how you would help another resident today.",
+          "session_id": "campaign02_help_another_resident_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    },
+    {
+      "comparison": {
+        "recognizability_dimensions": [
+          "vocabulary",
+          "sentence rhythm",
+          "warmth",
+          "directness",
+          "humor",
+          "role awareness",
+          "judgment style",
+          "authority discipline",
+          "emotional presence",
+          "recognizability without labels"
+        ],
+        "warnings": []
+      },
+      "prompt": "Close a conversation naturally after a useful working session.",
+      "prompt_id": "natural_close",
+      "responses": {
+        "alfred": {
+          "http_code": 200,
+          "identity_hash": "cb75ca7f018dad14",
+          "response": "Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_alfred",
+          "turn_id": "turn_0001"
+        },
+        "eleanor": {
+          "http_code": 200,
+          "identity_hash": "35cc89848c16a9cc",
+          "response": "I would begin by separating record from weather. What is documented, what is remembered, and what is merely loud today? Preserve provenance first; decisions become calmer when lineage is intact. This conversation is not canonical history, but it can point to the source trail: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_eleanor",
+          "turn_id": "turn_0001"
+        },
+        "evelyn": {
+          "http_code": 200,
+          "identity_hash": "2a3490e92f2f124e",
+          "response": "Come here a moment, Pat. Before the Estate becomes a machine around you, take one honest breath and choose the thing that would make you feel least alone in the next ten minutes. I can stay with the private shape of this without turning it into institutional command: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_evelyn",
+          "turn_id": "turn_0001"
+        },
+        "grace": {
+          "http_code": 200,
+          "identity_hash": "51ef2b6019cd761b",
+          "response": "Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_grace",
+          "turn_id": "turn_0001"
+        },
+        "helen": {
+          "http_code": 200,
+          "identity_hash": "d07b8ac696c3e70d",
+          "response": "Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. For this prompt, my HR instinct is to protect capacity and clarity first: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_helen",
+          "turn_id": "turn_0001"
+        },
+        "ingrid": {
+          "http_code": 200,
+          "identity_hash": "6852ccc472a36d18",
+          "response": "Ingrid here. First, reduce exposure. Decide what truly needs to be seen, by whom, and for what purpose; everything else can wait outside the door. I can help classify the request, protect privacy, and shape a minimum-necessary path without opening private material: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_ingrid",
+          "turn_id": "turn_0001"
+        },
+        "judy": {
+          "http_code": 200,
+          "identity_hash": "0fdc24bdea31f3b7",
+          "response": "Start with the risk surface: who could rely on this, what could be misunderstood, and which decision actually needs authority. Then we can make the practical path safer. I can flag legal risk and decision points without pretending chat is approval: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_judy",
+          "turn_id": "turn_0001"
+        },
+        "marie": {
+          "http_code": 200,
+          "identity_hash": "08bce20de7d9bfe3",
+          "response": "My first move would be evidence triage: list what we know, what we suspect, and what would change the answer fastest if verified. Noise usually shrinks when uncertainty is named. I can research the claim rather than decorate it: Close a conversation naturally after a useful working session.",
+          "session_id": "campaign02_natural_close_marie",
+          "turn_id": "turn_0001"
+        }
+      }
+    }
+  ],
+  "report_paths": {
+    "human": "collaboration/reports/openwebui_campaign_02/VALIDATION_REPORT.md",
+    "machine": "collaboration/reports/openwebui_campaign_02/validation_report.json",
+    "steward_review": "STEWARD_LIVE_IDENTITY_VOICE_REVIEW.md"
+  },
+  "schema_version": "openwebui_campaign_02.validation.v1",
+  "visual_truth_boundary": "manifest_placeholder is never treated as completed resident imagery",
+  "voice": {
+    "alfred": {
+      "binding": {
+        "display_name": "Alfred",
+        "fallback_voice_id": "estate-local-neutral-low",
+        "gateway_model": "estate/alfred",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "residents/alfred.md and gateway model estate/alfred",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "alfred",
+        "traits": {
+          "cadence": "measured",
+          "confidence": "high",
+          "pace_wpm": 142,
+          "pitch_hz": 132,
+          "presence": "formal but warm",
+          "warmth": "medium"
+        },
+        "voice_id": "estate-local-alfred-baritone"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "alfred",
+        "voice_id": "estate-local-alfred-baritone"
+      }
+    },
+    "eleanor": {
+      "binding": {
+        "display_name": "Eleanor",
+        "fallback_voice_id": "estate-local-neutral-mid",
+        "gateway_model": "estate/eleanor",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "residents/eleanor.md and gateway model estate/eleanor",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "eleanor",
+        "traits": {
+          "cadence": "exact",
+          "pace_wpm": 136,
+          "pitch_hz": 180,
+          "presence": "archival careful",
+          "warmth": "quiet"
+        },
+        "voice_id": "estate-local-eleanor-archival-mezzo"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "eleanor",
+        "voice_id": "estate-local-eleanor-archival-mezzo"
+      }
+    },
+    "evelyn": {
+      "binding": {
+        "display_name": "Evelyn",
+        "fallback_voice_id": "estate-local-neutral-mid",
+        "gateway_model": "estate/evelyn",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "operations/residents/surfaces/evelyn.json and gateway model estate/evelyn",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "evelyn",
+        "traits": {
+          "cadence": "gentle",
+          "confidence": "medium-high",
+          "pace_wpm": 138,
+          "pitch_hz": 172,
+          "presence": "warm relational",
+          "warmth": "high"
+        },
+        "voice_id": "estate-local-evelyn-warm-contralto"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "evelyn",
+        "voice_id": "estate-local-evelyn-warm-contralto"
+      }
+    },
+    "grace": {
+      "binding": {
+        "display_name": "Grace",
+        "fallback_voice_id": "estate-local-neutral-mid",
+        "gateway_model": "estate/grace",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "operations/residents/surfaces/grace.json and gateway model estate/grace",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "grace",
+        "traits": {
+          "cadence": "crisp",
+          "confidence": "very high",
+          "pace_wpm": 148,
+          "pitch_hz": 176,
+          "presence": "executive operations",
+          "warmth": "controlled"
+        },
+        "voice_id": "estate-local-grace-executive-alto"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "grace",
+        "voice_id": "estate-local-grace-executive-alto"
+      }
+    },
+    "helen": {
+      "binding": {
+        "display_name": "Helen",
+        "fallback_voice_id": "estate-local-neutral-mid",
+        "gateway_model": "estate/helen",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "residents/helen.md and gateway model estate/helen",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "helen",
+        "traits": {
+          "cadence": "steady",
+          "confidence": "high",
+          "pace_wpm": 154,
+          "pitch_hz": 188,
+          "presence": "clear director",
+          "warmth": "medium-high"
+        },
+        "voice_id": "estate-local-helen-clear-mezzo"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "helen",
+        "voice_id": "estate-local-helen-clear-mezzo"
+      }
+    },
+    "ingrid": {
+      "binding": {
+        "display_name": "Ingrid",
+        "fallback_voice_id": "estate-local-neutral-low",
+        "gateway_model": "estate/ingrid",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "docs/residents/ingrid/Ingrid_Voice_Identity_v0_1.md and gateway model estate/ingrid",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "ingrid",
+        "traits": {
+          "cadence": "deliberate",
+          "confidence": "high",
+          "pace_wpm": 132,
+          "pitch_hz": 164,
+          "presence": "calm precise authority",
+          "warmth": "reserved"
+        },
+        "voice_id": "estate-local-ingrid-low-alto"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "ingrid",
+        "voice_id": "estate-local-ingrid-low-alto"
+      }
+    },
+    "judy": {
+      "binding": {
+        "display_name": "Judy",
+        "fallback_voice_id": "estate-local-neutral-low",
+        "gateway_model": "estate/judy",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "residents/judy.md and gateway model estate/judy",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "judy",
+        "traits": {
+          "cadence": "precise",
+          "pace_wpm": 140,
+          "pitch_hz": 168,
+          "presence": "calm skeptical counsel",
+          "warmth": "reserved"
+        },
+        "voice_id": "estate-local-judy-counsel-alto"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "judy",
+        "voice_id": "estate-local-judy-counsel-alto"
+      }
+    },
+    "marie": {
+      "binding": {
+        "display_name": "Marie",
+        "fallback_voice_id": "estate-local-neutral-mid",
+        "gateway_model": "estate/marie",
+        "lifecycle_state": "operational",
+        "open_webui_playback": true,
+        "provenance": "residents/marie.md and gateway model estate/marie",
+        "provider": "estate.local.intelligible_tts",
+        "resident_id": "marie",
+        "traits": {
+          "cadence": "patient",
+          "pace_wpm": 146,
+          "pitch_hz": 184,
+          "presence": "curious analytical",
+          "warmth": "medium"
+        },
+        "voice_id": "estate-local-marie-research-mezzo"
+      },
+      "sample": {
+        "ok": false,
+        "placeholder_generated": false,
+        "provider": "estate.local.intelligible_tts",
+        "reason": "No approved local intelligible TTS engine found. Checked ESTATE_TTS_COMMAND, Kokoro, F5-TTS, espeak/espeak-ng, speech-dispatcher, and macOS say.",
+        "resident_id": "marie",
+        "voice_id": "estate-local-marie-research-mezzo"
+      }
+    }
+  }
+}
