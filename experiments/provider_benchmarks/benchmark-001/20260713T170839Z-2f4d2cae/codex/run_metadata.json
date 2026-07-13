@@ -1,0 +1,39 @@
+{
+  "benchmark_id": "benchmark-001",
+  "blockers": [
+    "Canonical packet was not present at the assigned path; matching SHA-256 packet was read from experiments/provider_benchmarks/specs/benchmark-001.canonical_packet.md."
+  ],
+  "canonical_packet_available_at_assigned_path": false,
+  "canonical_packet_fallback_read_path": "experiments/provider_benchmarks/specs/benchmark-001.canonical_packet.md",
+  "canonical_packet_path": "experiments/provider_benchmarks/benchmark-001/20260713T170839Z-2f4d2cae/codex/CANONICAL_PACKET.md",
+  "canonical_packet_sha256": "1c36bf618283b7d7481166e002a90f3c4be21b82cdb2bdda623c5c3c537a03a8",
+  "commands_run": [
+    "find .. -name AGENTS.md -print",
+    "sha256sum experiments/provider_benchmarks/benchmark-001/20260713T170839Z-2f4d2cae/codex/CANONICAL_PACKET.md",
+    "find experiments/provider_benchmarks/benchmark-001 -name CANONICAL_PACKET.md -print",
+    "sha256sum experiments/provider_benchmarks/specs/benchmark-001.canonical_packet.md",
+    "cat experiments/provider_benchmarks/specs/benchmark-001.canonical_packet.md",
+    "python -m unittest test_dependency_batcher_visible.py"
+  ],
+  "eval_duration": null,
+  "eval_duration_reason": "not available in this execution environment",
+  "executor": "codex",
+  "load_duration": null,
+  "load_duration_reason": "not available in this execution environment",
+  "output_tokens": null,
+  "output_tokens_reason": "not available in this execution environment",
+  "prompt_eval_duration": null,
+  "prompt_eval_duration_reason": "not available in this execution environment",
+  "prompt_tokens": null,
+  "prompt_tokens_reason": "not available in this execution environment",
+  "repair_attempts": 1,
+  "run_id": "20260713T170839Z-2f4d2cae",
+  "test_command": "python -m unittest test_dependency_batcher_visible.py",
+  "test_exit_code": 0,
+  "test_result": "pass",
+  "total_duration": null,
+  "total_duration_reason": "not available in this execution environment",
+  "total_tokens": null,
+  "total_tokens_reason": "not available in this execution environment",
+  "wall_clock_seconds": 1.6365575790405273
+}
