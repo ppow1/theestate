@@ -1,0 +1,316 @@
+{
+  "schema_version": "avatar_registry.v1",
+  "campaign": "Campaign 08 - Iconography and UI Assets",
+  "work_packages": [
+    "WP-4178",
+    "WP-4179",
+    "WP-4180",
+    "WP-4181",
+    "WP-4182",
+    "WP-4183",
+    "WP-4184",
+    "WP-4185",
+    "WP-4186",
+    "WP-4187"
+  ],
+  "generated_at": "2026-07-13T00:00:00Z",
+  "commissioned_resident_count": 8,
+  "supported_interface_sizes": [
+    32,
+    64,
+    128,
+    256,
+    24,
+    20,
+    16
+  ],
+  "global_standards": {
+    "master_crop": "centered head-and-shoulders crop with eyes on upper third; face occupies 62-70 percent of 256px canvas",
+    "facial_readability": "preserve canonical visual traits, silhouette, gaze, hair/wardrobe anchors, and non-caricature realism at every derivative size",
+    "contrast": "minimum 3:1 edge separation for icon silhouette against registered light and dark surfaces; add governed rim/keyline where needed",
+    "variants": "produce square, circular mask, transparent-background, light-mode, dark-mode, notification, and compact-presence derivatives from the same master crop",
+    "canonical_status": "prompt-ready manifest placeholders only; no raster binary is promoted as final canonical art without Steward approval"
+  },
+  "residents": [
+    {
+      "resident_id": "RES-000001",
+      "display_name": "Alfred",
+      "avatar_family_id": "c08-alfred-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c08-alfred-avatar-family-v1.json",
+      "manifest_hash": "sha256:a1d54e4ea1221438afb9957eac9dd80d789e3445c3deed2bdc889fd9058a29c9",
+      "canonical_traits": [
+        "composed executive butler presence",
+        "silver-gray tailoring",
+        "warmly precise expression"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "RES-000002",
+      "display_name": "Ingrid",
+      "avatar_family_id": "c08-ingrid-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/ingrid/internal/assets/candidates/c08-ingrid-avatar-family-v1.json",
+      "manifest_hash": "sha256:d662d3ec19bd4cee6ec6e5184971e3e0d2e41beafd7457342c45532bb84c910f",
+      "canonical_traits": [
+        "reserved elegant boundary guardian",
+        "dark tailored attire",
+        "privacy-aware gaze"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "RES-000003",
+      "display_name": "Helen",
+      "avatar_family_id": "c08-helen-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/helen/internal/assets/candidates/c08-helen-avatar-family-v1.json",
+      "manifest_hash": "sha256:ca9c6f7ac3d4c68cf51a9a7ca61f5105d51d16e10a7f3ce71b33d05f33a5a45e",
+      "canonical_traits": [
+        "approachable workforce leader",
+        "soft professional wardrobe",
+        "humane attentive expression"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "grace",
+      "display_name": "Grace",
+      "avatar_family_id": "c08-grace-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/grace/internal/assets/candidates/c08-grace-avatar-family-v1.json",
+      "manifest_hash": "sha256:a29fcaf4d3849adf9849a42fd8ffc8ee5c55837c7b25499ef3ff2d26c0253f46",
+      "canonical_traits": [
+        "energetic operations director",
+        "crisp practical attire",
+        "decisive momentum"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "evelyn",
+      "display_name": "Evelyn",
+      "avatar_family_id": "c08-evelyn-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c08-evelyn-avatar-family-v1.json",
+      "manifest_hash": "sha256:a91e0b7d0bc82dce29f61f31572dd17e47a110cd812e0e3f90b8e80c9541f57f",
+      "canonical_traits": [
+        "private confidant presence",
+        "soft restrained elegance",
+        "Steward-private warmth"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "RES-000004",
+      "display_name": "Eleanor",
+      "avatar_family_id": "c08-eleanor-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c08-eleanor-avatar-family-v1.json",
+      "manifest_hash": "sha256:e756bf8fd69056fb587a1848f97e553263b9c76f3688c3ec0dfe4c2d2878a95e",
+      "canonical_traits": [
+        "archival registrar presence",
+        "ordered provenance materials",
+        "quiet exacting expression"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "RES-000005",
+      "display_name": "Marie",
+      "avatar_family_id": "c08-marie-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/marie/internal/assets/candidates/c08-marie-avatar-family-v1.json",
+      "manifest_hash": "sha256:ea1e9f1896629c4587e8501124178e6a5f6095e191be93518ce174e6ae59cedc",
+      "canonical_traits": [
+        "research investigator presence",
+        "practical scholarly attire",
+        "curious focused expression"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    },
+    {
+      "resident_id": "RES-000006",
+      "display_name": "Judy",
+      "avatar_family_id": "c08-judy-avatar-family-v1",
+      "manifest_path": "data/visual_bibles/residents/judy/internal/assets/candidates/c08-judy-avatar-family-v1.json",
+      "manifest_hash": "sha256:a8f497d7e7c9515927c51a33d8c7d5cf0eda4858e582822098b8260f6d3359ed",
+      "canonical_traits": [
+        "general counsel presence",
+        "structured legal attire",
+        "measured risk-aware expression"
+      ],
+      "interface_coverage": {
+        "standard_sizes": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "compact_sizes": [
+          24,
+          20,
+          16
+        ],
+        "shapes": [
+          "circle",
+          "square"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "transparent"
+        ]
+      },
+      "validation_status": "complete_manifest_controls_pending_raster_generation"
+    }
+  ]
+}
