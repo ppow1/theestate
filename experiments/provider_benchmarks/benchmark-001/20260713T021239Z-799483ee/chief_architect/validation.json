@@ -1,0 +1,17 @@
+{
+  "commands": [
+    {
+      "command": "/root/.pyenv/versions/3.12.13/bin/python -m unittest test_dependency_batcher_visible.py",
+      "exit_code": 0,
+      "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK\n",
+      "stdout": ""
+    }
+  ],
+  "end": "2026-07-13T02:12:47+00:00",
+  "failed": [],
+  "hidden_review_executed": false,
+  "passed": [
+    "visible_unittest"
+  ],
+  "start": "2026-07-13T02:12:47+00:00"
+}

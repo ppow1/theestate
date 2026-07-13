@@ -1,0 +1,12 @@
+{
+  "migration_id": "WP-0545-provider-benchmark-backfill-v1",
+  "schema_version": "migration.plan.v1",
+  "purpose": "Forward-compatible placeholder for registering pre-existing provider benchmark evidence without mutating completed runs.",
+  "applies_to": "experiments/provider_benchmarks",
+  "actions": [
+    "discover benchmark_spec.snapshot.json files",
+    "verify executor metadata.json evidence",
+    "write comparison reports only when absent"
+  ],
+  "destructive": false
+}

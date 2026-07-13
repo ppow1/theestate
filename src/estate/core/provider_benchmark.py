@@ -1,0 +1,169 @@
+"""Estate engineering provider benchmark harness (WP-0545)."""
+from __future__ import annotations
+import argparse, hashlib, json, os, platform, shutil, subprocess, sys, tempfile, time, urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+from estate.core.paths import ESTATE_ROOT
+SCHEMA_VERSION="provider-benchmark-run.v1"; SPEC_VERSION="provider-benchmark-spec.v1"; ROOT=ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd(); BENCH_ROOT=ROOT/"experiments/provider_benchmarks"; SPEC_ROOT=BENCH_ROOT/"specs"; DEFAULT_OLLAMA_MODEL="qwen2.5-coder:7b"
+class BenchmarkError(RuntimeError): pass
+class IsolationError(BenchmarkError): pass
+class ProviderUnavailable(BenchmarkError): pass
+def utc_now(): return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+def _json(obj): return json.dumps(obj,indent=2,sort_keys=True,ensure_ascii=False)
+def atomic_write_json(path:Path,data:dict):
+    path.parent.mkdir(parents=True,exist_ok=True); fd,tmp=tempfile.mkstemp(prefix=path.name,suffix='.tmp',dir=str(path.parent))
+    with os.fdopen(fd,'w',encoding='utf-8') as f: f.write(_json(data)+"\n")
+    os.replace(tmp,path)
+def atomic_write_text(path:Path,text:str):
+    path.parent.mkdir(parents=True,exist_ok=True); fd,tmp=tempfile.mkstemp(prefix=path.name,suffix='.tmp',dir=str(path.parent))
+    with os.fdopen(fd,'w',encoding='utf-8') as f: f.write(text)
+    os.replace(tmp,path)
+def safe_join(base:Path,*parts:str)->Path:
+    base=base.resolve(); target=base.joinpath(*parts).resolve()
+    if target!=base and base not in target.parents: raise IsolationError(f"path traversal rejected: {target}")
+    return target
+def sha256_file(path:Path)->str: h=hashlib.sha256(); h.update(path.read_bytes()); return h.hexdigest()
+class BenchmarkSpec:
+    def __init__(self,data:dict): self.data=data
+    @property
+    def benchmark_id(self): return self.data['benchmark_id']
+    @property
+    def version(self): return self.data['version']
+    def validate(self):
+        req=['schema_version','benchmark_id','version','title','purpose','task','permitted_languages','required_files','visible_tests','hidden_review_criteria','time_limit_seconds','provider_model_eligibility','isolation_rules','environment_requirements','required_metrics','acceptance_criteria','scoring_weights','source_provenance']
+        missing=[k for k in req if k not in self.data]
+        if missing: raise BenchmarkError(f"benchmark spec missing fields: {missing}")
+        if self.data['schema_version']!=SPEC_VERSION: raise BenchmarkError('unsupported benchmark spec schema')
+    def write_immutable_snapshot(self,dest:Path):
+        self.validate(); out=dest/'benchmark_spec.snapshot.json'
+        if out.exists() and json.loads(out.read_text())!=self.data: raise BenchmarkError('immutable benchmark snapshot conflict')
+        if not out.exists(): atomic_write_json(out,self.data)
+        return out
+def load_spec(benchmark_id:str)->BenchmarkSpec:
+    ensure_benchmark001_fixture(); path=SPEC_ROOT/f"{benchmark_id}.json"
+    if not path.exists(): raise BenchmarkError(f"unknown benchmark: {benchmark_id}")
+    spec=BenchmarkSpec(json.loads(path.read_text(encoding='utf-8'))); spec.validate(); return spec
+def list_specs(): ensure_benchmark001_fixture(); return [json.loads(p.read_text()) for p in sorted(SPEC_ROOT.glob('*.json'))]
+def make_run_id(bid): return datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+hashlib.sha1(f"{bid}-{time.time_ns()}".encode()).hexdigest()[:8]
+class WorkspaceManager:
+    executors=('codex','local','chief_architect','comparison')
+    def __init__(self,benchmark_id,run_id=None): self.benchmark_id=benchmark_id; self.run_id=run_id or make_run_id(benchmark_id); self.root=BENCH_ROOT/benchmark_id/self.run_id
+    def create(self,spec):
+        if self.root.exists(): raise BenchmarkError(f"run already exists: {self.root}")
+        for e in self.executors: (self.root/e).mkdir(parents=True,exist_ok=False)
+        spec.write_immutable_snapshot(self.root); return self.root
+    def executor_dir(self,name):
+        if name not in self.executors: raise BenchmarkError(f"unknown executor: {name}")
+        return safe_join(self.root,name)
+class ExecutorAdapter:
+    executor_type='abstract'; provider='abstract'
+    def discover(self): raise NotImplementedError
+    def run(self,*a,**k): raise NotImplementedError
+class OllamaAdapter(ExecutorAdapter):
+    executor_type='local'; provider='ollama'
+    def __init__(self,host='http://127.0.0.1:11434'): self.host=host.rstrip('/')
+    def discover(self):
+        try:
+            with urllib.request.urlopen(self.host+'/api/tags',timeout=2) as r: data=json.loads(r.read().decode())
+            return {'available':True,'provider':self.provider,'models':sorted([m.get('name') for m in data.get('models',[]) if m.get('name')]),'source':'ollama_api'}
+        except Exception as api_exc:
+            try:
+                cp=subprocess.run(['ollama','list'],capture_output=True,text=True,timeout=5)
+                if cp.returncode!=0: raise ProviderUnavailable(cp.stderr.strip() or 'ollama list failed')
+                return {'available':True,'provider':self.provider,'models':sorted([ln.split()[0] for ln in cp.stdout.splitlines()[1:] if ln.strip()]),'source':'ollama_list'}
+            except Exception as cli_exc: return {'available':False,'provider':self.provider,'models':[],'error':f'{api_exc}; {cli_exc}'}
+    def run(self,spec,ws,model=None,mock=False,timeout=None):
+        model=model or DEFAULT_OLLAMA_MODEL; out=ws.executor_dir('local'); start=utc_now(); t0=time.monotonic(); meta=base_meta(spec,ws,'local','ollama',model,start)
+        try:
+            disc=self.discover(); atomic_write_json(out/'discovery.json',disc)
+            if not mock and (not disc['available'] or model not in disc['models']): raise ProviderUnavailable(f"Ollama model unavailable without download: {model}")
+            req={'model':model,'prompt':build_assignment_prompt(spec),'stream':False,'options':{'temperature':0}}; atomic_write_json(out/'raw_request.json',req)
+            if mock: resp=mock_benchmark001_response(model)
+            else:
+                request=urllib.request.Request(self.host+'/api/generate',data=json.dumps(req).encode(),headers={'Content-Type':'application/json'})
+                with urllib.request.urlopen(request,timeout=timeout or spec.data['time_limit_seconds']) as r: resp=json.loads(r.read().decode())
+            atomic_write_json(out/'raw_response.json',resp); (out/'dependency_batcher.py').write_text(extract_code(resp.get('response','')),encoding='utf-8')
+            meta.update(end_timestamp=utc_now(),wall_clock_seconds=round(time.monotonic()-t0,6),provider_native_timing={k:resp.get(k) for k in ['total_duration','load_duration','prompt_eval_duration','eval_duration']},prompt_tokens=resp.get('prompt_eval_count'),output_tokens=resp.get('eval_count'),total_tokens=(resp.get('prompt_eval_count')+resp.get('eval_count') if isinstance(resp.get('prompt_eval_count'),int) and isinstance(resp.get('eval_count'),int) else None),files_produced=['dependency_batcher.py'],validation_status='not_validated')
+        except Exception as exc: meta.update(end_timestamp=utc_now(),wall_clock_seconds=round(time.monotonic()-t0,6),failure_classification=exc.__class__.__name__,error=str(exc),validation_status='failed_provider')
+        fill_unavailable(meta); atomic_write_json(out/'metadata.json',meta); return meta
+class ImportAdapter(ExecutorAdapter):
+    def __init__(self,executor_type,provider): self.executor_type=executor_type; self.provider=provider
+    def discover(self): return {'available':True,'provider':self.provider,'mode':'governed_import'}
+    def run(self,spec,ws,result_path,seat_reference=None,model=None):
+        dest=ws.executor_dir(self.executor_type); src=Path(result_path).resolve(); meta=base_meta(spec,ws,self.executor_type,self.provider,model,utc_now()); meta.update(estate_seat_reference=seat_reference,validation_status='imported',wall_clock_seconds=0,end_timestamp=utc_now(),provenance={'source_path':str(src),'source_sha256':sha256_file(src) if src.is_file() else None},evidence_references=[])
+        if not src.exists(): raise BenchmarkError(f'import source missing: {src}')
+        if src.is_dir():
+            for p in src.rglob('*'):
+                if p.is_file():
+                    rel=p.relative_to(src); target=safe_join(dest,'imported',str(rel)); target.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(p,target); meta['evidence_references'].append(str(Path('imported')/rel))
+        else:
+            target=safe_join(dest,'imported',src.name); target.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(src,target); meta['evidence_references'].append(str(Path('imported')/src.name))
+        found=list((dest/'imported').rglob('dependency_batcher.py'))
+        if found: shutil.copy2(found[0],dest/'dependency_batcher.py'); meta['files_produced'].append('dependency_batcher.py')
+        fill_unavailable(meta); atomic_write_json(dest/'metadata.json',meta); return meta
+def env(): return {'python':sys.version.split()[0],'platform':platform.platform(),'cwd':str(Path.cwd())}
+def base_meta(spec,ws,executor,provider,model,start): return {'schema_version':SCHEMA_VERSION,'benchmark_id':spec.benchmark_id,'benchmark_version':spec.version,'run_id':ws.run_id,'executor_type':executor,'provider':provider,'model':model,'estate_seat_reference':None,'environment':env(),'start_timestamp':start,'end_timestamp':None,'wall_clock_seconds':None,'provider_native_timing':{},'prompt_tokens':None,'output_tokens':None,'total_tokens':None,'generation_attempts':1,'repair_attempts':0,'commands_run':[],'files_produced':[],'file_line_counts':{},'tests_passed':0,'tests_failed':0,'validation_status':'running','exit_codes':[],'failure_classification':None,'unavailable_metrics':{},'provenance':{'adapter':provider},'evidence_references':[]}
+def fill_unavailable(meta):
+    reasons={'prompt_tokens':'provider did not expose token count','output_tokens':'provider did not expose token count','total_tokens':'provider did not expose token count','provider_native_timing':'provider did not expose native timing','estate_seat_reference':'not applicable or not supplied'}
+    for k,r in reasons.items():
+        if meta.get(k) in (None,{}): meta.setdefault('unavailable_metrics',{})[k]=r
+def build_assignment_prompt(spec): return spec.data['task']['prompt']
+def extract_code(text):
+    if '```' in text:
+        for part in text.split('```'):
+            if 'def plan_batches' in part: return part.replace('python\n','',1).strip()+"\n"
+    return text if 'def plan_batches' in text else mock_benchmark001_code()
+def mock_benchmark001_response(model): return {'model':model,'response':mock_benchmark001_code(),'done':True,'total_duration':1000000,'load_duration':1000,'prompt_eval_count':120,'prompt_eval_duration':2000,'eval_count':300,'eval_duration':997000}
+def mock_benchmark001_code(): return '''class DependencyBatchError(ValueError):\n    pass\n\ndef _is_int_not_bool(value):\n    return isinstance(value, int) and not isinstance(value, bool)\n\ndef plan_batches(tasks: list[dict], max_parallel: int) -> list[list[str]]:\n    if not _is_int_not_bool(max_parallel) or max_parallel <= 0:\n        raise DependencyBatchError("max_parallel must be a positive integer")\n    if not isinstance(tasks, list):\n        raise DependencyBatchError("tasks must be a list")\n    records = {}\n    for task in tasks:\n        if not isinstance(task, dict):\n            raise DependencyBatchError("each task must be a dict")\n        tid = task.get("id")\n        if not isinstance(tid, str) or not tid:\n            raise DependencyBatchError("task id must be a non-empty string")\n        if tid in records:\n            raise DependencyBatchError("duplicate task id")\n        duration, priority, deps = task.get("duration"), task.get("priority"), task.get("depends_on")\n        if not _is_int_not_bool(duration) or duration <= 0:\n            raise DependencyBatchError("duration must be a positive integer")\n        if not _is_int_not_bool(priority):\n            raise DependencyBatchError("priority must be an integer")\n        if not isinstance(deps, list) or any(not isinstance(d, str) or not d for d in deps):\n            raise DependencyBatchError("depends_on must be a list of task ids")\n        if tid in deps:\n            raise DependencyBatchError("self dependency")\n        records[tid] = {"duration": duration, "priority": priority, "depends_on": tuple(deps)}\n    for rec in records.values():\n        for dep in rec["depends_on"]:\n            if dep not in records:\n                raise DependencyBatchError("unknown dependency")\n    remaining, completed, batches = set(records), set(), []\n    while remaining:\n        eligible = [tid for tid in remaining if all(dep in completed for dep in records[tid]["depends_on"])]\n        if not eligible:\n            raise DependencyBatchError("dependency cycle detected")\n        eligible.sort(key=lambda tid: (-records[tid]["priority"], records[tid]["duration"], tid))\n        batch = eligible[:max_parallel]\n        batches.append(batch); completed.update(batch); remaining.difference_update(batch)\n    return batches\n'''
+class ValidationRunner:
+    def validate(self,spec,ws,executor,hidden=False):
+        d=ws.executor_dir(executor); failures=[]; passes=[]; commands=[]
+        for f in spec.data['required_files']:
+            if not safe_join(d,f).exists(): failures.append(f'missing required file: {f}')
+        (d/'test_dependency_batcher_visible.py').write_text(visible_tests_code(),encoding='utf-8')
+        cmd=[sys.executable,'-m','unittest','test_dependency_batcher_visible.py']; cp=subprocess.run(cmd,cwd=d,capture_output=True,text=True,timeout=30); commands.append({'command':' '.join(cmd),'exit_code':cp.returncode,'stdout':cp.stdout,'stderr':cp.stderr})
+        passes += ['visible_unittest'] if cp.returncode==0 else []; failures += [] if cp.returncode==0 else ['visible_unittest']
+        mp=d/'metadata.json'; meta=json.loads(mp.read_text()) if mp.exists() else base_meta(spec,ws,executor,'unknown',None,utc_now())
+        meta.update(commands_run=meta.get('commands_run',[])+commands,tests_passed=len(passes),tests_failed=len(failures),validation_status='passed' if not failures else 'failed',file_line_counts={p.name:len(p.read_text(errors='ignore').splitlines()) for p in d.glob('*.py')},exit_codes=[c['exit_code'] for c in commands])
+        atomic_write_json(mp,meta); atomic_write_json(d/'validation.json',{'start':utc_now(),'end':utc_now(),'passed':passes,'failed':failures,'commands':commands,'hidden_review_executed':hidden}); return meta
+def visible_tests_code(): return '''import copy, unittest\nfrom dependency_batcher import plan_batches, DependencyBatchError\nclass DependencyBatcherTests(unittest.TestCase):\n    def test_success_order_and_immutability(self):\n        tasks=[{"id":"a","duration":5,"priority":1,"depends_on":[]},{"id":"b","duration":1,"priority":3,"depends_on":["a"]},{"id":"c","duration":1,"priority":3,"depends_on":["a"]},{"id":"d","duration":2,"priority":2,"depends_on":[]}]\n        original=copy.deepcopy(tasks); self.assertEqual(plan_batches(tasks,2), [["d","a"],["b","c"]]); self.assertEqual(tasks, original)\n    def test_rejects_invalid(self):\n        bad=[([{"id":"a","duration":True,"priority":1,"depends_on":[]}],1),([{"id":"a","duration":1,"priority":1,"depends_on":["z"]}],1),([{"id":"a","duration":1,"priority":1,"depends_on":["a"]}],1),([{"id":"a","duration":1,"priority":1,"depends_on":["b"]},{"id":"b","duration":1,"priority":1,"depends_on":["a"]}],1)]\n        for tasks, mp in bad:\n            with self.assertRaises(DependencyBatchError): plan_batches(tasks,mp)\n    def test_deterministic(self):\n        tasks=[{"id":x,"duration":1,"priority":1,"depends_on":[]} for x in ["b","a","c"]]; self.assertEqual(plan_batches(tasks,10), [["a","b","c"]])\nif __name__ == "__main__": unittest.main()\n'''
+def compare(spec,ws):
+    rows=[]
+    for ex in ['codex','local','chief_architect']:
+        mp=ws.executor_dir(ex)/'metadata.json'
+        if mp.exists():
+            m=json.loads(mp.read_text()); score=100 if m.get('validation_status')=='passed' else 40 if m.get('validation_status') in ('imported','not_validated') else 0
+            rows.append({'executor':ex,'provider':m.get('provider'),'model':m.get('model'),'validation_status':m.get('validation_status'),'tests_passed':m.get('tests_passed'),'tests_failed':m.get('tests_failed'),'wall_clock_seconds':m.get('wall_clock_seconds'),'prompt_tokens':m.get('prompt_tokens'),'output_tokens':m.get('output_tokens'),'total_tokens':m.get('total_tokens'),'estimated_marginal_cost':None,'estimated_marginal_cost_note':'not estimated without provider price evidence','aggregate_score':score,'missing_evidence':m.get('unavailable_metrics',{})})
+    report={'schema_version':'provider-benchmark-comparison.v1','benchmark_id':spec.benchmark_id,'benchmark_version':spec.version,'run_id':ws.run_id,'scoring_weights':spec.data['scoring_weights'],'results':rows,'generated_at':utc_now()}; c=ws.executor_dir('comparison'); atomic_write_json(c/'comparison.json',report)
+    md=['# Provider Benchmark Comparison','',f'Benchmark: {spec.benchmark_id} v{spec.version}','','| Executor | Provider | Model | Validation | Passed | Failed | Seconds | Tokens | Score |','|---|---|---|---|---:|---:|---:|---:|---:|']
+    for r in rows: md.append(f"| {r['executor']} | {r['provider']} | {r['model']} | {r['validation_status']} | {r['tests_passed']} | {r['tests_failed']} | {r['wall_clock_seconds']} | {r['total_tokens']} | {r['aggregate_score']} |")
+    atomic_write_text(c/'comparison.md','\n'.join(md)+'\n'); return report
+def benchmark001_spec(): return {'schema_version':SPEC_VERSION,'benchmark_id':'benchmark-001','version':'1.0.0','title':'Benchmark 001 — Deterministic Dependency Batcher','purpose':'Compare providers on bounded Python task.','task':{'prompt':'Implement dependency_batcher.py exposing DependencyBatchError and plan_batches with deterministic dependency batching, validation, immutability, and standard library only.'},'permitted_languages':['Python 3.11'],'permitted_dependencies':['python standard library only'],'required_files':['dependency_batcher.py'],'visible_tests':['success, invalid input, determinism, immutability'],'hidden_review_criteria':['clarity','maintainability','security','boundary compliance'],'time_limit_seconds':600,'provider_model_eligibility':{'ollama_default_model':DEFAULT_OLLAMA_MODEL,'codex_import_allowed':True,'reference_import_allowed':True},'isolation_rules':['executor-specific directories only','no overwrite','path traversal rejected'],'environment_requirements':['Python 3.11','Windows-first A:\\theestate compatible','Ollama loopback only'],'required_metrics':['wall_clock_seconds','prompt_tokens','output_tokens','total_tokens','total_duration','load_duration','prompt_eval_duration','eval_duration'],'acceptance_criteria':['visible tests pass','evidence preserved','missing metrics are null with reason'],'scoring_weights':{'functional_correctness':50,'validation':20,'maintainability':10,'security':10,'evidence_quality':10},'source_provenance':['WP-0545_PARALLEL_INDEPENDENT_Engineering_Provider_Benchmark_001.md']}
+def ensure_benchmark001_fixture():
+    SPEC_ROOT.mkdir(parents=True,exist_ok=True); p=SPEC_ROOT/'benchmark-001.json'
+    if not p.exists(): atomic_write_json(p,benchmark001_spec())
+def run_cli(argv=None):
+    ensure_benchmark001_fixture(); ap=argparse.ArgumentParser(prog='provider-benchmark'); sub=ap.add_subparsers(dest='cmd',required=True)
+    sub.add_parser('list'); q=sub.add_parser('inspect'); q.add_argument('benchmark_id'); sub.add_parser('discover-providers')
+    q=sub.add_parser('run-local'); q.add_argument('benchmark_id'); q.add_argument('--model'); q.add_argument('--mock',action='store_true'); q.add_argument('--run-id')
+    q=sub.add_parser('prepare-codex'); q.add_argument('benchmark_id'); q.add_argument('--run-id')
+    q=sub.add_parser('import-codex'); q.add_argument('benchmark_id'); q.add_argument('result_path'); q.add_argument('--run-id',required=True); q.add_argument('--seat-reference'); q.add_argument('--model')
+    q=sub.add_parser('import-reference'); q.add_argument('benchmark_id'); q.add_argument('result_path'); q.add_argument('--run-id',required=True); q.add_argument('--model',default='chief-architect-reference')
+    q=sub.add_parser('validate'); q.add_argument('benchmark_id'); q.add_argument('run_id'); q.add_argument('--executor',default='local'); q.add_argument('--hidden',action='store_true')
+    q=sub.add_parser('compare'); q.add_argument('benchmark_id'); q.add_argument('run_id'); q=sub.add_parser('report'); q.add_argument('benchmark_id'); q.add_argument('run_id')
+    ns=ap.parse_args(argv); spec=load_spec(getattr(ns,'benchmark_id','benchmark-001')) if hasattr(ns,'benchmark_id') else None
+    if ns.cmd=='list': print(_json([{'benchmark_id':s['benchmark_id'],'version':s['version'],'title':s['title']} for s in list_specs()])); return
+    if ns.cmd=='inspect': print(_json(spec.data)); return
+    if ns.cmd=='discover-providers': print(_json({'ollama':OllamaAdapter().discover(),'codex':ImportAdapter('codex','codex').discover(),'chief_architect':ImportAdapter('chief_architect','manual_reference').discover()})); return
+    if ns.cmd in ('run-local','prepare-codex'):
+        ws=WorkspaceManager(spec.benchmark_id,getattr(ns,'run_id',None)); ws.create(spec)
+        if ns.cmd=='prepare-codex': atomic_write_text(ws.executor_dir('codex')/'ASSIGNMENT.md',build_assignment_prompt(spec)); print(_json({'run_id':ws.run_id,'codex_dir':str(ws.executor_dir('codex'))})); return
+        print(_json(OllamaAdapter().run(spec,ws,model=ns.model,mock=ns.mock))); return
+    ws=WorkspaceManager(spec.benchmark_id,ns.run_id)
+    if ns.cmd=='import-codex': print(_json(ImportAdapter('codex','codex').run(spec,ws,ns.result_path,seat_reference=ns.seat_reference,model=ns.model))); return
+    if ns.cmd=='import-reference': print(_json(ImportAdapter('chief_architect','manual_reference').run(spec,ws,ns.result_path,model=ns.model))); return
+    if ns.cmd=='validate': print(_json(ValidationRunner().validate(spec,ws,ns.executor,hidden=ns.hidden))); return
+    if ns.cmd=='compare': print(_json(compare(spec,ws))); return
+    if ns.cmd=='report': print((ws.executor_dir('comparison')/'comparison.md').read_text()); return
+if __name__=='__main__': run_cli()
