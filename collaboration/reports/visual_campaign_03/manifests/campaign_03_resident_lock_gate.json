@@ -1,0 +1,16 @@
+{
+  "campaign": "Visual Estate Initiative Campaign 03",
+  "gate": "Campaign 04 blocked until every resident has a Steward-approved canonical physical lock",
+  "generated_at": "2026-07-13T00:00:00Z",
+  "residents": [
+    {"resident_id":"alfred","lock_record":"collaboration/reports/visual_campaign_03/locks/alfred_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"eleanor","lock_record":"collaboration/reports/visual_campaign_03/locks/eleanor_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"evelyn","lock_record":"collaboration/reports/visual_campaign_03/locks/evelyn_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"grace","lock_record":"collaboration/reports/visual_campaign_03/locks/grace_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"helen","lock_record":"collaboration/reports/visual_campaign_03/locks/helen_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"ingrid","lock_record":"collaboration/reports/visual_campaign_03/locks/ingrid_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"judy","lock_record":"collaboration/reports/visual_campaign_03/locks/judy_physical_lock_record.md","steward_approval_status":"pending"},
+    {"resident_id":"marie","lock_record":"collaboration/reports/visual_campaign_03/locks/marie_physical_lock_record.md","steward_approval_status":"pending"}
+  ],
+  "campaign_04_status": "blocked"
+}
