@@ -427,6 +427,148 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "wardrobe_activity_library": [
+      {
+        "work_package": "WP-4148",
+        "wardrobe_id": "c05-evelyn-business-v1",
+        "title": "Business wardrobe library",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-business-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4149",
+        "wardrobe_id": "c05-evelyn-business_casual-v1",
+        "title": "Business-casual wardrobe library",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-business_casual-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4150",
+        "wardrobe_id": "c05-evelyn-formal_cocktail-v1",
+        "title": "Formal and cocktail wardrobe library",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-formal_cocktail-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4151",
+        "wardrobe_id": "c05-evelyn-casual_home-v1",
+        "title": "Casual and home wardrobe library",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-casual_home-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4152",
+        "wardrobe_id": "c05-evelyn-seasonal-v1",
+        "title": "Seasonal wardrobe library",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-seasonal-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4153",
+        "wardrobe_id": "c05-evelyn-fitness_movement-v1",
+        "title": "Fitness and movement wardrobe library",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-fitness_movement-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4154",
+        "wardrobe_id": "c05-evelyn-dance_performance-v1",
+        "title": "Dance and performance imagery",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-dance_performance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4155",
+        "wardrobe_id": "c05-evelyn-swimwear_adult_controls-v1",
+        "title": "Swimwear imagery and adult presentation controls",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-swimwear_adult_controls-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4156",
+        "wardrobe_id": "c05-evelyn-signature_accessory_lock-v1",
+        "title": "Signature outfit and accessory lock",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-signature_accessory_lock-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4157",
+        "wardrobe_id": "c05-evelyn-wardrobe_fit_validation-v1",
+        "title": "Wardrobe consistency and fit validation",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-wardrobe_fit_validation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -525,6 +667,96 @@
         "campaign": "Campaign 04",
         "work_package": "WP-4147",
         "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-business-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-business-v1.json",
+        "hash": "sha256:73b06a313da8e13f1e0c0d4aff6c762a4293506f7683444450adf87601a1b8d2",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4148",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-business_casual-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-business_casual-v1.json",
+        "hash": "sha256:f0699191e3727ef1442a4a79cc44af2150cc8823e00173eca5df40e60215efd0",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4149",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-formal_cocktail-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-formal_cocktail-v1.json",
+        "hash": "sha256:8d3a4e83d17cca02ef51666dec38cb01034374d2bcb844410930520b819009d2",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4150",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-casual_home-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-casual_home-v1.json",
+        "hash": "sha256:9c9371d401ba14666138db59bd1085deb187cc12a12c76a9987641acb9bab6b5",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4151",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-seasonal-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-seasonal-v1.json",
+        "hash": "sha256:82f84036b797ef95b04421826a7fef4c4c25b54c2f3ea6975981c002ea108a72",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4152",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-fitness_movement-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-fitness_movement-v1.json",
+        "hash": "sha256:477d8e3bcc30e90121cedc8c93feefbd120072f2d6f72c3b107591c33519cb9c",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4153",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-dance_performance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-dance_performance-v1.json",
+        "hash": "sha256:3373ea80781e91247b19f227601494ce813e82629cf2b7b18a3b4c1d6a7c1f03",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4154",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-swimwear_adult_controls-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-swimwear_adult_controls-v1.json",
+        "hash": "sha256:d787f4acec53b582807c3331d441c9ead96f78b1bbd6306ed9e89db75f584d54",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4155",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-signature_accessory_lock-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-signature_accessory_lock-v1.json",
+        "hash": "sha256:79d4de73307759baff0ee6cd814fa74047c17835f714c7088b68f59a4a95725e",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4156",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-evelyn-wardrobe_fit_validation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c05-evelyn-wardrobe_fit_validation-v1.json",
+        "hash": "sha256:5239e2c6be9b01a8db2e828a27a4df29513555a821215194bb9a7814eaa5c9e6",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4157",
+        "asset_type": "wardrobe_activity_manifest"
       }
     ],
     "rejected": [],

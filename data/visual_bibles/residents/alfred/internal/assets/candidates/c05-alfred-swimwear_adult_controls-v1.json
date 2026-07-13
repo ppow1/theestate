@@ -1,0 +1,46 @@
+{
+  "schema_version": "wardrobe_activity_manifest.v1",
+  "campaign": "Campaign 05",
+  "work_package": "WP-4155",
+  "wardrobe_id": "c05-alfred-swimwear_adult_controls-v1",
+  "title": "Swimwear imagery and adult presentation controls",
+  "resident_id": "RES-000001",
+  "display_name": "Alfred",
+  "asset_status": "approved_manifest_placeholder",
+  "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+  "category": "swimwear_adult_controls",
+  "wardrobe_profile": {
+    "resident_style_language": "precise executive service tailoring, dark neutrals, immaculate fit",
+    "fit_rules": [
+      "preserve canonical body proportions; do not use clothing to alter height, build, or age presentation",
+      "ensure garment scale remains resident-specific across full-body and group scenes",
+      "keep public/internal/restricted/private context boundaries explicit"
+    ],
+    "continuity_controls": [
+      "stable face, posture, silhouette, camera scale, lighting, and footwear metadata across variants",
+      "do not promote generated imagery to canonical without Steward approval"
+    ]
+  },
+  "prompt_contract": {
+    "positive": [
+      "Alfred wearing resident-specific swimwear imagery and adult presentation controls",
+      "precise executive service tailoring, dark neutrals, immaculate fit",
+      "identity-stable adult presentation",
+      "fit and fabric behavior consistent with Visual Bible"
+    ],
+    "negative": [
+      "generic fashion archetype",
+      "age drift",
+      "body-proportion drift",
+      "non-consensual exposure",
+      "wardrobe malfunction",
+      "cross-resident wardrobe borrowing"
+    ]
+  },
+  "review_requirements": [
+    "identity remains recognizable without caption",
+    "wardrobe context matches work package",
+    "access tier and adult presentation controls are respected",
+    "fit validation passes before canonical lock"
+  ]
+}

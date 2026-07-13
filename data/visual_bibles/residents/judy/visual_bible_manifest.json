@@ -176,6 +176,148 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "wardrobe_activity_library": [
+      {
+        "work_package": "WP-4148",
+        "wardrobe_id": "c05-judy-business-v1",
+        "title": "Business wardrobe library",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-business-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4149",
+        "wardrobe_id": "c05-judy-business_casual-v1",
+        "title": "Business-casual wardrobe library",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-business_casual-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4150",
+        "wardrobe_id": "c05-judy-formal_cocktail-v1",
+        "title": "Formal and cocktail wardrobe library",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-formal_cocktail-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4151",
+        "wardrobe_id": "c05-judy-casual_home-v1",
+        "title": "Casual and home wardrobe library",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-casual_home-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4152",
+        "wardrobe_id": "c05-judy-seasonal-v1",
+        "title": "Seasonal wardrobe library",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-seasonal-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4153",
+        "wardrobe_id": "c05-judy-fitness_movement-v1",
+        "title": "Fitness and movement wardrobe library",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-fitness_movement-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4154",
+        "wardrobe_id": "c05-judy-dance_performance-v1",
+        "title": "Dance and performance imagery",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-dance_performance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4155",
+        "wardrobe_id": "c05-judy-swimwear_adult_controls-v1",
+        "title": "Swimwear imagery and adult presentation controls",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-swimwear_adult_controls-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4156",
+        "wardrobe_id": "c05-judy-signature_accessory_lock-v1",
+        "title": "Signature outfit and accessory lock",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-signature_accessory_lock-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4157",
+        "wardrobe_id": "c05-judy-wardrobe_fit_validation-v1",
+        "title": "Wardrobe consistency and fit validation",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-wardrobe_fit_validation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -270,6 +412,96 @@
         "campaign": "Campaign 04",
         "work_package": "WP-4147",
         "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c05-judy-business-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-business-v1.json",
+        "hash": "sha256:3efbada1c00fc55e40179c244c107fa5c7e4d798d56b6c72a1641549efbc8e4b",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4148",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-business_casual-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-business_casual-v1.json",
+        "hash": "sha256:185a67d553ae087c777d08fe028195a28831d279bd6a6707ba14020e905cda59",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4149",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-formal_cocktail-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-formal_cocktail-v1.json",
+        "hash": "sha256:cdd992aede0cf7ce97fc992d999011fdd343411fb6ef7628b97168b27128c3d9",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4150",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-casual_home-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-casual_home-v1.json",
+        "hash": "sha256:a52a73dc58f2225054a14870820bc06391045d7630df45c13df5d8abf27e1148",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4151",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-seasonal-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-seasonal-v1.json",
+        "hash": "sha256:e1e497dac1d2de4daf96371d821c1232a107da31f5952013bcbb1c0a432f2be0",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4152",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-fitness_movement-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-fitness_movement-v1.json",
+        "hash": "sha256:550fb3c0095eaa59f9c27f55aa238fe5b72e5a0133807499181723139525fdca",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4153",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-dance_performance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-dance_performance-v1.json",
+        "hash": "sha256:08bb88c5f11cbf789c15ae40f97d7a0b0f73f16f0dd02ecdf14906a78468ff94",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4154",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-swimwear_adult_controls-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-swimwear_adult_controls-v1.json",
+        "hash": "sha256:607a53fb92531deb5d8fefb401ff4fcf9d34bc0e2b3b1819df4f3871fd7376b0",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4155",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-signature_accessory_lock-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-signature_accessory_lock-v1.json",
+        "hash": "sha256:020cc20b430cb90dbe9524b1eff040c29ffadddfd78e8901a2b67dbb19f9aaaa",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4156",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-judy-wardrobe_fit_validation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c05-judy-wardrobe_fit_validation-v1.json",
+        "hash": "sha256:3f5055f8770b583531bd796f08615ae2e43c3e3c7466fbc75e6318bb231a2507",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4157",
+        "asset_type": "wardrobe_activity_manifest"
       }
     ],
     "rejected": [],

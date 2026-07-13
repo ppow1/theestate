@@ -176,6 +176,148 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "wardrobe_activity_library": [
+      {
+        "work_package": "WP-4148",
+        "wardrobe_id": "c05-helen-business-v1",
+        "title": "Business wardrobe library",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-business-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4149",
+        "wardrobe_id": "c05-helen-business_casual-v1",
+        "title": "Business-casual wardrobe library",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-business_casual-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4150",
+        "wardrobe_id": "c05-helen-formal_cocktail-v1",
+        "title": "Formal and cocktail wardrobe library",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-formal_cocktail-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4151",
+        "wardrobe_id": "c05-helen-casual_home-v1",
+        "title": "Casual and home wardrobe library",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-casual_home-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4152",
+        "wardrobe_id": "c05-helen-seasonal-v1",
+        "title": "Seasonal wardrobe library",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-seasonal-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4153",
+        "wardrobe_id": "c05-helen-fitness_movement-v1",
+        "title": "Fitness and movement wardrobe library",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-fitness_movement-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4154",
+        "wardrobe_id": "c05-helen-dance_performance-v1",
+        "title": "Dance and performance imagery",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-dance_performance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4155",
+        "wardrobe_id": "c05-helen-swimwear_adult_controls-v1",
+        "title": "Swimwear imagery and adult presentation controls",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-swimwear_adult_controls-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4156",
+        "wardrobe_id": "c05-helen-signature_accessory_lock-v1",
+        "title": "Signature outfit and accessory lock",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-signature_accessory_lock-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4157",
+        "wardrobe_id": "c05-helen-wardrobe_fit_validation-v1",
+        "title": "Wardrobe consistency and fit validation",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-wardrobe_fit_validation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -270,6 +412,96 @@
         "campaign": "Campaign 04",
         "work_package": "WP-4147",
         "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c05-helen-business-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-business-v1.json",
+        "hash": "sha256:72f02a2bbce77cbb4759e54ef8b751abd7e35b66d6f4497aba4b98f96eab0216",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4148",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-business_casual-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-business_casual-v1.json",
+        "hash": "sha256:a68368ff27f5d3ee78f4807409c952d5eb8d19a7f3011ee912249525574b0154",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4149",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-formal_cocktail-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-formal_cocktail-v1.json",
+        "hash": "sha256:1d8c124b5bbd08cee7f2321a94b09c167ea055da9a474bb1f449d7bc00ac566d",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4150",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-casual_home-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-casual_home-v1.json",
+        "hash": "sha256:4e47f1506e7183a87bafafa2f7d93c9f08a22a8678222aca73e14e7c6467260f",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4151",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-seasonal-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-seasonal-v1.json",
+        "hash": "sha256:13604e01dc4cb4eb045773b004c5853ab12f7c3624755c8bd8ed10388e223176",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4152",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-fitness_movement-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-fitness_movement-v1.json",
+        "hash": "sha256:d2c17a555b97d4f36b93d9fc36aec02c199aee1cbc5ac6ec7a9ab752a4172073",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4153",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-dance_performance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-dance_performance-v1.json",
+        "hash": "sha256:bbbf6059f28ae361f44cb54c6483415e8d65a4c3f1b7e94a1e52e453720d688d",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4154",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-swimwear_adult_controls-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-swimwear_adult_controls-v1.json",
+        "hash": "sha256:dc894d13651d016c4a6b4fd80fb68c7ddf67f317745ef8a9353b3e8e8d50a5f1",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4155",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-signature_accessory_lock-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-signature_accessory_lock-v1.json",
+        "hash": "sha256:124b1dd641d0ee752124d93f7d989e17ed2c46c9472bcdc9a6c0de93d337c5f4",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4156",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-helen-wardrobe_fit_validation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c05-helen-wardrobe_fit_validation-v1.json",
+        "hash": "sha256:0334d13ca32a4233a197bdaea35f228caf0879c41d1fea819032a65701f2f78b",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4157",
+        "asset_type": "wardrobe_activity_manifest"
       }
     ],
     "rejected": [],

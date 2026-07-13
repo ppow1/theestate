@@ -1,0 +1,46 @@
+{
+  "schema_version": "wardrobe_activity_manifest.v1",
+  "campaign": "Campaign 05",
+  "work_package": "WP-4148",
+  "wardrobe_id": "c05-marie-business-v1",
+  "title": "Business wardrobe library",
+  "resident_id": "RES-000005",
+  "display_name": "Marie",
+  "asset_status": "approved_manifest_placeholder",
+  "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+  "category": "business",
+  "wardrobe_profile": {
+    "resident_style_language": "archive-registrar practicality, neat layers, organized details",
+    "fit_rules": [
+      "preserve canonical body proportions; do not use clothing to alter height, build, or age presentation",
+      "ensure garment scale remains resident-specific across full-body and group scenes",
+      "keep public/internal/restricted/private context boundaries explicit"
+    ],
+    "continuity_controls": [
+      "stable face, posture, silhouette, camera scale, lighting, and footwear metadata across variants",
+      "do not promote generated imagery to canonical without Steward approval"
+    ]
+  },
+  "prompt_contract": {
+    "positive": [
+      "Marie wearing resident-specific business wardrobe library",
+      "archive-registrar practicality, neat layers, organized details",
+      "identity-stable adult presentation",
+      "fit and fabric behavior consistent with Visual Bible"
+    ],
+    "negative": [
+      "generic fashion archetype",
+      "age drift",
+      "body-proportion drift",
+      "non-consensual exposure",
+      "wardrobe malfunction",
+      "cross-resident wardrobe borrowing"
+    ]
+  },
+  "review_requirements": [
+    "identity remains recognizable without caption",
+    "wardrobe context matches work package",
+    "access tier and adult presentation controls are respected",
+    "fit validation passes before canonical lock"
+  ]
+}
