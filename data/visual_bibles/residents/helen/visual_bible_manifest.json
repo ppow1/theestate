@@ -480,7 +480,24 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
-    ]
+    ],
+    "avatar_icon_family": {
+      "campaign": "Campaign 08",
+      "work_packages": [
+        "WP-4178",
+        "WP-4179",
+        "WP-4180",
+        "WP-4181",
+        "WP-4182",
+        "WP-4183",
+        "WP-4184",
+        "WP-4185",
+        "WP-4186",
+        "WP-4187"
+      ],
+      "status": "complete_manifest_controls_pending_raster_generation",
+      "registry_path": "data/visuals/avatar_registry.json"
+    }
   },
   "asset_library": {
     "canonical": [],
@@ -754,6 +771,15 @@
         "campaign": "Campaign 06",
         "work_package": "WP-4167",
         "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c08-helen-avatar-family-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c08-helen-avatar-family-v1.json",
+        "hash": "sha256:ca9c6f7ac3d4c68cf51a9a7ca61f5105d51d16e10a7f3ce71b33d05f33a5a45e",
+        "campaign": "Campaign 08",
+        "work_package": "WP-4178-WP-4187",
+        "asset_type": "avatar_icon_family_manifest"
       }
     ],
     "rejected": [],

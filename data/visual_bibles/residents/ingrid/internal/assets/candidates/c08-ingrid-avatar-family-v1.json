@@ -1,0 +1,101 @@
+{
+  "schema_version": "resident_avatar_family.v1",
+  "campaign": "Campaign 08 - Iconography and UI Assets",
+  "work_packages": [
+    "WP-4178",
+    "WP-4179",
+    "WP-4180",
+    "WP-4181",
+    "WP-4182",
+    "WP-4183",
+    "WP-4184",
+    "WP-4185",
+    "WP-4186",
+    "WP-4187"
+  ],
+  "resident_id": "RES-000002",
+  "display_name": "Ingrid",
+  "asset_id": "c08-ingrid-avatar-family-v1",
+  "review_state": "provisionally_approved_manifest_pending_raster_generation",
+  "source_identity": "data/visuals/resident_visual_identities.json",
+  "canonical_traits": [
+    "reserved elegant boundary guardian",
+    "dark tailored attire",
+    "privacy-aware gaze"
+  ],
+  "identity_anchors": [
+    "Security and Boundary office",
+    "calm protective posture"
+  ],
+  "negative_prompts": [
+    "spy caricature",
+    "aggressive tactical gear",
+    "exposed private material"
+  ],
+  "master_crop_standard": "centered head-and-shoulders crop with eyes on upper third; face occupies 62-70 percent of 256px canvas",
+  "production_matrix": {
+    "pixel_sizes": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "shapes": [
+      "circle",
+      "square"
+    ],
+    "theme_variants": [
+      "light",
+      "dark",
+      "transparent"
+    ],
+    "compact_presence": [
+      "notification_24",
+      "presence_16",
+      "presence_20"
+    ],
+    "asset_paths": {
+      "32_circle_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/32/circle_light.png",
+      "32_circle_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/32/circle_dark.png",
+      "32_circle_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/32/circle_transparent.png",
+      "32_square_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/32/square_light.png",
+      "32_square_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/32/square_dark.png",
+      "32_square_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/32/square_transparent.png",
+      "64_circle_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/64/circle_light.png",
+      "64_circle_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/64/circle_dark.png",
+      "64_circle_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/64/circle_transparent.png",
+      "64_square_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/64/square_light.png",
+      "64_square_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/64/square_dark.png",
+      "64_square_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/64/square_transparent.png",
+      "128_circle_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/128/circle_light.png",
+      "128_circle_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/128/circle_dark.png",
+      "128_circle_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/128/circle_transparent.png",
+      "128_square_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/128/square_light.png",
+      "128_square_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/128/square_dark.png",
+      "128_square_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/128/square_transparent.png",
+      "256_circle_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/256/circle_light.png",
+      "256_circle_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/256/circle_dark.png",
+      "256_circle_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/256/circle_transparent.png",
+      "256_square_light": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/256/square_light.png",
+      "256_square_dark": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/256/square_dark.png",
+      "256_square_transparent": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/256/square_transparent.png",
+      "notification_24": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/compact/notification_24.png",
+      "presence_16": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/compact/presence_16.png",
+      "presence_20": "data/visual_bibles/residents/ingrid/internal/assets/icons/c08-ingrid-avatar-family-v1/compact/presence_20.png"
+    }
+  },
+  "prompt": "Canonical UI avatar icon family for Ingrid: head-and-shoulders portrait crop, instantly readable at 32/64/128/256px and compact presence sizes; preserve reserved elegant boundary guardian, dark tailored attire, privacy-aware gaze; use clean Estate UI lighting, accurate adult proportions, non-caricature realism, and consistent face geometry across square, circular, transparent, dark-mode, and light-mode variants.",
+  "validation": {
+    "wp_4178_master_crop": "pass_manifest_standard_defined",
+    "wp_4179_32px": "pass_readability_controls",
+    "wp_4180_64px": "pass_readability_controls",
+    "wp_4181_128px": "pass_readability_controls",
+    "wp_4182_256px": "pass_readability_controls",
+    "wp_4183_circle_square": "pass_variant_paths_declared",
+    "wp_4184_transparent": "pass_variant_paths_declared",
+    "wp_4185_dark_light": "pass_contrast_controls_declared",
+    "wp_4186_notification_compact": "pass_compact_paths_declared",
+    "wp_4187_recognizability_contrast": "pass_manifest_validation_pending_raster_review",
+    "notes": "Repository validation confirms required slots and controls; generated raster readability must be re-checked after asset creation."
+  }
+}

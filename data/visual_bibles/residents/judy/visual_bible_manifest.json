@@ -480,7 +480,24 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
-    ]
+    ],
+    "avatar_icon_family": {
+      "campaign": "Campaign 08",
+      "work_packages": [
+        "WP-4178",
+        "WP-4179",
+        "WP-4180",
+        "WP-4181",
+        "WP-4182",
+        "WP-4183",
+        "WP-4184",
+        "WP-4185",
+        "WP-4186",
+        "WP-4187"
+      ],
+      "status": "complete_manifest_controls_pending_raster_generation",
+      "registry_path": "data/visuals/avatar_registry.json"
+    }
   },
   "asset_library": {
     "canonical": [],
@@ -754,6 +771,15 @@
         "campaign": "Campaign 06",
         "work_package": "WP-4167",
         "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c08-judy-avatar-family-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c08-judy-avatar-family-v1.json",
+        "hash": "sha256:a8f497d7e7c9515927c51a33d8c7d5cf0eda4858e582822098b8260f6d3359ed",
+        "campaign": "Campaign 08",
+        "work_package": "WP-4178-WP-4187",
+        "asset_type": "avatar_icon_family_manifest"
       }
     ],
     "rejected": [],
