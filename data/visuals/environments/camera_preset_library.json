@@ -1,0 +1,111 @@
+{
+  "schema_version": "estate_camera_preset_library.v1",
+  "campaign": "Campaign 06",
+  "status": "complete",
+  "proportion_policy": "All presets are environment/camera instructions only; they must not stretch, shrink, stylize, or otherwise modify canonical resident proportions from Campaign 03.",
+  "presets": [
+    {
+      "preset_id": "c06-camera-office-35mm-eye",
+      "name": "Office eye-level three-quarter",
+      "default_focal_length": "35mm",
+      "use_cases": [
+        "WP-4158"
+      ],
+      "scale_controls": [
+        "eye-level framing",
+        "no body-scale distortion"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-hallway-28mm-leading",
+      "name": "Hallway leading-line transition",
+      "default_focal_length": "28mm",
+      "use_cases": [
+        "WP-4159"
+      ],
+      "scale_controls": [
+        "keep verticals corrected",
+        "avoid wide-angle resident distortion"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-archive-50mm-table",
+      "name": "Archive table consultation",
+      "default_focal_length": "50mm",
+      "use_cases": [
+        "WP-4160"
+      ],
+      "scale_controls": [
+        "table height anchors seated posture"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-conference-35mm-wide",
+      "name": "Conference strategy wide",
+      "default_focal_length": "35mm",
+      "use_cases": [
+        "WP-4161"
+      ],
+      "scale_controls": [
+        "consistent chair/table proportions"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-cafe-50mm-candid",
+      "name": "Cafe candid medium",
+      "default_focal_length": "50mm",
+      "use_cases": [
+        "WP-4162"
+      ],
+      "scale_controls": [
+        "natural standing/seated height relationships"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-garden-70mm-compressed",
+      "name": "Garden portrait compression",
+      "default_focal_length": "70mm",
+      "use_cases": [
+        "WP-4163"
+      ],
+      "scale_controls": [
+        "compressed background; no resident resizing"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-hospitality-35mm-warm",
+      "name": "Hospitality warm room view",
+      "default_focal_length": "35mm",
+      "use_cases": [
+        "WP-4164"
+      ],
+      "scale_controls": [
+        "sofa/chair dimensions anchor scale"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-workshop-40mm-process",
+      "name": "Workshop process view",
+      "default_focal_length": "40mm",
+      "use_cases": [
+        "WP-4165"
+      ],
+      "scale_controls": [
+        "bench/tool heights anchor scale"
+      ]
+    },
+    {
+      "preset_id": "c06-camera-continuity-check",
+      "name": "Scale and lighting continuity check",
+      "default_focal_length": "50mm",
+      "use_cases": [
+        "WP-4166",
+        "WP-4167"
+      ],
+      "scale_controls": [
+        "compare against Campaign 03 physical locks",
+        "flag proportion drift before approval"
+      ]
+    }
+  ]
+}

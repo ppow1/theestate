@@ -318,6 +318,168 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "environment_spatial_presence_library": [
+      {
+        "work_package": "WP-4158",
+        "environment_id": "c06-eleanor-resident_office_environment-v1",
+        "registry_environment_id": "c06-resident_office_environment-v1",
+        "title": "Resident office environment integration",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-resident_office_environment-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "primary",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4159",
+        "environment_id": "c06-eleanor-estate_hallway_transition-v1",
+        "registry_environment_id": "c06-estate_hallway_transition-v1",
+        "title": "Estate hallway and transition imagery",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-estate_hallway_transition-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4160",
+        "environment_id": "c06-eleanor-library_archive-v1",
+        "registry_environment_id": "c06-library_archive-v1",
+        "title": "Library and archive environments",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-library_archive-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4161",
+        "environment_id": "c06-eleanor-conference_strategy-v1",
+        "registry_environment_id": "c06-conference_strategy-v1",
+        "title": "Conference and strategy environments",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-conference_strategy-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "contextual_reference",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4162",
+        "environment_id": "c06-eleanor-cafe_kitchen_gathering-v1",
+        "registry_environment_id": "c06-cafe_kitchen_gathering-v1",
+        "title": "Cafe, kitchen, and informal gathering environments",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-cafe_kitchen_gathering-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4163",
+        "environment_id": "c06-eleanor-garden_exterior_grounds-v1",
+        "registry_environment_id": "c06-garden_exterior_grounds-v1",
+        "title": "Garden and exterior Estate grounds",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-garden_exterior_grounds-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4164",
+        "environment_id": "c06-eleanor-living_hospitality-v1",
+        "registry_environment_id": "c06-living_hospitality-v1",
+        "title": "Living and hospitality spaces",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-living_hospitality-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4165",
+        "environment_id": "c06-eleanor-workshop_project-v1",
+        "registry_environment_id": "c06-workshop_project-v1",
+        "title": "Workshop and project spaces",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-workshop_project-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "contextual_reference",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4166",
+        "environment_id": "c06-eleanor-scale_lighting_continuity-v1",
+        "registry_environment_id": "c06-scale_lighting_continuity-v1",
+        "title": "Scale, lighting, and environmental continuity",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-scale_lighting_continuity-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4167",
+        "environment_id": "c06-eleanor-environment_gallery_acceptance-v1",
+        "registry_environment_id": "c06-environment_gallery_acceptance-v1",
+        "title": "Environment gallery and acceptance review",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-environment_gallery_acceptance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -502,6 +664,96 @@
         "campaign": "Campaign 05",
         "work_package": "WP-4157",
         "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-resident_office_environment-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-resident_office_environment-v1.json",
+        "hash": "sha256:7bdb4f191de9c0f35dc810cf89f1655ad70c1c599602f300394312e4879b6f78",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4158",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-estate_hallway_transition-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-estate_hallway_transition-v1.json",
+        "hash": "sha256:59e5a47344937a4e335a99c4eb6857ab1e3a82c208b3cfd4495ff606b3ae78db",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4159",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-library_archive-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-library_archive-v1.json",
+        "hash": "sha256:1a2355a13eb8289e5467df282c75a9bf755e42911e780f58fdc7fe8dec7dc219",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4160",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-conference_strategy-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-conference_strategy-v1.json",
+        "hash": "sha256:e7ed8e8a7f071ae88dd4754605cb704c2bd89ca749437646e5e0659ae58e27d8",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4161",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-cafe_kitchen_gathering-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-cafe_kitchen_gathering-v1.json",
+        "hash": "sha256:d0777a2353f8b13194e80865ce5b325d0a14e93eb8243cba82ff275f5e1293b5",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4162",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-garden_exterior_grounds-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-garden_exterior_grounds-v1.json",
+        "hash": "sha256:1d3741fa2bc52fc08b9edef222ab24d980251c7e426c191196d523f265838aac",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4163",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-living_hospitality-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-living_hospitality-v1.json",
+        "hash": "sha256:a19acb947085ee30b42cdafa464c1b5f8b3f998de8c7712952ee3fae587abca6",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4164",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-workshop_project-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-workshop_project-v1.json",
+        "hash": "sha256:6dea304870c07d68c4678a42e8c452c88fba22daac5e6a8e2f1899fa42502e62",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4165",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-scale_lighting_continuity-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-scale_lighting_continuity-v1.json",
+        "hash": "sha256:841da6c4245222ea78db9f52bf0fc27c3f771b4b60f4a926c062be1085c4907b",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4166",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-eleanor-environment_gallery_acceptance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c06-eleanor-environment_gallery_acceptance-v1.json",
+        "hash": "sha256:97fafbc4195a80cadd8c860d785056d6dd54d38041c7ad42e5f8d3ee1feb877b",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4167",
+        "asset_type": "environment_spatial_presence_manifest"
       }
     ],
     "rejected": [],
