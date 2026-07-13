@@ -1,0 +1,242 @@
+{
+  "schema_version": "canonical_visual_registry.v1",
+  "version": "1.0",
+  "published_at": "2026-07-13T00:00:00Z",
+  "work_packages": [
+    "WP-4198",
+    "WP-4199",
+    "WP-4200",
+    "WP-4201",
+    "WP-4202",
+    "WP-4203",
+    "WP-4204",
+    "WP-4205",
+    "WP-4206",
+    "WP-4207"
+  ],
+  "publication_status": "published",
+  "canonical_lock": "Version 1.0 Canonical Visual Lock issued for manifest-controlled canonical visual registry; raster assets remain subject to Steward approval before promotion.",
+  "commissioned_resident_count": 8,
+  "residents": [
+    {
+      "resident_id": "RES-000001",
+      "display_name": "Alfred",
+      "visual_bible_manifest": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+      "manifest_sha256": "431afed25eeb645e3fab03c6b8bef57187240462b5b23f43eb6ff9b8a637a869",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    },
+    {
+      "resident_id": "RES-000004",
+      "display_name": "Eleanor",
+      "visual_bible_manifest": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+      "manifest_sha256": "fcf289a9fdbb3c4d7f0ed454503c95138e6747c2691757d616d34f499d974f6d",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    },
+    {
+      "resident_id": "RES-EVELYN",
+      "display_name": "Evelyn",
+      "visual_bible_manifest": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+      "manifest_sha256": "6eff0292dd678ef468147069f38d2eede0c7c20852200b54c35bb06ab3e2c676",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Restricted index only"
+    },
+    {
+      "resident_id": "grace",
+      "display_name": "Grace",
+      "visual_bible_manifest": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+      "manifest_sha256": "0e2cfa75a518f402be815b94a2b94ad329b003e10a68ee8d80720da0d9b99a4d",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    },
+    {
+      "resident_id": "RES-000003",
+      "display_name": "Helen",
+      "visual_bible_manifest": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+      "manifest_sha256": "f5f17b0991e20429cc245859e9be51477586730d910badd71960ff02d1caf502",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    },
+    {
+      "resident_id": "RES-000002",
+      "display_name": "Ingrid",
+      "visual_bible_manifest": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json",
+      "manifest_sha256": "e44a43f6c503584985ebb2bdbb0d38312e766be36cce35c134dfd010dbd452f1",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    },
+    {
+      "resident_id": "RES-000006",
+      "display_name": "Judy",
+      "visual_bible_manifest": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+      "manifest_sha256": "5cf8fed9e49b07bd38d795073bfabb25c27aabac05abc4b09dff02b26f59c0a7",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    },
+    {
+      "resident_id": "RES-000005",
+      "display_name": "Marie",
+      "visual_bible_manifest": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+      "manifest_sha256": "f497efef8cd3c8e030cadba3b28af2a2b9d401bc8e128e8fe92f82b7d04b96ab",
+      "visibility_layers": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ],
+      "canonical_lock_status": "locked_v1_manifest_controls",
+      "asset_library_status": "manifest_placeholder",
+      "physical_specification_status": "provisional",
+      "publication_scope": "Estate Internal"
+    }
+  ],
+  "source_registries": [
+    "data/visuals/avatar_registry.json",
+    "data/visuals/ensemble_registry.json",
+    "data/visuals/living_gallery.json",
+    "data/visuals/resident_visual_identities.json",
+    "data/visuals/resident_portraits.json",
+    "data/visuals/visual_continuity.json"
+  ],
+  "acceptance_criteria": [
+    {
+      "criterion": "Every commissioned resident has a Visual Bible manifest and linked image-library controls.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Canonical hero/profile/full-body/360 requirements are represented as governed manifest slots or restricted indexes.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Measurement/proportion decisions are recorded with no raster promotion beyond manifest-control readiness.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Avatar/icon recognizability controls exist for supported interface sizes.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Group-scene identity, relative height, posture, and role-presence controls exist.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Caption-hidden recognition is recorded as a manifest-control validation gate.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Prompt and negative-prompt/provenance controls are captured where generation is permitted.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Rejected/deferred variants remain archival/provenance records rather than silent replacements.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Evelyn private-mode hooks are separately indexed and restricted.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "The final canonical-lock report distinguishes approved, restricted, provisional, and deferred scope.",
+      "status": "satisfied"
+    }
+  ],
+  "quality_gates": {
+    "WP-4198": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4199": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4200": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4201": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4202": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4203": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4204": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4205": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4206": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4207": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    }
+  }
+}
