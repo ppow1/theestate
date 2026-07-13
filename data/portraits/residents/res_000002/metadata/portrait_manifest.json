@@ -1,0 +1,164 @@
+{
+  "schema_version": "resident_portrait_manifest_v1",
+  "campaign": "VISUAL-CAMPAIGN-02",
+  "resident_id": "RES-000002",
+  "display_name": "Ingrid",
+  "visual_bible_ref": null,
+  "status": "candidate_generation",
+  "adult_presentation_required": true,
+  "identity_anchors": [
+    "Security and Boundary office",
+    "calm protective posture"
+  ],
+  "canonical_traits": [
+    "reserved elegant boundary guardian",
+    "dark tailored attire",
+    "privacy-aware gaze"
+  ],
+  "unresolved_fields": [
+    "final photorealistic assets pending local generation",
+    "Steward visual acceptance pending"
+  ],
+  "portrait_slots": {
+    "hero": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "professional_office": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "full_body": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "profile_rear": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "three_quarter": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "expression_sheet": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "headshot": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    },
+    "thumbnail": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000002/candidates",
+        "canonical": "data/portraits/residents/res_000002/canonical",
+        "metadata": "data/portraits/residents/res_000002/metadata",
+        "reviews": "data/portraits/residents/res_000002/reviews"
+      }
+    }
+  },
+  "assets": [],
+  "canonical_locks": [],
+  "generation_queue": [
+    {
+      "slot": "hero",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "professional_office",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "full_body",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "profile_rear",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "three_quarter",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "expression_sheet",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "headshot",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "thumbnail",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    }
+  ]
+}

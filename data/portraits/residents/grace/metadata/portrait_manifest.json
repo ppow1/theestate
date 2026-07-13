@@ -1,0 +1,164 @@
+{
+  "schema_version": "resident_portrait_manifest_v1",
+  "campaign": "VISUAL-CAMPAIGN-02",
+  "resident_id": "grace",
+  "display_name": "Grace",
+  "visual_bible_ref": null,
+  "status": "candidate_generation",
+  "adult_presentation_required": true,
+  "identity_anchors": [
+    "Operations office",
+    "sequencing and checkpoint posture"
+  ],
+  "canonical_traits": [
+    "energetic operations director",
+    "crisp practical attire",
+    "decisive momentum"
+  ],
+  "unresolved_fields": [
+    "final photorealistic assets pending local generation",
+    "Steward visual acceptance pending"
+  ],
+  "portrait_slots": {
+    "hero": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "professional_office": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "full_body": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "profile_rear": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "three_quarter": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "expression_sheet": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "headshot": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    },
+    "thumbnail": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/grace/candidates",
+        "canonical": "data/portraits/residents/grace/canonical",
+        "metadata": "data/portraits/residents/grace/metadata",
+        "reviews": "data/portraits/residents/grace/reviews"
+      }
+    }
+  },
+  "assets": [],
+  "canonical_locks": [],
+  "generation_queue": [
+    {
+      "slot": "hero",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "professional_office",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "full_body",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "profile_rear",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "three_quarter",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "expression_sheet",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "headshot",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "thumbnail",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    }
+  ]
+}

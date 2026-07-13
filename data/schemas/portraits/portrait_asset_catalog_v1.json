@@ -1,0 +1,12 @@
+{
+  "$id": "estate.portraits.asset_catalog.v1",
+  "title": "Estate Portrait Asset Catalog v1",
+  "type": "object",
+  "required": ["schema_version", "residents", "estate_index", "validation_rules"],
+  "properties": {
+    "schema_version": {"const": "portrait_asset_catalog_v1"},
+    "residents": {"type": "array"},
+    "estate_index": {"type": "object"},
+    "validation_rules": {"type": "object"}
+  }
+}
