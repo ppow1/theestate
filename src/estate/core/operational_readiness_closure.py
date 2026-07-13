@@ -72,6 +72,13 @@ def _git_ahead_behind(repo:Path, left:str, right:str):
     parts=(r.get("stdout") or "0 0").split()
     return {"ahead":int(parts[0]) if parts and parts[0].isdigit() else 0,"behind":int(parts[1]) if len(parts)>1 and parts[1].isdigit() else 0,"command":r}
 
+def _policy_hash(payload:dict[str,Any]):
+    return hashlib.sha256(json.dumps(payload or {}, sort_keys=True).encode()).hexdigest()
+
+def _is_compile_only(recipe:list[list[str]]):
+    flat=" ".join(" ".join(cmd) for cmd in recipe if isinstance(cmd,list))
+    return "compileall" in flat and len(recipe or []) <= 1
+
 @dataclass
 class ReadinessCase:
     case_id: str; work_package_id: str; target_id: str; repository: str; base_branch: str; merge_commit: str
@@ -120,18 +127,66 @@ class OperationalReadinessClosureController:
 
     def create_or_resume(self, *, work_package_id:str, merge_commit:str, target_id="estate-main", repository="ppow1/theestate", base_branch="main", **kw):
         raw=f"{repository}|{target_id}|{work_package_id}|{merge_commit}"; cid="orc-"+hashlib.sha256(raw.encode()).hexdigest()[:16]
-        if self._case_path(cid).exists(): return ReadinessCase.from_dict(_read(self._case_path(cid)))
+        if self._case_path(cid).exists():
+            c=ReadinessCase.from_dict(_read(self._case_path(cid)))
+            return self.rehydrate_policy(c)
         t=self._target(target_id); md=t.metadata or {}
         c=ReadinessCase(cid,work_package_id,target_id,repository,base_branch,merge_commit,
-            state="assessment_required", validation_recipe=kw.get("validation_recipe") or md.get("validation_recipe") or [["python","-m","compileall","src/estate/core/operational_readiness_closure.py"]],
+            state="assessment_required", validation_recipe=md.get("validation_recipe") or kw.get("validation_recipe") or [["python","-m","compileall","src/estate/core/operational_readiness_closure.py"]],
             affected_files=kw.get("affected_files") or [], affected_subsystems=kw.get("affected_subsystems") or [],
-            allowed_remediations=kw.get("allowed_remediations") or md.get("allowed_remediations") or ["create_declared_runtime_directories","update_activation_ledger"],
-            activation_requirements=kw.get("activation_requirements") or md.get("activation_requirements") or {"ledger":True},
-            observation_policy=kw.get("observation_policy") or md.get("observation_policy") or {"checks_required":1},
+            allowed_remediations=md.get("allowed_remediations") or kw.get("allowed_remediations") or ["create_declared_runtime_directories","update_activation_ledger"],
+            activation_requirements=md.get("activation_requirements") or kw.get("activation_requirements") or {"ledger":True},
+            observation_policy=md.get("observation_policy") or kw.get("observation_policy") or {"checks_required":1},
             acceptance_authority=kw.get("acceptance_authority") or t.acceptance_authority)
         c.readiness_policy=md.get("readiness_policy") or {}
+        if c.readiness_policy:
+            c.readiness_policy.setdefault("policy_source", "runtime/operational_targets/registry.json:estate-main" if target_id=="estate-main" else "runtime/operational_targets/registry.json")
+            c.readiness_policy.setdefault("policy_hash", _policy_hash({k:v for k,v in c.readiness_policy.items() if k!="policy_hash"}))
         c.completion_receipt=kw.get("completion_receipt")
         self.record(c,"case_created",{"work_package_id":work_package_id,"merge_commit":merge_commit}); return self.save(c)
+    def rehydrate_policy(self,c:ReadinessCase):
+        """Reapply authoritative canonical target metadata to persisted cases."""
+        t=self._target(c.target_id); md=t.metadata or {}
+        changed={}
+        for attr, key in [("validation_recipe","validation_recipe"),("allowed_remediations","allowed_remediations"),("activation_requirements","activation_requirements"),("observation_policy","observation_policy")]:
+            val=md.get(key)
+            if val and getattr(c, attr) != val:
+                changed[attr]={"from":getattr(c, attr),"to":val}; setattr(c, attr, val)
+        if t.acceptance_authority and c.acceptance_authority != t.acceptance_authority:
+            changed["acceptance_authority"]={"from":c.acceptance_authority,"to":t.acceptance_authority}; c.acceptance_authority=t.acceptance_authority
+        policy=dict(md.get("readiness_policy") or {})
+        if policy:
+            policy.setdefault("policy_source", "runtime/operational_targets/registry.json:estate-main" if c.target_id=="estate-main" else "runtime/operational_targets/registry.json")
+            policy.setdefault("policy_hash", _policy_hash({k:v for k,v in policy.items() if k!="policy_hash"}))
+        if c.readiness_policy != policy:
+            changed["readiness_policy"]={"from":c.readiness_policy,"to":policy}; c.readiness_policy=policy
+        if changed:
+            self.record(c,"canonical_policy_rehydrated",changed); self.save(c)
+        return c
+
+    def _verdict_satisfies_current_policy(self,c:ReadinessCase):
+        blockers=self._policy_blockers(c)
+        pub=self._publication_status(c)
+        if pub.get("required") and (not pub.get("head_contained_upstream") or (pub.get("ahead_behind") or {}).get("ahead") or (pub.get("ahead_behind") or {}).get("behind")):
+            blockers.append({"class":"publication_required","blocker":"prior verdict lacks verified synchronized upstream publication"})
+        if c.latest_validation and c.latest_validation.get("status")!="passed": blockers.append({"class":"validation_required","blocker":"prior verdict lacks passing validation"})
+        if _is_compile_only(c.validation_recipe) and not c.readiness_policy.get("compile_only_sufficient"):
+            blockers.append({"class":"insufficient_production_validation_policy","blocker":"prior verdict used compile-only fallback"})
+        if c.observation.get("status")!="passed": blockers.append({"class":"observation_required","blocker":"prior verdict lacks passing observation"})
+        return blockers
+
+    def supersede_invalid_ready_verdict(self,c:ReadinessCase):
+        blockers=self._verdict_satisfies_current_policy(c)
+        if not blockers: return c
+        verdict_path=self.root/VERDICTS/f"{c.case_id}.json"
+        prior=_read(verdict_path,{}) if verdict_path.exists() else {}
+        superseded={"superseded_at":self.clock(),"case_id":c.case_id,"prior_verdict_path":_rel(self.root,verdict_path),"reason":"prior operationally_ready verdict does not satisfy current canonical production policy","blockers":blockers,"preserved_prior_verdict":prior}
+        rel=f"runtime/operational_readiness/evidence/{c.case_id}/superseded_verdict_{uuid.uuid4().hex[:8]}.json"; _write(self.root/rel,superseded)
+        if prior:
+            prior.update({"superseded":True,"superseded_at":superseded["superseded_at"],"superseded_reason":superseded["reason"],"supersession_evidence":rel})
+            _write(verdict_path,prior)
+        c.state="assessment_required"; c.blockers=blockers; self.record(c,"readiness_verdict_superseded",{"path":rel,"reason":superseded["reason"],"blockers":blockers}); return self.save(c)
+
     def record(self,c,kind,detail):
         rel=_rel(self.root,self._event_path(c.case_id)); _append_jsonl(self._event_path(c.case_id),{"at":self.clock(),"case_id":c.case_id,"kind":kind,"detail":detail});
         if rel not in c.evidence: c.evidence.append(rel)
@@ -352,10 +407,20 @@ class OperationalReadinessClosureController:
         self.record(c,"observation",c.observation); c.state="operationally_ready" if passed else "observation_in_progress"; return self.save(c)
     def write_verdict(self,c):
         payload={"readiness_case_id":c.case_id,"work_package_id":c.work_package_id,"repository":c.repository,"target_id":c.target_id,"merge_commit":c.merge_commit,"deployed_revision":(_git_ref(Path(self._target(c.target_id).local_path or self.root),"HEAD").get("stdout","").strip() if c.state=="operationally_ready" else None),"controller_mutation_commit":c.publication.get("pre_local_head") or next((r.get("result",{}).get("commit") for r in c.remediations_attempted if r.get("handler")=="update_activation_ledger"),None),"publication_required":bool((self._target(c.target_id).metadata or {}).get("publication_required") or (self._target(c.target_id).metadata or {}).get("publication",{}).get("required")),"publication_status":c.publication.get("status"),"upstream_branch":(c.publication.get("upstream")+"/"+c.publication.get("branch") if c.publication.get("upstream") else None),"verified_upstream_commit":c.publication.get("verified_upstream_head"),"local_upstream_ahead_behind":c.publication.get("post_ahead_behind"),"validation_policy":c.readiness_policy,"observation_policy":c.observation_policy,"activation_state":"verified" if c.state=="operationally_ready" else "not_verified","validation_status":(c.latest_validation or {}).get("status"),"validation_evidence":(c.latest_validation or {}).get("path"),"observation_status":c.observation.get("status"),"observation_evidence":c.evidence,"remediations_attempted":c.remediations_attempted,"unresolved_findings":c.blockers if c.state!="operationally_ready" else [],"final_state":c.state,"operationally_ready":c.state=="operationally_ready","institutional_acceptance_granted":False,"acceptance_authority":c.acceptance_authority,"generated_at":self.clock(),"evidence_root":f"runtime/operational_readiness/evidence/{c.case_id}"}
-        rel=VERDICTS/f"{c.case_id}.json"; _write(self.root/rel,payload); self.record(c,"verdict",{"path":_rel(self.root,self.root/rel),"state":c.state}); self.save(c); return payload
+        rel=VERDICTS/f"{c.case_id}.json"
+        prior=_read(self.root/rel,{}) if (self.root/rel).exists() else {}
+        if prior.get("superseded"):
+            payload["superseded_prior_verdict"]=prior
+        for k in ("superseded","superseded_at","superseded_reason","supersession_evidence"):
+            if k in prior: payload[k]=prior[k]
+        _write(self.root/rel,payload); self.record(c,"verdict",{"path":_rel(self.root,self.root/rel),"state":c.state}); self.save(c); return payload
     def process_one(self, case_id):
-        c=ReadinessCase.from_dict(_read(self._case_path(case_id),{}))
-        if c.paused or c.state in FINAL_STATES: return c.to_dict()
+        c=self.rehydrate_policy(ReadinessCase.from_dict(_read(self._case_path(case_id),{})))
+        if c.paused: return c.to_dict()
+        if c.state=="operationally_ready":
+            c=self.supersede_invalid_ready_verdict(c)
+            if c.state=="operationally_ready": return c.to_dict()
+        elif c.state in FINAL_STATES: return c.to_dict()
         c.lease={"holder":"operations_runtime","claimed_at":self.clock()}; self.save(c)
         for _ in range(4):
             assessment=self.assess(c)

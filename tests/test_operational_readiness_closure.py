@@ -144,7 +144,7 @@ def enable_publication_policy(root, *, authorized=True, production=False):
     if production:
         md['production_target']=True
         md['live_target_path']=str(root)
-        md['readiness_policy']={'production':True,'environment':'production','min_runtime_cycles':2,'compile_only_sufficient':False}
+        md['readiness_policy']={'production':True,'environment':'production','min_runtime_cycles':2,'compile_only_sufficient':False,'policy_version':'WP-0654-estate-main-production-readiness-v1'}
         md['observation_policy']={'checks_required':2,'min_elapsed_seconds':1,'health_checks':[[sys.executable,'-c','print("healthy")']], 'health_checks_not_applicable_rationale': None}
         md['validation_recipe']=[[sys.executable,'-c','print("live validation")']]
     (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
@@ -211,3 +211,51 @@ def test_recovery_publishes_safe_attributable_ahead_commit(tmp_path):
     out=ctl.process_one(c.case_id)
     assert out['publication']['status']=='verified'
     assert run(['git','rev-list','--left-right','--count','main...origin/main'], root).stdout.strip() == '0\t0'
+
+
+def test_manual_intake_cannot_weaken_canonical_production_policy(tmp_path):
+    root, sha=make_root(tmp_path, checks=2); add_bare_origin(root); enable_publication_policy(root, production=True)
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-WEAKEN', merge_commit=sha, allowed_remediations=[], observation_policy={'checks_required':1}, validation_recipe=[[sys.executable,'-m','compileall','src/estate/core/operational_readiness_closure.py']])
+    assert 'publish_controller_mutation' in c.allowed_remediations
+    assert c.observation_policy['checks_required'] == 2
+    assert 'compileall' not in ' '.join(' '.join(cmd) for cmd in c.validation_recipe)
+    assert c.readiness_policy['policy_version'] == 'WP-0654-estate-main-production-readiness-v1'
+    assert c.readiness_policy['policy_hash']
+
+
+def test_legacy_case_rehydrates_canonical_policy_and_merge_discovery_matches(tmp_path):
+    root, sha=make_root(tmp_path, checks=2); add_bare_origin(root); enable_publication_policy(root, production=True)
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-LEGACY', merge_commit=sha)
+    path=root/'runtime/operational_readiness/cases'/f'{c.case_id}.json'
+    data=json.loads(path.read_text()); data['readiness_policy']={}; data['allowed_remediations']=[]; data['observation_policy']={'checks_required':1}; path.write_text(json.dumps(data))
+    shown=ctl.create_or_resume(work_package_id='WP-LEGACY', merge_commit=sha)
+    assert shown.readiness_policy['policy_version'] == 'WP-0654-estate-main-production-readiness-v1'
+    assert 'publish_controller_mutation' in shown.allowed_remediations
+    discovery_dir = root / 'runtime/merge_discovery/discoveries'; discovery_dir.mkdir(parents=True)
+    discovery_dir.joinpath('md-policy.json').write_text(json.dumps({'target_id':'estate-main','state':'discovered','work_package_id':'WP-MD-POLICY','source_commit':sha,'metadata':{}}))
+    made=ctl.intake_from_merge_discovery()
+    md_case=next(x for x in made if x['work_package_id']=='WP-MD-POLICY')
+    assert md_case['readiness_policy']['policy_hash'] == shown.readiness_policy['policy_hash']
+
+
+def test_false_ready_verdict_is_preserved_and_superseded_under_current_policy(tmp_path):
+    root, sha=make_root(tmp_path, checks=1)
+    reg=json.loads((root/'runtime/operational_targets/registry.json').read_text())
+    md=reg['targets'][0]['metadata']; md['production_target']=True; md['activation_requirements']={'ledger':False}; md['runtime_directories']=[]
+    md['live_target_path']=str(root); md['readiness_policy']={'production':True,'environment':'production','min_runtime_cycles':2,'compile_only_sufficient':False,'policy_version':'WP-0654-estate-main-production-readiness-v1'}
+    md['validation_recipe']=[[sys.executable,'-m','compileall','src/estate/core/operational_readiness_closure.py']]
+    md['observation_policy']={'checks_required':1,'min_elapsed_seconds':0}
+    (root/'runtime/operational_targets/registry.json').write_text(json.dumps(reg))
+    ctl=OperationalReadinessClosureController(root)
+    c=ctl.create_or_resume(work_package_id='WP-FALSE-READY', merge_commit=sha)
+    c.state='operationally_ready'; c.latest_validation={'status':'passed'}; c.observation={'status':'passed','checks_passed':1,'elapsed_seconds':0}; ctl.save(c)
+    verdict_dir=root/'runtime/operational_readiness/verdicts'; verdict_dir.mkdir(parents=True)
+    (verdict_dir/f'{c.case_id}.json').write_text(json.dumps({'readiness_case_id':c.case_id,'operationally_ready':True,'legacy_evidence':['kept']}))
+    out=ctl.process_one(c.case_id)
+    assert out['state'] == 'blocked_manual_intervention'
+    verdict=json.loads((verdict_dir/f'{c.case_id}.json').read_text())
+    assert verdict['superseded'] is True
+    assert verdict['superseded_prior_verdict']['legacy_evidence'] == ['kept']
+    assert (root/verdict['supersession_evidence']).is_file()
