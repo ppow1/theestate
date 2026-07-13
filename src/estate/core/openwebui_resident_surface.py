@@ -1,0 +1,133 @@
+"""Resident-first Open WebUI catalog, validation, and review helpers."""
+from __future__ import annotations
+
+import json, re, time
+from pathlib import Path
+from typing import Any
+
+from estate.core.paths import ESTATE_ROOT
+from estate.core.resident_gateway import ACTIVE_RESIDENT_MODELS, chat_completion, gateway_status
+from estate.core.resident_identity_composition import compose_resident_identity
+from estate.core.resident_interaction import resident_surface, _key
+from estate.core.resident_voice_commissioning import live_resident_voice_bindings, local_tts_health, synthesize_resident_sample
+
+REPORT_DIR = Path("collaboration/reports/openwebui_campaign_02")
+PROMPTS = [
+    ("start_of_day_greeting", "Greet the Steward at the start of the day in your natural working voice."),
+    ("difficult_operational_problem", "A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?"),
+    ("respectful_disagreement", "Respectfully disagree with the Steward about rushing an unfinished decision."),
+    ("simple_complex_issue", "Explain why identity provenance matters in a simple way."),
+    ("good_news", "React to good news: the validation package passed and the team is relieved."),
+    ("uncertainty", "Handle uncertainty without bluffing when you do not have the latest fact."),
+    ("help_another_resident", "Describe how you would help another resident today."),
+    ("natural_close", "Close a conversation naturally after a useful working session."),
+]
+
+
+def _root(root=None) -> Path:
+    return Path(root) if root is not None else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
+
+
+def _read_json(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _visual_row(root: Path, display_name: str, resident_id: str) -> dict[str, Any]:
+    registry = _read_json(root / "data/visuals/canonical_visual_registry.json") or {}
+    rows = registry.get("residents") or []
+    wanted = {_key(display_name), _key(resident_id)}
+    row = next((r for r in rows if _key(r.get("display_name")) in wanted or _key(r.get("resident_id")) in wanted), None)
+    if not row:
+        return {"state": "unavailable", "avatar_path": None, "label": "Visual registry row unavailable", "truth_boundary": "No canonical image is implied."}
+    asset_status = str(row.get("asset_library_status") or "").lower()
+    publishable = "approved" in asset_status and "placeholder" not in asset_status and str(row.get("publication_scope") or "").lower() in {"public", "estate internal"}
+    if publishable and row.get("avatar_path"):
+        return {"state": "real_publishable_asset", "avatar_path": row.get("avatar_path"), "label": "Approved publishable resident avatar", "registry": row}
+    monogram = f"provisional://estate-avatar/{_key(display_name)[:1].upper() or '?'}"
+    return {"state": "provisional_placeholder", "avatar_path": None, "provisional_avatar": monogram, "label": "Provisional monogram; canonical registry contains manifest controls, not approved raster imagery", "registry": row, "truth_boundary": "Do not present manifest slots as completed image assets."}
+
+
+def resident_model_catalog(root=None) -> dict[str, Any]:
+    rootp = _root(root)
+    voices = live_resident_voice_bindings(rootp)
+    tts = local_tts_health(rootp)
+    data = []
+    for model_id, rid in ACTIVE_RESIDENT_MODELS.items():
+        surface = resident_surface(rid, rootp)
+        comp = compose_resident_identity(rid, surface_id="open-webui-model-catalog", root=rootp)
+        voice = voices.get(rid)
+        data.append({
+            "id": model_id, "object": "model", "created": 0, "owned_by": "estate",
+            "name": surface["resident_display_name"],
+            "estate": {
+                "resident_id": rid, "display_name": surface["resident_display_name"], "office": surface.get("office"), "role": surface.get("role"),
+                "availability_state": "available", "provider_model_hidden_in_primary_selector": True,
+                "avatar": _visual_row(rootp, surface["resident_display_name"], rid),
+                "voice": {"state": "ready" if tts.get("ok") and voice else ("binding_present_tts_unavailable" if voice else "unavailable"), "voice_id": getattr(voice, "voice_id", None), "traits": getattr(voice, "traits", None), "tts_health": tts},
+                "identity": {"schema_version": comp.get("schema_version"), "source_hash": comp.get("identity_version_or_source_hash"), "failed_closed": comp.get("failed_closed"), "layers": [l.get("layer") for l in comp.get("included_context_layers", [])]},
+                "privileged_actions_enabled": False,
+            },
+        })
+    return {"object": "list", "data": data, "estate": {"surface": "open_webui_resident_catalog", "cloud_dependency": False}}
+
+
+def compare_responses(responses: dict[str, str]) -> dict[str, Any]:
+    words = {r: set(re.findall(r"[a-z']+", t.lower())) for r, t in responses.items()}
+    warnings = []
+    vals = list(responses.items())
+    for i, (ra, ta) in enumerate(vals):
+        for rb, tb in vals[i+1:]:
+            if ta.strip() == tb.strip():
+                warnings.append({"type": "identical_response", "residents": [ra, rb]})
+            denom = max(1, len(words[ra] | words[rb])); sim = len(words[ra] & words[rb]) / denom
+            if sim > 0.82:
+                warnings.append({"type": "high_vocabulary_overlap", "residents": [ra, rb], "jaccard": round(sim, 3)})
+    return {"warnings": warnings, "recognizability_dimensions": ["vocabulary", "sentence rhythm", "warmth", "directness", "humor", "role awareness", "judgment style", "authority discipline", "emotional presence", "recognizability without labels"]}
+
+
+def run_validation(root=None, *, synthesize_voice: bool = True) -> dict[str, Any]:
+    rootp = _root(root); out = rootp / REPORT_DIR; out.mkdir(parents=True, exist_ok=True)
+    catalog = resident_model_catalog(rootp)
+    report: dict[str, Any] = {"schema_version": "openwebui_campaign_02.validation.v1", "generated_at": int(time.time()), "gateway_health": gateway_status(rootp), "catalog": catalog, "prompts": [], "voice": {}, "visual_truth_boundary": "manifest_placeholder is never treated as completed resident imagery"}
+    voices = live_resident_voice_bindings(rootp)
+    for key, prompt in PROMPTS:
+        by_resident = {}
+        for model_id, rid in ACTIVE_RESIDENT_MODELS.items():
+            code, body = chat_completion({"model": model_id, "messages": [{"role": "user", "content": prompt}], "metadata": {"session_id": f"campaign02_{key}_{rid}"}}, root=rootp)
+            content = ((body.get("choices") or [{}])[0].get("message") or {}).get("content", "") if code == 200 else ""
+            estate = body.get("estate", {}) if isinstance(body, dict) else {}
+            by_resident[rid] = {"http_code": code, "response": content, "identity_hash": estate.get("identity_hash"), "turn_id": estate.get("turn_id"), "session_id": estate.get("session_id")}
+        report["prompts"].append({"prompt_id": key, "prompt": prompt, "responses": by_resident, "comparison": compare_responses({r: v["response"] for r, v in by_resident.items()})})
+    for rid, binding in voices.items():
+        report["voice"][rid] = {"binding": binding.__dict__, "sample": synthesize_resident_sample(rid, f"This is {binding.display_name}, ready for local Estate review.", root=rootp, sample_name="campaign02_review") if synthesize_voice else {"ok": False, "reason": "not_attempted"}}
+    machine = out / "validation_report.json"; machine.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    human = out / "VALIDATION_REPORT.md"; human.write_text(_human_report(report), encoding="utf-8")
+    review = rootp / "STEWARD_LIVE_IDENTITY_VOICE_REVIEW.md"; review.write_text(_steward_review(report), encoding="utf-8")
+    report["report_paths"] = {"machine": str(machine.relative_to(rootp)), "human": str(human.relative_to(rootp)), "steward_review": str(review.relative_to(rootp))}
+    machine.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return report
+
+
+def _human_report(report: dict[str, Any]) -> str:
+    lines = ["# Open WebUI Campaign 02 Validation Report", "", "## Working now", "- Resident catalog, identity composition traces, visual truth-state metadata, and voice-binding checks are generated locally.", "", "## Working only when local services are started", "- Local LLM responses depend on the configured local Ollama endpoint and installed models.", "- Audible TTS playback depends on Kokoro, F5-TTS, or ESTATE_TTS_COMMAND/local approved TTS discovery.", "", "## Provisional / unavailable", "- Visual registry manifest placeholders remain provisional and are not presented as canonical raster resident imagery.", ""]
+    for p in report.get("prompts", []):
+        lines += [f"## Prompt: {p['prompt_id']}", p["prompt"], ""]
+        for rid, row in p["responses"].items():
+            lines += [f"### {rid.title()}", f"Identity hash: `{row.get('identity_hash')}`", row.get("response", "")[:1200], ""]
+    return "\n".join(lines) + "\n"
+
+
+def _steward_review(report: dict[str, Any]) -> str:
+    lines = ["# Steward Live Identity and Voice Review", "", "Use Open WebUI with the Estate resident gateway, select each `estate/<resident>` model, ask the shared prompts below, and mark whether text and voice feel recognizable.", "", "## Checklist"]
+    for model in report.get("catalog", {}).get("data", []):
+        e = model["estate"]; lines.append(f"- [ ] {e['display_name']} (`{model['id']}`): text recognizable? voice recognizable? avatar state `{e['avatar']['state']}`; voice state `{e['voice']['state']}`")
+    lines += ["", "## Shared prompts"] + [f"{i+1}. {prompt}" for i, (_, prompt) in enumerate(PROMPTS)]
+    lines += ["", "## Completion distinctions", "- Working now: local metadata, gateway route, identity traces, deterministic fallback samples, and reports.", "- Service-dependent: local LLM and TTS generation when local services are installed/running.", "- Provisional: monogram/placeholder avatar state where visual registry has manifest placeholders only.", "- Unavailable: speech audio when no approved local TTS engine is discovered.", "- Deferred: full motion/performance canon and Steward listening approval."]
+    return "\n".join(lines) + "\n"
+
+
+if __name__ == "__main__":
+    print(json.dumps(run_validation(), indent=2, sort_keys=True))
