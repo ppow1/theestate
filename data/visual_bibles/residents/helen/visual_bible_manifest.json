@@ -318,6 +318,168 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "environment_spatial_presence_library": [
+      {
+        "work_package": "WP-4158",
+        "environment_id": "c06-helen-resident_office_environment-v1",
+        "registry_environment_id": "c06-resident_office_environment-v1",
+        "title": "Resident office environment integration",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-resident_office_environment-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "primary",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4159",
+        "environment_id": "c06-helen-estate_hallway_transition-v1",
+        "registry_environment_id": "c06-estate_hallway_transition-v1",
+        "title": "Estate hallway and transition imagery",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-estate_hallway_transition-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4160",
+        "environment_id": "c06-helen-library_archive-v1",
+        "registry_environment_id": "c06-library_archive-v1",
+        "title": "Library and archive environments",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-library_archive-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "contextual_reference",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4161",
+        "environment_id": "c06-helen-conference_strategy-v1",
+        "registry_environment_id": "c06-conference_strategy-v1",
+        "title": "Conference and strategy environments",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-conference_strategy-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4162",
+        "environment_id": "c06-helen-cafe_kitchen_gathering-v1",
+        "registry_environment_id": "c06-cafe_kitchen_gathering-v1",
+        "title": "Cafe, kitchen, and informal gathering environments",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-cafe_kitchen_gathering-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4163",
+        "environment_id": "c06-helen-garden_exterior_grounds-v1",
+        "registry_environment_id": "c06-garden_exterior_grounds-v1",
+        "title": "Garden and exterior Estate grounds",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-garden_exterior_grounds-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4164",
+        "environment_id": "c06-helen-living_hospitality-v1",
+        "registry_environment_id": "c06-living_hospitality-v1",
+        "title": "Living and hospitality spaces",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-living_hospitality-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4165",
+        "environment_id": "c06-helen-workshop_project-v1",
+        "registry_environment_id": "c06-workshop_project-v1",
+        "title": "Workshop and project spaces",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-workshop_project-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "contextual_reference",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4166",
+        "environment_id": "c06-helen-scale_lighting_continuity-v1",
+        "registry_environment_id": "c06-scale_lighting_continuity-v1",
+        "title": "Scale, lighting, and environmental continuity",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-scale_lighting_continuity-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4167",
+        "environment_id": "c06-helen-environment_gallery_acceptance-v1",
+        "registry_environment_id": "c06-environment_gallery_acceptance-v1",
+        "title": "Environment gallery and acceptance review",
+        "resident_id": "RES-000003",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-environment_gallery_acceptance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -502,6 +664,96 @@
         "campaign": "Campaign 05",
         "work_package": "WP-4157",
         "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c06-helen-resident_office_environment-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-resident_office_environment-v1.json",
+        "hash": "sha256:7839de1668576865c84e0e5a48447a82a2137e9326d75978cb0bb96a51877c68",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4158",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-estate_hallway_transition-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-estate_hallway_transition-v1.json",
+        "hash": "sha256:5390ebe593418154a8b7f219482081f175520ae1cb154707e0c8a3ead6a958bd",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4159",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-library_archive-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-library_archive-v1.json",
+        "hash": "sha256:c8fa5319cb627abdb107497ea5a31990c5e464e21047139236ba8abaf7bc723d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4160",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-conference_strategy-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-conference_strategy-v1.json",
+        "hash": "sha256:a5a2de3ce909a0cfa197ffa5d01620d7bb4f68f2d324e54f92ee1e1460582c08",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4161",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-cafe_kitchen_gathering-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-cafe_kitchen_gathering-v1.json",
+        "hash": "sha256:66467204c64837b4cf58c6b8189e4066fa894a369df305cd86fc7248fbd8edae",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4162",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-garden_exterior_grounds-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-garden_exterior_grounds-v1.json",
+        "hash": "sha256:a15f4a2d532b65be6c6ea67ccb3b1505a8bfaed907b3bcd846550a16669b894a",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4163",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-living_hospitality-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-living_hospitality-v1.json",
+        "hash": "sha256:c565d351adbf91bfd574655b36e56909b2c446624788f886d8049f734ecece97",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4164",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-workshop_project-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-workshop_project-v1.json",
+        "hash": "sha256:7b8828bdb1fcb0448f592069a7ff9348b87390f6c0148de3b931cdb31c577246",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4165",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-scale_lighting_continuity-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-scale_lighting_continuity-v1.json",
+        "hash": "sha256:ee7540e358b3863849f55f63fa936f62e1307795894d89910e6a9d44c66d3359",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4166",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-helen-environment_gallery_acceptance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-environment_gallery_acceptance-v1.json",
+        "hash": "sha256:7438d160819c7932fd04efdfd603dfc6bf615e4272dab5eeaadcd310e9238c5a",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4167",
+        "asset_type": "environment_spatial_presence_manifest"
       }
     ],
     "rejected": [],

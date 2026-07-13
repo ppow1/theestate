@@ -318,6 +318,168 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "environment_spatial_presence_library": [
+      {
+        "work_package": "WP-4158",
+        "environment_id": "c06-marie-resident_office_environment-v1",
+        "registry_environment_id": "c06-resident_office_environment-v1",
+        "title": "Resident office environment integration",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-resident_office_environment-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "primary",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4159",
+        "environment_id": "c06-marie-estate_hallway_transition-v1",
+        "registry_environment_id": "c06-estate_hallway_transition-v1",
+        "title": "Estate hallway and transition imagery",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-estate_hallway_transition-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4160",
+        "environment_id": "c06-marie-library_archive-v1",
+        "registry_environment_id": "c06-library_archive-v1",
+        "title": "Library and archive environments",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-library_archive-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4161",
+        "environment_id": "c06-marie-conference_strategy-v1",
+        "registry_environment_id": "c06-conference_strategy-v1",
+        "title": "Conference and strategy environments",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-conference_strategy-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4162",
+        "environment_id": "c06-marie-cafe_kitchen_gathering-v1",
+        "registry_environment_id": "c06-cafe_kitchen_gathering-v1",
+        "title": "Cafe, kitchen, and informal gathering environments",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-cafe_kitchen_gathering-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4163",
+        "environment_id": "c06-marie-garden_exterior_grounds-v1",
+        "registry_environment_id": "c06-garden_exterior_grounds-v1",
+        "title": "Garden and exterior Estate grounds",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-garden_exterior_grounds-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4164",
+        "environment_id": "c06-marie-living_hospitality-v1",
+        "registry_environment_id": "c06-living_hospitality-v1",
+        "title": "Living and hospitality spaces",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-living_hospitality-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4165",
+        "environment_id": "c06-marie-workshop_project-v1",
+        "registry_environment_id": "c06-workshop_project-v1",
+        "title": "Workshop and project spaces",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-workshop_project-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4166",
+        "environment_id": "c06-marie-scale_lighting_continuity-v1",
+        "registry_environment_id": "c06-scale_lighting_continuity-v1",
+        "title": "Scale, lighting, and environmental continuity",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-scale_lighting_continuity-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4167",
+        "environment_id": "c06-marie-environment_gallery_acceptance-v1",
+        "registry_environment_id": "c06-environment_gallery_acceptance-v1",
+        "title": "Environment gallery and acceptance review",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-environment_gallery_acceptance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -502,6 +664,96 @@
         "campaign": "Campaign 05",
         "work_package": "WP-4157",
         "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c06-marie-resident_office_environment-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-resident_office_environment-v1.json",
+        "hash": "sha256:8c5f1914f37d1404bf87a1821d7c6bce16608b26dcffccfb0982e8ddfb2510f6",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4158",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-estate_hallway_transition-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-estate_hallway_transition-v1.json",
+        "hash": "sha256:372a02e36c33f2221c57920891bf374baa05c0273740cc7022417244e280499d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4159",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-library_archive-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-library_archive-v1.json",
+        "hash": "sha256:c62f9e229c1b7f8f4c51c92918afbdb72672610a6dee750d3c0f4d6a9b190a5e",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4160",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-conference_strategy-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-conference_strategy-v1.json",
+        "hash": "sha256:981370e75b207c65a27d18a3a8bd6c3ad084547d742c2a3776474895286ddf7d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4161",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-cafe_kitchen_gathering-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-cafe_kitchen_gathering-v1.json",
+        "hash": "sha256:f1357b3c7e3e28e8a83a1a981805b17b2ddcdc964c1fac50ec51cdc81957db47",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4162",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-garden_exterior_grounds-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-garden_exterior_grounds-v1.json",
+        "hash": "sha256:2c5f0e9e173c8ea7bc0b711ab725342f45aea353e5c219c32dc845626a4c97e0",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4163",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-living_hospitality-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-living_hospitality-v1.json",
+        "hash": "sha256:db79c2ccbbadf5790664093981a5723f82f1e20197be9c992947d1437e90e63d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4164",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-workshop_project-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-workshop_project-v1.json",
+        "hash": "sha256:f7a5979540ee3faf972478ff761e16ae71445e7f9abadb3b73a705d69404587d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4165",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-scale_lighting_continuity-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-scale_lighting_continuity-v1.json",
+        "hash": "sha256:3caff5c6b2a2850fa4beae8912dcf73dafe28de75d5a5a4240929ebd0c96038d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4166",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-marie-environment_gallery_acceptance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c06-marie-environment_gallery_acceptance-v1.json",
+        "hash": "sha256:ea417eade59e9337b40c35c42bae06499d7430c49d0ca3c0236f48a75ec47f34",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4167",
+        "asset_type": "environment_spatial_presence_manifest"
       }
     ],
     "rejected": [],

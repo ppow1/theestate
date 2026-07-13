@@ -1,0 +1,32 @@
+{
+  "schema_version": "environment_asset_candidate.v1",
+  "campaign": "Campaign 06",
+  "resident": {
+    "resident_id": "RES-000003",
+    "display_name": "Helen",
+    "resident_slug": "helen"
+  },
+  "work_package": "WP-4167",
+  "environment_id": "c06-helen-environment_gallery_acceptance-v1",
+  "registry_environment_id": "c06-environment_gallery_acceptance-v1",
+  "title": "Environment gallery and acceptance review",
+  "resident_id": "RES-000003",
+  "asset_status": "approved_manifest_placeholder",
+  "asset_ref": "data/visual_bibles/residents/helen/internal/assets/candidates/c06-helen-environment_gallery_acceptance-v1.json",
+  "visual_bible_ref": "data/visual_bibles/residents/helen/visual_bible_manifest.json",
+  "resident_association": "associated",
+  "continuity_requirements": [
+    "preserve Campaign 03 canonical resident proportions",
+    "preserve resident visual fingerprint",
+    "do not promote placeholder to canonical imagery without Steward approval"
+  ],
+  "environment_prompt_controls": {
+    "spatial_role": "Human Resources office",
+    "lighting": "consistent Estate soft natural light with warm interior practicals",
+    "materials": "canonical Estate wood, stone, archival textiles, glass, and brass accents as appropriate",
+    "negative_controls": [
+      "do not alter resident height, body proportions, age presentation, or face",
+      "do not conflict with Campaign 03 physical lock records"
+    ]
+  }
+}

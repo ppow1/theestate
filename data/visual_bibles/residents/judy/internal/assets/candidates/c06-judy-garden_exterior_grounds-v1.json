@@ -1,0 +1,32 @@
+{
+  "schema_version": "environment_asset_candidate.v1",
+  "campaign": "Campaign 06",
+  "resident": {
+    "resident_id": "RES-000006",
+    "display_name": "Judy",
+    "resident_slug": "judy"
+  },
+  "work_package": "WP-4163",
+  "environment_id": "c06-judy-garden_exterior_grounds-v1",
+  "registry_environment_id": "c06-garden_exterior_grounds-v1",
+  "title": "Garden and exterior Estate grounds",
+  "resident_id": "RES-000006",
+  "asset_status": "approved_manifest_placeholder",
+  "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c06-judy-garden_exterior_grounds-v1.json",
+  "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+  "resident_association": "associated",
+  "continuity_requirements": [
+    "preserve Campaign 03 canonical resident proportions",
+    "preserve resident visual fingerprint",
+    "do not promote placeholder to canonical imagery without Steward approval"
+  ],
+  "environment_prompt_controls": {
+    "spatial_role": "Legal counsel office",
+    "lighting": "consistent Estate soft natural light with warm interior practicals",
+    "materials": "canonical Estate wood, stone, archival textiles, glass, and brass accents as appropriate",
+    "negative_controls": [
+      "do not alter resident height, body proportions, age presentation, or face",
+      "do not conflict with Campaign 03 physical lock records"
+    ]
+  }
+}

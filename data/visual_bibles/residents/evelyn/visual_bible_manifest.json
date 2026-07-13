@@ -569,6 +569,168 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "environment_spatial_presence_library": [
+      {
+        "work_package": "WP-4158",
+        "environment_id": "c06-evelyn-resident_office_environment-v1",
+        "registry_environment_id": "c06-resident_office_environment-v1",
+        "title": "Resident office environment integration",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-resident_office_environment-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "primary",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4159",
+        "environment_id": "c06-evelyn-estate_hallway_transition-v1",
+        "registry_environment_id": "c06-estate_hallway_transition-v1",
+        "title": "Estate hallway and transition imagery",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-estate_hallway_transition-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4160",
+        "environment_id": "c06-evelyn-library_archive-v1",
+        "registry_environment_id": "c06-library_archive-v1",
+        "title": "Library and archive environments",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-library_archive-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "contextual_reference",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4161",
+        "environment_id": "c06-evelyn-conference_strategy-v1",
+        "registry_environment_id": "c06-conference_strategy-v1",
+        "title": "Conference and strategy environments",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-conference_strategy-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4162",
+        "environment_id": "c06-evelyn-cafe_kitchen_gathering-v1",
+        "registry_environment_id": "c06-cafe_kitchen_gathering-v1",
+        "title": "Cafe, kitchen, and informal gathering environments",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-cafe_kitchen_gathering-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4163",
+        "environment_id": "c06-evelyn-garden_exterior_grounds-v1",
+        "registry_environment_id": "c06-garden_exterior_grounds-v1",
+        "title": "Garden and exterior Estate grounds",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-garden_exterior_grounds-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4164",
+        "environment_id": "c06-evelyn-living_hospitality-v1",
+        "registry_environment_id": "c06-living_hospitality-v1",
+        "title": "Living and hospitality spaces",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-living_hospitality-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4165",
+        "environment_id": "c06-evelyn-workshop_project-v1",
+        "registry_environment_id": "c06-workshop_project-v1",
+        "title": "Workshop and project spaces",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-workshop_project-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "contextual_reference",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4166",
+        "environment_id": "c06-evelyn-scale_lighting_continuity-v1",
+        "registry_environment_id": "c06-scale_lighting_continuity-v1",
+        "title": "Scale, lighting, and environmental continuity",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-scale_lighting_continuity-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4167",
+        "environment_id": "c06-evelyn-environment_gallery_acceptance-v1",
+        "registry_environment_id": "c06-environment_gallery_acceptance-v1",
+        "title": "Environment gallery and acceptance review",
+        "resident_id": "RES-EVELYN",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-environment_gallery_acceptance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -757,6 +919,96 @@
         "campaign": "Campaign 05",
         "work_package": "WP-4157",
         "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-resident_office_environment-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-resident_office_environment-v1.json",
+        "hash": "sha256:78133a04b92bdf81c62ebf298229e18e99009214f3f44364e505913c17f4e0f4",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4158",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-estate_hallway_transition-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-estate_hallway_transition-v1.json",
+        "hash": "sha256:cf4b4e162b4caa4515691e1729c7f2ac2ee1b2d753cfb1c1fa2b951927203631",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4159",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-library_archive-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-library_archive-v1.json",
+        "hash": "sha256:0efc08a2b277494bdc82c4c32111c024a4b085b7221178032357b1325717e8e9",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4160",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-conference_strategy-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-conference_strategy-v1.json",
+        "hash": "sha256:323f8496ad07ae37d6b638a926fd27b6a76ed992544f651a108e019e904c910b",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4161",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-cafe_kitchen_gathering-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-cafe_kitchen_gathering-v1.json",
+        "hash": "sha256:497014dcf51c191bc5210954e705017cadb3f0a4356aaac5c068f86f8d60bfbc",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4162",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-garden_exterior_grounds-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-garden_exterior_grounds-v1.json",
+        "hash": "sha256:cb854f917f05b6e1748ae00fb1c5b3b1afa2c00b709a5a977d094982b179b5c9",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4163",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-living_hospitality-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-living_hospitality-v1.json",
+        "hash": "sha256:1b2ca61bc643ddd47b7c01c16081d0dbae8d4e0ecc47ee0799dc6df15c57e0b1",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4164",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-workshop_project-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-workshop_project-v1.json",
+        "hash": "sha256:6f24c92760f67bd8843ae7423858fd895e9028384bdcd5ce044af3fcfe4657b2",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4165",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-scale_lighting_continuity-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-scale_lighting_continuity-v1.json",
+        "hash": "sha256:a590dab3f64a189fdc1b135614fd98c59f60216df1e653ea7d98ada8122cc70f",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4166",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-evelyn-environment_gallery_acceptance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-environment_gallery_acceptance-v1.json",
+        "hash": "sha256:9abe19ec8673141351bd197e08f3f00ff462e2a0c5449bb62380a2a30b407526",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4167",
+        "asset_type": "environment_spatial_presence_manifest"
       }
     ],
     "rejected": [],

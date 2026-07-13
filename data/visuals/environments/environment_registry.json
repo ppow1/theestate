@@ -1,0 +1,515 @@
+{
+  "schema_version": "estate_environment_registry.v1",
+  "campaign": "Campaign 06",
+  "work_packages": [
+    "WP-4158",
+    "WP-4159",
+    "WP-4160",
+    "WP-4161",
+    "WP-4162",
+    "WP-4163",
+    "WP-4164",
+    "WP-4165",
+    "WP-4166",
+    "WP-4167"
+  ],
+  "status": "complete_manifest_library_pending_generated_imagery",
+  "resident_proportion_policy": "Campaign 03 canonical resident proportions are locked and must not be modified by environment generation. Environments adapt around residents, never residents around environments.",
+  "environments": [
+    {
+      "environment_id": "c06-resident_office_environment-v1",
+      "work_package": "WP-4158",
+      "title": "Resident office environment integration",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-estate_hallway_transition-v1",
+      "work_package": "WP-4159",
+      "title": "Estate hallway and transition imagery",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-library_archive-v1",
+      "work_package": "WP-4160",
+      "title": "Library and archive environments",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        },
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-conference_strategy-v1",
+      "work_package": "WP-4161",
+      "title": "Conference and strategy environments",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-cafe_kitchen_gathering-v1",
+      "work_package": "WP-4162",
+      "title": "Cafe, kitchen, and informal gathering environments",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-garden_exterior_grounds-v1",
+      "work_package": "WP-4163",
+      "title": "Garden and exterior Estate grounds",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-living_hospitality-v1",
+      "work_package": "WP-4164",
+      "title": "Living and hospitality spaces",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-workshop_project-v1",
+      "work_package": "WP-4165",
+      "title": "Workshop and project spaces",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-scale_lighting_continuity-v1",
+      "work_package": "WP-4166",
+      "title": "Scale, lighting, and environmental continuity",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    },
+    {
+      "environment_id": "c06-environment_gallery_acceptance-v1",
+      "work_package": "WP-4167",
+      "title": "Environment gallery and acceptance review",
+      "status": "approved_manifest_placeholder",
+      "canonical_scope": "Estate environment manifest; generated image binaries require Steward approval before canonical promotion",
+      "associated_residents": [
+        {
+          "resident_slug": "alfred",
+          "resident_id": "RES-000001",
+          "display_name": "Alfred"
+        },
+        {
+          "resident_slug": "eleanor",
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor"
+        },
+        {
+          "resident_slug": "evelyn",
+          "resident_id": "RES-EVELYN",
+          "display_name": "Evelyn"
+        },
+        {
+          "resident_slug": "grace",
+          "resident_id": "grace",
+          "display_name": "Grace"
+        },
+        {
+          "resident_slug": "helen",
+          "resident_id": "RES-000003",
+          "display_name": "Helen"
+        },
+        {
+          "resident_slug": "ingrid",
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid"
+        },
+        {
+          "resident_slug": "judy",
+          "resident_id": "RES-000006",
+          "display_name": "Judy"
+        },
+        {
+          "resident_slug": "marie",
+          "resident_id": "RES-000005",
+          "display_name": "Marie"
+        }
+      ],
+      "continuity_controls": [
+        "preserve Campaign 03 resident proportions and relative scale",
+        "preserve resident visual fingerprints",
+        "maintain consistent Estate materials, lighting, and camera language"
+      ]
+    }
+  ]
+}

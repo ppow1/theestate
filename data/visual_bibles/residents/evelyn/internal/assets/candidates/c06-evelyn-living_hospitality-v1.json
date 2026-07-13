@@ -1,0 +1,32 @@
+{
+  "schema_version": "environment_asset_candidate.v1",
+  "campaign": "Campaign 06",
+  "resident": {
+    "resident_id": "RES-EVELYN",
+    "display_name": "Evelyn",
+    "resident_slug": "evelyn"
+  },
+  "work_package": "WP-4164",
+  "environment_id": "c06-evelyn-living_hospitality-v1",
+  "registry_environment_id": "c06-living_hospitality-v1",
+  "title": "Living and hospitality spaces",
+  "resident_id": "RES-EVELYN",
+  "asset_status": "approved_manifest_placeholder",
+  "asset_ref": "data/visual_bibles/residents/evelyn/internal/assets/candidates/c06-evelyn-living_hospitality-v1.json",
+  "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+  "resident_association": "associated",
+  "continuity_requirements": [
+    "preserve Campaign 03 canonical resident proportions",
+    "preserve resident visual fingerprint",
+    "do not promote placeholder to canonical imagery without Steward approval"
+  ],
+  "environment_prompt_controls": {
+    "spatial_role": "Executive strategy office",
+    "lighting": "consistent Estate soft natural light with warm interior practicals",
+    "materials": "canonical Estate wood, stone, archival textiles, glass, and brass accents as appropriate",
+    "negative_controls": [
+      "do not alter resident height, body proportions, age presentation, or face",
+      "do not conflict with Campaign 03 physical lock records"
+    ]
+  }
+}

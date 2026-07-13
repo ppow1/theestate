@@ -318,6 +318,168 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "environment_spatial_presence_library": [
+      {
+        "work_package": "WP-4158",
+        "environment_id": "c06-alfred-resident_office_environment-v1",
+        "registry_environment_id": "c06-resident_office_environment-v1",
+        "title": "Resident office environment integration",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-resident_office_environment-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "primary",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4159",
+        "environment_id": "c06-alfred-estate_hallway_transition-v1",
+        "registry_environment_id": "c06-estate_hallway_transition-v1",
+        "title": "Estate hallway and transition imagery",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-estate_hallway_transition-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4160",
+        "environment_id": "c06-alfred-library_archive-v1",
+        "registry_environment_id": "c06-library_archive-v1",
+        "title": "Library and archive environments",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-library_archive-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4161",
+        "environment_id": "c06-alfred-conference_strategy-v1",
+        "registry_environment_id": "c06-conference_strategy-v1",
+        "title": "Conference and strategy environments",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-conference_strategy-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4162",
+        "environment_id": "c06-alfred-cafe_kitchen_gathering-v1",
+        "registry_environment_id": "c06-cafe_kitchen_gathering-v1",
+        "title": "Cafe, kitchen, and informal gathering environments",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-cafe_kitchen_gathering-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4163",
+        "environment_id": "c06-alfred-garden_exterior_grounds-v1",
+        "registry_environment_id": "c06-garden_exterior_grounds-v1",
+        "title": "Garden and exterior Estate grounds",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-garden_exterior_grounds-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4164",
+        "environment_id": "c06-alfred-living_hospitality-v1",
+        "registry_environment_id": "c06-living_hospitality-v1",
+        "title": "Living and hospitality spaces",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-living_hospitality-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4165",
+        "environment_id": "c06-alfred-workshop_project-v1",
+        "registry_environment_id": "c06-workshop_project-v1",
+        "title": "Workshop and project spaces",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-workshop_project-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4166",
+        "environment_id": "c06-alfred-scale_lighting_continuity-v1",
+        "registry_environment_id": "c06-scale_lighting_continuity-v1",
+        "title": "Scale, lighting, and environmental continuity",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-scale_lighting_continuity-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4167",
+        "environment_id": "c06-alfred-environment_gallery_acceptance-v1",
+        "registry_environment_id": "c06-environment_gallery_acceptance-v1",
+        "title": "Environment gallery and acceptance review",
+        "resident_id": "RES-000001",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-environment_gallery_acceptance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+        "resident_association": "associated",
+        "continuity_requirements": [
+          "preserve Campaign 03 canonical resident proportions",
+          "preserve resident visual fingerprint",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -502,6 +664,96 @@
         "campaign": "Campaign 05",
         "work_package": "WP-4157",
         "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-resident_office_environment-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-resident_office_environment-v1.json",
+        "hash": "sha256:da6dd6256fed50d0ffd282beafa5ab94ae3955049f41073ae296f6f6221ce6ba",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4158",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-estate_hallway_transition-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-estate_hallway_transition-v1.json",
+        "hash": "sha256:2ed557bbe6e9e0c92e28df92ef3b50556f140fa400d9b2caa10cb6d57e5db06d",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4159",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-library_archive-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-library_archive-v1.json",
+        "hash": "sha256:6d5f86ab001ea977dd18d9e68232ac6d336d870949e66d517470ca295b0464d2",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4160",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-conference_strategy-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-conference_strategy-v1.json",
+        "hash": "sha256:aad8066f9bdb58d773d576688ea3e29b59d893b4b66d89b124ebb7c34200e6b4",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4161",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-cafe_kitchen_gathering-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-cafe_kitchen_gathering-v1.json",
+        "hash": "sha256:b5b0cdddfa0dbd8b9456a36637d3636844c756a47138ed86d5c64d36693ce67a",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4162",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-garden_exterior_grounds-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-garden_exterior_grounds-v1.json",
+        "hash": "sha256:02e7e52b41f530aaaad49282775810fbcc64682ccacdb2fc2f4cbf23d4afbfc4",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4163",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-living_hospitality-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-living_hospitality-v1.json",
+        "hash": "sha256:6d86549885e9a64cee9d63ab4aae063a03fed03afa4f25e56bdc33da6e8faf7f",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4164",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-workshop_project-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-workshop_project-v1.json",
+        "hash": "sha256:39e64a348971b8e01f003fe758020e3bb3d1bc3e62265c75442296f05b8726a1",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4165",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-scale_lighting_continuity-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-scale_lighting_continuity-v1.json",
+        "hash": "sha256:92e386d8c93a821246aef93fc4ff4ea2570e037aba0baf609d98f141c683e43b",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4166",
+        "asset_type": "environment_spatial_presence_manifest"
+      },
+      {
+        "asset_id": "c06-alfred-environment_gallery_acceptance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/alfred/internal/assets/candidates/c06-alfred-environment_gallery_acceptance-v1.json",
+        "hash": "sha256:9d34078cafa7bfacb6c148d345a52ad8fe30139de6f794ba8b7ad9cfc759d506",
+        "campaign": "Campaign 06",
+        "work_package": "WP-4167",
+        "asset_type": "environment_spatial_presence_manifest"
       }
     ],
     "rejected": [],
