@@ -1,0 +1,6 @@
+{
+  "available": false,
+  "error": "<urlopen error [Errno 111] Connection refused>; [Errno 2] No such file or directory: 'ollama'",
+  "models": [],
+  "provider": "ollama"
+}

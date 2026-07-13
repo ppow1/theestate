@@ -1,0 +1,8 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "options": {
+    "temperature": 0
+  },
+  "prompt": "Implement dependency_batcher.py exposing DependencyBatchError and plan_batches with deterministic dependency batching, validation, immutability, and standard library only.",
+  "stream": false
+}
