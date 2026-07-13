@@ -1,0 +1,316 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-EVELYN",
+    "display_name": "Evelyn",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/evelyn.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "Campaign 01 preserves Steward direction as provisional; no unreviewed imagery is canonical."
+    },
+    "height": {
+      "imperial": "4 ft 10 in maximum",
+      "centimeters": 147
+    },
+    "measurements": {
+      "units": "inches",
+      "values": {
+        "bust": "33B",
+        "waist": 21,
+        "hips": 31
+      },
+      "uncertainty": "provisional Steward calibration; not a universal template"
+    },
+    "build_class": "extremely petite adult",
+    "silhouette": "subtle hourglass",
+    "posture": "slight attentive relational head tilt; professional stance",
+    "footwear_adjusted_presentation": [
+      {
+        "label": "signature candidate",
+        "heel_height_inches": 3,
+        "note": "presentation height only; canonical height unchanged"
+      }
+    ],
+    "provenance": {
+      "source": "WP-4109/WP-4117 Evelyn calibration example",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:9cd9a611c4b2a14b1bd4f19e8edc2dddb8202bc9e5602e0caece7ab110b05edd",
+      "lineage": [
+        "collaboration/codex_campaigns/VISUAL-CAMPAIGN-01-VISUAL-BIBLE-FOUNDATION.md"
+      ]
+    }
+  },
+  "facial_geometry": {
+    "face_shape": "soft mature-professional facial structure",
+    "landmarks": {
+      "smile": "gentle reassuring smile",
+      "head_angle": "slight attentive head tilt"
+    },
+    "hair": {
+      "color": "soft brunette",
+      "movement": "natural"
+    },
+    "eyes": {
+      "color": "warm hazel",
+      "shape": "warm attentive"
+    },
+    "artistic_ambiguity_note": "Rare, extremely subtle artistic ambiguity may be noted without asserting ancestry or demographic classification.",
+    "provenance": {
+      "source": "WP-4110 Evelyn example",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:9cd9a611c4b2a14b1bd4f19e8edc2dddb8202bc9e5602e0caece7ab110b05edd"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "warm hazel eyes",
+      "soft brunette hair with natural movement",
+      "slight attentive head tilt",
+      "gentle reassuring smile",
+      "approachable mature-professional presence"
+    ],
+    "secondary_cues": [
+      "tailored petite presentation",
+      "calm relational posture"
+    ],
+    "never_exaggerate": [
+      "artistic ambiguity",
+      "petite proportions",
+      "smile warmth"
+    ],
+    "icon_scale_cues": [
+      "warm eyes and slight head tilt"
+    ],
+    "group_differentiation_cues": [
+      "very petite relative height",
+      "soft brunette silhouette",
+      "professional reassuring posture"
+    ]
+  },
+  "scale_reference": {
+    "head_to_body_ratio": "petite adult proportion target; exact ratio pending Steward lock",
+    "camera_standard": {
+      "focal_length": "70mm equivalent for scale references",
+      "horizon": "mid-torso neutral horizon",
+      "distance": "standardized full-body distance",
+      "framing": "full body, feet visible, no perspective exaggeration"
+    },
+    "required_views": [
+      "front",
+      "front_three_quarter",
+      "side",
+      "rear_three_quarter",
+      "rear"
+    ],
+    "heel_comparison_required": {
+      "applicable": true,
+      "minimum_inches": 3
+    },
+    "group_scale_rules": [
+      "preserve relative height",
+      "do not confuse heel presentation with canonical height"
+    ]
+  },
+  "wardrobe_library": {
+    "signature_looks": [
+      {
+        "label": "white linen mid-knee dress with 3-inch heels",
+        "status": "preferred candidate",
+        "visibility": "internal"
+      }
+    ],
+    "categories": [
+      "office",
+      "casual",
+      "formal",
+      "activity",
+      "seasonal",
+      "restricted"
+    ],
+    "fit_guidance": [
+      "tailoring may alter apparent shape without changing canonical measurements"
+    ],
+    "restricted_categories": [
+      {
+        "label": "private-mode hooks",
+        "visibility": "private",
+        "default_load": false,
+        "authorization_required": true
+      }
+    ]
+  },
+  "prompt_canon": {
+    "identity_fragments": [
+      "adult Evelyn, very petite, warm hazel eyes, soft brunette hair, gentle reassuring smile"
+    ],
+    "asset_type_templates": [
+      {
+        "asset_type": "turnaround",
+        "fixed_variables": [
+          "pose",
+          "camera",
+          "lighting",
+          "wardrobe",
+          "expression"
+        ]
+      }
+    ],
+    "reproducibility_receipt_fields": [
+      "provider",
+      "model",
+      "checkpoint",
+      "seed",
+      "reference_images",
+      "control_settings",
+      "prompt_hash",
+      "negative_prompt_hash"
+    ],
+    "audience_scope": "internal"
+  },
+  "negative_prompt_canon": {
+    "global_rules": [
+      "extra limbs",
+      "malformed hands",
+      "malformed feet",
+      "duplicate faces",
+      "facial identity drift",
+      "age drift",
+      "height drift",
+      "body-proportion drift",
+      "incorrect eye color",
+      "incorrect hair color",
+      "watermarks",
+      "cut-off feet"
+    ],
+    "resident_rules": [
+      "do not inflate height",
+      "do not exaggerate ambiguity",
+      "do not replace warm hazel eyes"
+    ],
+    "comparison_rules": [
+      "no camera-angle changes",
+      "no pose changes",
+      "no lighting changes",
+      "no wardrobe changes"
+    ],
+    "group_rules": [
+      "no face blending",
+      "no identity swapping",
+      "no repeated faces",
+      "preserve relative height"
+    ],
+    "defect_taxonomy": [
+      "identity",
+      "anatomy",
+      "scale",
+      "wardrobe",
+      "rendering",
+      "provenance"
+    ]
+  },
+  "review_workflow": {
+    "states": [
+      "draft",
+      "pending_steward_review",
+      "revision_requested",
+      "provisionally_approved",
+      "canonical",
+      "rejected",
+      "superseded"
+    ],
+    "steward_notes_ledger": [
+      {
+        "note_id": "SN-EVELYN-001",
+        "text": "Preserve eye warmth and slight head tilt.",
+        "visibility": "internal"
+      }
+    ],
+    "measurement_variant_comparisons": [
+      {
+        "comparison_id": "CMP-EVELYN-001",
+        "resident_id": "RES-EVELYN",
+        "facial_fingerprint_hash": "sha256:9cd9a611c4b2a14b1bd4f19e8edc2dddb8202bc9e5602e0caece7ab110b05edd",
+        "variants": [
+          {
+            "label": "A",
+            "measurement_delta": "baseline"
+          },
+          {
+            "label": "B",
+            "measurement_delta": "narrower waist"
+          },
+          {
+            "label": "C",
+            "measurement_delta": "slightly fuller hip"
+          }
+        ],
+        "fixed_variables": [
+          "identity",
+          "facial_fingerprint",
+          "pose",
+          "expression",
+          "camera_position",
+          "focal_length",
+          "lighting",
+          "background",
+          "wardrobe"
+        ],
+        "views": [
+          "front",
+          "front_three_quarter",
+          "side",
+          "rear_three_quarter",
+          "rear"
+        ],
+        "vertical_alignment": true,
+        "heel_set": {
+          "included": true,
+          "heel_height_inches": 3
+        },
+        "steward_selection_notes": "Pending Steward selection; examples are candidates only.",
+        "regenerate_if_not_distinguishable": true
+      }
+    ],
+    "revision_packets": [],
+    "emotional_anchors": []
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "CAND-EVELYN-PLACEHOLDER",
+        "review_state": "pending_steward_review"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    },
+    "hidden_caption_test_plan": "Verify recognition with captions hidden before canonical lock.",
+    "group_compatibility_gate": "Later campaigns must validate relative scale and identity separation in pair and group images."
+  }
+}
