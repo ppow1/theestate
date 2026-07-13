@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-000005",
+    "display_name": "Marie",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/marie.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:dc90027d8e9a1f5f97ea5e4e404caafa3c2bf31cf29cac7a4f0b6be300c40d2d"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-marie-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-marie-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-marie-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-marie-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-marie-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-marie-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-marie-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-marie-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-marie-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-marie-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "RES-000005",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/marie/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-marie-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-office_working-v1.json",
+        "hash": "sha256:026779c701a113404e442e81bc67fa1888dbf6cdd2882404e09dc42f96e4229b",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-coffee_conversation-v1.json",
+        "hash": "sha256:f7b1bd61866e87babcfa3669f55ae8ca15558b570eaae9abaebd1599293be1a2",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-reading_reflective-v1.json",
+        "hash": "sha256:df6d25d9a340eacc85124318b1c3b451e68f2cbc480e5bae0985b9d8318ee48d",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-walking_transitional-v1.json",
+        "hash": "sha256:7c7e176e544a9f630b89a38c610a53f45d36ec3812eb570279f00a93c18c2db0",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-laughter_warmth-v1.json",
+        "hash": "sha256:07996a77203238e464cbc5e65094a716c1fcb29d64e7dadfa108b1649e02f96a",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-concern_focus-v1.json",
+        "hash": "sha256:7560859b14049480b715c6ea64f7591de0f541866e2ad3fc83b70c90a04f6fb7",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-outdoor_garden-v1.json",
+        "hash": "sha256:5ca7cfebe30f766bfa7503c60dac405f8319f9e1cd39811bc75cadd49509bca1",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-evening_after_hours-v1.json",
+        "hash": "sha256:6d44e16ea565cbfdd4f0e72ed9aeade14a0851f7ed1ebd085901f15abe289aea",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:ac0d6da369e195dcc755fb8c5413add83f2f2b52bc9222b466ce44f9038b5bed",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-marie-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/marie/internal/assets/candidates/c04-marie-recognizability_review-v1.json",
+        "hash": "sha256:45bacc7cc3d97d8f769af7742bfc81de9fec1aebf80eeaf3f71414fbbb0db20b",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

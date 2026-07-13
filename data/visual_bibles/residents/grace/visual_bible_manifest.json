@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "grace",
+    "display_name": "Grace",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/grace.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:1caf62660c63155c518bb425ca1466e47ef02f25f5d740fbf27788e8e3d61939"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-grace-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-grace-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-grace-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-grace-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-grace-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-grace-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-grace-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-grace-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-grace-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-grace-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "grace",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/grace/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-grace-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-office_working-v1.json",
+        "hash": "sha256:f880e981b96d4dbdd158136eee1c7cd9c31878062c039c3d29d88e767233bb45",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-coffee_conversation-v1.json",
+        "hash": "sha256:7ee02f0b304dbdf47493b235bb84134f56bbc581e50d7a512158387da8836c4e",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-reading_reflective-v1.json",
+        "hash": "sha256:900d9ac98f05033bee8764050b51d02a2e35afc24e00d0d8a69d5b3ea1fbd893",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-walking_transitional-v1.json",
+        "hash": "sha256:7122010325aa7da12bfaeeb17eb35935396d570a4832ca9771e900428cbc2cda",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-laughter_warmth-v1.json",
+        "hash": "sha256:eddcfc07b7426e39eb6ce8e10d2e593dd2ba2ef6fa04af6cc48e405edb17f1c6",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-concern_focus-v1.json",
+        "hash": "sha256:50be96a074a057a8505e843ea4daa6716c91028102160e850b5150f32fc95223",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-outdoor_garden-v1.json",
+        "hash": "sha256:c9a15053f0952e9da26919b1e4fb9c2c5a4bd4c49a91a3e0368fbc46401bc844",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-evening_after_hours-v1.json",
+        "hash": "sha256:121c820146451683e0b6172ac9a5014e1abc8b487490a27310dd7e7e3ea8fec5",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:1ddc69688d501b5ca3824bc7ebb684d7aed96a253dd96cb0fd59c99685e76148",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-grace-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/grace/internal/assets/candidates/c04-grace-recognizability_review-v1.json",
+        "hash": "sha256:9ab23d144729d4a03001ea3bfbac30c539db36439203628e51c3face8f987273",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

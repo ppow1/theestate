@@ -1,7 +1,81 @@
-{"schema_version":"character_presentation_pose.v1","work_package":"WP-4076","poses":[
-{"pose_id":"pose-executive-attention","name":"Executive Attention","description":"Upright composed attention with hands relaxed or holding briefing folder."},
-{"pose_id":"pose-boundary-review","name":"Boundary Review","description":"Calm review posture with guarded professional distance."},
-{"pose_id":"pose-workforce-welcome","name":"Workforce Welcome","description":"Open seated or standing posture suited to onboarding."},
-{"pose_id":"pose-operations-handoff","name":"Operations Handoff","description":"Forward-moving posture with checklist, board, or handoff packet."},
-{"pose_id":"pose-private-listening","name":"Private Listening","description":"Quiet listening posture for restricted Steward-private presentation."}
-]}
+{
+  "schema_version": "character_presentation_pose.v1",
+  "work_package": "WP-4076",
+  "poses": [
+    {
+      "pose_id": "pose-executive-attention",
+      "name": "Executive Attention",
+      "description": "Upright composed attention with hands relaxed or holding briefing folder."
+    },
+    {
+      "pose_id": "pose-boundary-review",
+      "name": "Boundary Review",
+      "description": "Calm review posture with guarded professional distance."
+    },
+    {
+      "pose_id": "pose-workforce-welcome",
+      "name": "Workforce Welcome",
+      "description": "Open seated or standing posture suited to onboarding."
+    },
+    {
+      "pose_id": "pose-operations-handoff",
+      "name": "Operations Handoff",
+      "description": "Forward-moving posture with checklist, board, or handoff packet."
+    },
+    {
+      "pose_id": "pose-private-listening",
+      "name": "Private Listening",
+      "description": "Quiet listening posture for restricted Steward-private presentation."
+    },
+    {
+      "pose_id": "pose-archive-ledger-review",
+      "name": "Archive Ledger Review",
+      "description": "Composed review posture with ledger, archive card, or provenance packet."
+    },
+    {
+      "pose_id": "pose-research-contextualizing",
+      "name": "Research Contextualizing",
+      "description": "Focused posture comparing notes, sources, and evidence without theatrical certainty."
+    },
+    {
+      "pose_id": "pose-legal-risk-review",
+      "name": "Legal Risk Review",
+      "description": "Measured counsel posture with marked clauses, compliance notes, or risk memo."
+    },
+    {
+      "pose_id": "pose-coffee-conversation",
+      "name": "Coffee Conversation",
+      "description": "Informal seated exchange with relaxed hands and resident-specific warmth."
+    },
+    {
+      "pose_id": "pose-reflective-reading",
+      "name": "Reflective Reading",
+      "description": "Quiet reading or annotated review posture preserving identity anchors."
+    },
+    {
+      "pose_id": "pose-transitional-walk",
+      "name": "Transitional Walk",
+      "description": "Natural walking posture between Estate locations with role-appropriate momentum."
+    },
+    {
+      "pose_id": "pose-informal-laughter",
+      "name": "Informal Warmth",
+      "description": "Brief authentic laugh or smile that preserves resident dignity and age band."
+    },
+    {
+      "pose_id": "pose-serious-concern",
+      "name": "Serious Focus",
+      "description": "Concerned, focused, or difficult-conversation posture without melodrama."
+    },
+    {
+      "pose_id": "pose-garden-reflection",
+      "name": "Garden Reflection",
+      "description": "Outdoor reflective posture with calm environmental presence."
+    },
+    {
+      "pose_id": "pose-evening-after-hours",
+      "name": "Evening After-Hours",
+      "description": "Low-key after-hours posture with subdued lighting and professional boundaries."
+    }
+  ]
+}

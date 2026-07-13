@@ -1,0 +1,11 @@
+{
+  "asset_id": "c04-ingrid-evening_after_hours-v1",
+  "resident_id": "RES-000002",
+  "campaign": "04",
+  "work_package": "WP-4145",
+  "review_state": "provisionally_approved",
+  "asset_type": "lifestyle_emotional_anchor_manifest",
+  "binary_asset": "not_generated",
+  "title": "Evening and after-hours scene",
+  "visual_bible_ref": "data/visual_bibles/residents/ingrid/visual_bible_manifest.json"
+}

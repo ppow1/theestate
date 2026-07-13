@@ -1,7 +1,62 @@
-{"schema_version":"resident_portrait_management.v1","work_package":"WP-4079","portraits":[
-{"portrait_id":"portrait-alfred-v1","resident_id":"RES-000001","gallery_id":"gallery-alfred-portrait-v1","primary":true,"approval_state":"canonical_placeholder"},
-{"portrait_id":"portrait-ingrid-v1","resident_id":"RES-000002","gallery_id":"gallery-ingrid-portrait-v1","primary":true,"approval_state":"canonical_placeholder"},
-{"portrait_id":"portrait-helen-v1","resident_id":"RES-000003","gallery_id":"gallery-helen-portrait-v1","primary":true,"approval_state":"canonical_placeholder"},
-{"portrait_id":"portrait-grace-v1","resident_id":"grace","gallery_id":"gallery-grace-portrait-v1","primary":true,"approval_state":"canonical_placeholder"},
-{"portrait_id":"portrait-evelyn-private-v1","resident_id":"evelyn","gallery_id":"gallery-evelyn-private-index-v1","primary":true,"approval_state":"restricted_index_only"}
-]}
+{
+  "schema_version": "resident_portrait_management.v1",
+  "work_package": "WP-4079",
+  "portraits": [
+    {
+      "portrait_id": "portrait-alfred-v1",
+      "resident_id": "RES-000001",
+      "gallery_id": "gallery-alfred-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    },
+    {
+      "portrait_id": "portrait-ingrid-v1",
+      "resident_id": "RES-000002",
+      "gallery_id": "gallery-ingrid-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    },
+    {
+      "portrait_id": "portrait-helen-v1",
+      "resident_id": "RES-000003",
+      "gallery_id": "gallery-helen-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    },
+    {
+      "portrait_id": "portrait-grace-v1",
+      "resident_id": "grace",
+      "gallery_id": "gallery-grace-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    },
+    {
+      "portrait_id": "portrait-evelyn-private-v1",
+      "resident_id": "evelyn",
+      "gallery_id": "gallery-evelyn-private-index-v1",
+      "primary": true,
+      "approval_state": "restricted_index_only"
+    },
+    {
+      "portrait_id": "portrait-eleanor-v1",
+      "resident_id": "RES-000004",
+      "gallery_id": "gallery-eleanor-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    },
+    {
+      "portrait_id": "portrait-marie-v1",
+      "resident_id": "RES-000005",
+      "gallery_id": "gallery-marie-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    },
+    {
+      "portrait_id": "portrait-judy-v1",
+      "resident_id": "RES-000006",
+      "gallery_id": "gallery-judy-portrait-v1",
+      "primary": true,
+      "approval_state": "canonical_placeholder"
+    }
+  ]
+}

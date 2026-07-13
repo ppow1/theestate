@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-000004",
+    "display_name": "Eleanor",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/eleanor.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:0f5f888bc5846db28e90a226205b45d71b4a13594bab8c87a74d1212ecdb1354"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-eleanor-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-eleanor-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-eleanor-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-eleanor-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-eleanor-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-eleanor-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-eleanor-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-eleanor-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-eleanor-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-eleanor-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-eleanor-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-office_working-v1.json",
+        "hash": "sha256:9b7da73ae5ea7067e1232b2f7cbd98735aeded6380bca2c7c94fccc89d722c3a",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-coffee_conversation-v1.json",
+        "hash": "sha256:d25df31bd795d67dfbad19ae2e9e756dc8188c4b5157609296897860c47e97b7",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-reading_reflective-v1.json",
+        "hash": "sha256:766b283f3316aa9c04feab0772dc3fbfece49eaf0c9e58b6cbcfafca7c089738",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-walking_transitional-v1.json",
+        "hash": "sha256:c9ccad09578d519a7e93ab5fb4bd43ee60643b4bf72de82167131f09207b9766",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-laughter_warmth-v1.json",
+        "hash": "sha256:2db3f9cf94ca3ec7ac51fb9ce2a6b3b89e0627888d66f00fe89c41184fde29dd",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-concern_focus-v1.json",
+        "hash": "sha256:ef5c941b5388cb029d6473a81731b9f6c05e510d64cbd9145549809f3faf6115",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-outdoor_garden-v1.json",
+        "hash": "sha256:e793b5142da0e6cab226a936de99a75529b116855316ed504cb039cee4e6ca92",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-evening_after_hours-v1.json",
+        "hash": "sha256:9246bcd168d13912805ec3dca6ba7de4878724331e1483e91ca62f6133d5bd75",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:7c8da8ea6bbb7cfe5e3578b2ce32dd51d9f4ad8d61a33e93abcb1c1860b5e2c4",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-eleanor-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c04-eleanor-recognizability_review-v1.json",
+        "hash": "sha256:624f15886d48c8902d965863d52849c9ca76b85b38834e9ccdfe44610e21d538",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

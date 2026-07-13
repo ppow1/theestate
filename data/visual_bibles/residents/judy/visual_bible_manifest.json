@@ -1,0 +1,291 @@
+{
+  "schema_version": "visual_bible_foundation_v1",
+  "resident": {
+    "resident_id": "RES-000006",
+    "display_name": "Judy",
+    "adult_status": "adult",
+    "identity_document_refs": [
+      "residents/judy.md"
+    ]
+  },
+  "visibility_layers": [
+    "public",
+    "internal",
+    "restricted",
+    "private"
+  ],
+  "physical_specification": {
+    "status": "provisional",
+    "steward_approval": {
+      "approved": false,
+      "notes": "No Campaign 03 Steward-approved physical lock in repository."
+    },
+    "provenance": {
+      "source": "Campaign 04 manifest scaffold",
+      "created_at": "2026-07-13",
+      "created_by": "Codex",
+      "hash": "sha256:7739a1dc3ef6b46116d371b26066aabe775d2ceddc98dfdfe79cc6a92e05e277"
+    }
+  },
+  "visual_fingerprint": {
+    "primary_cues": [
+      "role-specific professional presence",
+      "resident-specific posture",
+      "canonical office context"
+    ]
+  },
+  "review_workflow": {
+    "emotional_anchors": [
+      {
+        "work_package": "WP-4138",
+        "anchor_id": "c04-judy-office_working-v1",
+        "title": "Office working scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-office_working-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4139",
+        "anchor_id": "c04-judy-coffee_conversation-v1",
+        "title": "Coffee and conversation scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-coffee_conversation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4140",
+        "anchor_id": "c04-judy-reading_reflective-v1",
+        "title": "Reading and reflective scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-reading_reflective-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4141",
+        "anchor_id": "c04-judy-walking_transitional-v1",
+        "title": "Walking and transitional scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-walking_transitional-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4142",
+        "anchor_id": "c04-judy-laughter_warmth-v1",
+        "title": "Laughter and informal warmth scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-laughter_warmth-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4143",
+        "anchor_id": "c04-judy-concern_focus-v1",
+        "title": "Concern, focus, and serious-conversation scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-concern_focus-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4144",
+        "anchor_id": "c04-judy-outdoor_garden-v1",
+        "title": "Outdoor and garden scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-outdoor_garden-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4145",
+        "anchor_id": "c04-judy-evening_after_hours-v1",
+        "title": "Evening and after-hours scene",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-evening_after_hours-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4146",
+        "anchor_id": "c04-judy-emotional_anchor_gallery-v1",
+        "title": "Emotional anchor gallery",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-emotional_anchor_gallery-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4147",
+        "anchor_id": "c04-judy-recognizability_review-v1",
+        "title": "Lifestyle recognizability review",
+        "resident_id": "RES-000006",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-recognizability_review-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/judy/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve office role posture",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
+    ]
+  },
+  "asset_library": {
+    "canonical": [],
+    "candidates": [
+      {
+        "asset_id": "c04-judy-office_working-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-office_working-v1.json",
+        "hash": "sha256:f096f5bf8f2a25351a174cd20887251c9cf70d70a8bf431f6efd5b68aafb4e4d",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4138",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-coffee_conversation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-coffee_conversation-v1.json",
+        "hash": "sha256:d3a85447e8b711cc0cf1c3c0d4c0ccf992e9d9cae88c561baed34bbbc74aa9b7",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4139",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-reading_reflective-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-reading_reflective-v1.json",
+        "hash": "sha256:b38506f03258b870e4e99a372827dd9ba20bd86a826a30d5127b9acacc184f69",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4140",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-walking_transitional-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-walking_transitional-v1.json",
+        "hash": "sha256:af422ec55a275f1ed7ef6c6fc0cc5cdf88eced8a6861b1d282d0bec144a0e470",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4141",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-laughter_warmth-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-laughter_warmth-v1.json",
+        "hash": "sha256:be67dbed36d3863f109463535f43b8a0ba568535de70ad2df984669cfdea0b4a",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4142",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-concern_focus-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-concern_focus-v1.json",
+        "hash": "sha256:c464a4057d0c1dd8f783be33a5b20c07b531ff5d3137f9926ad31330ea4fdf36",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4143",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-outdoor_garden-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-outdoor_garden-v1.json",
+        "hash": "sha256:e838e44957cab970ca5b6358531a37ae9a97a69d34f6a046ba1fb001d5d359c9",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4144",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-evening_after_hours-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-evening_after_hours-v1.json",
+        "hash": "sha256:6bf47d346f174cfc5d897e77e005bf77c46764be999a18d39e21b617ec7d79cb",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4145",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-emotional_anchor_gallery-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-emotional_anchor_gallery-v1.json",
+        "hash": "sha256:fff062054da7bc181be39d2cea9f65bdf7b47be9bd157fd269728f3327155dc8",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4146",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c04-judy-recognizability_review-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/judy/internal/assets/candidates/c04-judy-recognizability_review-v1.json",
+        "hash": "sha256:766cca48eee786ed8d014a925134f1785788e8e28a79f4230893b0c60b949f87",
+        "campaign": "Campaign 04",
+        "work_package": "WP-4147",
+        "asset_type": "lifestyle_emotional_anchor_manifest"
+      }
+    ],
+    "rejected": [],
+    "superseded": [],
+    "comparisons": [],
+    "turnarounds": [],
+    "thumbnails": [],
+    "group_images": []
+  },
+  "canonical_lock": {
+    "status": "review_candidate",
+    "explicit_steward_approval_required": true,
+    "lock_record": {},
+    "unlock_controls": {
+      "new_version_required": true,
+      "silent_replacement_prohibited": true
+    }
+  }
+}

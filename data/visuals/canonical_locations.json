@@ -1,8 +1,95 @@
-{"schema_version":"canonical_estate_locations.v1","work_package":"WP-4075","locations":[
-{"location_id":"loc-chief-staff-office","name":"Chief of Staff Office","canonical_use":"Alfred briefings and Steward attention routing","asset_refs":["docs/onboarding/visual_manifest.md"]},
-{"location_id":"loc-boundary-office","name":"Security and Boundary Office","canonical_use":"Ingrid privacy and crossing reviews","asset_refs":["docs/governance/offices/Office_of_Character_Architecture.md"]},
-{"location_id":"loc-hr-office","name":"Human Resources Office","canonical_use":"Helen workforce and onboarding scenes","asset_refs":["docs/character-architecture/Resident_Inventory_v0_1.md"]},
-{"location_id":"loc-operations-floor","name":"Operations Floor","canonical_use":"Grace sequencing, handoffs, and checkpoint scenes","asset_refs":["docs/operations/Mission_Control_Workspace_v1.md"]},
-{"location_id":"loc-private-study","name":"Private Steward Study","canonical_use":"Restricted Evelyn presentation only","asset_refs":["docs/operations/Steward_Recall_Decision_Model_v1.md"],"classification":"Estate Restricted"},
-{"location_id":"loc-living-gallery","name":"Living Estate Gallery","canonical_use":"Approved resident portrait and continuity exhibition","asset_refs":["docs/governance/visuals/README.md"]}
-]}
+{
+  "schema_version": "canonical_estate_locations.v1",
+  "work_package": "WP-4075",
+  "locations": [
+    {
+      "location_id": "loc-chief-staff-office",
+      "name": "Chief of Staff Office",
+      "canonical_use": "Alfred briefings and Steward attention routing",
+      "asset_refs": [
+        "docs/onboarding/visual_manifest.md"
+      ]
+    },
+    {
+      "location_id": "loc-boundary-office",
+      "name": "Security and Boundary Office",
+      "canonical_use": "Ingrid privacy and crossing reviews",
+      "asset_refs": [
+        "docs/governance/offices/Office_of_Character_Architecture.md"
+      ]
+    },
+    {
+      "location_id": "loc-hr-office",
+      "name": "Human Resources Office",
+      "canonical_use": "Helen workforce and onboarding scenes",
+      "asset_refs": [
+        "docs/character-architecture/Resident_Inventory_v0_1.md"
+      ]
+    },
+    {
+      "location_id": "loc-operations-floor",
+      "name": "Operations Floor",
+      "canonical_use": "Grace sequencing, handoffs, and checkpoint scenes",
+      "asset_refs": [
+        "docs/operations/Mission_Control_Workspace_v1.md"
+      ]
+    },
+    {
+      "location_id": "loc-private-study",
+      "name": "Private Steward Study",
+      "canonical_use": "Restricted Evelyn presentation only",
+      "asset_refs": [
+        "docs/operations/Steward_Recall_Decision_Model_v1.md"
+      ],
+      "classification": "Estate Restricted"
+    },
+    {
+      "location_id": "loc-living-gallery",
+      "name": "Living Estate Gallery",
+      "canonical_use": "Approved resident portrait and continuity exhibition",
+      "asset_refs": [
+        "docs/governance/visuals/README.md"
+      ]
+    },
+    {
+      "location_id": "loc-archives-registrar-office",
+      "name": "Archives Registrar Office",
+      "canonical_use": "Eleanor provenance, ledger, and institutional memory scenes",
+      "asset_refs": [
+        "docs/onboarding/visual_manifest.md"
+      ]
+    },
+    {
+      "location_id": "loc-research-library",
+      "name": "Research Library",
+      "canonical_use": "Marie investigation, reading, validation, and contextualization scenes",
+      "asset_refs": [
+        "docs/onboarding/visual_manifest.md"
+      ]
+    },
+    {
+      "location_id": "loc-legal-review-office",
+      "name": "Legal Review Office",
+      "canonical_use": "Judy compliance, claims, contracts, and risk review scenes",
+      "asset_refs": [
+        "docs/onboarding/visual_manifest.md"
+      ]
+    },
+    {
+      "location_id": "loc-estate-garden",
+      "name": "Estate Garden",
+      "canonical_use": "Outdoor reflective, walking, and informal resident scenes",
+      "asset_refs": [
+        "docs/onboarding/visual_manifest.md"
+      ]
+    },
+    {
+      "location_id": "loc-evening-parlor",
+      "name": "Evening Parlor",
+      "canonical_use": "After-hours calm conversation and emotional-anchor scenes",
+      "asset_refs": [
+        "docs/onboarding/visual_manifest.md"
+      ]
+    }
+  ]
+}
