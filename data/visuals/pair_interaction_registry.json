@@ -1,0 +1,1063 @@
+{
+  "schema_version": "pair_interaction_registry.v1",
+  "campaign": "Campaign 07 - Pair and Interaction Library",
+  "work_packages": [
+    "WP-4168",
+    "WP-4169",
+    "WP-4170",
+    "WP-4171",
+    "WP-4172",
+    "WP-4173",
+    "WP-4174",
+    "WP-4175",
+    "WP-4176",
+    "WP-4177"
+  ],
+  "generated_at": "2026-07-13T00:00:00Z",
+  "commissioned_resident_count": 8,
+  "pair_count": 28,
+  "coverage": "all unordered pairs among commissioned residents",
+  "global_controls": {
+    "scale": "Keep resident relative height/body-scale anchors visible through floor contact, eye-line, and seated/standing context.",
+    "posture": "Use open professional posture; avoid romantic, hostile, combat, caricature, or authority-swapping poses.",
+    "relationship": "Preserve department roles, clearance boundaries, Evelyn restricted-context protections, and Steward authority separation."
+  },
+  "pairs": [
+    {
+      "pair_id": "pair-res-000001-res-000002",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        }
+      ],
+      "canonical_scene_type": "professional_collaboration",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_ingrid/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Ingrid. Boundary handoff in a quiet corridor; Alfred requests routing clarity while Ingrid protects crossing rules. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000001-res-000003",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_helen/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Helen. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000001-grace",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        }
+      ],
+      "canonical_scene_type": "professional_collaboration",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_grace/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Grace. Operations checkpoint at the strategy board; Alfred stabilizes context while Grace sequences next movement. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000001-evelyn",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        }
+      ],
+      "canonical_scene_type": "steward_interaction_framework",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_evelyn/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Evelyn. Steward-adjacent private threshold; Alfred remains outside private intimacy while Evelyn protects relational discretion. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000001-res-000004",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_eleanor/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Eleanor. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000001-res-000005",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_marie/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Marie. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000001-res-000006",
+      "residents": [
+        {
+          "resident_id": "RES-000001",
+          "display_name": "Alfred",
+          "scale_anchor": "tall composed adult; upright service posture",
+          "identity_traits": [
+            "composed executive butler presence",
+            "silver-gray tailoring",
+            "warmly precise expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/alfred_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Alfred and Judy. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000002-res-000003",
+      "residents": [
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        },
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/ingrid_helen/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Ingrid and Helen. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000002-grace",
+      "residents": [
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        },
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/ingrid_grace/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Ingrid and Grace. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000002-evelyn",
+      "residents": [
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        },
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        }
+      ],
+      "canonical_scene_type": "steward_interaction_framework",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/ingrid_evelyn/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Ingrid and Evelyn. Steward-adjacent privacy threshold conversation; Ingrid protects disclosure boundaries while Evelyn keeps relational discretion private and non-institutional. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000002-res-000004",
+      "residents": [
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        },
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/ingrid_eleanor/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Ingrid and Eleanor. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000002-res-000005",
+      "residents": [
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        },
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/ingrid_marie/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Ingrid and Marie. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000002-res-000006",
+      "residents": [
+        {
+          "resident_id": "RES-000002",
+          "display_name": "Ingrid",
+          "scale_anchor": "average-tall adult; still protective stance",
+          "identity_traits": [
+            "reserved elegant boundary guardian",
+            "dark tailored attire",
+            "privacy-aware gaze"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "professional_collaboration",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/ingrid_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Ingrid and Judy. Compliance and clearance review; Judy names legal exposure while Ingrid marks privacy boundaries. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000003-grace",
+      "residents": [
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        },
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        }
+      ],
+      "canonical_scene_type": "mentoring_support",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/helen_grace/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Helen and Grace. Workload triage beside the daily board; Helen supports staffing health while Grace adjusts pace. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000003-evelyn",
+      "residents": [
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        },
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/helen_evelyn/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Helen and Evelyn. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000003-res-000004",
+      "residents": [
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/helen_eleanor/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Helen and Eleanor. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000003-res-000005",
+      "residents": [
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/helen_marie/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Helen and Marie. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000003-res-000006",
+      "residents": [
+        {
+          "resident_id": "RES-000003",
+          "display_name": "Helen",
+          "scale_anchor": "average adult; open attentive stance",
+          "identity_traits": [
+            "approachable workforce leader",
+            "soft professional wardrobe",
+            "humane attentive expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/helen_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Helen and Judy. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-grace-evelyn",
+      "residents": [
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        },
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/grace_evelyn/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Grace and Evelyn. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-grace-res-000004",
+      "residents": [
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        },
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/grace_eleanor/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Grace and Eleanor. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-grace-res-000005",
+      "residents": [
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        },
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/grace_marie/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Grace and Marie. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-grace-res-000006",
+      "residents": [
+        {
+          "resident_id": "grace",
+          "display_name": "Grace",
+          "scale_anchor": "average adult; forward operational stance",
+          "identity_traits": [
+            "energetic operations director",
+            "crisp practical attire",
+            "decisive momentum"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/grace_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Grace and Judy. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-evelyn-res-000004",
+      "residents": [
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        },
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/evelyn_eleanor/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Evelyn and Eleanor. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-evelyn-res-000005",
+      "residents": [
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        },
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/evelyn_marie/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Evelyn and Marie. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-evelyn-res-000006",
+      "residents": [
+        {
+          "resident_id": "evelyn",
+          "display_name": "Evelyn",
+          "scale_anchor": "average adult; restrained intimate posture",
+          "identity_traits": [
+            "private confidant presence",
+            "soft restrained elegance",
+            "Steward-private warmth"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/evelyn_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Evelyn and Judy. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000004-res-000005",
+      "residents": [
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "professional_collaboration",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/eleanor_marie/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Eleanor and Marie. Archive research table; Eleanor preserves provenance while Marie tests a research lead. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000004-res-000006",
+      "residents": [
+        {
+          "resident_id": "RES-000004",
+          "display_name": "Eleanor",
+          "scale_anchor": "average adult; precise archival stance",
+          "identity_traits": [
+            "archival registrar presence",
+            "ordered provenance materials",
+            "quiet exacting expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "conversational_common_area",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/eleanor_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Eleanor and Judy. Estate common-area conversation that preserves each resident office identity and comfortable professional distance. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    },
+    {
+      "pair_id": "pair-res-000005-res-000006",
+      "residents": [
+        {
+          "resident_id": "RES-000005",
+          "display_name": "Marie",
+          "scale_anchor": "average adult; investigative scholar stance",
+          "identity_traits": [
+            "research investigator presence",
+            "practical scholarly attire",
+            "curious focused expression"
+          ]
+        },
+        {
+          "resident_id": "RES-000006",
+          "display_name": "Judy",
+          "scale_anchor": "average adult; formal legal stance",
+          "identity_traits": [
+            "general counsel presence",
+            "structured legal attire",
+            "measured risk-aware expression"
+          ]
+        }
+      ],
+      "canonical_scene_type": "celebration_milestone",
+      "commissioned_image": {
+        "status": "prompt_ready_pending_generation",
+        "asset_slot": "data/visual_bibles/pairs/marie_judy/canonical_interaction_v1.png",
+        "prompt": "Canonical Estate interaction image of Marie and Judy. Small Estate milestone recognition after a successfully reviewed research/legal finding; Marie acknowledges validated discovery while Judy marks approved compliance closure. Preserve relative body scale, adult proportions, eye-line consistency, non-caricature realism, office-appropriate wardrobe, and both resident identity anchors."
+      },
+      "validation": {
+        "scale": "pass_prompt_controls",
+        "posture": "pass_prompt_controls",
+        "relationship": "pass_prompt_controls",
+        "notes": "No generated raster is claimed; acceptance is limited to canonical prompt, slot, and continuity-control readiness."
+      }
+    }
+  ]
+}
