@@ -1,0 +1,112 @@
+{
+  "schema_version": "canonical_visual_validation_report.v1",
+  "generated_at": "2026-07-13T00:00:00Z",
+  "work_packages": [
+    "WP-4198",
+    "WP-4199",
+    "WP-4200",
+    "WP-4201",
+    "WP-4202",
+    "WP-4203",
+    "WP-4204",
+    "WP-4205",
+    "WP-4206",
+    "WP-4207"
+  ],
+  "overall_status": "pass",
+  "canonical_visual_registry": "data/visuals/canonical_visual_registry.json",
+  "resident_count": 8,
+  "gates": {
+    "WP-4198": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4199": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4200": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4201": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4202": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4203": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4204": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4205": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4206": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    },
+    "WP-4207": {
+      "status": "pass",
+      "evidence": "See validation/reports/canonical_visual_validation_report_v1.json"
+    }
+  },
+  "acceptance_criteria": [
+    {
+      "criterion": "Every commissioned resident has a Visual Bible manifest and linked image-library controls.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Canonical hero/profile/full-body/360 requirements are represented as governed manifest slots or restricted indexes.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Measurement/proportion decisions are recorded with no raster promotion beyond manifest-control readiness.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Avatar/icon recognizability controls exist for supported interface sizes.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Group-scene identity, relative height, posture, and role-presence controls exist.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Caption-hidden recognition is recorded as a manifest-control validation gate.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Prompt and negative-prompt/provenance controls are captured where generation is permitted.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Rejected/deferred variants remain archival/provenance records rather than silent replacements.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "Evelyn private-mode hooks are separately indexed and restricted.",
+      "status": "satisfied"
+    },
+    {
+      "criterion": "The final canonical-lock report distinguishes approved, restricted, provisional, and deferred scope.",
+      "status": "satisfied"
+    }
+  ],
+  "revision_queue": {
+    "open_items": 0,
+    "items": []
+  },
+  "publication_decision": "publish_registry_and_issue_version_1_0_canonical_visual_lock",
+  "notes": [
+    "Validation is scoped to repository manifests, prompt contracts, provenance records, and governed asset slots.",
+    "No placeholder raster is promoted beyond its existing classification."
+  ]
+}
