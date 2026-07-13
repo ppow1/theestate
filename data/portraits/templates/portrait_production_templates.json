@@ -1,0 +1,17 @@
+{
+  "schema_version": "portrait_production_templates_v1",
+  "campaign": "VISUAL-CAMPAIGN-02",
+  "portrait_types": ["hero", "professional_office", "full_body", "profile_rear", "three_quarter", "expression_sheet", "headshot", "thumbnail", "consistency_board", "canonical_lock"],
+  "review_states": ["not_started", "candidate_generation", "steward_review", "revision_requested", "approved", "rejected", "superseded", "canonical_locked"],
+  "access_classifications": ["public", "internal", "restricted", "private", "review_only"],
+  "canonical_rule": "No asset is canonical unless metadata canonical_status is canonical_locked and Steward approval evidence is present.",
+  "negative_prompt_canon": ["generic stock face", "beauty-template convergence", "age drift", "infantilization", "identity drift", "malformed anatomy", "unapproved ancestry assertion", "review-only asset marked canonical"],
+  "hero": {"required_candidates": 3, "derivatives": ["master_png", "square_crop", "4x5_vertical_crop", "16x9_safe_area"]},
+  "professional_office": {"required_scenes": ["seated_desk", "standing_environmental", "conversational", "candid_work"], "optional_scenes": ["doorway_arrival", "environmental_detail"]},
+  "full_body": {"required_poses": ["neutral_front", "relaxed_front", "standing_three_quarter", "side_profile", "rear_standing", "walking", "seated_role_appropriate", "signature_pose", "scale_reference", "footwear_variant"]},
+  "profile_rear": {"required_angles": ["left_facial_profile", "right_facial_profile", "left_full_body_profile", "right_full_body_profile", "rear_head_shoulders", "rear_full_body", "rear_three_quarter_left", "rear_three_quarter_right", "hair_from_behind", "posture_shoulder_line"]},
+  "three_quarter": {"required_angles": ["front_three_quarter_left", "front_three_quarter_right", "rear_three_quarter_left", "rear_three_quarter_right"]},
+  "expression_sheet": {"core_expressions": ["neutral", "warm", "listening", "reassuring", "focused", "concerned", "role_specific"], "micro_expressions_required": true},
+  "headshot_thumbnail": {"required_assets": ["canonical_close_headshot", "shoulders_up", "conversational", "circular_crop", "square_crop", "transparent_cutout", "dark_thumbnail", "light_thumbnail", "monochrome", "notification_avatar"], "sizes_px": [32, 64, 128, 256, 512]},
+  "validation": {"drift_categories": ["facial_geometry", "age", "eye", "hair", "proportion", "expression", "ancestry_overstatement", "body_scale", "wardrobe_identity_loss", "crop_identity_loss", "model_style", "artifact_anatomy"]}
+}

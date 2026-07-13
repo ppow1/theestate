@@ -1,0 +1,164 @@
+{
+  "schema_version": "resident_portrait_manifest_v1",
+  "campaign": "VISUAL-CAMPAIGN-02",
+  "resident_id": "evelyn",
+  "display_name": "Evelyn",
+  "visual_bible_ref": "data/visual_bibles/residents/evelyn/visual_bible_manifest.json",
+  "status": "candidate_generation",
+  "adult_presentation_required": true,
+  "identity_anchors": [
+    "Steward Relationship Layer",
+    "intimate but non-institutional posture"
+  ],
+  "canonical_traits": [
+    "private confidant presence",
+    "soft restrained elegance",
+    "Steward-private warmth"
+  ],
+  "unresolved_fields": [
+    "final photorealistic assets pending local generation",
+    "Steward visual acceptance pending"
+  ],
+  "portrait_slots": {
+    "hero": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "professional_office": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "full_body": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "profile_rear": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "three_quarter": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "expression_sheet": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "headshot": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    },
+    "thumbnail": {
+      "status": "candidate_generation",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/evelyn/candidates",
+        "canonical": "data/portraits/residents/evelyn/canonical",
+        "metadata": "data/portraits/residents/evelyn/metadata",
+        "reviews": "data/portraits/residents/evelyn/reviews"
+      }
+    }
+  },
+  "assets": [],
+  "canonical_locks": [],
+  "generation_queue": [
+    {
+      "slot": "hero",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "professional_office",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "full_body",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "profile_rear",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "three_quarter",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "expression_sheet",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "headshot",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    },
+    {
+      "slot": "thumbnail",
+      "reason": "No approved local image-generation runtime output is available; create candidates from deterministic prompts before Steward review."
+    }
+  ]
+}
