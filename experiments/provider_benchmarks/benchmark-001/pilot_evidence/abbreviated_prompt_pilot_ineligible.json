@@ -1,0 +1,11 @@
+{
+  "schema_version": "provider-benchmark-pilot-evidence.v1",
+  "benchmark_id": "benchmark-001",
+  "status": "preserved_ineligible_for_provider_ranking",
+  "reason": "WP-0545 local pilot runs used the pre-WP-0546 abbreviated prompt rather than the immutable canonical benchmark packet. They remain preserved as pilot evidence only and must not be ranked against fair reruns.",
+  "preserved_runs": [
+    "experiments/provider_benchmarks/benchmark-001/20260713T021222Z-6dc0e6ca",
+    "experiments/provider_benchmarks/benchmark-001/20260713T021239Z-799483ee"
+  ],
+  "do_not_overwrite_or_delete_prior_evidence": true
+}
