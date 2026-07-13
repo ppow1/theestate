@@ -176,6 +176,148 @@
           "do not promote placeholder to canonical imagery without Steward approval"
         ]
       }
+    ],
+    "wardrobe_activity_library": [
+      {
+        "work_package": "WP-4148",
+        "wardrobe_id": "c05-eleanor-business-v1",
+        "title": "Business wardrobe library",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-business-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4149",
+        "wardrobe_id": "c05-eleanor-business_casual-v1",
+        "title": "Business-casual wardrobe library",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-business_casual-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4150",
+        "wardrobe_id": "c05-eleanor-formal_cocktail-v1",
+        "title": "Formal and cocktail wardrobe library",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-formal_cocktail-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4151",
+        "wardrobe_id": "c05-eleanor-casual_home-v1",
+        "title": "Casual and home wardrobe library",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-casual_home-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4152",
+        "wardrobe_id": "c05-eleanor-seasonal-v1",
+        "title": "Seasonal wardrobe library",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-seasonal-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4153",
+        "wardrobe_id": "c05-eleanor-fitness_movement-v1",
+        "title": "Fitness and movement wardrobe library",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-fitness_movement-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4154",
+        "wardrobe_id": "c05-eleanor-dance_performance-v1",
+        "title": "Dance and performance imagery",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-dance_performance-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4155",
+        "wardrobe_id": "c05-eleanor-swimwear_adult_controls-v1",
+        "title": "Swimwear imagery and adult presentation controls",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-swimwear_adult_controls-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4156",
+        "wardrobe_id": "c05-eleanor-signature_accessory_lock-v1",
+        "title": "Signature outfit and accessory lock",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-signature_accessory_lock-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      },
+      {
+        "work_package": "WP-4157",
+        "wardrobe_id": "c05-eleanor-wardrobe_fit_validation-v1",
+        "title": "Wardrobe consistency and fit validation",
+        "resident_id": "RES-000004",
+        "asset_status": "approved_manifest_placeholder",
+        "asset_ref": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-wardrobe_fit_validation-v1.json",
+        "visual_bible_ref": "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+        "recognizability_requirements": [
+          "preserve resident visual fingerprint",
+          "preserve resident-specific wardrobe language",
+          "do not promote placeholder to canonical imagery without Steward approval"
+        ]
+      }
     ]
   },
   "asset_library": {
@@ -270,6 +412,96 @@
         "campaign": "Campaign 04",
         "work_package": "WP-4147",
         "asset_type": "lifestyle_emotional_anchor_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-business-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-business-v1.json",
+        "hash": "sha256:87bb999bac0b3c8a225e28f1a9520d3e0d5e8d5529d7996718a62c4995933480",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4148",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-business_casual-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-business_casual-v1.json",
+        "hash": "sha256:b9b6d47cb50d40001b31a6a413936dd120d169e2e9b3dfe6c236d82fe3647108",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4149",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-formal_cocktail-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-formal_cocktail-v1.json",
+        "hash": "sha256:0e6ee4704494770c362fef63408d665bc8028c6d871f3d9191b622af28908d7f",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4150",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-casual_home-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-casual_home-v1.json",
+        "hash": "sha256:96ca5348b27e5a077ba3b32c5edc1622c22ab424780a6ab0c5dc5765f91cf278",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4151",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-seasonal-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-seasonal-v1.json",
+        "hash": "sha256:b4911bc3ba704ca9c4de4ccf481d1948992c9b53a410c832e77683964425f214",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4152",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-fitness_movement-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-fitness_movement-v1.json",
+        "hash": "sha256:36d427c5fc59ffae2f04ae41b0c71e7486863316b4612d7454a9aa697cff4571",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4153",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-dance_performance-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-dance_performance-v1.json",
+        "hash": "sha256:e98825a3e8632ab48fe1381a357fdd4c20c6aeb0ab3d4d9cfabc29108f72923b",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4154",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-swimwear_adult_controls-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-swimwear_adult_controls-v1.json",
+        "hash": "sha256:bf6874cdcbfecaca6f9afcac45e4944096b56b80129577638a7d6e2d9003b935",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4155",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-signature_accessory_lock-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-signature_accessory_lock-v1.json",
+        "hash": "sha256:33b6356b8f74c91bd5a10fea549709006eb5db293509f00dd82e8d796bcd2ca3",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4156",
+        "asset_type": "wardrobe_activity_manifest"
+      },
+      {
+        "asset_id": "c05-eleanor-wardrobe_fit_validation-v1",
+        "review_state": "provisionally_approved",
+        "path": "data/visual_bibles/residents/eleanor/internal/assets/candidates/c05-eleanor-wardrobe_fit_validation-v1.json",
+        "hash": "sha256:db4350dfcbed1e3f1efe942a677a114c2632ecca5d071081473bc5a484835e3f",
+        "campaign": "Campaign 05",
+        "work_package": "WP-4157",
+        "asset_type": "wardrobe_activity_manifest"
       }
     ],
     "rejected": [],
