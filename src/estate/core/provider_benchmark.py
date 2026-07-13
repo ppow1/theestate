@@ -176,6 +176,79 @@ def extract_code(text):
     return text if 'def plan_batches' in text else mock_benchmark001_code()
 def mock_benchmark001_response(model): return {'model':model,'response':mock_benchmark001_code(),'done':True,'total_duration':1000000,'load_duration':1000,'prompt_eval_count':120,'prompt_eval_duration':2000,'eval_count':300,'eval_duration':997000}
 def mock_benchmark001_code(): return '''class DependencyBatchError(ValueError):\n    pass\n\ndef _is_int_not_bool(value):\n    return isinstance(value, int) and not isinstance(value, bool)\n\ndef plan_batches(tasks: list[dict], max_parallel: int) -> list[list[str]]:\n    if not _is_int_not_bool(max_parallel) or max_parallel <= 0:\n        raise DependencyBatchError("max_parallel must be a positive integer")\n    if not isinstance(tasks, list):\n        raise DependencyBatchError("tasks must be a list")\n    records = {}\n    for task in tasks:\n        if not isinstance(task, dict):\n            raise DependencyBatchError("each task must be a dict")\n        tid = task.get("id")\n        if not isinstance(tid, str) or not tid:\n            raise DependencyBatchError("task id must be a non-empty string")\n        if tid in records:\n            raise DependencyBatchError("duplicate task id")\n        duration, priority, deps = task.get("duration"), task.get("priority"), task.get("depends_on")\n        if not _is_int_not_bool(duration) or duration <= 0:\n            raise DependencyBatchError("duration must be a positive integer")\n        if not _is_int_not_bool(priority):\n            raise DependencyBatchError("priority must be an integer")\n        if not isinstance(deps, list) or any(not isinstance(d, str) or not d for d in deps):\n            raise DependencyBatchError("depends_on must be a list of task ids")\n        if tid in deps:\n            raise DependencyBatchError("self dependency")\n        records[tid] = {"duration": duration, "priority": priority, "depends_on": tuple(deps)}\n    for rec in records.values():\n        for dep in rec["depends_on"]:\n            if dep not in records:\n                raise DependencyBatchError("unknown dependency")\n    remaining, completed, batches = set(records), set(), []\n    while remaining:\n        eligible = [tid for tid in remaining if all(dep in completed for dep in records[tid]["depends_on"])]\n        if not eligible:\n            raise DependencyBatchError("dependency cycle detected")\n        eligible.sort(key=lambda tid: (-records[tid]["priority"], records[tid]["duration"], tid))\n        batch = eligible[:max_parallel]\n        batches.append(batch); completed.update(batch); remaining.difference_update(batch)\n    return batches\n'''
+
+def _run_root(benchmark_id:str, run_id:str)->Path:
+    return safe_join(BENCH_ROOT, benchmark_id, run_id)
+def _metadata_path(executor_dir:Path)->Path|None:
+    for name in ('metadata.json','run_metadata.json'):
+        p=executor_dir/name
+        if p.exists(): return p
+    return None
+def _load_executor_metadata(executor_dir:Path)->tuple[dict,Path]:
+    p=_metadata_path(executor_dir)
+    if not p: raise BenchmarkError(f'missing source result metadata: {executor_dir}')
+    return json.loads(p.read_text(encoding='utf-8')), p
+def _result_files(root:Path)->list[Path]:
+    return sorted(p for p in root.rglob('*') if p.is_file() and 'comparison' not in p.relative_to(root).parts)
+def _file_hashes(root:Path)->dict[str,str]:
+    return {str(p.relative_to(root)).replace(os.sep,'/'):sha256_file(p) for p in _result_files(root)}
+def _metadata_value(meta:dict,*names,default=None):
+    for n in names:
+        if n in meta: return meta[n]
+    return default
+def _normalize_result_metadata(spec:BenchmarkSpec, run_id:str, executor:str, meta:dict)->dict:
+    status=_metadata_value(meta,'validation_status','test_result',default='unknown')
+    if status=='pass': status='passed'
+    if status=='fail': status='failed'
+    unavailable=dict(meta.get('unavailable_metrics',{}))
+    for field in ('prompt_tokens','output_tokens','total_tokens'):
+        if meta.get(field) is None and meta.get(f'{field}_reason'):
+            unavailable[field]=meta[f'{field}_reason']
+    return {
+        'schema_version':meta.get('schema_version',SCHEMA_VERSION),'benchmark_id':meta.get('benchmark_id',spec.benchmark_id),'benchmark_version':meta.get('benchmark_version',spec.version),'run_id':run_id,
+        'canonical_packet_sha256':meta.get('canonical_packet_sha256'),'canonical_packet_eligible':meta.get('canonical_packet_eligible', True),'packet_fair_comparison_status':meta.get('packet_fair_comparison_status','eligible'),
+        'executor_type':meta.get('executor_type',meta.get('executor',executor)),'provider':meta.get('provider', meta.get('executor',executor)),'model':meta.get('model'),
+        'wall_clock_seconds':meta.get('wall_clock_seconds'),'prompt_tokens':meta.get('prompt_tokens'),'output_tokens':meta.get('output_tokens'),'total_tokens':meta.get('total_tokens'),
+        'generation_attempts':meta.get('generation_attempts'),'repair_attempts':meta.get('repair_attempts'),'tests_passed':meta.get('tests_passed', 1 if meta.get('test_result')=='pass' else 0),'tests_failed':meta.get('tests_failed', 0 if meta.get('test_result')=='pass' else 1 if meta.get('test_result')=='fail' else 0),
+        'validation_status':status,'unavailable_metrics':unavailable,'provenance':meta.get('provenance',{}),'imported_evidence':meta.get('imported_evidence',False),'source_metadata':meta}
+
+def import_executor_result(spec:BenchmarkSpec, source_run_id:str, source_executor:str, destination_run_id:str, destination_executor:str|None=None, command:str|None=None)->dict:
+    destination_executor=destination_executor or source_executor
+    if source_executor not in WorkspaceManager.executors or source_executor=='comparison': raise BenchmarkError(f'unknown source executor: {source_executor}')
+    if destination_executor not in WorkspaceManager.executors or destination_executor=='comparison': raise BenchmarkError(f'unknown destination executor: {destination_executor}')
+    source_dir=safe_join(_run_root(spec.benchmark_id,source_run_id),source_executor)
+    dest_dir=safe_join(_run_root(spec.benchmark_id,destination_run_id),destination_executor)
+    if not source_dir.exists(): raise BenchmarkError(f'missing source result: {source_dir}')
+    if not _run_root(spec.benchmark_id,destination_run_id).exists(): raise BenchmarkError(f'missing destination run: {_run_root(spec.benchmark_id,destination_run_id)}')
+    source_meta, source_meta_path=_load_executor_metadata(source_dir)
+    src_norm=_normalize_result_metadata(spec,source_run_id,source_executor,source_meta)
+    dest_snapshot=_run_root(spec.benchmark_id,destination_run_id)/'benchmark_spec.snapshot.json'
+    if dest_snapshot.exists():
+        dst_spec=json.loads(dest_snapshot.read_text(encoding='utf-8'))
+        if dst_spec.get('benchmark_id')!=spec.benchmark_id or dst_spec.get('version')!=spec.version: raise BenchmarkError('destination benchmark ID/version mismatch')
+    if src_norm['benchmark_id']!=spec.benchmark_id or src_norm['benchmark_version']!=spec.version: raise BenchmarkError('source benchmark ID/version mismatch')
+    expected=canonical_packet_hash(spec); source_hash=src_norm.get('canonical_packet_sha256')
+    if not source_hash: raise BenchmarkError('source canonical packet hash missing')
+    dst_hash_path=_run_root(spec.benchmark_id,destination_run_id)/'canonical_packet.hash.json'
+    if dst_hash_path.exists() and json.loads(dst_hash_path.read_text()).get('canonical_packet_sha256')!=source_hash: raise BenchmarkError('destination canonical packet hash mismatch')
+    if source_hash!=expected: raise BenchmarkError('source canonical packet hash mismatch')
+    if src_norm.get('canonical_packet_eligible') is not True or src_norm.get('packet_fair_comparison_status') not in (None,'eligible'): raise BenchmarkError('source result is not canonical-packet eligible')
+    before=_file_hashes(source_dir); dest_hashes=_file_hashes(dest_dir) if dest_dir.exists() else {}
+    if dest_hashes:
+        existing_receipt=dest_dir/'import_receipt.json'
+        if existing_receipt.exists() and json.loads(existing_receipt.read_text()).get('source_run_id')==source_run_id and dest_hashes==before: return json.loads(existing_receipt.read_text())
+        raise BenchmarkError('destination executor directory already contains non-identical result evidence')
+    dest_dir.mkdir(parents=True,exist_ok=True)
+    for p in _result_files(source_dir):
+        rel=p.relative_to(source_dir); target=safe_join(dest_dir,*rel.parts); target.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(p,target)
+    copied=_file_hashes(dest_dir)
+    if before!=_file_hashes(source_dir): raise BenchmarkError('source evidence changed during import')
+    imported_meta=dict(source_meta); imported_meta['imported_evidence']=True; imported_meta['run_id']=destination_run_id; imported_meta['provenance']=dict(imported_meta.get('provenance',{}))|{'imported_from_run_id':source_run_id,'imported_from_executor':source_executor}
+    atomic_write_json(dest_dir/('metadata.json' if (dest_dir/'metadata.json').exists() or not (dest_dir/'run_metadata.json').exists() else 'run_metadata.json'), imported_meta)
+    copied=_file_hashes(dest_dir)
+    receipt={'schema_version':'provider-benchmark-import-receipt.v1','source_run_id':source_run_id,'source_executor':source_executor,'destination_run_id':destination_run_id,'destination_executor':destination_executor,'source_metadata_sha256':sha256_file(source_meta_path),'copied_file_sha256':copied,'canonical_packet_sha256':source_hash,'import_timestamp':utc_now(),'import_command':command,'import_eligibility_decision':'eligible_imported','receipt_path':str((dest_dir/'import_receipt.json').relative_to(ROOT)) if (dest_dir/'import_receipt.json').is_relative_to(ROOT) else str(dest_dir/'import_receipt.json')}
+    atomic_write_json(dest_dir/'import_receipt.json',receipt); return receipt
+
 class ValidationRunner:
     def validate(self,spec,ws,executor,hidden=False):
         d=ws.executor_dir(executor); failures=[]; passes=[]; commands=[]
@@ -191,9 +264,10 @@ def visible_tests_code(): return '''import copy, unittest\nfrom dependency_batch
 def compare(spec,ws):
     expected_hash=canonical_packet_hash(spec); rows=[]; mismatches=[]
     for ex in ['codex','local','chief_architect']:
-        mp=ws.executor_dir(ex)/'metadata.json'
-        if mp.exists():
-            m=json.loads(mp.read_text())
+        ed=ws.executor_dir(ex); mp=_metadata_path(ed)
+        if mp:
+            raw=json.loads(mp.read_text())
+            m=_normalize_result_metadata(spec,ws.run_id,ex,raw)
             eligible=m.get('canonical_packet_sha256')==expected_hash and m.get('canonical_packet_eligible', True) is True
             if not eligible: mismatches.append({'executor':ex,'canonical_packet_sha256':m.get('canonical_packet_sha256'),'canonical_packet_eligible':m.get('canonical_packet_eligible')})
             score=100 if eligible and m.get('validation_status')=='passed' else 40 if eligible and m.get('validation_status') in ('imported','not_validated') else 0
@@ -215,6 +289,7 @@ def run_cli(argv=None):
     q=sub.add_parser('prepare-codex'); q.add_argument('benchmark_id'); q.add_argument('--run-id')
     q=sub.add_parser('import-codex'); q.add_argument('benchmark_id'); q.add_argument('result_path'); q.add_argument('--run-id',required=True); q.add_argument('--seat-reference'); q.add_argument('--model')
     q=sub.add_parser('import-reference'); q.add_argument('benchmark_id'); q.add_argument('result_path'); q.add_argument('--run-id',required=True); q.add_argument('--model',default='chief-architect-reference')
+    q=sub.add_parser('import-executor-result'); q.add_argument('benchmark_id'); q.add_argument('source_run_id'); q.add_argument('source_executor'); q.add_argument('destination_run_id'); q.add_argument('--destination-executor')
     q=sub.add_parser('validate'); q.add_argument('benchmark_id'); q.add_argument('run_id'); q.add_argument('--executor',default='local'); q.add_argument('--hidden',action='store_true')
     q=sub.add_parser('compare'); q.add_argument('benchmark_id'); q.add_argument('run_id'); q=sub.add_parser('report'); q.add_argument('benchmark_id'); q.add_argument('run_id')
     ns=ap.parse_args(argv); spec=load_spec(getattr(ns,'benchmark_id','benchmark-001')) if hasattr(ns,'benchmark_id') else None
@@ -225,6 +300,9 @@ def run_cli(argv=None):
         ws=WorkspaceManager(spec.benchmark_id,getattr(ns,'run_id',None)); ws.create(spec)
         if ns.cmd=='prepare-codex': atomic_write_text(ws.executor_dir('codex')/'CANONICAL_PACKET.md',build_assignment_prompt(spec)); atomic_write_json(ws.executor_dir('codex')/'metadata.json',base_meta(spec,ws,'codex','codex',None,utc_now())|{'validation_status':'packet_prepared','end_timestamp':utc_now()}); print(_json({'run_id':ws.run_id,'codex_dir':str(ws.executor_dir('codex')),'canonical_packet_sha256':canonical_packet_hash(spec),'canonical_packet':'CANONICAL_PACKET.md'})); return
         print(_json(OllamaAdapter().run(spec,ws,model=ns.model,mock=ns.mock))); return
+    if ns.cmd=='import-executor-result':
+        cmd='provider-benchmark import-executor-result '+ ' '.join([ns.benchmark_id,ns.source_run_id,ns.source_executor,ns.destination_run_id])
+        print(_json(import_executor_result(spec,ns.source_run_id,ns.source_executor,ns.destination_run_id,ns.destination_executor,cmd))); return
     ws=WorkspaceManager(spec.benchmark_id,ns.run_id)
     if ns.cmd=='import-codex': print(_json(ImportAdapter('codex','codex').run(spec,ws,ns.result_path,seat_reference=ns.seat_reference,model=ns.model))); return
     if ns.cmd=='import-reference': print(_json(ImportAdapter('chief_architect','manual_reference').run(spec,ws,ns.result_path,model=ns.model))); return
