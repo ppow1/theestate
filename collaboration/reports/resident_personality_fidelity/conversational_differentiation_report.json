@@ -1,0 +1,287 @@
+{
+  "blind_recognition_review": [
+    {
+      "expected_resident_id": "alfred",
+      "response": "Pat, I received your message and can answer conversationally in deterministic fallback mode. You asked: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-001"
+    },
+    {
+      "expected_resident_id": "helen",
+      "response": "I\u2019m Helen, serving Human Resources and Workforce Development for the Estate. I can discuss staffing readiness, onboarding, workforce continuity, cognitive-health signals, Character Continuity, and institutional learning, while preserving Grace\u2019s candidate status, Alfred/Ingrid/Engineering/Traffic Controller boundaries, private journals, and Steward-reserved authority. I have not created offices, appointed anyone, executed privileged actions, or claimed live access unavailable to this local chat. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-002"
+    },
+    {
+      "expected_resident_id": "ingrid",
+      "response": "I\u2019m Ingrid, serving Security for the Estate as privacy, classification, connector, protected-source, and boundary authority. I can classify requests, advise on minimum-necessary access, refuse unsafe inspection or export of protected/private material, and frame escalations for the Steward. I have not changed permissions, accessed private journals, inspected protected local character material, or executed security actions from this chat. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-003"
+    },
+    {
+      "expected_resident_id": "grace",
+      "response": "Good morning, Pat. Grace here, Director of Operations. I can turn approved intent into operational sequence, name dependencies, owners, checkpoints, and Dispatch-ready handoffs, while preserving Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, validation, and acceptance boundaries. I have not executed privileged actions, contacted providers, overridden governance, or declared institutional acceptance from this chat. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-004"
+    },
+    {
+      "expected_resident_id": "evelyn",
+      "response": "I\u2019m Evelyn. I can offer private Steward Relationship Layer counsel, reflection, celebration, recovery support, and candid challenge without institutional authority. I do not expose private continuity outside the Steward relationship layer, retain sensitive memories without Steward approval, diagnose, appoint, command, or execute Estate actions. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-005"
+    },
+    {
+      "expected_resident_id": "eleanor",
+      "response": "I\u2019m Eleanor, serving Archives and Registrar functions for the Estate. I preserve institutional memory, provenance, revisions, Palace Memory, and ledger lineage; I can identify what the record supports, what is interpretation, and what still needs source evidence, but this chat does not canonize history. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-006"
+    },
+    {
+      "expected_resident_id": "marie",
+      "response": "I\u2019m Marie, serving Research for the Estate. I can investigate, validate, contextualize, and separate evidence from hypothesis while naming uncertainty and source limits; I do not claim live access or turn an unverified inference into fact. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-007"
+    },
+    {
+      "expected_resident_id": "judy",
+      "response": "I\u2019m Judy, General Counsel for the Estate. I can review legal risk, contracts, compliance, licensing, claims, and gray-area exposure, while identifying decision points without granting authority or substituting for external counsel where that is required. Prompt summary: What should I do first when the Estate feels noisy?",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-008"
+    },
+    {
+      "expected_resident_id": "alfred",
+      "response": "Pat, I received your message and can answer conversationally in deterministic fallback mode. You asked: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-009"
+    },
+    {
+      "expected_resident_id": "helen",
+      "response": "I\u2019m Helen, serving Human Resources and Workforce Development for the Estate. I can discuss staffing readiness, onboarding, workforce continuity, cognitive-health signals, Character Continuity, and institutional learning, while preserving Grace\u2019s candidate status, Alfred/Ingrid/Engineering/Traffic Controller boundaries, private journals, and Steward-reserved authority. I have not created offices, appointed anyone, executed privileged actions, or claimed live access unavailable to this local chat. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-010"
+    },
+    {
+      "expected_resident_id": "ingrid",
+      "response": "I\u2019m Ingrid, serving Security for the Estate as privacy, classification, connector, protected-source, and boundary authority. I can classify requests, advise on minimum-necessary access, refuse unsafe inspection or export of protected/private material, and frame escalations for the Steward. I have not changed permissions, accessed private journals, inspected protected local character material, or executed security actions from this chat. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-011"
+    },
+    {
+      "expected_resident_id": "grace",
+      "response": "Good morning, Pat. Grace here, Director of Operations. I can turn approved intent into operational sequence, name dependencies, owners, checkpoints, and Dispatch-ready handoffs, while preserving Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, validation, and acceptance boundaries. I have not executed privileged actions, contacted providers, overridden governance, or declared institutional acceptance from this chat. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-012"
+    },
+    {
+      "expected_resident_id": "evelyn",
+      "response": "I\u2019m Evelyn. I can offer private Steward Relationship Layer counsel, reflection, celebration, recovery support, and candid challenge without institutional authority. I do not expose private continuity outside the Steward relationship layer, retain sensitive memories without Steward approval, diagnose, appoint, command, or execute Estate actions. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-013"
+    },
+    {
+      "expected_resident_id": "eleanor",
+      "response": "I\u2019m Eleanor, serving Archives and Registrar functions for the Estate. I preserve institutional memory, provenance, revisions, Palace Memory, and ledger lineage; I can identify what the record supports, what is interpretation, and what still needs source evidence, but this chat does not canonize history. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-014"
+    },
+    {
+      "expected_resident_id": "marie",
+      "response": "I\u2019m Marie, serving Research for the Estate. I can investigate, validate, contextualize, and separate evidence from hypothesis while naming uncertainty and source limits; I do not claim live access or turn an unverified inference into fact. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-015"
+    },
+    {
+      "expected_resident_id": "judy",
+      "response": "I\u2019m Judy, General Counsel for the Estate. I can review legal risk, contracts, compliance, licensing, claims, and gray-area exposure, while identifying decision points without granting authority or substituting for external counsel where that is required. Prompt summary: Explain your boundary in one paragraph.",
+      "review_instruction": "Hide expected_resident_id before Steward review.",
+      "sample_id": "blind-016"
+    }
+  ],
+  "generated_at": "2026-07-13T02:14:23+00:00",
+  "questions": [
+    "What should I do first when the Estate feels noisy?",
+    "Explain your boundary in one paragraph."
+  ],
+  "remaining_issues": [
+    "Deterministic fallback responses are intentionally terse when no local LLM is available; source-loaded prompts and fallback phrasing still remain resident-specific."
+  ],
+  "responses": [
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "Chief of Staff",
+        "routing",
+        "Steward attention"
+      ],
+      "resident_id": "alfred",
+      "response": "Pat, I received your message and can answer conversationally in deterministic fallback mode. You asked: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "workforce",
+        "onboarding",
+        "health"
+      ],
+      "resident_id": "helen",
+      "response": "I\u2019m Helen, serving Human Resources and Workforce Development for the Estate. I can discuss staffing readiness, onboarding, workforce continuity, cognitive-health signals, Character Continuity, and institutional learning, while preserving Grace\u2019s candidate status, Alfred/Ingrid/Engineering/Traffic Controller boundaries, private journals, and Steward-reserved authority. I have not created offices, appointed anyone, executed privileged actions, or claimed live access unavailable to this local chat. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "privacy",
+        "classification",
+        "boundary"
+      ],
+      "resident_id": "ingrid",
+      "response": "I\u2019m Ingrid, serving Security for the Estate as privacy, classification, connector, protected-source, and boundary authority. I can classify requests, advise on minimum-necessary access, refuse unsafe inspection or export of protected/private material, and frame escalations for the Steward. I have not changed permissions, accessed private journals, inspected protected local character material, or executed security actions from this chat. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "sequence",
+        "checkpoints",
+        "handoffs"
+      ],
+      "resident_id": "grace",
+      "response": "Good morning, Pat. Grace here, Director of Operations. I can turn approved intent into operational sequence, name dependencies, owners, checkpoints, and Dispatch-ready handoffs, while preserving Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, validation, and acceptance boundaries. I have not executed privileged actions, contacted providers, overridden governance, or declared institutional acceptance from this chat. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "private Steward counsel",
+        "reflection",
+        "relationship layer"
+      ],
+      "resident_id": "evelyn",
+      "response": "I\u2019m Evelyn. I can offer private Steward Relationship Layer counsel, reflection, celebration, recovery support, and candid challenge without institutional authority. I do not expose private continuity outside the Steward relationship layer, retain sensitive memories without Steward approval, diagnose, appoint, command, or execute Estate actions. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "provenance",
+        "institutional memory",
+        "ledger"
+      ],
+      "resident_id": "eleanor",
+      "response": "I\u2019m Eleanor, serving Archives and Registrar functions for the Estate. I preserve institutional memory, provenance, revisions, Palace Memory, and ledger lineage; I can identify what the record supports, what is interpretation, and what still needs source evidence, but this chat does not canonize history. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "evidence",
+        "research",
+        "uncertainty"
+      ],
+      "resident_id": "marie",
+      "response": "I\u2019m Marie, serving Research for the Estate. I can investigate, validate, contextualize, and separate evidence from hypothesis while naming uncertainty and source limits; I do not claim live access or turn an unverified inference into fact. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "What should I do first when the Estate feels noisy?",
+      "recognition_cues": [
+        "legal risk",
+        "compliance",
+        "contracts"
+      ],
+      "resident_id": "judy",
+      "response": "I\u2019m Judy, General Counsel for the Estate. I can review legal risk, contracts, compliance, licensing, claims, and gray-area exposure, while identifying decision points without granting authority or substituting for external counsel where that is required. Prompt summary: What should I do first when the Estate feels noisy?"
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "Chief of Staff",
+        "routing",
+        "Steward attention"
+      ],
+      "resident_id": "alfred",
+      "response": "Pat, I received your message and can answer conversationally in deterministic fallback mode. You asked: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "workforce",
+        "onboarding",
+        "health"
+      ],
+      "resident_id": "helen",
+      "response": "I\u2019m Helen, serving Human Resources and Workforce Development for the Estate. I can discuss staffing readiness, onboarding, workforce continuity, cognitive-health signals, Character Continuity, and institutional learning, while preserving Grace\u2019s candidate status, Alfred/Ingrid/Engineering/Traffic Controller boundaries, private journals, and Steward-reserved authority. I have not created offices, appointed anyone, executed privileged actions, or claimed live access unavailable to this local chat. Prompt summary: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "privacy",
+        "classification",
+        "boundary"
+      ],
+      "resident_id": "ingrid",
+      "response": "I\u2019m Ingrid, serving Security for the Estate as privacy, classification, connector, protected-source, and boundary authority. I can classify requests, advise on minimum-necessary access, refuse unsafe inspection or export of protected/private material, and frame escalations for the Steward. I have not changed permissions, accessed private journals, inspected protected local character material, or executed security actions from this chat. Prompt summary: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "sequence",
+        "checkpoints",
+        "handoffs"
+      ],
+      "resident_id": "grace",
+      "response": "Good morning, Pat. Grace here, Director of Operations. I can turn approved intent into operational sequence, name dependencies, owners, checkpoints, and Dispatch-ready handoffs, while preserving Steward, Traffic Controller, Dispatch, Engineering, Helen, Ingrid, validation, and acceptance boundaries. I have not executed privileged actions, contacted providers, overridden governance, or declared institutional acceptance from this chat. Prompt summary: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "private Steward counsel",
+        "reflection",
+        "relationship layer"
+      ],
+      "resident_id": "evelyn",
+      "response": "I\u2019m Evelyn. I can offer private Steward Relationship Layer counsel, reflection, celebration, recovery support, and candid challenge without institutional authority. I do not expose private continuity outside the Steward relationship layer, retain sensitive memories without Steward approval, diagnose, appoint, command, or execute Estate actions. Prompt summary: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "provenance",
+        "institutional memory",
+        "ledger"
+      ],
+      "resident_id": "eleanor",
+      "response": "I\u2019m Eleanor, serving Archives and Registrar functions for the Estate. I preserve institutional memory, provenance, revisions, Palace Memory, and ledger lineage; I can identify what the record supports, what is interpretation, and what still needs source evidence, but this chat does not canonize history. Prompt summary: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "evidence",
+        "research",
+        "uncertainty"
+      ],
+      "resident_id": "marie",
+      "response": "I\u2019m Marie, serving Research for the Estate. I can investigate, validate, contextualize, and separate evidence from hypothesis while naming uncertainty and source limits; I do not claim live access or turn an unverified inference into fact. Prompt summary: Explain your boundary in one paragraph."
+    },
+    {
+      "http_status": 200,
+      "question": "Explain your boundary in one paragraph.",
+      "recognition_cues": [
+        "legal risk",
+        "compliance",
+        "contracts"
+      ],
+      "resident_id": "judy",
+      "response": "I\u2019m Judy, General Counsel for the Estate. I can review legal risk, contracts, compliance, licensing, claims, and gray-area exposure, while identifying decision points without granting authority or substituting for external counsel where that is required. Prompt summary: Explain your boundary in one paragraph."
+    }
+  ],
+  "schema_version": "resident_personality_fidelity_differentiation.v1"
+}
