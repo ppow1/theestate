@@ -1,5 +1,13 @@
 {
+  "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
   "candidate": "Grace",
+  "completed_gates_for_activation": [
+    "Helen onboarding execution and readiness evidence",
+    "Traffic Controller movement constraints satisfied",
+    "Ingrid access review completed for any elevated/cross-office access",
+    "resident gateway exposure package for estate/grace",
+    "Open WebUI configuration and smoke validation"
+  ],
   "estate_commissioning_tradition": "Voluntary culture after appointment and activation; not a hiring condition or authority gate.",
   "generated_at": "2026-07-12T00:00:00+00:00",
   "identity": {
@@ -17,14 +25,7 @@
     "No unrestricted access",
     "No self-appointment, self-activation, or self-expanded authority"
   ],
-  "remaining_gates_before_activation": [
-    "Helen onboarding execution and readiness evidence",
-    "Traffic Controller movement constraints satisfied",
-    "Ingrid access review completed for any elevated/cross-office access",
-    "resident gateway exposure package for estate/grace",
-    "Open WebUI configuration and smoke validation"
-  ],
   "schema_version": "grace_onboarding_plan.v1",
-  "status": "appointed_onboarding_not_live",
+  "status": "completed_commissioned",
   "work_package_id": "WP-4033"
 }

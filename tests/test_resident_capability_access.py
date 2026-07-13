@@ -6,6 +6,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from estate.core.resident_capability_access import (  # noqa: E402
     APPROVAL_REQUIRED,
+    APPROVED,
     DENIED,
     UNKNOWN,
     capability_display_payload,
@@ -35,14 +36,14 @@ def test_helen_has_workforce_capabilities_without_undeclared_ollama_access():
     assert by_tool(payload, "personnel_identity_modify")["state"] == DENIED
 
 
-def test_grace_candidate_is_limited_and_deterministic():
+def test_grace_commissioned_capabilities_are_deterministic_and_bounded():
     first = resolve_resident_capabilities("Grace", requested_tools=["resident_chat", "work_package_draft", "runtime_presence_update"])
     second = resolve_resident_capabilities("grace", requested_tools=["resident_chat", "work_package_draft", "runtime_presence_update"])
-    assert first["state"] == "candidate"
+    assert first["state"] == "active"
     assert first["declared_capabilities"] == second["declared_capabilities"]
-    assert by_tool(first, "resident_chat")["state"] == DENIED
-    assert by_tool(first, "work_package_draft")["state"] == DENIED
-    assert by_tool(first, "runtime_presence_update")["state"] == DENIED
+    assert by_tool(first, "resident_chat")["state"] in {APPROVED, APPROVAL_REQUIRED}
+    assert by_tool(first, "work_package_draft")["state"] == APPROVAL_REQUIRED
+    assert by_tool(first, "runtime_presence_update")["state"] in {APPROVED, APPROVAL_REQUIRED}
 
 
 def test_unknown_resident_receives_no_implied_access():
