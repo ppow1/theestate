@@ -1,0 +1,31 @@
+{
+  "archive_record_id": "",
+  "source_work_package": "WP-4137",
+  "resident_id": "",
+  "resident_name": "",
+  "variant_id": "",
+  "variant_status": "rejected",
+  "measurements": {},
+  "measurement_deltas_from_candidate": {},
+  "generation": {
+    "prompt": "",
+    "negative_prompt": "",
+    "model": "",
+    "workflow": "",
+    "seed": "",
+    "identity_reference": "",
+    "camera": "",
+    "lighting": "",
+    "wardrobe": "",
+    "footwear": ""
+  },
+  "assets": [],
+  "metadata_paths": [],
+  "comparison_sheet_path": "",
+  "rejection": {
+    "reason": "",
+    "reviewer": "",
+    "reviewed_at": "",
+    "replacement_variant_id": ""
+  }
+}

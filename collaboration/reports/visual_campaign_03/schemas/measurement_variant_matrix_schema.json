@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.visual_campaign_03.measurement_variant_matrix.v1",
+  "title": "Campaign 03 Measurement Variant Matrix",
+  "type": "object",
+  "required": ["resident_id", "resident_name", "fixed_controls", "variants", "selection_record"],
+  "properties": {
+    "resident_id": { "type": "string" },
+    "resident_name": { "type": "string" },
+    "fixed_controls": {
+      "type": "object",
+      "required": ["height", "face_reference", "age_presentation", "pose", "camera", "lighting", "wardrobe", "footwear"],
+      "properties": {
+        "height": { "type": "string" },
+        "face_reference": { "type": "string" },
+        "age_presentation": { "type": "string" },
+        "pose": { "type": "string" },
+        "camera": { "type": "string" },
+        "lighting": { "type": "string" },
+        "wardrobe": { "type": "string" },
+        "footwear": { "type": "string" }
+      }
+    },
+    "variants": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["variant_id", "role", "measurements", "changed_dimensions", "narrative_reason", "discernible_at_normal_size", "status"],
+        "properties": {
+          "variant_id": { "type": "string" },
+          "role": { "enum": ["lower", "candidate", "upper", "exploratory"] },
+          "measurements": { "type": "object" },
+          "changed_dimensions": { "type": "array", "items": { "type": "string" } },
+          "narrative_reason": { "type": "string" },
+          "discernible_at_normal_size": { "type": "boolean" },
+          "status": { "enum": ["selected", "rejected", "superseded", "review"] },
+          "provenance_id": { "type": "string" }
+        }
+      }
+    },
+    "selection_record": {
+      "type": "object",
+      "required": ["canonical_variant_id", "steward_approval_status", "rationale"],
+      "properties": {
+        "canonical_variant_id": { "type": ["string", "null"] },
+        "steward_approval_status": { "enum": ["approved", "pending", "rejected"] },
+        "rationale": { "type": "string" },
+        "approved_by": { "type": ["string", "null"] },
+        "approved_at": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

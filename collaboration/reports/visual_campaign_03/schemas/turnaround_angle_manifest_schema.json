@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.visual_campaign_03.turnaround_angle_manifest.v1",
+  "title": "Campaign 03 Turnaround Angle Manifest",
+  "type": "object",
+  "required": ["resident_id", "resident_name", "variant_id", "capture_controls", "angles", "validation"],
+  "properties": {
+    "resident_id": { "type": "string" },
+    "resident_name": { "type": "string" },
+    "variant_id": { "type": "string" },
+    "review_state": { "enum": ["review", "candidate", "canonical", "rejected", "superseded"] },
+    "capture_controls": {
+      "type": "object",
+      "required": ["camera_height", "focal_length", "camera_distance", "lighting_rig", "background", "wardrobe_id", "footwear_id", "posture", "expression"],
+      "properties": {
+        "identity_reference": { "type": "string" },
+        "camera_height": { "type": "string" },
+        "focal_length": { "type": "string" },
+        "camera_distance": { "type": "string" },
+        "lighting_rig": { "type": "string" },
+        "background": { "type": "string" },
+        "wardrobe_id": { "type": "string" },
+        "footwear_id": { "type": "string" },
+        "heel_height_inches": { "type": "number", "minimum": 0 },
+        "posture": { "type": "string" },
+        "expression": { "type": "string" }
+      }
+    },
+    "angles": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["angle_id", "degrees", "asset_path", "metadata_path"],
+        "properties": {
+          "angle_id": { "enum": ["front", "front_left_45", "left_profile", "rear_left_45", "rear", "rear_right_45", "right_profile", "front_right_45"] },
+          "degrees": { "type": "integer" },
+          "asset_path": { "type": "string" },
+          "metadata_path": { "type": "string" },
+          "seed": { "type": ["string", "integer"] }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["identity_stable", "proportions_stable", "wardrobe_stable", "camera_stable", "silhouette_visible"],
+      "properties": {
+        "identity_stable": { "type": "boolean" },
+        "proportions_stable": { "type": "boolean" },
+        "wardrobe_stable": { "type": "boolean" },
+        "camera_stable": { "type": "boolean" },
+        "silhouette_visible": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
