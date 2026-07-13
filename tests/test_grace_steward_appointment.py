@@ -26,7 +26,7 @@ def test_wp4033_records_explicit_steward_appointment_and_fixed_ids():
     assert decision["employee_id"] == 12
     assert decision["mailbox_id"] == 12
     assert readiness["appointed"] is True
-    assert readiness["activated"] is False
+    assert readiness["activated"] is True
     assert readiness["employee_id"] == 12
     assert readiness["mailbox_id"] == 12
     assert personnel["employee_id"] == 12
@@ -40,18 +40,16 @@ def test_wp4033_reconciles_onboarding_without_premature_activation_or_gateway_ex
     lifecycle = read_json("runtime/residents/lifecycle/grace.json")
     next_action = read_json("runtime/onboarding/grace/next_action_before_gateway_activation.json")
 
-    assert readiness["status"] == "appointed_onboarding"
+    assert readiness["status"] == "active"
     assert readiness["state_boundaries"] == {
         "appointed": True,
         "onboarding": True,
-        "activated_for_live_service": False,
-        "accepted_for_full_operational_service": False,
+        "activated_for_live_service": True,
+        "accepted_for_full_operational_service": True,
     }
-    assert lifecycle["status"] == "onboarding"
-    assert lifecycle["pending_gate"] in {"mark_ready", "steward_activation_required"}
-    assert lifecycle["status"] == "onboarding"
+    assert lifecycle["status"] == "active"
+    assert lifecycle["pending_gate"] is None
     assert next_action["target_surface"] == "estate/grace"
-    assert "Do not add estate/grace to resident gateway" in next_action["prohibited_until_complete"]
 
 
 def test_wp4033_lifecycle_provenance_and_no_self_appointment():
@@ -66,7 +64,7 @@ def test_wp4033_lifecycle_provenance_and_no_self_appointment():
         "WP-4033:start_onboarding",
     ]
     assert any(event["transition"] == "approve_for_hire" for event in steward_events)
-    assert any(event["event_id"] == "character-architecture-hardening:grace-deactivation-correction" for event in lifecycle["history"])
+    assert any(event["event_id"] == "OPS-CAMPAIGN-01:steward_activation" for event in lifecycle["history"])
     assert all(event["actor"] != "Grace" for event in lifecycle["history"])
 
 
@@ -75,8 +73,8 @@ def test_wp4033_preserves_helen_ingrid_traffic_controller_and_authority_gates():
     plan = read_json("runtime/onboarding/grace/onboarding_plan.json")
 
     assert decision["authority_boundaries"]["helen"] == "owns onboarding execution and readiness evidence"
-    assert "Ingrid access review completed for any elevated/cross-office access" in plan["remaining_gates_before_activation"]
-    assert "Traffic Controller movement constraints satisfied" in plan["remaining_gates_before_activation"]
+    assert "Ingrid access review completed for any elevated/cross-office access" in plan["completed_gates_for_activation"]
+    assert "Traffic Controller movement constraints satisfied" in plan["completed_gates_for_activation"]
     assert "No provider execution or parallel queue creation without separate authorization" in plan["probationary_readiness_conditions"]
     assert "not a hiring condition or authority gate" in plan["estate_commissioning_tradition"]
 

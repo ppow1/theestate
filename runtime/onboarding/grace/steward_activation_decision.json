@@ -1,0 +1,42 @@
+{
+  "activating_authority": "Steward",
+  "appointing_authority": "Steward",
+  "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
+  "authority_boundaries": [
+    "Activation does not enlarge the Office of Operations.",
+    "Grace may sequence approved operational movement and prepare governed handoffs only.",
+    "Grace may not appoint personnel, grant access, merge code, override Steward/Traffic Controller/Dispatch/Helen/Ingrid/Validation/Chief Architect authority, or execute providers directly."
+  ],
+  "authorized_by_campaign": "collaboration/codex_campaigns/OPS-CAMPAIGN-01-GRACE-OPERATIONAL-COMMISSIONING.md",
+  "decided_at": "2026-07-13T00:00:00+00:00",
+  "decision": "activate_operational_service",
+  "gateway_model": "estate/grace",
+  "onboarding_evidence": [
+    "runtime/onboarding/grace/appointment_readiness.json",
+    "runtime/onboarding/grace/hiring_assessment.json",
+    "runtime/onboarding/grace/onboarding_plan.json",
+    "operations/onboarding/grace/Grace_Hiring_and_Onboarding_Report.md",
+    "operations/validation/reports/WP-4005_grace_hiring_onboarding.md",
+    "operations/validation/reports/WP-4006_grace_operations_runtime.md"
+  ],
+  "open_webui": {
+    "endpoint": "/v1/chat/completions",
+    "exposed": true,
+    "model_id": "estate/grace",
+    "models_endpoint": "/v1/models"
+  },
+  "resident": "Grace",
+  "resident_id": "grace",
+  "rollback": {
+    "gateway_disable": "remove estate/grace from resident_gateway ACTIVE_RESIDENT_MODELS and set runtime identity gateway_model to null",
+    "mailbox_disable": "return Grace mailbox status to onboarding or suspended with correction evidence",
+    "stand_down_transition": "resident lifecycle stand_down by Steward if active service is revoked"
+  },
+  "schema_version": "grace_activation_decision.v1",
+  "state_separation": {
+    "activation": "authorized_by_steward_through_ops_campaign_01",
+    "appointment": "completed_by_steward_wp4033",
+    "commissioning": "operational_service_commissioned",
+    "validation": "recorded_in_commissioning_evidence"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "benchmark_id": "benchmark-001",
+  "benchmark_version": "1.0.0",
+  "commands_run": [
+    {
+      "command": "/root/.pyenv/versions/3.12.13/bin/python -m unittest test_dependency_batcher_visible.py",
+      "exit_code": 0,
+      "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK\n",
+      "stdout": ""
+    }
+  ],
+  "end_timestamp": "2026-07-13T02:12:39+00:00",
+  "environment": {
+    "cwd": "/workspace/theestate",
+    "platform": "Linux-6.12.47-x86_64-with-glibc2.39",
+    "python": "3.12.13"
+  },
+  "estate_seat_reference": null,
+  "evidence_references": [],
+  "executor_type": "local",
+  "exit_codes": [
+    0
+  ],
+  "failure_classification": null,
+  "file_line_counts": {
+    "dependency_batcher.py": 43,
+    "test_dependency_batcher_visible.py": 13
+  },
+  "files_produced": [
+    "dependency_batcher.py"
+  ],
+  "generation_attempts": 1,
+  "model": "qwen2.5-coder:7b",
+  "output_tokens": 300,
+  "prompt_tokens": 120,
+  "provenance": {
+    "adapter": "ollama"
+  },
+  "provider": "ollama",
+  "provider_native_timing": {
+    "eval_duration": 997000,
+    "load_duration": 1000,
+    "prompt_eval_duration": 2000,
+    "total_duration": 1000000
+  },
+  "repair_attempts": 0,
+  "run_id": "20260713T021239Z-799483ee",
+  "schema_version": "provider-benchmark-run.v1",
+  "start_timestamp": "2026-07-13T02:12:39+00:00",
+  "tests_failed": 0,
+  "tests_passed": 1,
+  "total_tokens": 420,
+  "unavailable_metrics": {
+    "estate_seat_reference": "not applicable or not supplied"
+  },
+  "validation_status": "passed",
+  "wall_clock_seconds": 0.025225
+}

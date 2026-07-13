@@ -1,0 +1,69 @@
+{
+  "acceptance_criteria": [
+    "visible tests pass",
+    "evidence preserved",
+    "missing metrics are null with reason"
+  ],
+  "benchmark_id": "benchmark-001",
+  "environment_requirements": [
+    "Python 3.11",
+    "Windows-first A:\\theestate compatible",
+    "Ollama loopback only"
+  ],
+  "hidden_review_criteria": [
+    "clarity",
+    "maintainability",
+    "security",
+    "boundary compliance"
+  ],
+  "isolation_rules": [
+    "executor-specific directories only",
+    "no overwrite",
+    "path traversal rejected"
+  ],
+  "permitted_dependencies": [
+    "python standard library only"
+  ],
+  "permitted_languages": [
+    "Python 3.11"
+  ],
+  "provider_model_eligibility": {
+    "codex_import_allowed": true,
+    "ollama_default_model": "qwen2.5-coder:7b",
+    "reference_import_allowed": true
+  },
+  "purpose": "Compare providers on bounded Python task.",
+  "required_files": [
+    "dependency_batcher.py"
+  ],
+  "required_metrics": [
+    "wall_clock_seconds",
+    "prompt_tokens",
+    "output_tokens",
+    "total_tokens",
+    "total_duration",
+    "load_duration",
+    "prompt_eval_duration",
+    "eval_duration"
+  ],
+  "schema_version": "provider-benchmark-spec.v1",
+  "scoring_weights": {
+    "evidence_quality": 10,
+    "functional_correctness": 50,
+    "maintainability": 10,
+    "security": 10,
+    "validation": 20
+  },
+  "source_provenance": [
+    "WP-0545_PARALLEL_INDEPENDENT_Engineering_Provider_Benchmark_001.md"
+  ],
+  "task": {
+    "prompt": "Implement dependency_batcher.py exposing DependencyBatchError and plan_batches with deterministic dependency batching, validation, immutability, and standard library only."
+  },
+  "time_limit_seconds": 600,
+  "title": "Benchmark 001 — Deterministic Dependency Batcher",
+  "version": "1.0.0",
+  "visible_tests": [
+    "success, invalid input, determinism, immutability"
+  ]
+}

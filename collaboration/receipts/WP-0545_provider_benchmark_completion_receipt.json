@@ -1,0 +1,14 @@
+{
+  "work_package": "WP-0545",
+  "status": "implemented_with_mocked_commissioning_evidence_due_local_ollama_unavailable",
+  "benchmark_id": "benchmark-001",
+  "commissioning_run_id": "20260713T021239Z-799483ee",
+  "local_model_requested_first": "qwen2.5-coder:7b",
+  "real_local_ollama_attempt_run_id": "20260713T021222Z-6dc0e6ca",
+  "real_local_ollama_attempt_status": "failed_provider",
+  "real_local_ollama_blocker": "Ollama qwen2.5-coder:7b unavailable in this Linux container; no model download attempted.",
+  "mocked_commissioning_status": "passed",
+  "codex_import_status": "passed",
+  "chief_architect_import_status": "passed",
+  "comparison_report": "experiments/provider_benchmarks/benchmark-001/20260713T021239Z-799483ee/comparison/comparison.md"
+}

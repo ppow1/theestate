@@ -1,6 +1,6 @@
 # Helen Operational Readiness Report
 
-Generated: 2026-07-10T18:17:33Z
+Generated: 2026-07-13T02:07:38Z
 Overall status: `ready`
 Grace hiring gate: `eligible_for_steward_review`
 
@@ -15,8 +15,8 @@ Grace hiring gate: `eligible_for_steward_review`
 - PASS — G7: Helen can produce governed hiring recommendation without granting authority
 - PASS — G8: Grace office and role authorization evidence exists
 - PASS — G9: Grace resident package and validation artifacts exist
-- PASS — G10: Steward-reserved appointment remains unperformed
+- PASS — G10: Steward-reserved appointment or activation is authorized before Grace registry exposure
 
 ## Authority Flags
 
-All authority flags remain false; Helen did not appoint, activate, or onboard Grace.
+Helen authority flags remain false for constitutional authority, provider execution, and operational queue control; Grace appointment/activation may be true only when separately Steward-authorized.

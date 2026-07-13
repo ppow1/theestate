@@ -2744,6 +2744,16 @@ def cmd_sync_ollama(args):
         print("No new Ollama providers created.")
 
 def main(argv=None):
+    if argv is None:
+        import sys as _sys
+        argv = _sys.argv[1:]
+
+    # WP-0545 provider benchmark harness: delegate to isolated subsystem without
+    # creating another scheduler, provider registry, or credential store.
+    if argv and len(argv) > 0 and argv[0] == "provider-benchmark":
+        from estate.core.provider_benchmark import run_cli as run_provider_benchmark_cli
+        run_provider_benchmark_cli(argv[1:])
+        return
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
     sub = parser.add_subparsers(dest="command")
 

@@ -60,14 +60,15 @@
     "status": "active"
   },
   {
-    "activation_status": "appointed_onboarding_steward_activation_required",
+    "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
+    "activation_status": "active_operational_service",
     "display_name": "Grace",
     "mailbox_id": 12,
     "mailbox_type": "personnel",
-    "notes": "Grace mailbox identity is reserved for appointed onboarding only; it is not a live operational or gateway-exposed resident service mailbox.",
+    "notes": "Grace is Steward-activated as Director of Operations for governed operational service; authority remains bounded by the Office of Operations architecture.",
     "owning_office": "Office of Operations",
     "purpose": "Personal mailbox for Grace during appointed onboarding as Director of Operations.",
     "responsible_employee_id": 12,
-    "status": "onboarding"
+    "status": "active"
   }
 ]

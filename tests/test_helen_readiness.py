@@ -13,20 +13,20 @@ def test_helen_readiness_writes_deterministic_gate_artifacts():
         "constitutional_authority_granted": False,
         "provider_execution_performed": False,
         "operational_queue_control_performed": False,
-        "grace_appointed_or_activated": False,
+        "grace_appointed_or_activated": True,
     }
     assert len(payload["gates"]) == 10
     assert Path("runtime/residents/helen/readiness.json").is_file()
     assert Path("operations/residents/helen/Helen_Operational_Readiness_Report.md").is_file()
 
 
-def test_grace_gate_blocks_missing_or_unperformed_evidence_without_appointment():
+def test_grace_gate_allows_steward_authorized_commissioning_evidence():
     payload = build_readiness(write=True)
     g10 = next(g for g in payload["gates"] if g["gate_id"] == "G10")
     assert g10["passed"] is True
-    assert payload["authority_flags"]["grace_appointed_or_activated"] is False
+    assert payload["authority_flags"]["grace_appointed_or_activated"] is True
     registry = json.loads(Path("data/registry/residents.json").read_text())
-    assert all(entry.get("name") != "Grace" for entry in registry)
+    assert any(entry.get("name") == "Grace" and entry.get("status") == "Active" for entry in registry)
 
 
 def test_cli_helen_readiness_json(capsys):

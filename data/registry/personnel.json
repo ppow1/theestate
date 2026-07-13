@@ -126,7 +126,8 @@
     "status": "onboarding"
   },
   {
-    "activation_status": "appointed_onboarding_steward_activation_required",
+    "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
+    "activation_status": "active_operational_service",
     "appointment_authority": "Steward",
     "appointment_decision": "runtime/onboarding/grace/steward_appointment_decision.json",
     "current_office": "Office of Operations",
@@ -135,10 +136,10 @@
     "display_name": "Grace",
     "employee_id": 12,
     "mailbox_id": 12,
-    "notes": "Grace is appointed and in Helen-owned onboarding; she is not live, not operational, and not exposed through estate/grace until a later Steward activation package completes.",
+    "notes": "Grace is Steward-activated as Director of Operations for governed operational service; authority remains bounded by the Office of Operations architecture.",
     "reporting_line": "Reports to Steward through governed Estate channels; coordinates with Alfred for Steward attention.",
     "resident_id": "grace",
     "security_clearance": "Estate Internal (proposed; Ingrid review required before elevation)",
-    "status": "appointed_onboarding"
+    "status": "active"
   }
 ]

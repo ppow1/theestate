@@ -1,12 +1,14 @@
 {
+  "activation_decision": "runtime/onboarding/grace/steward_activation_decision.json",
   "authority_boundaries": [
-    "Grace is appointed and onboarding; she is not operational and is not gateway exposed until explicit Steward activation.",
+    "Grace is Steward-activated for operational service without enlarged office authority.",
     "Grace conducts approved operational movement; she does not grant authority or create offices.",
     "Provider execution remains behind Dispatch and adapter controls.",
     "Traffic Controller, Engineering, Helen, Ingrid, Validation, Chief Architect, and Steward authorities remain distinct.",
     "Resident chat may discuss, recommend, and propose; it must not execute privileged actions."
   ],
   "classification": "Estate Internal",
+  "commissioned_at": "2026-07-13T00:00:00+00:00",
   "created_from": [
     "runtime/onboarding/grace/steward_appointment_decision.json",
     "runtime/onboarding/grace/appointment_readiness.json",
@@ -16,12 +18,12 @@
     "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
     "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml"
   ],
-  "gateway_model": null,
+  "gateway_model": "estate/grace",
   "office": "Office of Operations",
   "open_webui": {
-    "compatible_endpoint": null,
-    "exposed": false,
-    "manual_validation": "blocked_until_steward_activation",
+    "compatible_endpoint": "/v1/chat/completions",
+    "exposed": true,
+    "manual_validation": "repository_smoke_validated",
     "models_endpoint": "/v1/models",
     "streaming_supported": true
   },
@@ -29,13 +31,13 @@
   "resident_name": "Grace",
   "runtime_surfaces": {
     "employee_id": 12,
-    "gateway": null,
+    "gateway": "estate/grace",
     "lifecycle": "runtime/residents/lifecycle/grace.json",
     "mailbox_id": 12,
-    "open_webui_model": null,
+    "open_webui_model": "estate/grace",
     "resident_surface": "operations/residents/surfaces/grace.json"
   },
   "schema_version": "resident_runtime_identity.v1",
-  "status": "appointed_onboarding",
+  "status": "active",
   "title": "Director of Operations"
 }
