@@ -60,12 +60,37 @@ def commissioned_voice_projection(resident_id: str, root: str | Path | None = No
     health = local_tts_health(root)
     return {"voice_state":"canonical","voice_engine":row.get("engine"),"voice_id":row.get("voice"),"voice_speed":row.get("speed"),"voice_approval_state":row.get("status"),"tts_available":bool(health.get("ok")),"voice_binding":row,"voice_provenance":{"registry":str(REGISTRY_PATH),"approval":row.get("approval"),"validation":row.get("validation",[])}}
 
+def _is_existing_executable_path(raw: str) -> bool:
+    path = Path(raw)
+    return path.exists() and path.is_file() and (os.access(path, os.X_OK) or path.suffix.lower() in {".exe", ".bat", ".cmd", ".ps1", ".py"})
+
+
+def _parse_command_env(raw: str) -> list[str]:
+    raw = raw.strip()
+    if not raw:
+        return []
+    # Steward-machine Windows installs may provide a bare path such as
+    # A:\AI\TTS\kokoro_py311\Scripts\python.exe.  POSIX shlex parsing
+    # treats backslashes as escapes and corrupts that value, so preserve a raw
+    # environment value that is already an executable path before considering it
+    # a command line.
+    if _is_existing_executable_path(raw):
+        return [raw]
+    if re.match(r"^[A-Za-z]:\\", raw) and not re.search(r"\s", raw):
+        return [raw]
+    posix = not (os.name == "nt" or re.search(r'(^|\s)([A-Za-z]:\\|"[A-Za-z]:\\)', raw))
+    parts = shlex.split(raw, posix=posix)
+    if not posix:
+        parts = [p[1:-1] if len(p) >= 2 and p[0] == p[-1] and p[0] in {'"', "'"} else p for p in parts]
+    return parts or [raw]
+
+
 def discover_kokoro(root: str | Path | None = None) -> dict[str, Any]:
     env = os.environ.get("ESTATE_KOKORO_COMMAND") or os.environ.get("ESTATE_KOKORO_PYTHON")
     legacy = os.environ.get("ESTATE_TTS_COMMAND")
     candidates: list[tuple[list[str], str]] = []
-    if env: candidates.append((shlex.split(env) or [env], "kokoro"))
-    if legacy: candidates.append((shlex.split(legacy) or [legacy], "custom-command"))
+    if env: candidates.append((_parse_command_env(env), "kokoro"))
+    if legacy: candidates.append((_parse_command_env(legacy), "custom-command"))
     for p in KNOWN_KOKORO:
         if Path(p).exists(): candidates.append(([p], "kokoro"))
     for exe in ("kokoro",):
@@ -112,8 +137,8 @@ def build_kokoro_command(engine: dict[str, Any], text: str, output: Path, voice:
         return argv + [str(output), text]
     exe = Path(argv[0]).name.lower()
     if "python" in exe:
-        return argv + ["-m", "kokoro", "--voice", voice, "--speed", str(speed), "--output", str(output), "--text", text]
-    return argv + ["--voice", voice, "--speed", str(speed), "--output", str(output), "--text", text]
+        return argv + ["-m", "kokoro", "--voice", voice, "--speed", str(speed), "--output-file", str(output), "--text", text]
+    return argv + ["--voice", voice, "--speed", str(speed), "--output-file", str(output), "--text", text]
 
 def _assert_playable_audio(path: Path) -> None:
     if not path.exists() or path.stat().st_size <= 44: raise RuntimeError("missing_or_empty_wav")

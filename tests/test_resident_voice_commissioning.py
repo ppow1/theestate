@@ -6,9 +6,11 @@ import textwrap
 import wave
 
 from estate.core.resident_voice_commissioning import (
+    audio_metadata_for_request,
     commissioning_report,
     installed_capability_audit,
     live_resident_voice_bindings,
+    safe_audio_path,
     synthesize_open_webui_resident_response,
     synthesize_resident_sample,
 )
@@ -73,3 +75,32 @@ def test_commissioning_report_writes_matrix_and_samples(tmp_path, monkeypatch):
     matrix = json.loads((tmp_path / "runtime/voice/resident_voice_bindings.json").read_text())
     assert "helen" in matrix["bindings"] and "grace" in matrix["bindings"]
     assert all(sample["ok"] for sample in report["samples"])
+
+
+def test_open_webui_audio_metadata_playback_and_path_safety(tmp_path, monkeypatch):
+    _install_fake_tts(tmp_path, monkeypatch)
+    code, body = synthesize_open_webui_resident_response({"model": "estate/helen", "messages": [{"role": "user", "content": "Speak."}]}, root=tmp_path)
+    assert code == 200
+    audio = body["estate"]["audio"]
+    assert audio["ok"] is True
+    assert audio["audio_url"].startswith("/v1/estate/audio/helen/")
+    filename = audio["audio_path"].rsplit("/", 1)[-1]
+    meta_code, meta, served = audio_metadata_for_request("helen", filename, root=tmp_path)
+    assert meta_code == 200
+    assert meta["mime_type"] == "audio/wav"
+    assert served is not None and served.exists()
+    with wave.open(str(served), "rb") as wav:
+        assert wav.getnframes() > 0
+    traversal_code, _, traversal_path = audio_metadata_for_request("helen", "../secret.wav", root=tmp_path)
+    assert traversal_code == 404
+    assert traversal_path is None
+
+
+def test_no_fake_audio_created_on_synthesis_failure(tmp_path, monkeypatch):
+    failing = tmp_path / "fail_tts.py"
+    failing.write_text("import sys; sys.exit(7)\n", encoding="utf-8")
+    monkeypatch.setenv("ESTATE_TTS_COMMAND", f"{sys.executable} {failing}")
+    result = synthesize_resident_sample("helen", "This should fail.", root=tmp_path, sample_name="failure")
+    assert result["ok"] is False
+    assert result["placeholder_generated"] is False
+    assert not safe_audio_path(tmp_path, "helen", "failure").exists()
