@@ -10,6 +10,7 @@ from estate.core.resident_gateway import ACTIVE_RESIDENT_MODELS, chat_completion
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.resident_interaction import resident_surface, _key
 from estate.core.resident_voice_commissioning import live_resident_voice_bindings, local_tts_health, synthesize_resident_sample
+from estate.core.openwebui_resident_package import resident_package
 
 REPORT_DIR = Path("collaboration/reports/openwebui_campaign_02")
 PROMPTS = [
@@ -52,27 +53,26 @@ def _visual_row(root: Path, display_name: str, resident_id: str) -> dict[str, An
 
 def resident_model_catalog(root=None) -> dict[str, Any]:
     rootp = _root(root)
-    voices = live_resident_voice_bindings(rootp)
-    tts = local_tts_health(rootp)
     data = []
     for model_id, rid in ACTIVE_RESIDENT_MODELS.items():
-        surface = resident_surface(rid, rootp)
-        comp = compose_resident_identity(rid, surface_id="open-webui-model-catalog", root=rootp)
-        voice = voices.get(rid)
+        package = resident_package(model_id, rid, rootp)
         data.append({
             "id": model_id, "object": "model", "created": 0, "owned_by": "estate",
-            "name": surface["resident_display_name"],
+            "name": package["display_name"],
             "estate": {
-                "resident_id": rid, "display_name": surface["resident_display_name"], "office": surface.get("office"), "role": surface.get("role"),
-                "availability_state": "available", "provider_model_hidden_in_primary_selector": True,
-                "avatar": _visual_row(rootp, surface["resident_display_name"], rid),
-                "voice": {"state": "ready" if tts.get("ok") and voice else ("binding_present_tts_unavailable" if voice else "unavailable"), "voice_id": getattr(voice, "voice_id", None), "traits": getattr(voice, "traits", None), "tts_health": tts},
-                "identity": {"schema_version": comp.get("schema_version"), "source_hash": comp.get("identity_version_or_source_hash"), "failed_closed": comp.get("failed_closed"), "layers": [l.get("layer") for l in comp.get("included_context_layers", [])]},
-                "privileged_actions_enabled": False,
+                **package,
+                "display_name": package["display_name"],
+                "office": package["office_title"],
+                "role": package["role_summary"],
+                "availability_state": "available",
+                "provider_model_hidden_in_primary_selector": True,
+                "resident_gateway_capable": True,
+                "avatar": {"state": package["visual_state"], "avatar_uri": package["avatar_uri"], "provenance": package["visual_provenance"]},
+                "voice": {"state": package["voice_state"], "engine": package["voice_engine"], "voice_id": package["voice_id"], "speed": package["voice_speed"], "approval_state": package["voice_approval_state"], "tts_available": package["tts_available"], "tts_health": local_tts_health(rootp)},
+                "identity": {"schema_version": package["identity_schema_version"], "source_hash": package["identity_source_hash"], "failed_closed": package["identity_failed_closed"], "sources": package["identity_sources"]},
             },
         })
     return {"object": "list", "data": data, "estate": {"surface": "open_webui_resident_catalog", "cloud_dependency": False}}
-
 
 def compare_responses(responses: dict[str, str]) -> dict[str, Any]:
     words = {r: set(re.findall(r"[a-z']+", t.lower())) for r, t in responses.items()}
