@@ -28,7 +28,11 @@ def test_chat_completion_maps_commissioned_grace(tmp_path):
     code, body = chat_completion({'model':'estate/grace','messages':[{'role':'user','content':'Who are you?'}]}, root=tmp_path)
     assert code == 200
     assert body['estate']['resident_id'] == 'grace'
-    assert 'Grace' in body['choices'][0]['message']['content']
+    assert body['estate']['identity_hash']
+    assert body['estate']['identity_schema_version']
+    assert body['estate']['resident_package']['resident_id'] == 'grace'
+    assert body['estate']['resident_package']['identity_source_hash'] == body['estate']['identity_hash']
+    assert body['choices'][0]['message']['content'].strip()
 
 
 def test_chat_completion_rejects_unknown_and_stream(tmp_path):

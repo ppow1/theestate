@@ -6,6 +6,7 @@ from estate.core.resident_gateway import chat_completion, models_payload
 from estate.core.resident_voice_commissioning import (
     build_kokoro_command,
     commissioned_voice_projection,
+    discover_kokoro,
     safe_audio_path,
     synthesize_resident_sample,
     audio_metadata_for_request,
@@ -64,6 +65,8 @@ def test_kokoro_command_construction_and_failure_path(tmp_path):
     out = tmp_path / "out.wav"
     cmd = build_kokoro_command({"argv":["python"]}, "hello", out, "af_bella", 0.92)
     assert cmd[:3] == ["python", "-m", "kokoro"]
+    assert "--output-file" in cmd or "-o" in cmd
+    assert "--output" not in cmd
     assert "af_bella" in cmd
     result = synthesize_resident_sample("alfred", "hello", root=tmp_path)
     assert result["ok"] is False
@@ -80,3 +83,30 @@ def test_generated_file_validation_and_audio_contract(tmp_path):
     assert served == path
     code, _, _ = audio_metadata_for_request("helen", "../secret.wav", root=tmp_path)
     assert code == 404
+
+
+def test_kokoro_env_preserves_raw_windows_path_and_parses_quoted_command(monkeypatch):
+    raw = r"A:\AI\TTS\kokoro_py311\Scripts\python.exe"
+    monkeypatch.setenv("ESTATE_KOKORO_COMMAND", raw)
+    engine = discover_kokoro()
+    assert engine["argv"] == [raw]
+    assert engine["executable"] == raw
+
+    quoted = f'"{raw}" --flag value'
+    monkeypatch.setenv("ESTATE_KOKORO_COMMAND", quoted)
+    engine = discover_kokoro()
+    assert engine["argv"][0] == raw
+    assert engine["argv"][1:] == ["--flag", "value"]
+
+
+def test_kokoro_command_uses_supported_output_flag_for_python_and_exe(tmp_path):
+    out = tmp_path / "out.wav"
+    py_cmd = build_kokoro_command({"engine":"kokoro", "argv":["python.exe"]}, "hello", out, "af_bella", 0.92)
+    assert py_cmd[:3] == ["python.exe", "-m", "kokoro"]
+    assert "--output-file" in py_cmd or "-o" in py_cmd
+    assert "--output" not in py_cmd
+
+    exe_cmd = build_kokoro_command({"engine":"kokoro", "argv":["kokoro.exe"]}, "hello", out, "af_jessica", 1.0)
+    assert exe_cmd[0] == "kokoro.exe"
+    assert "--output-file" in exe_cmd or "-o" in exe_cmd
+    assert "--output" not in exe_cmd
