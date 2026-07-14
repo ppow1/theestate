@@ -34,7 +34,7 @@ def _install_fake_tts(tmp_path, monkeypatch):
 def test_audit_reports_intelligible_tts_availability_truthfully(tmp_path, monkeypatch):
     monkeypatch.delenv("ESTATE_TTS_COMMAND", raising=False)
     audit = installed_capability_audit(tmp_path)
-    assert audit["provider"] == "estate.local.intelligible_tts"
+    assert audit["provider"] == "estate.local.kokoro"
     assert audit["repository_placeholders_distinguished"] is True
     assert audit["placeholder_waveforms_commissioned_as_speech"] is False
     assert "health_check" in audit
@@ -42,18 +42,19 @@ def test_audit_reports_intelligible_tts_availability_truthfully(tmp_path, monkey
 
 def test_live_gateway_residents_have_distinct_voice_bindings():
     bindings = live_resident_voice_bindings()
-    assert {"alfred", "helen", "ingrid", "grace", "evelyn", "eleanor", "marie", "judy"} <= set(bindings)
+    assert {"helen", "grace"} <= set(bindings)
+    assert "alfred" not in bindings
     voice_ids = [binding.voice_id for binding in bindings.values()]
     assert len(voice_ids) == len(set(voice_ids))
 
 
 def test_synthesis_creates_playable_wav_sample(tmp_path, monkeypatch):
     _install_fake_tts(tmp_path, monkeypatch)
-    result = synthesize_resident_sample("ingrid", "The Estate is ready for local audible review.", root=tmp_path, sample_name="check")
+    result = synthesize_resident_sample("helen", "The Estate is ready for local audible review.", root=tmp_path, sample_name="check")
     assert result["ok"] is True
     with wave.open(result["audio_path"], "rb") as wav:
         assert wav.getnchannels() == 1
-        assert wav.getframerate() == 16000
+        assert wav.getframerate() in {16000, 24000}
         assert wav.getnframes() > 0
 
 
@@ -70,5 +71,5 @@ def test_commissioning_report_writes_matrix_and_samples(tmp_path, monkeypatch):
     report = commissioning_report(tmp_path)
     assert report["audit"]["health_check"]["ok"] is True
     matrix = json.loads((tmp_path / "runtime/voice/resident_voice_bindings.json").read_text())
-    assert "alfred" in matrix["bindings"]
+    assert "helen" in matrix["bindings"] and "grace" in matrix["bindings"]
     assert all(sample["ok"] for sample in report["samples"])

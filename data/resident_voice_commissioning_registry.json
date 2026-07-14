@@ -1,0 +1,43 @@
+{
+  "schema_version": "estate.resident_voice_commissioning.v1",
+  "engine_policy": {
+    "local_only": true,
+    "canonical_engine": "kokoro",
+    "sample_rate_hz": 24000,
+    "external_paid_api_required": false
+  },
+  "commissioned": {
+    "helen": {
+      "engine": "kokoro",
+      "engine_version": "0.9.4",
+      "voice": "af_bella",
+      "speed": 0.92,
+      "status": "canonical_v1",
+      "approval": "Steward",
+      "validation": [
+        "individual audition",
+        "speed audition",
+        "three-mode validation",
+        "conversation chemistry test"
+      ]
+    },
+    "grace": {
+      "engine": "kokoro",
+      "engine_version": "0.9.4",
+      "voice": "af_jessica",
+      "speed": 1.0,
+      "status": "canonical_v1",
+      "approval": "Steward",
+      "validation": [
+        "individual audition",
+        "Helen comparison",
+        "conversation chemistry test"
+      ]
+    }
+  },
+  "uncommissioned_default": {
+    "voice_state": "uncommissioned",
+    "voice_approval_state": "not_approved",
+    "tts_available": false
+  }
+}
