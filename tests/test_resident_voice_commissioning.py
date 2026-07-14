@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import stat
+from pathlib import Path
 import textwrap
 import wave
 
@@ -84,7 +85,7 @@ def test_open_webui_audio_metadata_playback_and_path_safety(tmp_path, monkeypatc
     audio = body["estate"]["audio"]
     assert audio["ok"] is True
     assert audio["audio_url"].startswith("/v1/estate/audio/helen/")
-    filename = audio["audio_path"].rsplit("/", 1)[-1]
+    filename = Path(audio["audio_path"]).name
     meta_code, meta, served = audio_metadata_for_request("helen", filename, root=tmp_path)
     assert meta_code == 200
     assert meta["mime_type"] == "audio/wav"
@@ -99,6 +100,8 @@ def test_open_webui_audio_metadata_playback_and_path_safety(tmp_path, monkeypatc
 def test_no_fake_audio_created_on_synthesis_failure(tmp_path, monkeypatch):
     failing = tmp_path / "fail_tts.py"
     failing.write_text("import sys; sys.exit(7)\n", encoding="utf-8")
+    monkeypatch.delenv("ESTATE_KOKORO_COMMAND", raising=False)
+    monkeypatch.delenv("ESTATE_KOKORO_PYTHON", raising=False)
     monkeypatch.setenv("ESTATE_TTS_COMMAND", f"{sys.executable} {failing}")
     result = synthesize_resident_sample("helen", "This should fail.", root=tmp_path, sample_name="failure")
     assert result["ok"] is False
