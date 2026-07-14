@@ -1,0 +1,11 @@
+{
+  "runtime_id": "engineering-worker-runtime",
+  "version": "1.0.0",
+  "canonical_runtime_root": "A:\\AI\\Tools\\EngineeringWorkerRuntime",
+  "entrypoint": "engineering_worker_runtime.py",
+  "documented_arguments": ["--package", "--worktree", "--evidence"],
+  "no_scheduler": true,
+  "no_provider_control_plane": true,
+  "no_dispatch_authority": true,
+  "no_acceptance_authority": true
+}
