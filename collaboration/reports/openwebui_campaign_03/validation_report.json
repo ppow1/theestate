@@ -164,7 +164,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -392,8 +392,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -442,7 +442,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -765,7 +765,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -993,8 +993,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -1043,7 +1043,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -1481,7 +1481,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -1709,8 +1709,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -1759,7 +1759,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -2070,7 +2070,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -2298,8 +2298,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -2348,7 +2348,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -2780,7 +2780,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -3008,8 +3008,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -3058,7 +3058,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -3363,7 +3363,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -3591,8 +3591,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -3641,7 +3641,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -4061,7 +4061,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {
                       "grace": {
@@ -4314,8 +4314,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -4364,7 +4364,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -4654,7 +4654,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {
                     "grace": {
@@ -4907,8 +4907,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -4957,7 +4957,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -5367,7 +5367,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -5595,8 +5595,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -5643,7 +5643,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -5958,7 +5958,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -6186,8 +6186,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -6234,7 +6234,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -6664,7 +6664,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -6892,8 +6892,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -6940,7 +6940,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -7203,7 +7203,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -7431,8 +7431,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -7479,7 +7479,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -7857,7 +7857,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -8085,8 +8085,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -8133,7 +8133,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -8396,7 +8396,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -8624,8 +8624,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -8672,7 +8672,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -9050,7 +9050,7 @@
                     },
                     "audit_path": "runtime/residents/authority_decisions.jsonl",
                     "default_unknown_action": "denied",
-                    "generated_at": "2026-07-14T18:41:02+00:00",
+                    "generated_at": "2026-07-14T19:55:38+00:00",
                     "kind": "resident_authority_boundary",
                     "resident_boundaries": {},
                     "source_references": [
@@ -9278,8 +9278,8 @@
                     }
                   ],
                   "schema_version": "resident_registry_snapshot.v1",
-                  "snapshot_hash": "f0930598922ac1f2",
-                  "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                  "snapshot_hash": "e7917d133504cb6a",
+                  "snapshot_timestamp": "2026-07-14T19:55:38Z",
                   "sources": [
                     "data/registry/residents.json",
                     "data/registry/personnel.json"
@@ -9326,7 +9326,7 @@
                     {
                       "key": "work_packages.pending_count",
                       "source": "collaboration/work_packages/pending",
-                      "value": 403,
+                      "value": 407,
                       "verification_state": "derived"
                     }
                   ],
@@ -9589,7 +9589,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -9817,8 +9817,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -9865,7 +9865,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -10109,7 +10109,7 @@
     },
     "object": "list"
   },
-  "generated_at": 1784054462,
+  "generated_at": 1784058938,
   "kokoro_discovery": {
     "argv": [],
     "available": false,
@@ -10246,7 +10246,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -10474,8 +10474,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -10524,7 +10524,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -10901,7 +10901,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -11129,8 +11129,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -11177,7 +11177,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -11494,7 +11494,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -11722,8 +11722,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -11770,7 +11770,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -12139,7 +12139,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {
                 "grace": {
@@ -12392,8 +12392,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -12442,7 +12442,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -12791,7 +12791,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -13019,8 +13019,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -13069,7 +13069,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -13440,7 +13440,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -13668,8 +13668,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -13718,7 +13718,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -14077,7 +14077,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -14305,8 +14305,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -14353,7 +14353,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -14670,7 +14670,7 @@
               },
               "audit_path": "runtime/residents/authority_decisions.jsonl",
               "default_unknown_action": "denied",
-              "generated_at": "2026-07-14T18:41:02+00:00",
+              "generated_at": "2026-07-14T19:55:38+00:00",
               "kind": "resident_authority_boundary",
               "resident_boundaries": {},
               "source_references": [
@@ -14898,8 +14898,8 @@
               }
             ],
             "schema_version": "resident_registry_snapshot.v1",
-            "snapshot_hash": "f0930598922ac1f2",
-            "snapshot_timestamp": "2026-07-14T18:41:02Z",
+            "snapshot_hash": "e7917d133504cb6a",
+            "snapshot_timestamp": "2026-07-14T19:55:38Z",
             "sources": [
               "data/registry/residents.json",
               "data/registry/personnel.json"
@@ -14946,7 +14946,7 @@
               {
                 "key": "work_packages.pending_count",
                 "source": "collaboration/work_packages/pending",
-                "value": 403,
+                "value": 407,
                 "verification_state": "derived"
               }
             ],
@@ -15282,7 +15282,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -15510,8 +15510,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -15560,7 +15560,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -15894,7 +15894,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -16122,8 +16122,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -16172,7 +16172,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -16425,7 +16425,7 @@
           "voice_state": "uncommissioned"
         },
         "session_id": "campaign03_alfred",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -16586,7 +16586,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -16814,8 +16814,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -16862,7 +16862,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -17136,7 +17136,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -17364,8 +17364,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -17412,7 +17412,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -17605,7 +17605,7 @@
           "voice_state": "uncommissioned"
         },
         "session_id": "campaign03_eleanor",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -17766,7 +17766,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -17994,8 +17994,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -18042,7 +18042,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -18368,7 +18368,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -18596,8 +18596,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -18644,7 +18644,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -18889,7 +18889,7 @@
           "voice_state": "uncommissioned"
         },
         "session_id": "campaign03_evelyn",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -19050,7 +19050,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {
                   "grace": {
@@ -19303,8 +19303,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -19353,7 +19353,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -19654,7 +19654,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {
                     "grace": {
@@ -19907,8 +19907,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -19957,7 +19957,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -20182,7 +20182,7 @@
           "voice_state": "canonical"
         },
         "session_id": "campaign03_grace",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -20343,7 +20343,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -20571,8 +20571,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -20621,7 +20621,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -20943,7 +20943,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -21171,8 +21171,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -21221,7 +21221,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -21468,7 +21468,7 @@
           "voice_state": "canonical"
         },
         "session_id": "campaign03_helen",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -21629,7 +21629,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -21857,8 +21857,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -21907,7 +21907,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -22223,7 +22223,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -22451,8 +22451,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -22501,7 +22501,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -22736,7 +22736,7 @@
           "voice_state": "uncommissioned"
         },
         "session_id": "campaign03_ingrid",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -22897,7 +22897,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -23125,8 +23125,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -23173,7 +23173,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -23447,7 +23447,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -23675,8 +23675,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -23723,7 +23723,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -23916,7 +23916,7 @@
           "voice_state": "uncommissioned"
         },
         "session_id": "campaign03_judy",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
@@ -24077,7 +24077,7 @@
                 },
                 "audit_path": "runtime/residents/authority_decisions.jsonl",
                 "default_unknown_action": "denied",
-                "generated_at": "2026-07-14T18:41:02+00:00",
+                "generated_at": "2026-07-14T19:55:38+00:00",
                 "kind": "resident_authority_boundary",
                 "resident_boundaries": {},
                 "source_references": [
@@ -24305,8 +24305,8 @@
                 }
               ],
               "schema_version": "resident_registry_snapshot.v1",
-              "snapshot_hash": "f0930598922ac1f2",
-              "snapshot_timestamp": "2026-07-14T18:41:02Z",
+              "snapshot_hash": "e7917d133504cb6a",
+              "snapshot_timestamp": "2026-07-14T19:55:38Z",
               "sources": [
                 "data/registry/residents.json",
                 "data/registry/personnel.json"
@@ -24353,7 +24353,7 @@
                 {
                   "key": "work_packages.pending_count",
                   "source": "collaboration/work_packages/pending",
-                  "value": 403,
+                  "value": 407,
                   "verification_state": "derived"
                 }
               ],
@@ -24627,7 +24627,7 @@
                   },
                   "audit_path": "runtime/residents/authority_decisions.jsonl",
                   "default_unknown_action": "denied",
-                  "generated_at": "2026-07-14T18:41:02+00:00",
+                  "generated_at": "2026-07-14T19:55:38+00:00",
                   "kind": "resident_authority_boundary",
                   "resident_boundaries": {},
                   "source_references": [
@@ -24855,8 +24855,8 @@
                   }
                 ],
                 "schema_version": "resident_registry_snapshot.v1",
-                "snapshot_hash": "f0930598922ac1f2",
-                "snapshot_timestamp": "2026-07-14T18:41:02Z",
+                "snapshot_hash": "e7917d133504cb6a",
+                "snapshot_timestamp": "2026-07-14T19:55:38Z",
                 "sources": [
                   "data/registry/residents.json",
                   "data/registry/personnel.json"
@@ -24903,7 +24903,7 @@
                   {
                     "key": "work_packages.pending_count",
                     "source": "collaboration/work_packages/pending",
-                    "value": 403,
+                    "value": 407,
                     "verification_state": "derived"
                   }
                 ],
@@ -25096,7 +25096,7 @@
           "voice_state": "uncommissioned"
         },
         "session_id": "campaign03_marie",
-        "turn_id": "turn_0003",
+        "turn_id": "turn_0001",
         "visual": {
           "avatar_uri": null,
           "provenance": {
