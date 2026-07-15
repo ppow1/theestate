@@ -15,7 +15,6 @@ Read completely:
 
 `AI_COMMUNICATION_HINTS.md`
 
-Use it to determine whether the item belongs in:
+Use it to determine whether the item belongs in the Parking Lot, a repository-backed message, a mailbox discovery flow, or a work package.
 
-- the Parking Lot;
-- a repository-backed message;
+Do not guess.
