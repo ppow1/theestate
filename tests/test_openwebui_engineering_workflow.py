@@ -1,3 +1,4 @@
+from estate.core.execution_adapter_handoff_runtime import prepare_handoff
 from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
 
@@ -33,6 +34,31 @@ def test_openwebui_chat_initiates_existing_helen_grace_dispatch_workflow(tmp_pat
     assert (tmp_path / "runtime/operations/grace/status/latest.json").exists()
     assert (tmp_path / "runtime/execution_dispatch/queue.json").exists()
     assert "No second execution system" in body["choices"][0]["message"]["content"]
+
+
+def test_openwebui_dispatch_is_immediately_handoff_eligible(tmp_path):
+    code, body = chat_completion(
+        {
+            "model": "estate/grace",
+            "messages": [{"role": "user", "content": EXACT_COMMAND}],
+            "metadata": {"session_id": "owui-eng-handoff-ready"},
+        },
+        root=tmp_path,
+    )
+
+    assert code == 200
+    dispatch_id = body["estate"]["engineering_assignment"]["grace_action"]["dispatch_handoff_request"]["dispatch_id"]
+    prepared = prepare_handoff(dispatch_id, tmp_path)
+
+    assert prepared["status"] == "handoff_validated"
+    assert prepared["errors"] == []
+    adapter_request = prepared["adapter_request"]
+    assert adapter_request["provider_id"] == "codex-cli-openai"
+    assert adapter_request["provider_type"] == "codex-cli"
+    assert adapter_request["prompt_source"] == "collaboration/work_packages/pending/WP-0649_WebUI_Helen_Grace_Engineering_Workflow_Integration.md"
+    assert adapter_request["read_scope_paths"]
+    assert adapter_request["decision_reference"]
+    assert adapter_request["metadata"]["authorization_reference"]
 
 EXACT_COMMAND = (
     "Initiate Engineering Department assignment: verify the Open WebUI engineering assignment workflow "

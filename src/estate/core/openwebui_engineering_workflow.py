@@ -90,7 +90,7 @@ def initiate_engineering_assignment_from_chat(
         owner="local-engineering-worker-001",
         checkpoint="Grace records assignment state; Chief Architect and Steward retain acceptance authority.",
         evidence=[str(request_path.relative_to(rootp)), str(assessment_path.relative_to(rootp))],
-        metadata={"helen_assessment_id": assessment.assessment_id, "open_webui_session_id": session_id, "summary_safe": True},
+        metadata={"helen_assessment_id": assessment.assessment_id, "open_webui_session_id": session_id, "summary_safe": True, "open_webui_engineering_assignment": True},
     )
     action, paths = grace.conduct_objective(objective, request_dispatch=True)
     return {
