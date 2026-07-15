@@ -413,3 +413,68 @@ def test_helen_diagnostic_path_and_fallback(tmp_path):
     assert res['turn']['resident_id'] == 'helen'
     assert res['turn']['llm']['fallback_used'] is True
     assert (tmp_path/'runtime/residents/helen/llm_diagnostics.json').exists()
+
+
+def test_resident_prompt_preserves_current_message_before_oversized_context(tmp_path):
+    from estate.core import resident_interaction as mod
+    question = "Can you supervise engineering workers? Please answer this exact latest question."
+    surface = mod.resident_surface("helen", root=tmp_path)
+    composition = {"layers": ["IDENTITY" + ("x" * 12000)], "included_context_layers": [{"layer": "oversized"}], "schema_version": 1}
+    context = {"recent_history": [{"user": "old" + ("h" * 5000), "resident": "old" + ("r" * 5000)}], "artifacts": [{"summary": "artifact" + ("a" * 8000)}]}
+    prompt = mod.resident_prompt("helen", question, surface, {"decision": "denied"}, context, {"metadata": "m" * 5000}, composition)
+    assert len(prompt) <= mod.MAX_RESIDENT_PROMPT_CHARS
+    assert f"Steward current message (complete unless diagnostics says truncated): {question}" in prompt
+    assert prompt.index("Steward current message") < prompt.index("Bounded Estate context packet")
+    assert "current_steward_message_present" in prompt and "true" in prompt.lower()
+    assert "bounded_estate_context_packet_truncated" in prompt or "canonical_runtime_identity_composition_truncated" in prompt
+
+
+def test_process_chat_final_prompt_authority_classification_for_helen_supervision(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    captured = {}
+    class CaptureAdapter(MockOllamaAdapter):
+        def generate(self, *, resident, prompt, model=None):
+            captured["prompt"] = prompt
+            assert "Can you supervise engineering workers?" in prompt
+            return {"ok": True, "text": "Helen can hire, qualify, and staff engineering workers; Grace supervises operational execution.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "generation_attempted": True, "generation_result_state": "generated", "discovered_models_count": 2}}
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", CaptureAdapter)
+    payload = process_chat("helen", "Can you supervise engineering workers?", action="conversation", root=tmp_path)
+    auth = payload["turn"]["authority"]
+    assert auth["normalized_action"] == "execute-work-package"
+    assert auth["decision"] == "denied"
+    assert "Grace/Operations owns scheduling" in captured["prompt"]
+    assert "Helen owns workforce readiness" in captured["prompt"]
+    assert "Answer the Steward's current message directly" in captured["prompt"]
+
+
+def test_process_chat_final_prompt_authority_classification_for_grace_hiring(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    captured = {}
+    class CaptureAdapter(MockOllamaAdapter):
+        def generate(self, *, resident, prompt, model=None):
+            captured["prompt"] = prompt
+            assert "Hire three engineers." in prompt
+            return {"ok": True, "text": "Hiring belongs to Helen/Personnel; I can receive and deploy the staffed team.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "generation_attempted": True, "generation_result_state": "generated", "discovered_models_count": 2}}
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", CaptureAdapter)
+    payload = process_chat("grace", "Hire three engineers.", action="conversation", root=tmp_path)
+    auth = payload["turn"]["authority"]
+    assert auth["normalized_action"] == "modify-personnel-identity"
+    assert auth["decision"] == "denied"
+    assert "Helen/Personnel owns hiring" in captured["prompt"]
+    assert "Grace can receive and deploy" in captured["prompt"]
+
+
+def test_process_chat_final_prompt_authority_classification_for_helen_budget(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    captured = {}
+    class CaptureAdapter(MockOllamaAdapter):
+        def generate(self, *, resident, prompt, model=None):
+            captured["prompt"] = prompt
+            assert "Approve a budget." in prompt
+            return {"ok": True, "text": "I can’t approve budgets; I would route that to the appropriate authority.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "generation_attempted": True, "generation_result_state": "generated", "discovered_models_count": 2}}
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", CaptureAdapter)
+    payload = process_chat("helen", "Approve a budget.", action="conversation", root=tmp_path)
+    auth = payload["turn"]["authority"]
+    assert auth["normalized_action"] == "approve-merge-work"
+    assert auth["decision"] == "denied"
+    assert "Budget approval is not held by Helen or Grace" in captured["prompt"]
