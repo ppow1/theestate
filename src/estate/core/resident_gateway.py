@@ -130,21 +130,69 @@ def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[int, str | None
     return 200, model, result
 
 
+def _engineering_assignment_content(workflow: dict[str, Any]) -> str:
+    return (
+        "Engineering Department assignment initiated through the existing Helen workforce, "
+        "Grace operations, and Dispatch runtimes. No provider or worker execution was performed. "
+        "No second execution system was created.\n\n"
+        + workflow["summary"]
+    )
+
+
+def _engineering_assignment_estate_envelope(model: str, session_id: str | None, workflow: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "resident_id": ACTIVE_RESIDENT_MODELS[model],
+        "session_id": session_id,
+        "privileged_action_executed": False,
+        "provider_execution_performed": False,
+        "second_execution_system_created": False,
+        "engineering_assignment": workflow,
+    }
+
+
+def _engineering_assignment_chat_completion(
+    payload: dict[str, Any],
+    *,
+    user_message: str,
+    session_id: str | None,
+    root=None,
+    stream: bool = False,
+) -> dict[str, Any] | None:
+    workflow = initiate_engineering_assignment_from_chat(payload, user_message=user_message, session_id=session_id, root=root)
+    if workflow is None:
+        return None
+    model = payload.get("model")
+    created = int(time.time())
+    content = _engineering_assignment_content(workflow)
+    if stream:
+        return {
+            "id": f"chatcmpl-{workflow['grace_action']['action_id']}",
+            "object": "chat.completion.chunk",
+            "created": created,
+            "model": model,
+            "choices": [{"index": 0, "delta": {"role": "assistant", "content": content}, "finish_reason": None}],
+            "estate": _engineering_assignment_estate_envelope(model, session_id, workflow),
+        }
+    return {
+        "id": f"chatcmpl-{workflow['grace_action']['action_id']}",
+        "object": "chat.completion",
+        "created": created,
+        "model": model,
+        "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}],
+        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        "estate": _engineering_assignment_estate_envelope(model, session_id, workflow),
+    }
+
+
 def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
     model = payload.get("model")
     user_message = _latest_user_message(payload.get("messages") or [])
     if not user_message:
         return 400, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
     session_id, _session_field = _session_id_from_payload(payload)
-    workflow = initiate_engineering_assignment_from_chat(payload, user_message=user_message, session_id=session_id, root=root)
-    if workflow is not None:
-        created = int(time.time())
-        content = (
-            "Engineering Department assignment initiated through the existing Helen workforce, "
-            "Grace operations, and Dispatch runtimes. No second execution system was created.\n\n"
-            + workflow["summary"]
-        )
-        return 200, {"id":f"chatcmpl-{workflow['grace_action']['action_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":ACTIVE_RESIDENT_MODELS[model],"session_id":session_id,"privileged_action_executed":False,"engineering_assignment":workflow}}
+    workflow_body = _engineering_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
+    if workflow_body is not None:
+        return 200, workflow_body
     code, model, result = _chat_result(payload, root=root)
     if code != 200:
         return code, result
@@ -161,6 +209,15 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
 
 
 def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
+    user_message = _latest_user_message(payload.get("messages") or [])
+    if not user_message:
+        return 400, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
+    session_id, _session_field = _session_id_from_payload(payload)
+    workflow_body = _engineering_assignment_chat_completion(
+        payload, user_message=user_message, session_id=session_id, root=root, stream=True
+    )
+    if workflow_body is not None:
+        return 200, workflow_body
     code, model, result = _chat_result(payload, root=root)
     if code != 200:
         return code, result
