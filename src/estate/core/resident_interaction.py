@@ -518,6 +518,8 @@ def resident_prompt(resident: str, message: str, surface: dict[str, Any], author
         "Answer the Steward's current message directly. Do not substitute a greeting, status report, or unrelated proposal.",
         f"Steward current message (complete unless diagnostics says truncated): {current_message}",
         f"Authority status for requested action: {json.dumps(authority, sort_keys=True)}",
+        "Internal authority fields, diagnostics, routing_guidance, policy names, implementation labels, and audit wording are for reasoning only; do not repeat them verbatim to the Steward.",
+        "Translate authority decisions into natural first-person language that preserves each resident's role boundary and names the right office or decision holder when useful.",
     ]
     remaining = MAX_RESIDENT_PROMPT_CHARS - len("\n".join(high_priority + [closing])) - 32
     budgets = [("Allowed capabilities", caps, 700), ("Provider/model metadata", llm_metadata, 600), ("Resident metadata", metadata, 600), ("Canonical runtime identity composition", composition or {}, 1800), ("Bounded Estate context packet", context, max(400, remaining - 3700))]
@@ -547,6 +549,8 @@ def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], 
         f"Resident metadata: {json.dumps({k: surface.get(k) for k in ['resident_id','resident_display_name','office','role','resident_api_standard_version','resident_implementation_version']}, sort_keys=True)}",
         f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
         f"Authority status for requested action: {json.dumps(auth, sort_keys=True)}",
+        "Internal authority fields, diagnostics, routing_guidance, policy names, implementation labels, and audit wording are for reasoning only; do not repeat them verbatim to the Steward.",
+        "Translate authority decisions into natural first-person language that preserves each resident's role boundary and names the right office or decision holder when useful.",
         f"Response metadata available to you: {json.dumps(llm_meta, sort_keys=True)}",
         f"Canonical runtime identity composition: {json.dumps(composition or {}, sort_keys=True)[:4500]}",
         f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:1800]}",
@@ -603,6 +607,52 @@ def _governed_action_guidance(root: Path, classification: dict[str, Any]) -> dic
     command = plan.get("planned_command") or f"PYTHONPATH=src python -m estate.cli.main ai-services {operation.replace('_model','-model')} {service_id} --json"
     return {"kind": "governed_action_next_step", "service_id": service_id, "operation": operation, "executed": False, "ai_services_plan": plan, "steward_command": command}
 
+
+FORBIDDEN_VISIBLE_AUTHORITY_PHRASES = (
+    "according to the authority status",
+    "this action is blocked",
+    "routing guidance",
+    "default personnel management policies",
+    "canonical authority explicitly granting it",
+    "residents don't execute work packages automatically",
+)
+
+
+def _natural_authority_boundary_response(resident: str, classification: dict[str, Any]) -> str | None:
+    rid = _key(resident)
+    intent = classification.get("intent")
+    if intent == "budget_approval_request" and rid == "helen":
+        return "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+    if intent == "budget_approval_request" and rid == "grace":
+        return "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+    if intent == "operational_execution_supervision_request" and rid == "helen":
+        return "I can hire, qualify, and staff engineering workers, but Grace supervises their operational execution."
+    if intent == "personnel_staffing_request" and rid == "grace":
+        return "Hiring belongs to Helen in Personnel. Once she staffs the team, I can schedule, dispatch, and supervise the work."
+    return None
+
+
+def _clean_resident_visible_response(response: str, resident: str, classification: dict[str, Any]) -> str:
+    text = str(response or "")
+    lower = text.lower()
+    if any(phrase in lower for phrase in FORBIDDEN_VISIBLE_AUTHORITY_PHRASES):
+        natural = _natural_authority_boundary_response(resident, classification)
+        if natural:
+            return natural
+        cleaned = text
+        replacements = {
+            "according to the authority status": "from what I can do here",
+            "this action is blocked": "I cannot do that from this conversation",
+            "routing guidance": "the right next step",
+            "default personnel management policies": "personnel boundaries",
+            "canonical authority explicitly granting it": "a designated decision holder grants it",
+            "residents don't execute work packages automatically": "I cannot carry that out automatically",
+        }
+        for phrase, replacement in replacements.items():
+            cleaned = re.sub(re.escape(phrase), replacement, cleaned, flags=re.IGNORECASE)
+        return cleaned
+    return text
+
 def _fallback_response(resident, message, surface, root: Path | None = None, classification: dict[str, Any] | None = None, governed_action: dict[str, Any] | None = None):
     rid = surface.get("resident_id")
     text = str(message or "").strip()
@@ -625,6 +675,9 @@ def _fallback_response(resident, message, surface, root: Path | None = None, cla
             return f"Pat, first I would quiet the room: pick the one decision that unlocks the next hour, park the rest, and let me route the loose pieces into order. Your note was: {text[:160]}"
         return ("Good morning, Pat. Current Estate status: bounded local context is available. Recommended next action: I would begin with the validation signal, then the pending queue, then the Engineering handoff—one clean pass before anyone adds ceremony. "
                 "I can summarize, recommend, and prepare proposed actions, but execution still waits for the proper Steward-authorized path.")
+    natural = _natural_authority_boundary_response(rid, classification or {})
+    if natural:
+        return natural
     if rid == "helen":
         return ("Pat, I would start by lowering the temperature, not by blaming the people in the room. Name the strain, separate overload from neglect, and give each worker one humane next step. "
                 f"For this prompt, my HR instinct is to protect capacity and clarity first: {text[:160]}")
@@ -685,6 +738,7 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     if governed_action:
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
     response = generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action)
+    response = _clean_resident_visible_response(response, surface["resident_id"], classification)
     if generated.get("ok") and surface.get("resident_id") == "alfred" and ("json files" in user_message.lower() and "llm" in user_message.lower()):
         response = str(generated.get("text"))
         if "local_llm_generated" not in response:

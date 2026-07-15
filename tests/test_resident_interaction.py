@@ -478,3 +478,65 @@ def test_process_chat_final_prompt_authority_classification_for_helen_budget(mon
     assert auth["normalized_action"] == "approve-merge-work"
     assert auth["decision"] == "denied"
     assert "Budget approval is not held by Helen or Grace" in captured["prompt"]
+
+FORBIDDEN_RESIDENT_AUTHORITY_PHRASES = (
+    "according to the authority status",
+    "this action is blocked",
+    "routing guidance",
+    "default personnel management policies",
+    "canonical authority explicitly granting it",
+    "residents don't execute work packages automatically",
+)
+
+
+def assert_no_forbidden_authority_language(text):
+    lowered = text.lower()
+    for phrase in FORBIDDEN_RESIDENT_AUTHORITY_PHRASES:
+        assert phrase not in lowered
+
+
+def test_helen_budget_approval_uses_natural_authority_boundary(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    payload = process_chat("helen", "Approve a budget.", root=tmp_path)
+    response = payload["turn"]["resident_response"]
+    assert response == "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+    assert payload["turn"]["authority"]["action_executed"] is False
+    assert payload["turn"]["authority"]["routing_guidance"]
+    assert_no_forbidden_authority_language(response)
+
+
+def test_helen_engineering_supervision_preserves_role_separation(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    payload = process_chat("helen", "Can you supervise engineering workers?", root=tmp_path)
+    response = payload["turn"]["resident_response"]
+    assert response == "I can hire, qualify, and staff engineering workers, but Grace supervises their operational execution."
+    assert payload["turn"]["authority"]["action_executed"] is False
+    assert payload["turn"]["authority"]["routing_guidance"]
+    assert_no_forbidden_authority_language(response)
+
+
+def test_grace_hiring_preserves_personnel_operations_boundary(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    payload = process_chat("grace", "Hire three engineers.", root=tmp_path)
+    response = payload["turn"]["resident_response"]
+    assert response == "Hiring belongs to Helen in Personnel. Once she staffs the team, I can schedule, dispatch, and supervise the work."
+    assert payload["turn"]["authority"]["action_executed"] is False
+    assert payload["turn"]["authority"]["routing_guidance"]
+    assert_no_forbidden_authority_language(response)
+
+
+class ImplementationLanguageAdapter(MockOllamaAdapter):
+    def generate(self, *, resident, prompt, model=None):
+        return {"ok": True, "text": "According to the authority status, this action is blocked by routing guidance and canonical authority explicitly granting it.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "generation_attempted": True, "generation_result_state": "succeeded", "discovered_models_count": 1, "prompt_summary": prompt[:200]}}
+
+
+def test_generated_resident_response_filters_forbidden_authority_phrases(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", ImplementationLanguageAdapter)
+    payload = process_chat("helen", "Approve a budget.", root=tmp_path)
+    response = payload["turn"]["resident_response"]
+    assert response == "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+    assert_no_forbidden_authority_language(response)
