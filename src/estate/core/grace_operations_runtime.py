@@ -155,7 +155,42 @@ class GraceOperationsRuntime:
             esc_path = self.root / ESCALATIONS_DIR / f"{action.created_at[:10]}_{action.action_id}.json"
             _write_json(esc_path, action.escalation); paths["escalation"] = str(esc_path)
         elif request_dispatch and action.dispatch_handoff_request:
-            dispatch_request = DispatchRequest(work_package_id=objective.work_package_id, title=objective.title, requested_by="Grace", assigned_worker=action.owner, classification=objective.classification, priority=objective.priority.title(), state="Queued", dependencies=objective.dependencies, provider_metadata={"grace_action_id": action.action_id, "checkpoint": action.checkpoint})
+            dispatch_payload: dict[str, Any] = {
+                "work_package_id": objective.work_package_id,
+                "title": objective.title,
+                "requested_by": "Grace",
+                "assigned_worker": action.owner,
+                "classification": objective.classification,
+                "priority": objective.priority.title(),
+                "state": "Queued",
+                "dependencies": objective.dependencies,
+                "provider_metadata": {"grace_action_id": action.action_id, "checkpoint": action.checkpoint},
+            }
+            if objective.metadata.get("open_webui_engineering_assignment") is True:
+                decision_reference = f"operations-control/{decision.decision_id}"
+                authorization_reference = f"grace/{objective.objective_id}/delegated-engineering-assignment"
+                dispatch_payload.update({
+                    "provider": "codex-cli-openai",
+                    "profile_label": "default",
+                    "state": "Ready",
+                    "prompt_source": "collaboration/work_packages/pending/WP-0649_WebUI_Helen_Grace_Engineering_Workflow_Integration.md",
+                    "sandbox": "workspace-write",
+                    "allowed_read_paths": ["collaboration/work_packages/pending", "src/estate/core", "external/engineering_worker_runtime"],
+                    "allowed_write_paths": ["runtime/local_engineering_department", "runtime/execution_adapters"],
+                    "allowed_providers": ["codex-cli-openai"],
+                    "validation_commands": ["pytest tests/test_openwebui_engineering_workflow.py tests/test_local_engineering_department.py"],
+                    "provider_metadata": {
+                        "grace_action_id": action.action_id,
+                        "checkpoint": action.checkpoint,
+                        "decision_reference": decision_reference,
+                        "authorization_reference": authorization_reference,
+                        "movement_authorization_reference": decision_reference,
+                        "provider_type": "codex-cli",
+                        "open_webui_session_id": objective.metadata.get("open_webui_session_id"),
+                        "provider_execution_must_remain_behind_dispatch": True,
+                    },
+                })
+            dispatch_request = DispatchRequest(**dispatch_payload)
             item = enqueue_dispatch_request(dispatch_request, root=self.root)
             action.state = "dispatch_requested"
             action.dispatch_handoff_request["dispatch_id"] = item.dispatch_id
