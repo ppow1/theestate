@@ -9,6 +9,7 @@ from estate.core.multi_resident_room import create_room, invite_participant, acc
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
+from estate.core.openwebui_engineering_workflow import initiate_engineering_assignment_from_chat
 
 ACTIVE_RESIDENT_MODELS = {
     "estate/alfred": "alfred",
@@ -130,6 +131,20 @@ def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[int, str | None
 
 
 def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
+    model = payload.get("model")
+    user_message = _latest_user_message(payload.get("messages") or [])
+    if not user_message:
+        return 400, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
+    session_id, _session_field = _session_id_from_payload(payload)
+    workflow = initiate_engineering_assignment_from_chat(payload, user_message=user_message, session_id=session_id, root=root)
+    if workflow is not None:
+        created = int(time.time())
+        content = (
+            "Engineering Department assignment initiated through the existing Helen workforce, "
+            "Grace operations, and Dispatch runtimes. No second execution system was created.\n\n"
+            + workflow["summary"]
+        )
+        return 200, {"id":f"chatcmpl-{workflow['grace_action']['action_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":ACTIVE_RESIDENT_MODELS[model],"session_id":session_id,"privileged_action_executed":False,"engineering_assignment":workflow}}
     code, model, result = _chat_result(payload, root=root)
     if code != 200:
         return code, result
