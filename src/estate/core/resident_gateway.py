@@ -1,6 +1,6 @@
 """Local OpenAI-compatible gateway for Estate residents."""
 from __future__ import annotations
-import json, time
+import hashlib, json, os, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Iterable
@@ -48,17 +48,91 @@ def chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[st
     return _non_streaming_chat_completion(payload, root=root)
 
 
-def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[str, dict[str, Any]]:
+def _message_text(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict) and item.get("type") in {"text", "input_text"}:
+                parts.append(str(item.get("text") or ""))
+            elif isinstance(item, str):
+                parts.append(item)
+        return "\n".join(parts)
+    return str(content or "")
+
+
+def _latest_user_message(messages: Any) -> str:
+    if not isinstance(messages, list):
+        return ""
+    for message in reversed(messages):
+        if isinstance(message, dict) and message.get("role") == "user":
+            text = _message_text(message.get("content")).strip()
+            if text:
+                return text
+    return ""
+
+
+def _session_id_from_payload(payload: dict[str, Any]) -> tuple[str | None, str | None]:
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    candidates = (
+        ("payload.session_id", payload.get("session_id")),
+        ("metadata.session_id", metadata.get("session_id")),
+        ("payload.conversation_id", payload.get("conversation_id")),
+        ("metadata.chat_id", metadata.get("chat_id")),
+        ("metadata.conversation_id", metadata.get("conversation_id")),
+        ("payload.chat_id", payload.get("chat_id")),
+    )
+    for field, value in candidates:
+        text = str(value or "").strip()
+        if text:
+            return text, field
+    return None, None
+
+
+def _safe_preview(text: str) -> str:
+    return str(text or "").replace("\n", " ")[:80]
+
+
+def _gateway_diagnostics(payload: dict[str, Any], user_message: str, session_field: str | None, result: dict[str, Any]) -> dict[str, Any]:
+    turn = result.get("turn") or {}
+    llm = turn.get("llm") or {}
+    return {
+        "model": payload.get("model"),
+        "stream": bool(payload.get("stream") is True),
+        "message_count": len(payload.get("messages") or []) if isinstance(payload.get("messages"), list) else 0,
+        "latest_user_message_sha256": hashlib.sha256(user_message.encode("utf-8")).hexdigest() if user_message else None,
+        "latest_user_message_preview": _safe_preview(user_message) if os.environ.get("ESTATE_RESIDENT_GATEWAY_DIAGNOSTIC_PREVIEW") == "1" else None,
+        "session_identifier_field": session_field,
+        "provider": llm.get("provider"),
+        "fallback_used": llm.get("fallback_used"),
+    }
+
+
+
+
+def _attach_optional_gateway_diagnostics(body: dict[str, Any], result: dict[str, Any]) -> None:
+    diagnostics = result.get("gateway_diagnostics")
+    if diagnostics:
+        body.setdefault("estate", {})["gateway_diagnostics"] = diagnostics
+
+
+def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[int, str | None, dict[str, Any]]:
     model = payload.get("model")
-    messages = payload.get("messages") or []
-    user_message = "\n".join(str(m.get("content") or "") for m in messages if m.get("role") in {"user", "system"}).strip()
-    session_id = payload.get("session_id") or (payload.get("metadata") or {}).get("session_id") or payload.get("conversation_id")
+    user_message = _latest_user_message(payload.get("messages") or [])
+    if not user_message:
+        return 400, None, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
+    session_id, session_field = _session_id_from_payload(payload)
     result = process_chat(ACTIVE_RESIDENT_MODELS[model], user_message, session_id=session_id, action="conversation", root=root)
-    return model, result
+    if os.environ.get("ESTATE_RESIDENT_GATEWAY_DIAGNOSTICS") == "1":
+        result.setdefault("gateway_diagnostics", _gateway_diagnostics(payload, user_message, session_field, result))
+    return 200, model, result
 
 
 def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
-    model, result = _chat_result(payload, root=root)
+    code, model, result = _chat_result(payload, root=root)
+    if code != 200:
+        return code, result
     turn = result["turn"]
     created = int(time.time())
     package = resident_package(model, turn["resident_id"], root)
@@ -67,14 +141,18 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
         from estate.core.resident_voice_commissioning import synthesize_resident_sample
         audio = synthesize_resident_sample(turn["resident_id"], turn["resident_response"], root=root, sample_name=f"{turn['turn_id']}")
     body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":package["identity_source_hash"],"identity_schema_version":package["identity_schema_version"],"identity_failed_closed":package["identity_failed_closed"],"identity_sources":package["identity_sources"],"resident_package":package,"voice":{"state":package["voice_state"],"engine":package["voice_engine"],"voice_id":package["voice_id"],"speed":package["voice_speed"],"approval_state":package["voice_approval_state"],"tts_available":package["tts_available"]},"visual":{"state":package["visual_state"],"avatar_uri":package["avatar_uri"],"provenance":package["visual_provenance"]},"audio":audio}}
+    _attach_optional_gateway_diagnostics(body, result)
     return 200, body
 
 
 def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
-    model, result = _chat_result(payload, root=root)
+    code, model, result = _chat_result(payload, root=root)
+    if code != 200:
+        return code, result
     turn = result["turn"]
     created = int(time.time())
     body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":turn["resident_response"]},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":(turn.get("identity_composition") or {}).get("identity_version_or_source_hash"),"identity_schema_version":(turn.get("identity_composition") or {}).get("schema_version"),"identity_failed_closed":(turn.get("identity_composition") or {}).get("failed_closed")}}
+    _attach_optional_gateway_diagnostics(body, result)
     return 200, body
 
 
@@ -82,7 +160,7 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
 def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
     normalized = normalize_open_webui_request(payload)
     messages = normalized.get("messages") or []
-    user_message = "\n".join(str(m.get("content") or "") for m in messages if m.get("role") in {"user", "system"}).strip()
+    user_message = _latest_user_message(messages)
     if not user_message:
         user_message = "Multi-resident room request received."
     targets = [rid for rid in normalized.get("resident_targets") or [] if rid in ACTIVE_RESIDENT_MODELS.values()]
@@ -107,6 +185,19 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
     body["estate"]["room_snapshot"] = {"room_id": room["room_id"], "participant_count": len(targets), "turn_count": len(room.get("turns", [])), "privileged_action_executed": False}
     return 200, body
 
+def _content_delta_chunks(body: dict[str, Any]) -> Iterable[dict[str, Any]]:
+    choice = body["choices"][0]
+    content = str((choice.get("delta") or {}).get("content") or "")
+    first = dict(body)
+    first["choices"] = [{"index":0,"delta":{"role":"assistant"},"finish_reason":None}]
+    yield first
+    if content:
+        chunk = max(1, min(160, len(content)))
+        for start in range(0, len(content), chunk):
+            part = content[start:start + chunk]
+            yield {"id":body["id"],"object":"chat.completion.chunk","created":body["created"],"model":body["model"],"choices":[{"index":0,"delta":{"content":part},"finish_reason":None}]}
+
+
 def chat_completion_stream(payload: dict[str, Any], *, root=None) -> tuple[int, Iterable[dict[str, Any]]]:
     code, body = chat_completion(payload, root=root)
     if code != 200:
@@ -114,7 +205,7 @@ def chat_completion_stream(payload: dict[str, Any], *, root=None) -> tuple[int, 
     if body.get("object") != "chat.completion.chunk":
         return 200, [body]
     final = {"id":body["id"],"object":"chat.completion.chunk","created":body["created"],"model":body["model"],"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
-    return 200, [body, final]
+    return 200, [*_content_delta_chunks(body), final]
 
 
 def gateway_status(root=None, host="127.0.0.1", port=11435) -> dict[str, Any]:
@@ -129,10 +220,13 @@ class Handler(BaseHTTPRequestHandler):
         raw=json.dumps(payload, indent=2, sort_keys=True).encode()
         self.send_response(code); self.send_header("Content-Type","application/json"); self.send_header("Content-Length",str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def _send_sse(self, chunks: Iterable[dict[str, Any]]):
-        self.send_response(200); self.send_header("Content-Type","text/event-stream; charset=utf-8"); self.send_header("Cache-Control","no-cache"); self.send_header("Connection","keep-alive"); self.end_headers()
+        self.send_response(200); self.send_header("Content-Type","text/event-stream; charset=utf-8"); self.send_header("Cache-Control","no-cache"); self.send_header("Connection","close"); self.end_headers()
         for chunk in chunks:
             self.wfile.write(f"data: {json.dumps(chunk, sort_keys=True)}\n\n".encode())
+            self.wfile.flush()
         self.wfile.write(b"data: [DONE]\n\n")
+        self.wfile.flush()
+        self.close_connection = True
     def do_GET(self):
         if self.path.rstrip("/") == "/v1/models": self._send(200, models_payload(self.root)); return
         if self.path.rstrip("/") == "/status": self._send(200, gateway_status(self.root)); return
