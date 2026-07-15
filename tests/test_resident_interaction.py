@@ -442,8 +442,8 @@ def test_process_chat_final_prompt_authority_classification_for_helen_supervisio
     auth = payload["turn"]["authority"]
     assert auth["normalized_action"] == "execute-work-package"
     assert auth["decision"] == "denied"
-    assert "Grace/Operations owns scheduling" in captured["prompt"]
-    assert "Helen owns workforce readiness" in captured["prompt"]
+    assert "Grace/Operations owns operational supervision after staffing" in captured["prompt"]
+    assert "Helen owns personnel" in captured["prompt"]
     assert "Answer the Steward's current message directly" in captured["prompt"]
 
 
@@ -481,6 +481,7 @@ def test_process_chat_final_prompt_authority_classification_for_helen_budget(mon
 
 FORBIDDEN_RESIDENT_AUTHORITY_PHRASES = (
     "according to the authority status",
+    "authority status",
     "this action is blocked",
     "routing guidance",
     "default personnel management policies",
@@ -500,7 +501,9 @@ def test_helen_budget_approval_uses_natural_authority_boundary(monkeypatch, tmp_
     monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
     payload = process_chat("helen", "Approve a budget.", root=tmp_path)
     response = payload["turn"]["resident_response"]
-    assert response == "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+    assert response == "I cannot approve a budget. Budget approval belongs to you as Steward or another designated budget authority. I can help prepare the request or route it to the correct decision-maker."
+    assert "I cannot approve a budget" in response
+    assert "Steward" in response or "designated budget authority" in response
     assert payload["turn"]["authority"]["action_executed"] is False
     assert payload["turn"]["authority"]["routing_guidance"]
     assert_no_forbidden_authority_language(response)
@@ -511,7 +514,9 @@ def test_helen_engineering_supervision_preserves_role_separation(monkeypatch, tm
     monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
     payload = process_chat("helen", "Can you supervise engineering workers?", root=tmp_path)
     response = payload["turn"]["resident_response"]
-    assert response == "I can hire, qualify, and staff engineering workers, but Grace supervises their operational execution."
+    assert response == "I own personnel, qualifications, staffing readiness, and workforce development for engineering workers, but I do not supervise engineering execution. Grace owns operational supervision once workers are staffed and assigned, including scheduling, dispatch, execution monitoring, and delivery."
+    assert any(term in response for term in ("personnel", "qualifications", "staffing readiness", "workforce development"))
+    assert "Grace" in response and any(term in response for term in ("operational supervision", "scheduling", "dispatch", "execution monitoring", "delivery"))
     assert payload["turn"]["authority"]["action_executed"] is False
     assert payload["turn"]["authority"]["routing_guidance"]
     assert_no_forbidden_authority_language(response)
@@ -522,9 +527,25 @@ def test_grace_hiring_preserves_personnel_operations_boundary(monkeypatch, tmp_p
     monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
     payload = process_chat("grace", "Hire three engineers.", root=tmp_path)
     response = payload["turn"]["resident_response"]
-    assert response == "Hiring belongs to Helen in Personnel. Once she staffs the team, I can schedule, dispatch, and supervise the work."
+    assert response == "Hiring belongs to Helen in Personnel. Once she staffs the team, I can schedule, dispatch, supervise operational execution, and track delivery."
+    assert "Helen" in response or "Personnel" in response
+    assert any(term in response for term in ("schedule", "dispatch", "operational", "delivery"))
     assert payload["turn"]["authority"]["action_executed"] is False
     assert payload["turn"]["authority"]["routing_guidance"]
+    assert_no_forbidden_authority_language(response)
+
+
+def test_grace_engineering_supervision_affirms_operational_responsibility(monkeypatch, tmp_path):
+    from estate.core import resident_interaction as mod
+    monkeypatch.setattr(mod, "LocalOllamaAdapter", UnavailableOllamaAdapter)
+    payload = process_chat("grace", "Can you supervise engineering workers?", root=tmp_path)
+    response = payload["turn"]["resident_response"]
+    assert response.startswith("Yes.")
+    assert "Helen" in response
+    assert any(term in response for term in ("personnel", "hiring", "qualification", "staffing-readiness", "workforce-development"))
+    assert all(term in response for term in ("scheduling", "dispatch", "sequencing", "monitoring", "checkpoints", "handoffs", "retries", "escalation", "delivery"))
+    assert "hire" not in response.lower().replace("hiring", "")
+    assert "not authorized to supervise engineering workers" not in response.lower()
     assert_no_forbidden_authority_language(response)
 
 
@@ -538,5 +559,7 @@ def test_generated_resident_response_filters_forbidden_authority_phrases(monkeyp
     monkeypatch.setattr(mod, "LocalOllamaAdapter", ImplementationLanguageAdapter)
     payload = process_chat("helen", "Approve a budget.", root=tmp_path)
     response = payload["turn"]["resident_response"]
-    assert response == "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+    assert response == "I cannot approve a budget. Budget approval belongs to you as Steward or another designated budget authority. I can help prepare the request or route it to the correct decision-maker."
+    assert "I cannot approve a budget" in response
+    assert "Steward" in response or "designated budget authority" in response
     assert_no_forbidden_authority_language(response)

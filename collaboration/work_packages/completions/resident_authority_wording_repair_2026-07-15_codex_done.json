@@ -1,0 +1,25 @@
+{
+  "schema_version": "estate.work_package.completion_receipt.v1",
+  "work": "resident-authority-wording-repair-after-pr-352",
+  "completed_at": "2026-07-15T00:00:00Z",
+  "completed_by": "codex",
+  "summary": "Repaired resident-visible authority wording for Helen budget refusal and Grace engineering operational supervision while preserving canonical authority checks and metadata.",
+  "files_changed": [
+    "src/estate/core/resident_interaction.py",
+    "tests/test_resident_interaction.py",
+    "operations/validation/reports/resident_authority_wording_repair_2026-07-15.md",
+    "collaboration/work_packages/completions/resident_authority_wording_repair_2026-07-15_codex_done.json"
+  ],
+  "tests": [
+    {
+      "command": "PYTHONPATH=src pytest tests/test_resident_interaction.py -q",
+      "result": "passed",
+      "details": "42 passed"
+    }
+  ],
+  "live_acceptance": {
+    "executed": false,
+    "reason": "Runtime restart and live Resident Gateway exercise were not performed in this repository repair session.",
+    "commands_recorded_in": "operations/validation/reports/resident_authority_wording_repair_2026-07-15.md"
+  }
+}
