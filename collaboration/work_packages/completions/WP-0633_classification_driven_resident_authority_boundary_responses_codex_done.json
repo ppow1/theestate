@@ -1,0 +1,20 @@
+{
+  "codex_status": "completed",
+  "completed_at": "2026-07-15T00:00:00Z",
+  "files_changed": [
+    "src/estate/core/resident_authority.py",
+    "tests/test_resident_authority.py",
+    "docs/integration/classification_driven_resident_authority_boundary_responses.md",
+    "collaboration/work_packages/completions/WP-0633_classification_driven_resident_authority_boundary_responses_codex_done.json"
+  ],
+  "known_limitations": [
+    "Requested pending work-package path was not present in the repository; implementation followed the supplied package title and existing resident authority boundary conventions."
+  ],
+  "merge_authority": "Class A: response guidance only; no governance, validation, merge, personnel, Steward, or execution authority changed.",
+  "ready_for_ca_review": true,
+  "summary": "Added classification-driven response guidance to resident authority decisions without changing resident authority boundaries.",
+  "tests_run": [
+    "PYTHONPATH=src pytest tests/test_resident_authority.py"
+  ],
+  "work_package_id": "WP-0633_CLASSIFICATION_DRIVEN_RESIDENT_AUTHORITY_BOUNDARY_RESPONSES"
+}

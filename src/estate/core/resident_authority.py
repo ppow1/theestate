@@ -25,6 +25,13 @@ DENIED = "denied"
 REQUIRES_STEWARD = "requires_steward_approval"
 REQUIRES_ESCALATION = "requires_escalation"
 
+RESPONSE_GUIDANCE = {
+    ALLOWED: {"tone": "normal", "label": "Allowed", "operator_message": "This resident action is within the non-authoritative resident boundary."},
+    DENIED: {"tone": "firm_boundary", "label": "Denied", "operator_message": "This resident action is outside delegated resident authority and must not proceed."},
+    REQUIRES_STEWARD: {"tone": "approval_required", "label": "Requires Steward approval", "operator_message": "This resident action may only proceed after explicit Steward approval."},
+    REQUIRES_ESCALATION: {"tone": "escalation_required", "label": "Requires escalation", "operator_message": "This resident action requires escalation before any external or consequential step occurs."},
+}
+
 ACTION_CATEGORIES: dict[str, dict[str, Any]] = {
     "observe": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Observation is read-only local awareness."},
     "summarize": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Summaries are non-authoritative operational views."},
@@ -102,6 +109,32 @@ def list_authority(resident: str | None = None) -> dict[str, Any]:
     return {"version": 1, "kind": "resident_authority_boundary", "generated_at": _now(), "audit_path": str(AUDIT_PATH), "source_references": SOURCE_REFERENCES, "action_categories": ACTION_CATEGORIES, "resident_boundaries": rules, "default_unknown_action": DENIED}
 
 
+def classification_driven_response(decision: str, classification: str, reason: str) -> dict[str, Any]:
+    """Return operator-facing response guidance derived from authority classification.
+
+    The guidance is intentionally descriptive only: it tells residents and
+    operators how to respond to a boundary decision without granting any new
+    authority or changing the decision itself.
+    """
+
+    guidance = RESPONSE_GUIDANCE.get(decision, RESPONSE_GUIDANCE[DENIED])
+    blocked = decision in {DENIED, REQUIRES_STEWARD, REQUIRES_ESCALATION}
+    return {
+        "response_classification": classification,
+        "boundary_response": guidance["label"],
+        "response_tone": guidance["tone"],
+        "operator_message": guidance["operator_message"],
+        "resident_instruction": (
+            "Provide only a non-authoritative explanation, cite the boundary reason, "
+            "and route to the required authority; do not execute or imply approval."
+            if blocked
+            else "Proceed only as a non-authoritative resident action and preserve audit context."
+        ),
+        "must_not_execute": blocked,
+        "reason": reason,
+    }
+
+
 def check_authority(resident: str, action: str, *, target: str | None = None, source_refs: list[str] | None = None, root: str | Path | None = None, audit: bool = True) -> dict[str, Any]:
     root_path = _root(root)
     normalized = normalize_action(action)
@@ -136,6 +169,7 @@ def check_authority(resident: str, action: str, *, target: str | None = None, so
         "requires_steward_approval": decision == REQUIRES_STEWARD,
         "requires_escalation": decision == REQUIRES_ESCALATION,
         "reason": reason,
+        "classification_driven_response": classification_driven_response(decision, classification, reason),
         "source_artifact_references": [*SOURCE_REFERENCES, *(source_refs or [])],
         "audit_path": str(AUDIT_PATH),
         "source_of_truth_boundary": "Operational permission check only; does not change Estate constitutional, governance, validation, merge, personnel, or Steward authority.",

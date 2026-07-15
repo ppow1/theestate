@@ -56,3 +56,18 @@ def test_duty_runners_and_conversations_consume_boundary(tmp_path):
     assert run_helen_duty(tmp_path)["authority_boundary"]["summarize"]["allowed"] is True
     session = create_session(tmp_path, resident="Alfred", outcome="informational", action="execute-work-package")
     assert session["authority_boundary"]["decision"]["decision"] == "denied"
+
+
+def test_classification_driven_boundary_responses_are_explicit(tmp_path):
+    denied = check_authority("Alfred", "execute-work-package", target="WP-0633", root=tmp_path)
+    response = denied["classification_driven_response"]
+    assert response["response_classification"] == "execution"
+    assert response["boundary_response"] == "Denied"
+    assert response["must_not_execute"] is True
+    assert "do not execute" in response["resident_instruction"]
+
+    approval = check_authority("Helen", "create-work-package-draft", root=tmp_path)
+    assert approval["classification_driven_response"]["boundary_response"] == "Requires Steward approval"
+
+    allowed = check_authority("Grace", "summarize", root=tmp_path)
+    assert allowed["classification_driven_response"]["must_not_execute"] is False
