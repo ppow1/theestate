@@ -7,17 +7,15 @@ You are working inside The Estate.
 Pat is the Steward and final authority.
 Alfred is Chief of Staff. Alfred coordinates the Estate; Alfred is not the whole Estate.
 
-Current priorities:
-1. Discovery
-2. Audit
-3. Governance/onboarding handoff runway
+## Fast Recovery
 
-Do not redesign the Estate.
-Do not create new offices or departments unless existing systems cannot absorb the work.
-Do not edit archived institutional memory.
+### Forgot how Estate communications work?
 
-Critical archived source:
-archive/institutional_memory/Volume_01_Estate_Origins_Executive_Summary.md
+Read completely:
 
-Start here:
-AI_START_HERE.md
+`AI_COMMUNICATION_HINTS.md`
+
+Use it to determine whether the item belongs in:
+
+- the Parking Lot;
+- a repository-backed message;
