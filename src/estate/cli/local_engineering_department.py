@@ -9,9 +9,16 @@ def main(argv=None):
     run = sub.add_parser("run-closed-loop")
     run.add_argument("--root", type=Path)
     run.add_argument("--json", action="store_true")
+    bridge = sub.add_parser("run-dispatch-bridge")
+    bridge.add_argument("dispatch_id")
+    bridge.add_argument("--root", type=Path)
+    bridge.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     if args.cmd == "run-closed-loop":
         result = LocalEngineeringDepartment(root=args.root).run_closed_loop()
+        print(json.dumps(result.to_dict(), indent=2, sort_keys=True) if args.json else format_closed_loop_result(result))
+    elif args.cmd == "run-dispatch-bridge":
+        result = LocalEngineeringDepartment(root=args.root).run_dispatch_bridge(args.dispatch_id)
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True) if args.json else format_closed_loop_result(result))
 
 if __name__ == "__main__":

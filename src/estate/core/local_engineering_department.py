@@ -16,7 +16,8 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from estate.core.execution_dispatch import complete_dispatch_item, update_dispatch_state
+from estate.core.execution_dispatch import complete_dispatch_item, inspect_dispatch_item, update_dispatch_state
+from estate.core.execution_adapter_handoff_runtime import prepare_handoff
 from estate.core.grace_operations_runtime import GraceObjective, GraceOperationsRuntime
 from estate.core.helen_workforce import HelenWorkforceStore, WorkforceAssessment, WorkforceRequest
 from estate.core.paths import ESTATE_ROOT
@@ -193,6 +194,44 @@ class LocalEngineeringDepartment:
         result = LocalEngineeringResult("CAMPAIGN_0550", ["WP-0548", "WP-0549", "WP-0550", "WP-0551", "WP-0552"], utc_now(), self.runtime_root_ref, self.worktree_root_ref, self.run_root_ref, "", dispatch_id or "", objective.objective_id, assessment.assessment_id, "completed", evidence, [])
         record = self.governance_root / "acceptance_records" / f"{run_id}.json"; result.governance_record = str(record.relative_to(self.root))
         _write_json(record, result.to_dict()); _write_json(self.governance_root / "latest.json", result.to_dict())
+        return result
+
+    def run_dispatch_bridge(self, dispatch_id: str) -> LocalEngineeringResult:
+        """Execute an existing governed Dispatch item through the external worker runtime.
+
+        This bridge is intentionally narrow: Dispatch remains the source of execution
+        authority, the external runtime receives only a bounded package, validation is
+        recorded independently, Grace records closure evidence, and Chief Architect /
+        Steward acceptance remains an evidence record rather than an automatic approval.
+        """
+        paths: dict[str, str] = {"runtime_manifest": str(Path(self.runtime_root_ref) / "runtime_manifest.json")}
+        manifest = self.adapter.validate_manifest()
+        item = inspect_dispatch_item(dispatch_id, self.root)
+        handoff = prepare_handoff(dispatch_id, self.root, write=True)
+        if handoff.get("errors"):
+            raise RuntimeError("Dispatch item is not eligible for engineering worker runtime bridge: " + "; ".join(handoff["errors"]))
+        paths.update(handoff.get("artifacts") or {})
+        self.worktree_root.mkdir(parents=True, exist_ok=True); self.run_root.mkdir(parents=True, exist_ok=True)
+        grace = GraceOperationsRuntime(self.root)
+        objective = GraceObjective.create(requested_by="Dispatch", title=f"Engineering worker runtime execution for {dispatch_id}", summary="Run an existing governed Dispatch item through the external Engineering Worker Runtime and record closure evidence.", work_package_id=item.work_package_id, owner=item.assigned_worker or "local-engineering-worker-001", evidence=list(paths.values()), metadata={"dispatch_id": dispatch_id, "handoff_status": handoff.get("status")})
+        _, grace_paths = grace.conduct_objective(objective, request_dispatch=False); paths.update(grace_paths)
+        run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid4().hex[:8]
+        worktree = self.worktree_root / run_id; evidence_dir = self.run_root / run_id; worktree.mkdir(parents=True); evidence_dir.mkdir(parents=True)
+        package = {"package_id": item.work_package_id or dispatch_id, "dispatch_id": dispatch_id, "handoff_reference": item.handoff_reference or handoff.get("artifacts", {}).get("request_path"), "prompt_source": item.prompt_source, "allowed_read_paths": item.allowed_read_paths, "allowed_write_paths": item.allowed_write_paths, "worktree": _canonical_child(self.worktree_root_ref, run_id), "evidence": _canonical_child(self.run_root_ref, run_id), "authority_boundary": "Dispatch authorizes; external runtime executes only this bounded package; validation and Grace closure are evidence; Chief Architect/Steward acceptance is not automatic."}
+        package_path = self.root / BOUNDED_PACKAGE_DIR / f"{run_id}_{dispatch_id}.json"; _write_json(package_path, package)
+        invocation = self.adapter.invoke(package_path=package_path, worktree_path=worktree, evidence_path=evidence_dir)
+        validation = generate_production_readiness_report(root=self.root)
+        validation_path = evidence_dir / "independent_validation.json"; _write_json(validation_path, validation)
+        raw_files = [evidence_dir / "worker_result.json", validation_path]
+        hashes = {p.name: _sha256(p) for p in raw_files}; hashes[package_path.name] = _sha256(package_path)
+        evidence = {"run_id": run_id, "dispatch_id": dispatch_id, "handoff": handoff, "external_runtime_root": self.runtime_root_ref, "external_worktree": package["worktree"], "external_evidence": package["evidence"], "runtime_manifest_sha256": _sha256(self.adapter.manifest_path), "entrypoint_sha256": _sha256(self.runtime_root / manifest["entrypoint"]), "sha256": hashes, "validation_summary": validation.get("summary", {}), "acceptance": {"chief_architect_review_required": True, "steward_acceptance_required": True, "automatic_acceptance": False}, "provenance": {"runtime_id": manifest["runtime_id"], "runtime_version": manifest["version"], "entrypoint": str(Path(self.runtime_root_ref) / manifest["entrypoint"]), "invocation": invocation["command"]}}
+        update_dispatch_state(dispatch_id, "Running", root=self.root)
+        update_dispatch_state(dispatch_id, "Validation", root=self.root)
+        complete_dispatch_item(dispatch_id, result_reference=package["evidence"] + r"\worker_result.json", root=self.root)
+        closure_paths = grace.close_objective(objective.objective_id, reviewed_by="Grace", result="completed with external Engineering Worker Runtime evidence for Chief Architect and Steward acceptance", accepted=False); paths.update(closure_paths)
+        result = LocalEngineeringResult("WP-0656", [item.work_package_id or dispatch_id], utc_now(), self.runtime_root_ref, self.worktree_root_ref, self.run_root_ref, "", dispatch_id, objective.objective_id, "", "completed", evidence, [])
+        record = self.governance_root / "acceptance_records" / f"{run_id}_{dispatch_id}.json"; result.governance_record = str(record.relative_to(self.root))
+        _write_json(record, result.to_dict()); _write_json(self.governance_root / "latest_dispatch_bridge.json", result.to_dict())
         return result
 
 

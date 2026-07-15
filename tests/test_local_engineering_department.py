@@ -101,3 +101,55 @@ def test_estate_records_references_and_hashes_not_raw_execution_artifacts(tmp_pa
     assert evidence["external_evidence"].startswith(r"A:\AI\EngineeringRuns")
     assert evidence["sha256"]["worker_result.json"]
     assert "External runtime received" not in json.dumps(record)
+
+from estate.core.execution_dispatch import enqueue_dispatch_request
+
+
+def dispatch_payload_for_bridge():
+    return {
+        "dispatch_id": "dispatch-wp-0656",
+        "work_package_id": "WP-0656",
+        "title": "Dispatch bridge",
+        "provider": "codex-cli-openai",
+        "profile_label": "default",
+        "classification": "Estate Internal",
+        "state": "Ready",
+        "prompt_source": "collaboration/work_packages/pending/WP-0656_Dispatch_Queue_to_Engineering_Worker_Runtime_Execution_Bridge.md",
+        "sandbox": "workspace-write",
+        "allowed_read_paths": ["collaboration/work_packages/pending"],
+        "allowed_write_paths": ["runtime/local_engineering_department"],
+        "allowed_providers": ["codex-cli-openai"],
+        "provider_metadata": {
+            "decision_reference": "traffic-controller/WP-0656/authorized",
+            "provider_type": "codex-cli",
+            "authorization_reference": "steward/WP-0656/authorized",
+        },
+    }
+
+
+def test_existing_dispatch_item_runs_through_external_worker_bridge(tmp_path):
+    materialize_runtime(tmp_path)
+    wp = tmp_path / "collaboration/work_packages/pending/WP-0656_Dispatch_Queue_to_Engineering_Worker_Runtime_Execution_Bridge.md"
+    wp.parent.mkdir(parents=True, exist_ok=True)
+    wp.write_text("# WP-0656\n", encoding="utf-8")
+    enqueue_dispatch_request(dispatch_payload_for_bridge(), tmp_path)
+
+    result = LocalEngineeringDepartment(root=tmp_path).run_dispatch_bridge("dispatch-wp-0656")
+
+    assert result.campaign == "WP-0656"
+    assert result.dispatch_id == "dispatch-wp-0656"
+    assert result.result == "completed"
+    assert result.evidence["acceptance"] == {
+        "chief_architect_review_required": True,
+        "steward_acceptance_required": True,
+        "automatic_acceptance": False,
+    }
+    record = json.loads((tmp_path / result.governance_record).read_text(encoding="utf-8"))
+    assert record["evidence"]["external_evidence"].startswith(r"A:\AI\EngineeringRuns")
+    queue = json.loads((tmp_path / "runtime/execution_dispatch/queue.json").read_text(encoding="utf-8"))
+    item = next(item for item in queue["items"] if item["dispatch_id"] == "dispatch-wp-0656")
+    assert item["state"] == "Completed"
+    assert item["handoff_reference"].startswith("runtime/execution_adapters/requests/")
+    assert item["result_reference"].startswith(r"A:\AI\EngineeringRuns")
+    assert (tmp_path / "runtime/operations/grace/closures").exists()
+    assert (tmp_path / "runtime/local_engineering_department/latest_dispatch_bridge.json").exists()
