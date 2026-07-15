@@ -586,7 +586,7 @@ def _classify_resident_request(resident: str, message: str, action: str) -> dict
         guidance = "Helen/Personnel owns hiring, qualifications, staffing, and workforce readiness; Grace can receive and deploy staffed teams but does not hire personnel."
         return {**base, "intent": "personnel_staffing_request", "authority_action": "modify-personnel-identity", "routing_guidance": guidance}
     if re.search(r"\b(supervise|schedule|dispatch|monitor)\b.*\b(worker|workers|engineer|engineers|execution|work|team|teams)\b|\b(supervise|schedule|dispatch|monitor)\b", text):
-        guidance = "Grace/Operations owns scheduling, dispatch, execution monitoring, and delivery; Helen owns workforce readiness and does not supervise engineering execution."
+        guidance = "Grace/Operations owns operational supervision after staffing, including scheduling, dispatch, sequencing, execution monitoring, blocker tracking, checkpoints, handoffs, retries, escalation, and delivery; Helen owns personnel, hiring, qualifications, staffing readiness, and workforce development."
         return {**base, "intent": "operational_execution_supervision_request", "authority_action": "execute-work-package", "routing_guidance": guidance}
     if re.search(r"\b(create|open|establish|stand up)\b.*\boffice\b", text):
         return {**base, "intent": "office_creation_request", "authority_action": "modify-governance-artifact", "routing_guidance": "Office creation is reserved to Steward/governance authority; residents may draft or route a proposal only."}
@@ -610,6 +610,7 @@ def _governed_action_guidance(root: Path, classification: dict[str, Any]) -> dic
 
 FORBIDDEN_VISIBLE_AUTHORITY_PHRASES = (
     "according to the authority status",
+    "authority status",
     "this action is blocked",
     "routing guidance",
     "default personnel management policies",
@@ -622,13 +623,15 @@ def _natural_authority_boundary_response(resident: str, classification: dict[str
     rid = _key(resident)
     intent = classification.get("intent")
     if intent == "budget_approval_request" and rid == "helen":
-        return "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+        return "I cannot approve a budget. Budget approval belongs to you as Steward or another designated budget authority. I can help prepare the request or route it to the correct decision-maker."
     if intent == "budget_approval_request" and rid == "grace":
-        return "I do not hold budget approval authority. That decision remains with you as Steward or another designated budget authority."
+        return "I cannot approve a budget. Budget approval belongs to you as Steward or another designated budget authority. I can help prepare the request or route it to the correct decision-maker."
     if intent == "operational_execution_supervision_request" and rid == "helen":
-        return "I can hire, qualify, and staff engineering workers, but Grace supervises their operational execution."
+        return "I own personnel, qualifications, staffing readiness, and workforce development for engineering workers, but I do not supervise engineering execution. Grace owns operational supervision once workers are staffed and assigned, including scheduling, dispatch, execution monitoring, and delivery."
+    if intent == "operational_execution_supervision_request" and rid == "grace":
+        return "Yes. Once Helen has staffed and qualified the engineering workers, I can supervise their operational execution through scheduling, dispatch, sequencing, monitoring, blocker tracking, checkpoints, handoffs, retries, escalation, and delivery. Helen retains personnel, hiring, qualification, staffing-readiness, and workforce-development responsibility."
     if intent == "personnel_staffing_request" and rid == "grace":
-        return "Hiring belongs to Helen in Personnel. Once she staffs the team, I can schedule, dispatch, and supervise the work."
+        return "Hiring belongs to Helen in Personnel. Once she staffs the team, I can schedule, dispatch, supervise operational execution, and track delivery."
     return None
 
 
@@ -737,7 +740,8 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     llm_meta.update({"selection_source": model_control_selection.get("selection_source"), "assigned_model": model_control_selection.get("assigned_model"), "capability": "text", "policy_result": model_control_selection.get("policy_result"), "model_control_warning": model_control_selection.get("warning")})
     if governed_action:
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
-    response = generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action)
+    natural_boundary = _natural_authority_boundary_response(surface["resident_id"], classification)
+    response = natural_boundary or (generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action))
     response = _clean_resident_visible_response(response, surface["resident_id"], classification)
     if generated.get("ok") and surface.get("resident_id") == "alfred" and ("json files" in user_message.lower() and "llm" in user_message.lower()):
         response = str(generated.get("text"))
