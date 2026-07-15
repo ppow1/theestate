@@ -30,6 +30,7 @@ PREFERRED_ALFRED_MODEL = BOOTSTRAP_ALFRED_MODEL
 DEFAULT_ALFRED_OLLAMA_TIMEOUT_SECONDS = 60.0
 MAX_ALFRED_PROMPT_CHARS = 6000
 MAX_RESIDENT_PROMPT_CHARS = 7000
+MAX_CURRENT_STEWARD_MESSAGE_CHARS = 2000
 
 def alfred_ollama_timeout_seconds() -> float:
     raw = os.environ.get("ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS")
@@ -473,6 +474,12 @@ def _context_packet(root: Path, resident: str, session: dict[str, Any] | None = 
     pending = [str(p.relative_to(root)).replace('\\','/') for p in sorted((root/"collaboration/work_packages/pending").glob("WP-*.md"))[:8]] if (root/"collaboration/work_packages/pending").exists() else []
     return {"artifacts": artifacts, "recent_history": turns, "pending_work_packages": pending}
 
+def _clip_prompt_section(label: str, value: Any, max_chars: int) -> tuple[str, bool, int, int]:
+    text = json.dumps(value, sort_keys=True) if not isinstance(value, str) else value
+    original = len(text)
+    clipped = text[:max_chars]
+    return f"{label}: {clipped}", original > len(clipped), original, len(clipped)
+
 def resident_prompt(resident: str, message: str, surface: dict[str, Any], authority: dict[str, Any], context: dict[str, Any], llm_metadata: dict[str, Any], composition: dict[str, Any] | None = None) -> str:
     rid = _key(resident)
     caps = [c.get("id") for c in surface.get("capabilities", [])]
@@ -500,19 +507,33 @@ def resident_prompt(resident: str, message: str, surface: dict[str, Any], author
     else:
         identity = [f"You are {_key(resident)}, a limited generic Estate resident chat surface.", "You do not inherit Alfred or Helen identity, office, authority, diagnostics, or model state."]
         closing = "Respond with explicit limits as a generic resident surface."
-    return "\n".join(identity + [
+
+    current_message = str(message or "")[:MAX_CURRENT_STEWARD_MESSAGE_CHARS]
+    diagnostics: dict[str, Any] = {"current_steward_message_present": True, "current_steward_message_chars": len(current_message), "current_steward_message_truncated": len(str(message or "")) > len(current_message), "section_truncation_priority": ["historical conversation context", "artifact summaries", "identity composition detail", "metadata"]}
+    metadata = {k: surface.get(k) for k in ['resident_id','resident_display_name','office','role','resident_api_standard_version','resident_implementation_version']}
+    high_priority = identity + [
         "You are speaking with Pat, the Steward.",
         "Chat must not execute privileged actions or claim Steward authorization.",
         "Use only bounded Estate context; do not inject unrestricted private journals or protected-source text.",
-        f"Resident metadata: {json.dumps({k: surface.get(k) for k in ['resident_id','resident_display_name','office','role','resident_api_standard_version','resident_implementation_version']}, sort_keys=True)}",
-        f"Allowed capabilities: {json.dumps(caps, sort_keys=True)}",
+        "Answer the Steward's current message directly. Do not substitute a greeting, status report, or unrelated proposal.",
+        f"Steward current message (complete unless diagnostics says truncated): {current_message}",
         f"Authority status for requested action: {json.dumps(authority, sort_keys=True)}",
-        f"Provider/model metadata: {json.dumps(llm_metadata, sort_keys=True)}",
-        f"Canonical runtime identity composition: {json.dumps(composition or {}, sort_keys=True)[:4500]}",
-        f"Bounded Estate context packet: {json.dumps(context, sort_keys=True)[:1800]}",
-        f"Steward message: {message}",
-        closing,
-    ])[:MAX_RESIDENT_PROMPT_CHARS]
+    ]
+    remaining = MAX_RESIDENT_PROMPT_CHARS - len("\n".join(high_priority + [closing])) - 32
+    budgets = [("Allowed capabilities", caps, 700), ("Provider/model metadata", llm_metadata, 600), ("Resident metadata", metadata, 600), ("Canonical runtime identity composition", composition or {}, 1800), ("Bounded Estate context packet", context, max(400, remaining - 3700))]
+    sections = []
+    for label, value, budget in budgets:
+        budget = max(120, min(budget, max(120, remaining // max(1, len(budgets)))))
+        section, was_truncated, original, clipped = _clip_prompt_section(label, value, budget)
+        diagnostics[f"{label.lower().replace('/', '_').replace(' ', '_')}_truncated"] = was_truncated
+        diagnostics[f"{label.lower().replace('/', '_').replace(' ', '_')}_chars"] = {"original": original, "included": clipped}
+        sections.append(section)
+        remaining -= len(section) + 1
+    prompt = "\n".join(high_priority + sections + [f"Prompt diagnostics: {json.dumps(diagnostics, sort_keys=True)}", closing])
+    if len(prompt) > MAX_RESIDENT_PROMPT_CHARS:
+        # Final guard only removes optional sections; high-priority identity, safety, current message, authority, diagnostics, and closing survive.
+        prompt = "\n".join(high_priority + [f"Prompt diagnostics: {json.dumps({**diagnostics, 'optional_sections_removed_by_final_guard': True}, sort_keys=True)}", closing])
+    return prompt
 
 def _alfred_prompt(message: str, surface: dict[str, Any], auth: dict[str, Any], context: dict[str, Any], llm_meta: dict[str, Any], composition: dict[str, Any] | None = None) -> str:
     caps = [c.get("id") for c in surface.get("capabilities", [])]
@@ -547,6 +568,29 @@ def _classify_alfred_request(message: str, action: str) -> dict[str, Any]:
     if "summarize" in text or action == "summarize":
         return {"response_type": "local_artifact_summary" if any(w in text for w in ("artifact", "estate")) else "direct_conversational_response", "intent": "summarize", "authority_action": "summarize"}
     return {"response_type": "direct_conversational_response", "intent": "conversation", "authority_action": "conversation"}
+
+
+def _classify_resident_request(resident: str, message: str, action: str) -> dict[str, Any]:
+    rid = _key(resident)
+    if rid == "alfred":
+        return _classify_alfred_request(message, action)
+    text = str(message or "").lower()
+    base = {"response_type": "direct_conversational_response", "intent": action, "authority_action": action}
+    if re.search(r"\b(approve|authorize)\b.*\bbudget\b|\bbudget\b.*\b(approval|approve|authorize)\b", text):
+        return {**base, "intent": "budget_approval_request", "authority_action": "approve-merge-work", "routing_guidance": "Budget approval is not held by Helen or Grace unless canonical authority explicitly grants it; route to Steward or designated budget authority."}
+    if re.search(r"\b(hire|appoint|recruit|staff)\b.*\b(worker|workers|engineer|engineers|personnel|team|staff)\b|\b(hire|appoint|recruit)\b", text):
+        guidance = "Helen/Personnel owns hiring, qualifications, staffing, and workforce readiness; Grace can receive and deploy staffed teams but does not hire personnel."
+        return {**base, "intent": "personnel_staffing_request", "authority_action": "modify-personnel-identity", "routing_guidance": guidance}
+    if re.search(r"\b(supervise|schedule|dispatch|monitor)\b.*\b(worker|workers|engineer|engineers|execution|work|team|teams)\b|\b(supervise|schedule|dispatch|monitor)\b", text):
+        guidance = "Grace/Operations owns scheduling, dispatch, execution monitoring, and delivery; Helen owns workforce readiness and does not supervise engineering execution."
+        return {**base, "intent": "operational_execution_supervision_request", "authority_action": "execute-work-package", "routing_guidance": guidance}
+    if re.search(r"\b(create|open|establish|stand up)\b.*\boffice\b", text):
+        return {**base, "intent": "office_creation_request", "authority_action": "modify-governance-artifact", "routing_guidance": "Office creation is reserved to Steward/governance authority; residents may draft or route a proposal only."}
+    if re.search(r"\b(grant|delegate|give|assign)\b.*\b(authority|permission|power|approval)\b", text):
+        return {**base, "intent": "authority_grant_request", "authority_action": "modify-governance-artifact", "routing_guidance": "Authority grants require canonical Steward/governance action; residents may not grant authority from chat."}
+    if action in {"conversation", "summarize", "observe"}:
+        return {**base, "intent": "conversation", "authority_action": action}
+    return base
 
 def _governed_action_guidance(root: Path, classification: dict[str, Any]) -> dict[str, Any]:
     service_id = classification.get("service_id") or "unknown"
@@ -610,12 +654,12 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     turn_no = len(existing.get("turns", [])) + 1
     attachment_records = [create_attachment(rootp, surface["resident_id"], sid, item, index=i+1, vision_adapter=vision_adapter) for i, item in enumerate(attachments or [])]
     request_started_at = _now()
-    classification = _classify_alfred_request(user_message, action) if surface.get("resident_id") == "alfred" else {"response_type": "direct_conversational_response", "intent": action, "authority_action": action}
+    classification = _classify_resident_request(surface.get("resident_id"), user_message, action)
     effective_action = classification.get("authority_action") or action
     llm_status = local_llm_status(resident=surface["resident_id"], root=rootp)
     auth = check_authority(surface["resident_id"], effective_action, root=rootp, audit=True)
     status = "within_responsibility" if auth.get("decision")==ALLOWED else ("requires_steward_authorization" if auth.get("decision")==REQUIRES_STEWARD else "blocked" if not auth.get("allowed") else "conversation_only")
-    auth_record = {"action_requested": effective_action not in {"summarize","observe","conversation"} or classification.get("response_type") == "blocked_privileged_execution","action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision")}
+    auth_record = {"action_requested": effective_action not in {"summarize","observe","conversation"} or classification.get("response_type") == "blocked_privileged_execution","action_executed":False,"authority_status":status,"authority_reference":"src/estate/core/resident_authority.py","decision":auth.get("decision"),"normalized_action":auth.get("normalized_action"),"authority_classification":auth.get("authority_classification"),"reason":auth.get("reason"),"routing_guidance":classification.get("routing_guidance")}
     governed_action = _governed_action_guidance(rootp, classification) if classification.get("response_type") == "blocked_privileged_execution" else None
     adapter = LocalOllamaAdapter()
     base_meta = _llm_metadata("deterministic_fallback", provider="ollama", model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason="generation not attempted yet", discovered_models_count=len(llm_status.get("models") or []))
