@@ -9,4 +9,4 @@ Use this file when a worker has forgotten how to park an idea, send a repository
 
 | Need | Use | Authoritative location |
 |---|---|---|
-| Preserve a valuable idea without interrupt
+| Preserve a valuable idea without interrupting current work |
