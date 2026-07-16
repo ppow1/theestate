@@ -62,3 +62,7 @@ Do not call the reflection package ready until all of the following are true:
 ## Recovery Command
 
 > Read `AI_REFLECTION_HINTS.md`, then read every document in its Required Reading Order completely. Follow the master specification and prepare or validate the reflection and continuity package. Do not claim readiness from filenames, snippets, partial connector output, or incomplete files.
+
+## Engineering Campaign Integration
+
+For Engineering-specific trigger and handoff mapping, read `docs/operations/Engineering_Reflection_and_Continuity_Integration_v1.md` after the required reading order above. The master process remains authoritative.
