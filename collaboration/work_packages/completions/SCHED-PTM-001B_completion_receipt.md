@@ -1,9 +1,11 @@
-# SCHED-PTM-001B completion receipt
+# SCHED-PTM-001B Completion Receipt
 
 ## Status
-Completed by Codex on 2026-07-16.
+
+Complete — ready for Chief Architect review.
 
 ## Package
+
 - Package ID: `SCHED-PTM-001B`
 - Source package: `collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md`
 - Campaign: `PTM-05`
@@ -11,14 +13,25 @@ Completed by Codex on 2026-07-16.
 - Integration checkpoint: Gate C/D — schedule/finance/KPI reconciliation
 
 ## Deliverables
-- Added `docs/architecture/estate_ptm_schedule_validation_fixtures_and_critical_path_plan.md` as the bounded validation artifact for gate enforcement fixtures and critical-path calculation planning.
+
+- Updated `docs/architecture/estate_ptm_schedule_validation_fixtures_and_critical_path_plan.md` as a bounded implementation-ready validation artifact for future schedule gate enforcement and critical-path calculation tests.
 
 ## Evidence
-- Reviewed accepted PTM authority, campaign sequencing, dependency model, package/campaign/dependency manifests, source planning draft, PTM backlog, WP-0659, WP-0660, SCHED-PTM-001A, and CORE-PTM-003B scheduling projection protocol.
-- Preserved SCHED-PTM-001A as the dependency and did not alter frozen upstream contracts.
-- Kept the work documentation-only and bounded to future validation fixtures.
+
+- Revalidated the package against the accepted Steward / Chief Architect baseline recorded in `docs/architecture/estate_ptm_specification_acceptance.md`.
+- Revalidated campaign sequencing, launch group, and checkpoint placement against `docs/architecture/estate_ptm_parallel_campaign_execution_plan.md`.
+- Revalidated dependency and critical-path context against `docs/architecture/estate_ptm_dependency_and_parallelism_plan.md`.
+- Revalidated package dependency `SCHED-PTM-001A`, the Codex execution lane, and launch group `G05B` against the PTM package, campaign, and dependency manifests.
+- Reviewed the source planning draft, PTM backlog, WP-0659, WP-0660, the accepted SCHED-PTM-001A deliverable, and the CORE-PTM-003B scheduling projection protocol.
+- Preserved `SCHED-PTM-001A` as the governing package dependency and did not alter any frozen upstream event, ID, command, projection, schedule, or readiness-gate contract.
+- Kept the work documentation-only and bounded to future schedule validation fixtures and critical-path tests.
 - No production PTM code was added.
 - No second queue, second registry, second scheduler, local-worker routing, or new governance authority was introduced.
 
-## Validation
-- `git diff --check` passed on 2026-07-16.
+## Validation commands
+
+- `git diff --check` — passed.
+
+## Estimate note
+
+The active work remained within the accepted under-60-minute bound; no estimate exception is required.
