@@ -1,6 +1,6 @@
 # CAMPAIGN 0670 — Engineering Department Operationalization
 
-Status: Pending
+Status: Pending protected acceptance (WP-0675 package prepared; no acceptance decision recorded)
 Owner: Chief Architect
 Execution lane: Codex
 Priority: High
