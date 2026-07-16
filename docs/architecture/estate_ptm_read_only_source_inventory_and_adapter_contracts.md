@@ -46,14 +46,14 @@ Repository scope reviewed: `collaboration/**` and `docs/architecture/**`, with t
 
 | Source family | Current path pattern or term match | Observed inventory | Read-only adapter intent | Notes and risks |
 | --- | --- | ---: | --- | --- |
-| Dispatch artifacts | `*dispatch*` under `collaboration/**` | 11 files | Expose dispatch package/evidence references and lifecycle closure records without creating a parallel dispatch queue. | Dispatch readiness and execution authority remain with existing governance paths. |
+| Dispatch artifacts | `*dispatch*` under `collaboration/**` | 12 files | Expose dispatch package/evidence references and lifecycle closure records without creating a parallel dispatch queue. | Dispatch readiness and execution authority remain with existing governance paths. |
 | Validation artifacts | `*validation*` under `collaboration/**` | 76 files | Expose validation recipes, reports, checklists, outcomes, and evidence paths. | Adapter must distinguish deterministic validation evidence from reviewer commentary. |
-| Resident artifacts | `*resident*` under `collaboration/**`; resident references in architecture docs | 113 collaboration files and 1 architecture filename match | Expose resident-related package/evidence links and command-surface references. | Do not create or synchronize a second resident registry. |
-| Helen artifacts | `*helen*` under `collaboration/**` | 20 files | Expose Helen-related staffing/HR/lock/evidence references. | Helen remains visible as an existing authority/persona boundary, not budget authority. |
-| Grace artifacts | `*grace*` under `collaboration/**` | 12 files | Expose Grace-related operations/lock/evidence references. | Preserve Grace boundary and do not conflate with Traffic Controller. |
+| Resident artifacts | `*resident*` under `collaboration/**`; resident references in architecture docs | 109 collaboration files and 1 architecture filename match | Expose resident-related package/evidence links and command-surface references. | Do not create or synchronize a second resident registry. |
+| Helen artifacts | `*helen*` under `collaboration/**` | 19 files | Expose Helen-related staffing/HR/lock/evidence references. | Helen remains visible as an existing authority/persona boundary, not budget authority. |
+| Grace artifacts | `*grace*` under `collaboration/**` | 11 files | Expose Grace-related operations/lock/evidence references. | Preserve Grace boundary and do not conflate with Traffic Controller. |
 | Traffic Controller artifacts | `*traffic*` under `collaboration/**` | 3 files | Expose operational routing/control references and source evidence. | No new routing authority is introduced. |
 | Operations artifacts | `*operation*` under `collaboration/**`; architecture operations docs | 78 collaboration files and 3 architecture filename matches | Expose operations packages, reports, panels, activity records, and governance references. | Operations records are source evidence for PTM projections, not a replacement operations center. |
-| Architecture PTM baseline | `docs/architecture/estate_project_task_management_*.md`, PTM campaign plans | 22 architecture files | Expose source-backed constraints, domain boundaries, roadmap phases, data model fields, KPI definitions, and implementation gates. | Frozen upstream contracts must not be redefined by adapters. |
+| Architecture PTM baseline | `docs/architecture/estate_project_task_management_*.md`, PTM campaign plans | 24 architecture files | Expose source-backed constraints, domain boundaries, roadmap phases, data model fields, KPI definitions, and implementation gates. | Frozen upstream contracts must not be redefined by adapters. |
 
 ### CORE-PTM-001B adapter fields
 
@@ -71,6 +71,25 @@ Minimum read model fields for this source slice:
 - `architecture_constraint_refs`
 - `parse_confidence`
 - `adapter_warnings`
+
+### CORE-PTM-001B evidence notes
+
+The inventory counts above were revalidated from the current branch on 2026-07-16 using bounded filename discovery within the authorized repository scope. The source families are intentionally path and term based because this package is a read-only inventory slice, not a schema freeze or production parser implementation. Future adapter implementation should preserve these source paths as provenance and emit low-confidence warnings for heterogeneous Markdown or JSON records rather than normalizing them into a new authoritative registry.
+
+Evidence commands used for this slice:
+
+```bash
+find collaboration -type f -iname '*dispatch*' | wc -l
+find collaboration -type f -iname '*validation*' | wc -l
+find collaboration -type f -iname '*resident*' | wc -l
+find collaboration -type f -iname '*helen*' | wc -l
+find collaboration -type f -iname '*grace*' | wc -l
+find collaboration -type f -iname '*traffic*' | wc -l
+find collaboration -type f -iname '*operation*' | wc -l
+find docs/architecture -type f -iname '*operation*' | wc -l
+find docs/architecture -type f -iname 'estate_ptm*.md' -o -iname 'estate_project_task_management*.md' | wc -l
+find docs/architecture -type f -iname '*resident*' | wc -l
+```
 
 ## CORE-PTM-001C draft adapter contract
 
