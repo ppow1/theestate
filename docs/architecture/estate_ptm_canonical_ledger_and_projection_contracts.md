@@ -128,7 +128,9 @@ ptm_command:
 4. CLI, library, UI, and Resident command surfaces must call the same command contract.
 5. Commands must not bypass established Steward, Chief Architect, Helen, Grace, Traffic Controller, dispatch, validation, or acceptance boundaries.
 
-## CORE-PTM-003A project, task, and portfolio projection contracts
+## CORE-PTM-003A project, task, portfolio, status, and audit projection contracts
+
+Detailed CORE-PTM-003A implementation-preparation requirements are frozen in `docs/architecture/estate_ptm_project_task_portfolio_projection_contracts.md`. The summary below is intentionally subordinate to that artifact and must not be used to create a second task registry, portfolio registry, dispatch queue, scheduler, or governance path.
 
 ### Shared projection envelope
 
@@ -137,10 +139,13 @@ ptm_projection_record:
   projection_name: string
   projection_version: string
   record_id: string
+  aggregate_type: portfolio | project | task | status | audit
+  aggregate_id: string
   source_event_ids: [string]
   source_refs: [object]
   computed_at: string
   high_watermark_event_id: string
+  high_watermark_recorded_at: string
   stale: boolean
   warnings: [string]
 ```
@@ -149,21 +154,22 @@ Projection records are deterministic replay outputs. They are not authoritative 
 
 ### Portfolio projection
 
-Minimum fields: `portfolio_id`, `title`, `status`, `owner_refs`, `project_ids`, `task_count_by_status`, `blocked_task_count`, `active_package_count`, `completion_receipt_refs`, `risk_warnings`, and the shared projection envelope.
+Minimum fields: `portfolio_id`, `title`, `summary`, `status`, `owner_refs`, `authority_refs`, `project_ids`, `task_ids`, `task_count_by_status`, `blocked_task_count`, `active_package_count`, `completion_receipt_refs`, `risk_warnings`, `latest_event_id`, and the shared projection envelope.
 
 ### Project projection
 
-Minimum fields: `project_id`, `portfolio_id`, `title`, `status`, `source_package_refs`, `dependency_refs`, `milestone_refs`, `task_ids`, `schedule_refs`, `financial_refs`, `kpi_refs`, `dispatch_refs`, `validation_refs`, and `audit_summary`.
+Minimum fields: `project_id`, `portfolio_id`, `title`, `summary`, `status`, `owner_refs`, `authority_refs`, `source_package_refs`, `dependency_refs`, `milestone_refs`, `task_ids`, `schedule_refs`, `financial_refs`, `kpi_refs`, `dispatch_refs`, `validation_refs`, and `audit_summary`.
 
 ### Task projection
 
-Minimum fields: `task_id`, `project_id`, `title`, `status`, `readiness_state`, `owner_or_lane_ref`, `authority_refs`, `dependency_refs`, `source_refs`, `schedule_refs`, `financial_refs`, `dispatch_refs`, `validation_refs`, `completion_receipt_refs`, `latest_event_id`, and `warnings`.
+Minimum fields: `task_id`, `project_id`, `portfolio_id`, `title`, `description`, `status`, `readiness_state`, `owner_or_lane_ref`, `authority_refs`, `dependency_refs`, `source_refs`, `schedule_refs`, `financial_refs`, `dispatch_refs`, `validation_refs`, `completion_receipt_refs`, `latest_event_id`, and `warnings`.
 
 ### Status and audit rules
 
 - Status values are normalized as `candidate`, `pending`, `ready`, `claimed`, `in_progress`, `blocked`, `in_review`, `completed`, `accepted`, `rejected`, `archived`, or `superseded`.
 - Path-derived status and body-declared status must both be preserved when they disagree.
-- Audit projections must expose event IDs, source paths, source hashes, actor refs, command IDs, and correction chains.
+- Audit projections must expose event IDs, source paths, source hashes, actor refs, command IDs, correction chains, source conflicts, event hashes, and previous event hashes.
+- Projection builders must not infer authority, ownership, approval, dispatch state, validation acceptance, budget authorization, or schedule readiness when the supporting event or source reference is absent.
 
 ## CORE-PTM-003B schedule, financial, utilization, KPI, and timeline projection contracts
 
