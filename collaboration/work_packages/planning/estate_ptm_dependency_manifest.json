@@ -1,0 +1,192 @@
+{
+  "generated_for": "WP-0660",
+  "hard_dependencies": {
+    "SPEC-PTM-001": [],
+    "CORE-PTM-001A": [
+      "SPEC-PTM-001"
+    ],
+    "CORE-PTM-001B": [
+      "SPEC-PTM-001"
+    ],
+    "CORE-PTM-001C": [
+      "CORE-PTM-001A",
+      "CORE-PTM-001B"
+    ],
+    "CORE-PTM-002A": [
+      "CORE-PTM-001C"
+    ],
+    "CORE-PTM-002B": [
+      "CORE-PTM-002A"
+    ],
+    "CORE-PTM-003A": [
+      "CORE-PTM-002B"
+    ],
+    "CORE-PTM-003B": [
+      "CORE-PTM-003A"
+    ],
+    "INTAKE-PTM-001A": [
+      "CORE-PTM-003A"
+    ],
+    "INTAKE-PTM-001B": [
+      "INTAKE-PTM-001A"
+    ],
+    "FILE-PTM-001A": [
+      "INTAKE-PTM-001A"
+    ],
+    "FILE-PTM-001B": [
+      "FILE-PTM-001A",
+      "INTAKE-PTM-001B"
+    ],
+    "UI-PTM-001A": [
+      "CORE-PTM-003A"
+    ],
+    "UI-PTM-001B": [
+      "UI-PTM-001A",
+      "CORE-PTM-003B"
+    ],
+    "UI-PTM-002": [
+      "UI-PTM-001B"
+    ],
+    "CONV-PTM-001": [
+      "INTAKE-PTM-001B"
+    ],
+    "SCHED-PTM-001A": [
+      "CORE-PTM-003B"
+    ],
+    "SCHED-PTM-001B": [
+      "SCHED-PTM-001A"
+    ],
+    "UTIL-PTM-001": [
+      "SCHED-PTM-001A"
+    ],
+    "FIN-PTM-001": [
+      "CORE-PTM-003B"
+    ],
+    "KPI-PTM-001": [
+      "UTIL-PTM-001",
+      "FIN-PTM-001"
+    ],
+    "DISPATCH-PTM-001": [
+      "SCHED-PTM-001A"
+    ],
+    "MIG-PTM-001A": [
+      "FILE-PTM-001B",
+      "DISPATCH-PTM-001"
+    ],
+    "MIG-PTM-001B": [
+      "MIG-PTM-001A"
+    ],
+    "TEST-PTM-001A": [
+      "CORE-PTM-003B",
+      "INTAKE-PTM-001B",
+      "SCHED-PTM-001A"
+    ],
+    "TEST-PTM-001B": [
+      "KPI-PTM-001",
+      "DISPATCH-PTM-001",
+      "MIG-PTM-001B",
+      "UI-PTM-002",
+      "CONV-PTM-001"
+    ],
+    "ROLL-PTM-001A": [
+      "TEST-PTM-001B"
+    ],
+    "ROLL-PTM-001B": [
+      "ROLL-PTM-001A"
+    ]
+  },
+  "soft_dependencies": {
+    "TEST-PTM-001A": [
+      "all accepted contracts improve fixture accuracy"
+    ],
+    "ROLL-PTM-001A": [
+      "Steward availability improves training fidelity"
+    ]
+  },
+  "parallel_safe_relationships": {
+    "G00": [
+      "SPEC-PTM-001"
+    ],
+    "G01A": [
+      "CORE-PTM-001A",
+      "CORE-PTM-001B"
+    ],
+    "G01B": [
+      "CORE-PTM-001C"
+    ],
+    "G02A": [
+      "CORE-PTM-002A"
+    ],
+    "G02B": [
+      "CORE-PTM-002B"
+    ],
+    "G02C": [
+      "CORE-PTM-003A"
+    ],
+    "G02D": [
+      "CORE-PTM-003B"
+    ],
+    "G03A": [
+      "INTAKE-PTM-001A",
+      "FILE-PTM-001A"
+    ],
+    "G03B": [
+      "INTAKE-PTM-001B"
+    ],
+    "G03C": [
+      "FILE-PTM-001B"
+    ],
+    "G04A": [
+      "UI-PTM-001A"
+    ],
+    "G04B": [
+      "UI-PTM-001B",
+      "CONV-PTM-001"
+    ],
+    "G04C": [
+      "UI-PTM-002"
+    ],
+    "G05A": [
+      "SCHED-PTM-001A",
+      "FIN-PTM-001"
+    ],
+    "G05B": [
+      "SCHED-PTM-001B",
+      "UTIL-PTM-001"
+    ],
+    "G05C": [
+      "KPI-PTM-001"
+    ],
+    "G06A": [
+      "DISPATCH-PTM-001",
+      "MIG-PTM-001A"
+    ],
+    "G06B": [
+      "MIG-PTM-001B"
+    ],
+    "G07A": [
+      "TEST-PTM-001A"
+    ],
+    "G07B": [
+      "TEST-PTM-001B"
+    ],
+    "G07C": [
+      "ROLL-PTM-001A"
+    ],
+    "G07D": [
+      "ROLL-PTM-001B"
+    ]
+  },
+  "integration_checkpoints": [
+    "PTM-00 acceptance",
+    "PTM-02 contract freeze",
+    "PTM-05 policy review",
+    "PTM-07 validation acceptance"
+  ],
+  "shared_file_collisions": [
+    "CORE-PTM-002A/CORE-PTM-002B future schema surface",
+    "UI-PTM-001B/UI-PTM-002 future Office surface",
+    "SCHED-PTM-001A/DISPATCH-PTM-001 readiness gates"
+  ],
+  "mutually_exclusive_branches": []
+}

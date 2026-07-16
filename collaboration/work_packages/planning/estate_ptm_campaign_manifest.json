@@ -1,0 +1,350 @@
+{
+  "generated_for": "WP-0660",
+  "supports_routing_modes": [
+    "All Codex",
+    "Hybrid RTX 4090 plus Codex",
+    "Local Preferred"
+  ],
+  "campaigns": [
+    {
+      "campaign_id": "PTM-00",
+      "title": "Governance acceptance",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "SPEC-PTM-001"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/SPEC-PTM-001_accept_ptm_specification_and_boundaries.md"
+      ],
+      "prerequisite_campaigns": [],
+      "parallel_safe_groups": [
+        "G00"
+      ],
+      "maximum_useful_concurrency": 1,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 12,
+        "expected_minutes": 25,
+        "conservative_minutes": 172
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-01",
+      "title": "Read-only source inventory",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "CORE-PTM-001A",
+        "CORE-PTM-001B",
+        "CORE-PTM-001C"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001A_inventory_collaboration_and_work-package_sources.md",
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001B_inventory_dispatch,_validation,_resident,_and_operations_sources.md",
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001C_draft_read-only_adapter_contracts.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-00"
+      ],
+      "parallel_safe_groups": [
+        "G01A",
+        "G01B"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 41,
+        "expected_minutes": 80,
+        "conservative_minutes": 281
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-02",
+      "title": "Canonical ledger and projection contracts",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "CORE-PTM-002A",
+        "CORE-PTM-002B",
+        "CORE-PTM-003A",
+        "CORE-PTM-003B"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002A_define_append-only_event_schema_and_hash_chain.md",
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002B_define_ptm_id_minting_and_command_contracts.md",
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003A_project_task_and_portfolio_projection_contracts.md",
+        "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003B_schedule_financial_kpi_projection_contracts.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-01"
+      ],
+      "parallel_safe_groups": [
+        "G02A",
+        "G02B",
+        "G02C",
+        "G02D"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 63,
+        "expected_minutes": 115,
+        "conservative_minutes": 343
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-03",
+      "title": "Governed intake and import contracts",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "INTAKE-PTM-001A",
+        "INTAKE-PTM-001B",
+        "FILE-PTM-001A",
+        "FILE-PTM-001B"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001A_manual_and_parking_lot_intake_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001B_conversation_intake_and_dedupe_confirmation_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001A_file_import_parser_format_inventory.md",
+        "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001B_file_import_report_and_sha_mapping_contract.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-02"
+      ],
+      "parallel_safe_groups": [
+        "G03A",
+        "G03B",
+        "G03C"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 46,
+        "expected_minutes": 98,
+        "conservative_minutes": 326
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-04",
+      "title": "Visibility and command surfaces",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "UI-PTM-001A",
+        "UI-PTM-001B",
+        "UI-PTM-002",
+        "CONV-PTM-001"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001A_workspace_information_architecture_shell.md",
+        "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001B_workspace_data_binding_and_navigation_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/UI-PTM-002_office_compact_card_and_deep-link_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/CONV-PTM-001_resident_governed_ptm_command_contract.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-03"
+      ],
+      "parallel_safe_groups": [
+        "G04A",
+        "G04B",
+        "G04C"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 56,
+        "expected_minutes": 108,
+        "conservative_minutes": 336
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-05",
+      "title": "Scheduling utilization financials and KPIs",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "SCHED-PTM-001A",
+        "SCHED-PTM-001B",
+        "UTIL-PTM-001",
+        "FIN-PTM-001",
+        "KPI-PTM-001"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001A_schedule_dependency_and_readiness-gate_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001B_schedule_validation_fixture_and_critical-path_plan.md",
+        "collaboration/work_packages/planning/ptm_drafts/UTIL-PTM-001_capacity_and_utilization_observation_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/FIN-PTM-001_budget_cost_approval_and_reconciliation_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/KPI-PTM-001_kpi_registry_quality_and_dashboard_contract.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-04"
+      ],
+      "parallel_safe_groups": [
+        "G05A",
+        "G05B",
+        "G05C"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 75,
+        "expected_minutes": 140,
+        "conservative_minutes": 395
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-06",
+      "title": "Dispatch evidence and pilot migration",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "DISPATCH-PTM-001",
+        "MIG-PTM-001A",
+        "MIG-PTM-001B"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/DISPATCH-PTM-001_task-to-dispatch_evidence_chain_contract.md",
+        "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001A_pilot_migration_source_slice_plan.md",
+        "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001B_pilot_migration_execution_package_draft.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-05"
+      ],
+      "parallel_safe_groups": [
+        "G06A",
+        "G06B"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 41,
+        "expected_minutes": 80,
+        "conservative_minutes": 281
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    },
+    {
+      "campaign_id": "PTM-07",
+      "title": "Validation and rollout planning",
+      "objective": "Execute included bounded packages as an authorization container.",
+      "included_package_ids": [
+        "TEST-PTM-001A",
+        "TEST-PTM-001B",
+        "ROLL-PTM-001A",
+        "ROLL-PTM-001B"
+      ],
+      "draft_paths": [
+        "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001A_automated_replay_gate_and_policy_validation_plan.md",
+        "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001B_end-to-end_acceptance_validation_package_draft.md",
+        "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001A_operational_runbook_and_resident_training_plan.md",
+        "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001B_rollout_acceptance_and_expansion_gate_package.md"
+      ],
+      "prerequisite_campaigns": [
+        "PTM-06"
+      ],
+      "parallel_safe_groups": [
+        "G07A",
+        "G07B",
+        "G07C",
+        "G07D"
+      ],
+      "maximum_useful_concurrency": 3,
+      "execution_lane_allocation": {},
+      "integration_checkpoints": [
+        "Chief Architect review gate",
+        "manifest and dependency revalidation"
+      ],
+      "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
+      "active_execution_estimate_by_lane_minutes": {},
+      "wall_clock_estimates": {
+        "best_minutes": 51,
+        "expected_minutes": 103,
+        "conservative_minutes": 331
+      },
+      "stop_or_replan_conditions": [
+        "dependency failure",
+        "shared-file collision",
+        "estimate exceeds 60 active minutes",
+        "new governance authority required"
+      ]
+    }
+  ]
+}
