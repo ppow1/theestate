@@ -1,9 +1,7 @@
 {
   "generated_for": "WP-0660",
   "supports_routing_modes": [
-    "All Codex",
-    "Hybrid RTX 4090 plus Codex",
-    "Local Preferred"
+    "All Codex"
   ],
   "campaigns": [
     {
@@ -21,13 +19,20 @@
         "G00"
       ],
       "maximum_useful_concurrency": 1,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "SPEC-PTM-001"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 10
+      },
       "wall_clock_estimates": {
         "best_minutes": 12,
         "expected_minutes": 25,
@@ -38,7 +43,12 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-00_Governance_Acceptance.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/SPEC-PTM-001_Accept_PTM_specification_and_boundaries.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-00_Governance_Acceptance.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-01",
@@ -62,13 +72,22 @@
         "G01B"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "CORE-PTM-001A",
+          "CORE-PTM-001B",
+          "CORE-PTM-001C"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 39
+      },
       "wall_clock_estimates": {
         "best_minutes": 41,
         "expected_minutes": 80,
@@ -79,7 +98,14 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-01_Read_Only_Source_Inventory.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/CORE-PTM-001A_Inventory_collaboration_and_work_package_sources.md",
+        "collaboration/work_packages/pending/CORE-PTM-001B_Inventory_dispatch_validation_resident_and_operations_sources.md",
+        "collaboration/work_packages/pending/CORE-PTM-001C_Draft_read_only_adapter_contracts.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-01_Read_Only_Source_Inventory.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-02",
@@ -107,13 +133,23 @@
         "G02D"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "CORE-PTM-002A",
+          "CORE-PTM-002B",
+          "CORE-PTM-003A",
+          "CORE-PTM-003B"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 57
+      },
       "wall_clock_estimates": {
         "best_minutes": 63,
         "expected_minutes": 115,
@@ -124,7 +160,15 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/CORE-PTM-002A_Define_append_only_event_schema_and_hash_chain.md",
+        "collaboration/work_packages/pending/CORE-PTM-002B_Define_PTM_ID_minting_and_command_contracts.md",
+        "collaboration/work_packages/pending/CORE-PTM-003A_Project_task_and_portfolio_projection_contracts.md",
+        "collaboration/work_packages/pending/CORE-PTM-003B_Schedule_financial_KPI_projection_contracts.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-03",
@@ -151,13 +195,23 @@
         "G03C"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "INTAKE-PTM-001A",
+          "INTAKE-PTM-001B",
+          "FILE-PTM-001A",
+          "FILE-PTM-001B"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 46
+      },
       "wall_clock_estimates": {
         "best_minutes": 46,
         "expected_minutes": 98,
@@ -168,7 +222,15 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/INTAKE-PTM-001A_Manual_and_Parking_Lot_intake_contract.md",
+        "collaboration/work_packages/pending/INTAKE-PTM-001B_Conversation_intake_and_dedupe_confirmation_contract.md",
+        "collaboration/work_packages/pending/FILE-PTM-001A_File_import_parser_format_inventory.md",
+        "collaboration/work_packages/pending/FILE-PTM-001B_File_import_report_and_SHA_mapping_contract.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-04",
@@ -195,13 +257,23 @@
         "G04C"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "UI-PTM-001A",
+          "UI-PTM-001B",
+          "UI-PTM-002",
+          "CONV-PTM-001"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 52
+      },
       "wall_clock_estimates": {
         "best_minutes": 56,
         "expected_minutes": 108,
@@ -212,7 +284,15 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/UI-PTM-001A_Workspace_information_architecture_shell.md",
+        "collaboration/work_packages/pending/UI-PTM-001B_Workspace_data_binding_and_navigation_contract.md",
+        "collaboration/work_packages/pending/UI-PTM-002_Office_compact_card_and_deep_link_contract.md",
+        "collaboration/work_packages/pending/CONV-PTM-001_Resident_governed_PTM_command_contract.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-05",
@@ -241,13 +321,24 @@
         "G05C"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "SCHED-PTM-001A",
+          "SCHED-PTM-001B",
+          "UTIL-PTM-001",
+          "FIN-PTM-001",
+          "KPI-PTM-001"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 69
+      },
       "wall_clock_estimates": {
         "best_minutes": 75,
         "expected_minutes": 140,
@@ -258,7 +349,16 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/SCHED-PTM-001A_Schedule_dependency_and_readiness_gate_contract.md",
+        "collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md",
+        "collaboration/work_packages/pending/UTIL-PTM-001_Capacity_and_utilization_observation_contract.md",
+        "collaboration/work_packages/pending/FIN-PTM-001_Budget_cost_approval_and_reconciliation_contract.md",
+        "collaboration/work_packages/pending/KPI-PTM-001_KPI_registry_quality_and_dashboard_contract.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-06",
@@ -282,13 +382,22 @@
         "G06B"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "DISPATCH-PTM-001",
+          "MIG-PTM-001A",
+          "MIG-PTM-001B"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 39
+      },
       "wall_clock_estimates": {
         "best_minutes": 41,
         "expected_minutes": 80,
@@ -299,7 +408,14 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-06_Dispatch_Evidence_and_Pilot_Migration.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/DISPATCH-PTM-001_Task_to_dispatch_evidence_chain_contract.md",
+        "collaboration/work_packages/pending/MIG-PTM-001A_Pilot_migration_source_slice_plan.md",
+        "collaboration/work_packages/pending/MIG-PTM-001B_Pilot_migration_execution_package_draft.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-06_Dispatch_Evidence_and_Pilot_Migration.md and execute the included Pending work packages exactly as instructed.\""
     },
     {
       "campaign_id": "PTM-07",
@@ -327,13 +443,23 @@
         "G07D"
       ],
       "maximum_useful_concurrency": 3,
-      "execution_lane_allocation": {},
+      "execution_lane_allocation": {
+        "Codex": [
+          "TEST-PTM-001A",
+          "TEST-PTM-001B",
+          "ROLL-PTM-001A",
+          "ROLL-PTM-001B"
+        ],
+        "Local RTX 4090 worker": []
+      },
       "integration_checkpoints": [
         "Chief Architect review gate",
         "manifest and dependency revalidation"
       ],
       "campaign_acceptance_gate": "All included package acceptance criteria satisfied; no implementation authorization implied.",
-      "active_execution_estimate_by_lane_minutes": {},
+      "active_execution_estimate_by_lane_minutes": {
+        "Codex": 49
+      },
       "wall_clock_estimates": {
         "best_minutes": 51,
         "expected_minutes": 103,
@@ -344,7 +470,15 @@
         "shared-file collision",
         "estimate exceeds 60 active minutes",
         "new governance authority required"
-      ]
+      ],
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md",
+      "pending_package_paths": [
+        "collaboration/work_packages/pending/TEST-PTM-001A_Automated_replay_gate_and_policy_validation_plan.md",
+        "collaboration/work_packages/pending/TEST-PTM-001B_End_to_end_acceptance_validation_package_draft.md",
+        "collaboration/work_packages/pending/ROLL-PTM-001A_Operational_runbook_and_resident_training_plan.md",
+        "collaboration/work_packages/pending/ROLL-PTM-001B_Rollout_acceptance_and_expansion_gate_package.md"
+      ],
+      "codex_handoff_command": "codex exec \"Read collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md and execute the included Pending work packages exactly as instructed.\""
     }
   ]
 }

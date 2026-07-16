@@ -188,5 +188,46 @@
     "UI-PTM-001B/UI-PTM-002 future Office surface",
     "SCHED-PTM-001A/DISPATCH-PTM-001 readiness gates"
   ],
-  "mutually_exclusive_branches": []
+  "mutually_exclusive_branches": [],
+  "execution_lane_policy": "Codex-only for this implementation cycle; local RTX 4090 worker routing inactive.",
+  "promoted_pending_paths": {
+    "SPEC-PTM-001": "collaboration/work_packages/pending/SPEC-PTM-001_Accept_PTM_specification_and_boundaries.md",
+    "CORE-PTM-001A": "collaboration/work_packages/pending/CORE-PTM-001A_Inventory_collaboration_and_work_package_sources.md",
+    "CORE-PTM-001B": "collaboration/work_packages/pending/CORE-PTM-001B_Inventory_dispatch_validation_resident_and_operations_sources.md",
+    "CORE-PTM-001C": "collaboration/work_packages/pending/CORE-PTM-001C_Draft_read_only_adapter_contracts.md",
+    "CORE-PTM-002A": "collaboration/work_packages/pending/CORE-PTM-002A_Define_append_only_event_schema_and_hash_chain.md",
+    "CORE-PTM-002B": "collaboration/work_packages/pending/CORE-PTM-002B_Define_PTM_ID_minting_and_command_contracts.md",
+    "CORE-PTM-003A": "collaboration/work_packages/pending/CORE-PTM-003A_Project_task_and_portfolio_projection_contracts.md",
+    "CORE-PTM-003B": "collaboration/work_packages/pending/CORE-PTM-003B_Schedule_financial_KPI_projection_contracts.md",
+    "INTAKE-PTM-001A": "collaboration/work_packages/pending/INTAKE-PTM-001A_Manual_and_Parking_Lot_intake_contract.md",
+    "INTAKE-PTM-001B": "collaboration/work_packages/pending/INTAKE-PTM-001B_Conversation_intake_and_dedupe_confirmation_contract.md",
+    "FILE-PTM-001A": "collaboration/work_packages/pending/FILE-PTM-001A_File_import_parser_format_inventory.md",
+    "FILE-PTM-001B": "collaboration/work_packages/pending/FILE-PTM-001B_File_import_report_and_SHA_mapping_contract.md",
+    "UI-PTM-001A": "collaboration/work_packages/pending/UI-PTM-001A_Workspace_information_architecture_shell.md",
+    "UI-PTM-001B": "collaboration/work_packages/pending/UI-PTM-001B_Workspace_data_binding_and_navigation_contract.md",
+    "UI-PTM-002": "collaboration/work_packages/pending/UI-PTM-002_Office_compact_card_and_deep_link_contract.md",
+    "CONV-PTM-001": "collaboration/work_packages/pending/CONV-PTM-001_Resident_governed_PTM_command_contract.md",
+    "SCHED-PTM-001A": "collaboration/work_packages/pending/SCHED-PTM-001A_Schedule_dependency_and_readiness_gate_contract.md",
+    "SCHED-PTM-001B": "collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md",
+    "UTIL-PTM-001": "collaboration/work_packages/pending/UTIL-PTM-001_Capacity_and_utilization_observation_contract.md",
+    "FIN-PTM-001": "collaboration/work_packages/pending/FIN-PTM-001_Budget_cost_approval_and_reconciliation_contract.md",
+    "KPI-PTM-001": "collaboration/work_packages/pending/KPI-PTM-001_KPI_registry_quality_and_dashboard_contract.md",
+    "DISPATCH-PTM-001": "collaboration/work_packages/pending/DISPATCH-PTM-001_Task_to_dispatch_evidence_chain_contract.md",
+    "MIG-PTM-001A": "collaboration/work_packages/pending/MIG-PTM-001A_Pilot_migration_source_slice_plan.md",
+    "MIG-PTM-001B": "collaboration/work_packages/pending/MIG-PTM-001B_Pilot_migration_execution_package_draft.md",
+    "TEST-PTM-001A": "collaboration/work_packages/pending/TEST-PTM-001A_Automated_replay_gate_and_policy_validation_plan.md",
+    "TEST-PTM-001B": "collaboration/work_packages/pending/TEST-PTM-001B_End_to_end_acceptance_validation_package_draft.md",
+    "ROLL-PTM-001A": "collaboration/work_packages/pending/ROLL-PTM-001A_Operational_runbook_and_resident_training_plan.md",
+    "ROLL-PTM-001B": "collaboration/work_packages/pending/ROLL-PTM-001B_Rollout_acceptance_and_expansion_gate_package.md"
+  },
+  "campaign_instruction_paths": {
+    "PTM-00": "collaboration/work_packages/campaigns/ptm/PTM-00_Governance_Acceptance.md",
+    "PTM-01": "collaboration/work_packages/campaigns/ptm/PTM-01_Read_Only_Source_Inventory.md",
+    "PTM-02": "collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md",
+    "PTM-03": "collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md",
+    "PTM-04": "collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md",
+    "PTM-05": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+    "PTM-06": "collaboration/work_packages/campaigns/ptm/PTM-06_Dispatch_Evidence_and_Pilot_Migration.md",
+    "PTM-07": "collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md"
+  }
 }
