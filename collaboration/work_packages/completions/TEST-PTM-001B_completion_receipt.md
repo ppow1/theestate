@@ -1,21 +1,21 @@
-# TEST-PTM-001B completion receipt
-
-## Status
-Completed by Codex on 2026-07-16.
+# TEST-PTM-001B Completion Receipt
 
 ## Package
 - Package ID: `TEST-PTM-001B`
-- Source package: `collaboration/work_packages/pending/TEST-PTM-001B_End_to_end_acceptance_validation_package_draft.md`
+- Title: End-to-end acceptance validation package draft
 - Campaign: `PTM-07`
+- Launch group: `G07B`
+- Integration checkpoint: Gate E — validation and rollout go/no-go
 
 ## Deliverables
-- Added `docs/architecture/estate_ptm_validation_and_rollout_gate_plan.md` as the bounded implementation-ready validation and rollout Gate E artifact covering this package's required slice.
+- Created `docs/architecture/estate_ptm_e2e_acceptance_validation_package.md` as the bounded implementation-ready E2E validation package artifact.
 
-## Evidence
-- Required inputs reviewed from the PTM-07 campaign handoff, pending package, planning draft, specification acceptance, parallel execution plan, dependency/parallelism plan, package/campaign/dependency manifests, PTM backlog, WP-0659, and WP-0660 materials.
-- Upstream dependency receipts were present for all pre-PTM-07 hard dependencies required by this campaign before authoring this package receipt.
-- No production PTM code was added.
-- No second queue, second registry, second scheduler, local-worker routing, or new governance authority was introduced.
+## Evidence notes
+- Revalidated package scope against the accepted authority baseline and PTM parallel campaign plan.
+- Preserved Codex-only execution routing and did not use the local RTX 4090 worker.
+- Did not create production PTM code, a second dispatch queue, a second registry, a second scheduler, or a new governance authority.
+- Kept the package within the accepted estimate boundary; no evidence-based exception is required.
 
-## Validation
-- `git diff --check` passed on 2026-07-16.
+## Validation commands
+- `git diff --check` — passed.
+- Documentation-only change; no executable package-specific tests were required.
