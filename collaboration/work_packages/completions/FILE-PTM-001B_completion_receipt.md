@@ -1,22 +1,26 @@
 # FILE-PTM-001B completion receipt
 
-Status: Complete for Chief Architect review
-Campaign: PTM-03 — Governed intake and import contracts
-Date: 2026-07-16
+## Status
+Completed by Codex on 2026-07-16.
 
-## Delivered artifact
+## Package
+- Package ID: `FILE-PTM-001B`
+- Source package: `collaboration/work_packages/pending/FILE-PTM-001B_File_import_report_and_SHA_mapping_contract.md`
+- Campaign: `PTM-03`
+- Launch group: `G03C`
+- Integration checkpoint: Gate C — intake/import reconciliation
 
-- Added this package's governed implementation-preparation content to `docs/architecture/estate_ptm_governed_intake_import_contracts.md` as part of the PTM-03 Gate C intake/import contract artifact.
+## Deliverables
+- Expanded `docs/architecture/estate_ptm_governed_intake_import_contracts.md` with the bounded FILE-PTM-001B file-import report and SHA-256 mapping contract.
+- Defined the deterministic report envelope, accepted/rejected/duplicate bucket requirements, SHA-256 mapping semantics, reason-code allow-list, and future implementation validation matrix.
 
-## Evidence notes
-
-- Source inputs reviewed from the accepted PTM baseline, PTM parallel execution plan, dependency and campaign manifests, source planning draft, and Gate B canonical ledger/projection contract.
-- The delivered artifact remains a specification and validation artifact only; no production PTM code or source mutation was added.
-- The artifact preserves the frozen command, event, ID, projection, and authority contracts and does not redefine upstream contracts.
-- No second dispatch queue, second registry, second scheduler, local-worker route, or new governance authority was introduced.
-- Active execution estimate remained under 60 minutes.
+## Evidence
+- Required inputs reviewed from specification acceptance, PTM parallel campaign plan, dependency and parallelism plan, package/campaign/dependency manifests, the accepted planning draft, backlog, WP-0659, WP-0660, and this Pending package.
+- Dependencies `FILE-PTM-001A` and `INTAKE-PTM-001B` were treated as accepted or explicitly waived by Chief Architect per the Pending package readiness gate.
+- The active estimate remained within the accepted 7/12/22 minute range and below the 60 active minute exception threshold.
+- No production PTM code was added.
+- No second queue, second registry, second scheduler, local-worker route, or new governance authority was introduced.
 
 ## Validation
-
-- `git diff --check` — passed on 2026-07-16.
-- Documentation-only change; no executable package-specific tests were required.
+- `git diff --check` passed on 2026-07-16.
+- Documentation-only package; no executable package-specific tests were required.

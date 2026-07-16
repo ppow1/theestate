@@ -175,29 +175,140 @@ Fixture assertions must check accepted, rejected, duplicate, and warning paths; 
 
 ## FILE-PTM-001B file-import report and SHA-256 mapping contract
 
-Every future file import session must produce a deterministic report envelope:
+Every future file import session must produce a deterministic report envelope. The report is the complete acceptance, rejection, duplicate, warning, and SHA-256 provenance contract for file-import dry runs and confirmed imports. It is a validation artifact and handoff contract; it does not authorize production import code.
 
 ```yaml
 ptm_file_import_report:
   import_id: string
   command_id: string
+  correlation_id: string
+  causation_id: string | null
   requested_by: string
   requested_at: string
   dry_run: boolean
+  import_scope: string
+  parser_set_version: string
   source_files:
-    - source_path: string
+    - source_ref: string
+      source_path: string
       source_sha256: string
+      byte_length: integer
       parser_format: markdown_work_package | json_manifest | csv_table | plain_text_note
       parser_version: string
-  accepted_records: [object]
-  rejected_records: [object]
-  duplicate_records: [object]
-  sha256_mappings: [object]
+      read_status: accepted | rejected
+      warnings: [string]
+  accepted_records:
+    - record_id: string
+      source_ref: string
+      source_locator: string
+      source_sha256: string
+      row_or_section_sha256: string
+      intake_id: string
+      confirmation_state: candidate | confirmed
+      proposed_target_type: portfolio | project | task | unknown
+      emitted_event_ids: [string]
+      warnings: [string]
+  rejected_records:
+    - record_id: string
+      source_ref: string
+      source_locator: string
+      source_sha256: string
+      row_or_section_sha256: string
+      reason_code: string
+      reason_detail: string
+      warnings: [string]
+  duplicate_records:
+    - record_id: string
+      source_ref: string
+      source_locator: string
+      source_sha256: string
+      row_or_section_sha256: string
+      dedupe_key: string
+      retained_record_id: string
+      retained_record_type: intake_candidate | intake_record | task | project | source_artifact
+      evidence_refs: [string]
+      decision_state: candidate_duplicate | confirmed_duplicate
+  sha256_mappings:
+    - mapping_id: string
+      source_ref: string
+      source_path: string
+      source_sha256: string
+      locator: string
+      content_sha256: string
+      maps_to_type: source_file | accepted_record | rejected_record | duplicate_record | warning
+      maps_to_id: string
   emitted_event_ids: [string]
   warnings: [string]
+  summary:
+    source_file_count: integer
+    accepted_count: integer
+    rejected_count: integer
+    duplicate_count: integer
+    warning_count: integer
 ```
 
-`import_id` must use the frozen `fil_<slug>_<ulid>` format. `sha256_mappings` must map each source file and accepted/rejected/duplicate row or section to its SHA-256 provenance. Accepted records point to candidate or confirmed intake IDs; rejected records include reason codes; duplicate records include the retained record ID and evidence. Dry-run reports must emit no persistent events.
+`import_id` must use the frozen `fil_<slug>_<ulid>` format. The command, correlation, causation, and event IDs must use the already frozen PTM command and event contracts. The `source_ref` value is a report-local stable reference for joining files, records, duplicate evidence, and SHA mappings; it is not a second registry key and must not outlive the report except as immutable audit evidence attached to canonical events.
+
+### Deterministic report generation rules
+
+Future handlers must generate reports with deterministic ordering and zero hidden mutation:
+
+1. Sort `source_files` by normalized repository-relative source path, then parser format.
+2. Sort record arrays by `source_ref`, source locator, normalized title or stable row key, and record type.
+3. Compute `source_sha256` over the exact source bytes read by the importer before parsing.
+4. Compute `row_or_section_sha256` or `content_sha256` over the exact row, section, object pointer, or note span used to stage or reject the record.
+5. Preserve warnings even when a record is accepted; warnings do not silently downgrade provenance.
+6. Return `emitted_event_ids: []` for dry runs, parser failures, validation failures, and reports with no confirmed mutations.
+7. Never rewrite, move, close, or annotate source files as part of report generation.
+
+### Accepted, rejected, and duplicate record requirements
+
+| Report bucket | Required content | Authorized downstream effect | Forbidden behavior |
+| --- | --- | --- | --- |
+| `accepted_records` | Source path, source locator, source hash, row/section hash, proposed intake candidate ID, confirmation state, target type, warnings, and emitted event IDs when not a dry run. | Stage a governed `file_import` intake candidate or record confirmed canonical events after the intake confirmation contract passes. | Treat parser acceptance as automatic task/project creation or bypass dedupe confirmation. |
+| `rejected_records` | Source path, source locator, source hash, row/section hash, stable reason code, human-readable detail, and warnings. | Preserve rejection evidence in the report and, when confirmed mutation is allowed, attach audit evidence through canonical events only. | Drop failed rows silently, mutate the source artifact, or emit partial task/schedule/dispatch events. |
+| `duplicate_records` | Source path, source locator, source hash, row/section hash, dedupe key, retained record ID/type, evidence references, and candidate/confirmed duplicate state. | Present duplicate evidence for governed confirmation or emit the duplicate decision event through the intake contract. | Silently merge duplicates, overwrite retained records, or create a second side list of imported tasks. |
+| `sha256_mappings` | One mapping per source file and per accepted/rejected/duplicate record span, including map target type and target ID. | Provide immutable migration and validation evidence for later `MIG-PTM-001A` source-slice planning. | Replace canonical IDs, create a registry, or rely on filename-only provenance. |
+
+### Reason-code allow-list
+
+Future handlers must use stable reason codes so validation can compare reports across dry-run and confirmed execution:
+
+- `unsupported_format`
+- `unreadable_source`
+- `sha256_mismatch`
+- `malformed_markdown`
+- `malformed_json`
+- `malformed_csv`
+- `invalid_encoding`
+- `missing_required_field`
+- `unknown_dependency_ref`
+- `duplicate_detected`
+- `authority_missing`
+- `confirmation_required`
+- `parser_contract_violation`
+
+Additional reason codes require a later accepted contract change; they must not be introduced ad hoc by an import implementation branch.
+
+### Validation matrix for future implementation
+
+Future implementation of this slice must validate the report contract before enabling file import mutation:
+
+| Case | Expected report result | Event expectation |
+| --- | --- | --- |
+| Dry-run valid Markdown work package | Accepted record with file and section SHA-256 mappings, warnings preserved if present. | No persistent events. |
+| Confirmed valid candidate | Accepted record with intake ID and emitted event IDs after governed confirmation. | Canonical intake/file-import events only. |
+| Malformed source | Rejected record with parser-specific reason code and source SHA-256 mapping. | No persistent events. |
+| Duplicate source row or section | Duplicate record with retained record evidence and SHA mapping. | No new task/project; duplicate decision event only if explicitly confirmed. |
+| Mixed file batch | Accepted, rejected, duplicate, warning, and source-file arrays all reconcile to summary counts. | Only confirmed accepted/duplicate decisions may emit events. |
+| Source hash drift between preview and confirmation | Rejected record or whole-report rejection with `sha256_mismatch`. | No persistent events. |
+
+### Evidence notes for future package promotion
+
+- The report contract is bounded to import evidence, dedupe evidence, and SHA-256 provenance for future file import handlers.
+- The contract depends on `FILE-PTM-001A` parser inventory and `INTAKE-PTM-001B` dedupe confirmation semantics, and it does not redefine parser allow-lists or conversation/manual intake authority.
+- Source file paths and SHA-256 mappings are evidence references only; canonical PTM state remains in the frozen append-only event ledger and projections.
+- The report intentionally feeds later migration planning by preserving accepted, rejected, duplicate, and warning evidence without creating a second queue, registry, scheduler, or governance authority.
 
 ## Gate C reconciliation notes
 
