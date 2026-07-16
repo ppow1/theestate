@@ -7,10 +7,11 @@ Date: 2026-07-16
 ## Delivered artifact
 
 - Added this package's governed implementation-preparation content to `docs/architecture/estate_ptm_governed_intake_import_contracts.md` as part of the PTM-03 Gate C intake/import contract artifact.
+- Expanded the FILE-PTM-001A section with the approved parser allow-list, parser extraction/rejection constraints, downstream handoff limits, and future fixture inventory.
 
 ## Evidence notes
 
-- Source inputs reviewed from the accepted PTM baseline, PTM parallel execution plan, dependency and campaign manifests, source planning draft, and Gate B canonical ledger/projection contract.
+- Source inputs reviewed from the accepted PTM baseline, PTM parallel execution plan, dependency and campaign manifests, source planning draft, Gate B canonical ledger/projection contract, and INTAKE-PTM-001A governed intake dependency.
 - The delivered artifact remains a specification and validation artifact only; no production PTM code or source mutation was added.
 - The artifact preserves the frozen command, event, ID, projection, and authority contracts and does not redefine upstream contracts.
 - No second dispatch queue, second registry, second scheduler, local-worker route, or new governance authority was introduced.
