@@ -24,6 +24,30 @@ The dedicated Project Management workspace owns the full planning interface. The
 | Archive | `ptm.archive` | Archived portfolios, projects, tasks, branches, and completed historical work hidden from default active views | `project_current`, `task_current`, `branch_graph` filtered by archived state | Restore events only |
 | Trash | `ptm.trash` | Reversible removals with retention, legal/audit hold, and purge prohibition visibility | `task_current`, `project_current`, `audit_timeline` filtered by trashed state | Restore or governed purge-block annotation only |
 
+### Workspace navigation model
+
+The workspace shell must use a single left-navigation hierarchy for the seven sections above and must not create a second task queue, registry, scheduler, or authority surface. Global search may jump to portfolio, project, task, intake, audit, archive, and trash routes, but search results remain read-only navigation affordances until a governed command handler opens a confirmation envelope.
+
+Required shell regions are:
+
+- a persistent section rail containing Portfolio, Projects, Task Ledger, Intake, Audit, Archive, and Trash;
+- a contextual header showing the active route ID, projection freshness, hash/rebuild status, and any blocked governance gate;
+- a primary content pane optimized for the selected projection-backed table, board, timeline, or detail view;
+- a secondary inspector that can summarize links, evidence, route targets, and command results without mutating canonical state;
+- a footer/status strip for validation state, acceptance separation, and source evidence warnings when applicable.
+
+### Section relationships and default entry points
+
+| From section | Default drill-down target | Cross-navigation rule |
+|---|---|---|
+| Portfolio | Filtered `ptm.projects` by portfolio or health segment | Portfolio metrics link to project/task filters, not duplicate portfolio-owned ledgers |
+| Projects | `ptm.projects.detail` for the selected `PROJ-` ID | Project rows may open task filters, audit timelines, or command confirmations |
+| Task Ledger | `ptm.tasks.detail` for the selected `TASK-` ID | Ledger rows remain canonical task navigation; bulk selection cannot bypass governed handlers |
+| Intake | Candidate detail or duplicate review panel | Confirmed candidates navigate to canonical project/task targets; rejected candidates remain auditable |
+| Audit | Object-scoped event timeline | Audit may link back to object details but remains read-only except governed annotation events |
+| Archive | Prior project/task route target | Restore actions open confirmation; archive never becomes a second active workspace |
+| Trash | Prior project/task route target with retention/hold status | Purge-block and restore visibility stays governed and auditable |
+
 ### Detail surfaces
 
 Every `ptm.projects.detail` and `ptm.tasks.detail` view must disclose summary first and defer raw runtime detail behind expansion controls. Detail views show project links, branch graph, relationships, Helen staffing evidence, Grace operational actions, Traffic Controller decisions, dispatch attempts, worker evidence, validation, acceptance, financials, utilization, KPI observations, source artifacts, and audit events.
