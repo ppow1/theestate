@@ -46,3 +46,7 @@ To send a message:
 > Read `AI_COMMUNICATION_HINTS.md`. Send a repository-backed message from [sender] to [destination]: [message].
 
 When uncertain, stop and read the governing source instead of inventing a new communication path.
+
+## Engineering Campaign Communication
+
+For Engineering campaign/package handoffs, blockers, acceptance requests, and escalation patterns, read `docs/operations/Engineering_Communication_and_Escalation_Standard_v1.md`. It applies the rules above and does not make messages or mailboxes a status registry.
