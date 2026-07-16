@@ -104,6 +104,40 @@ Conversation intake must return a confirmation response containing:
 
 Duplicate handling from conversation must follow the shared governed intake model. If the requester confirms that a candidate is a duplicate, the handler records the duplicate decision and links to the retained record; it must not create another registry, side list, or task record outside the PTM ledger/projection spine.
 
+Conversation intake handlers must use these payload schemas under the frozen event envelope:
+
+- `intake.conversation_candidate_staged.v1`
+- `intake.conversation_candidate_confirmed.v1`
+- `intake.conversation_candidate_rejected.v1`
+- `intake.conversation_candidate_marked_duplicate.v1`
+- `intake.conversation_candidate_superseded.v1`
+
+### Conversation candidate command contract
+
+Future conversation commands that propose PTM work must be staged as dry-run or candidate commands before mutation. The command payload must include the command text or normalized intent, the message or thread reference, the requesting actor, cited source references, proposed target type, dedupe key, and the confirmation token returned to the user. Confirmation tokens are scoped to the command, actor, candidate, dedupe result, and proposed payload preview; changing any of those values invalidates the confirmation and returns `needs_confirmation` again.
+
+A conversational statement such as "make this a task" is therefore only an intake request. It is not task creation until the user confirms the candidate preview through the same frozen PTM command envelope used by CLI, library, UI, and Resident command surfaces. Dry-run previews and validation failures must emit zero persistent events.
+
+### Conversation intake acceptance matrix
+
+Future implementation of this slice must validate the following cases before conversation-originated candidates can emit canonical PTM events:
+
+| Case | Required validation | Authorized result | Forbidden result |
+| --- | --- | --- | --- |
+| Preview from conversation | Command envelope, actor reference, conversation/message reference, source references, proposed title/description, target type, dedupe key, and dry-run flag are present. | Return a preview with proposed payloads, duplicate evidence, warnings, and no-mutation status. | Mint a task, project, portfolio, registry row, dispatch item, or confirmation event from preview alone. |
+| Explicit confirmation | Confirmation token still matches the candidate, actor, dedupe result, source references, and proposed payload preview. | Emit `intake.conversation_candidate_confirmed.v1` and then the applicable downstream creation or link event. | Reuse a stale confirmation token after edited content, changed duplicate result, or different actor. |
+| Potential duplicate | Dedupe evidence identifies an active candidate, accepted intake record, projected task/project, or source artifact match. | Present retained-record evidence and require confirm-new, mark-duplicate, reject, or supersede decision. | Silently merge, overwrite retained records, or create another task without a duplicate decision. |
+| Duplicate decision | Requester selects the retained record and supplies the duplicate decision through the command envelope. | Emit `intake.conversation_candidate_marked_duplicate.v1` with retained record, candidate, evidence, actor, and source refs. | Create a second registry, side list, dispatch queue row, or hidden conversation-only task. |
+| Validation or authority failure | Missing authority, invalid source reference, stale expected stream version, malformed target, or unsupported command is detected. | Return structured rejection/warning details and emit zero canonical events. | Emit partial intake, creation, schedule, dispatch, projection, Helen, Grace, or budget events. |
+| Rejection or supersession | Requester rejects the candidate or replaces it with a better-scoped candidate. | Emit the rejection or supersession event with reason and replacement/retained references where applicable. | Delete the original conversation evidence or mutate source artifacts. |
+
+### Conversation audit and downstream handoff notes
+
+- Every accepted, rejected, duplicate, or superseded conversation candidate must preserve `command_id`, `correlation_id`, `causation_id`, conversation/message references, actor references, authority references, source hashes where available, and the emitted event IDs.
+- Conversation-originated candidates may hand off to `CONV-PTM-001` resident command surfaces only through the governed intake command contract; resident commands must not define a separate creation path.
+- Conversation audit output is a projection/read model over canonical events and source references, not a second conversation task registry.
+- Helen, Grace, Traffic Controller, budget, scheduling, dispatch, validation, and acceptance authority boundaries remain unchanged; conversation intake may request or reference those lanes but may not approve or complete their decisions.
+
 ## FILE-PTM-001A approved file-import format inventory
 
 File import planning is limited to inventory and future fixture needs. Approved initial import formats are:
