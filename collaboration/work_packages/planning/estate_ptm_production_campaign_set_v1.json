@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "campaign_set_id": "PTM-PRODUCTION-SET-001",
+  "generated_by": "WP-0677",
+  "generated_at": "2026-07-16",
+  "state": "awaiting_chief_architect_launch",
+  "planning_baseline_complete": true,
+  "production_implementation_started": false,
+  "canonical_verifier_pass_required": true,
+  "campaigns": [
+    {
+      "campaign_id": "PTM-PROD-01",
+      "instruction_path": "collaboration/work_packages/campaigns/ptm-production/PTM-PROD-01_Read_Only_Discovery_and_Projection_Pilot.md",
+      "roadmap_phase": 1,
+      "launch_gate": "PTM-PROD-G0",
+      "final_gate": "PTM-PROD-G2",
+      "packages": ["PROD-PTM-001A", "PROD-PTM-001B", "PROD-PTM-001C"]
+    }
+  ],
+  "hard_dependencies": {
+    "PROD-PTM-001A": [],
+    "PROD-PTM-001B": ["PROD-PTM-001A"],
+    "PROD-PTM-001C": ["PROD-PTM-001A"]
+  },
+  "authority_boundaries": {
+    "execution_provider": "Codex",
+    "engineering_acceptance": "Chief Architect",
+    "protected_final_authority": "Steward",
+    "source_access": "read_only",
+    "forbidden_duplicates": ["queue", "registry", "scheduler", "validator", "acceptance_path", "governance_authority"]
+  }
+}
