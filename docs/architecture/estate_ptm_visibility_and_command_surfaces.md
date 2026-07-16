@@ -166,9 +166,53 @@ The Office card may show only:
 - health chips for projection freshness, intake backlog, dispatch readiness, and evidence completeness;
 - deep links to filtered workspace targets.
 
+### Summary data contract
+
+The compact card consumes the same projection-backed bindings frozen for the workspace and may cache only display summaries derived from those projections. A future card implementation must treat the following values as read-model inputs, not as Office-owned task state:
+
+| Card zone | Required projection/evidence source | Required quality label | Allowed deep-link target |
+|---|---|---|---|
+| Portfolio summary | `portfolio.current_state`, `project.current_state`, `task.status_rollup` | projection freshness and active-count confidence | `/office/ptm#portfolio`, `/office/ptm#projects` |
+| Production strip | `task.current_state`, `schedule.current_state`, dispatch evidence where present | schedule readiness and dispatch readiness | `/office/ptm#production`, `/office/ptm#tasks` |
+| Blockers and decisions | `task.current_state`, `schedule.current_state`, financial authority warnings, validation/acceptance state | blocker stale/unknown label and named gate owner | `/office/ptm#blocked`, `/office/ptm#decisions` |
+| Intake health | `intake_projection` and duplicate review state | backlog age, duplicate confidence, and source warning label | `/office/ptm#intake` |
+| Cost/capacity health | `financial.current_state`, utilization observations, 4090 telemetry if available | unknown/stale/estimated labels and budget authority boundary | `/office/ptm#portfolio`, filtered project links |
+| Evidence freshness | `audit.event_trace`, projection envelope, hash/rebuild status | hash-chain/rebuild status and high-watermark event ID | `/office/ptm#audit/<object-id>` where object-scoped |
+
+### Display and interaction rules
+
+- The card must fit a compact Office dashboard slot and expose at most a short list of top projects or task alerts; it must link to the workspace for tables, boards, timelines, details, filters, audit history, and command workflows.
+- Counts and chips must preserve `missing`, `unknown`, `stale`, `partial`, and `blocked_by_governance` states defined by UI-PTM-001B instead of converting them to zero, healthy, or accepted values.
+- The card may rank top active projects by priority only when priority is present in the projection; otherwise it must show an unknown-priority label and link to the filtered workspace.
+- Task, project, intake, cost, capacity, and evidence labels must include enough context for a Steward to choose the correct deep link, but raw event payloads and long task ledgers stay in the workspace.
+- The card must not store user-created watchlists, hidden task lists, alternate project IDs, Office-local dispatch states, or Office-local acceptance/validation decisions.
+
 ### Compact card actions
 
 Allowed Office card actions are navigation-only or confirmation-opening actions that delegate to governed handlers. The card may open PTM workspace links, open filtered blocked/production/intake/decision views, or open an existing governed confirmation surface. It must not directly mutate project/task state without the same command envelope, confirmation, and eventing used by the full workspace.
+
+| User action | Allowed behavior | Prohibited behavior |
+|---|---|---|
+| Open portfolio/project/task summary | Navigate to one of the frozen workspace route targets with filters encoded as URL state | Render a full project/task workspace inside Office card |
+| Review blocker or decision chip | Navigate to `/office/ptm#blocked`, `/office/ptm#decisions`, or object detail/audit route | Mark blocker resolved, approve budget, validate, or accept from card state |
+| Open intake backlog | Navigate to `/office/ptm#intake` or an existing governed confirmation surface | Create an Office-local candidate list or bypass dedupe confirmation |
+| Open production status | Navigate to `/office/ptm#production` or task detail | Move work into production, dispatch work, or change schedule readiness directly |
+| Start a governed command | Open the same canonical confirmation envelope used by workspace or Resident commands | Mint IDs, mutate tasks, or enqueue dispatch from card-only handlers |
+
+### Deep-link payload requirements
+
+Every card link must use a frozen target from UI-PTM-001A/UI-PTM-001B and include only navigation state: target route, canonical object ID where applicable, optional filter chips, cursor/sort/page state when returning to a table, source surface `office_compact_card`, and projection high-watermark. Deep links must not carry authoritative command intent, hidden approvals, Office-local IDs, or acceptance/validation outcomes.
+
+### Future implementation validation checklist
+
+A future Office card implementation satisfies this contract only when validation demonstrates that:
+
+1. the card renders summary counts/chips from named PTM projections or immutable evidence references;
+2. every card link resolves to the frozen workspace deep-link list or a Gate C-approved extension;
+3. no card view renders an unbounded ledger, board, audit timeline, or detail workspace;
+4. every mutating affordance opens the canonical governed confirmation envelope and does not mutate from card state;
+5. missing, unknown, stale, partial, and governance-blocked states remain visible; and
+6. no second queue, second registry, second scheduler, private Office task list, budget authority, validation authority, acceptance authority, or governance authority is introduced.
 
 ## CONV-PTM-001 resident governed PTM command contract
 
