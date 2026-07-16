@@ -1,0 +1,54 @@
+{
+  "campaign_id": "CAMPAIGN-0681",
+  "title": "Estate Operationalization",
+  "status": "draft_not_launched",
+  "authoritative_campaign_path": "collaboration/campaigns/CAMPAIGN_0681_ESTATE_OPERATIONALIZATION.md",
+  "primary_campaign_branch": "campaign/0681-estate-operationalization",
+  "launch_prerequisites": [
+    "WP-0678 completion evidence exists and is accepted",
+    "Chief Architect launch approval exists",
+    "Steward approval exists for protected action classes",
+    "base branch and campaign hash are recorded"
+  ],
+  "execution_policy": {
+    "single_handoff": true,
+    "single_campaign_branch": true,
+    "bounded_commit_per_work_package": true,
+    "dependency_aware": true,
+    "durable_checkpointing": true,
+    "fail_closed": true,
+    "single_campaign_pull_request": true,
+    "automatic_merge": false,
+    "automatic_acceptance": false
+  },
+  "gates": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"],
+  "packages": [
+    {"id":"WP-0688","path":"collaboration/work_packages/pending/WP-0688_Estate_Operational_Current_State_and_Canonical_Reuse_Map.md","depends_on":[],"gate":"G1"},
+    {"id":"WP-0689","path":"collaboration/work_packages/pending/WP-0689_Operational_State_Event_and_Transition_Contract.md","depends_on":["WP-0688"],"gate":"G1"},
+    {"id":"WP-0690","path":"collaboration/work_packages/pending/WP-0690_Authority_Aware_Operational_Action_Taxonomy.md","depends_on":["WP-0688","WP-0689"],"gate":"G1"},
+    {"id":"WP-0691","path":"collaboration/work_packages/pending/WP-0691_Resident_and_Service_Health_Signal_Integration.md","depends_on":["WP-0688","WP-0689"],"gate":"G2"},
+    {"id":"WP-0692","path":"collaboration/work_packages/pending/WP-0692_Campaign_and_Work_Package_Momentum_Observer.md","depends_on":["WP-0688","WP-0689"],"gate":"G2"},
+    {"id":"WP-0693","path":"collaboration/work_packages/pending/WP-0693_Operational_Blocker_and_Escalation_Classifier.md","depends_on":["WP-0690","WP-0691","WP-0692"],"gate":"G2"},
+    {"id":"WP-0694","path":"collaboration/work_packages/pending/WP-0694_Grace_Operational_Coordination_Surface.md","depends_on":["WP-0690","WP-0692","WP-0693"],"gate":"G3"},
+    {"id":"WP-0695","path":"collaboration/work_packages/pending/WP-0695_Helen_Staffing_and_Capability_Request_Integration.md","depends_on":["WP-0690","WP-0693"],"gate":"G3"},
+    {"id":"WP-0696","path":"collaboration/work_packages/pending/WP-0696_Alfred_Communication_and_Mailbox_Routing_Integration.md","depends_on":["WP-0690","WP-0693"],"gate":"G3"},
+    {"id":"WP-0697","path":"collaboration/work_packages/pending/WP-0697_Engineering_Department_Operational_Integration.md","depends_on":["WP-0692","WP-0693","WP-0694"],"gate":"G3"},
+    {"id":"WP-0698","path":"collaboration/work_packages/pending/WP-0698_Readiness_Validation_and_Evidence_Signal_Unification.md","depends_on":["WP-0691","WP-0692","WP-0697"],"gate":"G4"},
+    {"id":"WP-0699","path":"collaboration/work_packages/pending/WP-0699_Operational_Pause_Resume_Retry_and_Recovery_Controls.md","depends_on":["WP-0693","WP-0698"],"gate":"G4"},
+    {"id":"WP-0700","path":"collaboration/work_packages/pending/WP-0700_Continuous_Momentum_Engine_Bounded_Decision_Loop.md","depends_on":["WP-0694","WP-0698","WP-0699"],"gate":"G5"},
+    {"id":"WP-0701","path":"collaboration/work_packages/pending/WP-0701_Authorized_Action_Adapters.md","depends_on":["WP-0695","WP-0696","WP-0697","WP-0700"],"gate":"G5"},
+    {"id":"WP-0702","path":"collaboration/work_packages/pending/WP-0702_Operational_Checkpointing_Audit_and_Replay_Evidence.md","depends_on":["WP-0698","WP-0699","WP-0700"],"gate":"G5"},
+    {"id":"WP-0703","path":"collaboration/work_packages/pending/WP-0703_Steward_Operational_Dashboard_and_Protected_Decision_Queue.md","depends_on":["WP-0693","WP-0698","WP-0702"],"gate":"G6"},
+    {"id":"WP-0704","path":"collaboration/work_packages/pending/WP-0704_Metrics_Notebook_Reflection_and_Continuity_Integration.md","depends_on":["WP-0702","WP-0703"],"gate":"G6"},
+    {"id":"WP-0705","path":"collaboration/work_packages/pending/WP-0705_Failure_Mode_Authority_Boundary_and_Degraded_Service_Validation.md","depends_on":["WP-0700","WP-0701","WP-0702","WP-0703"],"gate":"G7"},
+    {"id":"WP-0706","path":"collaboration/work_packages/pending/WP-0706_Bounded_Real_Work_Pilot_Campaign.md","depends_on":["WP-0705"],"gate":"G7"},
+    {"id":"WP-0707","path":"collaboration/work_packages/pending/WP-0707_Estate_Operationalization_Integration_and_Acceptance.md","depends_on":["WP-0688","WP-0689","WP-0690","WP-0691","WP-0692","WP-0693","WP-0694","WP-0695","WP-0696","WP-0697","WP-0698","WP-0699","WP-0700","WP-0701","WP-0702","WP-0703","WP-0704","WP-0705","WP-0706"],"gate":"G8"}
+  ],
+  "parallel_groups": [
+    ["WP-0691","WP-0692"],
+    ["WP-0695","WP-0696"],
+    ["WP-0703","WP-0704"]
+  ],
+  "protected_stop_gates": ["G0","G1","G3","G5","G6","G7","G8"],
+  "notes": "Manifest reserves execution order and dependency semantics only. Exact owned paths, validation commands, hashes, and checkpoint locations must be completed before launch."
+}
