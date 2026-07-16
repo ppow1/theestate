@@ -45,3 +45,21 @@ The verifier does **not** mutate package state, infer governance acceptance, cre
 a queue or registry, or replace the source manifests. Findings identify the
 source artifact to review; the authoritative record remains in its existing
 repository location.
+
+## Read-only adapter contract fixtures
+
+From the repository root, run the Gate G2 fixture integration checks with:
+
+```text
+pytest -q tests/test_ptm_read_only_adapter_contract_fixtures.py
+```
+
+The expected result is `4 passed`. The command exercises sanitized Parking Lot,
+work-package, Dispatch, validation, and acceptance shapes and must leave the
+fixture sandbox byte-for-byte, timestamp-for-timestamp, and mode-for-mode
+unchanged. It also expects missing and oversized records to be unavailable,
+conflicting status to remain explicit, stale records to be marked stale, path
+escapes to fail closed, source hashes to be calculated from bytes, and explicitly
+private fields to be absent from normalized results. The fixtures under
+`tests/fixtures/ptm_read_only_adapters/` are non-production test inputs, never an
+authoritative dataset.

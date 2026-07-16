@@ -118,7 +118,7 @@ class PtmReadOnlyAdapterRuntime:
             return self._unavailable(adapter_name, source, f"{type(exc).__name__}: {exc}")
 
         source = SourceReference(relative, hashlib.sha256(content).hexdigest(), len(content))
-        text = content.decode("utf-8")
+        text = self._redact_private_fields(content.decode("utf-8"))
         title_match = re.search(r"^#\s+(.+?)\s*$", text, re.MULTILINE)
         id_match = re.search(r"\b(?:WP|PL|PROD-PTM|[A-Z]+-PTM)-[A-Z0-9-]+\b", text)
         status_match = re.search(r"^Status:\s*(.+?)\s*$", text, re.MULTILINE | re.IGNORECASE)
@@ -213,3 +213,17 @@ class PtmReadOnlyAdapterRuntime:
     def _label_refs(text: str, label: str) -> tuple[str, ...]:
         values = re.findall(rf"^(?:{label})[^:]*:\s*(.+)$", text, re.MULTILINE | re.IGNORECASE)
         return tuple(sorted(set(value.strip() for value in values)))
+
+    @staticmethod
+    def _redact_private_fields(text: str) -> str:
+        """Exclude explicitly private source fields from all extracted values.
+
+        The source bytes (and therefore their integrity hash) remain untouched.
+        This is deliberately a narrow field-level rule rather than an attempt to
+        classify or rewrite the authoritative document.
+        """
+        private_label = re.compile(
+            r"^\s*(?:private(?:[-_ ]field)?|secret|password|token|api[-_ ]?key)\s*:",
+            re.IGNORECASE,
+        )
+        return "\n".join(line for line in text.splitlines() if not private_label.match(line))
