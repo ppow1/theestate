@@ -1,0 +1,996 @@
+{
+  "generated_for": "WP-0660",
+  "planning_unit": "minutes",
+  "packages": [
+    {
+      "package_id": "SPEC-PTM-001",
+      "title": "Accept PTM specification and boundaries",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/SPEC-PTM-001_accept_ptm_specification_and_boundaries.md",
+      "parent_category": "Specification",
+      "campaign": "PTM-00",
+      "preferred_lane": "Chief Architect",
+      "alternate_lanes": [
+        "Codex analysis"
+      ],
+      "prohibited_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 5,
+        "expected": 10,
+        "conservative": 20
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [],
+      "parallel_group": "G00",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-001A",
+      "title": "Inventory collaboration and work-package sources",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001A_inventory_collaboration_and_work-package_sources.md",
+      "parent_category": "Core ledger",
+      "campaign": "PTM-01",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Production runtime changes"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "SPEC-PTM-001"
+      ],
+      "parallel_group": "G01A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-001B",
+      "title": "Inventory dispatch, validation, resident, and operations sources",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001B_inventory_dispatch,_validation,_resident,_and_operations_sources.md",
+      "parent_category": "Core ledger",
+      "campaign": "PTM-01",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Production runtime changes"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "SPEC-PTM-001"
+      ],
+      "parallel_group": "G01A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-001C",
+      "title": "Draft read-only adapter contracts",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001C_draft_read-only_adapter_contracts.md",
+      "parent_category": "Core ledger",
+      "campaign": "PTM-01",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Unsupervised local merge"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-001A",
+        "CORE-PTM-001B"
+      ],
+      "parallel_group": "G01B",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-002A",
+      "title": "Define append-only event schema and hash chain",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002A_define_append-only_event_schema_and_hash_chain.md",
+      "parent_category": "Core ledger",
+      "campaign": "PTM-02",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "No-review local authority"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-001C"
+      ],
+      "parallel_group": "G02A",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-002B",
+      "title": "Define PTM ID minting and command contracts",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002B_define_ptm_id_minting_and_command_contracts.md",
+      "parent_category": "Core ledger",
+      "campaign": "PTM-02",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Independent second registry"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-002A"
+      ],
+      "parallel_group": "G02B",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-003A",
+      "title": "Project task and portfolio projection contracts",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003A_project_task_and_portfolio_projection_contracts.md",
+      "parent_category": "Audit",
+      "campaign": "PTM-02",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Local-only canonical decisions"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-002B"
+      ],
+      "parallel_group": "G02C",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CORE-PTM-003B",
+      "title": "Schedule financial KPI projection contracts",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003B_schedule_financial_kpi_projection_contracts.md",
+      "parent_category": "Audit",
+      "campaign": "PTM-02",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Local-only canonical decisions"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-003A"
+      ],
+      "parallel_group": "G02D",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "INTAKE-PTM-001A",
+      "title": "Manual and Parking Lot intake contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001A_manual_and_parking_lot_intake_contract.md",
+      "parent_category": "Intake",
+      "campaign": "PTM-03",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Ungoverned local task creation"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-003A"
+      ],
+      "parallel_group": "G03A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "INTAKE-PTM-001B",
+      "title": "Conversation intake and dedupe confirmation contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001B_conversation_intake_and_dedupe_confirmation_contract.md",
+      "parent_category": "Intake",
+      "campaign": "PTM-03",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Private side lists"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "INTAKE-PTM-001A"
+      ],
+      "parallel_group": "G03B",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "FILE-PTM-001A",
+      "title": "File import parser format inventory",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001A_file_import_parser_format_inventory.md",
+      "parent_category": "File intake",
+      "campaign": "PTM-03",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Production importer changes"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 5,
+        "expected": 10,
+        "conservative": 20
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "INTAKE-PTM-001A"
+      ],
+      "parallel_group": "G03A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "FILE-PTM-001B",
+      "title": "File import report and SHA mapping contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001B_file_import_report_and_sha_mapping_contract.md",
+      "parent_category": "File intake",
+      "campaign": "PTM-03",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Unreviewed import execution"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "FILE-PTM-001A",
+        "INTAKE-PTM-001B"
+      ],
+      "parallel_group": "G03C",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "UI-PTM-001A",
+      "title": "Workspace information architecture shell",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001A_workspace_information_architecture_shell.md",
+      "parent_category": "UI",
+      "campaign": "PTM-04",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Production UI mutation before contract freeze"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-003A"
+      ],
+      "parallel_group": "G04A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "UI-PTM-001B",
+      "title": "Workspace data binding and navigation contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001B_workspace_data_binding_and_navigation_contract.md",
+      "parent_category": "UI",
+      "campaign": "PTM-04",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Second task workspace"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "UI-PTM-001A",
+        "CORE-PTM-003B"
+      ],
+      "parallel_group": "G04B",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "UI-PTM-002",
+      "title": "Office compact card and deep-link contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-002_office_compact_card_and_deep-link_contract.md",
+      "parent_category": "UI",
+      "campaign": "PTM-04",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Full PTM duplicate in Office"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 5,
+        "expected": 10,
+        "conservative": 20
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "UI-PTM-001B"
+      ],
+      "parallel_group": "G04C",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "CONV-PTM-001",
+      "title": "Resident governed PTM command contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/CONV-PTM-001_resident_governed_ptm_command_contract.md",
+      "parent_category": "Conversation integration",
+      "campaign": "PTM-04",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Private command side lists"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "INTAKE-PTM-001B"
+      ],
+      "parallel_group": "G04B",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "SCHED-PTM-001A",
+      "title": "Schedule dependency and readiness-gate contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001A_schedule_dependency_and_readiness-gate_contract.md",
+      "parent_category": "Scheduling",
+      "campaign": "PTM-05",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Local-only scheduling authority"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-003B"
+      ],
+      "parallel_group": "G05A",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "SCHED-PTM-001B",
+      "title": "Schedule validation fixture and critical-path plan",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001B_schedule_validation_fixture_and_critical-path_plan.md",
+      "parent_category": "Scheduling",
+      "campaign": "PTM-05",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Runtime gate changes"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "SCHED-PTM-001A"
+      ],
+      "parallel_group": "G05B",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "UTIL-PTM-001",
+      "title": "Capacity and utilization observation contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/UTIL-PTM-001_capacity_and_utilization_observation_contract.md",
+      "parent_category": "Utilization",
+      "campaign": "PTM-05",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Unlabeled inferred telemetry"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "SCHED-PTM-001A"
+      ],
+      "parallel_group": "G05B",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "FIN-PTM-001",
+      "title": "Budget cost approval and reconciliation contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/FIN-PTM-001_budget_cost_approval_and_reconciliation_contract.md",
+      "parent_category": "Financials",
+      "campaign": "PTM-05",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Local financial authority decisions"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-003B"
+      ],
+      "parallel_group": "G05A",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "KPI-PTM-001",
+      "title": "KPI registry quality and dashboard contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/KPI-PTM-001_kpi_registry_quality_and_dashboard_contract.md",
+      "parent_category": "KPIs",
+      "campaign": "PTM-05",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Flattening unknown data"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "UTIL-PTM-001",
+        "FIN-PTM-001"
+      ],
+      "parallel_group": "G05C",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "DISPATCH-PTM-001",
+      "title": "Task-to-dispatch evidence chain contract",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/DISPATCH-PTM-001_task-to-dispatch_evidence_chain_contract.md",
+      "parent_category": "Dispatch integration",
+      "campaign": "PTM-06",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Second dispatch queue"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "SCHED-PTM-001A"
+      ],
+      "parallel_group": "G06A",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "MIG-PTM-001A",
+      "title": "Pilot migration source slice plan",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001A_pilot_migration_source_slice_plan.md",
+      "parent_category": "Migration",
+      "campaign": "PTM-06",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Unapproved broad migration"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "FILE-PTM-001B",
+        "DISPATCH-PTM-001"
+      ],
+      "parallel_group": "G06A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "MIG-PTM-001B",
+      "title": "Pilot migration execution package draft",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001B_pilot_migration_execution_package_draft.md",
+      "parent_category": "Migration",
+      "campaign": "PTM-06",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Unreviewed data migration"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "MIG-PTM-001A"
+      ],
+      "parallel_group": "G06B",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "TEST-PTM-001A",
+      "title": "Automated replay gate and policy validation plan",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001A_automated_replay_gate_and_policy_validation_plan.md",
+      "parent_category": "Testing",
+      "campaign": "PTM-07",
+      "preferred_lane": "Local RTX 4090 worker",
+      "alternate_lanes": [
+        "Codex"
+      ],
+      "prohibited_lanes": [
+        "Production test changes before contracts"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "CORE-PTM-003B",
+        "INTAKE-PTM-001B",
+        "SCHED-PTM-001A"
+      ],
+      "parallel_group": "G07A",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "TEST-PTM-001B",
+      "title": "End-to-end acceptance validation package draft",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001B_end-to-end_acceptance_validation_package_draft.md",
+      "parent_category": "Testing",
+      "campaign": "PTM-07",
+      "preferred_lane": "Codex",
+      "alternate_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "prohibited_lanes": [
+        "Self-acceptance without independent review"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 10,
+        "expected": 15,
+        "conservative": 25
+      },
+      "validation_estimate_minutes": {
+        "best": 7,
+        "expected": 10,
+        "conservative": 17
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "KPI-PTM-001",
+        "DISPATCH-PTM-001",
+        "MIG-PTM-001B",
+        "UI-PTM-002",
+        "CONV-PTM-001"
+      ],
+      "parallel_group": "G07B",
+      "confidence": "Medium",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "ROLL-PTM-001A",
+      "title": "Operational runbook and resident training plan",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001A_operational_runbook_and_resident_training_plan.md",
+      "parent_category": "Rollout",
+      "campaign": "PTM-07",
+      "preferred_lane": "Grace/Ops",
+      "alternate_lanes": [
+        "Codex drafting",
+        "Local RTX 4090 drafting"
+      ],
+      "prohibited_lanes": [
+        "Local-only authorization"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 7,
+        "expected": 12,
+        "conservative": 22
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "TEST-PTM-001B"
+      ],
+      "parallel_group": "G07C",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    },
+    {
+      "package_id": "ROLL-PTM-001B",
+      "title": "Rollout acceptance and expansion gate package",
+      "file_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001B_rollout_acceptance_and_expansion_gate_package.md",
+      "parent_category": "Rollout",
+      "campaign": "PTM-07",
+      "preferred_lane": "Chief Architect + Steward",
+      "alternate_lanes": [
+        "Codex analysis"
+      ],
+      "prohibited_lanes": [
+        "Local RTX 4090 worker"
+      ],
+      "active_execution_estimate_minutes": {
+        "best": 5,
+        "expected": 10,
+        "conservative": 20
+      },
+      "validation_estimate_minutes": {
+        "best": 5,
+        "expected": 8,
+        "conservative": 15
+      },
+      "rework_allowance_minutes": {
+        "expected": 5,
+        "conservative": 15
+      },
+      "dependencies": [
+        "ROLL-PTM-001A"
+      ],
+      "parallel_group": "G07D",
+      "confidence": "High",
+      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
+      "over_15_minute_review_flag": false
+    }
+  ]
+}
