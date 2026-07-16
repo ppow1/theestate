@@ -95,6 +95,59 @@ The workspace must render from rebuildable projections and retain links to canon
 
 Any command that creates, links, reprioritizes, moves, archives, restores, or requests staffing/operations must return a command result containing: event ID or pending confirmation ID, affected object IDs, resulting state summary, evidence refs, validation/acceptance separation note when relevant, and one or more route targets from the frozen deep-link list.
 
+### Projection binding map
+
+All workspace bindings consume the CORE-PTM-003A and CORE-PTM-003B projection names as read models. UI implementations may rename labels for display, but they must not rename, reinterpret, or silently coerce the source projection fields listed below.
+
+| Workspace target | Canonical projection records | Required primary keys | Required quality/status fields | Required navigation targets |
+|---|---|---|---|---|
+| `ptm.portfolio` | `portfolio.current_state`, `financial.current_state`, `kpi.observation` | `portfolio_id`, `project_ids`, `task_ids` | projection envelope `stale`, `warnings`, `high_watermark_event_id`; KPI `quality_label` and `publication_state`; financial `budget_ready` and `authority_warnings` | filtered `/office/ptm#projects`, `/office/ptm#tasks`, `/office/ptm#blocked`, `/office/ptm#decisions` |
+| `ptm.projects` | `project.current_state`, `task.current_state`, `schedule.current_state`, `financial.current_state` | `project_id`, related `task_ids`, milestone IDs where present | normalized status, schedule readiness, budget state, acceptance wait counts, projection warnings | `/office/ptm#project/<PROJ-id>`, filtered `/office/ptm#tasks`, object audit route |
+| `ptm.projects.detail` | `project.current_state`, linked task/schedule/financial/KPI/audit records | requested `PROJ-` ID retained even when missing | missing/unknown projection state, source confidence, freshness, hash/rebuild state | prior section route, task filters, `/office/ptm#audit/<object-id>` |
+| `ptm.task_ledger` | `task.current_state`, `task.status_rollup`, `schedule.current_state`, `financial.current_state`, `audit.event_trace` | `TASK-` ID, `project_ids`, `branch_ids`, `WP-`/`DISP-` links where present | blocker, dispatch, validation, acceptance, classification, evidence completeness, stale/warning labels | `/office/ptm#task/<TASK-id>`, filtered production/blocked/decision routes |
+| `ptm.tasks.detail` | `task.current_state`, relationship index, schedule/financial/utilization/KPI/audit records | requested `TASK-` ID retained even when missing | governed gate outcomes, acceptance separation, evidence warnings, projection freshness | project detail, branch/work-package/dispatch evidence links, object audit route |
+| `ptm.intake` | `intake_projection`, `task.current_state`, `audit.event_trace` | `INTAKE-` ID, duplicate candidate `TASK-`/`PROJ-` IDs | confirmation state, duplicate confidence, source hash, classification/visibility warnings | confirmed canonical target, duplicate review, `/office/ptm#intake` |
+| `ptm.audit` | `audit.event_trace` | event ID, object ID, causation/correlation IDs | hash status, projection rebuild state, evidence refs, actor/source warnings | object detail route and immutable evidence references |
+| `ptm.archive` / `ptm.trash` | filtered `project.current_state`, `task.current_state`, `branch_graph`, `audit.event_trace` | object ID and prior route target | archived/trashed timestamp, hold state, restore eligibility, purge-block reason | prior project/task route, restore confirmation, object audit route |
+
+### Large-ledger navigation contract
+
+The Task Ledger and any project-filtered task table are expected to grow beyond in-memory browser rendering. Future UI files must therefore implement navigation against cursor-backed projection slices rather than loading every task row at once. The stable cursor contract is:
+
+- cursor inputs: route ID, projection name, projection version, high-watermark event ID, stable sort key, filter expression, page size, and opaque cursor token;
+- default stable sort: `updated_at` descending, then canonical ID ascending, with alternate sorts limited to explicit projection fields;
+- cursor outputs: row records, next/previous opaque cursor tokens, current high-watermark event ID, total count only when available without unbounded replay, and projection warning summaries;
+- URL state: section, detail target, filters, sort key, page size, and cursor token may be represented in the URL so browser back/forward restores navigation without reminting IDs or reissuing commands;
+- selection state: bulk selection is page- and filter-scoped UI state only until a governed command handler creates a confirmation envelope;
+- missing rows: if a cursor points at a row that is no longer visible because a projection advanced, the UI must show an honest stale-cursor notice and offer refresh/navigation, not fabricate a task state.
+
+### Missing, stale, and partial projection states
+
+Every route must explicitly render projection quality instead of flattening uncertainty into normal values. Required states are:
+
+- `missing`: the requested canonical ID is well-formed but absent from the current projection; show the ID, route target, and an audit lookup affordance;
+- `unknown`: the projection contract allows the field to be unavailable; show `Unknown` with the source warning or missing-evidence reason;
+- `stale`: the projection envelope or a joined domain record marks stale input; show the high-watermark and refresh/rebuild status;
+- `partial`: joined projection families disagree or have different high-watermarks; show the affected families and suppress derived KPI/financial conclusions when required by the projection contracts;
+- `blocked_by_governance`: a route or command result depends on staffing, budget, validation, acceptance, Traffic Controller, Helen, Grace, Steward, or Chief Architect gates that have not been satisfied.
+
+### Detail route contract
+
+Detail routes must be deterministic functions of the canonical ID and current projection high-watermark. Opening `/office/ptm#task/<TASK-id>` or `/office/ptm#project/<PROJ-id>` must not emit events, enqueue dispatch, infer acceptance, create private lists, or mutate schedule state. Detail views may open command confirmations, but the confirmation envelope remains the only mutation path.
+
+Project detail views must show project summary, linked task rollups, schedule readiness, budget/financial warnings, KPI quality, milestone state, source evidence, and audit timeline. Task detail views must show task summary, project/branch relationships, staffing readiness, Grace operational evidence, Traffic Controller routing decisions, dispatch evidence, validation and acceptance separation, financial/utilization/KPI observations, source artifacts, and audit timeline.
+
+### Gate C downstream implementation checks
+
+A future Office UI implementation package satisfies this UI-PTM-001B contract only when it demonstrates that:
+
+1. all rendered PTM values originate from named projections or immutable evidence references;
+2. all deep links use the frozen target list or a Gate C-approved extension;
+3. large-ledger tables use cursor pagination or virtualization with stable URL restoration;
+4. command-result navigation returns governed route targets and never directly mutates state from client filter or selection state;
+5. missing, stale, partial, and unknown projection states are visible to the user; and
+6. no second queue, second registry, second scheduler, private task list, or new governance authority is introduced.
+
 ## UI-PTM-002 Office compact card and deep-link contract
 
 The Office compact card is summary-only. It must not duplicate the full Project Management workspace, render large ledgers, expose private side lists, or create an alternate project/task control surface.
