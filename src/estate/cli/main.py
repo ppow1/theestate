@@ -1,6 +1,7 @@
 import argparse
 import json
 from pathlib import Path
+from estate.core.ptm_pilot_projection import build_repository_pilot, normalized_json as normalized_ptm_json, reviewer_report as ptm_reviewer_report
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
@@ -2743,6 +2744,13 @@ def cmd_sync_ollama(args):
     else:
         print("No new Ollama providers created.")
 
+def cmd_ptm_pilot_projection(args):
+    """Print an ephemeral PTM projection; deliberately persist nothing."""
+    projection = build_repository_pilot(str(Path(args.root or ".").resolve()))
+    output = normalized_ptm_json(projection) if args.format == "json" else ptm_reviewer_report(projection)
+    print(output, end="")
+
+
 def main(argv=None):
     if argv is None:
         import sys as _sys
@@ -2756,6 +2764,11 @@ def main(argv=None):
         return
     parser = argparse.ArgumentParser(prog="estate", description="Estate Core CLI")
     sub = parser.add_subparsers(dest="command")
+
+    p = sub.add_parser("ptm-pilot-projection", help="Rebuild the ephemeral read-only PTM pilot projection")
+    p.add_argument("--root", help="Estate repository root (defaults to the current directory)")
+    p.add_argument("--format", choices=("json", "report"), default="report")
+    p.set_defaults(func=cmd_ptm_pilot_projection)
 
 
 
