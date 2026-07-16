@@ -2,6 +2,9 @@
 
 Package library contains 28 bounded packages: SPEC-PTM-001, CORE-PTM-001A, CORE-PTM-001B, CORE-PTM-001C, CORE-PTM-002A, CORE-PTM-002B, CORE-PTM-003A, CORE-PTM-003B, INTAKE-PTM-001A, INTAKE-PTM-001B, FILE-PTM-001A, FILE-PTM-001B, UI-PTM-001A, UI-PTM-001B, UI-PTM-002, CONV-PTM-001, SCHED-PTM-001A, SCHED-PTM-001B, UTIL-PTM-001, FIN-PTM-001, KPI-PTM-001, DISPATCH-PTM-001, MIG-PTM-001A, MIG-PTM-001B, TEST-PTM-001A, TEST-PTM-001B, ROLL-PTM-001A, ROLL-PTM-001B. Expected active execution totals 361 minutes (6.0 hours), validation 248 minutes, and expected rework 140 minutes. All expected active estimates are 15 minutes or less; none exceeds 60 minutes.
 
+## WP-0661 parallel fan-out correction
+
+The campaign waves above are authorization containers, not a strict one-campaign-at-a-time execution queue. After `CORE-PTM-003B` freezes the projection contracts, `PTM-03`, `PTM-04`, `PTM-05`, and `TEST-PTM-001A` may proceed concurrently where their package-level dependencies are satisfied. `PTM-06` planning may join once `DISPATCH-PTM-001` and file-import feeders are stable; rollout packages remain serialized after formal validation. Use `docs/architecture/estate_ptm_parallel_campaign_execution_plan.md` as the controlling midpoint integration plan for concurrent launches.
 
 ## Campaign waves
 ### PTM-00 — Governance acceptance
