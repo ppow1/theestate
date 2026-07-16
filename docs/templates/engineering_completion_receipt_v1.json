@@ -1,0 +1,21 @@
+{
+  "schema_version": "engineering_completion_receipt/v1",
+  "campaign_id": "<CAMPAIGN-ID>",
+  "work_package_id": "<WP-ID>",
+  "execution_state": "implementation_complete",
+  "lifecycle_state_requested": "package_validation",
+  "acceptance_status": "not_accepted",
+  "attribution": {"worker": "<identity>", "lane": "<lane>", "provider": "<provider-or-not_applicable>", "attempt_ref": "<reference-or-not_applicable>"},
+  "source": {"branch": "<branch>", "base_commit": "<sha>", "head_commit": "<sha>", "pr_ref": "not_yet_recorded", "merged_commit": "not_yet_recorded"},
+  "summary": "<implementation summary>",
+  "changed_files": [],
+  "validation": [{"command": "<exact command>", "environment": "<details>", "outcome": "pass", "evidence_ref": "<path>"}],
+  "artifact_refs": [],
+  "dependency_and_contract_impact": "<impact>",
+  "warnings_and_limitations": [],
+  "recovery": "<rollback or recovery>",
+  "requested_acceptance_lane": "Chief Architect",
+  "acknowledgements": {"executor": "<identity/time>", "validator": "not_yet_recorded", "integration_owner": "not_yet_recorded"},
+  "supersedes": null
+}
+
