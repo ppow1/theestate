@@ -151,3 +151,74 @@ adapter_record:
 - CORE-PTM-001C adapter contract draft completed from the two inventories.
 - No production PTM code was added.
 - No second dispatch queue, second registry, second scheduler, or new governance authority was introduced.
+
+## CORE-PTM-001C implementation-ready adapter contract freeze draft
+
+This section freezes the Gate A adapter contract names and minimum behavior for downstream PTM planning. It is a draft contract for future implementation packages only; it does not add executable adapters or change source authority.
+
+### Contract status
+
+- Contract version: `ptm-01-gate-a-draft`.
+- Contract owner for review: Chief Architect.
+- Source baseline: CORE-PTM-001A collaboration/work-package inventory and CORE-PTM-001B dispatch/validation/resident/operations inventory.
+- Downstream use: CORE-PTM-002A and later packages may reference these adapter names and source categories, but must not treat this draft as production parser code.
+
+### Adapter contract catalog
+
+| Adapter name | Required source roots | Required discovery mode | Required minimum extracted fields | Required uncertainty behavior | Prohibited behavior |
+| --- | --- | --- | --- | --- | --- |
+| `work_package_source_adapter` | `collaboration/work_packages/**` | Enumerate lifecycle buckets, root work-package Markdown files, planning manifests, campaign instructions, queue files, claimed/open markers, completions, and completed receipts. | `source_path`, `source_family`, `source_status_bucket`, `package_or_item_id`, `title`, `authority_refs`, `dependency_refs`, `validation_refs`, `completion_receipt_refs`, `parse_confidence`, `adapter_warnings`. | Prefer explicit headings and manifest fields; when directory bucket and body status conflict, emit both via `extracted_status` plus warning. | Must not create, reorder, claim, close, or dispatch work packages. |
+| `parking_lot_source_adapter` | `collaboration/parking_lot/**` | Enumerate Parking Lot Markdown candidates and preserve candidate path provenance. | `source_path`, `source_family`, `package_or_item_id`, `title`, `promotion_refs`, `authority_refs`, `parse_confidence`, `adapter_warnings`. | Treat parking-lot records as candidates until governed intake confirms promotion. | Must not silently promote, dedupe, reject, or prioritize parking-lot items. |
+| `promotion_source_adapter` | `collaboration/promotions/**` | Enumerate promotion state directories and files, including empty `.gitkeep`-only state. | `source_path`, `source_family`, `source_status_bucket`, `package_or_item_id`, `promotion_refs`, `related_source_paths`, `parse_confidence`, `adapter_warnings`. | Emit low-confidence records for structural placeholders with no substantive promotion payload. | Must not approve, reject, or replace any promotion authority. |
+| `dispatch_source_adapter` | Dispatch-named artifacts under `collaboration/**` | Enumerate dispatch packages, evidence files, reports, and closure records by path/name evidence. | `source_path`, `source_family`, `artifact_id`, `title`, `dispatch_refs`, `evidence_refs`, `authority_refs`, `parse_confidence`, `adapter_warnings`. | Warn when dispatch evidence is documentary rather than runtime-confirmed. | Must not create a second dispatch queue or mutate dispatch readiness. |
+| `validation_source_adapter` | Validation-named artifacts under `collaboration/**` | Enumerate validation recipes, checklists, reports, package receipts, and evidence links by path/name evidence. | `source_path`, `source_family`, `artifact_id`, `title`, `validation_refs`, `evidence_refs`, `parse_confidence`, `adapter_warnings`. | Distinguish commands run, expected validation, reviewer notes, skipped checks, and environment limitations where detectable. | Must not mark packages accepted or override reviewer validation. |
+| `resident_operations_source_adapter` | Resident, Helen, Grace, Traffic Controller, and operations artifacts under `collaboration/**` plus named architecture references. | Enumerate source files with resident, Helen, Grace, Traffic Controller, and operations evidence. | `source_path`, `source_family`, `artifact_id`, `title`, `governance_actor_refs`, `resident_refs`, `operations_refs`, `authority_refs`, `parse_confidence`, `adapter_warnings`. | Preserve actor names as references, not authority grants; warn when files mention multiple governance actors with unclear role boundaries. | Must not create a resident registry, staffing ledger, budget authority, or routing authority. |
+| `architecture_constraint_adapter` | `docs/architecture/**` PTM and operations architecture documents | Enumerate accepted PTM baseline, campaign plan, dependency plan, data-model, KPI, roadmap, financial, scheduling, utilization, and operations constraint documents. | `source_path`, `source_family`, `artifact_id`, `title`, `architecture_constraint_refs`, `authority_refs`, `dependency_refs`, `parse_confidence`, `adapter_warnings`. | Emit constraints as source-backed references; when a downstream package proposes a conflicting contract, stop for replan rather than resolving locally. | Must not redefine frozen upstream contracts or create new governance boundaries. |
+
+### Normalization and provenance requirements
+
+Every adapter record must preserve enough provenance to re-open the original source and verify the projection. The shared envelope remains intentionally pre-canonical until CORE-PTM-002A, CORE-PTM-002B, CORE-PTM-003A, and CORE-PTM-003B freeze event and projection contracts.
+
+Required envelope fields:
+
+- `adapter_name`: one of the seven names in the adapter contract catalog.
+- `adapter_version`: `ptm-01-gate-a-draft` until a later accepted package changes it.
+- `source_path`: repository-relative path to the original source file or structural directory marker.
+- `source_sha256`: hash of the source file content where a file exists; `null` only for directory-only structural observations.
+- `source_family`: stable family label from the adapter catalog.
+- `discovered_at`: ISO-8601 timestamp for the inventory run that produced the record.
+- `extracted_id`: package, parking-lot, artifact, or architecture identifier when detectable.
+- `extracted_title`: title or heading when detectable.
+- `extracted_status`: explicit status or path-derived bucket when detectable.
+- `authority_refs`: source-backed authority, owner, reviewer, or governance references.
+- `dependency_refs`: source-backed package, campaign, or readiness dependencies.
+- `evidence_refs`: source-backed validation, receipt, report, or completion evidence references.
+- `related_source_paths`: additional paths directly referenced by the source record.
+- `parse_confidence`: `high`, `medium`, or `low`.
+- `adapter_warnings`: non-fatal uncertainty, contradiction, missing-field, placeholder, or boundary warnings.
+
+### Parse-confidence guidance
+
+| Confidence | Required evidence | Example use |
+| --- | --- | --- |
+| `high` | Explicit ID/status/title fields or manifest keys with consistent path evidence. | Pending PTM package with clear package ID, status, dependencies, scope, and validation headings. |
+| `medium` | Clear path/name evidence plus partial body evidence, or heterogeneous records with enough headings to classify safely. | Markdown completion receipt with commands and deliverables but no machine-readable status key. |
+| `low` | Placeholder, structural-only, contradictory, or filename-only evidence. | `.gitkeep` promotion state marker or artifact with actor term match but unclear PTM relevance. |
+
+### Downstream freeze handoff
+
+- CORE-PTM-002A may reference `adapter_name`, `adapter_version`, `source_path`, `source_sha256`, and evidence/reference arrays when drafting append-only event semantics.
+- CORE-PTM-002B may reference `extracted_id`, command envelope provenance, and source hash fields when drafting ID and command contract behavior.
+- CORE-PTM-003A and CORE-PTM-003B may reference extracted status, dependency, validation, schedule, financial, KPI, and actor-reference fields for projection planning.
+- Any downstream package that needs to rename an adapter, add a required field, or change a prohibited behavior must stop and open a replan note because Gate A adapter names are shared fan-out assumptions.
+
+### CORE-PTM-001C unresolved-question log
+
+| Question | Affected future package(s) | Current Gate A disposition |
+| --- | --- | --- |
+| Which Markdown headings and JSON keys become canonical receipt fields? | CORE-PTM-002A, CORE-PTM-003A, TEST-PTM-001A | Defer to event/projection freeze; adapters expose raw evidence and warnings now. |
+| Should path-derived lifecycle status override body status when they conflict? | CORE-PTM-002A, CORE-PTM-003A, UI-PTM-001A | Do not override at adapter layer; emit both with a warning until canonical projections decide precedence. |
+| What confidence threshold is safe for resident-facing views? | UI-PTM-001A, UI-PTM-001B, CONV-PTM-001, TEST-PTM-001A | Defer to UI/conversation validation; adapters emit confidence only. |
+| Which dispatch evidence fields are safe before runtime dispatch integration hardens? | DISPATCH-PTM-001, MIG-PTM-001A, TEST-PTM-001B | Treat dispatch artifacts as references only; no readiness mutation or queue write. |
+| How should archived, rejected, superseded, or placeholder promotion records appear in portfolio rollups? | INTAKE-PTM-001A, INTAKE-PTM-001B, KPI-PTM-001 | Preserve promotion state and low-confidence placeholder warnings; defer rollup semantics. |
+| Should source hashes be recalculated on every projection read or captured only at import time? | CORE-PTM-002B, MIG-PTM-001A, TEST-PTM-001B | Require hash presence in adapter records; timing and storage semantics defer to event/ID contract packages. |
