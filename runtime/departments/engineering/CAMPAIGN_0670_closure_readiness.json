@@ -1,0 +1,40 @@
+{
+  "schema_version": "campaign_closure_readiness_observation.v1",
+  "record_role": "read_only_projection_not_authority",
+  "campaign_id": "CAMPAIGN_0670_ENGINEERING_DEPARTMENT_OPERATIONALIZATION",
+  "work_package_id": "WP-0675",
+  "observed_at": "2026-07-16T00:00:00Z",
+  "status": "pending_protected_acceptance",
+  "readiness": "conditionally_ready",
+  "accepted": false,
+  "archived": false,
+  "protected_gates": {
+    "gate_a": "decision_not_recorded",
+    "gate_b": "decision_not_recorded",
+    "gate_c": "decision_not_recorded",
+    "gate_d": "evidence_prepared_decision_not_recorded",
+    "chief_architect_acceptance": "not_recorded",
+    "steward_final_acceptance": "not_recorded"
+  },
+  "package_definitions": ["WP-0670", "WP-0671", "WP-0672", "WP-0673", "WP-0674", "WP-0675"],
+  "completion_receipts": ["WP-0670", "WP-0671", "WP-0672", "WP-0673", "WP-0674", "WP-0675"],
+  "pilot": {"id": "PILOT-0670-01", "result": "bounded_dry_run_complete", "live_control_plane_mutation": false},
+  "conflicts": ["WP-0670 through WP-0674 receipts retain submission-time unmerged/gate-unreleased statements while Git history contains their merged deliverables"],
+  "open_conditions": [
+    "Chief Architect must reconcile and record Gate A, Gate B, and Gate C decisions and package dispositions",
+    "independent validator must validate the WP-0675 commit and evidence bundle",
+    "PR review and authorized merge must occur before post-merge validation",
+    "canonical post-merge operational-readiness checks must bind to the merged commit",
+    "Chief Architect and then applicable Steward protected acceptance decisions must be recorded",
+    "archive and continuity actions may occur only after protected acceptance"
+  ],
+  "evidence": [
+    "docs/operations/Engineering_Department_Operational_Readiness_Assessment_v1.md",
+    "operations/departments/engineering/CAMPAIGN_0670_end_to_end_pilot_report.md",
+    "operations/departments/engineering/CAMPAIGN_0670_authority_boundary_proof.md",
+    "operations/departments/engineering/CAMPAIGN_0670_failure_mode_validation_report.md",
+    "collaboration/campaigns/CAMPAIGN_0670_ACCEPTANCE_PACKAGE.md",
+    "collaboration/work_packages/completions/WP-0675_completion_receipt.md"
+  ],
+  "next_authorized_action": "Chief Architect review of the WP-0675 PR and reconciliation of protected gate records; do not accept or archive from this projection"
+}
