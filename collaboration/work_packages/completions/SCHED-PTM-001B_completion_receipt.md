@@ -1,20 +1,26 @@
-# SCHED-PTM-001B completion receipt
+# SCHED-PTM-001B Completion Receipt
 
 ## Status
-Completed by Codex on 2026-07-16.
+Complete — ready for Chief Architect review.
 
 ## Package
 - Package ID: `SCHED-PTM-001B`
-- Source package: `collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md`
 - Campaign: `PTM-05`
+- Launch group: `G05B`
+- Integration checkpoint: Gate C/D — schedule/finance/KPI reconciliation
 
 ## Deliverables
-- Added `docs/architecture/estate_ptm_schedule_validation_fixtures_and_critical_path_plan.md` as the bounded validation artifact for gate enforcement fixtures and critical-path calculation planning.
+- Updated `docs/architecture/estate_ptm_schedule_validation_fixtures_and_critical_path_plan.md` as a bounded implementation-ready validation artifact for future schedule gate enforcement and critical-path calculation tests.
 
-## Evidence
-- Required inputs reviewed from the PTM campaign handoff, pending package, planning draft, SCHED-PTM-001A deliverable, CORE-PTM-003B projection contract, scheduling protocol, package/campaign/dependency manifests, backlog, WP-0659, WP-0660, and specification acceptance materials.
-- No production PTM code was added.
-- No second queue, second registry, second scheduler, local-worker routing, or new governance authority was introduced.
+## Evidence notes
+- Revalidated the package against the accepted Steward / Chief Architect baseline from `docs/architecture/estate_ptm_specification_acceptance.md`.
+- Revalidated launch group and checkpoint placement against `docs/architecture/estate_ptm_parallel_campaign_execution_plan.md`.
+- Revalidated dependency and critical-path context against `docs/architecture/estate_ptm_dependency_and_parallelism_plan.md`.
+- Revalidated package dependency `SCHED-PTM-001A`, Codex lane, and `G05B` group against the PTM planning manifests.
+- No production PTM code, scheduler, queue, registry, or governance authority was introduced.
 
-## Validation
-- `git diff --check` passed on 2026-07-16.
+## Validation commands
+- `git diff --check` — passed.
+
+## Estimate note
+The active work remained within the accepted under-60-minute bound; no estimate exception is required.
