@@ -5,15 +5,15 @@
     {
       "package_id": "SPEC-PTM-001",
       "title": "Accept PTM specification and boundaries",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/SPEC-PTM-001_accept_ptm_specification_and_boundaries.md",
+      "file_path": "collaboration/work_packages/pending/SPEC-PTM-001_Accept_PTM_specification_and_boundaries.md",
       "parent_category": "Specification",
       "campaign": "PTM-00",
-      "preferred_lane": "Chief Architect",
-      "alternate_lanes": [
-        "Codex analysis"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local RTX 4090 worker"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 5,
@@ -32,21 +32,28 @@
       "dependencies": [],
       "parallel_group": "G00",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/SPEC-PTM-001_accept_ptm_specification_and_boundaries.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/SPEC-PTM-001_accept_ptm_specification_and_boundaries.md",
+      "pending_path": "collaboration/work_packages/pending/SPEC-PTM-001_Accept_PTM_specification_and_boundaries.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-00_Governance_Acceptance.md",
+      "launch_group": "G00",
+      "integration_checkpoint": "Gate 0 \u2014 authority acceptance"
     },
     {
       "package_id": "CORE-PTM-001A",
       "title": "Inventory collaboration and work-package sources",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001A_inventory_collaboration_and_work-package_sources.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-001A_Inventory_collaboration_and_work_package_sources.md",
       "parent_category": "Core ledger",
       "campaign": "PTM-01",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Production runtime changes"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -67,21 +74,28 @@
       ],
       "parallel_group": "G01A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001A_inventory_collaboration_and_work-package_sources.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001A_inventory_collaboration_and_work-package_sources.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-001A_Inventory_collaboration_and_work_package_sources.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-01_Read_Only_Source_Inventory.md",
+      "launch_group": "G01A",
+      "integration_checkpoint": "Gate A \u2014 inventory and adapter merge"
     },
     {
       "package_id": "CORE-PTM-001B",
       "title": "Inventory dispatch, validation, resident, and operations sources",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001B_inventory_dispatch,_validation,_resident,_and_operations_sources.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-001B_Inventory_dispatch_validation_resident_and_operations_sources.md",
       "parent_category": "Core ledger",
       "campaign": "PTM-01",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Production runtime changes"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -102,21 +116,28 @@
       ],
       "parallel_group": "G01A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001B_inventory_dispatch,_validation,_resident,_and_operations_sources.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001B_inventory_dispatch,_validation,_resident,_and_operations_sources.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-001B_Inventory_dispatch_validation_resident_and_operations_sources.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-01_Read_Only_Source_Inventory.md",
+      "launch_group": "G01A",
+      "integration_checkpoint": "Gate A \u2014 inventory and adapter merge"
     },
     {
       "package_id": "CORE-PTM-001C",
       "title": "Draft read-only adapter contracts",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001C_draft_read-only_adapter_contracts.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-001C_Draft_read_only_adapter_contracts.md",
       "parent_category": "Core ledger",
       "campaign": "PTM-01",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Unsupervised local merge"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -138,21 +159,28 @@
       ],
       "parallel_group": "G01B",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001C_draft_read-only_adapter_contracts.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-001C_draft_read-only_adapter_contracts.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-001C_Draft_read_only_adapter_contracts.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-01_Read_Only_Source_Inventory.md",
+      "launch_group": "G01B",
+      "integration_checkpoint": "Gate A \u2014 inventory and adapter merge"
     },
     {
       "package_id": "CORE-PTM-002A",
       "title": "Define append-only event schema and hash chain",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002A_define_append-only_event_schema_and_hash_chain.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-002A_Define_append_only_event_schema_and_hash_chain.md",
       "parent_category": "Core ledger",
       "campaign": "PTM-02",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "No-review local authority"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -173,21 +201,28 @@
       ],
       "parallel_group": "G02A",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002A_define_append-only_event_schema_and_hash_chain.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002A_define_append-only_event_schema_and_hash_chain.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-002A_Define_append_only_event_schema_and_hash_chain.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md",
+      "launch_group": "G02A",
+      "integration_checkpoint": "Gate B \u2014 canonical event/projection freeze"
     },
     {
       "package_id": "CORE-PTM-002B",
       "title": "Define PTM ID minting and command contracts",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002B_define_ptm_id_minting_and_command_contracts.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-002B_Define_PTM_ID_minting_and_command_contracts.md",
       "parent_category": "Core ledger",
       "campaign": "PTM-02",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Independent second registry"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -208,21 +243,28 @@
       ],
       "parallel_group": "G02B",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002B_define_ptm_id_minting_and_command_contracts.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-002B_define_ptm_id_minting_and_command_contracts.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-002B_Define_PTM_ID_minting_and_command_contracts.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md",
+      "launch_group": "G02B",
+      "integration_checkpoint": "Gate B \u2014 canonical event/projection freeze"
     },
     {
       "package_id": "CORE-PTM-003A",
       "title": "Project task and portfolio projection contracts",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003A_project_task_and_portfolio_projection_contracts.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-003A_Project_task_and_portfolio_projection_contracts.md",
       "parent_category": "Audit",
       "campaign": "PTM-02",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local-only canonical decisions"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -243,21 +285,28 @@
       ],
       "parallel_group": "G02C",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003A_project_task_and_portfolio_projection_contracts.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003A_project_task_and_portfolio_projection_contracts.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-003A_Project_task_and_portfolio_projection_contracts.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md",
+      "launch_group": "G02C",
+      "integration_checkpoint": "Gate B \u2014 canonical event/projection freeze"
     },
     {
       "package_id": "CORE-PTM-003B",
       "title": "Schedule financial KPI projection contracts",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003B_schedule_financial_kpi_projection_contracts.md",
+      "file_path": "collaboration/work_packages/pending/CORE-PTM-003B_Schedule_financial_KPI_projection_contracts.md",
       "parent_category": "Audit",
       "campaign": "PTM-02",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local-only canonical decisions"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -278,21 +327,28 @@
       ],
       "parallel_group": "G02D",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003B_schedule_financial_kpi_projection_contracts.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CORE-PTM-003B_schedule_financial_kpi_projection_contracts.md",
+      "pending_path": "collaboration/work_packages/pending/CORE-PTM-003B_Schedule_financial_KPI_projection_contracts.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-02_Canonical_Contracts.md",
+      "launch_group": "G02D",
+      "integration_checkpoint": "Gate B \u2014 canonical event/projection freeze"
     },
     {
       "package_id": "INTAKE-PTM-001A",
       "title": "Manual and Parking Lot intake contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001A_manual_and_parking_lot_intake_contract.md",
+      "file_path": "collaboration/work_packages/pending/INTAKE-PTM-001A_Manual_and_Parking_Lot_intake_contract.md",
       "parent_category": "Intake",
       "campaign": "PTM-03",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Ungoverned local task creation"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -313,21 +369,28 @@
       ],
       "parallel_group": "G03A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001A_manual_and_parking_lot_intake_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001A_manual_and_parking_lot_intake_contract.md",
+      "pending_path": "collaboration/work_packages/pending/INTAKE-PTM-001A_Manual_and_Parking_Lot_intake_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md",
+      "launch_group": "G03A",
+      "integration_checkpoint": "Gate C \u2014 intake/import reconciliation"
     },
     {
       "package_id": "INTAKE-PTM-001B",
       "title": "Conversation intake and dedupe confirmation contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001B_conversation_intake_and_dedupe_confirmation_contract.md",
+      "file_path": "collaboration/work_packages/pending/INTAKE-PTM-001B_Conversation_intake_and_dedupe_confirmation_contract.md",
       "parent_category": "Intake",
       "campaign": "PTM-03",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Private side lists"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -348,21 +411,28 @@
       ],
       "parallel_group": "G03B",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001B_conversation_intake_and_dedupe_confirmation_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/INTAKE-PTM-001B_conversation_intake_and_dedupe_confirmation_contract.md",
+      "pending_path": "collaboration/work_packages/pending/INTAKE-PTM-001B_Conversation_intake_and_dedupe_confirmation_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md",
+      "launch_group": "G03B",
+      "integration_checkpoint": "Gate C \u2014 intake/import reconciliation"
     },
     {
       "package_id": "FILE-PTM-001A",
       "title": "File import parser format inventory",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001A_file_import_parser_format_inventory.md",
+      "file_path": "collaboration/work_packages/pending/FILE-PTM-001A_File_import_parser_format_inventory.md",
       "parent_category": "File intake",
       "campaign": "PTM-03",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Production importer changes"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 5,
@@ -383,21 +453,28 @@
       ],
       "parallel_group": "G03A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001A_file_import_parser_format_inventory.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001A_file_import_parser_format_inventory.md",
+      "pending_path": "collaboration/work_packages/pending/FILE-PTM-001A_File_import_parser_format_inventory.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md",
+      "launch_group": "G03A",
+      "integration_checkpoint": "Gate C \u2014 intake/import reconciliation"
     },
     {
       "package_id": "FILE-PTM-001B",
       "title": "File import report and SHA mapping contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001B_file_import_report_and_sha_mapping_contract.md",
+      "file_path": "collaboration/work_packages/pending/FILE-PTM-001B_File_import_report_and_SHA_mapping_contract.md",
       "parent_category": "File intake",
       "campaign": "PTM-03",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Unreviewed import execution"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -419,21 +496,28 @@
       ],
       "parallel_group": "G03C",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001B_file_import_report_and_sha_mapping_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/FILE-PTM-001B_file_import_report_and_sha_mapping_contract.md",
+      "pending_path": "collaboration/work_packages/pending/FILE-PTM-001B_File_import_report_and_SHA_mapping_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-03_Governed_Intake_and_Import.md",
+      "launch_group": "G03C",
+      "integration_checkpoint": "Gate C \u2014 intake/import reconciliation"
     },
     {
       "package_id": "UI-PTM-001A",
       "title": "Workspace information architecture shell",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001A_workspace_information_architecture_shell.md",
+      "file_path": "collaboration/work_packages/pending/UI-PTM-001A_Workspace_information_architecture_shell.md",
       "parent_category": "UI",
       "campaign": "PTM-04",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Production UI mutation before contract freeze"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -454,21 +538,28 @@
       ],
       "parallel_group": "G04A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001A_workspace_information_architecture_shell.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001A_workspace_information_architecture_shell.md",
+      "pending_path": "collaboration/work_packages/pending/UI-PTM-001A_Workspace_information_architecture_shell.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md",
+      "launch_group": "G04A",
+      "integration_checkpoint": "Gate C \u2014 route/command surface reconciliation"
     },
     {
       "package_id": "UI-PTM-001B",
       "title": "Workspace data binding and navigation contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001B_workspace_data_binding_and_navigation_contract.md",
+      "file_path": "collaboration/work_packages/pending/UI-PTM-001B_Workspace_data_binding_and_navigation_contract.md",
       "parent_category": "UI",
       "campaign": "PTM-04",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Second task workspace"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -490,21 +581,28 @@
       ],
       "parallel_group": "G04B",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001B_workspace_data_binding_and_navigation_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-001B_workspace_data_binding_and_navigation_contract.md",
+      "pending_path": "collaboration/work_packages/pending/UI-PTM-001B_Workspace_data_binding_and_navigation_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md",
+      "launch_group": "G04B",
+      "integration_checkpoint": "Gate C \u2014 route/command surface reconciliation"
     },
     {
       "package_id": "UI-PTM-002",
       "title": "Office compact card and deep-link contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-002_office_compact_card_and_deep-link_contract.md",
+      "file_path": "collaboration/work_packages/pending/UI-PTM-002_Office_compact_card_and_deep_link_contract.md",
       "parent_category": "UI",
       "campaign": "PTM-04",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Full PTM duplicate in Office"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 5,
@@ -525,21 +623,28 @@
       ],
       "parallel_group": "G04C",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-002_office_compact_card_and_deep-link_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/UI-PTM-002_office_compact_card_and_deep-link_contract.md",
+      "pending_path": "collaboration/work_packages/pending/UI-PTM-002_Office_compact_card_and_deep_link_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md",
+      "launch_group": "G04C",
+      "integration_checkpoint": "Gate C \u2014 route/command surface reconciliation"
     },
     {
       "package_id": "CONV-PTM-001",
       "title": "Resident governed PTM command contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/CONV-PTM-001_resident_governed_ptm_command_contract.md",
+      "file_path": "collaboration/work_packages/pending/CONV-PTM-001_Resident_governed_PTM_command_contract.md",
       "parent_category": "Conversation integration",
       "campaign": "PTM-04",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Private command side lists"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -560,21 +665,28 @@
       ],
       "parallel_group": "G04B",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/CONV-PTM-001_resident_governed_ptm_command_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/CONV-PTM-001_resident_governed_ptm_command_contract.md",
+      "pending_path": "collaboration/work_packages/pending/CONV-PTM-001_Resident_governed_PTM_command_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-04_Visibility_and_Command_Surfaces.md",
+      "launch_group": "G04B",
+      "integration_checkpoint": "Gate C \u2014 route/command surface reconciliation"
     },
     {
       "package_id": "SCHED-PTM-001A",
       "title": "Schedule dependency and readiness-gate contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001A_schedule_dependency_and_readiness-gate_contract.md",
+      "file_path": "collaboration/work_packages/pending/SCHED-PTM-001A_Schedule_dependency_and_readiness_gate_contract.md",
       "parent_category": "Scheduling",
       "campaign": "PTM-05",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local-only scheduling authority"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -595,21 +707,28 @@
       ],
       "parallel_group": "G05A",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001A_schedule_dependency_and_readiness-gate_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001A_schedule_dependency_and_readiness-gate_contract.md",
+      "pending_path": "collaboration/work_packages/pending/SCHED-PTM-001A_Schedule_dependency_and_readiness_gate_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+      "launch_group": "G05A",
+      "integration_checkpoint": "Gate C/D \u2014 schedule/finance/KPI reconciliation"
     },
     {
       "package_id": "SCHED-PTM-001B",
       "title": "Schedule validation fixture and critical-path plan",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001B_schedule_validation_fixture_and_critical-path_plan.md",
+      "file_path": "collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md",
       "parent_category": "Scheduling",
       "campaign": "PTM-05",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Runtime gate changes"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -630,21 +749,28 @@
       ],
       "parallel_group": "G05B",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001B_schedule_validation_fixture_and_critical-path_plan.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/SCHED-PTM-001B_schedule_validation_fixture_and_critical-path_plan.md",
+      "pending_path": "collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+      "launch_group": "G05B",
+      "integration_checkpoint": "Gate C/D \u2014 schedule/finance/KPI reconciliation"
     },
     {
       "package_id": "UTIL-PTM-001",
       "title": "Capacity and utilization observation contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/UTIL-PTM-001_capacity_and_utilization_observation_contract.md",
+      "file_path": "collaboration/work_packages/pending/UTIL-PTM-001_Capacity_and_utilization_observation_contract.md",
       "parent_category": "Utilization",
       "campaign": "PTM-05",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Unlabeled inferred telemetry"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -665,21 +791,28 @@
       ],
       "parallel_group": "G05B",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/UTIL-PTM-001_capacity_and_utilization_observation_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/UTIL-PTM-001_capacity_and_utilization_observation_contract.md",
+      "pending_path": "collaboration/work_packages/pending/UTIL-PTM-001_Capacity_and_utilization_observation_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+      "launch_group": "G05B",
+      "integration_checkpoint": "Gate C/D \u2014 schedule/finance/KPI reconciliation"
     },
     {
       "package_id": "FIN-PTM-001",
       "title": "Budget cost approval and reconciliation contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/FIN-PTM-001_budget_cost_approval_and_reconciliation_contract.md",
+      "file_path": "collaboration/work_packages/pending/FIN-PTM-001_Budget_cost_approval_and_reconciliation_contract.md",
       "parent_category": "Financials",
       "campaign": "PTM-05",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local financial authority decisions"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -700,21 +833,28 @@
       ],
       "parallel_group": "G05A",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/FIN-PTM-001_budget_cost_approval_and_reconciliation_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/FIN-PTM-001_budget_cost_approval_and_reconciliation_contract.md",
+      "pending_path": "collaboration/work_packages/pending/FIN-PTM-001_Budget_cost_approval_and_reconciliation_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+      "launch_group": "G05A",
+      "integration_checkpoint": "Gate C/D \u2014 schedule/finance/KPI reconciliation"
     },
     {
       "package_id": "KPI-PTM-001",
       "title": "KPI registry quality and dashboard contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/KPI-PTM-001_kpi_registry_quality_and_dashboard_contract.md",
+      "file_path": "collaboration/work_packages/pending/KPI-PTM-001_KPI_registry_quality_and_dashboard_contract.md",
       "parent_category": "KPIs",
       "campaign": "PTM-05",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Flattening unknown data"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -736,21 +876,28 @@
       ],
       "parallel_group": "G05C",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/KPI-PTM-001_kpi_registry_quality_and_dashboard_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/KPI-PTM-001_kpi_registry_quality_and_dashboard_contract.md",
+      "pending_path": "collaboration/work_packages/pending/KPI-PTM-001_KPI_registry_quality_and_dashboard_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-05_Scheduling_Utilization_Financials_and_KPIs.md",
+      "launch_group": "G05C",
+      "integration_checkpoint": "Gate C/D \u2014 schedule/finance/KPI reconciliation"
     },
     {
       "package_id": "DISPATCH-PTM-001",
       "title": "Task-to-dispatch evidence chain contract",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/DISPATCH-PTM-001_task-to-dispatch_evidence_chain_contract.md",
+      "file_path": "collaboration/work_packages/pending/DISPATCH-PTM-001_Task_to_dispatch_evidence_chain_contract.md",
       "parent_category": "Dispatch integration",
       "campaign": "PTM-06",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Second dispatch queue"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -771,21 +918,28 @@
       ],
       "parallel_group": "G06A",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/DISPATCH-PTM-001_task-to-dispatch_evidence_chain_contract.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/DISPATCH-PTM-001_task-to-dispatch_evidence_chain_contract.md",
+      "pending_path": "collaboration/work_packages/pending/DISPATCH-PTM-001_Task_to_dispatch_evidence_chain_contract.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-06_Dispatch_Evidence_and_Pilot_Migration.md",
+      "launch_group": "G06A",
+      "integration_checkpoint": "Gate D \u2014 migration/dispatch readiness"
     },
     {
       "package_id": "MIG-PTM-001A",
       "title": "Pilot migration source slice plan",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001A_pilot_migration_source_slice_plan.md",
+      "file_path": "collaboration/work_packages/pending/MIG-PTM-001A_Pilot_migration_source_slice_plan.md",
       "parent_category": "Migration",
       "campaign": "PTM-06",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Unapproved broad migration"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -807,21 +961,28 @@
       ],
       "parallel_group": "G06A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001A_pilot_migration_source_slice_plan.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001A_pilot_migration_source_slice_plan.md",
+      "pending_path": "collaboration/work_packages/pending/MIG-PTM-001A_Pilot_migration_source_slice_plan.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-06_Dispatch_Evidence_and_Pilot_Migration.md",
+      "launch_group": "G06A",
+      "integration_checkpoint": "Gate D \u2014 migration/dispatch readiness"
     },
     {
       "package_id": "MIG-PTM-001B",
       "title": "Pilot migration execution package draft",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001B_pilot_migration_execution_package_draft.md",
+      "file_path": "collaboration/work_packages/pending/MIG-PTM-001B_Pilot_migration_execution_package_draft.md",
       "parent_category": "Migration",
       "campaign": "PTM-06",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Unreviewed data migration"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -842,21 +1003,28 @@
       ],
       "parallel_group": "G06B",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001B_pilot_migration_execution_package_draft.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/MIG-PTM-001B_pilot_migration_execution_package_draft.md",
+      "pending_path": "collaboration/work_packages/pending/MIG-PTM-001B_Pilot_migration_execution_package_draft.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-06_Dispatch_Evidence_and_Pilot_Migration.md",
+      "launch_group": "G06B",
+      "integration_checkpoint": "Gate D \u2014 migration/dispatch readiness"
     },
     {
       "package_id": "TEST-PTM-001A",
       "title": "Automated replay gate and policy validation plan",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001A_automated_replay_gate_and_policy_validation_plan.md",
+      "file_path": "collaboration/work_packages/pending/TEST-PTM-001A_Automated_replay_gate_and_policy_validation_plan.md",
       "parent_category": "Testing",
       "campaign": "PTM-07",
-      "preferred_lane": "Local RTX 4090 worker",
-      "alternate_lanes": [
-        "Codex"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Production test changes before contracts"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -879,21 +1047,28 @@
       ],
       "parallel_group": "G07A",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001A_automated_replay_gate_and_policy_validation_plan.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001A_automated_replay_gate_and_policy_validation_plan.md",
+      "pending_path": "collaboration/work_packages/pending/TEST-PTM-001A_Automated_replay_gate_and_policy_validation_plan.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md",
+      "launch_group": "G07A",
+      "integration_checkpoint": "Gate E \u2014 validation and rollout go/no-go"
     },
     {
       "package_id": "TEST-PTM-001B",
       "title": "End-to-end acceptance validation package draft",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001B_end-to-end_acceptance_validation_package_draft.md",
+      "file_path": "collaboration/work_packages/pending/TEST-PTM-001B_End_to_end_acceptance_validation_package_draft.md",
       "parent_category": "Testing",
       "campaign": "PTM-07",
       "preferred_lane": "Codex",
-      "alternate_lanes": [
-        "Local RTX 4090 worker"
-      ],
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Self-acceptance without independent review"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 10,
@@ -918,22 +1093,28 @@
       ],
       "parallel_group": "G07B",
       "confidence": "Medium",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001B_end-to-end_acceptance_validation_package_draft.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/TEST-PTM-001B_end-to-end_acceptance_validation_package_draft.md",
+      "pending_path": "collaboration/work_packages/pending/TEST-PTM-001B_End_to_end_acceptance_validation_package_draft.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md",
+      "launch_group": "G07B",
+      "integration_checkpoint": "Gate E \u2014 validation and rollout go/no-go"
     },
     {
       "package_id": "ROLL-PTM-001A",
       "title": "Operational runbook and resident training plan",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001A_operational_runbook_and_resident_training_plan.md",
+      "file_path": "collaboration/work_packages/pending/ROLL-PTM-001A_Operational_runbook_and_resident_training_plan.md",
       "parent_category": "Rollout",
       "campaign": "PTM-07",
-      "preferred_lane": "Grace/Ops",
-      "alternate_lanes": [
-        "Codex drafting",
-        "Local RTX 4090 drafting"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local-only authorization"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 7,
@@ -954,21 +1135,28 @@
       ],
       "parallel_group": "G07C",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001A_operational_runbook_and_resident_training_plan.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001A_operational_runbook_and_resident_training_plan.md",
+      "pending_path": "collaboration/work_packages/pending/ROLL-PTM-001A_Operational_runbook_and_resident_training_plan.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md",
+      "launch_group": "G07C",
+      "integration_checkpoint": "Gate E \u2014 validation and rollout go/no-go"
     },
     {
       "package_id": "ROLL-PTM-001B",
       "title": "Rollout acceptance and expansion gate package",
-      "file_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001B_rollout_acceptance_and_expansion_gate_package.md",
+      "file_path": "collaboration/work_packages/pending/ROLL-PTM-001B_Rollout_acceptance_and_expansion_gate_package.md",
       "parent_category": "Rollout",
       "campaign": "PTM-07",
-      "preferred_lane": "Chief Architect + Steward",
-      "alternate_lanes": [
-        "Codex analysis"
-      ],
+      "preferred_lane": "Codex",
+      "alternate_lanes": [],
       "prohibited_lanes": [
-        "Local RTX 4090 worker"
+        "Local RTX 4090 worker",
+        "No-review local authority",
+        "Production merge without PR"
       ],
       "active_execution_estimate_minutes": {
         "best": 5,
@@ -989,8 +1177,15 @@
       ],
       "parallel_group": "G07D",
       "confidence": "High",
-      "readiness_status": "Planning Draft \u2014 Not Authorized for Execution",
-      "over_15_minute_review_flag": false
+      "readiness_status": "Executable Pending \u2014 Authorized for Codex handoff after dependencies pass",
+      "over_15_minute_review_flag": false,
+      "draft_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001B_rollout_acceptance_and_expansion_gate_package.md",
+      "source_draft_path": "collaboration/work_packages/planning/ptm_drafts/ROLL-PTM-001B_rollout_acceptance_and_expansion_gate_package.md",
+      "pending_path": "collaboration/work_packages/pending/ROLL-PTM-001B_Rollout_acceptance_and_expansion_gate_package.md",
+      "execution_lane": "Codex",
+      "campaign_instruction_path": "collaboration/work_packages/campaigns/ptm/PTM-07_Validation_and_Rollout.md",
+      "launch_group": "G07D",
+      "integration_checkpoint": "Gate E \u2014 validation and rollout go/no-go"
     }
   ]
 }
