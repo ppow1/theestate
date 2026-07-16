@@ -1,21 +1,21 @@
-# MIG-PTM-001B completion receipt
+# MIG-PTM-001B Completion Receipt
 
 ## Status
-Completed by Codex on 2026-07-16.
+Completed for Chief Architect review.
 
-## Package
-- Package ID: `MIG-PTM-001B`
-- Source package: `collaboration/work_packages/pending/MIG-PTM-001B_Pilot_migration_execution_package_draft.md`
-- Campaign: `PTM-06`
+## Summary
+Created a bounded implementation-ready pilot migration execution validation specification for the accepted pilot migration slice. The specification defines future execution inputs, guardrails, candidate report fields, stop/replan conditions, and evidence notes without authorizing production PTM code or data mutation.
 
-## Deliverables
-- Added `docs/architecture/estate_ptm_dispatch_evidence_and_pilot_migration.md` with the bounded future pilot migration execution package draft and validation gates.
+## Files changed
+- `collaboration/work_packages/planning/MIG-PTM-001B_pilot_migration_execution_validation_spec.md`
+- `collaboration/work_packages/completions/MIG-PTM-001B_completion_receipt.md`
 
-## Evidence
-- Required inputs reviewed from the PTM campaign handoff, pending package, planning draft, package/campaign/dependency manifests, WP-0660, PTM specification acceptance, and existing upstream PTM architecture contracts.
-- Future execution remains limited to the MIG-PTM-001A accepted pilot slice and dry-run-first review.
-- No production PTM code was added.
-- No second queue, second registry, second scheduler, local-worker routing, or new governance authority was introduced.
+## Validation evidence
+- `git diff --check` — passed.
 
-## Validation
-- `git diff --check` passed on 2026-07-16.
+## Scope and authority confirmation
+- No production PTM code was changed.
+- No pilot migration was executed.
+- No second dispatch queue, registry, scheduler, or governance authority was introduced.
+- Future execution remains dependent on `MIG-PTM-001A` acceptance or explicit Chief Architect waiver.
+- Execution remains Codex-only for this cycle and remains in PTM-06/G06B for Gate D review.
