@@ -71,6 +71,25 @@ Required manual/Parking Lot event payload schemas are limited to domain payloads
 - `intake.candidate_marked_duplicate.v1`
 - `intake.candidate_superseded.v1`
 
+### Manual and Parking Lot acceptance matrix
+
+Future implementation of this slice must validate the following cases before promotion from dry-run/staging behavior to event emission:
+
+| Case | Required validation | Authorized result | Forbidden result |
+| --- | --- | --- | --- |
+| New manual candidate | Required fields, requester, authority references, dedupe key, and proposed target type are present. | Stage a candidate and present explicit confirmation. | Create a task, project, portfolio, registry entry, or dispatch item before confirmation. |
+| Parking Lot candidate | Source path, source hash, body-declared status, path-derived status, title/body excerpt, and Parking Lot provenance are preserved. | Stage a candidate with `intake_source_type: parking_lot` and immutable source references. | Rewrite, move, close, or otherwise mutate the Parking Lot source artifact. |
+| Potential duplicate | Dedupe key and evidence references identify an active candidate, confirmed intake record, or projected task/project. | Present duplicate evidence and require a duplicate, reject, or confirm decision. | Silently merge records or overwrite candidate/source fields. |
+| Validation failure | Missing required field, unsupported source type, source hash mismatch, or malformed proposed target. | Return structured warnings/rejection details and emit zero canonical events. | Emit partial intake, creation, dispatch, or projection events. |
+| Confirmed candidate | Confirmation command passes frozen command-envelope, authority, and hash-chain requirements. | Emit `intake.candidate_confirmed.v1` followed by the applicable downstream creation/link event. | Bypass the append-only ledger/projection spine or create a second queue/registry. |
+
+### Evidence notes for future package promotion
+
+- The manual/Parking Lot intake handler surface is bounded to candidate staging, dedupe presentation, explicit confirmation, duplicate marking, rejection, or supersession.
+- All state-changing outcomes must be represented as canonical append-only PTM events using the already frozen event envelope; dry-run and validation-failure paths emit no persistent events.
+- Parking Lot and manually referenced source artifacts remain authoritative in place and are referenced by path plus SHA-256 provenance.
+- This contract depends on `CORE-PTM-003A` projection fields and intentionally does not redefine project, task, portfolio, scheduler, or dispatch projections.
+
 ## INTAKE-PTM-001B conversation intake and dedupe confirmation contract
 
 Conversation intake covers future command/intake handlers that propose PTM candidates from governed Resident, Office, or command conversations. Future handlers must not treat conversational text as authority by itself. They must bind every candidate to a conversation message reference, actor/requester reference, timestamp, command envelope, and any cited source artifacts.
