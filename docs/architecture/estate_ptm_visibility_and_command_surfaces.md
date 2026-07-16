@@ -137,6 +137,22 @@ Resident commands are governed front doors into the canonical PTM event system. 
 
 Material command confirmations must include: command family, actor, actor type, source surface, target object IDs, proposed event type, prior/resulting state summary, reason, evidence refs, classification/visibility, duplicate warnings, governance gate outcomes, frozen deep-link targets, and expiration. Confirmed commands emit append-only events using upstream command and event contracts; denied/expired commands remain visible as audit/intake evidence where appropriate.
 
+### Command confirmation and result contract
+
+Future Resident command files must implement confirmations as thin, governed envelopes over canonical PTM handlers. The command surface may draft a confirmation, render a denial, or return read-only history, but it must not mint PTM IDs, write task state, change schedule readiness, assign Helen/Grace authority, move dispatch work, or approve budgets outside the frozen upstream contracts.
+
+| Command family | Pre-confirmation checks | Confirmation payload | Confirmed result | Denial or blocked result |
+|---|---|---|---|---|
+| Create | Intake dedupe, target project existence or Parking Lot fallback, classification, source evidence hash, and visibility | Proposed intake/task title, target project or Parking Lot, duplicate candidates, evidence refs, classification, reason, route targets | Append intake/create event through governed intake; return `INTAKE-` or `TASK-` ID and `/office/ptm#intake` or task detail link | Return duplicate candidates, missing evidence, or classification warning without creating a task |
+| Link | Source and target object existence, relationship type validity, duplicate link, permissions, and evidence | Source object, target object, proposed relationship, evidence refs, warnings, route targets | Append relationship event; return affected IDs and task/project/audit links | Return missing target, duplicate relationship, or permission warning |
+| Priority | Current priority, requested priority, reason, schedule/budget impact, blocker/acceptance state | Current and proposed priority, reason, impact warnings, evidence refs, route targets | Append priority-change event; return updated priority and schedule warning summary | Return missing reason, invalid priority, or blocked authority gate |
+| Production | Staffing readiness, schedule gate, capacity, budget status, privacy/classification, validation plan, acceptance owner | Target task, current state, required gate outcomes, evidence refs, production route, blocked route | Append production-state request/change only when all gates pass; return production and task links | Return named failed gates with evidence links; do not move work into production |
+| Helen | Task existence, staffing-readiness scope, evidence sufficiency, budget/dispatch/acceptance boundary | Staffing request/evidence summary, Helen scope note, evidence refs, route targets | Append staffing-readiness request/evidence event; return task and audit links | Return missing scope/evidence or authority-boundary warning |
+| Grace | Staffing readiness already present, operational supervision scope, Traffic Controller routing boundary | Grace request/evidence summary, staffing readiness link, authority-boundary note, route targets | Append operational supervision request/evidence event; return task and audit links | Return missing staffing readiness or Traffic Controller boundary warning |
+| History | Object ID namespace and projection availability | No material confirmation required for read-only history | Render audit timeline with evidence links, hash-chain status, projection freshness, and object route | Return honest missing/unknown projection state with retained object ID and audit link |
+
+All material results must include the event ID or pending confirmation ID, affected object IDs, source evidence refs, validation/acceptance separation note when applicable, and one or more frozen deep-link targets. Read-only history results must disclose projection freshness and hash-chain status rather than implying mutation.
+
 ## Gate C reconciliation evidence
 
 This PTM-04 artifact preserves frozen upstream event, ID, projection, intake, route, schedule, dispatch, and validation contracts. It defines route and command consumers only. Future implementation packages must reconcile against this document before creating Office UI files, resident command files, or compact-card files.
