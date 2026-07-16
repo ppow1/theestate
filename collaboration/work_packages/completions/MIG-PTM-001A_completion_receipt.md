@@ -1,21 +1,20 @@
-# MIG-PTM-001A completion receipt
+# MIG-PTM-001A Completion Receipt
 
 ## Status
-Completed by Codex on 2026-07-16.
+Completed for Chief Architect review.
 
-## Package
-- Package ID: `MIG-PTM-001A`
-- Source package: `collaboration/work_packages/pending/MIG-PTM-001A_Pilot_migration_source_slice_plan.md`
-- Campaign: `PTM-06`
+## Summary
+Created a bounded implementation-ready pilot migration source-slice specification with source mappings, duplicate policy, rollback plan, future-readiness checklist, and evidence notes.
 
-## Deliverables
-- Added `docs/architecture/estate_ptm_dispatch_evidence_and_pilot_migration.md` with the bounded pilot migration source slice plan, source mapping, duplicate policy, and rollback plan.
+## Files changed
+- `collaboration/work_packages/planning/MIG-PTM-001A_pilot_migration_source_slice_spec.md`
+- `collaboration/work_packages/completions/MIG-PTM-001A_completion_receipt.md`
 
-## Evidence
-- Required inputs reviewed from the PTM campaign handoff, pending package, planning draft, package/campaign/dependency manifests, WP-0660, PTM specification acceptance, and existing upstream PTM architecture contracts.
-- Selected a repository-local PTM work-package-library pilot slice under `collaboration/work_packages/planning`, pending package files, campaign handoffs, and completion receipts.
-- No production PTM code was added.
-- No second queue, second registry, second scheduler, local-worker routing, or new governance authority was introduced.
+## Validation evidence
+- `git diff --check` — passed.
 
-## Validation
-- `git diff --check` passed on 2026-07-16.
+## Scope and authority confirmation
+- No production PTM code was changed.
+- No second dispatch queue, registry, scheduler, or governance authority was introduced.
+- The selected slice remains limited to the `MIG-PTM-001` planning evidence set.
+- Dependencies `FILE-PTM-001B` and `DISPATCH-PTM-001` remain future execution gates unless accepted or explicitly waived by the Chief Architect.
