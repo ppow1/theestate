@@ -151,6 +151,28 @@ File import planning is limited to inventory and future fixture needs. Approved 
 
 No importer may execute source mutation, auto-accept a candidate, or bypass the governed intake confirmation contract.
 
+### Parser inventory constraints
+
+Future parser work must treat this inventory as the bounded allow-list until a later accepted package changes it. Each parser must return normalized candidate records plus structured warnings, never direct PTM task, project, portfolio, schedule, dispatch, budget, or validation events. Parser outputs feed the shared intake candidate envelope and must preserve the original file bytes through source path, parser format, section or row locator, and SHA-256 provenance.
+
+| Parser surface | Required extracted fields | Required rejection or warning cases | Downstream handoff |
+| --- | --- | --- | --- |
+| Markdown work-package file | Title or first heading, body status, path-derived status when available, owner/lane text, dependency references, validation commands, and source section locators. | Missing title, contradictory statuses, unsupported heading structure, dependency reference not present in the current manifest, and source hash mismatch. | Stage one or more `file_import` candidates for governed confirmation; do not rewrite the Markdown source. |
+| JSON manifest | Manifest type, stable package/campaign/dependency IDs, referenced paths, dependency edges, readiness status, and source object pointers. | Malformed JSON, duplicate ID in the same manifest, dependency target absent from the manifest baseline, unexpected top-level shape, and non-UTF-8 input. | Stage metadata-backed candidates or report-only findings for Chief Architect review; do not update manifests. |
+| CSV table | Header mapping, row number, normalized title/description columns, optional owner/lane/status columns, and raw row hash. | Missing required column, duplicate normalized row, invalid encoding, unparseable quoted field, and row-level required-field failure. | Stage per-row candidates with row provenance and per-row rejection reasons. |
+| Plain text note | Entire note text, inferred title suggestion, source hash, and ambiguity warnings. | Empty note, ambiguous target type, duplicate text hash, and insufficient authority/source references. | Stage manual-review candidates only; require human confirmation for all structured fields. |
+
+### Fixture inventory for future parser implementation
+
+Future implementation packages should create deterministic fixtures before enabling any importer behavior. Minimum fixture coverage is:
+
+- Markdown: valid pending package, valid completion receipt or completed package, body/path status mismatch, missing required heading, malformed dependency reference, and duplicate title with different source path.
+- JSON: valid package manifest excerpt, valid campaign/dependency manifest excerpt, duplicate package ID, missing dependency target, malformed JSON, and unexpected top-level shape.
+- CSV: valid UTF-8 backlog table, duplicate row, missing required column, invalid encoding sample, embedded delimiter/quote case, and row with blank title.
+- Plain text: single actionable note, ambiguous note requiring human target selection, duplicate note by content hash, and note lacking authority references.
+
+Fixture assertions must check accepted, rejected, duplicate, and warning paths; source SHA-256 preservation; deterministic ordering; and dry-run behavior with zero emitted persistent events.
+
 ## FILE-PTM-001B file-import report and SHA-256 mapping contract
 
 Every future file import session must produce a deterministic report envelope:
