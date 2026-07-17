@@ -9,74 +9,60 @@ Risk class: Elevated — cross-office operational integration without authority 
 
 ## Approved intent
 
-- Intake source kind: Steward directive
-- Canonical intake reference: Steward direction during Chief Architect planning discussion, following CAMPAIGN-0670 and WP-0678 review
-- Disposition decision: Proceed with one large, dependency-aware operationalization campaign rather than another documentation-only institutional-foundation campaign
+- Intake source kind: Steward directive.
+- Canonical intake reference: Steward direction following CAMPAIGN-0670 and WP-0678 review.
+- Disposition: Execute one large dependency-aware operationalization campaign through the WP-0678 campaign-level Codex capability.
 
-## Objective and outcomes
+## Objective
 
-Make the Estate behave as an operating institution rather than a collection of individually functional systems.
+Make the Estate behave as one governed operating institution rather than a collection of individually functional systems.
 
-The campaign shall connect existing offices, residents, services, campaigns, work packages, mailboxes, health signals, staffing, validation, escalation, continuity, and Steward review into one observable and governed operational flow.
+The campaign connects existing offices, residents, services, campaigns, work packages, mailboxes, health signals, staffing, validation, escalation, continuity, and Steward review into one observable operational flow. It must not create a parallel constitution, office structure, scheduler, dispatch queue, mailbox, validator, state store, dashboard authority, or acceptance mechanism.
 
-CAMPAIGN-0681 shall be intentionally broad at campaign level while preserving atomic work-package boundaries. It is intended to become the first substantial institutional campaign executed through the campaign-level Codex execution capability established by WP-0678.
-
-Successful completion means:
-
-1. one approved campaign handoff can initiate the campaign;
-2. Grace can observe and coordinate operational momentum without acquiring protected authority;
-3. Helen can supply staffing and capability through explicit requests and evidence;
-4. Alfred can route operational communications without becoming the execution authority;
-5. Engineering can operate as one department within the larger Estate operating model;
-6. resident and service health can affect campaign readiness and escalation truthfully;
-7. campaigns can advance, pause, resume, block, recover, and close through repository-grounded state and evidence;
-8. the Steward receives concise, decision-ready operational views and protected escalation requests;
-9. all automated or assisted actions remain bounded by existing institutional authority;
-10. the campaign closes through one campaign pull request and protected acceptance process.
+Successful completion means the Estate can observe canonical state, reconcile dependencies and readiness, identify the next permitted action, coordinate through existing offices and communications, perform only authorized mechanical actions, verify results, record durable evidence, recover from interruption, and stop at protected gates.
 
 ## Constitutional precedence
 
-Existing accepted Estate constitutional, office, campaign, engineering, communication, mailbox, PTM, Dispatch, validation, readiness, evidence, acceptance, reflection, and continuity standards remain authoritative.
+Accepted Estate constitutional, office, campaign, engineering, communication, mailbox, PTM, Dispatch, validation, readiness, evidence, acceptance, reflection, and continuity standards remain authoritative.
 
-If an apparent conflict exists between this campaign and an accepted canonical artifact, the accepted canonical artifact shall prevail.
-
-CAMPAIGN-0681 is authorized to connect and operationalize existing systems. It shall not silently redefine, replace, supersede, or transfer established authority. Any required constitutional or office-authority change must be isolated as a protected architectural decision and approved separately.
+If this campaign conflicts with an accepted canonical artifact, the accepted canonical artifact prevails. Any constitutional or office-authority change must be isolated and separately approved.
 
 ## Required authoritative inputs
 
-Before decomposition or execution, discover and read the canonical successors of at least:
+Before execution, discover and read the canonical successors of at least:
 
 - `AI_HINTS.md`
 - `AI_START_HERE.md`
 - `AI_COMMUNICATION_HINTS.md`
 - `collaboration/campaigns/CAMPAIGN_0670_ACCEPTANCE_PACKAGE.md`
-- all WP-0670 through WP-0675 completion receipts and accepted deliverables
-- `collaboration/work_packages/pending/WP-0678_Campaign_Level_Codex_Execution_Capability.md` and its eventual completion evidence
-- existing office charters for Grace, Helen, Alfred, Chief Architect, and Steward
-- canonical PTM, Dispatch, mailbox, repository-message, resident, service-health, validation, readiness, acceptance, reflection, and continuity specifications
+- WP-0670 through WP-0675 completion receipts and accepted deliverables
+- WP-0678 specification, completion evidence, and protected acceptance
+- office charters for Grace, Helen, Alfred, Chief Architect, and Steward
+- canonical PTM, Dispatch, mailbox, repository-message, resident, service-health, validation, readiness, evidence, acceptance, reflection, and continuity specifications
 - CAMPAIGN-0680 artifacts where decision-support outputs or dashboards overlap
+- `collaboration/campaigns/CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md`
 
-A moved path is not permission to invent a replacement. Discover the canonical successor through repository evidence.
+A moved path is not permission to invent a replacement.
 
 ## Scope
 
 The campaign includes implementation, integration, validation, and bounded documentation necessary to establish:
 
-- a canonical Estate operational state model;
-- operational event ingestion and normalization from existing systems;
+- canonical operational state and event normalization;
 - campaign and work-package momentum observation;
-- dependency, readiness, health, staffing, validation, and authority-aware coordination;
+- dependency, readiness, health, staffing, validation, evidence, communication, and authority-aware coordination;
 - resident and service health integration;
-- operational blocker classification and escalation;
-- explicit office interaction contracts expressed through existing mechanisms;
+- blocker classification and escalation;
+- explicit office interaction contracts through existing mechanisms;
 - staffing and capability request flows;
-- communication and mailbox routing integration;
+- mailbox and repository-message routing integration;
 - pause, resume, retry, recovery, and fail-closed behavior;
-- operational dashboards and Steward decision surfaces;
-- durable evidence, auditability, notebook, reflection, and continuity integration;
-- a bounded Continuous Momentum Engine capability that recommends or performs only actions already authorized by canonical policy;
-- pilot execution using a real but bounded institutional workflow;
-- campaign-level acceptance evidence.
+- bounded policy and guardrail enforcement;
+- durable audit, explainability, checkpoint, replay, notebook, reflection, and continuity evidence;
+- Steward visibility and protected decision surfaces;
+- a bounded Continuous Momentum Engine;
+- one real but bounded institutional pilot;
+- campaign-level integration and protected acceptance evidence.
 
 ## Non-goals and protected surfaces
 
@@ -84,39 +70,36 @@ This campaign shall not:
 
 - create a new office or department when an existing office can own the function;
 - transfer final authority away from the Steward;
-- grant Grace architectural, staffing, engineering-acceptance, merge, deployment, or final institutional authority;
-- grant Helen engineering priority, architectural, or acceptance authority;
+- grant Grace architectural, staffing, merge, deployment, engineering-acceptance, or final institutional authority;
+- grant Helen engineering-priority, architectural, or acceptance authority;
 - grant Alfred execution or acceptance authority;
 - treat Codex, a local model, or any provider as an office or institutional authority;
 - bypass PTM, Dispatch, mailbox, repository-message, validation, readiness, evidence, or acceptance mechanisms;
-- create duplicate registries, queues, schedulers, validators, dashboards, or state stores where canonical systems can be extended;
-- silently merge, deploy, accept, or close protected work;
-- conceal degraded residents, services, stale evidence, failed validation, blocked authority, or partial campaign failure;
-- replace CAMPAIGN-0670 engineering standards or CAMPAIGN-0680 decision-support capabilities;
-- build an unconstrained autonomous agent loop.
+- silently merge, deploy, accept, close, spend, staff, or disclose protected information;
+- conceal degraded residents, stale evidence, failed validation, blocked authority, or partial failure;
+- build an unconstrained autonomous-agent loop.
 
 ## Campaign execution policy
 
-After WP-0678 is accepted and operationally authorized, CAMPAIGN-0681 shall use:
+CAMPAIGN-0681 shall use:
 
 - one campaign handoff;
 - one campaign branch;
 - one bounded commit per atomic work package;
 - dependency-aware execution;
-- explicit approved parallel groups only where shared-file and authority safety is proven;
+- only the manifest’s explicit parallel groups;
 - durable checkpoints and resumability;
 - fail-closed partial-failure handling;
+- per-package completion evidence;
 - aggregated campaign evidence;
 - one campaign pull request;
 - no automatic merge or acceptance.
 
-The campaign shall not launch before WP-0678 completion evidence and Chief Architect launch approval exist.
+## Authoritative work-package graph
 
-## Proposed work-package graph
+The authored package set and exact manifest paths are authoritative. Earlier summary labels superseded by the namespace-resolution record are non-authoritative.
 
-The following is the authorized decomposition target. Package numbers are reserved for this campaign beginning after CAMPAIGN-0680's WP-0680 through WP-0687 range.
-
-| Package ID | Objective | Depends on | Integration checkpoint |
+| Package | Objective | Depends on | Gate |
 |---|---|---|---|
 | WP-0688 | Estate operational current-state and canonical-reuse map | none | G1 |
 | WP-0689 | Operational state, event, and transition contract | WP-0688 | G1 |
@@ -127,125 +110,85 @@ The following is the authorized decomposition target. Package numbers are reserv
 | WP-0694 | Grace operational coordination surface | WP-0690, WP-0692, WP-0693 | G3 |
 | WP-0695 | Helen staffing and capability request integration | WP-0690, WP-0693 | G3 |
 | WP-0696 | Alfred communication and mailbox routing integration | WP-0690, WP-0693 | G3 |
-| WP-0697 | Engineering Department operational integration | WP-0692, WP-0693, WP-0694 | G3 |
-| WP-0698 | Readiness, validation, and evidence signal unification | WP-0691, WP-0692, WP-0697 | G4 |
-| WP-0699 | Operational pause, resume, retry, and recovery controls | WP-0693, WP-0698 | G4 |
-| WP-0700 | Continuous Momentum Engine bounded decision loop | WP-0694, WP-0698, WP-0699 | G5 |
-| WP-0701 | Authorized action adapters using existing institutional seams | WP-0695, WP-0696, WP-0697, WP-0700 | G5 |
-| WP-0702 | Operational checkpointing, audit, and replay evidence | WP-0698, WP-0699, WP-0700 | G5 |
-| WP-0703 | Steward operational dashboard and protected decision queue | WP-0693, WP-0698, WP-0702; reuse CAMPAIGN-0680 | G6 |
-| WP-0704 | Metrics, notebook, reflection, and continuity integration | WP-0702, WP-0703 | G6 |
-| WP-0705 | Failure-mode, authority-boundary, and degraded-service validation | WP-0700, WP-0701, WP-0702, WP-0703 | G7 |
+| WP-0697 | Engineering Department operational integration | WP-0688, WP-0689, WP-0690, WP-0692, WP-0693 | G3 |
+| WP-0698 | Readiness, validation, and evidence signal unification | WP-0688 through WP-0693 | G4 |
+| WP-0699 | Operational pause, resume, retry, and recovery controls | WP-0689 through WP-0693, WP-0698 | G4 |
+| WP-0700 | Continuous Momentum Engine bounded decision loop | WP-0689 through WP-0699 as declared in the manifest | G5 |
+| WP-0701 | Operational policy and guardrail enforcement | WP-0689, WP-0690, WP-0693, WP-0699, WP-0700 | G5 |
+| WP-0702 | Operational audit trail and decision explainability | WP-0689, WP-0690, WP-0698, WP-0700, WP-0701 | G5 |
+| WP-0703 | Operational dashboard and Steward visibility surface | WP-0693, WP-0698, WP-0702 | G6 |
+| WP-0704 | Operational acceptance, graduation, and campaign closeout | WP-0691 through WP-0703 as declared in the manifest | G6 |
+| WP-0705 | Failure-mode, authority-boundary, and degraded-service validation | WP-0700 through WP-0704 | G7 |
 | WP-0706 | Bounded real-work pilot campaign | WP-0705 | G7 |
-| WP-0707 | Estate Operationalization integration and acceptance package | all prior packages | G8 |
+| WP-0707 | Estate Operationalization integration and acceptance | all prior CAMPAIGN-0681 packages | G8 |
 
-Every work package shall name CAMPAIGN-0681 as its one primary campaign and shall preserve independently readable completion evidence.
+For CAMPAIGN-0681, the canonical WP-0697 is only `WP-0697_ENGINEERING_DEPARTMENT_OPERATIONAL_INTEGRATION.md`. The legacy WP-0697 and its completion receipt belong to another campaign lineage and provide no CAMPAIGN-0681 completion evidence.
 
-## Milestones and integration gates
+## Milestones and release authority
 
-| Gate | Prerequisites | Evidence | Release authority |
-|---|---|---|---|
-| G0 — Launch authorization | WP-0678 accepted; campaign manifest complete; branch/base verified | WP-0678 receipt, campaign hash, readiness evidence | Chief Architect and Steward where protected |
-| G1 — Canonical and authority freeze | WP-0688 through WP-0690 | reuse map, state/event contract, action taxonomy, conflict report | Chief Architect |
-| G2 — Observation truth | WP-0691 through WP-0693 | health, momentum, blocker and escalation tests | Chief Architect |
-| G3 — Office integration | WP-0694 through WP-0697 | office interaction proofs; no authority transfer | Chief Architect plus office acknowledgements where required |
-| G4 — Governed control readiness | WP-0698 and WP-0699 | readiness/evidence integration and recovery proof | Chief Architect |
-| G5 — Momentum capability | WP-0700 through WP-0702 | bounded-loop, adapter, checkpoint, replay, and fail-closed evidence | Chief Architect; Steward approval for protected action classes |
-| G6 — Steward visibility and continuity | WP-0703 and WP-0704 | dashboard, decision queue, metrics, notebook, reflection, continuity evidence | Steward review |
-| G7 — Safety and pilot proof | WP-0705 and WP-0706 | failure-mode report, authority-boundary proof, pilot receipts | Chief Architect and Steward |
-| G8 — Campaign acceptance | WP-0707 | aggregate evidence, PR, unresolved blockers, acceptance package | Protected acceptance lane; no automatic acceptance |
+| Gate | Prerequisites | Release authority |
+|---|---|---|
+| G0 | WP-0678 accepted; manifest valid; namespace reconciled; launch baseline verified | Chief Architect and Steward where protected |
+| G1 | WP-0688 through WP-0690 | Chief Architect |
+| G2 | WP-0691 through WP-0693 | Chief Architect |
+| G3 | WP-0694 through WP-0697 | Chief Architect plus office acknowledgements where required |
+| G4 | WP-0698 and WP-0699 | Chief Architect |
+| G5 | WP-0700 through WP-0702 | Chief Architect; Steward for protected action classes |
+| G6 | WP-0703 and WP-0704 | Steward review |
+| G7 | WP-0705 and WP-0706 | Chief Architect and Steward |
+| G8 | WP-0707 and aggregate evidence | Protected acceptance lane; no automatic acceptance |
 
 ## Required behavioral model
 
-The resulting operational flow must support this bounded pattern:
+The resulting operational flow must:
 
 1. Observe canonical state and new events.
-2. Reconcile state against campaign dependencies, readiness, health, evidence, staffing, and authority.
-3. Identify eligible, blocked, degraded, failed, or protected work.
-4. Recommend the next authorized action and explain why.
-5. Perform only actions explicitly delegated to the acting office or adapter.
-6. Stop at review, acceptance, merge, deployment, budget, privacy, staffing, architectural, or Steward gates as canonical policy requires.
-7. Record every recommendation, action, refusal, transition, failure, retry, and escalation.
+2. Reconcile dependencies, readiness, health, evidence, staffing, validation, communication state, and authority.
+3. Classify work as eligible, blocked, degraded, failed, or protected.
+4. Explain the next permitted action.
+5. Perform only explicitly delegated mechanical actions.
+6. Verify the result.
+7. Record recommendations, actions, refusals, transitions, failures, retries, and escalations.
 8. Resume deterministically from the last safe checkpoint.
+9. Stop at review, merge, deployment, acceptance, budget, privacy, staffing, architectural, and Steward gates.
 
-The system must distinguish clearly among:
+Observation, recommendation, coordination, execution request, mechanical action, office decision, protected decision, and acceptance must remain distinct.
 
-- observation;
-- recommendation;
-- coordination;
-- execution request;
-- authorized mechanical action;
-- office decision;
-- protected institutional decision;
-- acceptance.
+## Shared-file and collision rules
 
-No recommendation or mechanical action may be misrepresented as authority or acceptance.
-
-## Shared-file collision plan
-
-The final work-package definitions and machine-readable manifest must identify exact owned paths and shared-file rules before launch.
-
-At minimum:
-
-- canonical registries and office charters are read-only unless a separately approved package grants modification authority;
-- shared operational state and dashboard surfaces must be integrated through designated integration packages;
-- WP-0707 owns final campaign aggregation and acceptance-package updates;
-- packages touching the same runtime seam must be sequenced unless the manifest proves collision-free parallel execution;
-- no package may rewrite another package's completion receipt.
+- Exact manifest paths control package identity.
+- Canonical registries and office charters are read-only unless a package explicitly grants modification authority.
+- Shared operational state and dashboard surfaces are integrated only through designated packages.
+- Packages touching the same runtime seam must be sequenced unless the manifest proves collision-free parallel execution.
+- No package may rewrite another package’s completion receipt.
+- WP-0707 owns final campaign aggregation and acceptance-package updates.
 
 ## Pilot requirement
 
-WP-0706 shall run one real but bounded workflow that crosses multiple existing Estate capabilities. The pilot must prove, at minimum:
-
-- a campaign or governed initiative is observed from canonical state;
-- readiness, dependency, resident/service health, staffing, validation, and authority are evaluated;
-- Grace receives a coordination view;
-- Helen and Alfred are engaged only through their existing lanes;
-- Engineering receives executable work through its accepted mechanisms;
-- one interruption or failure is recovered from a durable checkpoint;
-- one protected decision is escalated and not bypassed;
-- Steward visibility is concise and evidence-backed;
-- completion evidence remains package- and campaign-readable;
-- no automatic merge, deployment, or institutional acceptance occurs.
+WP-0706 must demonstrate one bounded workflow crossing multiple existing Estate capabilities, including readiness, dependency, health, staffing, validation, authority, Grace coordination, Helen and Alfred interaction through their existing lanes, Engineering execution, interruption recovery, protected escalation, Steward visibility, and truthful evidence. It must not automatically merge, deploy, or accept.
 
 ## Acceptance criteria
 
-CAMPAIGN-0681 is complete only when the Estate can truthfully demonstrate an end-to-end operational cycle in which existing institutional systems cooperate as one governed operating model.
-
-Acceptance requires proof that:
-
-- the campaign ran through the WP-0678 campaign-execution capability;
-- existing canonical systems were reused rather than duplicated;
-- operational state is repository-grounded, observable, and auditable;
-- Grace can coordinate momentum without acquiring protected authority;
-- Helen, Alfred, Engineering, residents, and services participate through their proper lanes;
-- dependency, readiness, health, validation, evidence, staffing, and authority affect progression correctly;
-- interruption and partial failure are recoverable;
-- protected gates stop unauthorized continuation;
-- the Steward receives decision-ready operational information;
-- one bounded pilot completed with truthful evidence;
-- one campaign PR presents the complete change set;
-- no merge, deployment, or acceptance occurred automatically.
+CAMPAIGN-0681 is complete only when the Estate truthfully demonstrates an end-to-end governed operational cycle through the WP-0678 execution capability, reuses canonical systems rather than duplicating them, recovers from interruption, stops at protected gates, completes the bounded pilot, and presents one campaign pull request with aggregate evidence. Merge, deployment, and institutional acceptance remain protected human actions.
 
 ## Required deliverables
 
-The campaign shall ultimately produce:
-
-1. one canonical campaign execution manifest compatible with WP-0678;
-2. atomic pending work packages WP-0688 through WP-0707;
-3. implementation and tests in existing canonical seams;
-4. per-package completion receipts;
-5. gate evidence and authority decisions;
-6. failure-mode and degraded-service validation reports;
-7. pilot evidence;
-8. operational documentation sufficient for Grace, Helen, Alfred, Engineering, Chief Architect, and Steward use;
-9. campaign aggregate evidence;
-10. `collaboration/campaigns/CAMPAIGN_0681_ACCEPTANCE_PACKAGE.md`;
-11. one campaign pull request for protected review.
+1. Complete machine-readable execution manifest.
+2. Atomic work packages WP-0688 through WP-0707.
+3. Implementation and tests in existing canonical seams.
+4. Independent per-package completion receipts.
+5. Gate evidence and authority decisions.
+6. Failure-mode and degraded-service validation reports.
+7. Pilot evidence.
+8. Operational documentation for affected offices.
+9. Campaign aggregate evidence.
+10. `collaboration/campaigns/CAMPAIGN_0681_ACCEPTANCE_PACKAGE.md`.
+11. One campaign pull request awaiting protected review.
 
 ## Amendment history
 
-| Version/time | Action | Decision authority/reference | Affected packages and reevaluation |
+| Version/time | Action | Authority/reference | Effect |
 |---|---|---|---|
-| Draft 1 | Initial campaign charter created from Steward direction | Steward direction; Chief Architect drafting | Entire campaign remained unlaunched pending WP-0678 acceptance, detailed decomposition, staffing, readiness, and launch review |
-| 2026-07-16 G0 activation | WP-0678 acceptance confirmed; Chief Architect and Steward launch authorization recorded; campaign moved to launch-authorized state | `collaboration/work_packages/completions/WP-0678_protected_acceptance_record.md`; `collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md` | All packages WP-0688 through WP-0707 authorized for bounded execution subject to manifest dependencies, gates, validations, and protected stops |
+| Draft 1 | Initial campaign charter | Steward direction; Chief Architect drafting | Campaign remained unlaunched pending prerequisites |
+| 2026-07-16 G0 activation | WP-0678 acceptance and launch authorization recorded | WP-0678 protected acceptance; CAMPAIGN-0681 G0 authorization | Campaign moved to launch-authorized state |
+| 2026-07-17 topology reconciliation | Resolved WP-0697 collision and reconciled WP-0701 through WP-0704 to the authored package set | `CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md` | Exact manifest paths and amended authored objectives control execution |
