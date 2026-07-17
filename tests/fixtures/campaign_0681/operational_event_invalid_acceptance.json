@@ -1,0 +1,23 @@
+{
+  "event_id": "opn-WP-0689-invalid-acceptance",
+  "event_type": "work_package.acceptance_inferred",
+  "source_system": "execution_provider",
+  "source_record": "runtime/provider/result.json",
+  "subject": {
+    "subject_type": "work_package",
+    "subject_id": "WP-0689",
+    "canonical_path": "collaboration/work_packages/pending/WP-0689_Operational_State_Event_and_Transition_Contract.md"
+  },
+  "observed_at": "2026-07-17T20:00:00Z",
+  "effective_at": "2026-07-17T20:00:00Z",
+  "prior_state": "complete",
+  "new_state": "accepted",
+  "emitter": "execution-provider",
+  "authority_classification": "observation",
+  "evidence_refs": ["runtime/provider/result.json"],
+  "correlation_id": "CAMPAIGN-0681",
+  "causation_id": null,
+  "severity": "warning",
+  "idempotency_key": "CAMPAIGN-0681:WP-0689:invalid-acceptance:v1",
+  "schema_version": "estate.operational.v1"
+}

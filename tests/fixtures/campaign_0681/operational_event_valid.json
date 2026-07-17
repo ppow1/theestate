@@ -1,0 +1,23 @@
+{
+  "event_id": "opn-WP-0689-ready",
+  "event_type": "work_package.readiness_observed",
+  "source_system": "campaign_manifest",
+  "source_record": "collaboration/work_packages/planning/CAMPAIGN_0681_manifest.json",
+  "subject": {
+    "subject_type": "work_package",
+    "subject_id": "WP-0689",
+    "canonical_path": "collaboration/work_packages/pending/WP-0689_Operational_State_Event_and_Transition_Contract.md"
+  },
+  "observed_at": "2026-07-17T20:00:00Z",
+  "effective_at": "2026-07-17T19:59:00Z",
+  "prior_state": "pending",
+  "new_state": "ready",
+  "emitter": "campaign-executor",
+  "authority_classification": "observation",
+  "evidence_refs": ["collaboration/work_packages/completions/WP-0688_completion_receipt.md"],
+  "correlation_id": "CAMPAIGN-0681",
+  "causation_id": "opn-WP-0688-complete",
+  "severity": "info",
+  "idempotency_key": "CAMPAIGN-0681:WP-0689:ready:v1",
+  "schema_version": "estate.operational.v1"
+}
