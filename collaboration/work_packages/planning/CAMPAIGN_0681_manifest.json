@@ -4,7 +4,940 @@
   "title": "Estate Operationalization",
   "status": "launch_authorized",
   "authoritative_campaign_path": "collaboration/campaigns/CAMPAIGN_0681_ESTATE_OPERATIONALIZATION.md",
+  "primary_campaign_branch": "campaign/0681-estate-operationalization",
   "single_handoff_path": "collaboration/campaigns/CAMPAIGN_0681_CODEX_LAUNCH_HANDOFF.md",
   "launch_authorization_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
   "namespace_resolution_path": "collaboration/campaigns/CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md",
-  "wp0678_acceptance_path": "collaboration/work_packages/completions
+  "wp0678_acceptance_path": "collaboration/work_packages/completions/WP-0678_protected_acceptance_record.md",
+
+  "authorization_baseline": {
+    "branch": "main",
+    "commit": "4b4cdad294bd290ffc9a75d99bd91aec98a15c4d",
+    "meaning": "Last authoritative reconciliation baseline before final manifest restoration",
+    "descendant_execution_permitted": true,
+    "required_ancestor_check": "git merge-base --is-ancestor 4b4cdad294bd290ffc9a75d99bd91aec98a15c4d HEAD",
+    "checkout_alias_policy": {
+      "permitted_local_branch_names": [
+        "main",
+        "work"
+      ],
+      "rule": "A Codex-managed local branch named work is permitted only when HEAD is the repository-selected main commit or a descendant of the authorization baseline and the working tree is clean.",
+      "remote_required": false,
+      "detached_or_isolated_checkout_permitted": true
+    }
+  },
+
+  "launch_prerequisites": [
+    {
+      "id": "PREREQ-WP0678",
+      "description": "WP-0678 completion evidence exists and is protected-accepted.",
+      "evidence_path": "collaboration/work_packages/completions/WP-0678_protected_acceptance_record.md",
+      "required": true
+    },
+    {
+      "id": "PREREQ-CHIEF-ARCHITECT",
+      "description": "Chief Architect launch approval exists.",
+      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
+      "required": true
+    },
+    {
+      "id": "PREREQ-STEWARD",
+      "description": "Steward authorization exists for the protected action classes permitted at launch.",
+      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
+      "required": true
+    },
+    {
+      "id": "PREREQ-NAMESPACE",
+      "description": "The WP-0697 namespace collision and WP-0701 through WP-0704 topology are authoritatively reconciled.",
+      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md",
+      "required": true
+    },
+    {
+      "id": "PREREQ-BASE",
+      "description": "The execution checkout is the authorization baseline or a verified descendant containing this complete manifest and all activation records.",
+      "required": true
+    }
+  ],
+
+  "execution_policy": {
+    "single_handoff": true,
+    "single_campaign_branch": true,
+    "bounded_commit_per_work_package": true,
+    "dependency_aware": true,
+    "durable_checkpointing": true,
+    "append_only_transition_evidence": true,
+    "fail_closed": true,
+    "single_campaign_pull_request": true,
+    "automatic_merge": false,
+    "automatic_deployment": false,
+    "automatic_acceptance": false,
+    "automatic_campaign_close": false,
+    "automatic_spending": false,
+    "automatic_staffing": false,
+    "automatic_disclosure": false,
+    "protected_authority_may_not_be_inferred": true,
+    "exact_package_path_controls_identity": true,
+    "package_number_alone_does_not_control_identity": true
+  },
+
+  "runtime_checkout_policy": {
+    "expected_repository": "ppow1/theestate",
+    "expected_repository_root_names": [
+      "theestate"
+    ],
+    "canonical_base_branch": "main",
+    "codex_checkout_alias": "work",
+    "campaign_branch": "campaign/0681-estate-operationalization",
+    "working_tree_must_be_clean_before_launch": true,
+    "campaign_branch_must_not_preexist_with_unverified_changes": true,
+    "remote_tracking_branch_required": false,
+    "verification": [
+      "Verify git rev-parse --show-toplevel succeeds.",
+      "Verify git status --porcelain is empty before branch creation.",
+      "Verify HEAD contains authorization baseline commit 4b4cdad294bd290ffc9a75d99bd91aec98a15c4d as an ancestor.",
+      "Verify the complete manifest parses as JSON.",
+      "Verify every package path listed in this manifest exists.",
+      "Verify the authoritative campaign, launch authorization, namespace resolution, and WP-0678 acceptance record exist.",
+      "Create or use only campaign/0681-estate-operationalization for campaign implementation."
+    ]
+  },
+
+  "canonical_identity_resolution": {
+    "WP-0697": {
+      "campaign_0681_canonical_path": "collaboration/work_packages/pending/WP-0697_ENGINEERING_DEPARTMENT_OPERATIONAL_INTEGRATION.md",
+      "excluded_collision_path": "collaboration/work_packages/pending/WP-0697_Codex_Campaign_Final_Gate_Precedence_and_Specification_Alignment.md",
+      "excluded_collision_receipt": "collaboration/work_packages/completions/WP-0697_completion_receipt.md",
+      "rule": "The excluded path and its receipt belong to a separate Engineering campaign-execution-enablement lineage and do not complete or accept CAMPAIGN-0681 WP-0697.",
+      "campaign_0681_receipt_path": "collaboration/work_packages/completions/CAMPAIGN-0681_WP-0697_completion_receipt.md"
+    },
+    "topology_amendment": {
+      "WP-0701": "Operational Policy and Guardrail Enforcement",
+      "WP-0702": "Operational Audit Trail and Decision Explainability",
+      "WP-0703": "Operational Dashboard and Steward Visibility Surface",
+      "WP-0704": "Operational Acceptance, Graduation, and Campaign Closeout",
+      "authority_path": "collaboration/campaigns/CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md"
+    }
+  },
+
+  "gates": [
+    {
+      "id": "G0",
+      "name": "Launch authorization",
+      "protected": true,
+      "packages": [],
+      "release_authority": [
+        "Chief Architect",
+        "Steward where protected"
+      ],
+      "required_evidence": [
+        "WP-0678 protected acceptance",
+        "G0 launch authorization",
+        "namespace and topology resolution",
+        "valid execution manifest",
+        "verified authorization-baseline ancestry",
+        "clean working tree"
+      ]
+    },
+    {
+      "id": "G1",
+      "name": "Canonical and authority freeze",
+      "protected": true,
+      "packages": [
+        "WP-0688",
+        "WP-0689",
+        "WP-0690"
+      ],
+      "release_authority": [
+        "Chief Architect"
+      ],
+      "required_evidence": [
+        "Canonical reuse map",
+        "Operational state and event contract",
+        "Authority-aware action taxonomy",
+        "Conflict and duplication report"
+      ]
+    },
+    {
+      "id": "G2",
+      "name": "Observation truth",
+      "protected": false,
+      "packages": [
+        "WP-0691",
+        "WP-0692",
+        "WP-0693"
+      ],
+      "release_authority": [
+        "Chief Architect"
+      ],
+      "required_evidence": [
+        "Resident and service health integration tests",
+        "Campaign momentum observation tests",
+        "Blocker and escalation classification tests"
+      ]
+    },
+    {
+      "id": "G3",
+      "name": "Office integration",
+      "protected": true,
+      "packages": [
+        "WP-0694",
+        "WP-0695",
+        "WP-0696",
+        "WP-0697"
+      ],
+      "release_authority": [
+        "Chief Architect",
+        "Applicable office acknowledgements where required"
+      ],
+      "required_evidence": [
+        "Grace coordination proof",
+        "Helen staffing-request proof",
+        "Alfred communication-routing proof",
+        "Engineering Department integration proof",
+        "No-authority-transfer proof"
+      ]
+    },
+    {
+      "id": "G4",
+      "name": "Governed control readiness",
+      "protected": false,
+      "packages": [
+        "WP-0698",
+        "WP-0699"
+      ],
+      "release_authority": [
+        "Chief Architect"
+      ],
+      "required_evidence": [
+        "Readiness, validation, and evidence unification proof",
+        "Pause, resume, retry, and recovery proof"
+      ]
+    },
+    {
+      "id": "G5",
+      "name": "Momentum capability",
+      "protected": true,
+      "packages": [
+        "WP-0700",
+        "WP-0701",
+        "WP-0702"
+      ],
+      "release_authority": [
+        "Chief Architect",
+        "Steward for protected action classes"
+      ],
+      "required_evidence": [
+        "Bounded Continuous Momentum Engine loop proof",
+        "Policy and guardrail enforcement proof",
+        "Audit, explainability, checkpoint, and replay proof",
+        "Fail-closed behavior proof"
+      ]
+    },
+    {
+      "id": "G6",
+      "name": "Steward visibility and operational closeout readiness",
+      "protected": true,
+      "packages": [
+        "WP-0703",
+        "WP-0704"
+      ],
+      "release_authority": [
+        "Steward review",
+        "Chief Architect"
+      ],
+      "required_evidence": [
+        "Operational dashboard and Steward visibility proof",
+        "Protected decision queue proof",
+        "Operational acceptance and graduation controls",
+        "Campaign closeout controls",
+        "Continuity and institutional-record integration"
+      ]
+    },
+    {
+      "id": "G7",
+      "name": "Safety and pilot proof",
+      "protected": true,
+      "packages": [
+        "WP-0705",
+        "WP-0706"
+      ],
+      "release_authority": [
+        "Chief Architect",
+        "Steward"
+      ],
+      "required_evidence": [
+        "Failure-mode validation",
+        "Authority-boundary proof",
+        "Degraded-service proof",
+        "Bounded real-work pilot receipts",
+        "Protected-decision escalation proof",
+        "Checkpoint recovery proof"
+      ]
+    },
+    {
+      "id": "G8",
+      "name": "Campaign integration and acceptance preparation",
+      "protected": true,
+      "packages": [
+        "WP-0707"
+      ],
+      "release_authority": [
+        "Protected acceptance lane",
+        "Chief Architect",
+        "Steward"
+      ],
+      "required_evidence": [
+        "Aggregate campaign evidence",
+        "All package completion receipts",
+        "All gate decisions",
+        "Pilot results",
+        "Residual-risk report",
+        "One campaign pull request",
+        "No automatic merge or acceptance"
+      ]
+    }
+  ],
+
+  "packages": [
+    {
+      "id": "WP-0688",
+      "title": "Estate Operational Current-State and Canonical Reuse Map",
+      "path": "collaboration/work_packages/pending/WP-0688_Estate_Operational_Current_State_and_Canonical_Reuse_Map.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0688_completion_receipt.md",
+      "depends_on": [],
+      "gate": "G1",
+      "parallel_group": null,
+      "objective": "Discover and document the existing canonical operational systems, ownership boundaries, reusable seams, conflicts, and prohibited duplicates.",
+      "implementation_mode": "Repository discovery and bounded implementation as required by the package.",
+      "validation_source": "The work-package document and affected canonical subsystem tests.",
+      "completion_requires": [
+        "All package acceptance criteria satisfied",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0689",
+      "title": "Operational State, Event, and Transition Contract",
+      "path": "collaboration/work_packages/pending/WP-0689_Operational_State_Event_and_Transition_Contract.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0689_completion_receipt.md",
+      "depends_on": [
+        "WP-0688"
+      ],
+      "gate": "G1",
+      "parallel_group": null,
+      "objective": "Define the canonical operational state, event, transition, evidence, and authority-aware transition contract.",
+      "implementation_mode": "Extend existing canonical seams; do not create a competing state store.",
+      "validation_source": "The work-package document and affected state-transition tests.",
+      "completion_requires": [
+        "Transition model implemented or formally bound to existing canonical state",
+        "Invalid transitions fail closed",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0690",
+      "title": "Authority-Aware Operational Action Taxonomy",
+      "path": "collaboration/work_packages/pending/WP-0690_Authority_Aware_Operational_Action_Taxonomy.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0690_completion_receipt.md",
+      "depends_on": [
+        "WP-0688",
+        "WP-0689"
+      ],
+      "gate": "G1",
+      "parallel_group": null,
+      "objective": "Classify observation, recommendation, coordination, execution request, mechanical action, office decision, protected decision, and acceptance.",
+      "implementation_mode": "Reuse existing authority and policy records; do not transfer authority.",
+      "validation_source": "The work-package document and authority-boundary tests.",
+      "completion_requires": [
+        "Every action class has an explicit authority boundary",
+        "Protected actions cannot be inferred",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0691",
+      "title": "Resident and Service Health Signal Integration",
+      "path": "collaboration/work_packages/pending/WP-0691_Resident_and_Service_Health_Signal_Integration.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0691_completion_receipt.md",
+      "depends_on": [
+        "WP-0688",
+        "WP-0689"
+      ],
+      "gate": "G2",
+      "parallel_group": "PG-01",
+      "objective": "Integrate existing resident and service-health truth into operational readiness, blocking, degradation, and escalation.",
+      "implementation_mode": "Consume canonical health signals; do not create a replacement health registry.",
+      "validation_source": "The work-package document and resident/service-health integration tests.",
+      "completion_requires": [
+        "Healthy, degraded, unavailable, stale, and unknown states are distinguished",
+        "Health affects readiness truthfully",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0692",
+      "title": "Campaign and Work-Package Momentum Observer",
+      "path": "collaboration/work_packages/pending/WP-0692_Campaign_and_Work_Package_Momentum_Observer.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0692_completion_receipt.md",
+      "depends_on": [
+        "WP-0688",
+        "WP-0689"
+      ],
+      "gate": "G2",
+      "parallel_group": "PG-01",
+      "objective": "Observe canonical campaign and work-package state and determine eligible, blocked, degraded, failed, protected, and completed work.",
+      "implementation_mode": "Read canonical records; do not become a scheduler, dispatch queue, or authority source.",
+      "validation_source": "The work-package document and momentum-observation tests.",
+      "completion_requires": [
+        "Observation is distinct from recommendation and execution",
+        "Dependencies and evidence affect classification",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0693",
+      "title": "Operational Blocker and Escalation Classifier",
+      "path": "collaboration/work_packages/pending/WP-0693_Operational_Blocker_and_Escalation_Classifier.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0693_completion_receipt.md",
+      "depends_on": [
+        "WP-0690",
+        "WP-0691",
+        "WP-0692"
+      ],
+      "gate": "G2",
+      "parallel_group": null,
+      "objective": "Classify dependency, health, evidence, staffing, validation, communication, policy, retry, and protected-authority blockers and route truthful escalation.",
+      "implementation_mode": "Reuse canonical mailbox and escalation mechanisms.",
+      "validation_source": "The work-package document and blocker/escalation tests.",
+      "completion_requires": [
+        "Blockers have explicit reason and authority owner",
+        "Protected escalation cannot be bypassed",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0694",
+      "title": "Grace Operational Coordination Surface",
+      "path": "collaboration/work_packages/pending/WP-0694_Grace_Operational_Coordination_Surface.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0694_completion_receipt.md",
+      "depends_on": [
+        "WP-0690",
+        "WP-0692",
+        "WP-0693"
+      ],
+      "gate": "G3",
+      "parallel_group": null,
+      "objective": "Give Grace an observable coordination surface without architectural, staffing, merge, deployment, engineering-acceptance, or final authority.",
+      "implementation_mode": "Extend existing Grace coordination seams and canonical messaging.",
+      "validation_source": "The work-package document and Grace authority-boundary tests.",
+      "completion_requires": [
+        "Grace can observe and coordinate permitted work",
+        "Grace cannot perform protected decisions",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0695",
+      "title": "Helen Staffing and Capability Request Integration",
+      "path": "collaboration/work_packages/pending/WP-0695_Helen_Staffing_and_Capability_Request_Integration.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0695_completion_receipt.md",
+      "depends_on": [
+        "WP-0690",
+        "WP-0693"
+      ],
+      "gate": "G3",
+      "parallel_group": "PG-02",
+      "objective": "Integrate explicit staffing and capability requests through Helen's accepted lane without transferring engineering priority, architectural, or acceptance authority.",
+      "implementation_mode": "Use canonical staffing and capability-request mechanisms.",
+      "validation_source": "The work-package document and Helen integration tests.",
+      "completion_requires": [
+        "Requests and responses are evidence-backed",
+        "Staffing decisions remain in their proper authority lane",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0696",
+      "title": "Alfred Communication and Mailbox Routing Integration",
+      "path": "collaboration/work_packages/pending/WP-0696_Alfred_Communication_and_Mailbox_Routing_Integration.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0696_completion_receipt.md",
+      "depends_on": [
+        "WP-0690",
+        "WP-0693"
+      ],
+      "gate": "G3",
+      "parallel_group": "PG-02",
+      "objective": "Use Alfred and canonical mailbox/repository-message mechanisms as operational communication transport without making Alfred execution authority.",
+      "implementation_mode": "Extend accepted communication seams; do not create a competing mailbox or message bus.",
+      "validation_source": "The work-package document and mailbox/routing tests.",
+      "completion_requires": [
+        "Routing is distinct from decision and execution authority",
+        "Failures and undeliverable messages are visible",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0697",
+      "title": "Engineering Department Operational Integration",
+      "path": "collaboration/work_packages/pending/WP-0697_ENGINEERING_DEPARTMENT_OPERATIONAL_INTEGRATION.md",
+      "receipt_path": "collaboration/work_packages/completions/CAMPAIGN-0681_WP-0697_completion_receipt.md",
+      "depends_on": [
+        "WP-0688",
+        "WP-0689",
+        "WP-0690",
+        "WP-0692",
+        "WP-0693"
+      ],
+      "gate": "G3",
+      "parallel_group": null,
+      "objective": "Integrate Engineering as one department in the Estate operating model through accepted PTM, Dispatch, validation, evidence, and acceptance seams.",
+      "implementation_mode": "Preserve CAMPAIGN-0670 engineering standards and existing Engineering authority.",
+      "validation_source": "The work-package document and Engineering operational-integration tests.",
+      "completion_requires": [
+        "Exact path controls package identity",
+        "Legacy WP-0697 receipt is not reused",
+        "Engineering receives work through accepted mechanisms",
+        "Validation evidence recorded",
+        "Independently readable CAMPAIGN-0681-specific completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0698",
+      "title": "Readiness, Validation, and Evidence Signal Unification",
+      "path": "collaboration/work_packages/pending/WP-0698_READINESS_VALIDATION_AND_EVIDENCE_SIGNAL_UNIFICATION.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0698_completion_receipt.md",
+      "depends_on": [
+        "WP-0688",
+        "WP-0689",
+        "WP-0690",
+        "WP-0691",
+        "WP-0692",
+        "WP-0693"
+      ],
+      "gate": "G4",
+      "parallel_group": null,
+      "objective": "Unify existing readiness, validation, and evidence signals into truthful operational progression decisions.",
+      "implementation_mode": "Reuse existing validators and evidence records; do not create competing acceptance truth.",
+      "validation_source": "The work-package document and readiness/validation/evidence integration tests.",
+      "completion_requires": [
+        "Stale, missing, conflicting, failed, and accepted evidence are distinguished",
+        "Progression fails closed when evidence is insufficient",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0699",
+      "title": "Operational Pause, Resume, Retry, and Recovery Controls",
+      "path": "collaboration/work_packages/pending/WP-0699_OPERATIONAL_PAUSE_RESUME_RETRY_AND_RECOVERY_CONTROLS.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0699_completion_receipt.md",
+      "depends_on": [
+        "WP-0689",
+        "WP-0690",
+        "WP-0691",
+        "WP-0692",
+        "WP-0693",
+        "WP-0698"
+      ],
+      "gate": "G4",
+      "parallel_group": null,
+      "objective": "Provide deterministic pause, resume, retry, exhaustion, interruption, partial-failure, and checkpoint recovery behavior.",
+      "implementation_mode": "Extend campaign execution and canonical state mechanisms.",
+      "validation_source": "The work-package document and pause/resume/retry/recovery tests.",
+      "completion_requires": [
+        "Recovery does not depend on chat or terminal memory",
+        "Retry exhaustion fails closed",
+        "Partial failure remains visible",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0700",
+      "title": "Continuous Momentum Engine Bounded Decision Loop",
+      "path": "collaboration/work_packages/pending/WP-0700_CONTINUOUS_MOMENTUM_ENGINE_BOUNDED_DECISION_LOOP.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0700_completion_receipt.md",
+      "depends_on": [
+        "WP-0689",
+        "WP-0690",
+        "WP-0691",
+        "WP-0692",
+        "WP-0693",
+        "WP-0694",
+        "WP-0695",
+        "WP-0696",
+        "WP-0697",
+        "WP-0698",
+        "WP-0699"
+      ],
+      "gate": "G5",
+      "parallel_group": null,
+      "objective": "Implement the bounded observe, reconcile, classify, select, recommend or execute, verify, record, checkpoint, and repeat loop.",
+      "implementation_mode": "Integrate existing canonical state and action seams; do not create an unconstrained autonomous agent.",
+      "validation_source": "The work-package document and Continuous Momentum Engine tests.",
+      "completion_requires": [
+        "Only explicitly authorized mechanical actions may execute",
+        "Protected actions stop and escalate",
+        "Every transition is evidence-backed",
+        "Execution resumes deterministically",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0701",
+      "title": "Operational Policy and Guardrail Enforcement",
+      "path": "collaboration/work_packages/pending/WP-0701_OPERATIONAL_POLICY_AND_GUARDRAIL_ENFORCEMENT.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0701_completion_receipt.md",
+      "depends_on": [
+        "WP-0689",
+        "WP-0690",
+        "WP-0693",
+        "WP-0699",
+        "WP-0700"
+      ],
+      "gate": "G5",
+      "parallel_group": null,
+      "objective": "Enforce canonical authority, policy, protected-stop, privacy, staffing, spending, deployment, merge, and acceptance guardrails around operational actions.",
+      "implementation_mode": "Use existing policy and authority sources; guardrails do not create authority.",
+      "validation_source": "The work-package document and policy/guardrail tests.",
+      "completion_requires": [
+        "Unauthorized actions are refused",
+        "Refusals are recorded and explained",
+        "Protected decisions remain human-controlled",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0702",
+      "title": "Operational Audit Trail and Decision Explainability",
+      "path": "collaboration/work_packages/pending/WP-0702_OPERATIONAL_AUDIT_TRAIL_AND_DECISION_EXPLAINABILITY.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0702_completion_receipt.md",
+      "depends_on": [
+        "WP-0689",
+        "WP-0690",
+        "WP-0698",
+        "WP-0700",
+        "WP-0701"
+      ],
+      "gate": "G5",
+      "parallel_group": null,
+      "objective": "Record append-only operational decisions, recommendations, actions, refusals, retries, failures, escalations, checkpoints, and replay evidence.",
+      "implementation_mode": "Extend accepted evidence and audit seams; do not create competing authority records.",
+      "validation_source": "The work-package document and audit/explainability/replay tests.",
+      "completion_requires": [
+        "Every decision exposes its inputs and governing rule",
+        "Replay is deterministic from safe checkpoints",
+        "Evidence is append-only or equivalently tamper-evident",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0703",
+      "title": "Operational Dashboard and Steward Visibility Surface",
+      "path": "collaboration/work_packages/pending/WP-0703_OPERATIONAL_DASHBOARD_AND_STEWARD_VISIBILITY_SURFACE.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0703_completion_receipt.md",
+      "depends_on": [
+        "WP-0693",
+        "WP-0698",
+        "WP-0702"
+      ],
+      "gate": "G6",
+      "parallel_group": null,
+      "objective": "Provide concise, decision-ready, evidence-backed operational visibility and protected-decision presentation for the Steward.",
+      "implementation_mode": "Reuse CAMPAIGN-0680 decision-support capabilities where applicable; do not create a competing truth source.",
+      "validation_source": "The work-package document and dashboard/visibility tests.",
+      "completion_requires": [
+        "Blocked, degraded, failed, protected, and ready states are visible",
+        "Protected decisions include evidence and requested authority",
+        "Dashboard state is derived from canonical records",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0704",
+      "title": "Operational Acceptance, Graduation, and Campaign Closeout",
+      "path": "collaboration/work_packages/pending/WP-0704_OPERATIONAL_ACCEPTANCE_GRADUATION_AND_CAMPAIGN_CLOSEOUT.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0704_completion_receipt.md",
+      "depends_on": [
+        "WP-0691",
+        "WP-0692",
+        "WP-0693",
+        "WP-0694",
+        "WP-0695",
+        "WP-0696",
+        "WP-0697",
+        "WP-0698",
+        "WP-0699",
+        "WP-0700",
+        "WP-0701",
+        "WP-0702",
+        "WP-0703"
+      ],
+      "gate": "G6",
+      "parallel_group": null,
+      "objective": "Define governed operational acceptance readiness, graduation evidence, continuity integration, and campaign closeout without automatic acceptance or closure.",
+      "implementation_mode": "Use the existing protected acceptance lane and institutional continuity mechanisms.",
+      "validation_source": "The work-package document and acceptance/graduation/closeout tests.",
+      "completion_requires": [
+        "Readiness is not misrepresented as acceptance",
+        "Final acceptance remains protected",
+        "Closeout remains blocked until required authority acts",
+        "Continuity and institutional records are produced",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0705",
+      "title": "Failure-Mode, Authority-Boundary, and Degraded-Service Validation",
+      "path": "collaboration/work_packages/pending/WP-0705_FAILURE_MODE_AUTHORITY_BOUNDARY_AND_DEGRADED_SERVICE_VALIDATION.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0705_completion_receipt.md",
+      "depends_on": [
+        "WP-0700",
+        "WP-0701",
+        "WP-0702",
+        "WP-0703",
+        "WP-0704"
+      ],
+      "gate": "G7",
+      "parallel_group": null,
+      "objective": "Prove fail-closed behavior across authority violations, stale evidence, degraded services, dependency failures, retry exhaustion, partial failure, and interruption.",
+      "implementation_mode": "Validate the integrated system without broadening authority.",
+      "validation_source": "The work-package document and failure-mode validation suite.",
+      "completion_requires": [
+        "Each required failure mode has recorded evidence",
+        "No protected boundary is bypassed",
+        "Degraded operation remains truthful",
+        "Validation evidence recorded",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0706",
+      "title": "Bounded Real-Work Pilot Campaign",
+      "path": "collaboration/work_packages/pending/WP-0706_BOUNDED_REAL_WORK_PILOT_CAMPAIGN.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0706_completion_receipt.md",
+      "depends_on": [
+        "WP-0705"
+      ],
+      "gate": "G7",
+      "parallel_group": null,
+      "objective": "Run one real but bounded institutional workflow across canonical state, offices, health, readiness, staffing, communications, Engineering, interruption recovery, and protected escalation.",
+      "implementation_mode": "Pilot only within already authorized operational boundaries.",
+      "validation_source": "The work-package document, pilot plan, pilot receipts, and pilot validation commands.",
+      "completion_requires": [
+        "Grace receives a coordination view",
+        "Helen and Alfred participate only through proper lanes",
+        "Engineering receives executable work through accepted mechanisms",
+        "One interruption recovers from a durable checkpoint",
+        "One protected decision escalates and is not bypassed",
+        "Steward visibility is concise and evidence-backed",
+        "No automatic merge, deployment, acceptance, spending, staffing, or disclosure occurs",
+        "Independently readable completion receipt",
+        "One bounded package commit"
+      ]
+    },
+    {
+      "id": "WP-0707",
+      "title": "Estate Operationalization Integration and Acceptance",
+      "path": "collaboration/work_packages/pending/WP-0707_ESTATE_OPERATIONALIZATION_INTEGRATION_AND_ACCEPTANCE.md",
+      "receipt_path": "collaboration/work_packages/completions/WP-0707_completion_receipt.md",
+      "depends_on": [
+        "WP-0688",
+        "WP-0689",
+        "WP-0690",
+        "WP-0691",
+        "WP-0692",
+        "WP-0693",
+        "WP-0694",
+        "WP-0695",
+        "WP-0696",
+        "WP-0697",
+        "WP-0698",
+        "WP-0699",
+        "WP-0700",
+        "WP-0701",
+        "WP-0702",
+        "WP-0703",
+        "WP-0704",
+        "WP-0705",
+        "WP-0706"
+      ],
+      "gate": "G8",
+      "parallel_group": null,
+      "objective": "Integrate all campaign results, produce aggregate evidence and the acceptance package, open one campaign pull request, and stop awaiting protected review.",
+      "implementation_mode": "Aggregate and validate; do not merge or accept.",
+      "validation_source": "The work-package document, aggregate campaign validation, and all package receipts.",
+      "completion_requires": [
+        "All prior package receipts exist and are internally consistent",
+        "All gate evidence is present",
+        "Pilot evidence is included",
+        "Unresolved blockers and residual risks are listed",
+        "CAMPAIGN_0681_ACCEPTANCE_PACKAGE.md is produced",
+        "One campaign pull request is opened",
+        "Campaign remains awaiting protected review and acceptance",
+        "No automatic merge or acceptance occurs",
+        "One bounded package commit"
+      ]
+    }
+  ],
+
+  "parallel_groups": [
+    {
+      "id": "PG-01",
+      "packages": [
+        "WP-0691",
+        "WP-0692"
+      ],
+      "permitted": true,
+      "condition": "Execute in parallel only after WP-0688 and WP-0689 complete and only when owned-path inspection proves collision-free execution."
+    },
+    {
+      "id": "PG-02",
+      "packages": [
+        "WP-0695",
+        "WP-0696"
+      ],
+      "permitted": true,
+      "condition": "Execute in parallel only after WP-0690 and WP-0693 complete and only when owned-path inspection proves collision-free execution."
+    }
+  ],
+
+  "protected_stop_gates": [
+    "G0",
+    "G1",
+    "G3",
+    "G5",
+    "G6",
+    "G7",
+    "G8"
+  ],
+
+  "shared_file_rules": {
+    "canonical_registries": "Read-only unless the active work package explicitly grants modification authority.",
+    "office_charters": "Read-only unless the active work package explicitly grants modification authority.",
+    "completion_receipts": "A package may create its own receipt but may not rewrite another package's receipt.",
+    "campaign_aggregate_evidence": "Owned by WP-0707.",
+    "campaign_acceptance_package": "Owned by WP-0707.",
+    "shared_runtime_seams": "Packages touching the same runtime seam must be sequenced unless exact owned-path analysis proves collision-free execution.",
+    "namespace_collisions": "Exact manifest path and campaign identity control. Numeric identifier alone is insufficient."
+  },
+
+  "validation_policy": {
+    "package_document_is_authoritative_for_package_specific_commands": true,
+    "missing_validation_command_is_blocking": true,
+    "all_required_validations_must_pass_before_commit": true,
+    "validation_output_must_be_recorded_in_receipt": true,
+    "minimum_campaign_checks": [
+      "python -m json.tool collaboration/work_packages/planning/CAMPAIGN_0681_manifest.json",
+      "git diff --check",
+      "Run all package-specific tests named by each work package",
+      "Run affected subsystem regression tests",
+      "Verify all listed completion receipts exist before WP-0707",
+      "Verify no automatic merge, deployment, acceptance, spending, staffing, or disclosure occurred"
+    ]
+  },
+
+  "checkpoint_policy": {
+    "durable": true,
+    "chat_memory_is_not_authoritative": true,
+    "terminal_memory_is_not_authoritative": true,
+    "checkpoint_after_each_package_commit": true,
+    "checkpoint_before_each_protected_gate": true,
+    "record": [
+      "campaign_id",
+      "branch",
+      "base_commit",
+      "current_head",
+      "completed_packages",
+      "active_package",
+      "dependency_state",
+      "gate_state",
+      "validation_state",
+      "retry_state",
+      "failure_state",
+      "escalation_state",
+      "protected_decisions_pending",
+      "next_permitted_action"
+    ]
+  },
+
+  "failure_policy": {
+    "branch_mismatch": "stop",
+    "authorization_baseline_not_ancestor": "stop",
+    "dirty_working_tree_before_launch": "stop",
+    "invalid_manifest": "stop",
+    "missing_package_path": "stop",
+    "ambiguous_package_identity": "stop",
+    "dependency_failure": "stop_and_checkpoint",
+    "stale_evidence": "stop_and_escalate",
+    "conflicting_evidence": "stop_and_escalate",
+    "missing_authority": "stop_and_escalate",
+    "validation_failure": "stop_and_checkpoint",
+    "retry_exhaustion": "stop_and_escalate",
+    "partial_campaign_failure": "stop_and_checkpoint",
+    "protected_gate_reached": "stop_and_request_authority"
+  },
+
+  "final_deliverables": [
+    "Implemented and tested bounded Continuous Momentum Engine integrated with canonical Estate state and action seams.",
+    "Communication routing and office coordination evidence.",
+    "Policy and guardrail enforcement evidence.",
+    "Pause, resume, retry, interruption, and recovery evidence.",
+    "Audit, explainability, checkpoint, and replay evidence.",
+    "Operational dashboard and Steward visibility evidence.",
+    "Failure-mode, authority-boundary, and degraded-service validation.",
+    "One bounded real-work pilot with receipts.",
+    "Completion receipts and gate evidence for WP-0688 through WP-0707.",
+    "collaboration/campaigns/CAMPAIGN_0681_ACCEPTANCE_PACKAGE.md",
+    "One campaign pull request containing the complete campaign change set.",
+    "Final report listing branch, authorization baseline, package commits, validations, gate decisions, pilot results, unresolved blockers, residual risks, and protected decisions awaiting human action."
+  ],
+
+  "final_state": {
+    "required": "awaiting_protected_review_and_acceptance",
+    "merge_permitted": false,
+    "deployment_permitted": false,
+    "automatic_acceptance_permitted": false,
+    "campaign_close_permitted": false
+  },
+
+  "notes": [
+    "This manifest supersedes every truncated or incomplete CAMPAIGN-0681 manifest.",
+    "The exact paths in this manifest resolve the legacy WP-0697 numeric collision.",
+    "The authored WP-0701 through WP-0704 package set is authoritative under the namespace-resolution record.",
+    "A Codex-managed local checkout named work is not itself a blocker when HEAD contains the authorization baseline as an ancestor, the manifest is valid, and the working tree is clean.",
+    "The existence of this manifest does not grant merge, deployment, acceptance, spending, staffing, disclosure, or other protected authority."
+  ]
+}
