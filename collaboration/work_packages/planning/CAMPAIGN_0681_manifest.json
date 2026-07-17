@@ -1,11 +1,9 @@
 {
+  "schema_version": "1.0",
   "campaign_id": "CAMPAIGN-0681",
   "title": "Estate Operationalization",
   "status": "launch_authorized",
   "authoritative_campaign_path": "collaboration/campaigns/CAMPAIGN_0681_ESTATE_OPERATIONALIZATION.md",
-  "primary_campaign_branch": "campaign/0681-estate-operationalization",
   "single_handoff_path": "collaboration/campaigns/CAMPAIGN_0681_CODEX_LAUNCH_HANDOFF.md",
   "launch_authorization_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
-  "wp0678_acceptance_path": "collaboration/work_packages/completions/WP-0678_protected_acceptance_record.md",
-  "verified_base_branch": "main",
-  "verified_base_commit": "e89e3915bcbfc32528903b87bc7e0b0f490d0a9d
+  "namespace_resolution_path": "collaboration/campaigns/CAMPA
