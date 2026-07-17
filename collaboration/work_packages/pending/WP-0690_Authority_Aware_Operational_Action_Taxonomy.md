@@ -37,7 +37,7 @@ Read completely before implementation:
 
 Moved paths must be resolved through repository evidence. Do not invent replacements.
 
-## Scope
+## Required Work
 
 ### 1. Canonical action classes
 
