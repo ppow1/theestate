@@ -1,79 +1,63 @@
-# CAMPAIGN-0681 — Canonical Artifact Repair and Superseding Launch Authorization
+# CAMPAIGN-0681 — Canonical Repair and Superseding Launch Authorization
 
 Status: Authorized
 Campaign: CAMPAIGN-0681 — Estate Operationalization
 Authorizing office: Chief Architect
-Authorization timestamp: 2026-07-17T12:59:27-04:00
+Authorization timestamp: 2026-07-17T15:11:37-04:00
 Repository: ppow1/theestate
 Base branch: main
 Authorized campaign branch: campaign/0681-estate-operationalization
 
-## Purpose
+## Superseding Baseline
 
-This authorization supersedes every earlier CAMPAIGN-0681 launch authorization that predates the completed canonical artifact repairs.
+Previous repaired launch baseline:
 
-The earlier launch baseline was blocked because required canonical documents were truncated or incomplete.
+fadea83d678bb50c30cacd62aa12f5c6010b8e02
 
-## Verified Repaired Baseline
+Additional canonical repair commit:
 
-WP-0691 canonical repair commit:
+92b0932afed51bbd570f22cb109548656e545fb4
 
-c7be2c612bd229b1c732055dea098933beb9a689
+The additional repair:
 
-Practical Worker Onboarding Addendum repair commit:
+1. supplies executable package-specific validation commands for WP-0688
+   through WP-0690 and WP-0692 through WP-0707;
+2. preserves the manifest rule that missing validation commands are blocking;
+3. updates the manifest to reference this superseding authorization lineage;
+4. explicitly authorizes bounded reuse of integrated CAMPAIGN-0670 artifacts;
+5. explicitly preserves CAMPAIGN-0670's unaccepted status;
+6. corrects WP-0688 language so acceptance is not inferred.
 
-ded5417e9030d8e9ded5d7993a72718b8ed48830
+## CAMPAIGN-0670 Boundary
 
-The Practical Worker Onboarding Addendum was restored from its original historical canonical source commit:
+CAMPAIGN-0670 is not accepted by this authorization.
 
-69fd1debe5fe35437d418dbc9a221f7960b0eb5b
+CAMPAIGN-0681 may use only the bounded artifact-reuse authority recorded in:
 
-The repaired base branch is:
+collaboration/campaigns/CAMPAIGN_0681_CAMPAIGN_0670_BOUNDED_REUSE_AUTHORIZATION.md
 
-main
+Any activity requiring CAMPAIGN-0670 protected acceptance remains blocked.
 
-The repaired base commit immediately preceding this authorization is:
+## Execution Authorization
 
-ded5417e9030d8e9ded5d7993a72718b8ed48830
+Codex is authorized to launch CAMPAIGN-0681 from a clean descendant of:
 
-## Superseding Authorization
+92b0932afed51bbd570f22cb109548656e545fb4
 
-The Chief Architect explicitly:
+Codex must use only:
 
-1. accepts the restored WP-0691 specification as canonical;
-2. accepts the restored Practical Worker Onboarding Addendum as canonical;
-3. supersedes all earlier CAMPAIGN-0681 launch authorizations that predate this record;
-4. authorizes creation or continued use only of branch campaign/0681-estate-operationalization;
-5. authorizes execution of WP-0688 through WP-0707 in manifest dependency and gate order;
-6. requires one bounded implementation commit per work package;
-7. requires validation evidence and completion receipts for every package;
-8. requires Codex to stop at all protected review and acceptance gates;
-9. does not authorize automatic merge;
-10. does not authorize deployment;
-11. does not authorize protected acceptance or campaign closure;
-12. does not authorize spending, staffing, disclosure, or architectural redesign beyond the campaign mandate.
+campaign/0681-estate-operationalization
 
-The commit containing this authorization becomes the sole authorized launch baseline for CAMPAIGN-0681.
+Codex must:
 
-## Required Codex Preflight
+1. repeat full preflight;
+2. verify every manifest package has an executable validation-command section;
+3. execute every package's listed validation command;
+4. run and record affected-subsystem tests;
+5. preserve exact command output in each completion receipt;
+6. execute WP-0688, WP-0689, and WP-0690 as bounded commits;
+7. stop at protected gate G1;
+8. not infer CAMPAIGN-0670 acceptance;
+9. not merge, deploy, accept, close, spend, staff, or disclose automatically.
 
-Before creating or switching to the campaign branch, Codex must:
-
-1. verify repository identity is ppow1/theestate;
-2. verify the working tree is clean;
-3. verify local main matches origin/main;
-4. verify HEAD is the commit containing this authorization;
-5. read AI_START_HERE.md;
-6. read AI_HINTS.md;
-7. read the complete CAMPAIGN-0681 handoff, manifest, namespace resolution, and authorization records;
-8. verify WP-0691 is complete;
-9. verify the Practical Worker Onboarding Addendum contains 198 lines and is not truncated;
-10. verify every exact manifest-listed work-package path exists;
-11. use only campaign/0681-estate-operationalization;
-12. stop on any demonstrated contradiction, truncation, missing requirement, or protected gate.
-
-## Execution Boundary
-
-Codex may implement the authorized campaign work and open the campaign pull request at the required review boundary.
-
-Codex may not merge that pull request or represent protected acceptance as granted.
+The commit containing this authorization is the current authorized launch commit.
