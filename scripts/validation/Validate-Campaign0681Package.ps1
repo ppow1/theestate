@@ -37,17 +37,20 @@ if (-not (Test-Path -LiteralPath $PackagePath)) {
 
 $PackageText = Get-Content -Raw -LiteralPath $PackagePath
 
-$RequiredHeadings = @(
-    "## Objective",
-    "## Required Work",
-    "## Required Deliverables",
-    "## Required Validation",
-    "## Acceptance Criteria"
+$RequiredHeadingGroups = @(
+    @("## Objective"),
+    @("## Required Work", "## Scope"),
+    @("## Required Deliverables", "## Deliverables"),
+    @("## Required Validation", "## Validation"),
+    @("## Acceptance Criteria")
 )
 
-foreach ($Heading in $RequiredHeadings) {
-    if ($PackageText -notmatch [regex]::Escape($Heading)) {
-        throw "$PackageId is missing required heading: $Heading"
+foreach ($HeadingGroup in $RequiredHeadingGroups) {
+    $Matched = @($HeadingGroup | Where-Object {
+        $PackageText -match [regex]::Escape($_)
+    })
+    if ($Matched.Count -eq 0) {
+        throw "$PackageId is missing required heading (accepted forms: $($HeadingGroup -join ', '))"
     }
 }
 
@@ -79,7 +82,7 @@ foreach ($Requirement in $ReceiptRequirements) {
 
 $DeliverableSectionMatch = [regex]::Match(
     $PackageText,
-    "(?s)## Required Deliverables\s*(.*?)(?=\r?\n## |\z)"
+    "(?s)## (?:Required Deliverables|Deliverables)\s*(.*?)(?=\r?\n## |\z)"
 )
 
 if ($DeliverableSectionMatch.Success) {
