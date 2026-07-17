@@ -51,3 +51,16 @@ Unify readiness, validation, acceptance, and supporting evidence signals into a 
 
 ## Constitutional Precedence
 Existing constitutional authority, office acceptance rules, Engineering validation practices, and accepted campaign records remain authoritative. This work package provides a unified operational projection only.
+## Executable Validation Commands
+
+Run the following commands from the repository root after implementation and
+after creating this package's completion receipt:
+
+    pwsh -NoProfile -File scripts/validation/Validate-Campaign0681Package.ps1 -PackageId WP-0698
+    git diff --check
+
+Run all additional affected-subsystem tests discovered during implementation.
+Record every exact command, result, environment, unresolved gap, and failure
+disposition in the package completion receipt.
+
+A prose expected outcome is not a substitute for executing the commands above.

@@ -23,7 +23,10 @@ Read completely and treat canonical successors as authoritative:
 - `collaboration/campaigns/CAMPAIGN_0681_ESTATE_OPERATIONALIZATION.md`
 - `collaboration/work_packages/planning/CAMPAIGN_0681_manifest.json`
 - `collaboration/campaigns/CAMPAIGN_0670_ACCEPTANCE_PACKAGE.md`
-- WP-0670 through WP-0675 completion receipts and accepted deliverables
+- WP-0670 through WP-0675 specifications, completion submissions, integrated
+  artifacts, and provisionally reusable evidence under
+  collaboration/campaigns/CAMPAIGN_0681_CAMPAIGN_0670_BOUNDED_REUSE_AUTHORIZATION.md;
+  do not represent CAMPAIGN-0670 or its artifacts as protected-accepted
 - WP-0678 and its eventual completion evidence
 - office charters and identity records for Steward, Grace, Helen, Alfred, and Chief Architect
 - personnel, mailbox, office, campaign, work-package, resident, service, provider, and capability registries
@@ -168,3 +171,16 @@ WP-0688 is complete when CAMPAIGN-0681 has a repository-grounded map of what alr
 ## Delivery
 
 Open or contribute to the CAMPAIGN-0681 campaign pull request only after the campaign is formally launched through WP-0678. Until then, leave this package Pending and do not execute it.
+## Executable Validation Commands
+
+Run the following commands from the repository root after implementation and
+after creating this package's completion receipt:
+
+    pwsh -NoProfile -File scripts/validation/Validate-Campaign0681Package.ps1 -PackageId WP-0688
+    git diff --check
+
+Run all additional affected-subsystem tests discovered during implementation.
+Record every exact command, result, environment, unresolved gap, and failure
+disposition in the package completion receipt.
+
+A prose expected outcome is not a substitute for executing the commands above.

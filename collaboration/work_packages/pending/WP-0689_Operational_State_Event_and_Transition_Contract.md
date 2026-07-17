@@ -151,3 +151,16 @@ WP-0689 is complete when later CAMPAIGN-0681 packages can consume one consistent
 ## Delivery
 
 Do not execute until WP-0688 is complete and CAMPAIGN-0681 is formally launched through the accepted WP-0678 capability. Do not merge or accept.
+## Executable Validation Commands
+
+Run the following commands from the repository root after implementation and
+after creating this package's completion receipt:
+
+    pwsh -NoProfile -File scripts/validation/Validate-Campaign0681Package.ps1 -PackageId WP-0689
+    git diff --check
+
+Run all additional affected-subsystem tests discovered during implementation.
+Record every exact command, result, environment, unresolved gap, and failure
+disposition in the package completion receipt.
+
+A prose expected outcome is not a substitute for executing the commands above.

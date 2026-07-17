@@ -53,3 +53,16 @@ Provide a consolidated operational visibility surface for the Steward and author
 
 ## Constitutional Precedence
 The dashboard is a derived visibility surface only. Canonical repository records, office systems, constitutional authority, and accepted decisions remain authoritative.
+## Executable Validation Commands
+
+Run the following commands from the repository root after implementation and
+after creating this package's completion receipt:
+
+    pwsh -NoProfile -File scripts/validation/Validate-Campaign0681Package.ps1 -PackageId WP-0703
+    git diff --check
+
+Run all additional affected-subsystem tests discovered during implementation.
+Record every exact command, result, environment, unresolved gap, and failure
+disposition in the package completion receipt.
+
+A prose expected outcome is not a substitute for executing the commands above.

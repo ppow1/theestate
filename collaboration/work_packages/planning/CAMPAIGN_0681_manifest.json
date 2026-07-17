@@ -6,16 +6,15 @@
   "authoritative_campaign_path": "collaboration/campaigns/CAMPAIGN_0681_ESTATE_OPERATIONALIZATION.md",
   "primary_campaign_branch": "campaign/0681-estate-operationalization",
   "single_handoff_path": "collaboration/campaigns/CAMPAIGN_0681_CODEX_LAUNCH_HANDOFF.md",
-  "launch_authorization_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
+  "launch_authorization_path": "collaboration/campaigns/CAMPAIGN_0681_WP_0691_REPAIR_SUPERSEDING_LAUNCH_AUTHORIZATION.md",
   "namespace_resolution_path": "collaboration/campaigns/CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md",
   "wp0678_acceptance_path": "collaboration/work_packages/completions/WP-0678_protected_acceptance_record.md",
-
   "authorization_baseline": {
     "branch": "main",
-    "commit": "4b4cdad294bd290ffc9a75d99bd91aec98a15c4d",
-    "meaning": "Last authoritative reconciliation baseline before final manifest restoration",
+    "commit": "fadea83d678bb50c30cacd62aa12f5c6010b8e02",
+    "meaning": "Canonical repair and superseding launch-authorization baseline",
     "descendant_execution_permitted": true,
-    "required_ancestor_check": "git merge-base --is-ancestor 4b4cdad294bd290ffc9a75d99bd91aec98a15c4d HEAD",
+    "required_ancestor_check": "git merge-base --is-ancestor fadea83d678bb50c30cacd62aa12f5c6010b8e02 HEAD",
     "checkout_alias_policy": {
       "permitted_local_branch_names": [
         "main",
@@ -26,7 +25,6 @@
       "detached_or_isolated_checkout_permitted": true
     }
   },
-
   "launch_prerequisites": [
     {
       "id": "PREREQ-WP0678",
@@ -36,14 +34,14 @@
     },
     {
       "id": "PREREQ-CHIEF-ARCHITECT",
-      "description": "Chief Architect launch approval exists.",
-      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
+      "description": "Chief Architect superseding launch authorization exists after canonical repairs.",
+      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_WP_0691_REPAIR_SUPERSEDING_LAUNCH_AUTHORIZATION.md",
       "required": true
     },
     {
       "id": "PREREQ-STEWARD",
       "description": "Steward authorization exists for the protected action classes permitted at launch.",
-      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_G0_LAUNCH_AUTHORIZATION.md",
+      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_WP_0691_REPAIR_SUPERSEDING_LAUNCH_AUTHORIZATION.md",
       "required": true
     },
     {
@@ -56,9 +54,14 @@
       "id": "PREREQ-BASE",
       "description": "The execution checkout is the authorization baseline or a verified descendant containing this complete manifest and all activation records.",
       "required": true
+    },
+    {
+      "id": "PREREQ-CAMPAIGN0670-BOUNDED-REUSE",
+      "description": "CAMPAIGN-0670 remains unaccepted; bounded reuse of integrated artifacts is explicitly authorized without inferring acceptance.",
+      "evidence_path": "collaboration/campaigns/CAMPAIGN_0681_CAMPAIGN_0670_BOUNDED_REUSE_AUTHORIZATION.md",
+      "required": true
     }
   ],
-
   "execution_policy": {
     "single_handoff": true,
     "single_campaign_branch": true,
@@ -79,7 +82,6 @@
     "exact_package_path_controls_identity": true,
     "package_number_alone_does_not_control_identity": true
   },
-
   "runtime_checkout_policy": {
     "expected_repository": "ppow1/theestate",
     "expected_repository_root_names": [
@@ -94,14 +96,14 @@
     "verification": [
       "Verify git rev-parse --show-toplevel succeeds.",
       "Verify git status --porcelain is empty before branch creation.",
-      "Verify HEAD contains authorization baseline commit 4b4cdad294bd290ffc9a75d99bd91aec98a15c4d as an ancestor.",
+      "Verify HEAD contains authorization baseline commit fadea83d678bb50c30cacd62aa12f5c6010b8e02 as an ancestor.",
       "Verify the complete manifest parses as JSON.",
       "Verify every package path listed in this manifest exists.",
       "Verify the authoritative campaign, launch authorization, namespace resolution, and WP-0678 acceptance record exist.",
-      "Create or use only campaign/0681-estate-operationalization for campaign implementation."
+      "Create or use only campaign/0681-estate-operationalization for campaign implementation.",
+      "Verify the CAMPAIGN-0670 bounded-reuse authorization exists and preserves CAMPAIGN-0670 non-acceptance."
     ]
   },
-
   "canonical_identity_resolution": {
     "WP-0697": {
       "campaign_0681_canonical_path": "collaboration/work_packages/pending/WP-0697_ENGINEERING_DEPARTMENT_OPERATIONAL_INTEGRATION.md",
@@ -118,7 +120,6 @@
       "authority_path": "collaboration/campaigns/CAMPAIGN_0681_WORK_PACKAGE_NAMESPACE_RESOLUTION.md"
     }
   },
-
   "gates": [
     {
       "id": "G0",
@@ -297,7 +298,6 @@
       ]
     }
   ],
-
   "packages": [
     {
       "id": "WP-0688",
@@ -812,7 +812,6 @@
       ]
     }
   ],
-
   "parallel_groups": [
     {
       "id": "PG-01",
@@ -833,7 +832,6 @@
       "condition": "Execute in parallel only after WP-0690 and WP-0693 complete and only when owned-path inspection proves collision-free execution."
     }
   ],
-
   "protected_stop_gates": [
     "G0",
     "G1",
@@ -843,7 +841,6 @@
     "G7",
     "G8"
   ],
-
   "shared_file_rules": {
     "canonical_registries": "Read-only unless the active work package explicitly grants modification authority.",
     "office_charters": "Read-only unless the active work package explicitly grants modification authority.",
@@ -853,7 +850,6 @@
     "shared_runtime_seams": "Packages touching the same runtime seam must be sequenced unless exact owned-path analysis proves collision-free execution.",
     "namespace_collisions": "Exact manifest path and campaign identity control. Numeric identifier alone is insufficient."
   },
-
   "validation_policy": {
     "package_document_is_authoritative_for_package_specific_commands": true,
     "missing_validation_command_is_blocking": true,
@@ -868,7 +864,6 @@
       "Verify no automatic merge, deployment, acceptance, spending, staffing, or disclosure occurred"
     ]
   },
-
   "checkpoint_policy": {
     "durable": true,
     "chat_memory_is_not_authoritative": true,
@@ -892,7 +887,6 @@
       "next_permitted_action"
     ]
   },
-
   "failure_policy": {
     "branch_mismatch": "stop",
     "authorization_baseline_not_ancestor": "stop",
@@ -909,7 +903,6 @@
     "partial_campaign_failure": "stop_and_checkpoint",
     "protected_gate_reached": "stop_and_request_authority"
   },
-
   "final_deliverables": [
     "Implemented and tested bounded Continuous Momentum Engine integrated with canonical Estate state and action seams.",
     "Communication routing and office coordination evidence.",
@@ -924,7 +917,6 @@
     "One campaign pull request containing the complete campaign change set.",
     "Final report listing branch, authorization baseline, package commits, validations, gate decisions, pilot results, unresolved blockers, residual risks, and protected decisions awaiting human action."
   ],
-
   "final_state": {
     "required": "awaiting_protected_review_and_acceptance",
     "merge_permitted": false,
@@ -932,7 +924,6 @@
     "automatic_acceptance_permitted": false,
     "campaign_close_permitted": false
   },
-
   "notes": [
     "This manifest supersedes every truncated or incomplete CAMPAIGN-0681 manifest.",
     "The exact paths in this manifest resolve the legacy WP-0697 numeric collision.",

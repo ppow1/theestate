@@ -188,3 +188,16 @@ WP-0692 is complete only when the Estate can observe a real campaign and truthfu
 - and why no observation has been misrepresented as dispatch, authority, or acceptance.
 
 Completion requires Chief Architect review and independently readable evidence. It does not launch CAMPAIGN-0681 or authorize execution of any observed package.
+## Executable Validation Commands
+
+Run the following commands from the repository root after implementation and
+after creating this package's completion receipt:
+
+    pwsh -NoProfile -File scripts/validation/Validate-Campaign0681Package.ps1 -PackageId WP-0692
+    git diff --check
+
+Run all additional affected-subsystem tests discovered during implementation.
+Record every exact command, result, environment, unresolved gap, and failure
+disposition in the package completion receipt.
+
+A prose expected outcome is not a substitute for executing the commands above.

@@ -82,3 +82,16 @@ WP-0693 is complete when observed conditions from WP-0691 and WP-0692 can be cla
 - no automatic acceptance, merge, deployment, or closure;
 - no replacement of canonical messages, mailboxes, PTM, Dispatch, readiness, validation, or authority systems;
 - no mutation of authoritative campaign state merely because a blocker was classified.
+## Executable Validation Commands
+
+Run the following commands from the repository root after implementation and
+after creating this package's completion receipt:
+
+    pwsh -NoProfile -File scripts/validation/Validate-Campaign0681Package.ps1 -PackageId WP-0693
+    git diff --check
+
+Run all additional affected-subsystem tests discovered during implementation.
+Record every exact command, result, environment, unresolved gap, and failure
+disposition in the package completion receipt.
+
+A prose expected outcome is not a substitute for executing the commands above.
