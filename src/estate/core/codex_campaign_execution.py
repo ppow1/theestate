@@ -142,7 +142,9 @@ class CodexCampaignExecution:
                 event = "review_gate_reached"
                 summary = f"Review gate {gate} reached; continuation is paused."
                 break
-        if all(p.state == "completed" for p in campaign.packages):
+        # A reached review gate takes precedence over acceptance readiness.  This
+        # is especially important when the gate feeder is the final package.
+        if campaign.status != "awaiting_review" and all(p.state == "completed" for p in campaign.packages):
             campaign.status = "awaiting_acceptance"
             campaign.active_gate = None
         self._save(campaign, event, summary, work_package_id=work_package_id, commit=commit)
@@ -178,6 +180,19 @@ class CodexCampaignExecution:
             raise ValueError("gate is not awaiting review")
         if not reviewer.strip():
             raise ValueError("reviewer identity is required")
+        all_packages_complete = all(p.state == "completed" for p in campaign.packages)
+        if all_packages_complete:
+            # Persist the approval before recording that the campaign is ready
+            # for the separate, authoritative acceptance process.
+            self._save(campaign, "review_gate_approved", f"{gate} approved by {reviewer}.", reviewer=reviewer)
+            campaign.active_gate = None
+            campaign.status = "awaiting_acceptance"
+            self._save(
+                campaign,
+                "campaign_awaiting_acceptance",
+                "All work packages and internal review gates are complete; campaign is ready for acceptance review.",
+            )
+            return campaign
         campaign.active_gate = None
         campaign.status = "running"
         self._save(campaign, "review_gate_approved", f"{gate} approved by {reviewer}.", reviewer=reviewer)

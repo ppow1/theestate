@@ -42,7 +42,40 @@ def test_dependency_parallel_gate_and_bounded_commits(tmp_path):
     assert runtime.load("CAMPAIGN-TEST").status == "awaiting_review"
     assert runtime.next_launches("CAMPAIGN-TEST") == []
     runtime.approve_gate("CAMPAIGN-TEST", "integration", reviewer="Chief Architect")
+    assert runtime.load("CAMPAIGN-TEST").status == "running"
     assert runtime.next_launches("CAMPAIGN-TEST") == ["WP-4"]
+
+
+def test_final_package_gate_precedes_acceptance_and_requires_approval(tmp_path):
+    value = manifest()
+    value.review_gates = {"final-review": ["WP-4"]}
+    runtime = CodexCampaignExecution(tmp_path)
+    runtime.register(value)
+    runtime.start("CAMPAIGN-TEST", current_branch="campaign/test")
+
+    for package, commit in (
+        ("WP-1", "abc123"),
+        ("WP-2", "def456"),
+        ("WP-3", "fed654"),
+        ("WP-4", "ghi789"),
+    ):
+        runtime.mark_running("CAMPAIGN-TEST", package)
+        runtime.record_commit("CAMPAIGN-TEST", package, commit)
+
+    campaign = runtime.load("CAMPAIGN-TEST")
+    assert campaign.status == "awaiting_review"
+    assert campaign.active_gate == "final-review"
+    assert runtime.next_launches("CAMPAIGN-TEST") == []
+
+    campaign = runtime.approve_gate("CAMPAIGN-TEST", "final-review", reviewer="Chief Architect")
+    assert campaign.status == "awaiting_acceptance"
+    assert campaign.active_gate is None
+    state = json.loads(runtime._path("CAMPAIGN-TEST").read_text())
+    assert [event["event"] for event in state["history"]][-3:] == [
+        "review_gate_reached",
+        "review_gate_approved",
+        "campaign_awaiting_acceptance",
+    ]
 
 
 def test_failure_is_durable_and_requires_explicit_reconciliation(tmp_path):
