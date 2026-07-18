@@ -22,6 +22,7 @@ REQUIRED_FIELDS = (
     "assignment",
     "authority_reference",
 )
+INITIATION_TYPES = ("evaluation", "direct_reflection")
 
 
 def _now() -> str:
@@ -48,8 +49,13 @@ def build_reflection_worker_request(
     office: str,
     assignment: str,
     authority_reference: str,
+    initiation_type: str = "evaluation",
+    reason: str = "",
+    current_assignment: str = "",
+    operational_risk: str = "",
     deliverables: Iterable[str] | None = None,
     constraints: Iterable[str] | None = None,
+    blockers: Iterable[str] | None = None,
     related_artifacts: Iterable[str] | None = None,
     created_by: str = "Chief Architect",
 ) -> dict:
@@ -66,8 +72,21 @@ def build_reflection_worker_request(
     if missing:
         raise ValueError(f"missing required input(s): {', '.join(missing)}")
 
+    normalized_initiation_type = str(initiation_type or "").strip().lower()
+    if normalized_initiation_type not in INITIATION_TYPES:
+        raise ValueError(
+            "invalid initiation_type: expected one of "
+            + ", ".join(INITIATION_TYPES)
+        )
+
+    lifecycle_state = (
+        "evaluation_requested"
+        if normalized_initiation_type == "evaluation"
+        else "reflection_authorized"
+    )
+
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "request_id": str(request_id).strip(),
         "created_at": _now(),
         "created_by": str(created_by).strip() or "Chief Architect",
@@ -76,10 +95,16 @@ def build_reflection_worker_request(
         "status": "open",
         "requires_ack": True,
         "ack_status": "pending",
+        "initiation_type": normalized_initiation_type,
+        "lifecycle_state": lifecycle_state,
         "authority_reference": str(authority_reference).strip(),
+        "reason": str(reason).strip(),
+        "current_assignment": str(current_assignment).strip(),
+        "operational_risk": str(operational_risk).strip(),
         "assignment": str(assignment).strip(),
         "deliverables": _clean_list(deliverables),
         "constraints": _clean_list(constraints),
+        "blockers": _clean_list(blockers),
         "related_artifacts": _clean_list(related_artifacts),
         "authority_boundaries": {
             "may_approve_renewal": False,
@@ -98,8 +123,13 @@ def write_reflection_worker_request(
     office: str,
     assignment: str,
     authority_reference: str,
+    initiation_type: str = "evaluation",
+    reason: str = "",
+    current_assignment: str = "",
+    operational_risk: str = "",
     deliverables: Iterable[str] | None = None,
     constraints: Iterable[str] | None = None,
+    blockers: Iterable[str] | None = None,
     related_artifacts: Iterable[str] | None = None,
     created_by: str = "Chief Architect",
     root: str | Path | None = None,
@@ -113,8 +143,13 @@ def write_reflection_worker_request(
         office=office,
         assignment=assignment,
         authority_reference=authority_reference,
+        initiation_type=initiation_type,
+        reason=reason,
+        current_assignment=current_assignment,
+        operational_risk=operational_risk,
         deliverables=deliverables,
         constraints=constraints,
+        blockers=blockers,
         related_artifacts=related_artifacts,
         created_by=created_by,
     )
