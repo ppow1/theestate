@@ -926,7 +926,7 @@
     "implementation_acceptance_granted": true,
     "implementation_graduated": true,
     "implementation_closed": true,
-    "deployment_complete": false,
+    "deployment_complete": true,
     "operational_rollout_complete": false,
     "qualification_evidence_required": true
   },

@@ -1,13 +1,14 @@
 # CAMPAIGN-0681 Aggregate Evidence
 
-Status: `G8 accepted for governed integration; operational rollout qualification pending`
+Status: `G8 accepted, merged, and deployed; operational rollout qualification pending`
 Date: `2026-07-18`
 Branch: `campaign/0681-estate-operationalization`
 Authorization baseline: `5c82f1a1e22aec23517fb80fe9c830566afac068`
 Main reconciliation: `56470256de1192b7310987eb0ff0061fe7434b80`
 
-This index aggregates evidence; it does not rewrite package receipts, release a
-gate, accept the campaign, merge, deploy, graduate, or close institutional work.
+This index aggregates evidence; it does not rewrite package receipts. G8
+acceptance, merge, deployment, and the remaining qualification state are
+recorded by their dated controlling records.
 
 ## Package and bounded-commit index
 
@@ -88,6 +89,10 @@ tracking artifact exists for it; calibration remains deferred follow-on work.
 ## Result
 
 G8 implementation acceptance, graduation, and implementation closeout are
-recorded. Governed integration and merge are authorized. Deployment and
-operational rollout are not yet evidenced; live-provider, long-duration, and safe
-production-like outage/restart/replay qualification remain required.
+recorded. PR #423 was merged with merge commit
+`54e267697dc9ff295fdfd45f3ac3f24a97266c8d`. The canonical external runtime
+bootstrap and two immediate post-deployment cycles passed, as recorded in
+`collaboration/campaigns/CAMPAIGN_0681_DEPLOYMENT_AND_ROLLOUT_QUALIFICATION_CHECKPOINT_2026-07-18.md`.
+Operational rollout remains incomplete: live-provider qualification is blocked
+for missing execution authority, and long-duration plus safe production-like
+outage/restart/replay qualification remain pending.

@@ -1,6 +1,6 @@
 # CAMPAIGN-0681 Protected Acceptance Package
 
-Status: **G8 accepted for governed integration; rollout qualification pending**
+Status: **G8 accepted, merged, and deployed; rollout qualification pending**
 Date: `2026-07-18`
 Branch: `campaign/0681-estate-operationalization`
 Base: `5c82f1a1e22aec23517fb80fe9c830566afac068`
@@ -56,6 +56,10 @@ rollout can be declared complete.
   tracker, so classifier calibration remains deferred follow-on work without an
   invented issue number or completion claim.
 
-Implementation closeout is recorded. Operational rollout remains incomplete;
-deployment, health, rollback, provider, soak, and outage/restart/replay results
-must be recorded truthfully before rollout closeout.
+Implementation closeout is recorded. PR #423 was merged as
+`54e267697dc9ff295fdfd45f3ac3f24a97266c8d`; the canonical external runtime
+bootstrap and immediate health verification passed. The controlling deployment
+checkpoint is
+`CAMPAIGN_0681_DEPLOYMENT_AND_ROLLOUT_QUALIFICATION_CHECKPOINT_2026-07-18.md`.
+Operational rollout remains incomplete because live-provider, long-duration,
+and outage/restart/replay qualification have not passed.
