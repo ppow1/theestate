@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable, Mapping
 from uuid import uuid4
 
 from estate.core.execution_dispatch import DispatchRequest, enqueue_dispatch_request
@@ -24,6 +25,10 @@ STATUS_DIR = GRACE_ROOT / "status"
 
 ALLOWED_AUTHORITY = {"delegated", "requires_steward", "unauthorized"}
 ALLOWED_STATES = {"proposed", "ready", "blocked", "awaiting_approval", "dispatch_requested", "escalated", "closed"}
+
+COORDINATION_SCHEMA_VERSION = "estate.grace-operational-coordination.v1"
+PROTECTED_MOMENTUM_STATES = {"protected_gated", "complete_pending_acceptance", "accepted_closed"}
+STOPPED_MOMENTUM_STATES = {"blocked", "failed", "paused", "indeterminate", "waiting", *PROTECTED_MOMENTUM_STATES}
 
 
 def _write_json(path: Path, payload: Any) -> None:
@@ -50,6 +55,193 @@ def _optional_list(value: Any) -> list[str]:
     if isinstance(value, str):
         return [value] if value.strip() else []
     raise ValueError("expected a list")
+
+
+def build_operational_coordination_view(
+    momentum: Mapping[str, Any],
+    blocker_classifications: Iterable[Mapping[str, Any]] = (),
+) -> dict[str, Any]:
+    """Project CAMPAIGN-0681 observation truth for Grace without granting action authority."""
+    source = deepcopy(dict(momentum))
+    if not str(source.get("campaign_id") or "").strip():
+        raise ValueError("campaign_id is required")
+    if not str(source.get("observation_timestamp") or "").strip():
+        raise ValueError("observation_timestamp is required")
+
+    classifications = {
+        str(item.get("affected_campaign_or_work_package") or ""): deepcopy(dict(item))
+        for item in blocker_classifications
+        if str(item.get("affected_campaign_or_work_package") or "").strip()
+    }
+    warnings = list(source.get("warnings") or [])
+    if source.get("observation_only") is not True:
+        warnings.append("Momentum input is not explicitly observation-only; coordination fails closed.")
+
+    items: list[dict[str, Any]] = []
+    for package in source.get("packages") or []:
+        package_id = str(package.get("package_id") or "").strip()
+        if not package_id:
+            warnings.append("Momentum input contains a package without a canonical identifier.")
+            continue
+        state = str(package.get("observed_state") or "indeterminate")
+        classification = classifications.get(package_id)
+        protected = state in PROTECTED_MOMENTUM_STATES or bool(
+            classification and classification.get("protected_decision")
+        )
+        evidence = sorted({
+            str(reference)
+            for reference in (
+                list(package.get("evidence_references") or [])
+                + list((classification or {}).get("canonical_evidence_references") or [])
+            )
+            if str(reference).strip()
+        })
+        item_warnings = list(package.get("warnings") or [])
+        if not evidence:
+            item_warnings.append("No canonical evidence reference supports this item.")
+        if classification and classification.get("fail_closed_reason"):
+            item_warnings.append(str(classification["fail_closed_reason"]))
+        stale_or_ambiguous = bool(item_warnings) or source.get("observation_only") is not True
+        coordination_permitted = (
+            state in {"eligible", "active", "degraded"}
+            and not protected
+            and not stale_or_ambiguous
+        )
+        action_class = "coordinate" if coordination_permitted else (
+            "protected_decision" if protected else "recommend"
+        )
+        destination = (
+            (classification or {}).get("escalation_destination")
+            or package.get("recommended_follow_up_destination")
+            or "Chief Architect"
+        )
+        items.append({
+            "package_id": package_id,
+            "observed_state": state,
+            "priority_basis": "canonical momentum order; Grace does not set Engineering priority",
+            "dependency_satisfaction": deepcopy(package.get("dependency_satisfaction") or {}),
+            "evidence_references": evidence,
+            "evidence_freshness_warnings": sorted(set(item_warnings)),
+            "blocker_class": (classification or {}).get("blocker_class"),
+            "severity": (classification or {}).get("severity"),
+            "recommended_next_action": (
+                (classification or {}).get("recommended_next_action")
+                or package.get("explanation")
+                or "Obtain current canonical evidence and reevaluate."
+            ),
+            "proper_office_or_lane": destination,
+            "action_class": action_class,
+            "coordination_permitted": coordination_permitted,
+            "protected_stop": protected,
+            "acknowledgement_required": bool(classification),
+            "authorizes_action": False,
+        })
+
+    state_order = {
+        "failed": 0, "blocked": 1, "protected_gated": 2, "indeterminate": 3,
+        "degraded": 4, "paused": 5, "eligible": 6, "active": 7,
+        "waiting": 8, "review_gated": 9, "complete_pending_acceptance": 10,
+        "accepted_closed": 11,
+    }
+    items.sort(key=lambda item: (state_order.get(item["observed_state"], 99), item["package_id"]))
+    return {
+        "schema_version": COORDINATION_SCHEMA_VERSION,
+        "campaign_id": source["campaign_id"],
+        "observed_at": source["observation_timestamp"],
+        "campaign_momentum_state": source.get("campaign_momentum_state"),
+        "role": "Grace / Office of Operations",
+        "items": items,
+        "summary": {
+            "total": len(items),
+            "coordination_permitted": sum(bool(item["coordination_permitted"]) for item in items),
+            "protected_stops": sum(bool(item["protected_stop"]) for item in items),
+            "blocked_or_degraded": sum(item["observed_state"] in {"blocked", "degraded", "failed", "indeterminate"} for item in items),
+        },
+        "warnings": sorted(set(warnings)),
+        "authority_boundaries": {
+            "may": ["observe", "recommend", "coordinate delegated operations"],
+            "must_route": ["architecture", "staffing", "communication routing", "protected decisions", "acceptance"],
+            "may_not": ["assign staff", "approve architecture", "accept Engineering work", "merge", "deploy", "spend", "make protected decisions"],
+        },
+        "canonical_sources": sorted({
+            str(reference)
+            for item in items
+            for reference in item["evidence_references"]
+        }),
+        "derived_view_only": True,
+        "authorizes_action": False,
+        "mutated_canonical_state": False,
+    }
+
+
+def create_coordination_request(
+    view: Mapping[str, Any],
+    package_id: str,
+    *,
+    destination: str,
+    destination_id: int,
+    mailbox_id: int,
+    created_at: str,
+    message_id: str | None = None,
+) -> dict[str, Any]:
+    """Create a canonical repository-message envelope for a permitted Grace request."""
+    if not destination.strip() or destination_id <= 0 or mailbox_id <= 0:
+        raise ValueError("canonical destination, destination_id, and mailbox_id are required")
+    validate_iso_timestamp(created_at, "created_at")
+    item = next((entry for entry in view.get("items") or [] if entry.get("package_id") == package_id), None)
+    if item is None:
+        raise KeyError(f"package is not present in the coordination view: {package_id}")
+    if not item.get("coordination_permitted") or item.get("protected_stop"):
+        raise PermissionError(f"Grace coordination is not permitted for {package_id}")
+    identifier = message_id or f"msg_grace_{created_at[:10].replace('-', '')}_{uuid4().hex[:10]}"
+    return {
+        "id": identifier,
+        "version": 1,
+        "created_at": created_at,
+        "created_by": "Grace",
+        "source": "Grace",
+        "source_employee_id": 12,
+        "destination": destination,
+        "destination_employee_id": destination_id,
+        "destination_mailbox_id": mailbox_id,
+        "classification": "Estate Internal",
+        "message_type": "coordination_request",
+        "priority": "normal",
+        "status": "open",
+        "requires_ack": True,
+        "ack_status": "pending",
+        "thread_id": identifier,
+        "related_work_package": package_id,
+        "related_artifact": "CAMPAIGN-0681 Grace operational coordination view",
+        "payload": {
+            "title": f"Coordination request for {package_id}",
+            "summary": str(item.get("recommended_next_action") or "Review the current operational evidence."),
+            "instructions": "Respond through the destination office's canonical authority lane; this message grants no execution or decision authority.",
+            "artifact_refs": list(item.get("evidence_references") or []),
+        },
+        "operational_context": {
+            "campaign_id": view.get("campaign_id"),
+            "observed_state": item.get("observed_state"),
+            "action_class": "coordinate",
+            "proper_office_or_lane": item.get("proper_office_or_lane"),
+            "authorizes_action": False,
+        },
+    }
+
+
+def record_coordination_request(root: Path, request: Mapping[str, Any]) -> str:
+    """Record a validated request in the existing repository-message directory."""
+    payload = deepcopy(dict(request))
+    identifier = _require_str(payload, "id")
+    if payload.get("message_type") != "coordination_request":
+        raise ValueError("only coordination_request messages may be recorded")
+    if payload.get("source") != "Grace" or payload.get("operational_context", {}).get("authorizes_action") is not False:
+        raise ValueError("request must preserve Grace's non-authoritative coordination boundary")
+    path = Path(root) / "collaboration" / "messages" / f"{identifier}.json"
+    if path.exists():
+        raise FileExistsError(f"coordination request already exists: {identifier}")
+    _write_json(path, payload)
+    return path.relative_to(root).as_posix()
 
 
 @dataclass
