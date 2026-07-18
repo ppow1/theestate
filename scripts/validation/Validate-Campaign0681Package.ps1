@@ -39,9 +39,9 @@ $PackageText = Get-Content -Raw -LiteralPath $PackagePath
 
 $RequiredHeadingGroups = @(
     @("## Objective"),
-    @("## Required Work", "## Scope"),
-    @("## Required Deliverables", "## Deliverables"),
-    @("## Required Validation", "## Validation"),
+    @("## Required Work", "## Scope", "## Required Behavior", "## Behavior"),
+    @("## Required Deliverables", "## Deliverables", "## Required Outputs", "## Outputs"),
+    @("## Required Validation", "## Validation", "## Executable Validation Commands", "## Exact Validation Commands"),
     @("## Acceptance Criteria")
 )
 
@@ -54,7 +54,7 @@ foreach ($HeadingGroup in $RequiredHeadingGroups) {
     }
 }
 
-if ($PackageText -notmatch "## Executable Validation Commands") {
+if ($PackageText -notmatch "## (?:Executable|Exact|Required) Validation Commands") {
     throw "$PackageId has no executable validation-command section."
 }
 
@@ -82,7 +82,7 @@ foreach ($Requirement in $ReceiptRequirements) {
 
 $DeliverableSectionMatch = [regex]::Match(
     $PackageText,
-    "(?s)## (?:Required Deliverables|Deliverables)\s*(.*?)(?=\r?\n## |\z)"
+    "(?s)## (?:Required Deliverables|Deliverables|Required Outputs|Outputs)\s*(.*?)(?=\r?\n## |\z)"
 )
 
 if ($DeliverableSectionMatch.Success) {
