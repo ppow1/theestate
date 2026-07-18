@@ -111,3 +111,14 @@ changing the checkpoint's protected state:
 
 G8 remains pending. This correction does not accept, merge, deploy, or roll out
 the campaign.
+
+## Superseding protected decision — 2026-07-18
+
+The Chief Architect, Steward, and protected acceptance lane subsequently accepted
+G8 and authorized governed integration. The append-only controlling record is
+`CAMPAIGN_0681_G8_ACCEPTANCE_AND_IMPLEMENTATION_CLOSEOUT_RECORD_2026-07-18.md`.
+
+This supersedes only the pending decision state. The checkpoint remains truthful
+for the time it was written. Implementation acceptance, graduation, and
+implementation closeout are now recorded; deployment and operational rollout
+remain unproven until actual execution and required qualification evidence exists.

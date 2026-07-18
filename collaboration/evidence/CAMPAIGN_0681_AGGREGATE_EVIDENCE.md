@@ -1,6 +1,6 @@
 # CAMPAIGN-0681 Aggregate Evidence
 
-Status: `implementation integrated; awaiting G8 protected review and acceptance`
+Status: `G8 accepted for governed integration; operational rollout qualification pending`
 Date: `2026-07-18`
 Branch: `campaign/0681-estate-operationalization`
 Authorization baseline: `5c82f1a1e22aec23517fb80fe9c830566afac068`
@@ -50,7 +50,7 @@ completed package; package order and G1 through G8 topology are unchanged.
 | G5 | `CAMPAIGN_0681_G5_PROTECTED_GATE_CHECKPOINT_2026-07-18.md`; `CAMPAIGN_0681_G5_RELEASE_RECORD_2026-07-18.md` | released by Chief Architect and Steward |
 | G6 | `CAMPAIGN_0681_G6_PROTECTED_GATE_CHECKPOINT_2026-07-18.md`; `CAMPAIGN_0681_G6_RELEASE_RECORD_2026-07-18.md` | released by Chief Architect and Steward |
 | G7 | `CAMPAIGN_0681_G7_PROTECTED_GATE_CHECKPOINT_2026-07-18.md`; `CAMPAIGN_0681_G7_RELEASE_RECORD_2026-07-18.md` | released by Chief Architect and Steward |
-| G8 | WP-0707 receipt, acceptance package, aggregate validation, risk register, campaign PR, and G8 checkpoint | prepared; protected decision pending |
+| G8 | WP-0707 receipt, acceptance package, aggregate validation, risk register, campaign PR, G8 checkpoint, and acceptance/closeout record | accepted by protected acceptance lane, Chief Architect, and Steward |
 
 Gate files are under `collaboration/campaigns` unless another path is shown.
 No office acknowledgement is inferred beyond the durable release records.
@@ -87,5 +87,7 @@ tracking artifact exists for it; calibration remains deferred follow-on work.
 
 ## Result
 
-All implementation and evidence preparation through WP-0707 is ready for G8.
-Final acceptance, merge, deployment, graduation, and closeout remain protected.
+G8 implementation acceptance, graduation, and implementation closeout are
+recorded. Governed integration and merge are authorized. Deployment and
+operational rollout are not yet evidenced; live-provider, long-duration, and safe
+production-like outage/restart/replay qualification remain required.

@@ -1,6 +1,6 @@
 # CAMPAIGN-0681 Protected Acceptance Package
 
-Status: **prepared for G8 review; not accepted**
+Status: **G8 accepted for governed integration; rollout qualification pending**
 Date: `2026-07-18`
 Branch: `campaign/0681-estate-operationalization`
 Base: `5c82f1a1e22aec23517fb80fe9c830566afac068`
@@ -30,15 +30,18 @@ acceptance, staffing, spending, disclosure, graduation, or closeout occurred.
 ## Authority conclusion
 
 The implementation reuses canonical Estate seams and does not confer authority.
-G0 through G7 have durable releases. G8 requires the protected acceptance lane,
-Chief Architect, and Steward. A PR review or green validation result is not G8
-release and is not campaign acceptance.
+G0 through G7 have durable releases. G8 was accepted on 2026-07-18 by the
+protected acceptance lane, Chief Architect, and Steward. The controlling record is
+`CAMPAIGN_0681_G8_ACCEPTANCE_AND_IMPLEMENTATION_CLOSEOUT_RECORD_2026-07-18.md`.
+Implementation acceptance and graduation are granted; deployment and operational
+rollout still require actual execution and qualification evidence.
 
-## Recommended protected decision
+## Protected decision
 
-Recommended: **accept CAMPAIGN-0681 for governed integration, with live-provider,
-long-duration, and production-like outage, restart, and replay qualification
-remaining explicit conditions before operational rollout**.
+Decision: **G8 accepted for governed integration**. Merge is separately authorized
+by the same decision. Live-provider, long-duration, and production-like outage,
+restart, and replay qualification remain explicit conditions before operational
+rollout can be declared complete.
 
 ## Residual conditions
 
@@ -53,14 +56,6 @@ remaining explicit conditions before operational rollout**.
   tracker, so classifier calibration remains deferred follow-on work without an
   invented issue number or completion claim.
 
-Available protected dispositions:
-
-1. Accept with the recorded rollout conditions, then separately authorize merge
-   and any deployment through their proper lanes.
-2. Hold G8 and name exact additional evidence or remediation.
-3. Reject acceptance and identify the package or authority boundary requiring
-   correction.
-
-Until that decision is durably recorded, the campaign remains
-`awaiting_protected_review_and_acceptance`; merge, deployment, acceptance,
-graduation, closeout, staffing, spending, and disclosure remain unauthorized.
+Implementation closeout is recorded. Operational rollout remains incomplete;
+deployment, health, rollback, provider, soak, and outage/restart/replay results
+must be recorded truthfully before rollout closeout.

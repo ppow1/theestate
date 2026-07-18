@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "campaign_id": "CAMPAIGN-0681",
   "title": "Estate Operationalization",
-  "status": "launch_authorized",
+  "status": "accepted_for_governed_integration",
   "authoritative_campaign_path": "collaboration/campaigns/CAMPAIGN_0681_ESTATE_OPERATIONALIZATION.md",
   "primary_campaign_branch": "campaign/0681-estate-operationalization",
   "single_handoff_path": "collaboration/campaigns/CAMPAIGN_0681_CODEX_LAUNCH_HANDOFF.md",
@@ -918,11 +918,17 @@
     "Final report listing branch, authorization baseline, package commits, validations, gate decisions, pilot results, unresolved blockers, residual risks, and protected decisions awaiting human action."
   ],
   "final_state": {
-    "required": "awaiting_protected_review_and_acceptance",
-    "merge_permitted": false,
-    "deployment_permitted": false,
+    "required": "accepted_for_governed_integration_with_rollout_qualification_pending",
+    "merge_permitted": true,
+    "deployment_permitted": true,
     "automatic_acceptance_permitted": false,
-    "campaign_close_permitted": false
+    "campaign_close_permitted": true,
+    "implementation_acceptance_granted": true,
+    "implementation_graduated": true,
+    "implementation_closed": true,
+    "deployment_complete": false,
+    "operational_rollout_complete": false,
+    "qualification_evidence_required": true
   },
   "notes": [
     "This manifest supersedes every truncated or incomplete CAMPAIGN-0681 manifest.",
