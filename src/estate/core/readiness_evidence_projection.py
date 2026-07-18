@@ -182,3 +182,95 @@ def project_readiness_evidence(
         "authorizes_action": False,
         "acceptance_notice": "Only a current protected acceptance record with its issuing authority can project accepted state.",
     }
+
+
+REQUIRED_GRADUATION_EVIDENCE = {
+    "validation", "operating_procedure", "ownership", "support", "recovery",
+    "observability", "audit", "authority_record",
+}
+
+
+def assess_operational_graduation(capabilities: Iterable[dict[str, Any]], *, campaign_id: str) -> dict[str, Any]:
+    """Assess protected-acceptance readiness without accepting or graduating."""
+    results = []
+    for raw in deepcopy(list(capabilities)):
+        capability_id = str(raw.get("capability_id") or "").strip()
+        authority = str(raw.get("accepting_authority") or "").strip()
+        evidence = raw.get("evidence") or {}
+        missing = sorted(key for key in REQUIRED_GRADUATION_EVIDENCE if not evidence.get(key))
+        risks = list(raw.get("residual_risks") or [])
+        exceptions = list(raw.get("accepted_exceptions") or [])
+        deferred = list(raw.get("deferred_scope") or [])
+        successors = list(raw.get("successor_work_packages") or [])
+        protected_ref = raw.get("protected_acceptance_reference")
+        acceptance_issuer = raw.get("acceptance_issuer")
+        accepted = bool(protected_ref and acceptance_issuer == authority and not missing)
+        if protected_ref and not accepted:
+            risks.append("acceptance reference is incomplete, issued by a different authority, or lacks required evidence")
+        if exceptions and any(not item.get("authority_reference") or not item.get("risk") for item in exceptions):
+            risks.append("accepted exception lacks authority reference or risk statement")
+        if deferred and not successors:
+            risks.append("deferred scope lacks a successor work package")
+        ready = bool(capability_id and authority and not missing and not risks)
+        state = "accepted" if accepted else ("ready_for_protected_acceptance" if ready else "evidence_incomplete")
+        results.append({
+            "capability_id": capability_id or None,
+            "accepting_authority": authority or None,
+            "operational_state": state,
+            "required_evidence": sorted(REQUIRED_GRADUATION_EVIDENCE),
+            "evidence_references": sorted({str(ref) for refs in evidence.values() for ref in (refs if isinstance(refs, list) else [refs]) if ref}),
+            "missing_evidence": missing,
+            "residual_risks": risks,
+            "accepted_exceptions": exceptions,
+            "deferred_scope": deferred,
+            "successor_work_packages": successors,
+            "protected_acceptance_reference": protected_ref,
+            "accepted": accepted,
+            "graduated": False,
+            "authorizes_action": False,
+        })
+    results.sort(key=lambda item: str(item["capability_id"]))
+    return {
+        "schema_version": "estate.operational-graduation-assessment.v1",
+        "campaign_id": campaign_id,
+        "capabilities": results,
+        "ready_for_campaign_acceptance_review": bool(results) and all(item["accepted"] for item in results),
+        "institutional_acceptance_granted": False,
+        "campaign_closed": False,
+        "authorizes_action": False,
+    }
+
+
+def draft_campaign_closeout(
+    assessment: dict[str, Any], *, campaign_acceptance_reference: str | None = None,
+    campaign_acceptance_authority: str | None = None,
+) -> dict[str, Any]:
+    """Draft a continuity-preserving closeout record; never close the campaign."""
+    obligations = []
+    for item in assessment.get("capabilities") or []:
+        obligations.extend({"capability_id": item["capability_id"], "kind": "residual_risk", "detail": risk} for risk in item["residual_risks"])
+        obligations.extend({"capability_id": item["capability_id"], "kind": "deferred_scope", "detail": scope, "successors": item["successor_work_packages"]} for scope in item["deferred_scope"])
+        if not item["accepted"]:
+            obligations.append({"capability_id": item["capability_id"], "kind": "protected_acceptance_pending", "authority": item["accepting_authority"]})
+    campaign_accepted = bool(
+        assessment.get("ready_for_campaign_acceptance_review") and
+        campaign_acceptance_reference and campaign_acceptance_authority == "Steward"
+    )
+    return {
+        "schema_version": "estate.campaign-closeout-draft.v1",
+        "campaign_id": assessment.get("campaign_id"),
+        "final_status": "accepted_awaiting_manual_closeout" if campaign_accepted else "awaiting_protected_acceptance",
+        "campaign_acceptance_reference": campaign_acceptance_reference,
+        "campaign_acceptance_authority": campaign_acceptance_authority,
+        "accepted_deliverables": [item["capability_id"] for item in assessment.get("capabilities") or [] if item["accepted"]],
+        "continuity_records": [
+            {"capability_id": item["capability_id"], "owner": item["accepting_authority"], "evidence_references": item["evidence_references"], "support_and_recovery_required": True}
+            for item in assessment.get("capabilities") or []
+        ],
+        "unresolved_obligations": obligations,
+        "campaign_acceptance_verified": campaign_accepted,
+        "closeout_blocked": True,
+        "campaign_closed": False,
+        "requires_manual_closeout_authority": True,
+        "authorizes_action": False,
+    }
