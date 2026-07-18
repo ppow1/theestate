@@ -2,10 +2,21 @@ import json
 
 import pytest
 
+from estate.core import (
+    build_reflection_worker_request as exported_build_reflection_worker_request,
+)
+from estate.core import (
+    write_reflection_worker_request as exported_write_reflection_worker_request,
+)
 from estate.core.reflection_worker_request import (
     build_reflection_worker_request,
     write_reflection_worker_request,
 )
+
+
+def test_core_package_exports_reflection_worker_helpers():
+    assert exported_build_reflection_worker_request is build_reflection_worker_request
+    assert exported_write_reflection_worker_request is write_reflection_worker_request
 
 
 def test_build_request_preserves_authority_boundaries():
