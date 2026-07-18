@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 SCHEMA_VERSION = "estate.campaign-momentum-observation.v1"
+ENGINEERING_SCHEMA_VERSION = "estate.engineering-operational-projection.v1"
 STATES = {
     "unready", "waiting", "eligible", "active", "review_gated",
     "protected_gated", "blocked", "degraded", "failed", "paused",
@@ -31,6 +32,29 @@ EXPLICIT_PRIORITY = {
     "protected_gated": 84, "review_gated": 82, "complete_pending_acceptance": 80,
     "active": 60, "degraded": 55, "eligible": 40, "waiting": 30,
     "unready": 20, "indeterminate": 10,
+}
+
+ENGINEERING_STATES = {
+    "queued", "active", "blocked", "validating", "accepted", "paused",
+    "abandoned", "indeterminate",
+}
+ENGINEERING_SOURCE_PRECEDENCE = {
+    "protected_acceptance": 100,
+    "protected_abandonment": 100,
+    "review_record": 90,
+    "validation_record": 80,
+    "dispatch_record": 70,
+    "work_package_record": 60,
+    "runtime_claim": 30,
+}
+ENGINEERING_CONFIDENCE = {
+    "protected_acceptance": "high",
+    "protected_abandonment": "high",
+    "review_record": "high",
+    "validation_record": "high",
+    "dispatch_record": "medium",
+    "work_package_record": "medium",
+    "runtime_claim": "low",
 }
 
 
@@ -233,3 +257,136 @@ def render_momentum_markdown(observation: dict[str, Any]) -> str:
         lines.append(f"| {item['package_id']} | {item['observed_state']} | {deps} | {item['explanation']} |")
     lines.extend(["", "> Observation only: this view does not dispatch, mutate state, or grant acceptance."])
     return "\n".join(lines) + "\n"
+
+
+def project_engineering_operations(
+    signals: Iterable[dict[str, Any]], *,
+    observed_at: str | datetime | None = None,
+    default_freshness_seconds: int = 86_400,
+) -> dict[str, Any]:
+    """Project canonical Engineering signals without mutating their sources.
+
+    Callers adapt existing work-package, dispatch, validation, review, and
+    protected-decision records into signals. A projection is deliberately
+    unusable as dispatch, validation, acceptance, merge, or closure authority.
+    """
+    now = _time(observed_at) or datetime.now(timezone.utc)
+    if default_freshness_seconds <= 0:
+        raise ValueError("default_freshness_seconds must be positive")
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for original in signals:
+        item = deepcopy(original)
+        work_id = str(item.get("work_id") or item.get("package_id") or "").strip()
+        source_kind = str(item.get("source_kind") or "").strip()
+        state = str(item.get("state") or "indeterminate").strip().lower().replace(" ", "_")
+        aliases = {
+            "ready": "queued", "eligible": "queued", "running": "active",
+            "in_progress": "active", "validation": "validating",
+            "complete_pending_acceptance": "validating",
+            "accepted_closed": "accepted", "cancelled": "abandoned",
+        }
+        state = aliases.get(state, state)
+        if state not in ENGINEERING_STATES:
+            state = "indeterminate"
+        effective_at = _time(item.get("effective_at") or item.get("observed_at"))
+        freshness_seconds = item.get("freshness_seconds", default_freshness_seconds)
+        try:
+            freshness_seconds = int(freshness_seconds)
+        except (TypeError, ValueError):
+            freshness_seconds = 0
+        stale = (
+            effective_at is None or freshness_seconds <= 0 or effective_at > now or
+            (now - effective_at).total_seconds() > freshness_seconds or bool(item.get("stale"))
+        )
+        normalized = {
+            "state": state,
+            "source_kind": source_kind,
+            "source_precedence": ENGINEERING_SOURCE_PRECEDENCE.get(source_kind, 0),
+            "reference": str(item.get("reference") or "").strip(),
+            "effective_at": _iso(effective_at) if effective_at else None,
+            "freshness_seconds": freshness_seconds,
+            "stale": stale,
+            "confidence": ENGINEERING_CONFIDENCE.get(source_kind, "low"),
+            "reason": str(item.get("reason") or "").strip(),
+            "owner": item.get("owner"),
+            "lane": item.get("lane"),
+        }
+        grouped.setdefault(work_id, []).append(normalized)
+
+    projections: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    for work_id in sorted(grouped):
+        lineage = sorted(grouped[work_id], key=lambda x: (x["reference"], x["state"], x["source_kind"]))
+        local: list[str] = []
+        current = [item for item in lineage if not item["stale"]]
+        selected: dict[str, Any] | None = None
+        state = "indeterminate"
+        if not work_id:
+            local.append("Engineering signal is missing a canonical work identifier")
+        if not current:
+            local.append(f"{work_id or '<missing>'}: all Engineering signals are stale or undated")
+        else:
+            highest = max(item["source_precedence"] for item in current)
+            peers = [item for item in current if item["source_precedence"] == highest]
+            peer_states = {item["state"] for item in peers}
+            if highest == 0:
+                local.append(f"{work_id}: no recognized canonical Engineering source kind")
+            elif len(peer_states) > 1:
+                local.append(f"{work_id}: equally authoritative Engineering signals conflict: {', '.join(sorted(peer_states))}")
+            else:
+                selected = max(peers, key=lambda x: (x["effective_at"] or "", x["reference"]))
+                state = selected["state"]
+                if not selected["reference"]:
+                    state = "indeterminate"
+                    local.append(f"{work_id}: selected Engineering signal has no canonical reference")
+        if not work_id:
+            state = "indeterminate"
+        if any(item["stale"] for item in lineage) and current:
+            local.append(f"{work_id}: stale Engineering signals were excluded")
+        warnings.extend(local)
+        projections.append({
+            "work_id": work_id or None,
+            "observed_state": state,
+            "owner": selected.get("owner") if selected else None,
+            "implementation_lane": selected.get("lane") if selected else None,
+            "confidence": selected.get("confidence") if selected and state != "indeterminate" else "low",
+            "evidence_references": sorted({item["reference"] for item in lineage if item["reference"]}),
+            "evidence_lineage": lineage,
+            "warnings": sorted(set(local)),
+            "derived_view_only": True,
+            "authorizes_action": False,
+        })
+
+    state_counts = {
+        state: sum(item["observed_state"] == state for item in projections)
+        for state in sorted(ENGINEERING_STATES)
+    }
+    active_lanes = sorted({
+        str(item["implementation_lane"]) for item in projections
+        if item["observed_state"] == "active" and item["implementation_lane"]
+    })
+    return {
+        "schema_version": ENGINEERING_SCHEMA_VERSION,
+        "observation_timestamp": _iso(now),
+        "work": projections,
+        "capacity": {
+            "active_work_count": state_counts["active"],
+            "queued_work_count": state_counts["queued"],
+            "blocked_work_count": state_counts["blocked"],
+            "active_implementation_lanes": active_lanes,
+            "capacity_limit": None,
+            "capacity_limit_known": False,
+        },
+        "state_counts": state_counts,
+        "limiting_dependencies": sorted(
+            item["work_id"] for item in projections
+            if item["work_id"] and item["observed_state"] in {"blocked", "indeterminate"}
+        ),
+        "warnings": sorted(set(warnings)),
+        "derived_view_only": True,
+        "authorizes_action": False,
+        "authority_notice": (
+            "Engineering governance and canonical records remain authoritative; "
+            "this projection cannot dispatch, validate, accept, merge, close, pause, or abandon work."
+        ),
+    }
