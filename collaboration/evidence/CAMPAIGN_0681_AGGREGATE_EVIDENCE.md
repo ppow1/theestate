@@ -32,7 +32,7 @@ gate, accept the campaign, merge, deploy, graduate, or close institutional work.
 | G6 | WP-0704 | `a28c15d3` | `collaboration/work_packages/completions/WP-0704_completion_receipt.md` |
 | G7 | WP-0705 | `9ec43167` | `collaboration/work_packages/completions/WP-0705_completion_receipt.md` |
 | G7 | WP-0706 | `b319d4cc` | `collaboration/work_packages/completions/WP-0706_completion_receipt.md` |
-| G8 | WP-0707 | resolve from receipt path after commit | `collaboration/work_packages/completions/WP-0707_completion_receipt.md` |
+| G8 | WP-0707 | `6e6098003d1650b45777249a3a00d9cef25cc299` | `collaboration/work_packages/completions/WP-0707_completion_receipt.md` |
 
 The manifest's exact path controls WP-0697 identity. The unqualified legacy
 WP-0697 receipt is not reused. All manifest dependency edges resolve to an earlier
@@ -71,6 +71,19 @@ No office acknowledgement is inferred beyond the durable release records.
   queued read-only Engineering Dispatch without provider execution, recovered an
   interruption without duplicate work, and escalated a protected decision with
   zero adapter calls.
+
+## Aggregate validation and rollout qualification
+
+The 19 prior package validators passed; the WP-0707 validator passed; 20 canonical
+package validators passed in total. Production-like outage, restart, and replay
+qualification remains required before operational rollout, in addition to the
+existing live-provider and long-duration qualification conditions.
+
+The authority classifier has been observed to send non-protected descriptive
+content to protected review. This false-positive causes unnecessary human
+escalation but does not bypass authority because the path fails closed. Human
+evidence review is the current mitigation. No canonical issue, work package, or
+tracking artifact exists for it; calibration remains deferred follow-on work.
 
 ## Result
 

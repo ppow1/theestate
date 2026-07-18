@@ -92,3 +92,22 @@ unmerged and the named remediation becomes the only permitted campaign work.
 The repository-local `.tmp` campaign test tree was removed from the working tree
 by a recoverable move to `A:\theestate-campaign-0681-tmp-20260718`; no durable
 campaign evidence depends on it.
+
+## G8 preparation correction — 2026-07-18
+
+This append-only correction clarifies the current acceptance summaries without
+changing the checkpoint's protected state:
+
+- WP-0707's exact bounded commit is
+  `6e6098003d1650b45777249a3a00d9cef25cc299`.
+- The 19 prior package validators passed; the WP-0707 validator passed; 20 canonical
+  package validators passed in total.
+- Production-like outage, restart, and replay qualification remains required
+  before operational rollout, together with live-provider and long-duration
+  qualification.
+- The residual-risk register now records the observed fail-closed
+  authority-classification false-positive and its human-review mitigation. No
+  canonical deferred tracker exists, so no issue identity is inferred.
+
+G8 remains pending. This correction does not accept, merge, deploy, or roll out
+the campaign.

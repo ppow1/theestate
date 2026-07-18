@@ -4,6 +4,7 @@ Status: **prepared for G8 review; not accepted**
 Date: `2026-07-18`
 Branch: `campaign/0681-estate-operationalization`
 Base: `5c82f1a1e22aec23517fb80fe9c830566afac068`
+WP-0707 bounded commit: `6e6098003d1650b45777249a3a00d9cef25cc299`
 
 ## Review package
 
@@ -13,10 +14,10 @@ WP-0688 through WP-0707. The authoritative package/commit and gate indexes are i
 are in `CAMPAIGN_0681_END_TO_END_VALIDATION_REPORT.md`; unresolved decisions and
 rollout risks are in `CAMPAIGN_0681_RESIDUAL_RISK_REGISTER.md`.
 
-All 19 prior canonical package validators passed. The final integrated suite
-passed 253 tests. WP-0707 validation and Git whitespace evidence are recorded in
-its receipt. The single campaign PR and its status are recorded in the append-only
-G8 checkpoint after the bounded package commit is pushed.
+The 19 prior package validators passed; the WP-0707 validator passed; 20 canonical
+package validators passed in total. The final integrated suite passed 253 tests.
+Git whitespace evidence is recorded in the WP-0707 receipt. The single campaign
+PR and its status are recorded in the append-only G8 checkpoint.
 
 ## Pilot conclusion
 
@@ -35,8 +36,22 @@ release and is not campaign acceptance.
 
 ## Recommended protected decision
 
-Recommended: **accept CAMPAIGN-0681 for governed integration, with live-provider
-and long-duration qualification remaining explicit rollout conditions**.
+Recommended: **accept CAMPAIGN-0681 for governed integration, with live-provider,
+long-duration, and production-like outage, restart, and replay qualification
+remaining explicit conditions before operational rollout**.
+
+## Residual conditions
+
+- Production-like outage, restart, and replay qualification remains required
+  before operational rollout; live-provider and long-duration qualification also
+  remain required.
+- The authority classifier has been observed to over-classify non-protected
+  descriptive content as requiring protected review. The observed impact is an
+  unnecessary protected stop and human escalation, not unauthorized execution or
+  authority transfer. Evidence-backed human review is the current fail-closed
+  mitigation. Repository and PR review searches found no canonical deferred
+  tracker, so classifier calibration remains deferred follow-on work without an
+  invented issue number or completion claim.
 
 Available protected dispositions:
 

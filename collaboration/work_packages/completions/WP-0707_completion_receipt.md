@@ -6,7 +6,7 @@
 - Completed: `2026-07-18`
 - Branch: `campaign/0681-estate-operationalization`
 - Disposition: `Implementation and acceptance preparation complete; awaiting G8 protected review`
-- Commit: resolve with `git log -1 --format=%H -- collaboration/work_packages/completions/WP-0707_completion_receipt.md`
+- Bounded commit: `6e6098003d1650b45777249a3a00d9cef25cc299`
 
 ## Changed paths
 
@@ -50,6 +50,8 @@ repository root `A:\theestate`; pytest used repository-local basetemp paths.
 | manifest JSON parse plus existence check for all 20 authoritative specification and receipt paths | 0 | topology and artifact reconciliation passed |
 | `git diff --check` | 0 | no tracked whitespace errors |
 
+The validator totals are: 19 prior package validators passed; the WP-0707 validator passed; 20 canonical package validators passed in total.
+
 No failure is waived or hidden. The historical defect was reproduced, repaired in
 the existing integration seam, and covered by the passing final suite.
 
@@ -59,3 +61,11 @@ WP-0707 prepares evidence and a review recommendation only. The protected
 acceptance lane, Chief Architect, and Steward retain G8 authority. Merge,
 deployment, acceptance, staffing, spending, disclosure, graduation, and closeout
 remain unauthorized.
+
+Production-like outage, restart, and replay qualification remains required before
+operational rollout, together with the existing live-provider and long-duration
+qualification conditions. An observed authority-classification false-positive can
+send non-protected descriptive content to protected review. Its observed impact is
+unnecessary human escalation, not authority bypass; fail-closed review is the
+current mitigation. No canonical follow-on tracker exists, so classifier
+calibration is recorded as deferred follow-on work without a completion claim.
