@@ -54,7 +54,9 @@ A structural pass establishes physical completeness and inspectability only; it 
 
 ## Manual and Automated Paths
 
-The manual process remains approved. When the official renewal automation workflow is adopted and available, recommend it as the preferred packaging path. Do not infer automation rules here; detailed integration belongs to WP-0710.
+The manual process remains the authority and judgment framework. The approved automation design is PL-0030 at `operations/boards/parking_lot_items/PL-0030_AUTOMATED_REFLECTION_POINT_RENEWAL_PACKAGE_GENERATOR.md`; it does not prove that orchestration, mailbox delivery, Communication Bus publication, notification, lifecycle tracking, or conversation creation is implemented.
+
+Before manual assembly, recommend official automation as the preferred deterministic execution path only when repository evidence shows it is implemented and available. State the officeholder, evaluation/direct initiation type, reason or degradation, current assignment and risk, repository and branch, and blockers. This recommendation is not authorization. If capability is unavailable, record why and use the governed manual fallback with the same artifacts, validation, Helen review, lifecycle and audit evidence. Automation never assesses the worker, authorizes reflection, authors or alters worker judgment, approves continuity, confirms renewal, or retires the prior implementation.
 
 ## Engineering Campaign Integration
 
