@@ -35,6 +35,25 @@ STATE_KEYS = {
 }
 TERMINAL_CYCLE_STATES = {"completed", "failed", "cancelled", "stopped"}
 ACTIVE_CYCLE_STATES = {"running", "starting", "sleeping", "stop_requested", "blocked"}
+CONTROL_TRANSITIONS = {
+    "pause": {"active": "paused", "queued": "paused", "validating": "paused", "blocked": "paused"},
+    "resume": {"paused": "queued"},
+    "retry": {"failed": "queued", "blocked": "queued"},
+    "recover": {"interrupted": "paused", "recovering": "paused"},
+    "abandon": {"queued": "abandoned", "active": "abandoned", "paused": "abandoned", "blocked": "abandoned", "failed": "abandoned", "interrupted": "abandoned"},
+}
+CONTROL_AUTHORITIES = {
+    "pause": {"Operations Manager", "Work Owner", "Safety Authority"},
+    "resume": {"Operations Manager", "Work Owner"},
+    "retry": {"Traffic Controller", "Engineering Authority"},
+    "recover": {"Operations Manager", "Recovery Operator"},
+    "abandon": {"Chief Architect", "Steward"},
+}
+REASON_CODES = {
+    "operator_requested", "dependency_block", "safety_stop", "infrastructure_failure",
+    "authority_hold", "validation_failure", "interrupted_execution", "retry_exhausted",
+    "protected_abandonment",
+}
 
 
 def utc_now_iso() -> str:
@@ -252,3 +271,87 @@ def load_recovery_status(root: Path | None = None) -> dict[str, Any]:
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     return RuntimeRecoveryManager(root).inspect_startup()
+
+
+def evaluate_operational_control(
+    *, work_id: str, current_state: str, action: str, actor_id: str,
+    actor_roles: list[str], reason_code: str, evidence_reference: str,
+    requested_at: str, checkpoint: dict[str, Any] | None = None,
+    failure_count: int = 0, retry_budget: int = 2,
+    cooldown_seconds: int = 300, last_attempt_at: str | None = None,
+    blocker_type: str | None = None, idempotency_key: str | None = None,
+    prior_idempotency_keys: list[str] | None = None,
+) -> dict[str, Any]:
+    """Evaluate a control request without changing state or creating dispatch."""
+    problems: list[str] = []
+    now = _parse_control_time(requested_at)
+    transition = CONTROL_TRANSITIONS.get(action, {}).get(current_state)
+    if not work_id or not actor_id or not evidence_reference or now is None:
+        problems.append("control request lacks attributable identity, evidence, or timestamp")
+    if action not in CONTROL_TRANSITIONS:
+        problems.append("unknown operational control")
+    elif transition is None:
+        problems.append(f"{action} is not allowed from {current_state}")
+    required = CONTROL_AUTHORITIES.get(action, set())
+    if not required.intersection(actor_roles):
+        problems.append(f"{action} requires one of: {', '.join(sorted(required))}")
+    if reason_code not in REASON_CODES:
+        problems.append("unknown reason code")
+    if blocker_type in {"protected_authority", "privacy", "staffing", "acceptance"} and action in {"resume", "retry", "recover"}:
+        problems.append(f"{blocker_type} blocker requires its canonical authority and cannot be mechanically cleared")
+    if action == "retry":
+        if retry_budget < 0 or failure_count >= retry_budget:
+            problems.append("bounded retry budget exhausted")
+        last = _parse_control_time(last_attempt_at)
+        if last and now and (now - last).total_seconds() < cooldown_seconds:
+            problems.append("retry cooldown has not elapsed")
+        if not idempotency_key:
+            problems.append("retry requires an idempotency key")
+        elif idempotency_key in (prior_idempotency_keys or []):
+            problems.append("duplicate retry idempotency key")
+    if action in {"resume", "recover"}:
+        if not checkpoint:
+            problems.append(f"{action} requires a recovery checkpoint")
+        else:
+            checkpoint_at = _parse_control_time(checkpoint.get("checkpointed_at"))
+            if checkpoint_at is None or now is None or checkpoint_at > now:
+                problems.append("checkpoint timestamp is missing or invalid")
+            elif (now - checkpoint_at).total_seconds() > int(checkpoint.get("freshness_seconds", 86_400)):
+                problems.append("recovery checkpoint is stale")
+            if not checkpoint.get("reference") or not checkpoint.get("checksum_valid"):
+                problems.append("checkpoint lacks canonical reference or valid checksum")
+    return {
+        "schema_version": "estate.operational-control-evaluation.v1",
+        "work_id": work_id,
+        "action": action,
+        "current_state": current_state,
+        "planned_state": transition if not problems else current_state,
+        "allowed": not problems,
+        "actor": {"actor_id": actor_id, "roles": sorted(set(actor_roles))},
+        "reason_code": reason_code,
+        "requested_at": requested_at,
+        "evidence_reference": evidence_reference,
+        "checkpoint_reference": checkpoint.get("reference") if checkpoint else None,
+        "retry": {"failure_count": failure_count, "budget": retry_budget, "cooldown_seconds": cooldown_seconds, "idempotency_key": idempotency_key},
+        "refusal_reasons": problems,
+        "rollback_contract": "Preserve prior evidence and restore only from the checksum-valid referenced checkpoint; destructive rollback requires separate authority.",
+        "creates_dispatch": False,
+        "authorizes_acceptance": False,
+        "mutates_state": False,
+        "audit_event": {
+            "event_type": "operational_control_evaluated",
+            "work_id": work_id, "action": action, "actor_id": actor_id,
+            "reason_code": reason_code, "at": requested_at,
+            "evidence_reference": evidence_reference, "allowed": not problems,
+        },
+    }
+
+
+def _parse_control_time(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed.replace(tzinfo=parsed.tzinfo or timezone.utc).astimezone(timezone.utc)
