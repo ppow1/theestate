@@ -11,11 +11,11 @@ This is a recovery guide only. It does not replace or amend the governing specif
 
 1. Master specification: `docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md`
 2. Blank operational template: `docs/templates/ChatGPT_Worker_Reflection_Continuity_Template_v1.md`
-3. Completed Reflection Package example: `operations/continuity/Chief_Architect_5_Reflection_Point_Continuity_Package.md`
-4. Completed Execution Handoff example: `operations/continuity/Chief_Architect_5_Execution_Handoff_Addendum.md`
+3. Historical Reflection Package example: `operations/continuity/Chief_Architect_5_Reflection_Point_Continuity_Package.md`
+4. Reconstructed historical Execution Handoff example: `operations/continuity/Chief_Architect_5_Execution_Handoff_Addendum.md`
 5. Pilot and lessons learned: `operations/continuity/Chief_Architect_6_Reflection_Renewal_Pilot_2026-07-12.md`
 
-Read the master specification completely before preparing artifacts. Use the template as the form. Use the completed examples for expected depth and structure. Use the pilot document to avoid known packaging and verification failures.
+Read the master specification completely before preparing artifacts. Use the template as the form. Use the historical examples for expected depth and structure only: they are implementation-specific, are not governing authority, and may contain dated claims. Prefer the master specification and current repository evidence whenever an example conflicts with either. Use the pilot document to avoid known packaging and verification failures.
 
 ## Core Rule
 
