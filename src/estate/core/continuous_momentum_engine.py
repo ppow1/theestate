@@ -51,6 +51,8 @@ def run_momentum_cycle(
             holds.append(f"{name}: input projection does not explicitly deny authority")
         if projection.get("stale") or projection.get("state") in {"stale", "indeterminate", "contradictory"}:
             holds.append(f"{name}: evidence is stale or indeterminate")
+        if projection.get("state") in {"failed", "blocked", "degraded"}:
+            holds.append(f"{name}: dependency is {projection.get('state')} and requires canonical recovery or clearance")
         if projection.get("warnings"):
             warnings.extend(f"{name}: {warning}" for warning in projection["warnings"])
         if projection.get("protected_decision"):
