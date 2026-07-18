@@ -4,17 +4,36 @@ Status: Operational Template
 Owner: Human Resources / Helen  
 Classification: Estate Internal  
 
-Use this template when renewing a long-running ChatGPT worker while preserving the same Estate officeholder identity.
+Required by: `docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md`
+
+Use every required section of this template for the two worker-produced deliverables. Reflection renews an implementation while preserving the office, officeholder identity, authority, and obligations. Historical examples are examples only; current institutional governance and repository evidence take precedence.
 
 ---
 
-## A. Reflection Point Request
+## A. Reflection Point Continuity Package
 
 **Officeholder:**  
 **Current implementation:**  
 **Reflection date:**  
 **Initiated by:**  
 **Reason for reflection:**  
+**Request type (evaluation or direct directive):**
+**Authority source (authorization required before packaging):**
+**Repository state verified at:**
+
+### Automation Execution Recommendation
+
+- Official automation implementation/availability evidence:
+- Recommended execution path (automation or manual fallback):
+- Officeholder being renewed:
+- Request type:
+- Reason or observed degradation:
+- Current assignment and operational risk:
+- Repository and branch:
+- Known blockers:
+- Manual-fallback reason, when applicable:
+
+This recommends an execution path only. It does not authorize reflection or establish that an operation is implemented.
 
 ### 1. Current Mission State
 
@@ -92,7 +111,7 @@ Write a brief personal memorandum to the renewed implementation covering:
 
 ---
 
-## B. Execution Handoff Addendum
+## B. Execution Handoff
 
 ### 1. Exact Current Assignment
 
@@ -178,7 +197,7 @@ Label each reference as verified, Steward-reported, historical, or uncertain.
 
 Provide one bounded, executable first assignment for the renewed implementation.
 
-### 7. Known Uncertainty
+### 7. Known Uncertainty and Provenance
 
 List all claims based on:
 
@@ -189,9 +208,22 @@ List all claims based on:
 - generated projections,
 - inference.
 
+For each material continuity claim, label it as verified current evidence, Steward-reported information, recollection/inherited continuity, historical evidence, inference, or uncertainty.
+
 ---
 
 ## C. Renewal Packet Checklist
+
+### Run and audit record
+
+- [ ] Run/case identifier and immutable package version
+- [ ] Initiation type, authority source, reason, actors, and timestamps
+- [ ] Office, officeholder, prior/renewed implementation IDs, and mailbox resolution
+- [ ] Repository, branch, remote, commit, and working-tree evidence
+- [ ] Last successful action, exact next action, warnings, uncertainties, and blockers
+- [ ] Lifecycle transition history and responsible actors
+- [ ] Delivery, Communication Bus, and notification receipts, or explicit unavailable/manual status
+- [ ] Retry/idempotency keys and prior receipts checked before side effects
 
 ### Institutional onboarding layer
 
@@ -206,10 +238,10 @@ List all claims based on:
 - [ ] Complete-file and hash verification
 - [ ] Bounded document count
 
-### Continuity layer
+### Implementation continuity layer
 
 - [ ] Reflection Point package
-- [ ] Execution Handoff Addendum
+- [ ] Execution Handoff
 - [ ] Backlog
 - [ ] Lessons learned
 - [ ] Reflection memo
@@ -218,6 +250,9 @@ List all claims based on:
 
 ### Startup validation
 
+- [ ] Read `AI_REFLECTION_HINTS.md` and adopted process first
+- [ ] Institutional onboarding corpus read
+- [ ] Reflection Point Continuity Package and Execution Handoff read
 - [ ] ZIP readable
 - [ ] Mandatory document count confirmed
 - [ ] Every file read completely
@@ -226,7 +261,24 @@ List all claims based on:
 - [ ] Contradictions and truncations reported
 - [ ] Inherited claims separated from verified evidence
 - [ ] Comprehension validation completed
+- [ ] Repository/evidence discrepancies, stale material, and uncertainty reported to Helen
+- [ ] Only the bounded first assignment accepted pending confirmation
 - [ ] Readiness stated
+
+### Mandatory structural validation
+
+- [ ] Every required file exists and is non-empty
+- [ ] No file appears to end mid-sentence or mid-section
+- [ ] Every required heading and template section is present
+- [ ] No unresolved placeholder text or blank required field remains
+- [ ] Every file is readable and uses a valid encoding
+- [ ] Manifest entries exactly match packaged files
+- [ ] Required hashes exist and match
+- [ ] No duplicate filename or path creates ambiguous authority
+- [ ] Every stated repository reference exists
+- [ ] Validation evidence and a clear pass/fail result are attached
+
+A structural pass means the package is physically complete and internally inspectable. It does not approve the substance of any claim or establish renewal readiness by itself.
 
 ---
 
@@ -237,6 +289,10 @@ List all claims based on:
 **Operational evidence supplied by Grace or Steward:**  
 **Continuity artifacts complete:** Yes / No  
 **Onboarding packet complete and bounded:** Yes / No  
+**Structural validation passed:** Yes / No
+**Substantive continuity review passed:** Yes / No
+**Unresolved warnings/exceptions approved or returned for correction:**
+**Startup instructions complete:** Yes / No
 **Known identity or memory risks:**  
 **Known task-continuity risks:**  
 **Renewal approved:** Yes / No  
@@ -244,6 +300,8 @@ List all claims based on:
 **First bounded assignment:**  
 **Success evidence required:**  
 **Review date after first assignment:**  
+
+The reflecting worker submits these artifacts and must not declare its own renewal complete. Helen or the designated continuity reviewer confirms the corpus and continuity sufficiency, provides the bounded first assignment, and retains the prior implementation until successful renewal is confirmed. The Steward retains final institutional judgment to initiate, defer, or accept reflection.
 
 ---
 

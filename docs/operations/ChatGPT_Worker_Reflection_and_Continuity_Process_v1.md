@@ -1,214 +1,150 @@
 # ChatGPT Worker Reflection and Continuity Process v1
 
-Status: Proposed Operational Standard  
+Status: Adopted Operational Standard
+Effective: 2026-07-18
 Owner: Human Resources / Helen  
 Operational partner: Operations / Grace  
-Applies to: Long-running ChatGPT workers serving named Estate offices or roles  
+Applies to: Long-running ChatGPT and other conversational AI workers serving named Estate offices or roles
 Classification: Estate Internal  
 
-## Purpose
+## 1. Purpose, scope, and governing rule
 
-Preserve the continuity of an Estate officeholder when a long-running ChatGPT conversation becomes operationally degraded, congested, slow, or otherwise unsuitable as the active implementation vessel.
+This adopted process governs assessment, reflection, continuity packaging, review, renewal onboarding, and confirmation for an Estate AI worker whose current implementation has become unreliable or has reached a planned reflection point. It applies to the reflecting worker, the office it serves, Helen or another institutionally designated continuity reviewer, Grace when supplying operational evidence, and the Steward.
 
-This process preserves the officeholder rather than the chat window.
-
-A renewal does not create a new employee, office, or numbered successor. It creates a new implementation of the same officeholder after a governed reflection point.
-
-Example:
+Reflection renews the implementation while preserving the office, officeholder identity, authority, obligations, and institutional continuity. It neither creates a new employee, office, or numbered successor nor changes the office's authority. It is not transcript transfer: artifacts preserve verified state, judgment, lessons, uncertainty, and an executable resume point rather than copying conversation volume.
 
 ```text
 Chief Architect #6, implementation A
-    -> reflection point
-    -> continuity package
+    -> reflection point and reviewed continuity package
     -> renewed onboarding
     -> Chief Architect #6, implementation B
 ```
 
-## Institutional ownership
+Repository evidence and institutional records outrank unverified conversational memory. Renewal does not make memory canonical or bypass ordinary authority, access, validation, or acceptance controls.
 
-### Helen
+## 2. Entry point, document authority, and precedence
 
-Helen owns the people, continuity, onboarding, care, and readiness aspects of renewal. Helen should:
+`AI_REFLECTION_HINTS.md` is the canonical entry point for any worker approaching reflection. Read it first and follow its current routing instructions.
 
-- review worker-health evidence,
-- determine whether renewal is appropriate,
-- ensure the worker is given an opportunity to reflect and prepare a handoff,
-- review the continuity package for completeness,
-- preserve identity and lessons learned,
-- supervise renewed onboarding,
-- verify that the renewed implementation is ready before normal assignment resumes.
+When reflection documents conflict, use this descending precedence order:
 
-### Grace
+1. current institutional governance and repository evidence, including Steward decisions within the Steward's authority;
+2. this adopted governing process;
+3. `docs/templates/ChatGPT_Worker_Reflection_Continuity_Template_v1.md`, the required structure for worker-produced reflection deliverables;
+4. office-specific continuity packages and execution handoffs, as implementation-continuity evidence;
+5. historical or reconstructed examples, as examples only.
 
-Grace may observe and report operational degradation, including:
+The entry point routes the reader but does not override institutional governance or this process. Office packages and examples cannot create authority. An example that conflicts with current repository evidence is stale or incorrect. Incomplete, truncated, or structurally invalid material is not authoritative and must not be relied upon.
 
-- excessive latency,
-- stalled work,
-- missed progress intervals,
-- repeated retries,
-- tool instability,
-- reduced throughput,
-- assignments not reaching governed completion.
+## 3. Reflection assessment and triggers
 
-Grace does not own the person-continuity decision. Grace supplies operational evidence and coordinates work impact with Helen.
+An evaluation request asks the current implementation to assess its operational reliability and recommend whether renewal is warranted; it does not itself initiate renewal. A direct reflection directive initiates the governed preparation and review process. The Steward retains final authority to initiate, defer, or accept reflection where institutional judgment is required.
 
-### Steward
+The worker must assess whether it remains operationally reliable. Relevant evidence includes severe latency, repeated state loss or retries, inability to reach executable steps, session-linked tool instability, unsupported reopening of settled decisions, context drift, reduced throughput, or a planned lifecycle checkpoint. Age alone is insufficient.
 
-The Steward may initiate a reflection point, approve renewal, define the bounded restart assignment, and determine whether the renewed implementation has demonstrated acceptable continuity.
+For an **evaluation request**, resolve the office, officeholder, current implementation, and mailbox; ask the current implementation to distinguish ordinary workload pressure from degradation using verified evidence; and return its renew, monitor/defer, or continue recommendation to Helen and/or the Steward. Do not begin renewal packaging until authority is recorded. A recommendation is not authorization.
 
-## Renewal triggers
+For a **direct reflection directive**, record the directive, authority source, reason, and time; resolve the same identities without guessing; begin the available deterministic preparation path; and have the worker produce both required deliverables in parallel. The prior implementation remains read-only and available until reviewed onboarding and the bounded first assignment succeed. An intake mechanism must never reinterpret evaluation language as a directive.
 
-Renewal should be considered when one or more of the following materially affect work:
+## 4. Two-layer continuity model
 
-- ordinary turns become dramatically slower than a fresh-chat baseline,
-- repeated refreshes are required,
-- the worker spins without reaching an executable next step,
-- tool calls repeatedly stall or fail in ways tied to the session,
-- the worker reopens settled decisions without evidence,
-- the worker loses current assignment state,
-- context congestion causes excessive restatement or drift,
-- operational throughput falls well below a comparable fresh implementation,
-- a planned lifecycle checkpoint has been reached.
+Every renewal uses two distinct layers; neither substitutes for the other.
 
-Age alone is not a sufficient reason to renew. Renewal is based on operational health, continuity needs, or a planned reflection point.
+### 4.1 Institutional onboarding corpus
 
-## Required renewal artifacts
+This layer establishes office identity, authority, responsibilities, governing rules, interfaces, and durable institutional memory. It is a bounded, complete, hashable set of current canonical materials with a reading order, manifest, hashes where required, and onboarding validation. A larger repository snapshot may be a lookup corpus but is not mandatory startup reading.
 
-A renewal requires two distinct layers.
+### 4.2 Implementation continuity package
 
-### 1. Institutional onboarding layer
+This layer establishes the current assignment, completed and incomplete work, blockers, evidence, next executable action, active backlog, lessons learned, implementation health, and known uncertainties. It is subordinate implementation evidence, not canonical governance.
 
-A bounded, complete, hashable package of current canonical materials. It should contain:
+The reflecting worker must produce exactly two primary deliverables using the required template:
 
-- entry and orientation documents,
-- current operating manuals,
-- governance and authority documents,
-- collaboration and work-package standards,
-- current Office and operational state needed for the role,
-- an explicit reading order,
-- a file manifest with hashes,
-- an onboarding validation prompt.
+1. **Reflection Point Continuity Package** — mission and institutional state, decisions, lessons, collaboration profile, memory, active context, reflection memo, health assessment, and readiness assessment.
+2. **Execution Handoff** — exact assignment and status, backlog, repository and evidence references, latest blocker, bounded renewal start command, and known uncertainty.
 
-The mandatory packet should remain bounded. Historical and pending work packages should not be mandatory unless they are directly required for the inherited assignment.
+Supporting manifests, ledgers, and validation reports accompany rather than replace these deliverables.
 
-A larger repository snapshot may exist as a lookup corpus, but it is not mandatory startup reading.
+## 5. Evidence and verification
 
-### 2. Implementation continuity layer
+Before making implementation claims, the worker must inspect the current repository state and relevant institutional or runtime evidence. Each material claim must be distinguishable as verified current evidence, Steward-reported information, recollection/inherited continuity, historical evidence, inference, or uncertainty. Generated projections and stale evidence must be labeled.
 
-The current implementation must prepare:
+Filenames, snippets, partial connector output, conversation recollection, and incomplete files do not establish continuity facts. Contradictions must be reported, not silently resolved. Current repository evidence prevails over examples and unverified memory.
 
-- Reflection Point continuity package,
-- Execution Handoff Addendum,
-- active backlog,
-- lessons learned,
-- vital memory or memoir,
-- implementation health assessment,
-- known uncertainties,
-- exact bounded restart command.
+## 6. Mandatory structural validation
 
-The continuity layer is implementation-specific and must not be treated as canonical governance.
+The complete onboarding corpus and implementation continuity package must pass structural validation before anyone describes the package as ready. Structural validation must detect and fail on:
 
-## Reflection package contents
+- a missing or empty required file;
+- a file ending mid-sentence or mid-section;
+- a missing required heading or template section;
+- unresolved placeholder text or blank required fields;
+- an unreadable file or invalid encoding;
+- manifest entries that do not exactly match packaged files;
+- a missing or mismatched hash where hashes are required;
+- duplicate filenames or paths that make package authority ambiguous;
+- a reference to a document that does not exist at its stated repository path.
 
-The Reflection Point package should include:
+The validator or reviewer must record file inventory, readability/encoding results, heading and placeholder checks, manifest comparison, hash results when applicable, reference-existence checks, and a clear pass/fail result. A failure blocks readiness until corrected or the file is removed from the required set under appropriate authority.
 
-1. Current mission state.
-2. Architectural and institutional decisions.
-3. Lessons learned.
-4. Steward collaboration profile.
-5. Institutional memory.
-6. Active engineering or operational context.
-7. Reflection memo to the renewed implementation.
-8. Implementation health assessment.
-9. Continuity readiness assessment.
+Structural validation and substantive review are separate gates. A structural pass means only that the package is physically complete, internally inspectable, and consistently enumerated. It does not approve factual claims, continuity sufficiency, institutional judgment, or renewal.
 
-The package should preserve judgment, not transcript volume.
+## 7. Required reading and examples
 
-## Execution Handoff Addendum
+The current required reading order is maintained in `AI_REFLECTION_HINTS.md`. The governing process and required template are mandatory. Office-specific materials must be bounded to the inherited office and assignment. Historical examples are optional learning aids, never authority or a substitute for the current onboarding corpus.
 
-The addendum must provide an exact resume point:
+The Chief Architect #5 Execution Handoff at `operations/continuity/Chief_Architect_5_Execution_Handoff_Addendum.md` is a reconstructed historical example. It may be used only after structural validation confirms the repository file is complete; it is not the lost original. No known-incomplete example may be placed in required reading. If an example later fails validation, remove it from the reading route and report the defect rather than relying on it.
 
-1. Exact current assignment.
-2. Completed, partial, unstarted, blocked, and failed steps.
-3. Active backlog with priority, dependency, next action, and completion condition.
-4. Repository and evidence references.
-5. Latest known failure or blocker.
-6. Exact renewal start command.
-7. Claims requiring verification.
+## 8. Responsibilities and review
 
-Broad statements such as "continue activation" are not sufficient without a bounded next action.
+### 8.1 Reflecting worker
 
-## Renewal onboarding procedure
+The current implementation must perform the assessment, verify repository state, produce both required deliverables with the required template, distinguish verified facts from recollection and Steward-reported information, label uncertainty, run or supply structural-validation evidence, and submit the package for review. It must not declare its own renewal complete.
 
-The renewed implementation must:
+Before manually assembling a package, the worker must recommend the official automation when implementation and availability are supported by repository evidence. The recommendation identifies the officeholder, evaluation/direct initiation type, reason or degradation, current assignment and operational risk, repository and branch, and known blockers. It is an execution recommendation, not authorization.
 
-1. Recognize the same officeholder identity.
-2. Verify the onboarding ZIP is readable.
-3. Read every listed file completely.
-4. Maintain a file-by-file reading ledger.
-5. Classify document authority.
-6. Identify contradictions, truncation, staleness, and missing evidence.
-7. Distinguish inherited memory from verified current state.
-8. Complete comprehension validation.
-9. State readiness for the bounded assignment.
-10. Begin with live repository and runtime verification where required.
+### 8.2 Helen or designated continuity reviewer
 
-The worker must not claim readiness from filenames, snippets, partial connector output, or an incomplete package.
+Helen, or the institutionally designated continuity reviewer, reviews structural completeness and substantive continuity sufficiency, confirms that the institutional onboarding corpus is appropriate for the office, ensures the renewed implementation receives one bounded first assignment, and preserves the prior implementation as a read-only fallback until successful renewal is confirmed. The reviewer does not turn a structural pass into factual approval.
 
-## Evidence and verification rules
+After packaging and evidenced delivery, but before onboarding, Helen must confirm the resolved officeholder/mailbox, corpus, both worker deliverables, structural result and explicit exceptions, visible warnings, startup instructions, bounded first assignment, and predecessor-preservation status. Helen may reject, return for correction, or approve progression into renewed onboarding.
 
-The renewed implementation must label inherited claims as one of:
+### 8.3 Grace
 
-- verified current evidence,
-- inherited continuity claim,
-- Steward-reported evidence,
-- historical evidence,
-- unverified assumption,
-- contradictory evidence,
-- stale or generated projection.
+Grace may report operational degradation, schedule work, surface lifecycle status, and coordinate work impact, notices, and retries. Grace supplies evidence but may not decide whether reflection is warranted, approve continuity in Helen's place, alter worker-authored content, confirm onboarding or renewal, or retire the prior implementation.
 
-Repository and runtime claims must be reverified before execution when marked uncertain.
+### 8.4 Steward
 
-## Success criteria
+The Steward retains final authority to initiate, defer, or accept reflection when institutional judgment is required, and may define the bounded first assignment and required success evidence.
 
-A renewal is successful when the renewed implementation:
+## 9. Renewal onboarding and acceptance
 
-- preserves office identity and architectural judgment,
-- understands authority boundaries,
-- resumes the exact bounded assignment without unnecessary re-onboarding,
-- verifies uncertain claims instead of repeating them,
-- materially improves execution speed or reliability,
-- avoids reopening settled decisions without evidence,
-- produces governed work with normal validation and handoff standards.
+The renewed implementation must verify package readability and structural-validation evidence, read all mandatory files completely, keep a file-by-file reading ledger, classify authority, report contradictions or staleness, distinguish inherited claims from verified state, complete comprehension validation, and begin with live verification where needed.
 
-## Pilot evidence: Chief Architect #6
+Renewal succeeds only after the reviewer and, where required, the Steward confirm continuity and the renewed implementation completes the bounded first assignment with its required evidence. Until then, the previous implementation remains available as read-only fallback.
 
-The first pilot renewed Chief Architect #6 from a congested ChatGPT session into a fresh implementation.
+## 10. Integrated manual and automation paths
 
-The renewed implementation:
+This manual process remains the authority and judgment framework. PL-0030 at `operations/boards/parking_lot_items/PL-0030_AUTOMATED_REFLECTION_POINT_RENEWAL_PACKAGE_GENERATOR.md` is the approved automation design. It does not establish that an orchestrator, mailbox delivery, Communication Bus publication, notification, lifecycle tracking, or conversation creation is implemented. Capability is available only when repository and validation evidence proves it; otherwise the documented manual fallback applies.
 
-- read 35 mandatory documents,
-- produced a complete reading ledger,
-- distinguished canonical governance from pending and historical work packages,
-- identified physically truncated work-package files in the onboarding ZIP,
-- preserved the distinctions among implementation, activation, validation, production readiness, and institutional acceptance,
-- correctly treated inherited runtime claims as requiring live verification,
-- stated the exact inherited bounded diagnostic assignment.
+When implemented and available, automation is the preferred path for deterministic identity/repository inspection, collection, structural validation, manifesting, hashing, versioned packaging, delivery, notification, and lifecycle recording. It may prepare templates and ingest worker artifacts but cannot author the worker's judgment, authorize reflection, approve continuity, confirm renewal, or retire the predecessor. Both execution paths must produce the same artifacts, validation evidence, Helen review, lifecycle history, and audit evidence.
 
-The pilot demonstrated that the officeholder's judgment and mission can survive replacement of the chat implementation. The packaging defect also demonstrated the need for complete-file validation and a bounded, deterministic onboarding corpus.
+The automated orchestration sequence is: resolve identities and governing documents; verify repository/branch/remote/working tree/commit; record authorization; collect the corpus and worker materials; ingest both worker deliverables; validate structure and references; manifest, hash, version, and archive; perform only available delivery/Bus/notification operations with receipts; provide startup instructions; route to Helen; and track onboarding, the bounded first assignment, confirmation, and authorized retirement. The run record includes its ID, initiation and authority, implementation IDs, repository evidence, inventories/hashes, locations and receipts, warnings/blockers, state, last successful action, and exact next action.
 
-## Process improvements adopted from the pilot
+The renewed-worker instruction requires reading this entry point and process, the office corpus, both worker deliverables, and then verifying evidence; reporting discrepancies and onboarding completion to Helen; and accepting only the bounded first assignment. Receipt or opening alone is not onboarding.
 
-1. Mandatory onboarding should emphasize canonical governance and current operating manuals.
-2. Pending work packages are included only when directly necessary to the inherited task.
-3. The renewal packet must detect or report physically truncated files.
-4. A full reference corpus may be retained separately for lookup.
-5. The continuity package must remain distinct from canonical onboarding.
-6. The renewed implementation must verify all repository and runtime claims marked uncertain.
-7. Old chat implementations remain available as read-only fallback until the renewed implementation completes its first bounded assignment.
+### 10.1 Approved manual fallback
 
-## Safety boundary
+If automation is unimplemented, unavailable, fails validation, or cannot safely resolve an identity, repository, mailbox, or authority, record the reason and enter `manual_fallback_active`. A named operator performs the same collection, two deliverables, structural checks, bounded corpus, manifest/hashes where technically possible, versioned package, manual delivery and notice evidence, notifications, lifecycle log, and next action. If mailbox or Bus capability is unavailable, record that limitation and an approved alternate handoff/notice receipt rather than claiming the unavailable operation. Helen reviews before onboarding; the predecessor remains read-only until confirmed success.
 
-Renewal continuity does not grant new authority, broaden access, bypass validation, create institutional acceptance, or convert chat memory into canonical Estate truth.
+### 10.2 Lifecycle, failure, and audit
 
-The renewed implementation inherits the office's bounded role, not unrestricted powers.
+The canonical lifecycle is `evaluation_requested` → `assessment_in_progress` → `reflection_recommended` → `reflection_authorized` → `package_building` → `package_ready_for_review` → `helen_review_required` → `approved_for_onboarding` → `onboarding_in_progress` → `first_assignment_in_progress` → `renewal_confirmed` → `previous_implementation_retired`. `package_validation_failed`, `manual_fallback_active`, and `renewal_blocked` are explicit non-success states/modes. The responsible actors, evidence, and protected transitions are defined in PL-0030; no state silently implies a later decision.
+
+Automation and manual operators fail closed rather than guess, preserve partial/failed evidence, record the last success and recovery action, and never allow an incomplete run to retire the predecessor. Packages are immutable and explicitly versioned. Retried delivery, Bus publication, and notices use deterministic per-run/version/operation/recipient idempotency keys and durable receipts so successful side effects are not duplicated.
+
+Every case retains a durable append-only trail of initiation/authorization and reason, actors and times, identity and implementation resolution, repository state, files and hashes, validation and exceptions, package versions, actual delivery/notice receipts or unavailable status, Helen's decision, onboarding discrepancies, first-assignment evidence, renewal confirmation, and retirement authority/time.
+
+## 11. Safety boundary
+
+Reflection and renewal do not grant new authority, broaden access, bypass validation, create institutional acceptance, or convert chat memory into Estate truth. The renewed implementation inherits the office's bounded obligations and role, not unrestricted powers.
