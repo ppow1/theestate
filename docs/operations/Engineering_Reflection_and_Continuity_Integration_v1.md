@@ -5,7 +5,7 @@ Governing authority: `docs/operations/ChatGPT_Worker_Reflection_and_Continuity_P
 
 ## Boundary
 
-This document maps Engineering events into the existing reflection process; it does not replace or amend it. `AI_REFLECTION_HINTS.md`, the master process, its template, completed examples, and pilot remain the required reading order. Renewal preserves an officeholder and changes its implementation; it does not create an employee or transfer institutional authority.
+This document maps Engineering events into the adopted reflection process; it does not replace or amend it. `AI_REFLECTION_HINTS.md` is the canonical entry point; the adopted governing process and required template are mandatory reading. Completed examples and the pilot are optional historical evidence, not authority. Renewal preserves an officeholder and changes its implementation; it does not create an employee or transfer institutional authority.
 
 ## Trigger and artifact matrix
 
