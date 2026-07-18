@@ -18,7 +18,22 @@ Use every required section of this template for the two worker-produced delivera
 **Initiated by:**  
 **Reason for reflection:**  
 **Request type (evaluation or direct directive):**
+**Authority source (authorization required before packaging):**
 **Repository state verified at:**
+
+### Automation Execution Recommendation
+
+- Official automation implementation/availability evidence:
+- Recommended execution path (automation or manual fallback):
+- Officeholder being renewed:
+- Request type:
+- Reason or observed degradation:
+- Current assignment and operational risk:
+- Repository and branch:
+- Known blockers:
+- Manual-fallback reason, when applicable:
+
+This recommends an execution path only. It does not authorize reflection or establish that an operation is implemented.
 
 ### 1. Current Mission State
 
@@ -199,6 +214,17 @@ For each material continuity claim, label it as verified current evidence, Stewa
 
 ## C. Renewal Packet Checklist
 
+### Run and audit record
+
+- [ ] Run/case identifier and immutable package version
+- [ ] Initiation type, authority source, reason, actors, and timestamps
+- [ ] Office, officeholder, prior/renewed implementation IDs, and mailbox resolution
+- [ ] Repository, branch, remote, commit, and working-tree evidence
+- [ ] Last successful action, exact next action, warnings, uncertainties, and blockers
+- [ ] Lifecycle transition history and responsible actors
+- [ ] Delivery, Communication Bus, and notification receipts, or explicit unavailable/manual status
+- [ ] Retry/idempotency keys and prior receipts checked before side effects
+
 ### Institutional onboarding layer
 
 - [ ] `00_READ_ME_FIRST.md`
@@ -224,6 +250,9 @@ For each material continuity claim, label it as verified current evidence, Stewa
 
 ### Startup validation
 
+- [ ] Read `AI_REFLECTION_HINTS.md` and adopted process first
+- [ ] Institutional onboarding corpus read
+- [ ] Reflection Point Continuity Package and Execution Handoff read
 - [ ] ZIP readable
 - [ ] Mandatory document count confirmed
 - [ ] Every file read completely
@@ -232,6 +261,8 @@ For each material continuity claim, label it as verified current evidence, Stewa
 - [ ] Contradictions and truncations reported
 - [ ] Inherited claims separated from verified evidence
 - [ ] Comprehension validation completed
+- [ ] Repository/evidence discrepancies, stale material, and uncertainty reported to Helen
+- [ ] Only the bounded first assignment accepted pending confirmation
 - [ ] Readiness stated
 
 ### Mandatory structural validation
@@ -260,6 +291,8 @@ A structural pass means the package is physically complete and internally inspec
 **Onboarding packet complete and bounded:** Yes / No  
 **Structural validation passed:** Yes / No
 **Substantive continuity review passed:** Yes / No
+**Unresolved warnings/exceptions approved or returned for correction:**
+**Startup instructions complete:** Yes / No
 **Known identity or memory risks:**  
 **Known task-continuity risks:**  
 **Renewal approved:** Yes / No  

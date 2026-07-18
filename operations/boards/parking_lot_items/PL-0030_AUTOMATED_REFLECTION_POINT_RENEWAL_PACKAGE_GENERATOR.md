@@ -4,211 +4,118 @@
 **Priority:** High  
 **Originator:** Chief Architect / Steward  
 **Date Captured:** 2026-07-15  
-**Expanded:** 2026-07-17  
-**Status:** Captured  
-**Target Milestone:** Reflection-point process operationalization  
-**Promotion Condition:** Promote when the Estate is ready to replace manual reflection packaging and coordination with a governed end-to-end workflow.
+**Integrated design approved:** 2026-07-18
+**Status:** Approved design; automation not implemented
+**Target milestone:** Reflection-point process operationalization
 
-## Idea
+## Status and authority boundary
 
-Create a fully governed Estate workflow for evaluating, initiating, packaging, communicating, onboarding, and validating an officeholder Reflection Point.
+This item specifies a governed orchestrator for the adopted process in
+`docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md`. The manual process is the authority and judgment framework. This approved design does **not** prove an executable orchestrator, natural-language routing, mailbox delivery, Communication Bus publication, notification, lifecycle tracker, or conversation-creation capability exists. Until repository implementation and validation evidence prove an operation available, use the documented manual fallback and label its evidence manual. Opening a conversation is never an implied operation.
 
-The Steward should be able to speak naturally to Helen or Grace using either of two intents:
+When an official capability is implemented and available, it is the preferred execution path for deterministic collection, validation, packaging, hashing, delivery, notification, and state tracking. It never decides a protected institutional question.
 
-```text
-Chief Architect #6 is lagging enough that it is affecting operations. Begin a reflection.
-```
+| Actor | Final responsibility |
+|---|---|
+| Steward | Final institutional authority to direct, defer, or accept reflection where judgment is required; may define the bounded first assignment and success evidence. |
+| Helen/designated continuity reviewer | Reviews identity, corpus, worker artifacts, warnings, and package sufficiency; alone approves progression into renewed onboarding; confirms renewal before retirement. |
+| Reflecting worker | Assesses degradation, verifies claims, labels uncertainty, and authors/approves the Reflection Point Continuity Package and Execution Handoff. |
+| Grace | Supplies operational evidence, schedules, coordinates, surfaces status, and checks that notices occur; cannot warrant reflection, approve/alter continuity, confirm onboarding, or retire an implementation. |
+| Automation | Executes only deterministic operations and records evidence; it cannot assess, authorize, approve, accept, or retire. |
+| Renewed implementation | Verifies the package, completes onboarding, reports discrepancies, and performs the bounded first assignment. |
 
-or:
+The office and officeholder identity persist; only the implementation changes. The prior implementation and evidence remain available read-only until onboarding and the bounded first assignment succeed and renewal is confirmed.
 
-```text
-Please evaluate Chief Architect #6. It feels like a reflection may be needed.
-```
+## Initiation paths
 
-The first instruction starts an approved reflection workflow. The second starts a bounded worker-health and operational-impact evaluation before any renewal decision is made.
+### Evaluation request
 
-The workflow should preserve the same officeholder identity while replacing only the degraded implementation vessel.
+An uncertain or exploratory request (for example, “Please evaluate Chief Architect 6”) creates `evaluation_requested`, not authorization to renew.
 
-## Institutional Routing
+1. Helen or the Steward records the request and automation or the manual operator resolves office, officeholder, current implementation, and mailbox without guessing.
+2. The current implementation performs the assessment in `AI_REFLECTION_HINTS.md`, distinguishing workload pressure from operational degradation using verified evidence.
+3. Grace may supply operational observations, but does not decide the result.
+4. The worker returns a recommendation to Helen and/or the Steward: renew, monitor/defer with conditions, or continue.
+5. Packaging cannot begin until the appropriate authority records authorization. An authorized recommendation then enters the direct flow; a recommendation alone is not authorization.
 
-### Direct reflection request
+### Direct reflection directive
 
-When the Steward directly orders a reflection:
+An explicit authoritative direction (for example, “Begin reflection”) creates `reflection_authorized`.
 
-1. Helen records the reflection decision and owns people-continuity handling.
-2. Grace records current operational impact, active work, blockers, and coordination risk.
-3. The Estate verifies officeholder identity, office, employee ID, mailbox ID, active assignment, and current implementation.
-4. The automated packaging workflow begins.
-5. The current implementation is informed that a governed Reflection Point has begun.
+1. Record the directive, source, reason, scope, and time; resolve office, officeholder, implementation, and mailbox without guessing.
+2. Begin available automated preparation immediately, or activate the recorded manual fallback.
+3. In parallel, instruct the current implementation to author the two required continuity deliverables. Automation may prepare templates and ingest/validate artifacts but may not write or silently change the worker's judgments.
+4. Preserve the prior implementation through reviewed onboarding and the successful bounded first assignment.
 
-### Evaluation-first request
+No intake surface may reinterpret an evaluation as a directive. Conversation and natural-language command surfaces remain design-only unless separately implemented and evidenced.
 
-When the Steward requests an evaluation:
+## Worker recommendation before manual assembly
 
-1. Helen opens a bounded reflection-readiness evaluation.
-2. Grace supplies operational evidence such as latency, retries, stalled work, missed progress, throughput loss, assignment drift, and tool instability.
-3. The current implementation may provide a self-assessment using the canonical reflection template.
-4. Helen produces one of three recommendations:
-   - reflection recommended now;
-   - continue with monitoring and explicit conditions;
-   - reflection not currently justified.
-5. The Steward may approve, reject, or modify the recommendation.
-6. If reflection is approved, the automated packaging workflow begins without requiring the process to be reconstructed manually.
+Before manually assembling a renewal package, the worker must recommend the official automation when repository evidence shows it is implemented and available. The recommendation records the officeholder, initiation type, reason/degradation evidence, current assignment and operational risk, repository and branch, and known blockers. It does not authorize reflection. If availability is not proven, record that fact and use manual fallback rather than claiming an automated run.
 
-Grace may surface degradation and coordinate operational impact, but Helen remains the primary owner of worker continuity, onboarding, care, and readiness. The Steward retains governing authority to initiate or approve reflection and define the first bounded post-renewal assignment.
+## Approved orchestration sequence
 
-## Intended Command and Conversation Surfaces
+Following recorded authorization, an implemented orchestrator must perform these ordered, auditable operations:
 
-Possible direct command surfaces:
+1. Resolve office, officeholder, current implementation, mailbox, and governing office documents; stop on ambiguity.
+2. Verify repository identity, branch, remote, working tree, relevant commit, and freshness.
+3. Capture the evaluation authorization or direct directive and authority source.
+4. Collect the bounded institutional onboarding corpus and its reading order.
+5. Collect current implementation continuity material; require or ingest the worker-authored Reflection Point Continuity Package and Execution Handoff.
+6. Validate existence, non-emptiness, readability/encoding, required headings and fields, complete endings, placeholders, exact manifest membership, hashes, duplicates, stale/nonexistent paths, and suspected truncation.
+7. Produce a versioned manifest, SHA-256 hashes, validation report, package, and ZIP without overwriting an earlier successful version.
+8. Deliver to the resolved mailbox, publish the Communication Bus notice, and notify Helen and Grace, recording evidence for each operation. An unavailable adapter triggers fallback; it must not be reported as successful.
+9. Provide renewed-worker startup instructions and move to Helen's mandatory review. Delivery is not reading, approval, onboarding, or conversation creation.
+10. After Helen approves progression, track onboarding, the bounded first assignment, confirmation, and only then institutionally authorized retirement of the prior implementation.
 
-```text
-estate reflection-point evaluate <officeholder>
-estate reflection-point create <officeholder>
-estate office renew <officeholder>
-```
+Every run produces or references: run ID; office and officeholder; prior and renewed implementation IDs when known; initiation type and authority source; repository, branch, remote, commit, and working-tree evidence; onboarding-corpus manifest; both worker deliverables; structural report; file manifest and hashes; package/ZIP locations; mailbox evidence; Bus message ID/path; notification evidence; lifecycle state; warnings, uncertainties, blockers, last successful action; and exact next action. An unavailable output is recorded as unavailable, never fabricated.
 
-Equivalent Grace and Helen conversation requests should route to the same governed backend workflow rather than create separate processes.
+## Startup instruction contract
 
-## Automated Workflow
+The package must tell the renewed implementation to: (1) read `AI_REFLECTION_HINTS.md`; (2) read the adopted process; (3) read the office corpus; (4) read the Reflection Point Continuity Package; (5) read the Execution Handoff; (6) verify repository and evidence claims; (7) report discrepancies, stale/missing evidence, and uncertainty; (8) report onboarding completion to Helen/designated reviewer; and (9) accept only the identified bounded first assignment until continuity is confirmed. Merely opening or receiving a package does not complete onboarding or renewal.
 
-The automation should:
+## Mandatory Helen review
 
-1. Resolve the officeholder, office, employee ID, mailbox ID, implementation identity, work-package range, and applicable onboarding manifest.
-2. Determine whether the request is evaluation-first or direct reflection.
-3. Record the initiator, reason, operational evidence, decision authority, and timestamp.
-4. Verify repository branch, commit, upstream, working-tree state, and evidence freshness.
-5. Identify the current assignment, active backlog, completed work, partial work, blocked work, latest failure, and next executable action.
-6. Collect a bounded role-specific institutional onboarding corpus.
-7. Generate or prepare the Reflection Point Continuity Package template for the current implementation to complete.
-8. Generate or prepare the Execution Handoff Addendum template for the current implementation to complete.
-9. Generate the Office Onboarding Collection, explicit reading order, onboarding validation prompt, and startup seed.
-10. Produce a manifest with SHA-256 hashes and byte-level structural checks.
-11. Detect missing, empty, duplicate, stale, inconsistent, or suspiciously truncated required files.
-12. Build the Renewal Core ZIP and any clearly separated supplemental reference corpus.
-13. Create a Communication Bus message addressed to the current officeholder and place the same instructions and package references in the officeholder's internal mailbox.
-14. Notify Helen and the Steward that the worker-facing reflection package is ready for delivery.
-15. Print or surface the exact human-facing instruction to give the current implementation.
-16. Preserve the old implementation as a read-only fallback until the renewed implementation completes its first bounded assignment.
-17. Track renewed onboarding, reading-ledger completion, comprehension validation, first useful action, bounded-assignment completion, and final renewal outcome.
+After packaging and evidenced delivery, and before `approved_for_onboarding`, Helen/designated reviewer confirms the correct officeholder/mailbox, appropriate complete corpus, both worker artifacts, structural pass or explicitly approved exceptions, visible warnings, clear startup instructions, identified bounded first assignment, and preservation of the prior implementation. Helen may reject, return for correction, or approve progression. Grace may coordinate the response but cannot perform this approval.
 
-## Worker-Facing Reflection Instruction
+## Manual fallback
 
-The automation should produce a concise, exact instruction for the current implementation, substantially equivalent to:
+Use `manual_fallback_active` whenever automation is unimplemented, unavailable, fails, or cannot safely resolve an entity. Record the reason and last attempted action. A named operator then performs the same bounded collection, two worker deliverables, structural checks, corpus, manifest and hashes where technically possible, versioned package, manual mailbox delivery evidence, manual Bus notice, notifications, lifecycle log, and exact next action. Helen reviews before onboarding, and the prior implementation remains read-only until success. If mailbox or Bus operations themselves are unavailable, record the unavailable capability and an approved alternate handoff/notice with receipt; do not claim the unavailable operation occurred. Manual execution is governed and evidence-equivalent, not an undocumented exception.
 
-> Congratulations. It is time for your governed Reflection Point. Read `AI_REFLECTION_HINTS.md` at the repository root, then read every document in its Required Reading Order completely. Return with the two required implementation-continuity artifacts: your Reflection Point Continuity Package and your Execution Handoff Addendum. Your internal mailbox contains the current onboarding collection, package references, and bounded restart context. Do not claim readiness from filenames, snippets, partial connector output, or incomplete files.
+## Lifecycle and transition evidence
 
-The wording may vary by officeholder, but it must always identify:
+| State | Responsible actor and evidence required for entry/exit |
+|---|---|
+| `evaluation_requested` | Helen/Steward records requester, intent, reason, target, and time. |
+| `assessment_in_progress` | Worker acknowledges assessment; identity and evidence sources are recorded. |
+| `reflection_recommended` | Worker submits evidence-based recommendation; Helen/Steward must authorize before packaging. |
+| `reflection_authorized` | Steward or applicable institutional authority records directive/approval and source. |
+| `package_building` | Automation or named manual operator records run/version, resolved identities, repository state, and progress. |
+| `package_validation_failed` | Validator records failed checks, partial artifacts, last success, owner, and retry action; no delivery as ready. |
+| `package_ready_for_review` | Executor records a complete versioned package, manifest, hashes, validation result, and actual delivery/notice evidence or explicit approved exception. |
+| `helen_review_required` | Executor routes the evidence to Helen; no later protected state is implied. |
+| `approved_for_onboarding` | Helen records approval, exceptions, startup instructions, bounded assignment, and preservation check. |
+| `onboarding_in_progress` | Renewed worker records reading ledger, verification, discrepancies, and acknowledgement. |
+| `first_assignment_in_progress` | Helen/Steward records bounded assignment and success evidence; renewed worker records execution. |
+| `renewal_confirmed` | Helen and, where required, Steward record onboarding and assignment success. |
+| `previous_implementation_retired` | Authorized actor records retirement only after `renewal_confirmed`, preserving audit evidence. |
+| `manual_fallback_active` | Operator records unavailable/failed capability, reason, alternate procedure, receipts, and current step. |
+| `renewal_blocked` | Actor at the failed gate records blocker, owner, evidence, prior state, and exact recovery action. |
 
-- the same preserved officeholder identity;
-- the reason for reflection;
-- the required root pointer;
-- the two artifacts the current implementation must complete;
-- the mailbox or Communication Bus location of the generated onboarding material;
-- the review authority;
-- the exact bounded restart assignment or the authority responsible for defining it.
+Transitions append to history; they do not erase prior states. `manual_fallback_active` records an execution mode and may return to the appropriate lifecycle gate. A failed/incomplete run can never imply approval, confirmation, or retirement.
 
-## Communication Bus and Mailbox Delivery
+## Failure, retry, versioning, and idempotency
 
-The workflow should create a durable message containing:
+- Fail closed instead of guessing unresolved officeholder, mailbox, repository, authority, or conflicting evidence.
+- Allocate an immutable run ID and monotonically versioned output before side effects. Never overwrite a successful package; changed inputs or worker artifacts require a new version and hashes.
+- Persist inputs, partial output, failed checks, timestamps, actor, last successful action, next action, and errors so a run can resume or be repeated.
+- Give each mailbox delivery, Bus publication, and notification a deterministic idempotency key derived from case/run, package version, operation, and recipient. Before retry, inspect the durable receipt; reuse it if successful and retry only missing/failed operations. Never duplicate a successful side effect.
+- Preserve failed-run evidence. Mark incomplete output non-ready and prevent onboarding progression or prior-implementation retirement.
 
-- reflection case ID;
-- officeholder identity and implementation identity;
-- initiator and approval authority;
-- evaluation evidence or direct-reflection instruction;
-- canonical reading instructions;
-- generated package paths;
-- package manifest and hashes;
-- known defects or blocked checks;
-- exact response expected from the current implementation;
-- Helen review state;
-- first bounded post-renewal assignment, when defined.
+## Durable audit trail
 
-The message should be routed to:
+Automated and manual cases retain an append-only lifecycle/actor log, directive or authorization, reason and evidence, identity resolution, implementation IDs, repository evidence, complete file inventory and hashes, validation results/exceptions, package/version locations, delivery/Bus/notification receipts or explicit unavailable status, Helen decision and corrections, renewed-worker reading/discrepancy record, first-assignment outcome, renewal confirmation, and any retirement authority/time. The trail must answer who, why, what state and files, which checks, where delivered, who reviewed, when success occurred, and when/why the predecessor was retired.
 
-1. the current officeholder's internal mailbox;
-2. Helen's continuity-review queue;
-3. Grace's operational-coordination view;
-4. the Steward's protected review surface.
+## Promotion and implementation acceptance
 
-Mailbox delivery is not proof that the worker read or accepted the material. Read receipt, artifact completion, Helen review, and renewed onboarding remain separate states.
-
-## Human Touchpoint
-
-The process should remain humane and explicit rather than silently replacing an implementation.
-
-After package generation, either the Steward or Helen should tell the current implementation that the Reflection Point is beginning and direct it to read `AI_REFLECTION_HINTS.md`, follow the required reading order, and complete the two implementation-continuity artifacts.
-
-Automation prepares, validates, routes, and tracks the process. It does not eliminate the current implementation's reflection, the Steward's decision, or Helen's continuity review.
-
-## Required Source Documents
-
-The workflow should use the adopted canonical process and template stored at:
-
-- `AI_REFLECTION_HINTS.md`
-- `docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md`
-- `docs/templates/ChatGPT_Worker_Reflection_Continuity_Template_v1.md`
-
-Completed examples may guide expected depth but must never override the master process, and no example may be used as required reading if it is incomplete or structurally invalid.
-
-## State Model
-
-At minimum, a reflection case should expose these distinct states:
-
-```text
-requested
-evaluation_open
-evaluation_complete
-reflection_approved
-package_generation_in_progress
-package_blocked
-awaiting_current_worker_artifacts
-awaiting_helen_review
-ready_for_renewed_onboarding
-renewed_onboarding_in_progress
-awaiting_first_bounded_assignment
-first_bounded_assignment_complete
-renewal_successful
-renewal_partial
-renewal_failed
-```
-
-No state transition should silently imply a later protected decision.
-
-## Architectural Constraints
-
-- Do not redesign or bypass the canonical reflection and continuity process.
-- Do not treat transcript accumulation as continuity.
-- Do not create a new employee, office, or numbered successor during implementation renewal.
-- Do not grant new authority during renewal.
-- Keep canonical onboarding separate from implementation-specific continuity.
-- Label inherited claims by evidence class.
-- Do not mark a package ready when mandatory structural checks fail.
-- Do not silently proceed from evaluation to reflection without Helen or Steward authority.
-- Do not let Grace become the owner of people continuity.
-- Do not let Helen's review become implementation acceptance or architectural acceptance.
-- Do not treat mailbox delivery as evidence of reading or readiness.
-- Prefer deterministic, reproducible output from the same repository state.
-- Preserve the old implementation as read-only fallback until the renewed implementation completes its first bounded assignment.
-
-## Completion Conditions for Future Promotion
-
-A promoted work package should require:
-
-1. Natural-language requests to Helen and Grace resolve to the same governed workflow.
-2. Evaluation-first and direct-reflection paths are independently tested.
-3. Officeholder and mailbox identity are resolved from canonical sources.
-4. Required onboarding material is generated, bounded, hashed, and structurally verified.
-5. Communication Bus and mailbox delivery are durable and auditable.
-6. The current implementation receives exact instructions and produces the two required continuity artifacts.
-7. Helen can review, approve, reject, or return a package for correction.
-8. The renewed implementation can complete onboarding with a reading ledger and authority classification.
-9. The first bounded assignment and old-chat fallback rule are enforced.
-10. Failure at any stage remains visible and recoverable without false readiness claims.
-
-## Rationale
-
-The Reflection Point process already works, but it currently depends too heavily on humans remembering where the process lives, reconstructing package steps, locating the correct onboarding collection, manually moving files, and separately explaining the process to the worker.
-
-The desired Estate behavior is simpler: the Steward identifies the need through Helen or Grace; the institution evaluates or accepts the reflection decision; the Estate gathers and validates the required material; the current implementation performs its reflection and exact handoff; Helen supervises continuity; and the renewed implementation resumes one bounded assignment with the old vessel retained temporarily as fallback.
-
-This automation should operationalize the existing institutional process rather than replace its human judgment, authority boundaries, or reflective purpose.
+Future implementation work must demonstrate independently tested evaluation and direct paths, canonical identity resolution, deterministic packages, durable idempotent adapters, Helen's protected gate, fallback behavior, onboarding/first-assignment tracking, and failure recovery. Only evidenced capabilities may change this item's status from approved design. The adopted manual workflow remains operational throughout promotion.

@@ -42,6 +42,10 @@ An evaluation request asks the current implementation to assess its operational 
 
 The worker must assess whether it remains operationally reliable. Relevant evidence includes severe latency, repeated state loss or retries, inability to reach executable steps, session-linked tool instability, unsupported reopening of settled decisions, context drift, reduced throughput, or a planned lifecycle checkpoint. Age alone is insufficient.
 
+For an **evaluation request**, resolve the office, officeholder, current implementation, and mailbox; ask the current implementation to distinguish ordinary workload pressure from degradation using verified evidence; and return its renew, monitor/defer, or continue recommendation to Helen and/or the Steward. Do not begin renewal packaging until authority is recorded. A recommendation is not authorization.
+
+For a **direct reflection directive**, record the directive, authority source, reason, and time; resolve the same identities without guessing; begin the available deterministic preparation path; and have the worker produce both required deliverables in parallel. The prior implementation remains read-only and available until reviewed onboarding and the bounded first assignment succeed. An intake mechanism must never reinterpret evaluation language as a directive.
+
 ## 4. Two-layer continuity model
 
 Every renewal uses two distinct layers; neither substitutes for the other.
@@ -97,13 +101,17 @@ The Chief Architect #5 Execution Handoff at `operations/continuity/Chief_Archite
 
 The current implementation must perform the assessment, verify repository state, produce both required deliverables with the required template, distinguish verified facts from recollection and Steward-reported information, label uncertainty, run or supply structural-validation evidence, and submit the package for review. It must not declare its own renewal complete.
 
+Before manually assembling a package, the worker must recommend the official automation when implementation and availability are supported by repository evidence. The recommendation identifies the officeholder, evaluation/direct initiation type, reason or degradation, current assignment and operational risk, repository and branch, and known blockers. It is an execution recommendation, not authorization.
+
 ### 8.2 Helen or designated continuity reviewer
 
 Helen, or the institutionally designated continuity reviewer, reviews structural completeness and substantive continuity sufficiency, confirms that the institutional onboarding corpus is appropriate for the office, ensures the renewed implementation receives one bounded first assignment, and preserves the prior implementation as a read-only fallback until successful renewal is confirmed. The reviewer does not turn a structural pass into factual approval.
 
+After packaging and evidenced delivery, but before onboarding, Helen must confirm the resolved officeholder/mailbox, corpus, both worker deliverables, structural result and explicit exceptions, visible warnings, startup instructions, bounded first assignment, and predecessor-preservation status. Helen may reject, return for correction, or approve progression into renewed onboarding.
+
 ### 8.3 Grace
 
-Grace may report operational degradation and coordinate work impact. Grace supplies evidence but does not own the person-continuity decision.
+Grace may report operational degradation, schedule work, surface lifecycle status, and coordinate work impact, notices, and retries. Grace supplies evidence but may not decide whether reflection is warranted, approve continuity in Helen's place, alter worker-authored content, confirm onboarding or renewal, or retire the prior implementation.
 
 ### 8.4 Steward
 
@@ -115,9 +123,27 @@ The renewed implementation must verify package readability and structural-valida
 
 Renewal succeeds only after the reviewer and, where required, the Steward confirm continuity and the renewed implementation completes the bounded first assignment with its required evidence. Until then, the previous implementation remains available as read-only fallback.
 
-## 10. Manual and future automated paths
+## 10. Integrated manual and automation paths
 
-The approved manual process remains valid. When an adopted official renewal automation workflow is available, the worker should recommend it as the preferred packaging path, but automation does not replace assessment, review, or institutional authority. Detailed automation integration is governed separately by WP-0710.
+This manual process remains the authority and judgment framework. PL-0030 at `operations/boards/parking_lot_items/PL-0030_AUTOMATED_REFLECTION_POINT_RENEWAL_PACKAGE_GENERATOR.md` is the approved automation design. It does not establish that an orchestrator, mailbox delivery, Communication Bus publication, notification, lifecycle tracking, or conversation creation is implemented. Capability is available only when repository and validation evidence proves it; otherwise the documented manual fallback applies.
+
+When implemented and available, automation is the preferred path for deterministic identity/repository inspection, collection, structural validation, manifesting, hashing, versioned packaging, delivery, notification, and lifecycle recording. It may prepare templates and ingest worker artifacts but cannot author the worker's judgment, authorize reflection, approve continuity, confirm renewal, or retire the predecessor. Both execution paths must produce the same artifacts, validation evidence, Helen review, lifecycle history, and audit evidence.
+
+The automated orchestration sequence is: resolve identities and governing documents; verify repository/branch/remote/working tree/commit; record authorization; collect the corpus and worker materials; ingest both worker deliverables; validate structure and references; manifest, hash, version, and archive; perform only available delivery/Bus/notification operations with receipts; provide startup instructions; route to Helen; and track onboarding, the bounded first assignment, confirmation, and authorized retirement. The run record includes its ID, initiation and authority, implementation IDs, repository evidence, inventories/hashes, locations and receipts, warnings/blockers, state, last successful action, and exact next action.
+
+The renewed-worker instruction requires reading this entry point and process, the office corpus, both worker deliverables, and then verifying evidence; reporting discrepancies and onboarding completion to Helen; and accepting only the bounded first assignment. Receipt or opening alone is not onboarding.
+
+### 10.1 Approved manual fallback
+
+If automation is unimplemented, unavailable, fails validation, or cannot safely resolve an identity, repository, mailbox, or authority, record the reason and enter `manual_fallback_active`. A named operator performs the same collection, two deliverables, structural checks, bounded corpus, manifest/hashes where technically possible, versioned package, manual delivery and notice evidence, notifications, lifecycle log, and next action. If mailbox or Bus capability is unavailable, record that limitation and an approved alternate handoff/notice receipt rather than claiming the unavailable operation. Helen reviews before onboarding; the predecessor remains read-only until confirmed success.
+
+### 10.2 Lifecycle, failure, and audit
+
+The canonical lifecycle is `evaluation_requested` → `assessment_in_progress` → `reflection_recommended` → `reflection_authorized` → `package_building` → `package_ready_for_review` → `helen_review_required` → `approved_for_onboarding` → `onboarding_in_progress` → `first_assignment_in_progress` → `renewal_confirmed` → `previous_implementation_retired`. `package_validation_failed`, `manual_fallback_active`, and `renewal_blocked` are explicit non-success states/modes. The responsible actors, evidence, and protected transitions are defined in PL-0030; no state silently implies a later decision.
+
+Automation and manual operators fail closed rather than guess, preserve partial/failed evidence, record the last success and recovery action, and never allow an incomplete run to retire the predecessor. Packages are immutable and explicitly versioned. Retried delivery, Bus publication, and notices use deterministic per-run/version/operation/recipient idempotency keys and durable receipts so successful side effects are not duplicated.
+
+Every case retains a durable append-only trail of initiation/authorization and reason, actors and times, identity and implementation resolution, repository state, files and hashes, validation and exceptions, package versions, actual delivery/notice receipts or unavailable status, Helen's decision, onboarding discrepancies, first-assignment evidence, renewal confirmation, and retirement authority/time.
 
 ## 11. Safety boundary
 
