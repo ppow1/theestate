@@ -5,13 +5,15 @@
 **Originator:** Chief Architect / Steward  
 **Date Captured:** 2026-07-15  
 **Integrated design approved:** 2026-07-18
-**Status:** Approved design; automation not implemented
+**Status:** Partial implementation; durable lifecycle tracking implemented and verified
 **Target milestone:** Reflection-point process operationalization
 
 ## Status and authority boundary
 
 This item specifies a governed orchestrator for the adopted process in
-`docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md`. The manual process is the authority and judgment framework. This approved design does **not** prove an executable orchestrator, natural-language routing, mailbox delivery, Communication Bus publication, notification, lifecycle tracker, or conversation-creation capability exists. Until repository implementation and validation evidence prove an operation available, use the documented manual fallback and label its evidence manual. Opening a conversation is never an implied operation.
+`docs/operations/ChatGPT_Worker_Reflection_and_Continuity_Process_v1.md`. The manual process is the authority and judgment framework. Repository code now implements durable lifecycle workflow creation, protected state transitions, append-only transition evidence, atomic JSON persistence, and replay/conflict handling in `src/estate/core/reflection_workflow.py`, with targeted tests in `tests/test_reflection_workflow.py`.
+
+That implemented lifecycle capability does **not** establish natural-language routing, canonical identity resolution, repository inspection, corpus collection, structural package validation, ZIP creation, mailbox delivery, Communication Bus publication, notification, onboarding execution, retirement execution, or conversation-creation capability. Until repository implementation and validation evidence prove a specific operation available, use the documented manual fallback for that operation and label its evidence manual. Opening a conversation is never an implied operation.
 
 When an official capability is implemented and available, it is the preferred execution path for deterministic collection, validation, packaging, hashing, delivery, notification, and state tracking. It never decides a protected institutional question.
 
@@ -25,6 +27,21 @@ When an official capability is implemented and available, it is the preferred ex
 | Renewed implementation | Verifies the package, completes onboarding, reports discrepancies, and performs the bounded first assignment. |
 
 The office and officeholder identity persist; only the implementation changes. The prior implementation and evidence remain available read-only until onboarding and the bounded first assignment succeed and renewal is confirmed.
+
+## Implemented capability boundary
+
+The current executable capability can:
+
+- create an `evaluation_requested` workflow from a recorded evaluation request;
+- create a `reflection_authorized` workflow from a Steward direct-reflection directive;
+- persist one durable record under `runtime/reflection/workflows`;
+- validate transitions against the adopted lifecycle graph;
+- protect entry into authority-sensitive states by actor;
+- append actor and evidence records without erasing prior history;
+- update blockers, warnings, artifacts, receipts, renewed implementation, last successful action, and next action;
+- treat an exact event replay as idempotent and reject conflicting reuse of an event identifier.
+
+This capability is a lifecycle evidence component, not the complete renewal orchestrator. Operators must not infer that an accepted state transition proves the external work named by that state occurred. Transition evidence must reference independently verified artifacts or receipts.
 
 ## Initiation paths
 
@@ -80,7 +97,7 @@ After packaging and evidenced delivery, and before `approved_for_onboarding`, He
 
 ## Manual fallback
 
-Use `manual_fallback_active` whenever automation is unimplemented, unavailable, fails, or cannot safely resolve an entity. Record the reason and last attempted action. A named operator then performs the same bounded collection, two worker deliverables, structural checks, corpus, manifest and hashes where technically possible, versioned package, manual mailbox delivery evidence, manual Bus notice, notifications, lifecycle log, and exact next action. Helen reviews before onboarding, and the prior implementation remains read-only until success. If mailbox or Bus operations themselves are unavailable, record the unavailable capability and an approved alternate handoff/notice with receipt; do not claim the unavailable operation occurred. Manual execution is governed and evidence-equivalent, not an undocumented exception.
+Use `manual_fallback_active` whenever a required automation component is unimplemented, unavailable, fails, or cannot safely resolve an entity. The implemented lifecycle tracker may record this state, but it does not perform the fallback operations. Record the reason and last attempted action. A named operator then performs the same bounded collection, two worker deliverables, structural checks, corpus, manifest and hashes where technically possible, versioned package, manual mailbox delivery evidence, manual Bus notice, notifications, lifecycle log, and exact next action. Helen reviews before onboarding, and the prior implementation remains read-only until success. If mailbox or Bus operations themselves are unavailable, record the unavailable capability and an approved alternate handoff/notice with receipt; do not claim the unavailable operation occurred. Manual execution is governed and evidence-equivalent, not an undocumented exception.
 
 ## Lifecycle and transition evidence
 
@@ -118,4 +135,6 @@ Automated and manual cases retain an append-only lifecycle/actor log, directive 
 
 ## Promotion and implementation acceptance
 
-Future implementation work must demonstrate independently tested evaluation and direct paths, canonical identity resolution, deterministic packages, durable idempotent adapters, Helen's protected gate, fallback behavior, onboarding/first-assignment tracking, and failure recovery. Only evidenced capabilities may change this item's status from approved design. The adopted manual workflow remains operational throughout promotion.
+Current implementation evidence covers lifecycle-record creation, lifecycle transition validation, protected transition actors, durable atomic persistence, append-only history, and event replay/conflict behavior. Targeted lifecycle tests pass.
+
+Remaining implementation work must demonstrate independently tested canonical identity resolution, repository evidence capture, deterministic package construction, structural validation, durable idempotent delivery/Bus/notification adapters, Helen's protected review evidence, startup-instruction generation, onboarding/first-assignment evidence collection, retirement execution, and failure recovery. Only evidenced capabilities may be promoted as operational. The adopted manual workflow remains operational throughout promotion.
