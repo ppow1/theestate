@@ -31,6 +31,7 @@ SOURCE_PATHS = {
     "operations_morning_briefing": "runtime/operations/morning_briefing.json",
 }
 VALID_DECISIONS = {"continue", "pause", "recall_recommended", "unknown"}
+OPERATIONAL_EVENT_KINDS = {"observed_fact", "derived_state", "recommendation", "policy_decision", "authorization", "action", "escalation", "correction"}
 
 
 def _root(root: str | Path | None = None) -> Path:
@@ -167,3 +168,89 @@ def format_autonomous_operations_audit(*, root: str | Path | None = None) -> str
         for item in record.get("blocked_conditions", []):
             lines.append(f"  - {item.get('type')}: {item.get('message')}")
     return "\n".join(lines) + "\n"
+
+
+def append_operational_audit_event(event: dict[str, Any], *, root: str | Path | None = None) -> dict[str, Any]:
+    """Append a normalized operational event to the existing audit JSONL."""
+    item = json.loads(json.dumps(event))
+    required = ["event_id", "event_kind", "occurred_at", "correlations", "source_evidence", "confidence", "policy_disposition", "outcome"]
+    missing = [name for name in required if item.get(name) in (None, "", [], {})]
+    if missing:
+        raise ValueError(f"operational audit event missing: {', '.join(missing)}")
+    if item["event_kind"] not in OPERATIONAL_EVENT_KINDS:
+        raise ValueError("unknown operational audit event kind")
+    if item.get("restricted_payload") is not None or item.get("personal_data") is not None:
+        raise ValueError("restricted or personal payloads must remain in their canonical authorized store")
+    root_path = _root(root)
+    existing = read_audit_records(root_path)
+    if any(record.get("event_id") == item["event_id"] for record in existing):
+        raise ValueError("operational audit event_id already exists")
+    if item["event_kind"] == "correction":
+        target = item.get("corrects_event_id")
+        if not target or not any(record.get("event_id") == target for record in existing):
+            raise ValueError("correction must reference an existing event_id")
+    refs = item["source_evidence"]
+    if not isinstance(refs, list) or not refs or any(not isinstance(ref, str) or not ref.strip() for ref in refs):
+        raise ValueError("source_evidence must contain canonical references")
+    record = {
+        "version": 2,
+        "record_type": "operational_audit_event",
+        "event_id": item["event_id"],
+        "event_kind": item["event_kind"],
+        "occurred_at": item["occurred_at"],
+        "recorded_at": item.get("recorded_at") or item["occurred_at"],
+        "correlations": item["correlations"],
+        "source_evidence": sorted(set(refs)),
+        "freshness": item.get("freshness") or "unknown",
+        "confidence": item["confidence"],
+        "policy_disposition": item["policy_disposition"],
+        "authority": item.get("authority") or {"required": True, "references": []},
+        "outcome": item["outcome"],
+        "uncertainty": item.get("uncertainty") or [],
+        "corrects_event_id": item.get("corrects_event_id"),
+        "supersedes_event_id": item.get("supersedes_event_id"),
+        "classification": item.get("classification") or "Estate Internal",
+        "explanation_inputs": item.get("explanation_inputs") or [],
+        "generated_explanation_is_authoritative": False,
+    }
+    path = root_path / AUDIT_JSONL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True) + "\n")
+    return record
+
+
+def query_operational_audit(*, root: str | Path | None = None, **correlations: str) -> list[dict[str, Any]]:
+    records = [record for record in read_audit_records(root) if record.get("record_type") == "operational_audit_event"]
+    return [record for record in records if all((record.get("correlations") or {}).get(key) == value for key, value in correlations.items())]
+
+
+def reconstruct_operational_history(*, root: str | Path | None = None, **correlations: str) -> dict[str, Any]:
+    events = query_operational_audit(root=root, **correlations)
+    corrected = {record.get("corrects_event_id") for record in events if record.get("corrects_event_id")}
+    superseded = {record.get("supersedes_event_id") for record in events if record.get("supersedes_event_id")}
+    events.sort(key=lambda record: (record["occurred_at"], record["event_id"]))
+    return {
+        "correlations": correlations,
+        "events": events,
+        "corrected_event_ids": sorted(corrected),
+        "superseded_event_ids": sorted(superseded),
+        "missing_evidence_visible": any(record.get("uncertainty") or record.get("freshness") in {"stale", "unknown"} for record in events),
+        "generated_explanation_is_authoritative": False,
+    }
+
+
+def explain_operational_history(history: dict[str, Any]) -> str:
+    lines = ["# Operational decision explanation", "", "> Generated explanation only; canonical evidence and authority records control.", ""]
+    if not history.get("events"):
+        lines.append("No matching operational audit events were found; the reason cannot be reconstructed from this audit view.")
+    for event in history.get("events") or []:
+        marker = " (later corrected)" if event["event_id"] in history.get("corrected_event_ids", []) else ""
+        lines.extend([
+            f"## {event['event_id']}{marker}",
+            f"- Kind: {event['event_kind']}", f"- At: {event['occurred_at']}",
+            f"- Policy: {event['policy_disposition']}", f"- Outcome: {event['outcome']}",
+            f"- Evidence: {', '.join(event['source_evidence'])}",
+            f"- Uncertainty: {', '.join(event.get('uncertainty') or []) or 'none recorded'}", "",
+        ])
+    return "\n".join(lines).rstrip() + "\n"

@@ -1,6 +1,6 @@
 # CAMPAIGN-0681 — Estate Operationalization
 
-Status: Launch authorized — ready for Codex execution  
+Status: G8 accepted — governed integration authorized; operational rollout qualification pending
 Parent authority: Steward direction to operationalize the Estate after campaign-level execution capability is available  
 Architecture and acceptance owner: Chief Architect  
 Operational owner: Grace, within existing authority boundaries  

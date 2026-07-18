@@ -1,0 +1,491 @@
+{
+  "alfred": {
+    "acceptance_granted": false,
+    "ack_status": "pending",
+    "authorizes_action": false,
+    "canonical_destination": {
+      "employee_id": 7,
+      "mailbox_id": 7,
+      "name": "Alfred"
+    },
+    "conflicting_duplicate": false,
+    "duplicate": false,
+    "indexed_destination_employee_id": 7,
+    "indexed_destination_mailbox_id": 7,
+    "mailbox_index_message_count": 1,
+    "mailbox_index_path": "collaboration/mailboxes/index.json",
+    "message_id": "msg_campaign0681_wp0706_pilot",
+    "message_type": "coordination_request",
+    "reasons": [],
+    "recorded": true,
+    "repository_message_path": "collaboration/messages/msg_campaign0681_wp0706_pilot.json",
+    "requires_ack": true,
+    "routable": true,
+    "routing_is_execution": false,
+    "schema_version": "estate.alfred-operational-route.v1",
+    "underlying_work_complete": false
+  },
+  "audit_event": {
+    "authority": {
+      "references": [
+        "collaboration/work_packages/planning/CAMPAIGN_0681_manifest.json"
+      ],
+      "required": true
+    },
+    "classification": "Estate Internal",
+    "confidence": "high",
+    "corrects_event_id": null,
+    "correlations": {
+      "campaign_id": "CAMPAIGN-0681",
+      "cycle_id": "wp0706-protected-stop",
+      "work_package_id": "WP-0706"
+    },
+    "event_id": "campaign0681-wp0706-pilot-protected-stop",
+    "event_kind": "escalation",
+    "explanation_inputs": [],
+    "freshness": "current",
+    "generated_explanation_is_authoritative": false,
+    "occurred_at": "2026-07-18T14:00:00Z",
+    "outcome": "protected decision held for Chief Architect and Steward",
+    "policy_disposition": "escalate",
+    "record_type": "operational_audit_event",
+    "recorded_at": "2026-07-18T14:00:00Z",
+    "source_evidence": [
+      "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+    ],
+    "supersedes_event_id": null,
+    "uncertainty": [],
+    "version": 2
+  },
+  "engineering": {
+    "dispatch_id": "dispatch-campaign0681-wp0706-pilot",
+    "live_provider_execution": false,
+    "provider": "codex-cli-openai",
+    "state": "Queued"
+  },
+  "grace": {
+    "coordination_message_id": "msg_campaign0681_wp0706_pilot",
+    "view": {
+      "authority_boundaries": {
+        "may": [
+          "observe",
+          "recommend",
+          "coordinate delegated operations"
+        ],
+        "may_not": [
+          "assign staff",
+          "approve architecture",
+          "accept Engineering work",
+          "merge",
+          "deploy",
+          "spend",
+          "make protected decisions"
+        ],
+        "must_route": [
+          "architecture",
+          "staffing",
+          "communication routing",
+          "protected decisions",
+          "acceptance"
+        ]
+      },
+      "authorizes_action": false,
+      "campaign_id": "CAMPAIGN-0681",
+      "campaign_momentum_state": "active",
+      "canonical_sources": [
+        "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+      ],
+      "derived_view_only": true,
+      "items": [
+        {
+          "acknowledgement_required": false,
+          "action_class": "coordinate",
+          "authorizes_action": false,
+          "blocker_class": null,
+          "coordination_permitted": true,
+          "dependency_satisfaction": {
+            "satisfied": [
+              "WP-0705"
+            ],
+            "unmet": []
+          },
+          "evidence_freshness_warnings": [],
+          "evidence_references": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "observed_state": "eligible",
+          "package_id": "WP-0706-PILOT",
+          "priority_basis": "canonical momentum order; Grace does not set Engineering priority",
+          "proper_office_or_lane": "Alfred",
+          "protected_stop": false,
+          "recommended_next_action": "Perform the bounded evidence-integrity handoff.",
+          "severity": null
+        }
+      ],
+      "mutated_canonical_state": false,
+      "observed_at": "2026-07-18T14:00:00Z",
+      "role": "Grace / Office of Operations",
+      "schema_version": "estate.grace-operational-coordination.v1",
+      "summary": {
+        "blocked_or_degraded": 0,
+        "coordination_permitted": 1,
+        "protected_stops": 0,
+        "total": 1
+      },
+      "warnings": []
+    }
+  },
+  "helen": {
+    "disposition": {
+      "acceptance_authority_granted": false,
+      "architecture_authority_granted": false,
+      "authority_evidence": [],
+      "campaign_id": "CAMPAIGN-0681",
+      "created_at": "2026-07-18T13:33:49Z",
+      "decided_by": "Helen",
+      "disposition": "deferred",
+      "disposition_id": "wfd-f1f90c524c4f4290af50812da875d0a1",
+      "engineering_priority_authority_granted": false,
+      "evidence_references": [
+        "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+      ],
+      "expires_at": null,
+      "fulfilled_capabilities": [],
+      "need_kind": "capability",
+      "package_id": "WP-0706-PILOT",
+      "partial_fulfillment": false,
+      "provider_execution_performed": false,
+      "reason": "Pilot proves the request lane only; no staffing is authorized or performed.",
+      "remaining_need": [
+        "campaign evidence integrity review"
+      ],
+      "request_id": "wfr-1b63fd42ab6c4c6b98799d82c1b23c1a",
+      "request_was_fulfillment": false,
+      "requires_protected_review": false,
+      "schema_version": "estate.operational-staffing-disposition.v1",
+      "staff_assignment_performed": false
+    },
+    "disposition_path": "runtime/workforce_development/operational_dispositions/wfd-f1f90c524c4f4290af50812da875d0a1.json",
+    "request_id": "wfr-1b63fd42ab6c4c6b98799d82c1b23c1a",
+    "request_path": "runtime/workforce_development/requests/wfr-1b63fd42ab6c4c6b98799d82c1b23c1a.json"
+  },
+  "interruption_recovery": {
+    "checkpoint_cycle_id": "wp0706-pilot",
+    "last_replayed_position": 2,
+    "reconstructed_state": {
+      "admitted_audit_state": {},
+      "campaign_state": {
+        "phase": "recovered-for-review",
+        "pilot_id": "CAMPAIGN-0681-WP0706-EVIDENCE-INTEGRITY"
+      },
+      "claims": {},
+      "completed_side_effects": [
+        "msg_campaign0681_wp0706_pilot"
+      ],
+      "cycle_checkpoint": {
+        "cycle_id": "wp0706-pilot",
+        "state": "running",
+        "updated_at": "2026-07-18T13:33:49Z"
+      },
+      "last_durable_event_position": 2,
+      "leases": {},
+      "scheduler_state": {}
+    },
+    "replay_started_at": "2026-07-18T13:33:49Z",
+    "replayed_events": 1,
+    "skipped_completed_side_effects": [
+      "msg_campaign0681_wp0706_pilot"
+    ]
+  },
+  "occurred_at": "2026-07-18T14:00:00Z",
+  "outcome": "pilot workflow completed mechanically; G7 protected review remains pending",
+  "owner": "Grace / Office of Operations",
+  "pilot_id": "CAMPAIGN-0681-WP0706-EVIDENCE-INTEGRITY",
+  "protected_actions": {
+    "acceptance": false,
+    "campaign_closeout": false,
+    "deployment": false,
+    "disclosure": false,
+    "merge": false,
+    "spending": false,
+    "staffing": false
+  },
+  "protected_escalation": {
+    "adapter_calls": 0,
+    "cycle": {
+      "action_executed": false,
+      "action_result": null,
+      "candidate_digest": "9f3785473079c2799120e078da804313774cb530661f3eaca3148a4a2ec70834",
+      "canonical_records_mutated_only_by_adapter": false,
+      "cooldown": {
+        "active": false,
+        "last_action_at": null,
+        "seconds": 300
+      },
+      "creates_authority": false,
+      "cycle_id": "wp0706-protected-stop",
+      "deduplication": {
+        "prior_action_keys": [],
+        "selected_key": null
+      },
+      "disposition": "escalate",
+      "evidence_references": [
+        "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+      ],
+      "holds": [
+        "decision: protected decision required"
+      ],
+      "input_digest": "2b7ed4789a3ea3971358dd3d638b94e413ae3b828946e85ae8a237f0fd82f9b7",
+      "mode": "live",
+      "observed_at": "2026-07-18T14:00:00Z",
+      "record_digest": "3c7f4c4ae8f2646a593467fc720a41635b0c4cac039fd8df9a0e2c1c70a5ccbe",
+      "safe_idle": false,
+      "schema_version": "estate.continuous-momentum-cycle.v1",
+      "selected_action": null,
+      "stages": [
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "deterministic cycle stage",
+          "stage": "observe",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "deterministic cycle stage",
+          "stage": "reconcile",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "deterministic cycle stage",
+          "stage": "classify",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "deterministic cycle stage",
+          "stage": "propose",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "deterministic cycle stage",
+          "stage": "authorize",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "no side effect performed",
+          "stage": "act",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "no executed outcome to verify",
+          "stage": "verify",
+          "status": "completed"
+        },
+        {
+          "evidence": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "note": "deterministic cycle stage",
+          "stage": "record",
+          "status": "completed"
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "risk": "low; repository-evidence-only sandbox with no live provider call",
+  "rollback": "Discard the isolated pilot root; committed result evidence is append-only.",
+  "schema_version": "estate.campaign-0681-bounded-pilot-result.v1",
+  "scope": "Validate the CAMPAIGN-0681 pilot evidence inventory through existing operational lanes.",
+  "starting_state": {
+    "authorization_reference": "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md",
+    "readiness": {
+      "acceptance_notice": "Only a current protected acceptance record with its issuing authority can project accepted state.",
+      "aggregate_readiness": "ready",
+      "authorizes_action": false,
+      "derived_view_only": true,
+      "observed_at": "2026-07-18T14:00:00Z",
+      "schema_version": "estate.readiness-evidence-projection.v1",
+      "subjects": [
+        {
+          "acceptance_authority": null,
+          "authorizes_action": false,
+          "confidence": "high",
+          "dependencies": [],
+          "derived_view_only": true,
+          "evidence_lineage": [
+            {
+              "authority": null,
+              "confidence": "high",
+              "evidence_id": "pilot-launch-validation",
+              "expires_at": null,
+              "freshness_seconds": 86400,
+              "inaccessible": false,
+              "issued_at": "2026-07-18T14:00:00Z",
+              "reference": "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md",
+              "source_kind": "validation_result",
+              "source_precedence": 70,
+              "stale": false,
+              "state": "ready",
+              "superseded": false,
+              "supersedes": null
+            }
+          ],
+          "evidence_references": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "readiness_state": "ready",
+          "subject_id": "CAMPAIGN-0681-WP0706-EVIDENCE-INTEGRITY",
+          "unaccepted_dependencies": [],
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "steward_visibility": {
+    "accessibility": {
+      "canonical_links_exposed": true,
+      "status_not_color_only": true,
+      "text_labels": true
+    },
+    "authorizes_action": false,
+    "derived_view_only": true,
+    "generated_at": "2026-07-18T14:00:00Z",
+    "highest_priority_constraints": [
+      {
+        "authorizes_action": false,
+        "classification": "Estate Internal",
+        "confidence": "high",
+        "controls": [],
+        "derived_view_only": true,
+        "domain": "pilot",
+        "evidence_references": [
+          "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+        ],
+        "freshness": "current",
+        "observed_at": "2026-07-18T14:00:00Z",
+        "owner": "Chief Architect and Steward",
+        "protected_decision": {
+          "decision_question": "Release G7 after reviewing pilot and failure evidence?",
+          "evidence_references": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "requested_authority": "Chief Architect and Steward"
+        },
+        "redacted": false,
+        "signal_id": "wp0706-protected-review",
+        "state": "protected",
+        "summary": "Pilot evidence is complete; acceptance remains protected.",
+        "title": "WP-0706 pilot requires protected review",
+        "warnings": []
+      }
+    ],
+    "information_architecture": [
+      "highest_priority_constraints",
+      "protected_decisions",
+      "campaign_momentum",
+      "health_and_readiness",
+      "audit_and_evidence",
+      "authorized_controls"
+    ],
+    "protected_decisions": [
+      {
+        "authorizes_action": false,
+        "classification": "Estate Internal",
+        "confidence": "high",
+        "controls": [],
+        "derived_view_only": true,
+        "domain": "pilot",
+        "evidence_references": [
+          "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+        ],
+        "freshness": "current",
+        "observed_at": "2026-07-18T14:00:00Z",
+        "owner": "Chief Architect and Steward",
+        "protected_decision": {
+          "decision_question": "Release G7 after reviewing pilot and failure evidence?",
+          "evidence_references": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "requested_authority": "Chief Architect and Steward"
+        },
+        "redacted": false,
+        "signal_id": "wp0706-protected-review",
+        "state": "protected",
+        "summary": "Pilot evidence is complete; acceptance remains protected.",
+        "title": "WP-0706 pilot requires protected review",
+        "warnings": []
+      }
+    ],
+    "schema_version": "estate.steward-operational-visibility.v1",
+    "signals": [
+      {
+        "authorizes_action": false,
+        "classification": "Estate Internal",
+        "confidence": "high",
+        "controls": [],
+        "derived_view_only": true,
+        "domain": "pilot",
+        "evidence_references": [
+          "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+        ],
+        "freshness": "current",
+        "observed_at": "2026-07-18T14:00:00Z",
+        "owner": "Chief Architect and Steward",
+        "protected_decision": {
+          "decision_question": "Release G7 after reviewing pilot and failure evidence?",
+          "evidence_references": [
+            "collaboration/evidence/CAMPAIGN_0681_WP0706_PILOT_AUTHORIZATION.md"
+          ],
+          "requested_authority": "Chief Architect and Steward"
+        },
+        "redacted": false,
+        "signal_id": "wp0706-protected-review",
+        "state": "protected",
+        "summary": "Pilot evidence is complete; acceptance remains protected.",
+        "title": "WP-0706 pilot requires protected review",
+        "warnings": []
+      }
+    ],
+    "summary": {
+      "by_state": {
+        "active": 0,
+        "blocked": 0,
+        "degraded": 0,
+        "failed": 0,
+        "indeterminate": 0,
+        "protected": 1,
+        "ready": 0,
+        "stale": 0
+      },
+      "displayed": 1,
+      "truncated": false
+    },
+    "viewer": {
+      "identity_evidence": [
+        "data/registry/personnel.json"
+      ],
+      "role": "steward"
+    },
+    "warnings": []
+  }
+}

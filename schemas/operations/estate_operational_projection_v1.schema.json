@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.operational.projection.v1",
+  "title": "Estate rebuildable operational projection",
+  "type": "object",
+  "required": ["subject", "state", "applied_event_ids", "duplicate_event_ids", "evidence_refs", "authoritative", "rebuildable", "schema_version"],
+  "$defs": {
+    "state": {"enum": ["observed", "pending", "not_ready", "ready", "eligible", "coordinating", "executing", "waiting_for_evidence", "waiting_for_authority", "blocked", "degraded", "failed", "paused", "recovering", "review_required", "complete", "accepted", "cancelled", "superseded"]}
+  },
+  "properties": {
+    "subject": {"type": "object"},
+    "state": {"$ref": "#/$defs/state"},
+    "applied_event_ids": {"type": "array", "items": {"type": "string"}},
+    "duplicate_event_ids": {"type": "array", "items": {"type": "string"}},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "authoritative": {"const": false},
+    "rebuildable": {"const": true},
+    "schema_version": {"const": "estate.operational.v1"}
+  }
+}

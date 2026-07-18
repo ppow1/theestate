@@ -6,6 +6,7 @@ authoritative source of truth for any capability.
 """
 
 import json
+import os
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,7 +35,15 @@ def _now():
 
 
 def _root(root=None):
-    return Path(root) if root is not None else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
+    if root is not None:
+        return Path(root)
+    configured = os.environ.get("ESTATE_ROOT")
+    if configured:
+        return Path(configured)
+    cwd = Path.cwd()
+    if (cwd / "data" / "registry").exists():
+        return cwd
+    return ESTATE_ROOT if ESTATE_ROOT.exists() else cwd
 
 
 def _rel(path, root):

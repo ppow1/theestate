@@ -5,9 +5,19 @@ execution. It only builds governed intake records and renders briefings.
 """
 from __future__ import annotations
 
+import json
+from copy import deepcopy
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
+
+from estate.core.mailbox_index import (
+    generate_mailbox_index,
+    load_functional_mailbox_registry,
+    load_personnel_registry,
+    resolve_destination,
+)
 
 EVENT_TYPES = {
     "work_package_completed",
@@ -31,6 +41,11 @@ AUTHORITY_BOUNDARY = {
     "live_access": "not_implied",
 }
 
+OPERATIONAL_MESSAGE_TYPES = {
+    "notification", "coordination_request", "staffing_request", "execution_request",
+    "blocker_escalation", "acceptance_request", "protected_decision_request",
+}
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -42,6 +57,171 @@ def _as_list(value: Any) -> list[Any]:
     if isinstance(value, list):
         return value
     return [value]
+
+
+def _parse_time(value: str) -> datetime:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("created_at is required")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("created_at must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def evaluate_operational_route(
+    message: dict[str, Any],
+    *,
+    root: str | Path,
+    now: str | None = None,
+    stale_after_seconds: int = 86400,
+) -> dict[str, Any]:
+    """Resolve one operational message against canonical registries without writing it."""
+    root_path = Path(root)
+    payload = deepcopy(message)
+    message_id = str(payload.get("message_id") or payload.get("id") or "").strip()
+    message_type = str(payload.get("message_type") or "").strip()
+    reasons: list[str] = []
+    if not message_id:
+        reasons.append("message_id is required")
+    if message_type not in OPERATIONAL_MESSAGE_TYPES:
+        reasons.append(f"unsupported operational message type: {message_type or '(missing)'}")
+    if not str(payload.get("source") or "").strip():
+        reasons.append("source is required")
+    if not isinstance(payload.get("payload"), dict):
+        reasons.append("payload object is required")
+    elif not str(payload["payload"].get("title") or "").strip():
+        reasons.append("payload title is required")
+    if payload.get("operational_context", {}).get("authorizes_action") is not False:
+        reasons.append("operational message must explicitly authorize no action")
+
+    personnel = load_personnel_registry(root_path)
+    mailboxes = load_functional_mailbox_registry(root_path)
+    employee_id, mailbox_id, warning = resolve_destination(payload, personnel, mailboxes)
+    if warning:
+        reasons.append(warning)
+    if employee_id is None and mailbox_id is None:
+        reasons.append("canonical destination could not be resolved")
+
+    explicit_employee = payload.get("destination_employee_id")
+    explicit_mailbox = payload.get("destination_mailbox_id")
+    if explicit_employee is None and explicit_mailbox is None:
+        reasons.append("explicit canonical destination ID is required; Alfred may not guess from a title")
+    if explicit_employee is not None and employee_id is not None and int(explicit_employee) != int(employee_id):
+        reasons.append("destination employee ID conflicts with canonical resolution")
+    if explicit_mailbox is not None and mailbox_id is not None and int(explicit_mailbox) != int(mailbox_id):
+        reasons.append("destination mailbox ID conflicts with canonical resolution")
+    if explicit_employee is not None and explicit_mailbox is not None:
+        entry = next((item for item in personnel if int(item.get("employee_id", -1)) == int(explicit_employee)), None)
+        if entry and int(entry.get("mailbox_id", -1)) != int(explicit_mailbox):
+            reasons.append("destination employee and mailbox IDs are misrouted")
+
+    try:
+        created_at = _parse_time(str(payload.get("created_at") or ""))
+        observed_at = _parse_time(now) if now else datetime.now(timezone.utc)
+        if (observed_at - created_at).total_seconds() > stale_after_seconds:
+            reasons.append("message is stale and requires refreshed evidence")
+        if created_at > observed_at:
+            reasons.append("message timestamp is in the future")
+    except ValueError as exc:
+        reasons.append(str(exc))
+
+    messages_dir = root_path / "collaboration" / "messages"
+    existing_path = messages_dir / f"{message_id}.json"
+    duplicate = False
+    conflicting_duplicate = False
+    if existing_path.exists():
+        try:
+            existing = json.loads(existing_path.read_text(encoding="utf-8"))
+            duplicate = existing == payload
+            conflicting_duplicate = not duplicate
+            if conflicting_duplicate:
+                reasons.append("message ID already exists with different content")
+        except (OSError, json.JSONDecodeError):
+            conflicting_duplicate = True
+            reasons.append("message ID already exists as unreadable evidence")
+
+    return {
+        "schema_version": "estate.alfred-operational-route.v1",
+        "message_id": message_id,
+        "message_type": message_type,
+        "canonical_destination": {
+            "name": payload.get("destination"),
+            "employee_id": employee_id,
+            "mailbox_id": mailbox_id,
+        },
+        "routable": not reasons,
+        "duplicate": duplicate,
+        "conflicting_duplicate": conflicting_duplicate,
+        "reasons": sorted(set(reasons)),
+        "requires_ack": payload.get("requires_ack") is True,
+        "ack_status": payload.get("ack_status"),
+        "repository_message_path": f"collaboration/messages/{message_id}.json" if message_id else None,
+        "mailbox_index_path": "collaboration/mailboxes/index.json",
+        "routing_is_execution": False,
+        "underlying_work_complete": False,
+        "acceptance_granted": False,
+        "authorizes_action": False,
+    }
+
+
+def route_operational_message(
+    message: dict[str, Any],
+    *,
+    root: str | Path,
+    now: str | None = None,
+    stale_after_seconds: int = 86400,
+) -> dict[str, Any]:
+    """Write a routable message to the existing source-of-truth and rebuild discovery."""
+    root_path = Path(root)
+    decision = evaluate_operational_route(
+        message, root=root_path, now=now, stale_after_seconds=stale_after_seconds
+    )
+    if not decision["routable"]:
+        raise ValueError("operational message is not routable: " + "; ".join(decision["reasons"]))
+    path = root_path / str(decision["repository_message_path"])
+    if not decision["duplicate"]:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(message, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    index = generate_mailbox_index(root_path, write=True)
+    indexed = next((item for item in index["messages"] if item.get("message_id") == decision["message_id"]), None)
+    if not indexed or indexed.get("warning"):
+        raise ValueError("routed message is not discoverable without warning in the canonical mailbox index")
+    return {
+        **decision,
+        "recorded": True,
+        "mailbox_index_message_count": index["message_count"],
+        "indexed_destination_employee_id": indexed.get("destination_employee_id"),
+        "indexed_destination_mailbox_id": indexed.get("destination_mailbox_id"),
+    }
+
+
+def correlate_operational_response(original: dict[str, Any], response: dict[str, Any]) -> dict[str, Any]:
+    """Correlate acknowledgement/reply evidence without changing underlying work status."""
+    original_id = str(original.get("message_id") or original.get("id") or "").strip()
+    response_id = str(response.get("message_id") or response.get("id") or "").strip()
+    thread_id = str(original.get("thread_id") or original_id)
+    correlated = bool(
+        original_id
+        and response_id
+        and (
+            response.get("reply_to") == original_id
+            or response.get("acknowledges") == original_id
+            or response.get("thread_id") == thread_id
+        )
+    )
+    return {
+        "original_message_id": original_id,
+        "response_message_id": response_id,
+        "correlated": correlated,
+        "acknowledged": correlated and response.get("message_type") == "acknowledgement",
+        "underlying_work_complete": False,
+        "decision_authority_exercised": False,
+        "acceptance_granted": False,
+        "authorizes_action": False,
+    }
 
 
 def classify_alfred_event(event_type: str, source: str | None = None, payload: dict[str, Any] | None = None) -> dict[str, Any]:

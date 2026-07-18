@@ -6,11 +6,15 @@ operational authority; it summarizes what existing Estate reports already know.
 """
 
 import json
+from copy import deepcopy
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
 from estate.core.paths import ESTATE_ROOT
+
+OPERATIONAL_SIGNAL_STATES = {"ready", "active", "blocked", "degraded", "failed", "protected", "stale", "indeterminate"}
+SIGNAL_PRIORITY = {"failed": 100, "protected": 95, "blocked": 90, "indeterminate": 85, "stale": 80, "degraded": 70, "active": 50, "ready": 30}
 
 OPTIONAL_JSON_INPUTS = [
     "runtime/operations/operations_board.json",
@@ -35,9 +39,12 @@ def _now():
 def estate_root(root=None):
     if root is not None:
         return Path(root)
+    cwd = Path.cwd()
+    if (cwd / "runtime" / "operations" / "operations_board.json").is_file():
+        return cwd
     if ESTATE_ROOT.exists():
         return ESTATE_ROOT
-    return Path.cwd()
+    return cwd
 
 
 def _rel(path, root):
@@ -287,3 +294,80 @@ def format_steward_dashboard_markdown(dashboard):
     no_action = dashboard.get("items_not_requiring_steward_action", [])
     lines.extend(f"- {item}" for item in no_action) if no_action else lines.append("- None recorded.")
     return "\n".join(lines)
+
+
+def build_operational_visibility(signals, *, viewer, generated_at, max_items=100):
+    """Build a bounded role-aware view over supplied canonical projections."""
+    if not viewer.get("role") or not viewer.get("identity_evidence"):
+        raise ValueError("viewer role and identity evidence are required")
+    if max_items <= 0 or max_items > 500:
+        raise ValueError("max_items must be between 1 and 500")
+    allowed_classes = set(viewer.get("allowed_classifications") or ["Estate Internal"])
+    items = []
+    warnings = []
+    for original in signals:
+        signal = deepcopy(original)
+        state = str(signal.get("state") or "indeterminate").lower()
+        if state not in OPERATIONAL_SIGNAL_STATES:
+            state = "indeterminate"
+        refs = sorted({str(ref) for ref in signal.get("evidence_references") or [] if ref})
+        local = list(signal.get("warnings") or [])
+        if not signal.get("signal_id") or not refs:
+            state = "indeterminate"
+            local.append("status lacks stable identity or canonical drill-through evidence")
+        classification = signal.get("classification") or "Estate Internal"
+        redacted = classification not in allowed_classes
+        protected = state == "protected" or bool(signal.get("protected_decision"))
+        decision = None
+        if protected:
+            decision = {
+                "requested_authority": signal.get("requested_authority"),
+                "decision_question": None if redacted else signal.get("decision_question"),
+                "evidence_references": refs,
+            }
+            if not decision["requested_authority"] or not signal.get("decision_question"):
+                state = "indeterminate"
+                local.append("protected decision lacks requested authority or decision question")
+        controls = []
+        for control in signal.get("controls") or []:
+            if control.get("authorized") and viewer["role"] in (control.get("allowed_roles") or []):
+                controls.append({"label": control.get("label"), "action_class": control.get("action_class"), "authority_reference": control.get("authority_reference")})
+        item = {
+            "signal_id": signal.get("signal_id"),
+            "domain": signal.get("domain"),
+            "title": "Restricted operational item" if redacted else signal.get("title"),
+            "summary": "Details withheld by existing classification policy." if redacted else signal.get("summary"),
+            "state": state,
+            "freshness": signal.get("freshness") or "unknown",
+            "confidence": signal.get("confidence") or "unknown",
+            "observed_at": signal.get("observed_at"),
+            "owner": signal.get("owner"),
+            "evidence_references": refs,
+            "warnings": sorted(set(local)),
+            "protected_decision": decision,
+            "controls": controls,
+            "redacted": redacted,
+            "classification": classification,
+            "derived_view_only": True,
+            "authorizes_action": False,
+        }
+        warnings.extend(f"{item['signal_id'] or '<missing>'}: {warning}" for warning in local)
+        items.append(item)
+    items.sort(key=lambda item: (-SIGNAL_PRIORITY[item["state"]], str(item["signal_id"])))
+    truncated = len(items) > max_items
+    items = items[:max_items]
+    constraints = [item for item in items if item["state"] in {"failed", "protected", "blocked", "indeterminate", "stale", "degraded"}]
+    return {
+        "schema_version": "estate.steward-operational-visibility.v1",
+        "generated_at": generated_at,
+        "viewer": {"role": viewer["role"], "identity_evidence": list(viewer["identity_evidence"])},
+        "information_architecture": ["highest_priority_constraints", "protected_decisions", "campaign_momentum", "health_and_readiness", "audit_and_evidence", "authorized_controls"],
+        "highest_priority_constraints": constraints,
+        "protected_decisions": [item for item in items if item["protected_decision"]],
+        "signals": items,
+        "summary": {"displayed": len(items), "truncated": truncated, "by_state": {state: sum(item["state"] == state for item in items) for state in sorted(OPERATIONAL_SIGNAL_STATES)}},
+        "warnings": sorted(set(warnings + (["view truncated at configured performance bound"] if truncated else []))),
+        "accessibility": {"status_not_color_only": True, "text_labels": True, "canonical_links_exposed": True},
+        "derived_view_only": True,
+        "authorizes_action": False,
+    }

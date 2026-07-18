@@ -39,10 +39,10 @@ $PackageText = Get-Content -Raw -LiteralPath $PackagePath
 
 $RequiredHeadingGroups = @(
     @("## Objective"),
-    @("## Required Work", "## Scope", "## Required Behavior", "## Behavior"),
-    @("## Required Deliverables", "## Deliverables", "## Required Outputs", "## Outputs"),
+    @("## Required Work", "## Scope", "## Required behavior", "## Required Behavior", "## Behavior"),
+    @("## Required Deliverables", "## Deliverables", "## Required Outputs", "## Outputs", "## Required Evidence"),
     @("## Required Validation", "## Validation", "## Executable Validation Commands", "## Exact Validation Commands"),
-    @("## Acceptance Criteria")
+    @("## Acceptance Criteria", "## Acceptance criteria")
 )
 
 foreach ($HeadingGroup in $RequiredHeadingGroups) {
@@ -82,7 +82,7 @@ foreach ($Requirement in $ReceiptRequirements) {
 
 $DeliverableSectionMatch = [regex]::Match(
     $PackageText,
-    "(?s)## (?:Required Deliverables|Deliverables|Required Outputs|Outputs)\s*(.*?)(?=\r?\n## |\z)"
+    "(?s)## (?:Required Deliverables|Deliverables|Required Outputs|Outputs|Required Evidence)\s*(.*?)(?=\r?\n## |\z)"
 )
 
 if ($DeliverableSectionMatch.Success) {
