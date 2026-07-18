@@ -26,6 +26,13 @@ WORKFORCE_BASE = Path("runtime/workforce_development")
 REQUESTS = WORKFORCE_BASE / "requests"
 ASSESSMENTS = WORKFORCE_BASE / "assessments"
 STATUS = WORKFORCE_BASE / "status"
+DISPOSITIONS = WORKFORCE_BASE / "operational_dispositions"
+
+OPERATIONAL_NEED_KINDS = {"staffing", "capability", "provider", "environment"}
+OPERATIONAL_DISPOSITIONS = {
+    "fulfilled", "partially_fulfilled", "refused", "deferred", "expired", "protected_review_required"
+}
+PROTECTED_OPERATIONAL_CONSTRAINTS = {"budget", "privacy", "protected_policy", "provider_suitability_unresolved"}
 
 ALLOWED_REQUEST_TYPES = {
     "staffing_request",
@@ -376,8 +383,164 @@ class HelenWorkforceStore:
         self.root = _root(root)
 
     def ensure_dirs(self) -> None:
-        for relative in [REQUESTS, ASSESSMENTS, STATUS]:
+        for relative in [REQUESTS, ASSESSMENTS, DISPOSITIONS, STATUS]:
             (self.root / relative).mkdir(parents=True, exist_ok=True)
+
+    def create_operational_request(
+        self,
+        blocker: dict[str, Any],
+        *,
+        campaign_id: str,
+        package_id: str,
+        need_kind: str,
+        required_role: str,
+        required_capabilities: list[str],
+        urgency: str,
+        duration: str,
+        constraints: list[str] | None = None,
+        requesting_office: str = "Office of Operations",
+    ) -> tuple[WorkforceRequest, Path]:
+        """Translate a qualifying operational blocker into Helen's workforce lane."""
+        blocker_class = str(blocker.get("blocker_class") or "")
+        if blocker_class not in {"staffing_or_capability_blocker", "provider_or_environment_blocker"}:
+            raise ValueError("blocker is not a staffing, capability, provider, or environment need")
+        if need_kind not in OPERATIONAL_NEED_KINDS:
+            raise ValueError(f"unknown operational need kind: {need_kind}")
+        for value, name in [
+            (campaign_id, "campaign_id"), (package_id, "package_id"),
+            (required_role, "required_role"), (urgency, "urgency"), (duration, "duration"),
+        ]:
+            _require_text(value, name)
+        _require_string_list(required_capabilities, "required_capabilities")
+        if not required_capabilities:
+            raise ValueError("required_capabilities must not be empty")
+        evidence = blocker.get("canonical_evidence_references") or []
+        _require_string_list(evidence, "canonical_evidence_references")
+        if not evidence:
+            raise ValueError("canonical blocker evidence is required")
+        limitations = sorted(set(constraints or []))
+        protected = sorted(set(limitations) & PROTECTED_OPERATIONAL_CONSTRAINTS)
+        if blocker.get("protected_decision"):
+            protected.append("blocker_requires_protected_decision")
+        request = WorkforceRequest.create(
+            request_type="staffing_request",
+            subject_id=f"{campaign_id}:{package_id}:{required_role}",
+            subject_type=f"operational_{need_kind}_need",
+            requesting_office=requesting_office,
+            summary=f"{package_id} requires {required_role} for a governed {need_kind} need.",
+            requested_outcome="Helen records an evidence-backed workforce or capability disposition without changing Engineering priority or acceptance.",
+            source_artifacts=list(evidence),
+            requires_steward_attention=bool(protected),
+            requires_boundary_review=bool(set(limitations) & {"privacy", "provider_suitability_unresolved"}),
+            metadata={
+                "schema_version": "estate.operational-staffing-request.v1",
+                "campaign_id": campaign_id,
+                "package_id": package_id,
+                "blocker_class": blocker_class,
+                "need_kind": need_kind,
+                "required_role": required_role,
+                "required_capabilities": sorted(set(required_capabilities)),
+                "urgency": urgency,
+                "duration": duration,
+                "constraints": limitations,
+                "protected_constraints": sorted(set(protected)),
+                "request_is_fulfillment": False,
+                "engineering_priority_authority_granted": False,
+                "architecture_authority_granted": False,
+                "acceptance_authority_granted": False,
+                "provider_execution_performed": False,
+            },
+        )
+        if protected:
+            request.status = "blocked"
+        return request, self.save_request(request)
+
+    def record_operational_disposition(
+        self,
+        request_id: str,
+        *,
+        disposition: str,
+        decided_by: str,
+        evidence_references: list[str],
+        fulfilled_capabilities: list[str] | None = None,
+        reason: str,
+        expires_at: str | None = None,
+        authority_evidence: list[str] | None = None,
+    ) -> tuple[dict[str, Any], Path]:
+        """Correlate Helen's disposition without assigning, dispatching, or accepting work."""
+        if disposition not in OPERATIONAL_DISPOSITIONS:
+            raise ValueError(f"unknown operational disposition: {disposition}")
+        _require_text(decided_by, "decided_by")
+        _require_text(reason, "reason")
+        _require_string_list(evidence_references, "evidence_references")
+        if not evidence_references:
+            raise ValueError("disposition evidence is required")
+        authority = authority_evidence or []
+        _require_string_list(authority, "authority_evidence")
+        capabilities = fulfilled_capabilities or []
+        _require_string_list(capabilities, "fulfilled_capabilities")
+        if expires_at:
+            validate_iso_timestamp(expires_at, "expires_at")
+
+        request = self.load_request(request_id)
+        protected = list(request.metadata.get("protected_constraints") or [])
+        if disposition in {"fulfilled", "partially_fulfilled"}:
+            if decided_by != "Helen":
+                raise ValueError("only Helen may record workforce fulfillment in this lane")
+            if not authority:
+                raise ValueError("fulfillment requires authority evidence")
+            if protected:
+                raise ValueError("protected constraints must be resolved by their authority before fulfillment")
+            if not capabilities:
+                raise ValueError("fulfilled capabilities are required")
+        if disposition == "expired" and not expires_at:
+            raise ValueError("expired disposition requires expires_at")
+
+        required_capabilities = list(request.metadata.get("required_capabilities") or [])
+        remaining_need = (
+            sorted(set(required_capabilities) - set(capabilities))
+            if disposition in {"fulfilled", "partially_fulfilled"}
+            else required_capabilities
+        )
+        disposition_id = f"wfd-{uuid4().hex}"
+        payload = {
+            "schema_version": "estate.operational-staffing-disposition.v1",
+            "disposition_id": disposition_id,
+            "request_id": request_id,
+            "campaign_id": request.metadata.get("campaign_id"),
+            "package_id": request.metadata.get("package_id"),
+            "need_kind": request.metadata.get("need_kind"),
+            "disposition": disposition,
+            "decided_by": decided_by,
+            "reason": reason,
+            "evidence_references": sorted(set(evidence_references)),
+            "authority_evidence": sorted(set(authority)),
+            "fulfilled_capabilities": sorted(set(capabilities)),
+            "partial_fulfillment": disposition == "partially_fulfilled",
+            "expires_at": expires_at,
+            "created_at": utc_now_iso(),
+            "request_was_fulfillment": False,
+            "staff_assignment_performed": False,
+            "provider_execution_performed": False,
+            "engineering_priority_authority_granted": False,
+            "architecture_authority_granted": False,
+            "acceptance_authority_granted": False,
+            "requires_protected_review": disposition == "protected_review_required" or bool(protected),
+            "remaining_need": remaining_need,
+        }
+        path = self.root / DISPOSITIONS / f"{disposition_id}.json"
+        self._write_new_or_idempotent(path, payload, "operational disposition")
+        request.status = {
+            "fulfilled": "closed",
+            "partially_fulfilled": "ready_for_action",
+            "refused": "declined",
+            "deferred": "blocked",
+            "expired": "blocked",
+            "protected_review_required": "blocked",
+        }[disposition]
+        _write_json(self.root / REQUESTS / f"{request.request_id}.json", request.to_dict())
+        self.write_status()
+        return payload, path
 
     def save_request(self, request: WorkforceRequest, *, emit_event: bool = True) -> Path:
         self.ensure_dirs()
@@ -464,9 +627,22 @@ class HelenWorkforceStore:
                 continue
         return assessments
 
+    def list_operational_dispositions(self) -> list[dict[str, Any]]:
+        directory = self.root / DISPOSITIONS
+        if not directory.exists():
+            return []
+        dispositions: list[dict[str, Any]] = []
+        for path in sorted(directory.glob("*.json")):
+            try:
+                dispositions.append(_read_json(path))
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+        return dispositions
+
     def build_status(self) -> dict[str, Any]:
         requests = self.list_requests()
         assessments = self.list_assessments()
+        dispositions = self.list_operational_dispositions()
         return {
             "available": True,
             "generated_at": utc_now_iso(),
@@ -484,9 +660,11 @@ class HelenWorkforceStore:
                 "missing_evidence_assessment_count": sum(bool(assessment.missing_evidence) for assessment in assessments),
                 "latest_request_id": requests[-1].request_id if requests else None,
                 "latest_assessment_id": assessments[-1].assessment_id if assessments else None,
+                "operational_disposition_count": len(dispositions),
             },
             "requests": [request.to_dict() for request in requests],
             "assessments": [assessment.to_dict() for assessment in assessments],
+            "operational_dispositions": dispositions,
             "operational_queue_control_performed": False,
             "provider_execution_performed": False,
             "constitutional_authority_granted": False,
