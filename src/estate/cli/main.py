@@ -1725,7 +1725,7 @@ def cmd_operations_center_profile(args):
         print(f"Tabs: {', '.join(profile.get('tab_order', []))}")
 
 def cmd_operational_validation(args):
-    report = generate_operational_validation_report()
+    report = generate_operational_validation_report(Path.cwd())
     if getattr(args, "json", False):
         import json
         print(json.dumps(report, indent=2, sort_keys=True))
