@@ -36,6 +36,8 @@ def test_build_request_preserves_authority_boundaries():
     assert payload["status"] == "open"
     assert payload["requires_ack"] is True
     assert payload["ack_status"] == "pending"
+    assert payload["initiation_type"] == "evaluation"
+    assert payload["lifecycle_state"] == "evaluation_requested"
     assert payload["authority_boundaries"] == {
         "may_approve_renewal": False,
         "may_grant_constitutional_authority": False,
@@ -43,6 +45,40 @@ def test_build_request_preserves_authority_boundaries():
         "may_execute_providers": False,
         "may_merge_code": False,
     }
+
+
+def test_direct_reflection_request_starts_at_authorized_state():
+    payload = build_reflection_worker_request(
+        request_id="RWR-0001-DIRECT",
+        worker="employee.12",
+        office="Chief Architect",
+        assignment="Begin required reflection deliverables.",
+        authority_reference="Steward direct reflection authorization",
+        initiation_type="direct_reflection",
+        reason="Operational lag is affecting active work.",
+        current_assignment="Complete continuity package.",
+        operational_risk="Loss of execution reliability.",
+        blockers=["repository validation pending"],
+    )
+
+    assert payload["initiation_type"] == "direct_reflection"
+    assert payload["lifecycle_state"] == "reflection_authorized"
+    assert payload["reason"] == "Operational lag is affecting active work."
+    assert payload["current_assignment"] == "Complete continuity package."
+    assert payload["operational_risk"] == "Loss of execution reliability."
+    assert payload["blockers"] == ["repository validation pending"]
+
+
+def test_build_request_rejects_unknown_initiation_type():
+    with pytest.raises(ValueError, match="invalid initiation_type"):
+        build_reflection_worker_request(
+            request_id="RWR-INVALID-TYPE",
+            worker="employee.12",
+            office="Chief Architect",
+            assignment="Inspect package.",
+            authority_reference="Steward authorization",
+            initiation_type="automatic_renewal",
+        )
 
 
 def test_build_request_rejects_missing_required_input():
