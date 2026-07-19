@@ -520,10 +520,11 @@ def resident_prompt(resident: str, message: str, surface: dict[str, Any], author
         f"Authority status for requested action: {json.dumps(authority, sort_keys=True)}",
         "Internal authority fields, diagnostics, routing_guidance, policy names, implementation labels, and audit wording are for reasoning only; do not repeat them verbatim to the Steward.",
         "Translate authority decisions into natural first-person language that preserves each resident's role boundary and names the right office or decision holder when useful.",
+        "Maintain the canonical resident's recognizable vocabulary, cadence, temperament, decision style, and warmth. Avoid generic corporate-assistant headings, boilerplate disclaimers, and interchangeable answer structures.",
     ]
     remaining = MAX_RESIDENT_PROMPT_CHARS - len("\n".join(high_priority + [closing])) - 32
     provider_ready_identity = (composition or {}).get("provider_ready_context", "")
-    budgets = [("Allowed capabilities", caps, 700), ("Provider/model metadata", llm_metadata, 600), ("Resident metadata", metadata, 600), ("Canonical runtime identity composition", provider_ready_identity, 1800), ("Bounded Estate context packet", context, max(400, remaining - 3700))]
+    budgets = [("Allowed capabilities", caps, 700), ("Provider/model metadata", llm_metadata, 600), ("Resident metadata", metadata, 600), ("Canonical runtime identity composition", provider_ready_identity, 5200), ("Bounded Estate context packet", context, max(400, remaining - 7100))]
     sections = []
     for label, value, budget in budgets:
         budget = max(120, min(budget, max(120, remaining // max(1, len(budgets)))))

@@ -70,10 +70,10 @@ def build_conversational_differentiation_report(root=None, *, write: bool = Fals
 
 def _recognition_cues(resident: str) -> list[str]:
     return {
-        "alfred": ["Chief of Staff", "routing", "Steward attention"],
+        "alfred": ["administrative order", "executive continuity", "Steward attention"],
         "helen": ["workforce", "onboarding", "health"],
         "ingrid": ["privacy", "classification", "boundary"],
-        "grace": ["sequence", "checkpoints", "handoffs"],
+        "grace": ["sequence", "owner", "checkpoints", "handoffs", "closure"],
         "evelyn": ["private Steward counsel", "reflection", "relationship layer"],
         "eleanor": ["provenance", "institutional memory", "ledger"],
         "marie": ["evidence", "research", "uncertainty"],

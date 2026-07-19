@@ -41,3 +41,38 @@ def test_campaign_reports_are_written_and_include_blind_review_artifact(tmp_path
     assert report["blind_recognition_review"]
     assert (tmp_path / "runtime/reports/resident_personality_fidelity/identity_composition_matrix.json").exists()
     assert (tmp_path / "runtime/reports/resident_personality_fidelity/conversational_differentiation_report.json").exists()
+
+
+def test_character_behavior_is_source_linked_and_provider_ready():
+    from estate.core.resident_identity_composition import compose_resident_identity
+
+    for resident in covered_residents():
+        composition = compose_resident_identity(resident, surface_id="open-webui-single-resident")
+        character = next(layer for layer in composition["included_context_layers"] if layer["layer"] == "character_context")
+        assert character["content"]["behavior_profile"]["office"]
+        assert any(source["source"] == "data/character-architecture/resident_behavior_profiles_v0_1.json" for source in character["sources"])
+        assert "Canonical character and behavior" in composition["provider_ready_context"]
+        assert "vocabulary_and_cadence" in composition["provider_ready_context"]
+
+
+def test_direct_and_conference_room_use_identical_resident_behavior(tmp_path):
+    question = "What should I do first when the Estate feels noisy?"
+    for resident in ("alfred", "helen", "ingrid", "grace"):
+        direct = chat_completion({"model": f"estate/{resident}", "messages": [{"role": "user", "content": question}]}, root=tmp_path)[1]
+        room = chat_completion({"model": "estate/conference-room", "messages": [{"role": "user", "content": question}], "metadata": {"resident_targets": [resident], "session_id": f"parity-{resident}"}}, root=tmp_path)[1]
+        direct_text = direct["choices"][0]["message"]["content"]
+        room_text = room["estate"]["resident_turns"][0]["content"]
+        assert direct_text == room_text
+        assert len(room["estate"]["resident_turns"]) == 1
+
+
+def test_personality_survives_continued_and_rehydrated_session(tmp_path):
+    payload = {"model": "estate/ingrid", "messages": [{"role": "user", "content": "Give me a safe first step."}], "metadata": {"session_id": "continuity-ingrid"}}
+    first = chat_completion(payload, root=tmp_path)[1]
+    second = chat_completion(payload, root=tmp_path)[1]
+    assert "minimum-necessary" in first["choices"][0]["message"]["content"]
+    assert first["choices"][0]["message"]["content"] == second["choices"][0]["message"]["content"]
+    import json
+    stored = json.loads((tmp_path / "runtime/resident_interactions/sessions/continuity-ingrid.json").read_text())
+    assert len(stored["turns"]) == 2
+    assert all("behavior_profile" in str(turn["identity_composition"]) for turn in stored["turns"])

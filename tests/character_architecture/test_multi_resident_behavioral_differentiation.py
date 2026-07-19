@@ -56,7 +56,7 @@ def test_profiles_are_machine_readable_and_cover_all_residents():
     data = load_json(PROFILES)
     assert data["schema_version"] == "0.1"
     residents = data["residents"]
-    assert set(residents) == {"alfred", "helen", "grace"}
+    assert set(residents) == {"alfred", "ingrid", "helen", "grace", "evelyn", "eleanor", "marie", "judy"}
     required_axes = {
         "vocabulary_and_cadence",
         "confidence_and_initiative",
@@ -72,7 +72,7 @@ def test_profiles_are_machine_readable_and_cover_all_residents():
     for profile in residents.values():
         assert required_axes.issubset(profile)
         assert profile["office_decision_patterns"]
-    assert residents["grace"]["status"] == "candidate_not_active"
+    assert all(profile["status"] == "active" for profile in residents.values())
 
 
 def test_paired_prompt_fixtures_are_deterministic_and_public_safe():
