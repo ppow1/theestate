@@ -57,11 +57,20 @@ def test_pending_index_creation_and_exact_resolution(tmp_path):
     assert index.resolve("WP-NOT-APPROVED")[0] == "named_identifier_not_approved"
 
 
+def test_supported_historical_and_approved_named_filenames(tmp_path):
+    (tmp_path / "CONV-PTM-001_Legacy.md").write_text("# CONV-PTM-001 — Legacy\n\n## Purpose\nMust work.\n")
+    (tmp_path / "WP-Operator-Deck-Prototype.md").write_text("# Work Package: Operator Deck Prototype\n")
+    index = PendingWorkPackageIndex(tmp_path).build()
+    assert not index.diagnostics
+    assert index.resolve("CONV-PTM-001")[0] == "matched_unique"
+    assert index.resolve("WP-OPERATOR-DECK-PROTOTYPE")[0] == "matched_unique"
+
+
 def test_duplicate_filename_body_mismatch_and_malformed(tmp_path):
     definition(tmp_path / "a")
     definition(tmp_path / "a", title="Other")
     (tmp_path / "a" / "WP-4213_Bad.md").write_text("# WP-4214 — Bad\n", encoding="utf-8")
-    (tmp_path / "a" / "README.md").write_text("# Notes\n", encoding="utf-8")
+    (tmp_path / "a" / "Notes.md").write_text("# Notes\n", encoding="utf-8")
     index = PendingWorkPackageIndex(tmp_path / "a").build()
     codes = {d["code"] for d in index.diagnostics}
     assert {"duplicate_pending_work_package_identifier", "pending_filename_body_identifier_mismatch", "malformed_pending_work_package_identifier"} <= codes
@@ -170,10 +179,31 @@ def test_pipeline_integration_assignment_mismatch_does_not_block_and_is_determin
     assessment = json.loads((first / "candidate_assessment_report.json").read_text())["assessments"][0]
     assert assessment["assessment"] == "complete_supporting_document"
     artifacts = {p.name for p in first.iterdir()}
-    assert {"pending_work_package_index.json", "runtime_canon_candidates.json", "definition_match_report.json", "candidate_assessment_report.json", "candidate_reconciliation_report.json", "supporting_document_manifest.json", "runtime_canon_recovery_report.md", "promotion_block_report.md"} <= artifacts
+    assert {"pending_work_package_index.json", "pending_index_repair_report.json", "archive_inventory.json", "runtime_canon_candidates.json", "definition_match_report.json", "candidate_assessment_report.json", "candidate_reconciliation_report.json", "supporting_document_manifest.json", "runtime_canon_review_queue.json", "runtime_canon_recovery_report.md", "pending_index_repair_report.md", "production_activation_report.md", "promotion_block_report.md"} <= artifacts
     assert json.loads((first / "supporting_document_manifest.json").read_text())["automatic_promotion_permitted"] is False
 
 
 def test_scope_correction_does_not_change_candidate_identity():
     before = detect(canon()); after = detect(canon())
     assert before["candidate_id"] == after["candidate_id"] and before["candidate_wp_identifier"] == "WP-4212"
+
+
+def test_directory_discovery_filters_duplicates_and_supports_html(tmp_path):
+    pending = tmp_path / "pending"; definition(pending)
+    html = ('<div data-message-author-role="user" data-message-id="u">go</div>'
+            '<div data-message-author-role="assistant" data-message-id="a">' + canon() + '</div>')
+    intake = tmp_path / "intake"; intake.mkdir()
+    (intake / "one.html").write_text(html)
+    (intake / "copy.html").write_text(html)
+    run = RuntimeCanonRecoveryPipeline(Path.cwd(), pending, tmp_path / "out").run([intake])
+    inventory = json.loads((run / "archive_inventory.json").read_text())
+    assert inventory["duplicate_inputs"] == 1
+    assert len(json.loads((run / "runtime_canon_candidates.json").read_text())["decisions"]) == 1
+
+
+def test_invalid_definition_does_not_block_valid_identifier(tmp_path):
+    pending = tmp_path / "pending"; definition(pending)
+    (pending / "WP-9998_Bad.md").write_text("# WP-9999 — mismatch\n")
+    source = tmp_path / "chat.txt"; source.write_text("Assistant: " + canon())
+    run = RuntimeCanonRecoveryPipeline(Path.cwd(), pending, tmp_path / "out").run([source])
+    assert json.loads((run / "definition_match_report.json").read_text())["matches"][0]["resolution_state"] == "matched_unique"

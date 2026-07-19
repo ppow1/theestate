@@ -4,9 +4,23 @@ This directory is the dedicated intake root for archived AI conversation files t
 
 It is intentionally separate from worker reflection, renewal, onboarding, and continuity-package records.
 
-## Current intake format
+## Production input contract
 
-- ChatGPT conversation archives saved as `.mhtml`
+- Repository-safe private intake: `ingestion/conversations/private/` (gitignored).
+- Accepted source extensions: `.mhtml`, `.mht`, `.html`, `.htm`, `.txt`, `.text`, and
+  `.md`; existing normalized bundles are directories containing `manifest.json` and
+  `messages.jsonl`.
+- Directories accept multiple files. Discovery is non-recursive unless `--recursive`
+  is explicitly supplied. `--archive-filter TEXT` limits sources by filename.
+- Every source is SHA-256 registered before analysis. Identical content is processed
+  once and duplicate paths remain visible in `archive_inventory.json`.
+
+Plain text must label each turn (`Steward:`, `User:`, `Assistant:`, or `ChatGPT:`).
+HTML must retain `data-message-author-role` elements. MHTML uses the largest HTML MIME
+part. Files that cannot satisfy these contracts fail without partial promotion.
+Filenames are descriptive only: identity and rerun location derive from content hashes.
+Conversation archives can contain private material; do not commit them unless repository
+policy and the data owner explicitly authorize that disclosure.
 
 ## Initial test archive
 
@@ -82,32 +96,40 @@ PYTHONPATH=src python -m estate.core.runtime_canon_recovery \
   --output-root staging/runtime_canon_recovery
 ```
 
-Windows PowerShell, from `A:\theestate`:
+Production directory run (from the repository root):
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m estate.core.runtime_canon_recovery `
-  "A:\theestate\ingestion\conversations\127-130 #1.mhtml" `
-  "A:\theestate\ingestion\conversations\Estate work-package continuation2.mhtml" `
-  --repository-root "A:\theestate" `
-  --output-root "A:\theestate\staging\runtime_canon_recovery"
+```bash
+PYTHONPATH=src python -m estate.core.runtime_canon_recovery \
+  ingestion/conversations/private --recursive --machine-readable
 ```
 
-Useful operator options are `--pending-root` (fixture/alternate pending index),
-`--identifier-filter WP-4212`, `--dry-run`, `--machine-readable`, and `--strict`.
+Use `--dry-run` to assess without staging a supporting document, or
+`--identifier-filter WP-4212` to process one identifier. `--output-root` selects the
+derived evidence location. Useful additional options are `--pending-root`,
+`--archive-filter`, `--machine-readable`, and `--strict`.
 Strict mode exits 2 for review blocks; fatal input, index, parsing, or generation
 errors exit 3. Default mode still exits 3 for fatal diagnostics, while ordinary
 review blocks remain inspectable without making batch processing fail.
 
 Each content-addressed run emits `pending_work_package_index.json`,
+`pending_index_repair_report.json`, `archive_inventory.json`,
 `runtime_canon_candidates.json`, `definition_match_report.json`,
 `candidate_assessment_report.json`, `candidate_reconciliation_report.json`,
-`supporting_document_manifest.json`, `runtime_canon_recovery_report.md`, and
-`promotion_block_report.md`. Proposed documents live only below the run's
+`supporting_document_manifest.json`, `runtime_canon_review_queue.json`,
+`runtime_canon_recovery_report.md`, `pending_index_repair_report.md`,
+`production_activation_report.md`, and `promotion_block_report.md`. Inspect the
+recovery report for counts and the review queue for per-WP human actions. Proposed documents live only below the run's
 `supporting_documents/` staging directory. They include a provenance preamble and
 the mechanically newline-normalized assistant body. The engine never writes to a
 proposed destination, never modifies a pending definition, and never promotes a
 derived document automatically.
+
+An unchanged source and pending index resolve to the same run identifier, so rerunning
+is resumable and atomically replaces deterministic artifacts. Missing named archives
+are not errors unless an operator requires them; place them in the private intake and
+rerun. Index diagnostics block only an affected ambiguous/invalid identifier. To request
+promotion, submit the staged document and manifest through normal human review—never
+copy it over a pending definition or bypass the promotion block report.
 
 ## Plain-text scope and runtime-canon validation (WP-4211)
 
