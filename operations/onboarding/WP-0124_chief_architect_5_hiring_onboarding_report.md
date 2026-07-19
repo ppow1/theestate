@@ -1,5 +1,11 @@
 # WP-0124 Chief Architect #5 Hiring and Onboarding Report
 
+## Authoritative Renewal Reconciliation (2026-07-19)
+
+For the current reflection-point renewal, the Steward explicitly confirms: occupant designation **Chief Architect #5**; Employee ID **5**; Mailbox ID **5**; assigned work-package range **`WP-0500` through `WP-0599`**. This current assignment supersedes this report's historical ID-8/new-hire characterization for renewal use without deleting the WP-0124 record.
+
+Chief Architect #5 remains the same continuing officeholder. This report does not assign Chief Architect #6, Chief Architect #7, or a new implementation identity, and the reconciliation does not declare renewal approved. Helen and the Steward retain acceptance authority.
+
 - Generated at: 2026-07-05T15:40:04+00:00
 - Current git commit: `97340a973988a132422a221c600ea05b921a8076`
 - Branch: `work`

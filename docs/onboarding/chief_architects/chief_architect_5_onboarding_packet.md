@@ -1,5 +1,11 @@
 # Chief Architect #5 Onboarding Packet
 
+## Authoritative Renewal Reconciliation (2026-07-19)
+
+The Steward explicitly assigns the continuing occupant as **Chief Architect #5**, Employee ID **5**, Mailbox ID **5**, with work-package range **`WP-0500` through `WP-0599`**. These values supersede the ID-8 and new-hire descriptions below for the present continuity action. The older text is preserved as historical WP-0124 evidence, not current identity authority.
+
+This action renews the same Chief Architect #5 implementation continuity. It does not hire a successor, renumber the officeholder, assign Chief Architect #6 or #7, approve renewal, or retire the prior implementation. Helen and the Steward retain review and acceptance authority.
+
 - Generated at: 2026-07-05T15:39:10+00:00
 - HR/onboarding owner: Helen, Manager of Human Resources, Employee ID 6 / Mailbox ID 6
 - Role title: Chief Architect #5
