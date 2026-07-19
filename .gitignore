@@ -27,3 +27,6 @@ Temp/
 collaboration/status/event_summary.json
 operations/services/service_health_registry.md
 operations/validation/validation_metrics_dashboard.md
+
+# Private conversation production intake
+ingestion/conversations/private/

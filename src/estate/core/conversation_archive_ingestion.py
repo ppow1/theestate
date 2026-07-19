@@ -99,19 +99,23 @@ class IngestionError(ValueError):
 
 
 def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], str]:
-    with archive.open("rb") as stream:
-        mime = BytesParser(policy=policy.default).parse(stream)
-    html_parts = [part for part in mime.walk() if part.get_content_type() == "text/html"]
-    if not html_parts:
-        raise IngestionError("archive contains no text/html MIME part")
-    primary = max(html_parts, key=lambda part: len(part.get_payload(decode=True) or b""))
-    payload = primary.get_payload(decode=True) or b""
-    charset = primary.get_content_charset() or "utf-8"
+    """Extract either a MIME web archive or a direct HTML conversation export."""
+    if archive.suffix.lower() in {".html", ".htm"}:
+        payload, charset, location = archive.read_bytes(), "utf-8", ""
+    else:
+        with archive.open("rb") as stream:
+            mime = BytesParser(policy=policy.default).parse(stream)
+        html_parts = [part for part in mime.walk() if part.get_content_type() == "text/html"]
+        if not html_parts:
+            raise IngestionError("archive contains no text/html MIME part")
+        primary = max(html_parts, key=lambda part: len(part.get_payload(decode=True) or b""))
+        payload = primary.get_payload(decode=True) or b""
+        charset = primary.get_content_charset() or "utf-8"
+        location = primary.get("Content-Location", "")
     parser = _MessageHTMLParser()
     parser.feed(payload.decode(charset, errors="replace"))
     if not parser.messages:
         raise IngestionError("HTML contains no data-message-author-role elements")
-    location = primary.get("Content-Location", "")
     messages = []
     for sequence, (role, source_id, text, formatted_text) in enumerate(parser.messages, 1):
         if role not in ALLOWED_ROLES:
@@ -207,7 +211,7 @@ def ingest(archive: Path, output_root: Path, *, repository_root: Path | None = N
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "run_id": run_id,
-        "source": {"path": source_path, "sha256": source_hash, "bytes": len(source_bytes), "media_type": "text/plain" if is_plain else "multipart/related", "content_location": location},
+        "source": {"path": source_path, "sha256": source_hash, "bytes": len(source_bytes), "media_type": "text/plain" if is_plain else ("text/html" if archive.suffix.lower() in {".html", ".htm"} else "multipart/related"), "content_location": location},
         "extraction": {"message_count": len(messages), "roles": {r: sum(m.role == r for m in messages) for r in sorted({m.role for m in messages})}},
         "classification": "Estate Internal",
         "canonical_status": "non_canonical_review_material",

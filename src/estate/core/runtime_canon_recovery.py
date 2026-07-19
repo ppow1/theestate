@@ -18,10 +18,14 @@ from typing import Any, Iterable
 from estate.core.conversation_archive_ingestion import _write_atomic, ingest
 
 SCHEMA_VERSION = "estate.runtime-canon-recovery/v1"
-GENERATOR_VERSION = "WP-4212/1.0"
+GENERATOR_VERSION = "WP-4213/1.0"
 GENERATED_AT = "1970-01-01T00:00:00Z"  # deliberately stable for reproducible evidence
 NUMBERED = re.compile(r"\bWP[- _](\d{4})\b", re.I)
-NAMED = re.compile(r"\b(?:WP|CORE|OPS)-[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+\b")
+NAMED = re.compile(r"\b(?:(?:WP|CORE|OPS)-[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+|[A-Z]+-PTM-\d{3}[A-Z]?)\b", re.I)
+APPROVED_FILENAME_EXCEPTIONS = {
+    "WP-Operator-Deck-Prototype.md": "WP-OPERATOR-DECK-PROTOTYPE",
+}
+ACCEPTED_ARCHIVE_EXTENSIONS = {".mhtml", ".mht", ".html", ".htm", ".txt", ".text", ".md"}
 HEADING = re.compile(
     r"(?im)^\s*(?:#{1,6}\s*|\*{1,2}\s*)?(?:runtime canon\s*[—–:-]\s*)?"
     r"(?:(?:supporting (?:design|document)(?: for)?|grounded in)\s+)?"
@@ -58,7 +62,7 @@ def normalize_identifier(value: str) -> tuple[str | None, str]:
     match = re.fullmatch(r"WP-(\d{4})", value)
     if match:
         return f"WP-{match.group(1)}", "numbered"
-    if re.fullmatch(r"(?:WP|CORE|OPS)-[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+", value):
+    if re.fullmatch(r"(?:(?:WP|CORE|OPS)-[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+|[A-Z]+-PTM-\d{3}[A-Z]?)", value):
         return value, "named"
     return None, "malformed"
 
@@ -75,8 +79,13 @@ class PendingWorkPackageIndex:
 
     def build(self) -> "PendingWorkPackageIndex":
         for path in sorted(self.root.glob("*.md"), key=lambda p: p.name.casefold()):
+            if path.name.casefold() == "readme.md":
+                continue
             filename_token = path.stem.split("_", 1)[0]
             filename_id, identifier_type = normalize_identifier(filename_token)
+            approved_exception = APPROVED_FILENAME_EXCEPTIONS.get(path.name)
+            if approved_exception:
+                filename_id, identifier_type = approved_exception, "approved_named_exception"
             problems: list[dict[str, Any]] = []
             try:
                 body = path.read_text(encoding="utf-8")
@@ -87,19 +96,21 @@ class PendingWorkPackageIndex:
             body_match = NUMBERED.search(first_heading) or NAMED.search(first_heading)
             body_raw = body_match.group(0) if body_match else ""
             body_id, _ = normalize_identifier(body_raw) if body_raw else (None, "malformed")
+            if approved_exception and first_heading.casefold().startswith("work package: operator deck prototype"):
+                body_id = approved_exception
             if not filename_id:
-                problems.append(diagnostic("malformed_pending_work_package_identifier", "Filename has no approved identifier.", "fatal", filename=path.name))
+                problems.append(diagnostic("malformed_pending_work_package_identifier", "Filename has no approved identifier; only this record is blocked.", "review", filename=path.name))
             if filename_id and body_id and filename_id != body_id:
-                problems.append(diagnostic("pending_filename_body_identifier_mismatch", "Filename and leading body identifier disagree.", "fatal", filename_identifier=filename_id, body_identifier=body_id))
+                problems.append(diagnostic("pending_filename_body_identifier_mismatch", "Filename and leading body identifier disagree; only this record is blocked.", "review", filename_identifier=filename_id, body_identifier=body_id))
             if filename_id and not body_id:
-                problems.append(diagnostic("pending_filename_body_identifier_mismatch", "Leading heading has no reliable identifier.", "fatal", filename_identifier=filename_id))
+                problems.append(diagnostic("pending_filename_body_identifier_mismatch", "Leading heading has no reliable identifier; only this record is blocked.", "review", filename_identifier=filename_id))
             record = {
                 "work_package_id": filename_id or filename_token, "canonical_identifier": filename_id,
                 "title": re.sub(r"^(?:WP[- _]\d{4}|[^_]+)[_\s—–:-]*", "", first_heading or path.stem).strip(),
                 "path": path.as_posix(), "filename": path.name, "content_sha256": _sha(body),
                 "filename_identifier": filename_id, "body_identifier": body_id,
                 "filename_body_consistent": bool(filename_id and body_id and filename_id == body_id),
-                "identifier_type": identifier_type, "index_status": "invalid" if problems else "valid",
+                "identifier_type": identifier_type, "approved_exception": bool(approved_exception), "index_status": "invalid" if problems else "valid",
                 "validation_diagnostics": problems, "content": body,
             }
             self.records.append(record); self.diagnostics.extend(problems)
@@ -109,7 +120,7 @@ class PendingWorkPackageIndex:
                 groups.setdefault(record["canonical_identifier"], []).append(record)
         for identifier, records in sorted(groups.items()):
             if len(records) > 1:
-                item = diagnostic("duplicate_pending_work_package_identifier", "Multiple pending definitions resolve to one identifier.", "fatal", identifier=identifier, paths=[r["path"] for r in records])
+                item = diagnostic("duplicate_pending_work_package_identifier", "Multiple pending definitions resolve to one identifier; unaffected identifiers remain usable.", "review", identifier=identifier, paths=[r["path"] for r in records])
                 self.diagnostics.append(item)
                 for record in records:
                     record["index_status"] = "ambiguous"; record["validation_diagnostics"].append(item)
@@ -267,16 +278,31 @@ class RuntimeCanonRecoveryPipeline:
     def __init__(self, repository_root: Path, pending_root: Path, output_root: Path) -> None:
         self.repository_root, self.pending_root, self.output_root = repository_root, pending_root, output_root
 
-    def run(self, inputs: list[Path], *, ingestion_root: Path | None = None, identifier_filter: str | None = None, dry_run: bool = False) -> Path:
+    def run(self, inputs: list[Path], *, ingestion_root: Path | None = None,
+            identifier_filter: str | None = None, archive_filter: str | None = None,
+            recursive: bool = False, dry_run: bool = False) -> Path:
         ingestion_root = ingestion_root or self.output_root / "ingested"
-        bundles = []
+        bundles = []; discovery = []; seen_hashes: dict[str, str] = {}
         for item in inputs:
-            expanded = sorted(p for p in item.iterdir() if p.is_file()) if item.is_dir() and not (item / "manifest.json").exists() else [item]
+            if item.is_dir() and not (item / "manifest.json").exists():
+                iterator = item.rglob("*") if recursive else item.iterdir()
+                expanded = sorted((p for p in iterator if p.is_file() and p.suffix.lower() in ACCEPTED_ARCHIVE_EXTENSIONS), key=lambda p: p.as_posix().casefold())
+            else: expanded = [item]
             for source in expanded:
-                bundles.append(source if source.is_dir() and (source / "manifest.json").exists() else ingest(source, ingestion_root, repository_root=self.repository_root))
+                if archive_filter and archive_filter.casefold() not in source.name.casefold(): continue
+                bundle = source if source.is_dir() and (source / "manifest.json").exists() else ingest(source, ingestion_root, repository_root=self.repository_root)
+                source_manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8")); digest = source_manifest["source"]["sha256"]
+                duplicate_of = seen_hashes.get(digest)
+                discovery.append({"path": source_manifest["source"]["path"], "sha256": digest, "normalized_bundle_id": digest[:16], "duplicate_of": duplicate_of, "status": "duplicate_skipped" if duplicate_of else "accepted"})
+                if not duplicate_of:
+                    seen_hashes[digest] = source_manifest["source"]["path"]; bundles.append(bundle)
+        if not bundles: raise ValueError("no supported conversation inputs were discovered")
         manifests = [json.loads((b / "manifest.json").read_text(encoding="utf-8")) for b in bundles]
-        input_hashes = sorted(m["source"]["sha256"] for m in manifests); run_id = _sha("\n".join(input_hashes) + SCHEMA_VERSION)[:16]; run = self.output_root / run_id
-        index = PendingWorkPackageIndex(self.pending_root).build(); detector = RuntimeCanonCandidateDetector(); decisions = []; messages_count = assistant_count = 0
+        input_hashes = sorted(m["source"]["sha256"] for m in manifests)
+        index = PendingWorkPackageIndex(self.pending_root).build()
+        definition_hashes = sorted(r["content_sha256"] for r in index.records)
+        run_id = _sha("\n".join(input_hashes + definition_hashes + [SCHEMA_VERSION, identifier_filter or ""]))[:16]; run = self.output_root / run_id
+        detector = RuntimeCanonCandidateDetector(); decisions = []; messages_count = assistant_count = 0
         for bundle, manifest in sorted(zip(bundles, manifests), key=lambda x: x[1]["source"]["sha256"]):
             records = [json.loads(line) for line in (bundle / "messages.jsonl").read_text(encoding="utf-8").splitlines() if line]
             messages_count += len(records)
@@ -303,23 +329,40 @@ class RuntimeCanonRecoveryPipeline:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.repository_root, text=True, capture_output=True, check=False).stdout.strip() or "unknown"
         diagnostics = [*index.diagnostics]
         common = {"schema_version": SCHEMA_VERSION, "generator_version": GENERATOR_VERSION, "repository_commit": commit, "run_identifier": run_id, "input_identifiers_and_hashes": [{"path": m["source"]["path"], "sha256": m["source"]["sha256"]} for m in sorted(manifests, key=lambda x: x["source"]["sha256"])], "generated_timestamp": GENERATED_AT, "diagnostic_summary": {"fatal": sum(d["severity"] == "fatal" for d in diagnostics), "review": sum(d["severity"] == "review" for d in diagnostics)}}
-        artifacts = {"pending_work_package_index.json": {**common, "records": index.public_records(), "diagnostics": diagnostics}, "runtime_canon_candidates.json": {**common, "decisions": decisions}, "definition_match_report.json": {**common, "matches": matches}, "candidate_assessment_report.json": {**common, "assessments": assessments_list}, "candidate_reconciliation_report.json": {**common, "groups": reconciliation}, "supporting_document_manifest.json": {**common, "artifacts": manifest_items, "automatic_promotion_permitted": False}}
+        repair_items = [{"classification": "duplicate authoritative definition" if d["code"].startswith("duplicate") else "unresolved condition requiring Steward review", "repair": "affected identifier review-blocked; unaffected identifiers remain processable", **d} for d in diagnostics]
+        review_items = []
+        for assessment in assessments_list:
+            group = next((g for g in reconciliation if assessment["candidate_id"] in g["candidate_ids"]), {})
+            if assessment.get("preservation_disposition") != "stage_proposed" or group.get("competing_group"):
+                candidate = next(c for c in candidates if c["candidate_id"] == assessment["candidate_id"])
+                review_items.append({"work_package_identifier": assessment["candidate_identifier"], "candidate_id": assessment["candidate_id"], "reason_for_review": "competing complete outputs" if group.get("competing_group") else assessment["assessment"], "source": {"archive": candidate["source_archive"], "message_sequence": candidate["source_message_sequence"]}, "candidate_summary": candidate["normalized_text"][:240], "blocking_diagnostics": assessment.get("contradiction_findings", []) + assessment.get("unsupported_claims", []) + assessment.get("truncation_signals", []), "recommended_human_action": "Compare against the authoritative definition and approve, reject, or request correction.", "safe_to_preserve_as_evidence": True, "eligible_for_later_promotion": assessment["assessment"] != "cannot_assess_definition"})
+        artifacts = {
+            "pending_work_package_index.json": {**common, "records": index.public_records(), "diagnostics": diagnostics},
+            "pending_index_repair_report.json": {**common, "before": {"diagnostics": len(diagnostics)}, "after": {"global_processing_blocked": False, "affected_identifiers_blocked": sorted({d.get("context", {}).get("identifier") for d in diagnostics if d.get("context", {}).get("identifier")})}, "conditions": repair_items},
+            "archive_inventory.json": {**common, "archives": discovery, "duplicate_inputs": sum(bool(x["duplicate_of"]) for x in discovery)},
+            "runtime_canon_candidates.json": {**common, "decisions": decisions}, "definition_match_report.json": {**common, "matches": matches}, "candidate_assessment_report.json": {**common, "assessments": assessments_list}, "candidate_reconciliation_report.json": {**common, "groups": reconciliation}, "supporting_document_manifest.json": {**common, "artifacts": manifest_items, "automatic_promotion_permitted": False},
+            "runtime_canon_review_queue.json": {**common, "items_by_identifier": {identifier: [x for x in review_items if x["work_package_identifier"] == identifier] for identifier in sorted({x["work_package_identifier"] for x in review_items})}, "item_count": len(review_items)},
+        }
         for name, payload in artifacts.items(): _write_atomic(run / name, json.dumps(payload, indent=2, sort_keys=True) + "\n")
         counts = {"archives_processed": len(bundles), "messages_parsed": messages_count, "assistant_messages_scanned": assistant_count, "candidates_detected": len(candidates), "unique_pending_matches": sum(m["resolution_state"] == "matched_unique" for m in matches), "unmatched_identifiers": sum(m["resolution_state"] != "matched_unique" for m in matches), "complete_candidates": sum(a["assessment"] == "complete_supporting_document" for a in assessments_list), "partial_candidates": sum(a["assessment"] in {"partial_supporting_document", "substantially_complete_review_required"} for a in assessments_list), "truncated_candidates": sum(a.get("assessment") == "truncated_candidate" for a in assessments_list), "duplicate_groups": sum(g["duplicate_group"] for g in reconciliation), "competing_groups": sum(g["competing_group"] for g in reconciliation), "supporting_documents_staged": len(manifest_items), "review_blocks": sum(a.get("preservation_disposition") != "stage_proposed" for a in assessments_list), "fatal_diagnostics": common["diagnostic_summary"]["fatal"]}
         report = ["# Runtime Canon Recovery Report", "", "> Derived non-canonical review material; automatic promotion is prohibited.", "", f"Run: `{run_id}`", "", "## Counts", ""] + [f"- {k}: {v}" for k, v in counts.items()] + ["", "## Candidates", ""] + [f"- `{a['candidate_identifier']}`: **{a['assessment']}** — {a['rationale']}" for a in assessments_list]
         _write_atomic(run / "runtime_canon_recovery_report.md", "\n".join(report) + "\n")
         blocks = ["# Promotion Block Report", "", "> Automatic canonical promotion is prohibited.", ""] + [f"- `{a['candidate_identifier']}`: {a['assessment']}" for a in assessments_list if a.get("preservation_disposition") != "stage_proposed"]
         _write_atomic(run / "promotion_block_report.md", "\n".join(blocks or ["- None beyond mandatory human approval."]) + "\n")
-        _write_atomic(run / "summary.json", json.dumps({**counts, "output": str(run), "run_identifier": run_id}, sort_keys=True) + "\n")
+        repair_md = ["# Pending Index Repair Report", "", f"- Definitions inventoried: {len(index.records)}", f"- Conditions remaining: {len(diagnostics)}", "- Supported historical forms: PTM identifiers and the approved Operator Deck named package.", "- Ambiguity blocks only its affected identifier; safe partial processing remains enabled."]
+        _write_atomic(run / "pending_index_repair_report.md", "\n".join(repair_md) + "\n")
+        activation = ["# Production Activation Report", "", f"Run: `{run_id}`", "", "Assignment reconstruction is diagnostic only and did not gate candidate extraction.", "No pending definition was written or overwritten. No derived document was promoted automatically.", "", "## Archive inventory", ""] + [f"- {x['path']}: {x['status']} (`{x['sha256']}`)" for x in discovery]
+        _write_atomic(run / "production_activation_report.md", "\n".join(activation) + "\n")
+        _write_atomic(run / "summary.json", json.dumps({**counts, "run_identifier": run_id}, sort_keys=True) + "\n")
         return run
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("inputs", nargs="+", type=Path); parser.add_argument("--repository-root", type=Path, default=Path.cwd()); parser.add_argument("--pending-root", type=Path); parser.add_argument("--output-root", type=Path, default=Path("staging/runtime_canon_recovery")); parser.add_argument("--ingestion-root", type=Path); parser.add_argument("--identifier-filter"); parser.add_argument("--dry-run", action="store_true"); parser.add_argument("--strict", action="store_true"); parser.add_argument("--machine-readable", action="store_true")
+    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("inputs", nargs="+", type=Path); parser.add_argument("--repository-root", type=Path, default=Path.cwd()); parser.add_argument("--pending-root", type=Path); parser.add_argument("--output-root", type=Path, default=Path("staging/runtime_canon_recovery")); parser.add_argument("--ingestion-root", type=Path); parser.add_argument("--identifier-filter"); parser.add_argument("--archive-filter"); parser.add_argument("--recursive", action="store_true"); parser.add_argument("--dry-run", action="store_true"); parser.add_argument("--strict", action="store_true"); parser.add_argument("--machine-readable", action="store_true")
     args = parser.parse_args(argv); pending = args.pending_root or args.repository_root / "collaboration/work_packages/pending"
-    try: run = RuntimeCanonRecoveryPipeline(args.repository_root, pending, args.output_root).run(args.inputs, ingestion_root=args.ingestion_root, identifier_filter=args.identifier_filter, dry_run=args.dry_run)
+    try: run = RuntimeCanonRecoveryPipeline(args.repository_root, pending, args.output_root).run(args.inputs, ingestion_root=args.ingestion_root, identifier_filter=args.identifier_filter, archive_filter=args.archive_filter, recursive=args.recursive, dry_run=args.dry_run)
     except (OSError, ValueError, json.JSONDecodeError) as exc: print(json.dumps({"fatal_error": str(exc)}, sort_keys=True)); return 3
-    summary = json.loads((run / "summary.json").read_text()); print(json.dumps(summary, sort_keys=True) if args.machine_readable else "\n".join(f"{k}: {v}" for k, v in summary.items()))
+    summary = json.loads((run / "summary.json").read_text()); displayed = {**summary, "output": str(run)}; print(json.dumps(displayed, sort_keys=True) if args.machine_readable else "\n".join(f"{k}: {v}" for k, v in displayed.items()))
     return 2 if args.strict and (summary["fatal_diagnostics"] or summary["review_blocks"]) else (3 if summary["fatal_diagnostics"] else 0)
 
 
