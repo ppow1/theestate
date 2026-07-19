@@ -1,0 +1,25 @@
+{
+  "work_package_id": "WP-4208",
+  "status": "completed",
+  "implementation_summary": [
+    "Added deterministic MHTML conversation parsing and content-addressed ingestion bundles.",
+    "Preserved archive, MIME, DOM-message, ordering, and content-hash provenance.",
+    "Separated verbatim extraction from empty review-gated interpretations and institutional candidates.",
+    "Added manifest schema, bundle integrity validation, tests, operator documentation, acceptance output, and validation evidence."
+  ],
+  "acceptance_fixture": "ingestion/conversations/Chief_Architect_Renewal_Verification_2026-07-19.mhtml",
+  "acceptance_run_id": "3107d96b21f2cd16",
+  "deliverables": [
+    "src/estate/core/conversation_archive_ingestion.py",
+    "data/schemas/conversation_ingestion_manifest_v1.json",
+    "tests/test_conversation_archive_ingestion.py",
+    "ingestion/conversations/derived/Chief_Architect_Renewal_Verification_2026-07-19/3107d96b21f2cd16",
+    "operations/validation/reports/WP-4208_conversation_archive_ingestion.md",
+    "collaboration/work_packages/completions/WP-4208_codex_done.json"
+  ],
+  "tests": [
+    "PYTHONPATH=src python -m pytest tests/test_conversation_archive_ingestion.py -q",
+    "PYTHONPATH=src python -m estate.core.conversation_archive_ingestion ingestion/conversations/Chief_Architect_Renewal_Verification_2026-07-19.mhtml"
+  ],
+  "ready_for_ca_review": true
+}
