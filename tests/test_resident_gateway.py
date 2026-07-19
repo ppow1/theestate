@@ -6,6 +6,53 @@ def test_models_expose_active_residents_include_commissioned_grace():
     assert {'estate/alfred', 'estate/helen', 'estate/ingrid', 'estate/grace'} <= ids
 
 
+def test_conference_room_supplies_canonical_identity_before_generation(monkeypatch, tmp_path):
+    canonical = {
+        "alfred": ("Alfred", "Manager of Administration", "working directly for the Steward"),
+        "ingrid": ("Ingrid", "Manager of Security", ""),
+        "helen": ("Helen", "Manager of Human Resources", ""),
+        "grace": ("Grace", "Director of Operations", ""),
+    }
+    forbidden = ("Engineering", "Finance", "Steward Liaison", "Office of Operations")
+    seen = {}
+
+    def fake_compose(resident, **kwargs):
+        name, office, reporting = canonical[resident]
+        provider_ready = f"Identity: {name}; office: {office}; {reporting}"
+        return {
+            "schema_version": "resident_runtime_identity_composition.v1",
+            "resident_id": resident,
+            "surface_id": kwargs["surface_id"],
+            "identity_version_or_source_hash": f"hash-{resident}",
+            "included_context_layers": [],
+            "source_artifacts": [{"source": "data/registry/residents.json"}],
+            "provider_ready_context": provider_ready,
+            "failed_closed": False,
+        }
+
+    def fake_process_chat(resident, user_message, **kwargs):
+        composition = kwargs.get("identity_composition")
+        assert composition is not None
+        assert composition["surface_id"] == "conference-room-gateway"
+        seen[resident] = composition
+        content = composition["provider_ready_context"].removeprefix("Identity: ")
+        return {"session_id": kwargs.get("session_id"), "turn": {"turn_id": "turn_0001", "resident_id": resident, "resident_display_name": canonical[resident][0], "resident_response": content, "identity_composition": composition, "llm": {"provider": "fake", "fallback_used": False}}}
+
+    monkeypatch.setattr("estate.core.resident_gateway.compose_resident_identity", fake_compose)
+    monkeypatch.setattr("estate.core.resident_gateway.process_chat", fake_process_chat)
+    code, body = chat_completion({"model": "estate/conference-room", "messages": [{"role": "user", "content": "State your office."}], "metadata": {"resident_targets": list(canonical), "session_id": "identity-room"}}, root=tmp_path)
+
+    assert code == 200
+    assert set(seen) == set(canonical)
+    outputs = {turn["resident_id"]: turn["content"] for turn in body["estate"]["resident_turns"]}
+    for resident, (name, office, reporting) in canonical.items():
+        assert name in outputs[resident]
+        assert office in outputs[resident]
+        if reporting:
+            assert reporting in outputs[resident]
+        assert not any(title in outputs[resident] for title in forbidden)
+
+
 def test_chat_completion_maps_helen_and_returns_openai_envelope(tmp_path):
     code, body = chat_completion({'model':'estate/helen','messages':[{'role':'user','content':'Who are you?'}], 'stream': False}, root=tmp_path)
     assert code == 200

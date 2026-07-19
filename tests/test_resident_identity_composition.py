@@ -29,10 +29,11 @@ def test_composer_layers_lineage_and_identity_stability(tmp_path):
     assert layers[:3] == ["resident_core_identity", "authority_and_capability_context", "institutional_registry_context"]
     identity = comp["included_context_layers"][0]["content"]
     assert identity["canonical_name"] == "Alfred"
-    assert identity["office"] == "Chief of Staff"
-    assert "Operations Director" in identity["role_boundaries"][0]
+    assert identity["office"] == "Manager of Administration"
+    assert identity["reporting_relationship"] == "Steward"
+    assert "Engineering" in identity["role_boundaries"][0]
     assert comp["source_artifacts"]
-    assert comp["detected_contradictions"]
+    assert comp["detected_contradictions"] == []
     assert "Conversation is not canonical" in comp["provider_ready_context"]
 
 
@@ -67,3 +68,19 @@ def test_gateway_single_and_room_expose_composition(tmp_path):
     code, room = chat_completion({"model":"estate/conference-room","messages":[{"role":"user","content":"Who is here?"}],"metadata":{"resident_targets":["evelyn","ingrid"],"session_id":"r"}}, root=tmp_path)
     assert code == 200
     assert all(t.get("identity_hash") for t in room["estate"]["resident_turns"])
+
+
+def test_conference_composition_preserves_room_context_and_source_lineage(tmp_path):
+    _seed(tmp_path)
+    room_context = {"shared_context": [{"classification": "Estate Internal", "text": "agenda"}], "omissions": []}
+    comp = compose_resident_identity(
+        "ingrid",
+        surface_id="conference-room-gateway",
+        root=tmp_path,
+        task_instructions="Introduce yourself.",
+        room_context=room_context,
+    )
+    conversation = next(layer for layer in comp["included_context_layers"] if layer["layer"] == "conversation_context")
+    assert conversation["content"]["room_context"] == room_context
+    assert "Room context:" in comp["provider_ready_context"]
+    assert comp["source_artifacts"]
