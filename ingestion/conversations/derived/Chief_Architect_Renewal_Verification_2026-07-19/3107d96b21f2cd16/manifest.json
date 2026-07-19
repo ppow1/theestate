@@ -1,0 +1,26 @@
+{
+  "artifacts": [
+    "manifest.json",
+    "messages.jsonl",
+    "verbatim_transcript.md",
+    "derived_review.json"
+  ],
+  "canonical_status": "non_canonical_review_material",
+  "classification": "Estate Internal",
+  "extraction": {
+    "message_count": 23,
+    "roles": {
+      "assistant": 4,
+      "user": 19
+    }
+  },
+  "run_id": "3107d96b21f2cd16",
+  "schema_version": "estate.conversation-ingestion/v1",
+  "source": {
+    "bytes": 41884049,
+    "content_location": "https://chatgpt.com/c/6a5ba652-ecc8-83ea-9d0c-d89edbd07f89",
+    "media_type": "multipart/related",
+    "path": "ingestion/conversations/Chief_Architect_Renewal_Verification_2026-07-19.mhtml",
+    "sha256": "3107d96b21f2cd16c0ec4ba0ca1ec545dfaaa0964fca9b921be91452f716162f"
+  }
+}

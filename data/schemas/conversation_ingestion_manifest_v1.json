@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/conversation_ingestion_manifest_v1",
+  "title": "Estate conversation ingestion manifest",
+  "type": "object",
+  "required": ["schema_version", "run_id", "source", "extraction", "classification", "canonical_status", "artifacts"],
+  "properties": {
+    "schema_version": {"const": "estate.conversation-ingestion/v1"},
+    "run_id": {"type": "string", "pattern": "^[a-f0-9]{16}$"},
+    "source": {
+      "type": "object",
+      "required": ["path", "sha256", "bytes", "media_type", "content_location"],
+      "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "bytes": {"type": "integer", "minimum": 1}, "media_type": {"const": "multipart/related"}, "content_location": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "extraction": {"type": "object"},
+    "classification": {"const": "Estate Internal"},
+    "canonical_status": {"const": "non_canonical_review_material"},
+    "artifacts": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}
