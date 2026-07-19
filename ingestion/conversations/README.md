@@ -66,3 +66,25 @@ conversation location, message ID and sequence, extraction run, and WP provenanc
 Suggested destinations are metadata only: the command never writes there, never
 edits source archives, and rejects any suggestion targeting a pending definition.
 Human review and the normal adoption process remain mandatory.
+
+## Plain-text scope and runtime-canon validation (WP-4211)
+
+Label every turn in a UTF-8 copy/paste capture with `Steward:`, `User:`,
+`Assistant:`, or `ChatGPT:`. Run the scope-aware successor pipeline with:
+
+```bash
+PYTHONPATH=src python -m estate.core.conversation_scope_validation \
+  ingestion/conversations/design-chat.txt
+```
+
+The command also accepts MHTML and reuses the same WP-4208 ingestion bundle. It
+derives the authoritative scope only from ordered Steward/user turns; later explicit
+corrections supersede earlier assignments, while assistant restatements remain
+non-authoritative. Production-style Markdown, bold, `Work Package`, and `Runtime
+Canon` WP headings are recognized.
+
+The content-addressed review directory contains `scope_timeline.json`,
+`execution_timeline.json`, `scope_validation_report.json`,
+`conversation_diagnostics.json`, and `promotion_block_report.md`. Exit status 2
+means a review-blocking diagnostic was found. Every result remains non-canonical,
+review-required material and automatic promotion is always prohibited.

@@ -1,4 +1,4 @@
-"""Deterministic, provenance-preserving ingestion of conversation MHTML archives.
+"""Deterministic, provenance-preserving ingestion of conversation archives.
 
 The archive is evidence.  This module only reads it and writes a derived run bundle;
 it never promotes conversation statements into Estate institutional truth.
@@ -133,6 +133,41 @@ def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], 
     return messages, location
 
 
+PLAIN_ROLE = re.compile(
+    r"(?im)^(?:\[?\s*)?(user|steward|assistant|chatgpt|system|tool)(?:\s*\]?\s*):\s*(.*)$"
+)
+
+
+def extract_plain_text(archive: Path, source_sha256: str) -> tuple[list[Message], str]:
+    """Parse a labelled UTF-8 copy/paste transcript without guessing unlabeled roles."""
+    raw = archive.read_bytes()
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise IngestionError("plain-text capture is not valid UTF-8") from exc
+    matches = list(PLAIN_ROLE.finditer(text))
+    if not matches:
+        raise IngestionError("plain-text capture contains no labelled conversation turns")
+    messages: list[Message] = []
+    role_map = {"steward": "user", "chatgpt": "assistant"}
+    for sequence, match in enumerate(matches, 1):
+        end = matches[sequence].start() if sequence < len(matches) else len(text)
+        body = (match.group(2) + text[match.end():end]).strip()
+        role = role_map.get(match.group(1).lower(), match.group(1).lower())
+        start_line = text.count("\n", 0, match.start()) + 1
+        end_line = text.count("\n", 0, end) + (0 if end and text[end - 1:end] == "\n" else 1)
+        source_id = f"plain-line-{start_line}"
+        messages.append(Message(
+            sequence=sequence, source_message_id=source_id, role=role, text=_normalize(body),
+            formatted_text=body, text_sha256=_sha256(_normalize(body).encode()),
+            formatted_text_sha256=_sha256(body.encode()), provenance={
+                "archive_sha256": source_sha256, "media_type": "text/plain",
+                "line_start": start_line, "line_end": max(start_line, end_line),
+            },
+        ))
+    return messages, ""
+
+
 def _write_atomic(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.")
@@ -149,7 +184,8 @@ def ingest(archive: Path, output_root: Path, *, repository_root: Path | None = N
     archive = archive.resolve()
     source_bytes = archive.read_bytes()
     source_hash = _sha256(source_bytes)
-    messages, location = extract_messages(archive, source_hash)
+    is_plain = archive.suffix.lower() in {".txt", ".text", ".md"}
+    messages, location = (extract_plain_text if is_plain else extract_messages)(archive, source_hash)
     run_id = source_hash[:16]
     run_dir = output_root / archive.stem / run_id
     try:
@@ -171,7 +207,7 @@ def ingest(archive: Path, output_root: Path, *, repository_root: Path | None = N
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "run_id": run_id,
-        "source": {"path": source_path, "sha256": source_hash, "bytes": len(source_bytes), "media_type": "multipart/related", "content_location": location},
+        "source": {"path": source_path, "sha256": source_hash, "bytes": len(source_bytes), "media_type": "text/plain" if is_plain else "multipart/related", "content_location": location},
         "extraction": {"message_count": len(messages), "roles": {r: sum(m.role == r for m in messages) for r in sorted({m.role for m in messages})}},
         "classification": "Estate Internal",
         "canonical_status": "non_canonical_review_material",
