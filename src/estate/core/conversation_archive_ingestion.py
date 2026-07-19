@@ -40,7 +40,8 @@ class _MessageHTMLParser(HTMLParser):
         self.role = ""
         self.message_id = ""
         self.parts: list[str] = []
-        self.messages: list[tuple[str, str, str]] = []
+        self.formatted_parts: list[str] = []
+        self.messages: list[tuple[str, str, str, str]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
@@ -49,10 +50,16 @@ class _MessageHTMLParser(HTMLParser):
             self.role = values["data-message-author-role"] or ""
             self.message_id = values.get("data-message-id") or ""
             self.parts = []
+            self.formatted_parts = []
         elif self.capture_div_depth and tag == "div":
             self.capture_div_depth += 1
         if self.capture_div_depth and tag in {"br", "p", "li", "pre", "h1", "h2", "h3"}:
             self.parts.append("\n")
+        if self.capture_div_depth:
+            prefixes = {"h1": "\n# ", "h2": "\n## ", "h3": "\n### ", "h4": "\n#### ",
+                        "p": "\n\n", "br": "\n", "li": "\n- ", "pre": "\n```\n",
+                        "blockquote": "\n> ", "tr": "\n| ", "th": "**", "td": ""}
+            self.formatted_parts.append(prefixes.get(tag, ""))
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         self.handle_starttag(tag, attrs)
@@ -61,12 +68,18 @@ class _MessageHTMLParser(HTMLParser):
     def handle_data(self, data: str) -> None:
         if self.capture_div_depth:
             self.parts.append(data)
+            self.formatted_parts.append(data)
 
     def handle_endtag(self, tag: str) -> None:
         if self.capture_div_depth and tag == "div":
             self.capture_div_depth -= 1
             if not self.capture_div_depth:
-                self.messages.append((self.role, self.message_id, _normalize("".join(self.parts))))
+                formatted = "".join(self.formatted_parts).strip()
+                formatted = re.sub(r"\n{3,}", "\n\n", formatted)
+                self.messages.append((self.role, self.message_id, _normalize("".join(self.parts)), formatted))
+        elif self.capture_div_depth:
+            suffixes = {"pre": "\n```\n", "th": "** | ", "td": " | ", "tr": "", "p": "\n"}
+            self.formatted_parts.append(suffixes.get(tag, ""))
 
 
 @dataclass(frozen=True)
@@ -75,7 +88,9 @@ class Message:
     source_message_id: str
     role: str
     text: str
+    formatted_text: str
     text_sha256: str
+    formatted_text_sha256: str
     provenance: dict[str, object]
 
 
@@ -98,7 +113,7 @@ def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], 
         raise IngestionError("HTML contains no data-message-author-role elements")
     location = primary.get("Content-Location", "")
     messages = []
-    for sequence, (role, source_id, text) in enumerate(parser.messages, 1):
+    for sequence, (role, source_id, text, formatted_text) in enumerate(parser.messages, 1):
         if role not in ALLOWED_ROLES:
             raise IngestionError(f"unsupported message role: {role!r}")
         messages.append(Message(
@@ -106,7 +121,9 @@ def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], 
             source_message_id=source_id,
             role=role,
             text=text,
+            formatted_text=formatted_text,
             text_sha256=_sha256(text.encode()),
+            formatted_text_sha256=_sha256(formatted_text.encode()),
             provenance={
                 "archive_sha256": source_sha256,
                 "mime_content_location": location,
@@ -180,7 +197,9 @@ def validate_bundle(run_dir: Path, archive: Path | None = None) -> dict[str, obj
     if [r["sequence"] for r in records] != list(range(1, len(records) + 1)):
         raise IngestionError("message sequence is not contiguous")
     for record in records:
-        if record["role"] not in ALLOWED_ROLES or _sha256(record["text"].encode()) != record["text_sha256"]:
+        if (record["role"] not in ALLOWED_ROLES
+                or _sha256(record["text"].encode()) != record["text_sha256"]
+                or _sha256(record["formatted_text"].encode()) != record["formatted_text_sha256"]):
             raise IngestionError("message integrity validation failed")
     if archive is not None and _sha256(archive.read_bytes()) != manifest["source"]["sha256"]:
         raise IngestionError("source archive hash mismatch")

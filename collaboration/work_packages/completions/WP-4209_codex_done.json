@@ -1,0 +1,24 @@
+{
+  "work_package_id": "WP-4209",
+  "status": "completed",
+  "canonical_status": "review_required",
+  "implementation_summary": [
+    "Extended WP-4208 extraction records with integrity-checked structure-preserving Markdown.",
+    "Added deterministic classification, bounded WP coverage, runtime-canon extraction, destination suggestion, staging, provenance, diagnostics, and validation.",
+    "Added CLI/operator guidance, schema, synthetic and realistic fixture tests, failure scenarios, and validation evidence."
+  ],
+  "deliverables": [
+    "src/estate/core/conversation_specification_extraction.py",
+    "data/schemas/conversation_specification_extraction_v1.json",
+    "tests/test_conversation_specification_extraction.py",
+    "ingestion/conversations/README.md",
+    "operations/validation/reports/WP-4209_conversation_specification_extraction.md"
+  ],
+  "tests": [
+    {
+      "command": "PYTHONPATH=src python -m pytest tests/test_conversation_archive_ingestion.py tests/test_conversation_specification_extraction.py -q",
+      "result": "12 passed in 2.40s"
+    }
+  ],
+  "ready_for_ca_review": true
+}

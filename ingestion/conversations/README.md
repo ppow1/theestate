@@ -41,3 +41,28 @@ review and the normal approval process are required before any institutional ado
 Use `validate_bundle` from `estate.core.conversation_archive_ingestion` to verify a
 bundle against its immutable source. A changed source gets a new run identifier;
 message or source tampering causes validation to fail.
+
+## Extracting work-package specification candidates
+
+After ingestion, the successor engine classifies conversation messages, extracts
+structured assistant runtime-canons, checks a deliberately bounded WP set, and
+writes review-only candidates:
+
+```bash
+PYTHONPATH=src python -m estate.core.conversation_specification_extraction \
+  ingestion/conversations/design-chat.mhtml \
+  --expected "WP-4107 through WP-4116"
+```
+
+`--expected` also accepts `WP-4117..WP-4126`, `WP-4127:WP-4130`, or a comma-separated
+identifier list. Output is content-addressed under
+`staging/conversation_specifications/<run-id>/`. `validation_report.json` always
+enumerates found, missing, duplicate, ambiguous, and unexpected identifiers. A
+blocked report causes CLI exit status 2; the report remains available for review.
+
+Candidates preserve headings, paragraphs, lists, tables, fenced code, and
+indentation from the archive's message HTML. Each candidate carries archive hash,
+conversation location, message ID and sequence, extraction run, and WP provenance.
+Suggested destinations are metadata only: the command never writes there, never
+edits source archives, and rejects any suggestion targeting a pending definition.
+Human review and the normal adoption process remain mandatory.
