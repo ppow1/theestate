@@ -67,6 +67,48 @@ Suggested destinations are metadata only: the command never writes there, never
 edits source archives, and rejects any suggestion targeting a pending definition.
 Human review and the normal adoption process remain mandatory.
 
+## Pending-definition matched runtime-canon recovery (WP-4212)
+
+The recovery command accepts one archive, several archives, a directory of
+archives, or existing WP-4208 bundle directories. It scans assistant messages
+without using conversational assignment as a filter, resolves substantive output
+against `collaboration/work_packages/pending/`, assesses completeness and
+truncation, reconciles cross-archive duplicates, and stages qualifying evidence:
+
+```bash
+PYTHONPATH=src python -m estate.core.runtime_canon_recovery \
+  ingestion/conversations/archive-one.mhtml \
+  ingestion/conversations/archive-two.mhtml \
+  --output-root staging/runtime_canon_recovery
+```
+
+Windows PowerShell, from `A:\theestate`:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m estate.core.runtime_canon_recovery `
+  "A:\theestate\ingestion\conversations\127-130 #1.mhtml" `
+  "A:\theestate\ingestion\conversations\Estate work-package continuation2.mhtml" `
+  --repository-root "A:\theestate" `
+  --output-root "A:\theestate\staging\runtime_canon_recovery"
+```
+
+Useful operator options are `--pending-root` (fixture/alternate pending index),
+`--identifier-filter WP-4212`, `--dry-run`, `--machine-readable`, and `--strict`.
+Strict mode exits 2 for review blocks; fatal input, index, parsing, or generation
+errors exit 3. Default mode still exits 3 for fatal diagnostics, while ordinary
+review blocks remain inspectable without making batch processing fail.
+
+Each content-addressed run emits `pending_work_package_index.json`,
+`runtime_canon_candidates.json`, `definition_match_report.json`,
+`candidate_assessment_report.json`, `candidate_reconciliation_report.json`,
+`supporting_document_manifest.json`, `runtime_canon_recovery_report.md`, and
+`promotion_block_report.md`. Proposed documents live only below the run's
+`supporting_documents/` staging directory. They include a provenance preamble and
+the mechanically newline-normalized assistant body. The engine never writes to a
+proposed destination, never modifies a pending definition, and never promotes a
+derived document automatically.
+
 ## Plain-text scope and runtime-canon validation (WP-4211)
 
 Label every turn in a UTF-8 copy/paste capture with `Steward:`, `User:`,
