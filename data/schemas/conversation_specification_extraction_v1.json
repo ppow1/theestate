@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/conversation_specification_extraction_v1",
+  "title": "Conversation specification extraction validation report",
+  "type": "object",
+  "required": ["schema_version", "run_id", "status", "canonical_status", "expected", "found", "missing", "duplicates", "ambiguous", "candidates", "diagnostics", "source"],
+  "properties": {
+    "schema_version": {"const": "estate.conversation-specification-extraction/v1"},
+    "run_id": {"type": "string", "pattern": "^[a-f0-9]{16}$"},
+    "status": {"enum": ["valid", "review_blocked"]},
+    "canonical_status": {"const": "non_canonical_review_material"},
+    "expected": {"type": "array", "items": {"type": "string", "pattern": "^WP-[0-9]{4}$"}, "uniqueItems": true},
+    "found": {"type": "array", "items": {"type": "string"}},
+    "missing": {"type": "array", "items": {"type": "string"}},
+    "duplicates": {"type": "array", "items": {"type": "string"}},
+    "ambiguous": {"type": "array", "items": {"type": "string"}},
+    "unexpected": {"type": "array", "items": {"type": "string"}},
+    "message_classifications": {"type": "array", "items": {"type": "object"}},
+    "candidates": {"type": "array", "items": {"type": "object", "required": ["wp_id", "title", "proposed_destination", "staging_artifact", "content_sha256", "provenance"]}},
+    "diagnostics": {"type": "array", "items": {"type": "object"}},
+    "source": {"type": "object", "required": ["ingestion_bundle", "archive_sha256"]}
+  }
+}
