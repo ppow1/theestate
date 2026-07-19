@@ -17,7 +17,20 @@ def load_character_context(resident, *, surface_id="resident", root=None):
     for p in candidates:
         if p.is_file() and p.suffix.lower() in {".md",".json",".yaml",".yml"}:
             rel=str(p.relative_to(base)).replace('\\','/'); sources.append(rel); excerpts.append({"source":rel,"excerpt":_excerpt(p)})
+    # The behavior registry is the provider-neutral, machine-readable expression
+    # of canon.  Load only the named resident's row; never let a model infer one
+    # resident's manner from another resident's prompt or conversation.
+    behavior_path = base / "data/character-architecture/resident_behavior_profiles_v0_1.json"
+    behavior = None
+    if behavior_path.exists():
+        try:
+            registry = json.loads(behavior_path.read_text(encoding="utf-8"))
+            behavior = (registry.get("residents") or {}).get(key)
+            if behavior:
+                sources.append(str(behavior_path.relative_to(base)).replace('\\', '/'))
+        except (OSError, ValueError, TypeError):
+            behavior = None
     private= key=="evelyn" or surface_id.startswith(("conference","room"))
-    content={"schema_version":"character_bible_context.v1","resident_key":key,"stable_traits":DEFAULTS.get(key,{}),"sources":sources[:20],"source_lineage":excerpts[:6],"unknown_policy":"missing durable personal facts remain unknown","authority_elevation_allowed":False,"private_material_excluded": surface_id.startswith(("conference","room"))}
+    content={"schema_version":"character_bible_context.v1","resident_key":key,"stable_traits":DEFAULTS.get(key,{}),"behavior_profile":behavior or {},"sources":sources[:20],"source_lineage":excerpts[:6],"unknown_policy":"missing durable personal facts remain unknown","authority_elevation_allowed":False,"private_material_excluded": surface_id.startswith(("conference","room"))}
     content["context_hash"]=hashlib.sha256(json.dumps(content,sort_keys=True,default=str).encode()).hexdigest()[:16]
     return content

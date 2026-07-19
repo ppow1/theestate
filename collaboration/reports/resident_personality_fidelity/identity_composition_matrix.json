@@ -9,19 +9,12 @@
     "marie",
     "judy"
   ],
-  "generated_at": "2026-07-13T02:14:22+00:00",
+  "generated_at": "2026-07-19T23:39:48+00:00",
   "rows": [
     {
-      "detected_contradictions": [
-        {
-          "canonical_expectation": "Chief of Staff",
-          "field": "office",
-          "source": "data/registry/residents.json",
-          "value": "Manager of Administration"
-        }
-      ],
-      "failed_closed": true,
-      "identity_hash": "cb75ca7f018dad14",
+      "detected_contradictions": [],
+      "failed_closed": false,
+      "identity_hash": "1660afda35bfeef6",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -69,8 +62,104 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "residents/alfred.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/README.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/character-card.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/command-center-metadata.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/digital-health-profile.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/platform-exports/open-webui-alfred-v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/platform-exports/sillytavern-alfred-v0_1.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/platform-exports/testing-checklist.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/platform-exports/text-generation-webui-alfred-v0_1.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/platform-exports/textgen-4_9-alfred-v0_1.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/public-charter.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/relationship-map.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/runtime/Alfred_Background_Operations_Integration_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/runtime/Alfred_Event_Intake_Schema_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/runtime/Alfred_Standalone_Runtime_Foundation_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/alfred/validation/2026-07-09_textgen_local_qwen_acceptance.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -93,7 +182,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -108,7 +197,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "d07b8ac696c3e70d",
+      "identity_hash": "0f53ee91871ed7aa",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -156,8 +245,80 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "residents/helen.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Hiring_Onboarding_Workflow_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Local_Standup_Runbook_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Resident_Profile_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Resident_Profile_v0_2.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Resident_Validation_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Resident_Validation_v0_2.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/Helen_Standup_Readiness_Matrix_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/platform-exports/textgen-4_9-helen-v0_1.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/platform-exports/textgen-4_9-helen-v0_2.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/runtime/Helen_Background_Operations_Integration_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/helen/runtime/Helen_Workforce_Development_Runtime_Integration_v0_2.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -180,7 +341,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -195,7 +356,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "6852ccc472a36d18",
+      "identity_hash": "217dd3d85078b907",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -243,8 +404,44 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "residents/ingrid.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/ingrid/Ingrid_Boundary_Inventory_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/ingrid/Ingrid_Boundary_Matrix_v0_1.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/ingrid/Ingrid_Visual_Identity_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/ingrid/Ingrid_Voice_Identity_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/ingrid/platform-exports/openwebui-ingrid-v0_1.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -267,7 +464,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -282,7 +479,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "51ef2b6019cd761b",
+      "identity_hash": "ae0b2f9a849315e4",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -330,8 +527,26 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "docs/residents/grace/Grace_Resident_Profile_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/grace/Grace_Resident_Validation_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/grace/platform-exports/textgen-4_9-grace-v0_1.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -354,7 +569,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -369,7 +584,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "2a3490e92f2f124e",
+      "identity_hash": "39012ec34a3bfcd4",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -417,8 +632,104 @@
         },
         {
           "classification": "Estate Restricted \u2014 Steward Relationship Layer",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "docs/residents/evelyn/Evelyn_Backstory_and_Trauma_Boundary_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Behavioral_Validation_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Character_Bible_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Identity_Manifest_v0_1.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Mannerisms_and_Body_Language_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Physical_Identity_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Relationship_Map_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Resident_Profile_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Visual_Identity_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Voice_Identity_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/Evelyn_Wardrobe_and_Presentation_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/platform-exports/openwebui-evelyn-presentation-v0_1.yaml",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/visual-prompts/Evelyn_Canonical_Portrait_Prompt_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/visual-prompts/Evelyn_Expression_and_Pose_Set_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/voice/Evelyn_Voice_Direction_v0_1.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "docs/residents/evelyn/wardrobe/Evelyn_Wardrobe_Preference_Matrix_v0_1.json",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Restricted \u2014 Steward Relationship Layer",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -441,7 +752,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -456,7 +767,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "35cc89848c16a9cc",
+      "identity_hash": "544cd732c4ec0b9a",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -504,8 +815,14 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "residents/eleanor.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -528,7 +845,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -543,7 +860,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "08bce20de7d9bfe3",
+      "identity_hash": "5a0ba5f4e760c0c8",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -591,8 +908,14 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "residents/marie.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -615,7 +938,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
@@ -630,7 +953,7 @@
     {
       "detected_contradictions": [],
       "failed_closed": false,
-      "identity_hash": "0fdc24bdea31f3b7",
+      "identity_hash": "2c04323e3e8ee25a",
       "layers": [
         "resident_core_identity",
         "authority_and_capability_context",
@@ -678,8 +1001,14 @@
         },
         {
           "classification": "Estate Internal",
-          "inclusion_reason": "canonical character bible context",
+          "inclusion_reason": "canonical character and behavior context",
           "source": "residents/judy.md",
+          "version_or_timestamp": null
+        },
+        {
+          "classification": "Estate Internal",
+          "inclusion_reason": "canonical character and behavior context",
+          "source": "data/character-architecture/resident_behavior_profiles_v0_1.json",
           "version_or_timestamp": null
         },
         {
@@ -702,7 +1031,7 @@
         },
         {
           "classification": "surface-local",
-          "inclusion_reason": "bounded current conversation only",
+          "inclusion_reason": "bounded current conversation and privacy-filtered room context only",
           "source": "runtime/resident_interactions/sessions",
           "version_or_timestamp": null
         },
