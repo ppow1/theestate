@@ -37,7 +37,7 @@ REQUIRED_IDENTITY_FIELDS = ("id", "name", "office", "role", "status")
 PRIVATE_CLASSES = {"Estate Restricted — Steward Relationship Layer", "evelyn_private_relationship", "hr_private", "security_private", "workforce_private"}
 
 ROLE_BOUNDARIES = {
-    "alfred": ["Chief of Staff / executive coordination; not Operations Director, Engineering, HR, Ingrid, Grace, or Steward."],
+    "alfred": ["Manager of Administration, working directly for the Steward; not Operations Director, Engineering, Finance, HR, Ingrid, Grace, or Steward Liaison."],
     "helen": ["Human Resources and Workforce Development; does not create offices, appoint residents, control mail, or run operations."],
     "grace": ["Director of Operations; does not absorb Traffic Controller, Steward, Engineering, Dispatch, Helen, or Ingrid authority."],
     "ingrid": ["Privacy, classification, connector, protected-source, and boundary authority; ordinary self-description remains allowed."],
@@ -46,7 +46,8 @@ ROLE_BOUNDARIES = {
     "marie": ["Research; investigates and contextualizes evidence without claiming unsupported certainty or live access."],
     "judy": ["General Counsel; frames legal risk and compliance concerns without granting authority or replacing external counsel."],
 }
-OFFICE_CORRECTIONS = {"alfred": "Chief of Staff", "helen": "Human Resources / Workforce Development"}
+OFFICE_CORRECTIONS = {"alfred": "Manager of Administration", "helen": "Manager of Human Resources"}
+REPORTING_CORRECTIONS = {"alfred": "Steward"}
 
 
 def _root(root=None) -> Path:
@@ -148,7 +149,7 @@ def compose_resident_identity(
         "department": (rec or {}).get("department"),
         "role": (rec or {}).get("role"),
         "lifecycle_status": (rec or {}).get("status"),
-        "reporting_relationship": (rec or {}).get("reports_to") or "unknown",
+        "reporting_relationship": REPORTING_CORRECTIONS.get(canonical_key, (rec or {}).get("reports_to") or "unknown"),
         "provider_independent_summary": f"{(rec or {}).get('name', resident)} is the Estate resident for {(rec or {}).get('office') or 'an unverified office'}.",
         "role_boundaries": ROLE_BOUNDARIES.get(canonical_key, ["No authority inferred from model capability or chat history."]),
     }
@@ -164,12 +165,13 @@ def compose_resident_identity(
     layers.append({"layer": "privacy_and_disclosure_context", "classification": "Estate Internal", "content": {"minimum_necessary": True, "ordinary_identity_allowed": True, "private_room_continuity_excluded": surface_id.startswith(("conference", "room"))}, "sources": [_source("src/estate/core/resident_identity_composition.py", reason="runtime privacy filter")]})
     layers.append({"layer": "relationship_context", "classification": "Estate Restricted" if canonical_key == "evelyn" else "Estate Internal", "content": relationships, "sources": [_source("src/estate/core/relationship_graph.py", (rec or {}).get("classification") or "Estate Internal", reason="privacy-filtered relationship graph")]})
     layers.append({"layer": "durable_memory_context", "classification": "Estate Restricted" if canonical_key == "evelyn" else "Estate Internal", "content": memory_context, "sources": [_source("runtime/resident_memory/memory_store.json", (rec or {}).get("classification") or "Estate Internal", reason="bounded privacy-filtered durable memory; excludes provider memory and raw transcripts")]})
-    layers.append({"layer": "conversation_context", "classification": "surface-local", "content": {"turns": list(conversation_context or [])[-4:], "canonical_truth": False}, "sources": [_source("runtime/resident_interactions/sessions", "surface-local", reason="bounded current conversation only")]})
+    layers.append({"layer": "conversation_context", "classification": "surface-local", "content": {"turns": list(conversation_context or [])[-4:], "room_context": dict(room_context or {}), "canonical_truth": False}, "sources": [_source("runtime/resident_interactions/sessions", "surface-local", reason="bounded current conversation and privacy-filtered room context only")]})
     layers.append({"layer": "task_specific_instructions", "classification": "surface-local", "content": {"instructions": task_instructions or "Respond within composed identity and authority."}, "sources": [_source("request_payload", "surface-local", reason="current request instructions")]})
 
     provider_ready = "\n".join([
         f"Runtime identity composition: {SCHEMA_VERSION}; resident={identity['canonical_name']}; surface={surface_id}.",
         f"Identity: {json.dumps(identity, sort_keys=True)}",
+        f"Room context: {json.dumps(dict(room_context or {}), sort_keys=True)[:1600]}",
         f"Active resident cast: {json.dumps(layers[2]['content']['active_residents'], sort_keys=True)}",
         f"Authority: {json.dumps(layers[1]['content'], sort_keys=True)[:1600]}",
         f"Privacy: {json.dumps(layers[5 if character_available else 4]['content'], sort_keys=True)}",

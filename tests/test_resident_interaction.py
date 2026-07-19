@@ -101,8 +101,8 @@ def test_process_chat_uses_mocked_local_llm_for_helen(monkeypatch, tmp_path):
         def generate(self, *, resident, prompt, model=None):
             assert resident == "helen"
             assert "You are Helen" in prompt
-            assert "Human Resources and Workforce Development" in prompt
-            assert "Grace remains a candidate" in prompt
+            assert "Manager of Human Resources" in prompt
+            assert "Grace is Director of Operations" in prompt
             return {"ok": True, "text": "I’m Helen in Human Resources and Workforce Development; I support staffing, onboarding, continuity, cognitive health, and institutional learning without appointing Grace or taking Alfred’s role.", "metadata": {"mode": "local_llm_generated", "provider": "ollama", "model": model, "endpoint": self.endpoint, "fallback_used": False, "fallback_reason": None, "generation_attempted": True, "generation_endpoint": f"{self.endpoint}/api/generate", "generation_result_state": "generated", "discovered_models_count": 2}}
     monkeypatch.setattr(mod, "LocalOllamaAdapter", HelenMockAdapter)
     payload = process_chat("helen", "Who are you?", root=tmp_path)
@@ -403,7 +403,7 @@ def test_resident_prompt_is_resident_specific(tmp_path):
     h = resident_prompt('helen','hello',resident_surface('helen', tmp_path),{}, {}, {})
     u = resident_prompt('unknown','hello',resident_surface('unknown', tmp_path),{}, {}, {})
     assert 'You are Alfred' in a and 'Human Resources and Workforce Development' not in a
-    assert 'You are Helen' in h and 'Human Resources and Workforce Development' in h and 'Grace remains a candidate' in h
+    assert 'You are Helen' in h and 'Manager of Human Resources' in h and 'Grace is Director of Operations' in h
     assert 'limited generic Estate resident' in u and 'You are Alfred' not in u
 
 

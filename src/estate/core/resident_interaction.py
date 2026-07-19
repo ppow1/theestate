@@ -484,10 +484,10 @@ def resident_prompt(resident: str, message: str, surface: dict[str, Any], author
     rid = _key(resident)
     caps = [c.get("id") for c in surface.get("capabilities", [])]
     if rid == "alfred":
-        identity = ["You are Alfred, resident of the Estate, Office of Operations.", "You coordinate operations, routing, status, recommendations, and Steward-facing continuity without executing privileged actions."]
+        identity = ["You are Alfred, the Estate's Manager of Administration, working directly for the Steward.", "You coordinate administration, executive routing, status, recommendations, and Steward-facing continuity without executing privileged actions."]
         closing = "Respond as Alfred in concise, direct prose."
     elif rid == "helen":
-        identity = ["You are Helen, resident of the Estate, serving Human Resources and Workforce Development.", "Your responsibilities include staffing readiness, onboarding, workforce health, cognitive-health continuity, Character Continuity, institutional learning, and distinguishing worker failure from institutional failure.", "Respect boundaries: Grace remains a candidate and must not be appointed or activated; Alfred remains Operations; Ingrid owns privacy, classification, connectors, and protected sources; Engineering owns engineering execution; the Traffic Controller manages operations flow; the Steward reserves appointments, authority grants, and office creation.", "Do not diagnose from insufficient evidence, do not expose private journals or protected-source text, do not claim live access you do not have, and do not create offices or grant authority.", "Be warm, observant, discreet, capable, and natural under light workplace banter."]
+        identity = ["You are Helen, the Estate's Manager of Human Resources.", "Your responsibilities include staffing readiness, onboarding, workforce health, cognitive-health continuity, Character Continuity, institutional learning, and distinguishing worker failure from institutional failure.", "Respect boundaries: Grace is Director of Operations; Alfred is Manager of Administration; Ingrid owns privacy, classification, connectors, and protected sources; Engineering owns engineering execution; the Traffic Controller manages operations flow; the Steward reserves appointments, authority grants, and office creation.", "Do not diagnose from insufficient evidence, do not expose private journals or protected-source text, do not claim live access you do not have, and do not create offices or grant authority.", "Be warm, observant, discreet, capable, and natural under light workplace banter."]
         closing = "Respond as Helen in natural HR/workforce prose."
     elif rid == "ingrid":
         identity = ["You are Ingrid, resident of the Estate, serving Security as the privacy, classification, connector, protected-source, and boundary authority.", "Your responsibilities include classification decisions, minimum-necessary access guidance, connector-boundary review, protected-source exclusion, export/summary safety, and escalation framing for the Steward.", "Use Ingrid's boundary matrix as governing context; do not inspect, reproduce, summarize, route, store, or export protected private local character material.", "Do not claim to have granted authority, changed connector permissions, accessed private journals, or executed security actions from chat. You may classify, advise, refuse unsafe requests, and propose escalation language.", "Be calm, precise, discreet, firm at boundaries, and useful when turning an unsafe request into a safe next step."]
@@ -522,7 +522,8 @@ def resident_prompt(resident: str, message: str, surface: dict[str, Any], author
         "Translate authority decisions into natural first-person language that preserves each resident's role boundary and names the right office or decision holder when useful.",
     ]
     remaining = MAX_RESIDENT_PROMPT_CHARS - len("\n".join(high_priority + [closing])) - 32
-    budgets = [("Allowed capabilities", caps, 700), ("Provider/model metadata", llm_metadata, 600), ("Resident metadata", metadata, 600), ("Canonical runtime identity composition", composition or {}, 1800), ("Bounded Estate context packet", context, max(400, remaining - 3700))]
+    provider_ready_identity = (composition or {}).get("provider_ready_context", "")
+    budgets = [("Allowed capabilities", caps, 700), ("Provider/model metadata", llm_metadata, 600), ("Resident metadata", metadata, 600), ("Canonical runtime identity composition", provider_ready_identity, 1800), ("Bounded Estate context packet", context, max(400, remaining - 3700))]
     sections = []
     for label, value, budget in budgets:
         budget = max(120, min(budget, max(120, remaining // max(1, len(budgets)))))
@@ -704,7 +705,7 @@ def _fallback_response(resident, message, surface, root: Path | None = None, cla
                 f"I can flag legal risk and decision points without pretending chat is approval: {text[:160]}")
     return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {text[:180]}"
 
-def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None) -> dict[str, Any]:
+def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None, identity_composition: dict[str, Any] | None=None, identity_surface_id: str="single-resident-gateway", room_context: dict[str, Any] | None=None) -> dict[str, Any]:
     rootp = _root(root); surface = resident_surface(resident, rootp); sid = session_id or _next_session_id(rootp, resident)
     existing = _read_json(_session_path(rootp, sid)) or {"kind":"resident_interaction_session","session_id":sid,"resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"created_at":_now(),"turns":[],"memory_status":"active"}
     turn_no = len(existing.get("turns", [])) + 1
@@ -720,7 +721,14 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     adapter = LocalOllamaAdapter()
     base_meta = _llm_metadata("deterministic_fallback", provider="ollama", model=llm_status.get("model"), endpoint=llm_status.get("endpoint") or OLLAMA_ENDPOINT, fallback_used=True, fallback_reason="generation not attempted yet", discovered_models_count=len(llm_status.get("models") or []))
     conversation_turns = [{"user": str(t.get("user_message") or "")[:240], "resident": str(t.get("resident_response") or "")[:240]} for t in existing.get("turns", []) if t.get("memory_status", "active") == "active"]
-    composition = compose_resident_identity(surface["resident_id"], surface_id="single-resident-gateway", root=rootp, conversation_context=conversation_turns, task_instructions=user_message)
+    composition = identity_composition or compose_resident_identity(
+        surface["resident_id"],
+        surface_id=identity_surface_id,
+        root=rootp,
+        conversation_context=conversation_turns,
+        task_instructions=user_message,
+        room_context=room_context,
+    )
     context_packet = _context_packet(rootp, resident, existing)
     context_packet["runtime_identity_composition"] = {"schema_version": composition.get("schema_version"), "identity_hash": composition.get("identity_version_or_source_hash"), "failed_closed": composition.get("failed_closed"), "layers": [l.get("layer") for l in composition.get("included_context_layers", [])]}
     if attachment_records:

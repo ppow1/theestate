@@ -248,8 +248,14 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
     for plan in plan_resident_turns(room, user_turn_id, target_resident_ids=targets):
         participant_session_id = f"{normalized.get('session_id')}_{plan['resident_id']}" if normalized.get("session_id") else None
         composition = compose_resident_identity(plan["resident_id"], surface_id="conference-room-gateway", root=root, task_instructions=user_message, room_context=plan.get("context_packet"))
-        result = process_chat(plan["resident_id"], user_message, session_id=participant_session_id, action="conversation", root=root)
-        result["turn"]["identity_composition"] = composition
+        result = process_chat(
+            plan["resident_id"],
+            user_message,
+            session_id=participant_session_id,
+            action="conversation",
+            root=root,
+            identity_composition=composition,
+        )
         turn = result["turn"]
         resident_turns.append({"resident_id": plan["resident_id"], "display_name": turn.get("resident_display_name") or plan.get("display_name"), "content": turn.get("resident_response", ""), "turn_id": turn.get("turn_id"), "identity_hash": (turn.get("identity_composition") or {}).get("identity_version_or_source_hash")})
         room = record_resident_turn(room, plan, text=turn.get("resident_response", ""), model_metadata=turn.get("llm") or {})
