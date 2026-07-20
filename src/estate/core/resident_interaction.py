@@ -618,7 +618,33 @@ FORBIDDEN_VISIBLE_AUTHORITY_PHRASES = (
     "default personnel management policies",
     "canonical authority explicitly granting it",
     "residents don't execute work packages automatically",
+    "unknown resident authority",
+    "unknown resident",
+    "unknown action category",
+    "blocked due to an unknown category",
 )
+
+
+def _canonical_self_personnel_response(message: str, composition: dict[str, Any]) -> str | None:
+    """Return canonical self-record facts for explicit personnel questions."""
+    text = str(message or "").lower()
+    if not any(term in text for term in ("employee id", "employee number", "mailbox id", "personnel record", "onboarding", "personnel status", "your status", "your office", "your title", "who do you report")):
+        return None
+    layer = next((item for item in composition.get("included_context_layers", []) if item.get("layer") == "canonical_self_personnel_facts"), None)
+    facts = (layer or {}).get("content") or {}
+    name = str(facts.get("resident") or composition.get("resident_id") or "This resident").title()
+    if not facts.get("record_found"):
+        return (f"My canonical personnel record is unavailable: {name} is not present in data/registry/personnel.json. "
+                "I have no verified employee ID, mailbox ID, or personnel/onboarding status to give you. No identifier has been assigned by this conversation.")
+    employee = facts.get("employee_id") if facts.get("employee_id") is not None else "unassigned"
+    mailbox = facts.get("mailbox_id") if facts.get("mailbox_id") is not None else "unassigned"
+    status = facts.get("personnel_status") or "unavailable"
+    office = facts.get("office") or "unavailable"
+    title = facts.get("title") or "unavailable"
+    reporting = facts.get("reporting_relationship") or "unavailable"
+    return (f"My canonical personnel record lists employee ID {employee}, mailbox ID {mailbox}, personnel status {status}, "
+            f"office {office}, and title {title}. My reporting relationship is {reporting}. "
+            "The personnel facts come from data/registry/personnel.json; lifecycle status is composed separately from data/registry/residents.json.")
 
 
 def _natural_authority_boundary_response(resident: str, classification: dict[str, Any]) -> str | None:
@@ -652,6 +678,10 @@ def _clean_resident_visible_response(response: str, resident: str, classificatio
             "default personnel management policies": "personnel boundaries",
             "canonical authority explicitly granting it": "a designated decision holder grants it",
             "residents don't execute work packages automatically": "I cannot carry that out automatically",
+            "unknown resident authority": "an unavailable authority record",
+            "unknown resident": "an unavailable resident record",
+            "unknown action category": "an unavailable action classification",
+            "blocked due to an unknown category": "I cannot verify that execution path",
         }
         for phrase, replacement in replacements.items():
             cleaned = re.sub(re.escape(phrase), replacement, cleaned, flags=re.IGNORECASE)
@@ -749,8 +779,9 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     llm_meta.update({"selection_source": model_control_selection.get("selection_source"), "assigned_model": model_control_selection.get("assigned_model"), "capability": "text", "policy_result": model_control_selection.get("policy_result"), "model_control_warning": model_control_selection.get("warning")})
     if governed_action:
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
+    canonical_personnel = _canonical_self_personnel_response(user_message, composition)
     natural_boundary = _natural_authority_boundary_response(surface["resident_id"], classification)
-    response = natural_boundary or (generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action))
+    response = canonical_personnel or natural_boundary or (generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action))
     response = _clean_resident_visible_response(response, surface["resident_id"], classification)
     if generated.get("ok") and surface.get("resident_id") == "alfred" and ("json files" in user_message.lower() and "llm" in user_message.lower()):
         response = str(generated.get("text"))
