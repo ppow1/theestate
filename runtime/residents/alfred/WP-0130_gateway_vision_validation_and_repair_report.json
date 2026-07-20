@@ -1,0 +1,18 @@
+{
+  "work_package_id": "WP-0130",
+  "follow_on": "gateway_vision_validation_and_repair",
+  "status": "implementation_complete_live_acceptance_blocked",
+  "root_cause": "resident_gateway discarded OpenAI image/file content while extracting text and called process_chat without attachments, so LocalVisionAdapter was never invoked",
+  "configuration_path": "runtime/residents/alfred/vision_model_config.json",
+  "configuration_scope": "canonical shared configuration for every gateway resident",
+  "detected_ollama_models": [],
+  "detected_vision_capable_models": [],
+  "selected_vision_model": null,
+  "ollama_tags_result": "connection refused at http://127.0.0.1:11434/api/tags",
+  "ollama_show_result": "not attempted because no model tag was available",
+  "recommended_steward_install_command": "ollama pull llama3.2-vision:11b",
+  "automatic_model_install_performed": false,
+  "gateway_residents": ["alfred", "ingrid", "helen", "grace", "evelyn", "eleanor", "marie", "judy"],
+  "privacy": {"cloud_vision": false, "raw_image_bytes_in_prompts_logs_or_reports": false, "summary_limit_chars": 1200},
+  "live_acceptance_blocker": "No reachable compatible local Ollama vision model; confirm/install only with Steward approval and restart Resident Gateway."
+}

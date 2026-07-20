@@ -1,0 +1,15 @@
+{
+  "work_package_id": "WP-0130",
+  "follow_on_id": "WP-0130-gateway-vision-validation-repair",
+  "codex_status": "done_with_live_acceptance_blocker",
+  "summary": "Repaired canonical Resident Gateway attachment transport so all eight residents and Conference Room use the existing LocalVisionAdapter boundary.",
+  "root_cause_report": "operations/residents/alfred/WP-0130_gateway_vision_validation_and_repair_report.md",
+  "machine_report": "runtime/residents/alfred/WP-0130_gateway_vision_validation_and_repair_report.json",
+  "vision_config_path": "runtime/residents/alfred/vision_model_config.json",
+  "detected_models": [],
+  "selected_model": null,
+  "live_acceptance_blocker": "Ollama /api/tags was unreachable; no model was installed automatically.",
+  "recommended_steward_install_command": "ollama pull llama3.2-vision:11b",
+  "ready_for_ca_review": true,
+  "merge_authority": "ca_verified_auto_merge_allowed"
+}

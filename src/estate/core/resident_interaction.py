@@ -209,7 +209,17 @@ def create_attachment(root: Path, resident: str, sid: str, item: dict[str, Any],
     if kind == "image":
         if mime not in IMAGE_MIME_EXT:
             raise ValueError("unsupported image mime type")
-        raw = base64.b64decode(str(item.get("data_base64") or ""), validate=True)
+        stored_source = item.get("storage_path")
+        if stored_source:
+            source_path = (root / str(stored_source)).resolve()
+            bounded_store = (root / ATTACHMENT_STORE).resolve()
+            if source_path != bounded_store and bounded_store not in source_path.parents:
+                raise ValueError("attachment source escaped bounded storage")
+            if not source_path.is_file():
+                raise ValueError("stored attachment is not readable")
+            raw = source_path.read_bytes()
+        else:
+            raw = base64.b64decode(str(item.get("data_base64") or ""), validate=True)
         if not raw:
             raise ValueError("empty image attachment")
         filename = _safe(item.get("original_filename") or f"clipboard-image{IMAGE_MIME_EXT[mime]}")
@@ -219,7 +229,8 @@ def create_attachment(root: Path, resident: str, sid: str, item: dict[str, Any],
         summary = None; vstatus = "not_attempted"; vprovider = "none"; vmodel = None
         vision = (vision_adapter or LocalVisionAdapter(root=root)).summarize_image(image_path=path, prompt=str(item.get("prompt") or "Describe this pasted resident conversation image."))
         vstatus = vision.get("status") or ("processed" if vision.get("ok") else "unavailable")
-        vprovider = vision.get("provider") or "none"; vmodel = vision.get("model"); summary = vision.get("summary")
+        vprovider = vision.get("provider") or "none"; vmodel = vision.get("model")
+        summary = str(vision.get("summary") or "").strip()[:1200] or None
     elif kind == "text_snippet":
         text = str(item.get("text") or "")
         if not text.strip(): raise ValueError("empty text snippet")
