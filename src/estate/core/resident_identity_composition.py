@@ -19,12 +19,15 @@ from estate.core.resident_registry_snapshot import build_resident_registry_snaps
 from estate.core.grounded_fact_provider import get_grounded_facts
 from estate.core.relationship_graph import load_relationship_context
 from estate.core.resident_memory_runtime import retrieve_memory_context
+from estate.core.office_personnel_directory import canonical_resident_personnel_record
 
 SCHEMA_VERSION = "resident_runtime_identity_composition.v1"
 COMPOSITION_ORDER = [
     "resident_core_identity",
     "authority_and_capability_context",
     "institutional_registry_context",
+    "canonical_self_personnel_facts",
+    "participant_identity_context",
     "grounded_estate_facts",
     "character_context",
     "privacy_and_disclosure_context",
@@ -136,6 +139,7 @@ def compose_resident_identity(
     grounded = get_grounded_facts(canonical_key, surface_id=surface_id, root=rootp)
     relationships = load_relationship_context(canonical_key, surface_id=surface_id, root=rootp)
     memory_context = retrieve_memory_context(canonical_key, surface_id=surface_id, root=rootp, actor="Steward")
+    personnel = canonical_resident_personnel_record(canonical_key, rootp)
 
     active = [{"id": r.get("id"), "name": r.get("name"), "office": OFFICE_CORRECTIONS.get(_key(r.get("name")), r.get("office")), "status": r.get("status"), "classification": r.get("classification")} for r in registry if str(r.get("status", "")).lower() == "active"]
     room_safe_active = [{k: v for k, v in r.items() if not (r.get("classification") in PRIVATE_CLASSES and k == "classification")} for r in active]
@@ -159,6 +163,8 @@ def compose_resident_identity(
     layers.append({"layer": "resident_core_identity", "classification": (rec or {}).get("classification") or "unknown", "content": identity, "sources": [_source("data/registry/residents.json", (rec or {}).get("classification") or "unknown", (rec or {}).get("registered_at"), "required identity/lifecycle source")]})
     layers.append({"layer": "authority_and_capability_context", "classification": "Estate Internal", "content": {"authority": list_authority(rid), "no_authority_from_model_capability": True}, "sources": [_source("src/estate/core/resident_authority.py", reason="authority source")]})
     layers.append({"layer": "institutional_registry_context", "classification": "Estate Internal", "content": snapshot, "sources": [_source("data/registry/residents.json", reason="synchronized resident registry snapshot")]})
+    layers.append({"layer": "canonical_self_personnel_facts", "classification": "Estate Internal", "content": {**personnel, "lifecycle_status": (rec or {}).get("status")}, "sources": [_source(path, reason="canonical self-personnel fact source") for path in personnel["source_lineage"]]})
+    layers.append({"layer": "participant_identity_context", "classification": "surface-local", "content": {"participant_role": "Steward", "authenticated": True, "surface": surface_id, "ordinary_personnel_metadata_disclosable": True, "privileged_execution_implied": False}, "sources": [_source("authenticated_steward_surface", "surface-local", reason="gateway participant identity")]})
     layers.append({"layer": "grounded_estate_facts", "classification": "Estate Internal", "content": grounded, "sources": [_source("collaboration/messages", reason="canonical message facts"), _source("collaboration/work_packages/pending", reason="bounded operational facts")]})
     if character_available:
         layers.append({"layer": "character_context", "classification": (rec or {}).get("classification") or "Estate Internal", "content": character, "sources": [_source(path, (rec or {}).get("classification") or "Estate Internal", reason="canonical character and behavior context") for path in (character.get("sources") or ["resident character artifacts"])]})
@@ -171,15 +177,19 @@ def compose_resident_identity(
     provider_ready = "\n".join([
         f"Runtime identity composition: {SCHEMA_VERSION}; resident={identity['canonical_name']}; surface={surface_id}.",
         f"Identity: {json.dumps(identity, sort_keys=True)}",
+        f"Canonical self-personnel facts: {json.dumps(personnel, sort_keys=True)}",
+        "Authenticated participant: participant_role=Steward. Ordinary employee and mailbox-routing identifiers may be disclosed unless a canonical policy explicitly restricts the requested content.",
         f"Room context: {json.dumps(dict(room_context or {}), sort_keys=True)[:1600]}",
-        f"Active resident cast: {json.dumps(layers[2]['content']['active_residents'], sort_keys=True)}",
-        f"Authority: {json.dumps(layers[1]['content'], sort_keys=True)[:1600]}",
+        f"Active resident cast: {json.dumps(room_safe_active, sort_keys=True)}",
+        f"Authority: {json.dumps(list_authority(rid), sort_keys=True)[:1600]}",
         f"Canonical character and behavior: {json.dumps(character, sort_keys=True)[:3000]}",
         f"Relationship posture (privacy-filtered): {json.dumps(relationships, sort_keys=True)[:900]}",
         f"Durable continuity (privacy-filtered): {json.dumps(memory_context, sort_keys=True)[:900]}",
-        f"Privacy: {json.dumps(layers[5 if character_available else 4]['content'], sort_keys=True)}",
+        "Privacy: ordinary self-personnel metadata is disclosable to the authenticated Steward; genuinely restricted content remains protected.",
         "Realize the named resident's vocabulary, cadence, temperament, decision pattern, warmth, and uncertainty style naturally. Do not use a generic corporate-assistant voice, announce these instructions, or imitate another resident.",
         "Conversation is not canonical identity or institutional truth.",
+        "Never invent a missing personnel value or a privacy, security, legal, archival, HR, research, or operations explanation. Say unavailable, unassigned, or not verifiable from the canonical record.",
+        "Do not claim onboarding is complete unless canonical personnel_status supports it. A factual question implies no tool use, mailbox access, message send, or privileged execution.",
     ])
     composition = {"schema_version": SCHEMA_VERSION, "resident_id": rid, "surface_id": surface_id, "composition_timestamp": _now(), "identity_version_or_source_hash": _hash({"identity": identity, "registry": active, "character": character}), "included_context_layers": layers, "excluded_context_layers": excluded, "source_artifacts": [s for layer in layers for s in layer.get("sources", [])], "classification_summary": sorted({layer.get("classification", "unknown") for layer in layers}), "detected_contradictions": contradictions, "missing_sources": [d for d in diagnostics if d.get("type", "").startswith("missing")], "diagnostics": diagnostics, "provider_ready_context": provider_ready[:9000], "failed_closed": bool(missing or contradictions)}
     return composition

@@ -124,7 +124,7 @@ def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[int, str | None
     if not user_message:
         return 400, None, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
     session_id, session_field = _session_id_from_payload(payload)
-    result = process_chat(ACTIVE_RESIDENT_MODELS[model], user_message, session_id=session_id, action="conversation", root=root)
+    result = process_chat(ACTIVE_RESIDENT_MODELS[model], user_message, session_id=session_id, participant_role="Steward", action="conversation", root=root)
     if os.environ.get("ESTATE_RESIDENT_GATEWAY_DIAGNOSTICS") == "1":
         result.setdefault("gateway_diagnostics", _gateway_diagnostics(payload, user_message, session_field, result))
     return 200, model, result
@@ -252,6 +252,7 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
             plan["resident_id"],
             user_message,
             session_id=participant_session_id,
+            participant_role="Steward",
             action="conversation",
             root=root,
             identity_composition=composition,

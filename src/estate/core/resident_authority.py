@@ -33,6 +33,7 @@ RESPONSE_GUIDANCE = {
 }
 
 ACTION_CATEGORIES: dict[str, dict[str, Any]] = {
+    "conversation": {"classification": "conversation_only", "default": ALLOWED, "reason": "Conversation is informational and performs no privileged action."},
     "observe": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Observation is read-only local awareness."},
     "summarize": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Summaries are non-authoritative operational views."},
     "search": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Local search is informational only."},
@@ -63,26 +64,35 @@ ALIASES = {
 RESIDENT_RULES = {
     "alfred": {
         "resident": "Alfred",
-        "allowed": ["observe", "summarize", "search", "draft", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
+        "allowed": ["conversation", "observe", "summarize", "search", "draft", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
         "approval_required": ["create-work-package-draft", "send-mailbox-message-artifact"],
         "escalation_required": ["external-notification-network-action"],
         "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],
     },
     "helen": {
         "resident": "Helen",
-        "allowed": ["observe", "summarize", "search", "draft", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
+        "allowed": ["conversation", "observe", "summarize", "search", "draft", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
         "approval_required": ["create-work-package-draft", "send-mailbox-message-artifact"],
         "escalation_required": ["external-notification-network-action"],
         "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],
     },
     "grace": {
         "resident": "Grace",
-        "allowed": ["observe", "summarize", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
+        "allowed": ["conversation", "observe", "summarize", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
         "approval_required": ["create-work-package-draft", "send-mailbox-message-artifact", "external-notification-network-action"],
         "escalation_required": [],
         "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],
     },
 }
+
+for _resident in ("ingrid", "evelyn", "eleanor", "marie", "judy"):
+    RESIDENT_RULES[_resident] = {
+        "resident": _resident.title(),
+        "allowed": ["conversation", "observe", "summarize", "search", "draft", "propose", "route", "request-steward-decision"],
+        "approval_required": ["create-work-package-draft", "send-mailbox-message-artifact"],
+        "escalation_required": ["external-notification-network-action"],
+        "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],
+    }
 
 
 def _root(root: str | Path | None = None) -> Path:

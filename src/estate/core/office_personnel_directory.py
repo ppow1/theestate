@@ -25,6 +25,34 @@ WORKER_SOURCES = ["data/registry/workers.json", "runtime/workers/worker_runtime_
 RUNTIME_PAYLOAD = "runtime/steward/office_personnel_directory.json"
 
 
+def canonical_resident_personnel_record(resident: str, root: Path | str | None = None) -> dict[str, Any]:
+    """Resolve one resident against the canonical personnel registry, read-only."""
+    rootp = _root(root)
+    warnings: list[dict[str, Any]] = []
+    records = _read_json(rootp, PERSONNEL_SOURCE, warnings, required=True)
+    wanted = re.sub(r"[^a-z0-9]+", "", str(resident or "").lower())
+    matches = []
+    for row in records if isinstance(records, list) else []:
+        if not isinstance(row, dict):
+            continue
+        keys = {re.sub(r"[^a-z0-9]+", "", str(row.get(field) or "").lower()) for field in ("display_name", "resident_id")}
+        if wanted in keys:
+            matches.append(row)
+    if len(matches) != 1:
+        return {"record_found": False, "resident": str(resident), "employee_id": None, "mailbox_id": None,
+                "personnel_status": None, "source_lineage": [PERSONNEL_SOURCE],
+                "reason": "canonical personnel record absent" if not matches else "canonical personnel record ambiguous",
+                "warnings": warnings, "identifier_assigned": False}
+    row = matches[0]
+    return {"record_found": True, "resident": row.get("display_name"), "resident_id": row.get("resident_id"),
+            "employee_id": row.get("employee_id"), "mailbox_id": row.get("mailbox_id"),
+            "office": row.get("current_office") or row.get("office"), "title": row.get("current_title") or row.get("role"),
+            "personnel_status": row.get("status"),
+            "reporting_relationship": row.get("reporting_line") or row.get("reports_to") or row.get("manager_employee_id"),
+            "source_lineage": [PERSONNEL_SOURCE, *([MAILBOX_SOURCE] if row.get("mailbox_id") is not None else [])],
+            "warnings": warnings, "identifier_assigned": True}
+
+
 def _root(root: Path | str | None = None) -> Path:
     return Path(root) if root is not None else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
 
