@@ -22,6 +22,22 @@ def record(text, role="assistant", sequence=2):
     return {"role": role, "sequence": sequence, "source_message_id": f"m{sequence}", "text": " ".join(text.split()), "formatted_text": text, "text_sha256": "a" * 64, "formatted_text_sha256": "b" * 64, "provenance": {}}
 
 
+def test_pipeline_reports_nonfatal_mhtml_decoding_warning(tmp_path: Path) -> None:
+    source = Path("tests/fixtures/conversation_archives/edge_cp1252_undefined_0x9d.mhtml")
+    pending = tmp_path / "pending"
+    pending.mkdir()
+    run = RuntimeCanonRecoveryPipeline(tmp_path, pending, tmp_path / "runs").run(
+        [source], ingestion_root=tmp_path / "ingested"
+    )
+    summary = json.loads((run / "summary.json").read_text(encoding="utf-8"))
+    report = (run / "runtime_canon_recovery_report.md").read_text(encoding="utf-8")
+    inventory = json.loads((run / "archive_inventory.json").read_text(encoding="utf-8"))
+    assert summary["archives_processed"] == 1
+    assert summary["decoding_warnings"] == 1
+    assert "windows-1252 replacement" in report
+    assert inventory["archives"][0]["decoding"]["replacement_character_count"] == 1
+
+
 def canon(wp="WP-4212", ending="Completion criteria are verified."):
     return f"""# Runtime Canon — {wp}
 ## Purpose

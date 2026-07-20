@@ -302,7 +302,8 @@ class RuntimeCanonRecoveryPipeline:
                 bundle = source if source.is_dir() and (source / "manifest.json").exists() else ingest(source, ingestion_root, repository_root=self.repository_root)
                 source_manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8")); digest = source_manifest["source"]["sha256"]
                 duplicate_of = seen_hashes.get(digest)
-                discovery.append({"path": source_manifest["source"]["path"], "sha256": digest, "normalized_bundle_id": digest[:16], "duplicate_of": duplicate_of, "status": "duplicate_skipped" if duplicate_of else "accepted"})
+                decoding = source_manifest.get("extraction", {}).get("decoding", {})
+                discovery.append({"path": source_manifest["source"]["path"], "sha256": digest, "normalized_bundle_id": digest[:16], "duplicate_of": duplicate_of, "status": "duplicate_skipped" if duplicate_of else "accepted", "decoding": decoding})
                 if not duplicate_of:
                     seen_hashes[digest] = source_manifest["source"]["path"]; bundles.append(bundle)
         manifests = [json.loads((b / "manifest.json").read_text(encoding="utf-8")) for b in bundles]
@@ -334,7 +335,9 @@ class RuntimeCanonRecoveryPipeline:
             candidate = next(c for c in candidates if c["candidate_id"] == preferred); assessment = assessment_map[preferred]
             if assessment["preservation_disposition"] == "stage_proposed" and not dry_run:
                 manifest_items.append(SupportingDocumentRenderer().render(run, candidate, definitions[candidate["candidate_wp_identifier"]], assessment, "preferred_candidate_selected"))
-        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.repository_root, text=True, capture_output=True, check=False).stdout.strip() or "unknown"
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.repository_root,
+                                text=True, encoding="utf-8", errors="replace",
+                                capture_output=True, check=False).stdout.strip() or "unknown"
         diagnostics = [*index.diagnostics]
         common = {"schema_version": SCHEMA_VERSION, "generator_version": GENERATOR_VERSION, "repository_commit": commit, "run_identifier": run_id, "input_identifiers_and_hashes": [{"path": m["source"]["path"], "sha256": m["source"]["sha256"]} for m in sorted(manifests, key=lambda x: x["source"]["sha256"])], "generated_timestamp": GENERATED_AT, "diagnostic_summary": {"fatal": sum(d["severity"] == "fatal" for d in diagnostics), "review": sum(d["severity"] == "review" for d in diagnostics)}}
         repair_items = [{"classification": "duplicate authoritative definition" if d["code"].startswith("duplicate") else "unresolved condition requiring Steward review", "repair": "affected identifier review-blocked; unaffected identifiers remain processable", **d} for d in diagnostics]
@@ -352,8 +355,9 @@ class RuntimeCanonRecoveryPipeline:
             "runtime_canon_review_queue.json": {**common, "items_by_identifier": {identifier: [x for x in review_items if x["work_package_identifier"] == identifier] for identifier in sorted({x["work_package_identifier"] for x in review_items})}, "item_count": len(review_items)},
         }
         for name, payload in artifacts.items(): _write_atomic(run / name, json.dumps(payload, indent=2, sort_keys=True) + "\n")
-        counts = {"archives_processed": len(bundles), "messages_parsed": messages_count, "assistant_messages_scanned": assistant_count, "candidates_detected": len(candidates), "unique_pending_matches": sum(m["resolution_state"] == "matched_unique" for m in matches), "unmatched_identifiers": sum(m["resolution_state"] != "matched_unique" for m in matches), "complete_candidates": sum(a["assessment"] == "complete_supporting_document" for a in assessments_list), "partial_candidates": sum(a["assessment"] in {"partial_supporting_document", "substantially_complete_review_required"} for a in assessments_list), "truncated_candidates": sum(a.get("assessment") == "truncated_candidate" for a in assessments_list), "duplicate_groups": sum(g["duplicate_group"] for g in reconciliation), "competing_groups": sum(g["competing_group"] for g in reconciliation), "supporting_documents_staged": len(manifest_items), "review_blocks": sum(a.get("preservation_disposition") != "stage_proposed" for a in assessments_list), "fatal_diagnostics": common["diagnostic_summary"]["fatal"]}
-        report = ["# Runtime Canon Recovery Report", "", "> Derived non-canonical review material; automatic promotion is prohibited.", "", f"Run: `{run_id}`", "", "## Counts", ""] + [f"- {k}: {v}" for k, v in counts.items()] + ["", "## Candidates", ""] + [f"- `{a['candidate_identifier']}`: **{a['assessment']}** — {a['rationale']}" for a in assessments_list]
+        counts = {"archives_processed": len(bundles), "decoding_warnings": sum(bool(m.get("extraction", {}).get("decoding", {}).get("diagnostics")) for m in manifests), "messages_parsed": messages_count, "assistant_messages_scanned": assistant_count, "candidates_detected": len(candidates), "unique_pending_matches": sum(m["resolution_state"] == "matched_unique" for m in matches), "unmatched_identifiers": sum(m["resolution_state"] != "matched_unique" for m in matches), "complete_candidates": sum(a["assessment"] == "complete_supporting_document" for a in assessments_list), "partial_candidates": sum(a["assessment"] in {"partial_supporting_document", "substantially_complete_review_required"} for a in assessments_list), "truncated_candidates": sum(a.get("assessment") == "truncated_candidate" for a in assessments_list), "duplicate_groups": sum(g["duplicate_group"] for g in reconciliation), "competing_groups": sum(g["competing_group"] for g in reconciliation), "supporting_documents_staged": len(manifest_items), "review_blocks": sum(a.get("preservation_disposition") != "stage_proposed" for a in assessments_list), "fatal_diagnostics": common["diagnostic_summary"]["fatal"]}
+        warnings = [f"- `{m['source']['path']}`: " + "; ".join(m.get("extraction", {}).get("decoding", {}).get("diagnostics", [])) for m in manifests if m.get("extraction", {}).get("decoding", {}).get("diagnostics")]
+        report = ["# Runtime Canon Recovery Report", "", "> Derived non-canonical review material; automatic promotion is prohibited.", "", f"Run: `{run_id}`", "", "## Counts", ""] + [f"- {k}: {v}" for k, v in counts.items()] + ["", "## Decoding warnings", ""] + (warnings or ["- None."]) + ["", "## Candidates", ""] + [f"- `{a['candidate_identifier']}`: **{a['assessment']}** — {a['rationale']}" for a in assessments_list]
         _write_atomic(run / "runtime_canon_recovery_report.md", "\n".join(report) + "\n")
         blocks = ["# Promotion Block Report", "", "> Automatic canonical promotion is prohibited.", ""] + [f"- `{a['candidate_identifier']}`: {a['assessment']}" for a in assessments_list if a.get("preservation_disposition") != "stage_proposed"]
         _write_atomic(run / "promotion_block_report.md", "\n".join(blocks or ["- None beyond mandatory human approval."]) + "\n")
@@ -382,7 +386,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     output_root = args.output_root or repository_root / "staging/runtime_canon_recovery"
     try: run = RuntimeCanonRecoveryPipeline(repository_root, pending, output_root).run(args.inputs, ingestion_root=args.ingestion_root, identifier_filter=args.identifier_filter, archive_filter=args.archive_filter, recursive=args.recursive, dry_run=args.dry_run)
     except (OSError, ValueError, json.JSONDecodeError) as exc: print(json.dumps({"fatal_error": str(exc)}, sort_keys=True)); return 3
-    summary = json.loads((run / "summary.json").read_text()); displayed = {**summary, "output": str(run), "recovery_report": str(run / "runtime_canon_recovery_report.md"), "review_queue": str(run / "runtime_canon_review_queue.json")}
+    summary = json.loads((run / "summary.json").read_text(encoding="utf-8")); displayed = {**summary, "output": str(run), "recovery_report": str(run / "runtime_canon_recovery_report.md"), "review_queue": str(run / "runtime_canon_review_queue.json")}
     if args.machine_readable:
         print(json.dumps(displayed, sort_keys=True))
     else:

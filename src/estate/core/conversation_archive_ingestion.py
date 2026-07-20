@@ -7,6 +7,7 @@ it never promotes conversation statements into Estate institutional truth.
 from __future__ import annotations
 
 import argparse
+import codecs
 import hashlib
 import json
 import os
@@ -14,6 +15,7 @@ import re
 import tempfile
 from dataclasses import asdict, dataclass
 from email import policy
+from email.header import decode_header, make_header
 from email.parser import BytesParser
 from html.parser import HTMLParser
 from pathlib import Path
@@ -98,10 +100,60 @@ class IngestionError(ValueError):
     pass
 
 
-def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], str]:
+def _safe_header(value: object | None) -> str:
+    """Decode encoded words and make malformed MIME values safely writable."""
+    if value is None:
+        return ""
+    try:
+        decoded = str(make_header(decode_header(str(value))))
+    except (LookupError, UnicodeError, ValueError):
+        decoded = str(value)
+    return decoded.encode("utf-8", errors="replace").decode("utf-8")
+
+
+def _charset_name(value: str | None) -> tuple[str | None, str | None]:
+    if not value:
+        return None, None
+    candidate = _safe_header(value).strip().strip('"\'')
+    try:
+        return codecs.lookup(candidate).name, None
+    except (LookupError, ValueError) as exc:
+        return None, f"invalid declared charset {candidate!r}: {exc}"
+
+
+def _decode_html(payload: bytes, declared: str | None) -> tuple[str, dict[str, object]]:
+    normalized, invalid_diagnostic = _charset_name(declared)
+    diagnostics: list[str] = [invalid_diagnostic] if invalid_diagnostic else []
+    attempts: list[str] = []
+    for encoding in (normalized, "utf-8", "windows-1252"):
+        if encoding and encoding not in attempts:
+            attempts.append(encoding)
+    for index, encoding in enumerate(attempts):
+        try:
+            text = payload.decode(encoding, errors="strict")
+            fallback = index > 0 or bool(declared and normalized is None)
+            if fallback:
+                diagnostics.append(f"declared charset could not decode payload; used {encoding}")
+            return text, {"declared_charset": _safe_header(declared) or None,
+                          "charset_used": encoding, "fallback_occurred": fallback,
+                          "replacement_character_count": text.count("\ufffd"),
+                          "diagnostics": diagnostics}
+        except (LookupError, UnicodeDecodeError) as exc:
+            diagnostics.append(f"{encoding} strict decode failed: {exc}")
+    # CP1252 preserves common Windows text byte-for-byte where defined. Undefined
+    # bytes such as 0x9d remain visible as replacement evidence rather than fatal.
+    text = payload.decode("windows-1252", errors="replace")
+    replacements = text.count("\ufffd")
+    diagnostics.append(f"decoded with windows-1252 replacement after strict fallbacks; {replacements} replacement character(s)")
+    return text, {"declared_charset": _safe_header(declared) or None,
+                  "charset_used": "windows-1252", "fallback_occurred": True,
+                  "replacement_character_count": replacements, "diagnostics": diagnostics}
+
+
+def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], str, dict[str, object]]:
     """Extract either a MIME web archive or a direct HTML conversation export."""
     if archive.suffix.lower() in {".html", ".htm"}:
-        payload, charset, location = archive.read_bytes(), "utf-8", ""
+        payload, declared, location, filename = archive.read_bytes(), "utf-8", "", ""
     else:
         with archive.open("rb") as stream:
             mime = BytesParser(policy=policy.default).parse(stream)
@@ -110,10 +162,13 @@ def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], 
             raise IngestionError("archive contains no text/html MIME part")
         primary = max(html_parts, key=lambda part: len(part.get_payload(decode=True) or b""))
         payload = primary.get_payload(decode=True) or b""
-        charset = primary.get_content_charset() or "utf-8"
-        location = primary.get("Content-Location", "")
+        declared = primary.get_content_charset()
+        location = _safe_header(primary.get("Content-Location"))
+        filename = _safe_header(primary.get_filename())
+    decoded, decoding = _decode_html(payload, declared)
+    decoding["mime_filename"] = filename or None
     parser = _MessageHTMLParser()
-    parser.feed(payload.decode(charset, errors="replace"))
+    parser.feed(decoded)
     if not parser.messages:
         raise IngestionError("HTML contains no data-message-author-role elements")
     messages = []
@@ -134,7 +189,7 @@ def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], 
                 "selector": f'[data-message-id="{source_id}"]' if source_id else None,
             },
         ))
-    return messages, location
+    return messages, location, decoding
 
 
 PLAIN_ROLE = re.compile(
@@ -142,7 +197,7 @@ PLAIN_ROLE = re.compile(
 )
 
 
-def extract_plain_text(archive: Path, source_sha256: str) -> tuple[list[Message], str]:
+def extract_plain_text(archive: Path, source_sha256: str) -> tuple[list[Message], str, dict[str, object]]:
     """Parse a labelled UTF-8 copy/paste transcript without guessing unlabeled roles."""
     raw = archive.read_bytes()
     try:
@@ -169,7 +224,7 @@ def extract_plain_text(archive: Path, source_sha256: str) -> tuple[list[Message]
                 "line_start": start_line, "line_end": max(start_line, end_line),
             },
         ))
-    return messages, ""
+    return messages, "", {"declared_charset": "utf-8", "charset_used": "utf-8-sig", "fallback_occurred": False, "replacement_character_count": 0, "diagnostics": [], "mime_filename": None}
 
 
 def _write_atomic(path: Path, content: str) -> None:
@@ -189,13 +244,13 @@ def ingest(archive: Path, output_root: Path, *, repository_root: Path | None = N
     source_bytes = archive.read_bytes()
     source_hash = _sha256(source_bytes)
     is_plain = archive.suffix.lower() in {".txt", ".text", ".md"}
-    messages, location = (extract_plain_text if is_plain else extract_messages)(archive, source_hash)
+    messages, location, decoding = (extract_plain_text if is_plain else extract_messages)(archive, source_hash)
     run_id = source_hash[:16]
     run_dir = output_root / archive.stem / run_id
     try:
-        source_path = str(archive.relative_to((repository_root or Path.cwd()).resolve()))
+        source_path = _safe_header(str(archive.relative_to((repository_root or Path.cwd()).resolve())))
     except ValueError:
-        source_path = str(archive)
+        source_path = _safe_header(str(archive))
 
     records = "".join(json.dumps(asdict(item), ensure_ascii=False, sort_keys=True) + "\n" for item in messages)
     transcript = ["# Verbatim Conversation Extraction", "", "> Derived extraction; not accepted Estate canon.", ""]
@@ -212,7 +267,7 @@ def ingest(archive: Path, output_root: Path, *, repository_root: Path | None = N
         "schema_version": SCHEMA_VERSION,
         "run_id": run_id,
         "source": {"path": source_path, "sha256": source_hash, "bytes": len(source_bytes), "media_type": "text/plain" if is_plain else ("text/html" if archive.suffix.lower() in {".html", ".htm"} else "multipart/related"), "content_location": location},
-        "extraction": {"message_count": len(messages), "roles": {r: sum(m.role == r for m in messages) for r in sorted({m.role for m in messages})}},
+        "extraction": {"message_count": len(messages), "roles": {r: sum(m.role == r for m in messages) for r in sorted({m.role for m in messages})}, "decoding": decoding},
         "classification": "Estate Internal",
         "canonical_status": "non_canonical_review_material",
         "artifacts": ["manifest.json", "messages.jsonl", "verbatim_transcript.md", "derived_review.json"],
@@ -226,11 +281,11 @@ def ingest(archive: Path, output_root: Path, *, repository_root: Path | None = N
 
 
 def validate_bundle(run_dir: Path, archive: Path | None = None) -> dict[str, object]:
-    manifest = json.loads((run_dir / "manifest.json").read_text())
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
     required = {"schema_version", "run_id", "source", "extraction", "canonical_status", "artifacts"}
     if not required.issubset(manifest) or manifest["schema_version"] != SCHEMA_VERSION:
         raise IngestionError("invalid manifest contract")
-    lines = (run_dir / "messages.jsonl").read_text().splitlines()
+    lines = (run_dir / "messages.jsonl").read_text(encoding="utf-8").splitlines()
     records = [json.loads(line) for line in lines]
     if len(records) != manifest["extraction"]["message_count"]:
         raise IngestionError("message count mismatch")
