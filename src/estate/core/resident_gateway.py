@@ -1,6 +1,7 @@
 """Local OpenAI-compatible gateway for Estate residents."""
 from __future__ import annotations
-import hashlib, json, os, time
+import base64, hashlib, json, os, time
+from urllib.parse import unquote_to_bytes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Iterable
@@ -74,6 +75,74 @@ def _latest_user_message(messages: Any) -> str:
     return ""
 
 
+def _data_url_attachment(url: str, *, filename: str | None = None) -> dict[str, Any] | None:
+    """Translate an OpenAI image data URL without retaining it in diagnostics."""
+    if not url.startswith("data:image/") or "," not in url:
+        return None
+    header, encoded = url.split(",", 1)
+    mime_type = header[5:].split(";", 1)[0].lower()
+    if ";base64" in header.lower():
+        # Validate here so malformed Open WebUI content fails as a client error,
+        # rather than being copied into a prompt or a diagnostic report.
+        base64.b64decode(encoded, validate=True)
+        data_base64 = encoded
+    else:
+        data_base64 = base64.b64encode(unquote_to_bytes(encoded)).decode("ascii")
+    return {"kind": "image", "source": "open_webui", "mime_type": mime_type,
+            "original_filename": filename or "image", "data_base64": data_base64}
+
+
+def _normalize_gateway_attachment(candidate: Any) -> dict[str, Any] | None:
+    if not isinstance(candidate, dict):
+        return None
+    wrapped = candidate.get("file") if isinstance(candidate.get("file"), dict) else candidate
+    filename = wrapped.get("name") or wrapped.get("filename") or wrapped.get("original_filename")
+    mime_type = wrapped.get("mime_type") or wrapped.get("content_type") or wrapped.get("type")
+    image_url = wrapped.get("image_url") or wrapped.get("url")
+    if isinstance(image_url, dict):
+        image_url = image_url.get("url")
+    if isinstance(image_url, str):
+        normalized = _data_url_attachment(image_url, filename=filename)
+        if normalized:
+            return normalized
+    data = wrapped.get("data_base64") or wrapped.get("file_data") or wrapped.get("data")
+    if isinstance(data, str) and data.startswith("data:image/"):
+        return _data_url_attachment(data, filename=filename)
+    if isinstance(data, str) and (str(mime_type or "").lower().startswith("image/") or candidate.get("kind") == "image"):
+        return {"kind": "image", "source": "open_webui", "mime_type": str(mime_type).lower(),
+                "original_filename": filename or "image", "data_base64": data}
+    storage_path = wrapped.get("storage_path") or wrapped.get("path")
+    if storage_path and (str(mime_type or "").lower().startswith("image/") or candidate.get("kind") == "image"):
+        return {"kind": "image", "source": "stored_local_attachment", "mime_type": str(mime_type).lower(),
+                "original_filename": filename or Path(str(storage_path)).name, "storage_path": str(storage_path)}
+    return None
+
+
+def _gateway_attachments(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """Extract Open WebUI/OpenAI attachment variants from the latest user turn."""
+    candidates: list[Any] = []
+    messages = payload.get("messages") if isinstance(payload.get("messages"), list) else []
+    for message in reversed(messages):
+        if not isinstance(message, dict) or message.get("role") != "user":
+            continue
+        content = message.get("content")
+        if isinstance(content, list):
+            candidates.extend(item for item in content if isinstance(item, dict) and item.get("type") in {"image_url", "input_image", "image", "file", "input_file"})
+        for field in ("attachments", "files"):
+            if isinstance(message.get(field), list):
+                candidates.extend(message[field])
+        break
+    for field in ("attachments", "files"):
+        if isinstance(payload.get(field), list):
+            candidates.extend(payload[field])
+    normalized = []
+    for candidate in candidates:
+        item = _normalize_gateway_attachment(candidate)
+        if item:
+            normalized.append(item)
+    return normalized
+
+
 def _session_id_from_payload(payload: dict[str, Any]) -> tuple[str | None, str | None]:
     metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
     candidates = (
@@ -124,7 +193,7 @@ def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[int, str | None
     if not user_message:
         return 400, None, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
     session_id, session_field = _session_id_from_payload(payload)
-    result = process_chat(ACTIVE_RESIDENT_MODELS[model], user_message, session_id=session_id, participant_role="Steward", action="conversation", root=root)
+    result = process_chat(ACTIVE_RESIDENT_MODELS[model], user_message, session_id=session_id, participant_role="Steward", action="conversation", root=root, attachments=_gateway_attachments(payload))
     if os.environ.get("ESTATE_RESIDENT_GATEWAY_DIAGNOSTICS") == "1":
         result.setdefault("gateway_diagnostics", _gateway_diagnostics(payload, user_message, session_field, result))
     return 200, model, result
@@ -245,6 +314,7 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
     room = submit_user_turn(room, text=user_message, submitted_by="openwebui", idempotency_key=normalized.get("session_id") or user_message, target_resident_ids=targets)
     user_turn_id = room["pending_questions"][-1]["user_turn_id"]
     resident_turns = []
+    attachments = _gateway_attachments(payload)
     for plan in plan_resident_turns(room, user_turn_id, target_resident_ids=targets):
         participant_session_id = f"{normalized.get('session_id')}_{plan['resident_id']}" if normalized.get("session_id") else None
         composition = compose_resident_identity(plan["resident_id"], surface_id="conference-room-gateway", root=root, task_instructions=user_message, room_context=plan.get("context_packet"))
@@ -255,6 +325,7 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
             participant_role="Steward",
             action="conversation",
             root=root,
+            attachments=attachments,
             identity_composition=composition,
         )
         turn = result["turn"]
