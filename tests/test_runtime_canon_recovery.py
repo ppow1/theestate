@@ -7,7 +7,7 @@ from estate.core.conversation_archive_ingestion import ingest
 from estate.core.runtime_canon_recovery import (
     CandidateCompletenessEvaluator, CandidateReconciler, CandidateTruncationDetector,
     PendingWorkPackageIndex, RuntimeCanonCandidateDetector, RuntimeCanonRecoveryPipeline,
-    SupportingDocumentRenderer, WorkPackageDefinitionParser, normalize_identifier,
+    SupportingDocumentRenderer, WorkPackageDefinitionParser, main, normalize_identifier,
 )
 
 
@@ -207,3 +207,53 @@ def test_invalid_definition_does_not_block_valid_identifier(tmp_path):
     source = tmp_path / "chat.txt"; source.write_text("Assistant: " + canon())
     run = RuntimeCanonRecoveryPipeline(Path.cwd(), pending, tmp_path / "out").run([source])
     assert json.loads((run / "definition_match_report.json").read_text())["matches"][0]["resolution_state"] == "matched_unique"
+
+
+def test_default_private_intake_is_created_idempotently_and_empty_is_nonfatal(tmp_path, capsys):
+    pending = tmp_path / "collaboration/work_packages/pending"; definition(pending)
+    arguments = ["--repository-root", str(tmp_path)]
+
+    assert main(arguments) == 0
+    assert main(arguments) == 0
+
+    private = tmp_path / "ingestion/conversations/private"
+    assert private.is_dir()
+    output = capsys.readouterr().out
+    assert "No conversation archives were found." in output
+    assert str(private.resolve()) in output
+    assert "recovery_report:" in output and "review_queue:" in output
+
+
+def test_default_intake_does_not_implicitly_ingest_sibling_repository_files(tmp_path, capsys):
+    pending = tmp_path / "collaboration/work_packages/pending"; definition(pending)
+    conversations = tmp_path / "ingestion/conversations"; conversations.mkdir(parents=True)
+    (conversations / "public archive.txt").write_text("Assistant: " + canon(), encoding="utf-8")
+
+    assert main(["--repository-root", str(tmp_path)]) == 0
+
+    output = capsys.readouterr().out
+    assert "archives_processed: 0" in output
+
+
+def test_explicit_archive_outside_private_with_spaces_is_accepted(tmp_path, capsys):
+    pending = tmp_path / "collaboration/work_packages/pending"; definition(pending)
+    source = tmp_path / "ingestion/conversations/Archive With Spaces.txt"
+    source.parent.mkdir(parents=True)
+    source.write_text("Assistant: " + canon(), encoding="utf-8")
+
+    assert main([str(source), "--repository-root", str(tmp_path)]) == 0
+
+    output = capsys.readouterr().out
+    assert "archives_processed: 1" in output
+    assert not (tmp_path / "ingestion/conversations/private").exists()
+
+
+def test_repository_policy_keeps_private_intake_ignored():
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "check-ignore", "ingestion/conversations/private/operator-archive.mhtml"],
+        cwd=Path.cwd(), text=True, capture_output=True, check=False,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "ingestion/conversations/private/operator-archive.mhtml"

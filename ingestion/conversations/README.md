@@ -7,6 +7,9 @@ It is intentionally separate from worker reflection, renewal, onboarding, and co
 ## Production input contract
 
 - Repository-safe private intake: `ingestion/conversations/private/` (gitignored).
+  The production command creates it automatically when it is missing. Git does not
+  preserve empty ignored directories, so its absence after a clone or pull is normal.
+  Copy private archives there after pulling; no manual directory setup is required.
 - Accepted source extensions: `.mhtml`, `.mht`, `.html`, `.htm`, `.txt`, `.text`, and
   `.md`; existing normalized bundles are directories containing `manifest.json` and
   `messages.jsonl`.
@@ -96,12 +99,29 @@ PYTHONPATH=src python -m estate.core.runtime_canon_recovery \
   --output-root staging/runtime_canon_recovery
 ```
 
-Production directory run (from the repository root):
+Production run on Windows (from `A:\theestate`):
 
-```bash
-PYTHONPATH=src python -m estate.core.runtime_canon_recovery \
-  ingestion/conversations/private --recursive --machine-readable
+```powershell
+.\scripts\Invoke-RuntimeCanonRecovery.ps1
 ```
+
+This command creates the intentionally gitignored `private/` intake if necessary,
+scans it recursively, runs runtime-canon recovery, and writes the established staging
+output under `staging/runtime_canon_recovery/`. It prints both the recovery-report
+and review-queue locations. An empty intake is a successful, non-fatal run with clear
+instructions showing the resolved intake path.
+
+To process an explicitly named archive anywhere under `ingestion/conversations/`
+(including an archive outside `private/`), pass its path directly. Quoting preserves
+paths containing spaces:
+
+```powershell
+.\scripts\Invoke-RuntimeCanonRecovery.ps1 "ingestion\conversations\Archive With Spaces.mhtml"
+```
+
+Only the default `private/` directory is scanned implicitly. The command does not
+scan the whole `ingestion/conversations/` tree; that broader directory is scanned
+only if the operator explicitly supplies it.
 
 Use `--dry-run` to assess without staging a supporting document, or
 `--identifier-filter WP-4212` to process one identifier. `--output-root` selects the
