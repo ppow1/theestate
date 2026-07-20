@@ -26,6 +26,7 @@ APPROVED_FILENAME_EXCEPTIONS = {
     "WP-Operator-Deck-Prototype.md": "WP-OPERATOR-DECK-PROTOTYPE",
 }
 ACCEPTED_ARCHIVE_EXTENSIONS = {".mhtml", ".mht", ".html", ".htm", ".txt", ".text", ".md"}
+DEFAULT_PRIVATE_INTAKE = Path("ingestion/conversations/private")
 HEADING = re.compile(
     r"(?im)^\s*(?:#{1,6}\s*|\*{1,2}\s*)?(?:runtime canon\s*[—–:-]\s*)?"
     r"(?:(?:supporting (?:design|document)(?: for)?|grounded in)\s+)?"
@@ -286,7 +287,15 @@ class RuntimeCanonRecoveryPipeline:
         for item in inputs:
             if item.is_dir() and not (item / "manifest.json").exists():
                 iterator = item.rglob("*") if recursive else item.iterdir()
-                expanded = sorted((p for p in iterator if p.is_file() and p.suffix.lower() in ACCEPTED_ARCHIVE_EXTENSIONS), key=lambda p: p.as_posix().casefold())
+                candidates = list(iterator)
+                bundle_roots = {p for p in candidates if p.is_dir() and (p / "manifest.json").is_file() and (p / "messages.jsonl").is_file()}
+                expanded = sorted(
+                    [p for p in bundle_roots]
+                    + [p for p in candidates if p.is_file()
+                       and p.suffix.lower() in ACCEPTED_ARCHIVE_EXTENSIONS
+                       and not any(root in p.parents for root in bundle_roots)],
+                    key=lambda p: p.as_posix().casefold(),
+                )
             else: expanded = [item]
             for source in expanded:
                 if archive_filter and archive_filter.casefold() not in source.name.casefold(): continue
@@ -296,7 +305,6 @@ class RuntimeCanonRecoveryPipeline:
                 discovery.append({"path": source_manifest["source"]["path"], "sha256": digest, "normalized_bundle_id": digest[:16], "duplicate_of": duplicate_of, "status": "duplicate_skipped" if duplicate_of else "accepted"})
                 if not duplicate_of:
                     seen_hashes[digest] = source_manifest["source"]["path"]; bundles.append(bundle)
-        if not bundles: raise ValueError("no supported conversation inputs were discovered")
         manifests = [json.loads((b / "manifest.json").read_text(encoding="utf-8")) for b in bundles]
         input_hashes = sorted(m["source"]["sha256"] for m in manifests)
         index = PendingWorkPackageIndex(self.pending_root).build()
@@ -358,11 +366,31 @@ class RuntimeCanonRecoveryPipeline:
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("inputs", nargs="+", type=Path); parser.add_argument("--repository-root", type=Path, default=Path.cwd()); parser.add_argument("--pending-root", type=Path); parser.add_argument("--output-root", type=Path, default=Path("staging/runtime_canon_recovery")); parser.add_argument("--ingestion-root", type=Path); parser.add_argument("--identifier-filter"); parser.add_argument("--archive-filter"); parser.add_argument("--recursive", action="store_true"); parser.add_argument("--dry-run", action="store_true"); parser.add_argument("--strict", action="store_true"); parser.add_argument("--machine-readable", action="store_true")
-    args = parser.parse_args(argv); pending = args.pending_root or args.repository_root / "collaboration/work_packages/pending"
-    try: run = RuntimeCanonRecoveryPipeline(args.repository_root, pending, args.output_root).run(args.inputs, ingestion_root=args.ingestion_root, identifier_filter=args.identifier_filter, archive_filter=args.archive_filter, recursive=args.recursive, dry_run=args.dry_run)
+    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("inputs", nargs="*", type=Path); parser.add_argument("--repository-root", type=Path, default=Path.cwd()); parser.add_argument("--pending-root", type=Path); parser.add_argument("--output-root", type=Path); parser.add_argument("--ingestion-root", type=Path); parser.add_argument("--identifier-filter"); parser.add_argument("--archive-filter"); parser.add_argument("--recursive", action="store_true"); parser.add_argument("--dry-run", action="store_true"); parser.add_argument("--strict", action="store_true"); parser.add_argument("--machine-readable", action="store_true")
+    args = parser.parse_args(argv)
+    repository_root = args.repository_root.resolve()
+    default_intake = repository_root / DEFAULT_PRIVATE_INTAKE
+    using_default_intake = not args.inputs
+    if using_default_intake:
+        # Git cannot preserve an empty ignored directory.  Bootstrap the private
+        # boundary on first production use; parents=True/exist_ok=True makes this
+        # safe after every clone, pull, and repeated invocation.
+        default_intake.mkdir(parents=True, exist_ok=True)
+        args.inputs = [default_intake]
+        args.recursive = True
+    pending = args.pending_root or repository_root / "collaboration/work_packages/pending"
+    output_root = args.output_root or repository_root / "staging/runtime_canon_recovery"
+    try: run = RuntimeCanonRecoveryPipeline(repository_root, pending, output_root).run(args.inputs, ingestion_root=args.ingestion_root, identifier_filter=args.identifier_filter, archive_filter=args.archive_filter, recursive=args.recursive, dry_run=args.dry_run)
     except (OSError, ValueError, json.JSONDecodeError) as exc: print(json.dumps({"fatal_error": str(exc)}, sort_keys=True)); return 3
-    summary = json.loads((run / "summary.json").read_text()); displayed = {**summary, "output": str(run)}; print(json.dumps(displayed, sort_keys=True) if args.machine_readable else "\n".join(f"{k}: {v}" for k, v in displayed.items()))
+    summary = json.loads((run / "summary.json").read_text()); displayed = {**summary, "output": str(run), "recovery_report": str(run / "runtime_canon_recovery_report.md"), "review_queue": str(run / "runtime_canon_review_queue.json")}
+    if args.machine_readable:
+        print(json.dumps(displayed, sort_keys=True))
+    else:
+        if using_default_intake and not summary["archives_processed"]:
+            print("No conversation archives were found.")
+            print("Place MHTML, HTML, labeled plain-text, or normalized conversation bundles in:")
+            print(default_intake)
+        print("\n".join(f"{k}: {v}" for k, v in displayed.items()))
     return 2 if args.strict and (summary["fatal_diagnostics"] or summary["review_blocks"]) else (3 if summary["fatal_diagnostics"] else 0)
 
 
