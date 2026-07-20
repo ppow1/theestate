@@ -1,0 +1,6 @@
+MIME-Version: 1.0
+Content-Location: https://example.test/edge
+Content-Type: text/html; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+
+<div data-message-author-role="user" data-message-id="u1"><p>before  after</p></div>

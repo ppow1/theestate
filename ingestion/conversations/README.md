@@ -172,3 +172,24 @@ The content-addressed review directory contains `scope_timeline.json`,
 `conversation_diagnostics.json`, and `promotion_block_report.md`. Exit status 2
 means a review-blocking diagnostic was found. Every result remains non-canonical,
 review-required material and automatic promotion is always prohibited.
+
+## MHTML character encoding
+
+HTML MIME parts are decoded using their declared charset when it is valid. Charset
+names are normalized through the standard codec registry, so common aliases such as
+`cp1252` and `Windows-1252` are handled consistently. If the declaration is missing
+or invalid, or strict decoding fails, ingestion tries UTF-8 and then Windows-1252.
+As a final non-fatal recovery, Windows-1252 is decoded with replacement so undefined
+Windows bytes remain visible as replacement characters rather than aborting the run.
+
+The ingestion manifest records the declared charset, codec actually used, whether a
+fallback occurred, replacement-character count, MIME filename, and decoding
+diagnostics. Runtime-canon recovery copies that evidence into its archive inventory,
+counts archives with decoding warnings, and prints the warnings in its report while
+continuing whenever extraction remains safe. MIME encoded words in locations,
+filenames, and metadata are decoded; malformed values are preserved safely.
+
+Fallback warnings mean the derived transcript requires human review; they do not
+change its non-canonical status and do not authorize promotion. Source archives are
+always read as immutable bytes, SHA-256 registered from those exact bytes, and never
+rewritten or silently transcoded. Only separate derived UTF-8 artifacts are written.
