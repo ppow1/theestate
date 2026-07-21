@@ -1,0 +1,6 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema", "$id":"estate.visual_bible.three_quarter_asset_metadata.v1", "type":"object",
+  "required":["schema_version","asset_id","resident_id","angle","set_type","lifecycle_state","asset_path","sha256","source_references","cross_angle_links","prompts","generation","camera","crop","pose","orientation","identity_fidelity","geometry","physical_fidelity","wardrobe_grooming","provenance","validation","hidden_caption_test","steward_review","canonical","lineage"],
+  "properties":{"schema_version":{"const":"three_quarter_asset_metadata_v1"},"angle":{"enum":["front_left_three_quarter","front_right_three_quarter","rear_left_three_quarter","rear_right_three_quarter"]},"set_type":{"enum":["technical","conversational"]},"lifecycle_state":{"enum":["candidate","pending_review","approved","canonical","rejected","superseded"]},"sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},"orientation":{"type":"object","required":["body_yaw_degrees","head_yaw_degrees","eye_direction","facing","visible_side"]}},
+  "additionalProperties":true
+}

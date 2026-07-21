@@ -86,7 +86,8 @@
         "canonical": "data/portraits/residents/evelyn/canonical",
         "metadata": "data/portraits/residents/evelyn/metadata",
         "reviews": "data/portraits/residents/evelyn/reviews"
-      }
+      },
+      "three_quarter_manifest_path": "data/portraits/residents/evelyn/three_quarter/manifest.json"
     },
     "expression_sheet": {
       "status": "not_started",

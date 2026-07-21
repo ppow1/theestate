@@ -33,6 +33,13 @@ PROFILE_REAR_STATES = {
     "rejected",
     "superseded",
 }
+THREE_QUARTER_ANGLES = {
+    "front_left_three_quarter": {"yaw": -45, "face": "front", "side": "left"},
+    "front_right_three_quarter": {"yaw": 45, "face": "front", "side": "right"},
+    "rear_left_three_quarter": {"yaw": -135, "face": "rear", "side": "left"},
+    "rear_right_three_quarter": {"yaw": 135, "face": "rear", "side": "right"},
+}
+THREE_QUARTER_STATES = PROFILE_REAR_STATES
 MAJOR_BODY_REGIONS = {"crown_hair", "head", "neck", "torso", "pelvis", "left_arm_hand", "right_arm_hand", "left_leg", "right_leg", "left_foot_shoe", "right_foot_shoe"}
 REQUIRED_DIRS = {"candidates", "canonical", "derivatives", "metadata", "reviews", "comparison_boards", "rejected", "superseded", "locks", "generation_queue"}
 
@@ -407,6 +414,59 @@ def validate_profile_rear_manifest(
             )
 
 
+def validate_three_quarter_sidecar(sidecar: dict, *, root: Path, resident_id: str) -> None:
+    asset_id = sidecar.get("asset_id", "<unknown>")
+    required = {"resident_id", "angle", "set_type", "lifecycle_state", "asset_path", "sha256", "source_references", "cross_angle_links", "prompts", "generation", "camera", "crop", "pose", "orientation", "identity_fidelity", "geometry", "physical_fidelity", "wardrobe_grooming", "provenance", "validation", "hidden_caption_test", "steward_review", "canonical", "lineage"}
+    _require(sidecar.get("schema_version") == "three_quarter_asset_metadata_v1", f"asset {asset_id} has unsupported three-quarter schema")
+    _require(not (required - sidecar.keys()), f"asset {asset_id} is missing three-quarter metadata: {sorted(required-sidecar.keys())}")
+    _require(sidecar["resident_id"] == resident_id and sidecar["prompts"].get("resident_binding") == resident_id, f"cross-resident identity binding for asset {asset_id}")
+    spec = THREE_QUARTER_ANGLES.get(sidecar["angle"])
+    _require(spec is not None and sidecar["set_type"] in {"technical", "conversational"} and sidecar["lifecycle_state"] in THREE_QUARTER_STATES-{"pending_generation"}, f"invalid three-quarter angle/set/state for asset {asset_id}")
+    orientation = sidecar["orientation"]
+    _require(orientation.get("facing") == spec["face"] and orientation.get("visible_side") == spec["side"] and abs(orientation.get("body_yaw_degrees", 999)-spec["yaw"]) <= 5, f"angle tolerance failure for asset {asset_id}")
+    camera = sidecar["camera"]
+    _require(70 <= camera.get("focal_length_equivalent_mm", 0) <= 105 and camera.get("distance_m") and camera.get("height_m") and camera.get("pitch_degrees") == 0 and camera.get("roll_degrees") == 0, f"camera normalization failure for asset {asset_id}")
+    _require(sidecar["crop"].get("type") in {"portrait", "whole_body"} and sidecar["crop"].get("required_regions_complete") is True, f"invalid or incomplete crop for asset {asset_id}")
+    _require(sidecar["source_references"] and all(sidecar["cross_angle_links"].get(x) for x in ("frontal", "left_profile", "right_profile", "rear")), f"missing cross-angle linkage for asset {asset_id}")
+    needed = {"face", "visual_fingerprint", "hair", "ears", "jaw", "neck", "shoulders", "back", "waist", "hips", "limbs", "posture", "silhouette"}
+    _require(not (needed-set(sidecar["geometry"])), f"missing geometry observations for asset {asset_id}")
+    checks = list(sidecar["identity_fidelity"].values()) + list(sidecar["physical_fidelity"].values()) + list(sidecar["wardrobe_grooming"]["continuity_checks"].values())
+    _require(checks and all(v in {"pass", "flag", "fail", "not_applicable"} for v in checks), f"invalid fidelity diagnostics for asset {asset_id}")
+    asset_path = root / sidecar["asset_path"]
+    _require(asset_path.is_file(), f"asset path does not exist: {sidecar['asset_path']}")
+    actual_hash = _sha256(asset_path)
+    _require(sidecar["sha256"] == actual_hash, f"stale hash for asset {asset_id}")
+    declared = sidecar["canonical"].get("declared") is True
+    _require(not (sidecar["lifecycle_state"] in TERMINAL_NONCANON and declared), f"terminal three-quarter asset {asset_id} cannot be canonical")
+    if declared:
+        _require(sidecar["lifecycle_state"] == "canonical" and not any(v in {"flag", "fail"} for v in checks), f"candidate or flagged asset {asset_id} presented as canon")
+        approval_path = sidecar["canonical"].get("steward_approval")
+        _require(approval_path, f"three-quarter canon requires Steward approval for {asset_id}")
+        approval = _load(root / approval_path)
+        _require(approval.get("authority") == "steward" and approval.get("decision") == "approve" and approval.get("asset_id") == asset_id and approval.get("angle") == sidecar["angle"] and approval.get("sha256") == actual_hash, f"three-quarter approval does not match asset/hash/angle for {asset_id}")
+
+
+def validate_three_quarter_manifest(manifest: dict, *, root: Path, registry_record: dict) -> None:
+    resident_id = registry_record["id"]
+    _require(manifest.get("schema_version") == "resident_three_quarter_manifest_v1", "unsupported three-quarter manifest schema")
+    _require(manifest.get("resident", {}).get("resident_id") == resident_id and manifest.get("resident_template_binding") == resident_id and manifest.get("cross_resident_inheritance") is False, f"cross-resident three-quarter identity binding for {resident_id}")
+    _require(set(manifest.get("cross_angle_sources", {})) == {"frontal", "left_profile", "right_profile", "rear"}, f"missing cross-angle sources for {resident_id}")
+    slots = manifest.get("required_slots", [])
+    _require({s.get("angle") for s in slots if s.get("required")} == set(THREE_QUARTER_ANGLES), f"missing required three-quarter angles for {resident_id}")
+    _require(manifest.get("naming_convention") == "{resident_id}__three-quarter__{set_type}__{angle}__v{revision:03d}__{asset_id}.{ext}", f"non-deterministic three-quarter naming for {resident_id}")
+    candidates = {}
+    for record in manifest.get("candidates", []):
+        sidecar = _load(root / record["metadata_path"])
+        validate_three_quarter_sidecar(sidecar, root=root, resident_id=resident_id)
+        candidates[sidecar["asset_id"]] = sidecar
+    for slot in slots:
+        if slot.get("state") == "pending_generation":
+            _require(slot.get("evidence") is None and not slot.get("candidate_asset_ids") and slot.get("canonical_asset_id") is None, f"pending three-quarter slot presented as evidence for {resident_id}")
+        if slot.get("canonical_asset_id"):
+            asset = candidates.get(slot["canonical_asset_id"])
+            _require(asset and asset["angle"] == slot["angle"] and asset["canonical"].get("declared"), f"candidate three-quarter asset presented as canon for {resident_id}/{slot['angle']}")
+
+
 def validate_resident_manifest(manifest: dict, *, root: Path | None = None) -> None:
     _require(manifest.get("schema_version") == "resident_portrait_manifest_v1", "unsupported resident portrait schema")
     _require(manifest.get("resident_id"), "resident_id is required")
@@ -485,6 +545,9 @@ def validate_catalog(root: Path) -> None:
         profile_rear_path = resident.get("profile_rear_manifest_path")
         _require(profile_rear_path and manifest.get("portrait_slots", {}).get("profile_rear", {}).get("profile_rear_manifest_path") == profile_rear_path, f"profile/rear manifest catalog/slot link missing for {resident['resident_id']}")
         validate_profile_rear_manifest(_load(root / profile_rear_path), root=root, registry_record=registry[resident["resident_id"]])
+        three_quarter_path = resident.get("three_quarter_manifest_path")
+        _require(three_quarter_path and manifest.get("portrait_slots", {}).get("three_quarter", {}).get("three_quarter_manifest_path") == three_quarter_path, f"three-quarter manifest catalog/slot link missing for {resident['resident_id']}")
+        validate_three_quarter_manifest(_load(root / three_quarter_path), root=root, registry_record=registry[resident["resident_id"]])
 
 
 def main() -> int:
@@ -492,7 +555,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     validate_catalog(args.root.resolve())
-    print("Portrait catalog and WP-4118 through WP-4121 runtime canon validation passed.")
+    print("Portrait catalog and WP-4118 through WP-4122 runtime canon validation passed.")
     return 0
 
 

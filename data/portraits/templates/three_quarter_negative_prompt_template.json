@@ -1,0 +1,5 @@
+{
+  "schema_version":"three_quarter_negative_prompt_v1",
+  "required_tokens":["wrong person","generic face","identity drift","frontal substitution","profile substitution","rear substitution","mirrored asymmetry","changed eye spacing","changed nose","changed jaw","changed ears","changed hairline","changed hair length or color","changed neck or shoulders","changed height or proportions","changed waist or hips","anatomy error","extra or missing limbs or digits","twisted spine","uneven weight without documentation","camera or lens mismatch","crop mismatch","lighting or background mismatch","wardrobe or accessory drift","sexualized pose","childlike or infantilized adult","caption name","watermark","over-stylization"],
+  "rule":"Negative prompts supplement, and never replace, source binding, validation, or Steward judgment."
+}

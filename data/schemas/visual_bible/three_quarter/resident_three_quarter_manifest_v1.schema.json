@@ -1,0 +1,5 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema", "$id":"estate.visual_bible.resident_three_quarter_manifest.v1", "type":"object",
+  "required":["schema_version","resident","resident_template_binding","cross_resident_inheritance","source_references","cross_angle_sources","naming_convention","directory_convention","required_slots","optional_conversational_slots","normalization","prompt_templates","review_sheet_template","candidates","canonical","generation_state","steward_review","history"],
+  "properties":{"schema_version":{"const":"resident_three_quarter_manifest_v1"},"required_slots":{"type":"array","minItems":4,"maxItems":4},"generation_state":{"enum":["pending_generation","candidate","pending_review","approved","canonical","rejected","superseded"]}}, "additionalProperties":true
+}

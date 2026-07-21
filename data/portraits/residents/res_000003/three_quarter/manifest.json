@@ -1,0 +1,165 @@
+{
+  "schema_version": "resident_three_quarter_manifest_v1",
+  "manifest_revision": 1,
+  "resident": {
+    "resident_id": "RES-000003",
+    "display_name": "Helen",
+    "adult_presentation_required": true
+  },
+  "resident_template_binding": "RES-000003",
+  "cross_resident_inheritance": false,
+  "source_references": [
+    "data/visual_bibles/residents/res_000003/visual_bible_manifest.json",
+    "data/portraits/residents/res_000003/metadata/hero_manifest.json",
+    "data/portraits/residents/res_000003/full_body/manifest.json",
+    "data/portraits/residents/res_000003/profile_rear/manifest.json",
+    "docs/visual_bible/wp4110_facial_geometry_visual_fingerprint_runtime_canon.md",
+    "docs/visual_bible/wp4111_height_proportion_scale_runtime_canon.md"
+  ],
+  "cross_angle_sources": {
+    "frontal": "data/portraits/residents/res_000003/full_body/manifest.json",
+    "left_profile": "data/portraits/residents/res_000003/profile_rear/manifest.json#left_face_profile",
+    "right_profile": "data/portraits/residents/res_000003/profile_rear/manifest.json#right_face_profile",
+    "rear": "data/portraits/residents/res_000003/profile_rear/manifest.json#rear_full_body"
+  },
+  "naming_convention": "{resident_id}__three-quarter__{set_type}__{angle}__v{revision:03d}__{asset_id}.{ext}",
+  "directory_convention": "data/portraits/residents/res_000003/three_quarter/{candidates|canonical|rejected|superseded|pending|metadata|reviews|comparison_sheets|generation_queue|validation}",
+  "required_slots": [
+    {
+      "angle": "front_left_three_quarter",
+      "target_yaw_degrees": -45,
+      "tolerance_degrees": 5,
+      "facing": "front",
+      "visible_side": "left",
+      "set_type": "technical",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "angle": "front_right_three_quarter",
+      "target_yaw_degrees": 45,
+      "tolerance_degrees": 5,
+      "facing": "front",
+      "visible_side": "right",
+      "set_type": "technical",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "angle": "rear_left_three_quarter",
+      "target_yaw_degrees": -135,
+      "tolerance_degrees": 5,
+      "facing": "rear",
+      "visible_side": "left",
+      "set_type": "technical",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "angle": "rear_right_three_quarter",
+      "target_yaw_degrees": 135,
+      "tolerance_degrees": 5,
+      "facing": "rear",
+      "visible_side": "right",
+      "set_type": "technical",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    }
+  ],
+  "optional_conversational_slots": [
+    {
+      "angle": "front_left_three_quarter",
+      "required": false,
+      "state": "pending_generation",
+      "documented_resident_pose_required": true,
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "angle": "front_right_three_quarter",
+      "required": false,
+      "state": "pending_generation",
+      "documented_resident_pose_required": true,
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "angle": "rear_left_three_quarter",
+      "required": false,
+      "state": "pending_generation",
+      "documented_resident_pose_required": true,
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "angle": "rear_right_three_quarter",
+      "required": false,
+      "state": "pending_generation",
+      "documented_resident_pose_required": true,
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    }
+  ],
+  "normalization": {
+    "focal_length_equivalent_mm": 85,
+    "permitted_range_mm": [
+      70,
+      105
+    ],
+    "camera_distance": "matched_and_recorded",
+    "camera_height": "matched_and_recorded",
+    "pitch_degrees": 0,
+    "roll_degrees": 0,
+    "crop": "matched portrait or whole_body",
+    "lighting": "soft neutral 5000-5600K",
+    "background": "matte neutral mid-gray",
+    "technical_pose": "neutral stance; balanced weight; arms relaxed",
+    "eye_head_orientation": "front set eyes toward camera with head/body relationship recorded; rear set gaze away; no hidden face substitution"
+  },
+  "prompt_templates": {
+    "positive": "data/portraits/templates/three_quarter_positive_prompt_template.json",
+    "negative": "data/portraits/templates/three_quarter_negative_prompt_template.json"
+  },
+  "review_sheet_template": "data/portraits/templates/three_quarter_review_sheet.md",
+  "candidates": [],
+  "canonical": {
+    "front_left_three_quarter": null,
+    "front_right_three_quarter": null,
+    "rear_left_three_quarter": null,
+    "rear_right_three_quarter": null
+  },
+  "generation_state": "pending_generation",
+  "generation_note": "No three-quarter image exists. Generation, automated validation, hidden-caption recognition, and Steward review remain pending.",
+  "steward_review": {
+    "state": "pending",
+    "authority": "steward",
+    "independent_angle_decisions_required": true,
+    "records": [],
+    "unresolved": [
+      "resident-specific generation",
+      "cross-angle visual comparison",
+      "hidden-caption recognition",
+      "Steward selection and canonical lock"
+    ]
+  },
+  "history": {
+    "rejections": [],
+    "supersessions": []
+  }
+}
