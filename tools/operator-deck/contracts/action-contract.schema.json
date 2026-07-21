@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://estate.local/operator-deck/action-contract.schema.json",
+  "title": "Estate Operator Deck Action Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "action", "gesture", "source"],
+  "properties": {
+    "contract_version": { "const": "1.0" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "action": {
+      "type": "string",
+      "enum": [
+        "window.activate", "window.target", "window.swap", "window.move_active",
+        "dictation.toggle", "dictation.status", "capture.region",
+        "clipboard.copy", "clipboard.paste", "clipboard.history"
+      ]
+    },
+    "gesture": { "type": "string", "enum": ["single", "double", "long"] },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "control"],
+      "properties": {
+        "adapter": { "type": "string", "minLength": 1 },
+        "control": { "type": "string", "minLength": 1 }
+      }
+    },
+    "arguments": { "type": "object" }
+  }
+}
