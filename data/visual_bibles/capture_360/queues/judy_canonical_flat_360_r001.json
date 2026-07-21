@@ -1,0 +1,25 @@
+{
+  "schema_version": "capture_360_generation_queue_v1",
+  "queue_id": "judy_canonical_flat_360_r001",
+  "resident_id": "judy",
+  "capture_set_ref": "data/visual_bibles/residents/judy/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+  "state": "blocked_pending_inputs",
+  "required_angles": [
+    "front",
+    "front_left_45",
+    "left_profile",
+    "rear_left_45",
+    "rear",
+    "rear_right_45",
+    "right_profile",
+    "front_right_45"
+  ],
+  "materialized_angles": [],
+  "blockers": [
+    "resolve canonical physical measurements and anatomical height",
+    "resolve accepted portrait identity reference",
+    "select and record workflow, model adapters, seed and settings",
+    "generate eight genuine captures",
+    "run human comparison and Steward review"
+  ]
+}
