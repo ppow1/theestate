@@ -12,6 +12,27 @@ OFFICE_STATES = {"candidate", "canonical", "anchor", "rejected", "superseded", "
 OFFICE_SCENES = {"seated_desk", "standing_environmental", "conversational", "candid_work"}
 FULL_BODY_CATEGORIES = {"neutral_front", "relaxed_front", "three_quarter", "side", "rear", "walking", "seated", "signature_pose", "scale_reference", "footwear_variant"}
 FULL_BODY_STATES = {"pending_generation", "candidate", "pending_review", "approved", "canonical", "rejected", "superseded"}
+PROFILE_REAR_CATEGORIES = {
+    "left_face_profile",
+    "right_face_profile",
+    "left_full_body_profile",
+    "right_full_body_profile",
+    "rear_head_shoulders",
+    "rear_full_body",
+    "rear_three_quarter_left",
+    "rear_three_quarter_right",
+    "rear_hair_silhouette",
+    "rear_posture_shoulders",
+}
+PROFILE_REAR_STATES = {
+    "pending_generation",
+    "candidate",
+    "pending_review",
+    "approved",
+    "canonical",
+    "rejected",
+    "superseded",
+}
 MAJOR_BODY_REGIONS = {"crown_hair", "head", "neck", "torso", "pelvis", "left_arm_hand", "right_arm_hand", "left_leg", "right_leg", "left_foot_shoe", "right_foot_shoe"}
 REQUIRED_DIRS = {"candidates", "canonical", "derivatives", "metadata", "reviews", "comparison_boards", "rejected", "superseded", "locks", "generation_queue"}
 
@@ -183,6 +204,209 @@ def validate_full_body_manifest(manifest: dict, *, root: Path, registry_record: 
             _require(canonical_id in candidates and candidates[canonical_id]["canonical"].get("declared") is True, f"candidate asset presented as canon for {resident_id}/{category['category']}")
 
 
+def validate_profile_rear_sidecar(
+    sidecar: dict, *, root: Path, resident_id: str
+) -> None:
+    asset_id = sidecar.get("asset_id", "<unknown>")
+    required = {
+        "resident_id",
+        "category",
+        "lifecycle_state",
+        "access_tier",
+        "asset_path",
+        "sha256",
+        "source_references",
+        "prompts",
+        "generation",
+        "camera",
+        "crop",
+        "pose",
+        "identity_fidelity",
+        "geometry",
+        "physical_fidelity",
+        "wardrobe_grooming",
+        "provenance",
+        "validation",
+        "hidden_caption_test",
+        "steward_review",
+        "canonical",
+        "lineage",
+    }
+    _require(
+        sidecar.get("schema_version") == "profile_rear_asset_metadata_v1",
+        f"asset {asset_id} has unsupported profile/rear schema",
+    )
+    _require(
+        not (required - sidecar.keys()),
+        f"asset {asset_id} is missing profile/rear metadata: {sorted(required - sidecar.keys())}",
+    )
+    _require(
+        sidecar["resident_id"] == resident_id
+        and sidecar["prompts"].get("resident_binding") == resident_id,
+        f"cross-resident identity binding for asset {asset_id}",
+    )
+    _require(
+        sidecar["category"] in PROFILE_REAR_CATEGORIES
+        and sidecar["lifecycle_state"] in PROFILE_REAR_STATES - {"pending_generation"},
+        f"invalid profile/rear category/state for asset {asset_id}",
+    )
+    _require(
+        sidecar["source_references"]
+        and sidecar["provenance"].get("created_at")
+        and sidecar["provenance"].get("operator"),
+        f"missing provenance for asset {asset_id}",
+    )
+    camera = sidecar["camera"]
+    _require(
+        70 <= camera.get("focal_length_equivalent_mm", 0) <= 105
+        and camera.get("distance_m")
+        and camera.get("eye_level")
+        and camera.get("floor_plane") == "level",
+        f"camera normalization failure for asset {asset_id}",
+    )
+    _require(
+        camera.get("yaw_degrees") is not None
+        and camera.get("pitch_degrees") is not None
+        and camera.get("roll_degrees") is not None,
+        f"missing camera angle receipt for asset {asset_id}",
+    )
+    crop = sidecar["crop"]
+    _require(
+        crop.get("type") in {"portrait", "whole_body"}
+        and crop.get("required_regions_complete") is True,
+        f"invalid or incomplete crop for asset {asset_id}",
+    )
+    if "full_body" in sidecar["category"]:
+        _require(
+            crop.get("crown_hair_complete") is True
+            and crop.get("both_feet_footwear_complete") is True,
+            f"whole-body profile/rear crop is incomplete for asset {asset_id}",
+        )
+    geometry = sidecar["geometry"]
+    needed = {
+        "nose",
+        "lips",
+        "chin",
+        "jaw",
+        "brow",
+        "ear",
+        "hairline",
+        "neck",
+        "shoulders",
+        "back",
+        "posture",
+        "silhouette",
+        "distinguishing_features",
+        "asymmetry",
+    }
+    _require(
+        not (needed - set(geometry)),
+        f"missing geometry observations for asset {asset_id}",
+    )
+    checks = (
+        list(sidecar["identity_fidelity"].values())
+        + list(sidecar["physical_fidelity"].values())
+        + list(sidecar["wardrobe_grooming"].get("continuity_checks", {}).values())
+    )
+    _require(
+        checks and all(v in {"pass", "flag", "fail", "not_applicable"} for v in checks),
+        f"invalid fidelity diagnostics for asset {asset_id}",
+    )
+    asset_path = root / sidecar["asset_path"]
+    _require(
+        asset_path.is_file(), f"asset path does not exist: {sidecar['asset_path']}"
+    )
+    actual_hash = _sha256(asset_path)
+    _require(sidecar["sha256"] == actual_hash, f"stale hash for asset {asset_id}")
+    canonical = sidecar["canonical"].get("declared") is True
+    _require(
+        not (sidecar["lifecycle_state"] in TERMINAL_NONCANON and canonical),
+        f"terminal profile/rear asset {asset_id} cannot be canonical",
+    )
+    _require(
+        sidecar["steward_review"].get("state"),
+        f"missing Steward review state for asset {asset_id}",
+    )
+    if canonical:
+        _require(
+            sidecar["lifecycle_state"] == "canonical"
+            and not any(v in {"flag", "fail"} for v in checks),
+            f"candidate or flagged asset {asset_id} presented as canon",
+        )
+        approval_path = sidecar["canonical"].get("steward_approval")
+        _require(
+            approval_path,
+            f"profile/rear canon requires Steward approval for {asset_id}",
+        )
+        approval = _load(root / approval_path)
+        _require(
+            approval.get("authority") == "steward"
+            and approval.get("decision") == "approve"
+            and approval.get("asset_id") == asset_id
+            and approval.get("sha256") == actual_hash
+            and approval.get("category") == sidecar["category"],
+            f"profile/rear approval does not match asset/hash/category for {asset_id}",
+        )
+
+
+def validate_profile_rear_manifest(
+    manifest: dict, *, root: Path, registry_record: dict
+) -> None:
+    _require(
+        manifest.get("schema_version") == "resident_profile_rear_manifest_v1",
+        "unsupported profile/rear manifest schema",
+    )
+    resident_id = registry_record["id"]
+    _require(
+        manifest.get("resident", {}).get("resident_id") == resident_id,
+        f"profile/rear resident mismatch for {resident_id}",
+    )
+    _require(
+        manifest.get("resident_template_binding") == resident_id
+        and manifest.get("cross_resident_inheritance") is False,
+        f"cross-resident identity binding for {resident_id}",
+    )
+    _require(
+        len(manifest.get("source_references", [])) >= 6,
+        f"missing profile/rear source provenance for {resident_id}",
+    )
+    categories = manifest.get("categories", [])
+    _require(
+        {c.get("category") for c in categories if c.get("required")}
+        == PROFILE_REAR_CATEGORIES,
+        f"missing required profile/rear categories for {resident_id}",
+    )
+    _require(
+        manifest.get("naming_convention")
+        == "{resident_id}__profile-rear__{category}__{crop}__v{revision:03d}__{asset_id}.{ext}",
+        f"non-deterministic profile/rear naming for {resident_id}",
+    )
+    _require(
+        manifest.get("steward_review", {}).get("state"),
+        f"missing Steward review state for {resident_id}",
+    )
+    candidates = {}
+    for record in manifest.get("candidates", []):
+        sidecar = _load(root / record["metadata_path"])
+        validate_profile_rear_sidecar(sidecar, root=root, resident_id=resident_id)
+        candidates[sidecar["asset_id"]] = sidecar
+    for category in categories:
+        if category.get("state") == "pending_generation":
+            _require(
+                category.get("evidence") is None
+                and not category.get("candidate_asset_ids")
+                and category.get("canonical_asset_id") is None,
+                f"pending profile/rear category presented as evidence for {resident_id}",
+            )
+        canonical_id = category.get("canonical_asset_id")
+        if canonical_id:
+            _require(
+                canonical_id in candidates
+                and candidates[canonical_id]["canonical"].get("declared") is True,
+                f"candidate profile/rear asset presented as canon for {resident_id}/{category['category']}",
+            )
+
+
 def validate_resident_manifest(manifest: dict, *, root: Path | None = None) -> None:
     _require(manifest.get("schema_version") == "resident_portrait_manifest_v1", "unsupported resident portrait schema")
     _require(manifest.get("resident_id"), "resident_id is required")
@@ -258,6 +482,9 @@ def validate_catalog(root: Path) -> None:
         full_body_path = resident.get("full_body_manifest_path")
         _require(full_body_path and manifest.get("portrait_slots", {}).get("full_body", {}).get("full_body_manifest_path") == full_body_path, f"full-body manifest catalog/slot link missing for {resident['resident_id']}")
         validate_full_body_manifest(_load(root / full_body_path), root=root, registry_record=registry[resident["resident_id"]])
+        profile_rear_path = resident.get("profile_rear_manifest_path")
+        _require(profile_rear_path and manifest.get("portrait_slots", {}).get("profile_rear", {}).get("profile_rear_manifest_path") == profile_rear_path, f"profile/rear manifest catalog/slot link missing for {resident['resident_id']}")
+        validate_profile_rear_manifest(_load(root / profile_rear_path), root=root, registry_record=registry[resident["resident_id"]])
 
 
 def main() -> int:
@@ -265,7 +492,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     validate_catalog(args.root.resolve())
-    print("Portrait catalog and WP-4118 through WP-4120 runtime canon validation passed.")
+    print("Portrait catalog and WP-4118 through WP-4121 runtime canon validation passed.")
     return 0
 
 

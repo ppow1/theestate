@@ -1,0 +1,20 @@
+{
+  "schema_version": "profile_rear_steward_review_v1",
+  "resident_id": "RES-000006",
+  "state": "pending",
+  "authority": "steward",
+  "angle_decisions": {
+    "left_face_profile": "pending_generation",
+    "right_face_profile": "pending_generation",
+    "left_full_body_profile": "pending_generation",
+    "right_full_body_profile": "pending_generation",
+    "rear_head_shoulders": "pending_generation",
+    "rear_full_body": "pending_generation",
+    "rear_three_quarter_left": "pending_generation",
+    "rear_three_quarter_right": "pending_generation",
+    "rear_hair_silhouette": "pending_generation",
+    "rear_posture_shoulders": "pending_generation"
+  },
+  "revision_requests": [],
+  "note": "No candidate exists; no visual or hidden-caption review has occurred."
+}

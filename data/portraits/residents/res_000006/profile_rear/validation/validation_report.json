@@ -1,0 +1,39 @@
+{
+  "schema_version": "profile_rear_validation_report_v1",
+  "resident_id": "RES-000006",
+  "state": "pending_generation",
+  "checked_at": "2026-07-21T00:00:00Z",
+  "category_coverage": {
+    "left_face_profile": "pending_generation",
+    "right_face_profile": "pending_generation",
+    "left_full_body_profile": "pending_generation",
+    "right_full_body_profile": "pending_generation",
+    "rear_head_shoulders": "pending_generation",
+    "rear_full_body": "pending_generation",
+    "rear_three_quarter_left": "pending_generation",
+    "rear_three_quarter_right": "pending_generation",
+    "rear_hair_silhouette": "pending_generation",
+    "rear_posture_shoulders": "pending_generation"
+  },
+  "candidate_count": 0,
+  "canonical_count": 0,
+  "checks": {
+    "schema": "pass",
+    "slot_coverage": "pass",
+    "candidate_canonical_separation": "pass",
+    "visual_identity": "pending_generation",
+    "profile_geometry": "pending_generation",
+    "rear_continuity": "pending_generation",
+    "height_proportion": "pending_generation",
+    "wardrobe_grooming": "pending_generation",
+    "hidden_caption_identity": "pending_generation",
+    "steward_review": "pending"
+  },
+  "diagnostics": [
+    {
+      "code": "PRR-PENDING-001",
+      "severity": "info",
+      "message": "Generation and Steward review remain pending; no image evidence is claimed."
+    }
+  ]
+}

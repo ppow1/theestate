@@ -1,0 +1,5 @@
+{
+  "schema_version": "profile_rear_negative_prompt_template_v1",
+  "base": ["frontalized face", "wrong viewing side", "mirrored or symmetry-normalized face", "mirrored text", "facial identity drift", "generic shared face", "cross-resident identity", "changed nose", "changed lips", "changed chin or jaw", "wrong brow or ear", "malformed ears", "hair length density texture part or fall inconsistency", "changed hairline", "changed neck shoulder back posture or silhouette", "altered height or proportions", "clothing seam hem closure or accessory discontinuity", "incorrect footwear", "sexualized rear pose", "anatomical overemphasis", "duplicate or missing limbs", "distorted hands", "cropped required anatomy", "wide-angle distortion", "camera tilt", "broken floor contact", "dramatic lighting", "busy background", "candidate presented as canonical", "watermark"],
+  "composition": "WP-4115 global + profile/rear base + category adapter + resident-specific extension; extensions may add but not remove governed terms."
+}

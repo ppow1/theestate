@@ -72,7 +72,8 @@
         "canonical": "data/portraits/residents/grace/canonical",
         "metadata": "data/portraits/residents/grace/metadata",
         "reviews": "data/portraits/residents/grace/reviews"
-      }
+      },
+      "profile_rear_manifest_path": "data/portraits/residents/grace/profile_rear/manifest.json"
     },
     "three_quarter": {
       "status": "not_started",

@@ -1,0 +1,6 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema", "$id":"estate.visual_bible.resident_profile_rear_manifest.v1", "type":"object",
+  "required":["schema_version","resident","source_references","resident_template_binding","categories","naming_convention","directory_convention","matched_comparison_sheet","geometry_notes","camera_pose_standard","continuity","prompt_templates","candidates","canonical","generation_state","steward_review","validation_report","history"],
+  "properties":{"schema_version":{"const":"resident_profile_rear_manifest_v1"},"resident":{"type":"object","required":["resident_id","display_name","access_tier","adult_presentation_required"]},"source_references":{"type":"array","minItems":6,"items":{"type":"string"}},"categories":{"type":"array","minItems":10,"maxItems":10,"items":{"type":"object","required":["category","classification","crop_requirement","required","state","candidate_asset_ids","canonical_asset_id","evidence"]}},"generation_state":{"enum":["pending_generation","candidate","pending_review","approved","canonical","rejected","superseded"]},"candidates":{"type":"array"},"canonical":{"type":"object"},"steward_review":{"type":"object","required":["state","authority","independent_angle_decisions_required","records"]}},
+  "additionalProperties":true
+}

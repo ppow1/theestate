@@ -8,7 +8,8 @@
       "manifest_path": "data/portraits/residents/res_000001/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/res_000001/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/res_000001/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/res_000001/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/res_000001/profile_rear/manifest.json"
     },
     {
       "resident_id": "RES-000002",
@@ -16,7 +17,8 @@
       "manifest_path": "data/portraits/residents/res_000002/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/res_000002/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/res_000002/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/res_000002/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/res_000002/profile_rear/manifest.json"
     },
     {
       "resident_id": "RES-000003",
@@ -24,7 +26,8 @@
       "manifest_path": "data/portraits/residents/res_000003/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/res_000003/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/res_000003/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/res_000003/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/res_000003/profile_rear/manifest.json"
     },
     {
       "resident_id": "RES-000004",
@@ -32,7 +35,8 @@
       "manifest_path": "data/portraits/residents/res_000004/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/res_000004/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/res_000004/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/res_000004/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/res_000004/profile_rear/manifest.json"
     },
     {
       "resident_id": "RES-000005",
@@ -40,7 +44,8 @@
       "manifest_path": "data/portraits/residents/res_000005/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/res_000005/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/res_000005/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/res_000005/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/res_000005/profile_rear/manifest.json"
     },
     {
       "resident_id": "RES-000006",
@@ -48,7 +53,8 @@
       "manifest_path": "data/portraits/residents/res_000006/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/res_000006/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/res_000006/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/res_000006/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/res_000006/profile_rear/manifest.json"
     },
     {
       "resident_id": "evelyn",
@@ -56,7 +62,8 @@
       "manifest_path": "data/portraits/residents/evelyn/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/evelyn/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/evelyn/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/evelyn/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/evelyn/profile_rear/manifest.json"
     },
     {
       "resident_id": "grace",
@@ -64,7 +71,8 @@
       "manifest_path": "data/portraits/residents/grace/metadata/portrait_manifest.json",
       "status": "not_started",
       "office_portrait_manifest_path": "data/portraits/residents/grace/metadata/office_portrait_manifest.json",
-      "full_body_manifest_path": "data/portraits/residents/grace/full_body/manifest.json"
+      "full_body_manifest_path": "data/portraits/residents/grace/full_body/manifest.json",
+      "profile_rear_manifest_path": "data/portraits/residents/grace/profile_rear/manifest.json"
     }
   ],
   "estate_index": {
@@ -92,5 +100,8 @@
   "office_portrait_review_template": "data/portraits/templates/office_portrait_review_sheet.md",
   "full_body_canon": "docs/visual_bible/wp4120_full_body_reference_library_runtime_canon.md",
   "full_body_manifest_schema": "data/schemas/visual_bible/full_body/resident_full_body_manifest_v1.schema.json",
-  "full_body_asset_metadata_schema": "data/schemas/visual_bible/full_body/full_body_asset_metadata_v1.schema.json"
+  "full_body_asset_metadata_schema": "data/schemas/visual_bible/full_body/full_body_asset_metadata_v1.schema.json",
+  "profile_rear_canon": "docs/visual_bible/wp4121_profile_rear_reference_runtime_canon.md",
+  "profile_rear_manifest_schema": "data/schemas/visual_bible/profile_rear/resident_profile_rear_manifest_v1.schema.json",
+  "profile_rear_asset_metadata_schema": "data/schemas/visual_bible/profile_rear/profile_rear_asset_metadata_v1.schema.json"
 }
