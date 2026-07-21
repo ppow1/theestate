@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/conference_room_session.v1",
+  "type": "object",
+  "required": ["schema_version", "room_id", "session_id", "default_moderator_at_creation", "current_moderator", "active_participants", "pending_acknowledgement", "departed_participants", "removed_participants", "role_history", "participant_history", "audit_events"],
+  "properties": {
+    "schema_version": {"const": "conference_room_session.v1"},
+    "room_id": {"type": "string"}, "session_id": {"type": "string"},
+    "default_moderator_at_creation": {"type": "string"},
+    "current_moderator": {"type": ["string", "null"]},
+    "backup_moderator": {"type": ["string", "null"]},
+    "active_participants": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "pending_acknowledgement": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "departed_participants": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "removed_participants": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "role_history": {"type": "array"}, "participant_history": {"type": "array"}, "audit_events": {"type": "array"}
+  }
+}
