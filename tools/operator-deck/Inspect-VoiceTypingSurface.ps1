@@ -90,6 +90,7 @@ try {
         $automationName = $null
         $automationType = $null
         $automationChildren = @()
+        $desktopAutomationElements = @()
         $nativeChildren = @()
         try {
             $element = [System.Windows.Automation.AutomationElement]::FromHandle($hWnd)
@@ -118,6 +119,35 @@ try {
                 }
             }
         } catch { }
+
+        if ($process.ProcessName -eq 'TextInputHost') {
+            try {
+                $processCondition = [System.Windows.Automation.PropertyCondition]::new(
+                    [System.Windows.Automation.AutomationElement]::ProcessIdProperty,
+                    [int]$processId
+                )
+                $desktopMatches = [System.Windows.Automation.AutomationElement]::RootElement.FindAll(
+                    [System.Windows.Automation.TreeScope]::Descendants,
+                    $processCondition
+                )
+                $desktopLimit = [Math]::Min($desktopMatches.Count, 500)
+                $desktopAutomationElements = for ($desktopIndex = 0; $desktopIndex -lt $desktopLimit; $desktopIndex++) {
+                    $desktopElement = $desktopMatches.Item($desktopIndex)
+                    $desktopCurrent = $desktopElement.Current
+                    if ($desktopCurrent.Name -or $desktopCurrent.AutomationId -or $desktopCurrent.HelpText) {
+                        [pscustomobject]@{
+                            name = $desktopCurrent.Name
+                            automation_id = $desktopCurrent.AutomationId
+                            help_text = $desktopCurrent.HelpText
+                            control_type = $desktopCurrent.ControlType.ProgrammaticName
+                            class_name = $desktopCurrent.ClassName
+                            is_enabled = $desktopCurrent.IsEnabled
+                            is_offscreen = $desktopCurrent.IsOffscreen
+                        }
+                    }
+                }
+            } catch { }
+        }
 
         if ($process.ProcessName -eq 'TextInputHost') {
             $childList = [System.Collections.Generic.List[object]]::new()
@@ -162,6 +192,7 @@ try {
             automation_name = $automationName
             automation_control_type = $automationType
             automation_descendants = @($automationChildren)
+            desktop_process_elements = @($desktopAutomationElements)
             native_children = @($nativeChildren)
         })
         return $true
@@ -171,7 +202,8 @@ try {
 
     $text = (($windows | ForEach-Object {
         $childText = ($_.automation_descendants | ForEach-Object { "$($_.name) $($_.automation_id) $($_.help_text)" }) -join ' '
-        "$($_.title) $($_.automation_name) $childText"
+        $desktopText = ($_.desktop_process_elements | ForEach-Object { "$($_.name) $($_.automation_id) $($_.help_text)" }) -join ' '
+        "$($_.title) $($_.automation_name) $childText $desktopText"
     }) -join ' ')
     $state = 'unknown'
     $confidence = 'none'
