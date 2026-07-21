@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "template_id": "movement-negative-template-v1",
+  "asset_type": "movement",
+  "required_rule_ids": [
+    "global-anatomy",
+    "global-identity",
+    "global-age",
+    "global-scale",
+    "global-proportion",
+    "global-appearance",
+    "global-rendering",
+    "global-artifact",
+    "global-framing",
+    "professional-presentation",
+    "wardrobe-protection",
+    "movement-integrity"
+  ],
+  "required_controls": [
+    "positive_identity_instruction_ids"
+  ],
+  "audience_scope": "internal",
+  "status": "review_required",
+  "provenance": {
+    "source_ids": [
+      "WP-4115"
+    ],
+    "created_at": "2026-07-21T00:00:00Z",
+    "created_by": "WP-4115 implementation"
+  }
+}
