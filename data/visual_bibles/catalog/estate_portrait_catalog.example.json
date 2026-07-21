@@ -1,0 +1,14 @@
+{
+  "schema_version": "portrait_asset_catalog_v1", "catalog_id": "estate_portraits", "generated_at": "2026-07-21T00:00:00Z", "stale_after_days": 3650,
+  "assets": [{
+    "asset_id": "pa_776d4b7d9b734335f9a6fd57", "resident_id": "evelyn", "resident_display_name": "Evelyn", "portrait_type": "hero", "angle": "front", "crop": "head_and_shoulders",
+    "expression": {"id":"neutral_composed","version":"1"}, "wardrobe": {"id":"signature_office","version":"1"}, "footwear": {"id":"not_visible","version":"1"}, "environment": {"id":"studio_neutral","version":"1"},
+    "camera": {"lens_mm":85,"distance_m":2.0}, "lighting": {"setup":"soft_key_fill"},
+    "generation": {"kind":"generated","generator":"fixture","model":"fixture-model","model_hash":"unknown","workflow":"fixture-workflow-v1","workflow_hash":"unknown","seed":42,"sampler":"fixture","scheduler":"fixture","settings":{},"adapters":[],"references":[]},
+    "prompts": {"prompt":{"id":"hero_prompt","version":"1"},"negative_prompt":{"id":"portrait_negative","version":"1"}},
+    "file": {"path":"tests/fixtures/portrait_consistency/hero.bin","sha256":"c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318","media_type":"application/octet-stream","bytes":5},
+    "lineage": {"source_asset_ids":[],"derivative_asset_ids":[],"supersedes":[],"rollback_target_id":null}, "access_tier":"internal", "review_state":"approved", "canonical_state":"canonical", "slot_state":"materialized", "revision":1,
+    "created_at":"2026-07-21T00:00:00Z","updated_at":"2026-07-21T00:00:00Z", "steward_approval":{"decision_id":"fixture-decision-1","steward_id":"steward-fixture","approved_at":"2026-07-21T00:00:00Z","evidence_sha256":"c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318"}
+  }],
+  "audit_records": [{"event_id":"evt-fixture-1","occurred_at":"2026-07-21T00:00:00Z","actor_id":"steward-fixture","action":"approve","asset_id":"pa_776d4b7d9b734335f9a6fd57","before_hash":null,"after_hash":"c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318","reason":"Test fixture only; not a production canon claim."}]
+}

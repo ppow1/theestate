@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/catalog/portrait_asset_catalog_v1.schema.json",
+  "title": "Estate Portrait Asset Catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_id", "generated_at", "stale_after_days", "assets", "audit_records"],
+  "properties": {
+    "schema_version": {"const": "portrait_asset_catalog_v1"},
+    "catalog_id": {"type": "string", "pattern": "^[a-z0-9_-]+$"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "stale_after_days": {"type": "integer", "minimum": 1},
+    "assets": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+    "audit_records": {"type": "array", "items": {"$ref": "#/$defs/audit"}}
+  },
+  "$defs": {
+    "reference": {"type": "object", "required": ["id", "version"], "properties": {"id": {"type": "string"}, "version": {"type": "string"}, "path": {"type": "string"}}, "additionalProperties": false},
+    "file": {"type": "object", "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "media_type": {"type": "string"}, "width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}, "bytes": {"type": "integer", "minimum": 0}}, "additionalProperties": false},
+    "lineage": {"type": "object", "required": ["source_asset_ids", "derivative_asset_ids", "supersedes"], "properties": {"source_asset_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "derivative_asset_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "supersedes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "rollback_target_id": {"type": ["string", "null"]}}, "additionalProperties": false},
+    "generation": {"type": "object", "required": ["kind", "generator", "workflow"], "properties": {"kind": {"enum": ["generated", "imported", "derived"]}, "generator": {"type": "string"}, "model": {"type": ["string", "null"]}, "model_hash": {"type": ["string", "null"]}, "workflow": {"type": "string"}, "workflow_hash": {"type": ["string", "null"]}, "seed": {"type": ["integer", "string", "null"]}, "sampler": {"type": ["string", "null"]}, "scheduler": {"type": ["string", "null"]}, "settings": {"type": "object"}, "adapters": {"type": "array", "items": {"type": "object"}}, "references": {"type": "array", "items": {"$ref": "#/$defs/reference"}}}, "additionalProperties": false},
+    "asset": {"type": "object", "required": ["asset_id", "resident_id", "resident_display_name", "portrait_type", "angle", "crop", "expression", "wardrobe", "footwear", "environment", "camera", "lighting", "generation", "prompts", "file", "lineage", "access_tier", "review_state", "canonical_state", "slot_state", "revision", "created_at", "updated_at"], "properties": {
+      "asset_id": {"type": "string", "pattern": "^pa_[0-9a-f]{24}$"}, "resident_id": {"type": "string"}, "resident_display_name": {"type": "string"},
+      "portrait_type": {"enum": ["hero", "professional_office", "full_body", "front_profile", "side_profile", "rear_reference", "three_quarter", "expression_sheet", "headshot", "thumbnail", "black_and_white", "photorealistic", "review_comparison", "rejected_or_superseded"]},
+      "angle": {"type": "string"}, "crop": {"type": "string"}, "expression": {"$ref": "#/$defs/reference"}, "wardrobe": {"$ref": "#/$defs/reference"}, "footwear": {"$ref": "#/$defs/reference"}, "environment": {"$ref": "#/$defs/reference"}, "camera": {"type": "object"}, "lighting": {"type": "object"}, "generation": {"$ref": "#/$defs/generation"},
+      "prompts": {"type": "object", "required": ["prompt", "negative_prompt"], "properties": {"prompt": {"$ref": "#/$defs/reference"}, "negative_prompt": {"$ref": "#/$defs/reference"}}, "additionalProperties": false},
+      "file": {"$ref": "#/$defs/file"}, "lineage": {"$ref": "#/$defs/lineage"}, "access_tier": {"enum": ["public", "internal", "restricted", "private"]}, "review_state": {"enum": ["pending", "in_review", "approved", "rejected"]}, "canonical_state": {"enum": ["candidate", "canonical", "superseded", "retired", "rejected"]}, "slot_state": {"enum": ["materialized", "reserved", "pending"]}, "revision": {"type": "integer", "minimum": 1}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}, "steward_approval": {"type": "object"}, "duplicate_of": {"type": "string"}, "lifecycle_reason": {"type": "string"}
+    }, "additionalProperties": false},
+    "audit": {"type": "object", "required": ["event_id", "occurred_at", "actor_id", "action", "asset_id", "before_hash", "after_hash"], "properties": {"event_id": {"type": "string"}, "occurred_at": {"type": "string", "format": "date-time"}, "actor_id": {"type": "string"}, "action": {"enum": ["reserve", "create", "review", "approve", "reject", "supersede", "retire", "rollback", "migrate"]}, "asset_id": {"type": "string"}, "before_hash": {"type": ["string", "null"]}, "after_hash": {"type": ["string", "null"]}, "reason": {"type": "string"}}, "additionalProperties": false}
+  }
+}

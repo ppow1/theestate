@@ -1,0 +1,21 @@
+{
+  "schema_version": "portrait_catalog_validation_v1",
+  "status": "pass",
+  "asset_count": 1,
+  "diagnostics": [],
+  "indexes": {
+    "estate": [
+      "pa_776d4b7d9b734335f9a6fd57"
+    ],
+    "residents": {
+      "evelyn": [
+        "pa_776d4b7d9b734335f9a6fd57"
+      ]
+    },
+    "lookup": {
+      "evelyn|hero|front|canonical": [
+        "pa_776d4b7d9b734335f9a6fd57"
+      ]
+    }
+  }
+}
