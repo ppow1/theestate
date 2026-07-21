@@ -1,0 +1,9 @@
+{
+  "schema_version": "expression_steward_review_v1",
+  "resident_id": "RES-000003",
+  "state": "pending",
+  "authority": "steward",
+  "decisions": [],
+  "notes": [],
+  "statement": "No Steward review or approval has occurred."
+}
