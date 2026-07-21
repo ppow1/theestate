@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$OutputPath = (Join-Path $PSScriptRoot 'runtime\voice-typing-surface.json'),
+    [ValidateRange(0, 30)]
+    [int]$StartDelaySeconds = 5,
     [switch]$NoClipboard
 )
 
@@ -12,7 +14,15 @@ if ($env:OS -ne 'Windows_NT') {
     exit 2
 }
 
-Write-Host 'Inspecting Windows Voice Typing surfaces (read-only)...'
+Write-Host 'Voice Typing inspection is armed (read-only).'
+if ($StartDelaySeconds -gt 0) {
+    Write-Host 'Turn Voice Typing on now and leave it listening.'
+    for ($remaining = $StartDelaySeconds; $remaining -gt 0; $remaining--) {
+        Write-Host "Inspecting in $remaining..."
+        Start-Sleep -Seconds 1
+    }
+}
+Write-Host 'Inspecting Windows Voice Typing surfaces now...'
 
 $nativeSource = @'
 using System;
