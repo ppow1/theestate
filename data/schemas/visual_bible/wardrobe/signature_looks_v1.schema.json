@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "record_id",
+    "revision",
+    "resident_id",
+    "audience_scope",
+    "lifecycle_state",
+    "canon_class",
+    "active",
+    "created_at",
+    "created_by",
+    "updated_at",
+    "provenance",
+    "steward_decision_id",
+    "title",
+    "category",
+    "contexts",
+    "physical_binding",
+    "design",
+    "fit_rule_id",
+    "footwear_ids",
+    "accessory_ids",
+    "prompt_fragment_id",
+    "distinctiveness",
+    "evidence",
+    "approval"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^estate\\.visual_bible\\.wardrobe\\."
+    },
+    "record_id": {
+      "type": "string",
+      "pattern": "^(wd|sl|fit|fw|acc|pf|wr|wae)-[a-z0-9]+-[a-z0-9-]+-v[1-9][0-9]*$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "resident_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "audience_scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ]
+    },
+    "lifecycle_state": {
+      "enum": [
+        "draft",
+        "in_review",
+        "revision_requested",
+        "approved",
+        "rejected",
+        "retired"
+      ]
+    },
+    "canon_class": {
+      "enum": [
+        "experimental",
+        "provisional",
+        "canonical",
+        "rejected",
+        "retired"
+      ]
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source_refs",
+        "parent_record_ids",
+        "replacement_for",
+        "content_digest",
+        "schema_digest"
+      ],
+      "properties": {
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent_record_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replacement_for": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "schema_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "steward_decision_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true,
+  "$id": "https://theestate.local/schemas/visual_bible/wardrobe/signature_looks_v1.schema.json"
+}

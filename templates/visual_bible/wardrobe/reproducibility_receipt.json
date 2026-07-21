@@ -1,0 +1,18 @@
+{
+  "receipt_id": "wardrobe-receipt-resident-look-revision",
+  "resident_id": "resident",
+  "audience_scope": "internal",
+  "look_record_id": "sl-resident-semantic-v1",
+  "look_revision": 1,
+  "physical_specification_digest": "sha256:REPLACE",
+  "facial_fingerprint_digest": "sha256:REPLACE",
+  "scale_profile_digest": "sha256:REPLACE",
+  "fit_rule_digest": "sha256:REPLACE",
+  "footwear_digests": [],
+  "accessory_digests": [],
+  "prompt_fragment_digest": "sha256:REPLACE",
+  "model_overlay_id": null,
+  "authorization_decision_id": null,
+  "generated_asset_id": null,
+  "note": "Governed placeholder; no image or approval is claimed."
+}
