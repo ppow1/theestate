@@ -412,6 +412,30 @@
       "notes": "Operating manual for the Office of Chief Architect, including methodology, boundaries, work package practice, validation interaction, and succession expectations.",
       "superseded_paths": [],
       "resolved": true
+    },
+    {
+      "id": "DOC-VISUAL-BIBLE-WP4117-CANON",
+      "title": "WP-4117 Visual Bible Acceptance and Canonical Lock Runtime Canon",
+      "path": "docs/visual_bible/wp4117_visual_bible_acceptance_canonical_lock_runtime_canon.md",
+      "category": "visual/governance",
+      "status": "required",
+      "audience": "visual workers and governance",
+      "source_of_truth": "canonical",
+      "notes": "Authority, evidence, lock, versioning, privacy, and rollback rules.",
+      "superseded_paths": [],
+      "resolved": true
+    },
+    {
+      "id": "DOC-VISUAL-BIBLE-WP4117-HUMAN-LOCK",
+      "title": "WP-4117 Human Canonical Lock Record Template",
+      "path": "docs/visual_bible/wp4117_human_lock_record_template.md",
+      "category": "visual/governance",
+      "status": "required",
+      "audience": "Steward and visual reviewers",
+      "source_of_truth": "canonical",
+      "notes": "Human companion record and review checklist; does not convey approval.",
+      "superseded_paths": [],
+      "resolved": true
     }
   ],
   "unresolved_documents": []

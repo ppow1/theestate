@@ -1,0 +1,28 @@
+{
+  "schema_version": "visual_bible_canonical_lock_v1",
+  "record_id": "VBL-EVELYN-CALIBRATION-001",
+  "resident_id": "RES-EVELYN",
+  "canonical_version": "0.1.0",
+  "state": "candidate",
+  "visibility": "internal",
+  "evidence": {},
+  "asset_completeness": {
+    "resident_id": "RES-EVELYN",
+    "measurement_comparison_required": true,
+    "entries": [
+      {"role":"hero_portrait","status":"reserved"},{"role":"canonical_headshot","status":"reserved"},{"role":"profile_reference","status":"reserved"},{"role":"full_body_reference","status":"reserved"},
+      {"role":"turnaround_front","status":"reserved"},{"role":"turnaround_front_three_quarter","status":"reserved"},{"role":"turnaround_side","status":"reserved"},{"role":"turnaround_rear_three_quarter","status":"reserved"},{"role":"turnaround_rear","status":"reserved"},
+      {"role":"measurement_comparison","status":"reserved"},{"role":"expression_reference","status":"reserved"},{"role":"black_and_white_reference","status":"reserved"},{"role":"thumbnail","status":"reserved"},{"role":"icon","status":"reserved"},{"role":"steward_notes","status":"reserved"},{"role":"revision_history","status":"reserved"}
+    ]
+  },
+  "recognition": {"hidden_caption_status":"pending","note":"No image evidence or Steward result exists."},
+  "group_compatibility": {"readiness":"awaiting_group_evidence"},
+  "prompt_reproducibility": {"status":"pending","workflows_completed":0},
+  "steward_decision": {"explicit_approval":false,"status":"awaiting_steward_review"},
+  "tolerated_limitations": [],
+  "blocking_findings": ["Required image assets do not exist", "Hidden-caption recognition is unperformed", "Group compatibility is unperformed", "Prompt reproducibility is unperformed", "Explicit Steward approval is absent"],
+  "change_control": {"silent_replacement_prohibited":true,"downstream_version_reference_required":true},
+  "supersedes": null,
+  "superseded_by": null,
+  "calibration_note": "The provisional Evelyn direction in the resident manifest is a nonbinding calibration example, not universal resident defaults or canonical identity."
+}
