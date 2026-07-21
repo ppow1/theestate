@@ -1,0 +1,11 @@
+{
+  "schema_version": "resident_hero_manifest_v1",
+  "resident_id": "evelyn",
+  "status": "not_started",
+  "canonical_asset_id": null,
+  "candidate_asset_ids": [],
+  "approved_alternate_asset_ids": [],
+  "comparison_sheet": null,
+  "steward_review": null,
+  "honesty_note": "No hero portrait candidate, review, approval, or canonical lock is evidenced in this repository."
+}

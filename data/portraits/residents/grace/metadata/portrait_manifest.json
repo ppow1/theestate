@@ -4,7 +4,7 @@
   "resident_id": "grace",
   "display_name": "Grace",
   "visual_bible_ref": null,
-  "status": "candidate_generation",
+  "status": "not_started",
   "adult_presentation_required": true,
   "identity_anchors": [
     "Operations office",
@@ -21,7 +21,7 @@
   ],
   "portrait_slots": {
     "hero": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -34,7 +34,7 @@
       }
     },
     "professional_office": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -47,7 +47,7 @@
       }
     },
     "full_body": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -60,7 +60,7 @@
       }
     },
     "profile_rear": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -73,7 +73,7 @@
       }
     },
     "three_quarter": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -86,7 +86,7 @@
       }
     },
     "expression_sheet": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -99,7 +99,7 @@
       }
     },
     "headshot": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,
@@ -112,7 +112,7 @@
       }
     },
     "thumbnail": {
-      "status": "candidate_generation",
+      "status": "not_started",
       "required": true,
       "canonical_asset_id": null,
       "steward_approval_required": true,

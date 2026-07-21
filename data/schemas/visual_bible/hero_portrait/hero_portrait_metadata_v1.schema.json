@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/visual-bible/hero-portrait-metadata-v1",
+  "title": "Hero portrait metadata sidecar",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "asset_id", "resident_id", "portrait_type", "lifecycle_state", "asset_path", "sha256", "technical", "provenance", "composition", "safe_areas", "review", "canonical"],
+  "properties": {
+    "schema_version": {"const": "hero_portrait_metadata_v1"},
+    "asset_id": {"type": "string", "minLength": 1},
+    "resident_id": {"type": "string", "minLength": 1},
+    "portrait_type": {"const": "hero"},
+    "lifecycle_state": {"enum": ["pending", "candidate", "rejected", "superseded", "canonical"]},
+    "asset_path": {"type": "string", "minLength": 1},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "technical": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mime_type", "width_px", "height_px", "color_profile"],
+      "properties": {"mime_type": {"enum": ["image/png", "image/tiff"]}, "width_px": {"type": "integer", "minimum": 1}, "height_px": {"type": "integer", "minimum": 1}, "color_profile": {"type": "string", "minLength": 1}}
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workflow", "model", "seed", "settings", "generation_date", "prompt_version", "negative_prompt_version", "source_references"],
+      "properties": {"workflow": {"type": "string", "minLength": 1}, "model": {"type": "string", "minLength": 1}, "seed": {"type": ["integer", "string"]}, "settings": {"type": "object"}, "generation_date": {"type": "string", "format": "date-time"}, "prompt_version": {"type": "string", "minLength": 1}, "negative_prompt_version": {"type": "string", "minLength": 1}, "source_references": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}
+    },
+    "composition": {"type": "object", "required": ["crop", "expression_intent", "role_intent", "adult_presentation_verified"], "properties": {"crop": {"enum": ["head_shoulders", "three_quarter"]}, "expression_intent": {"type": "string", "minLength": 1}, "role_intent": {"type": "string", "minLength": 1}, "adult_presentation_verified": {"const": true}}},
+    "safe_areas": {"type": "object", "required": ["square", "four_by_five", "sixteen_by_nine"], "properties": {"square": {"$ref": "#/$defs/safe"}, "four_by_five": {"$ref": "#/$defs/safe"}, "sixteen_by_nine": {"$ref": "#/$defs/safe"}}},
+    "derivative_of_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "review": {"type": "object", "required": ["state", "review_record"], "properties": {"state": {"enum": ["pending", "candidate", "steward_review", "approved", "rejected", "superseded"]}, "review_record": {"type": ["string", "null"]}}},
+    "canonical": {"type": "object", "required": ["declared", "canonical_hash", "steward_approval"], "properties": {"declared": {"type": "boolean"}, "canonical_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}, "steward_approval": {"type": ["string", "null"]}}}
+  },
+  "$defs": {"safe": {"type": "object", "required": ["status", "rationale"], "properties": {"status": {"enum": ["pass", "fail", "not_applicable"]}, "rationale": {"type": "string"}}}}
+}
