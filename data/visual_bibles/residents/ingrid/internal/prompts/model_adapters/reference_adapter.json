@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "adapter_id": "ingrid-reference-adapter-v1",
+  "audience_scope": "internal",
+  "model": "approved-model-placeholder",
+  "model_version": "pinned-at-execution",
+  "parameters": {
+    "steps": 30,
+    "guidance": 6.5,
+    "sampler": "recorded-at-execution"
+  },
+  "syntax": {},
+  "known_quirks": [],
+  "identity_overrides": {}
+}

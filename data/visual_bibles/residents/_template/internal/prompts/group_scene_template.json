@@ -1,0 +1,20 @@
+{
+  "template_id": "group-scene-v1",
+  "required": [
+    "resident_roster",
+    "identity_fragment_per_resident",
+    "relative_height_map",
+    "spatial_placement",
+    "posture",
+    "body_language",
+    "wardrobe_ids",
+    "face_hair_locks",
+    "interaction_intent",
+    "hidden_caption_test"
+  ],
+  "exclusions_interface": [
+    "no_face_merging",
+    "no_body_homogenization"
+  ],
+  "note": "exclusion taxonomy deferred to WP-4115"
+}

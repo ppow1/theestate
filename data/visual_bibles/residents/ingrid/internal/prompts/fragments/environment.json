@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "fragment_id": "ingrid-environment-v1",
+  "resident_id": "ingrid",
+  "audience_scope": "internal",
+  "layer": "environment",
+  "version": 1,
+  "status": "review_required",
+  "text": "neutral Estate studio with floor line and scale reference",
+  "bindings": {},
+  "provenance": {
+    "source_ids": [
+      "resident:ingrid",
+      "wp4114:environment"
+    ],
+    "created_at": "2026-07-21T00:00:00Z",
+    "created_by": "WP-4114",
+    "supersedes": null
+  }
+}

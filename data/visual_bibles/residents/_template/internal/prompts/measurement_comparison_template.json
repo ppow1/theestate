@@ -1,0 +1,33 @@
+{
+  "template_id": "measurement-comparison-v1",
+  "variants": [
+    "A",
+    "B",
+    "C"
+  ],
+  "required_angles": [
+    "front",
+    "front_three_quarter",
+    "side",
+    "rear_three_quarter",
+    "rear"
+  ],
+  "locks": [
+    "identity",
+    "face",
+    "pose",
+    "expression",
+    "camera",
+    "lighting",
+    "background",
+    "wardrobe",
+    "footwear",
+    "model",
+    "seed_or_equivalent"
+  ],
+  "vary_only": [
+    "declared_measurement_dimension"
+  ],
+  "layout": "vertical bands with same angles aligned",
+  "heel_control": "one applicable set at 3 inches or higher, or governed exemption"
+}
