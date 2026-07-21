@@ -11,6 +11,11 @@ from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, at
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
 from estate.core.openwebui_engineering_workflow import initiate_engineering_assignment_from_chat
+from estate.core.conference_room_lifecycle import (
+    depart as conference_depart, invite as conference_invite,
+    load_or_create_session, names_from_text, recognize_intent, save_session,
+    set_backup as conference_set_backup, transfer as conference_transfer,
+)
 
 ACTIVE_RESIDENT_MODELS = {
     "estate/alfred": "alfred",
@@ -304,23 +309,101 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
     user_message = _latest_user_message(messages)
     if not user_message:
         user_message = "Multi-resident room request received."
-    targets = [rid for rid in normalized.get("resident_targets") or [] if rid in ACTIVE_RESIDENT_MODELS.values()]
-    if not targets:
-        targets = ["alfred", "helen", "ingrid"]
-    room = create_room(display_name="Open WebUI Estate room", created_by="openwebui", session_reference={"session_id": normalized.get("session_id")})
-    for rid in targets:
+    session_id = normalized.get("session_id")
+    if not session_id:
+        # Compatibility for non-Open-WebUI callers; Open WebUI supplies a stable id.
+        session_id = f"ephemeral-{hashlib.sha256(user_message.encode()).hexdigest()[:16]}"
+    state, created = load_or_create_session(session_id, root)
+    intent = recognize_intent(user_message, root)
+    requested = [rid for rid in normalized.get("resident_targets") or [] if rid in ACTIVE_RESIDENT_MODELS.values()]
+    targets: list[str] = []
+    acknowledgements: set[str] = set()
+    scripted: list[dict[str, str]] = []
+    try:
+        if created and requested:
+            conference_invite(state,requested,root)
+            targets.extend(rid for rid in requested if rid in state["active_participants"])
+        elif created:
+            moderator = state["current_moderator"]
+            scripted.append({"resident_id":moderator,"display_name":moderator.title(),"content":"The conference room is open, Steward. I am serving as moderator. No other residents are currently present. Who would you like me to invite?"})
+        elif intent["intent"] == "invite":
+            admitted = conference_invite(state, intent.get("residents", []), root)
+            if not admitted:
+                raise ValueError("invitation named no eligible resident who was absent")
+            targets.extend(admitted)
+            acknowledgements.update(admitted)
+            # Compound instructions are applied only after each admission is acknowledged.
+            lower = user_message.lower(); names = names_from_text(user_message, root)
+            if ("transfer" in lower or "take over" in lower) and admitted:
+                target = next((n.lower() for n in names if n.lower() in admitted), admitted[-1])
+                conference_transfer(state, target, root)
+                scripted.append({"resident_id":target,"display_name":target.title(),"content":"I acknowledge the transfer and am now serving as moderator."})
+                if "then leave" in lower or "and then leave" in lower:
+                    former = state["default_moderator_at_creation"]
+                    if former in state["active_participants"] and former != target:
+                        conference_depart(state, former, root=root)
+        elif intent["intent"] == "roster":
+            moderator=state.get("current_moderator") or "estate"
+            present=", ".join(r.title() for r in state["active_participants"])
+            scripted.append({"resident_id":moderator,"display_name":moderator.title(),"content":f"Currently present: {present}."})
+        elif intent["intent"] == "moderator_status":
+            moderator=state.get("current_moderator")
+            content=f"{moderator.title()} is the current moderator." if moderator else "There is no current moderator; moderator-dependent operations are paused pending Steward direction."
+            speaker=moderator or state["active_participants"][1]
+            scripted.append({"resident_id":speaker,"display_name":speaker.title(),"content":content})
+        elif intent["intent"] == "set_backup":
+            rid=conference_set_backup(state,intent["resident"],root)
+            scripted.append({"resident_id":state["current_moderator"],"display_name":state["current_moderator"].title(),"content":f"{rid.title()} is designated backup moderator and remains a regular participant until activated."})
+        elif intent["intent"] == "assign_roles":
+            moderator=conference_transfer(state,intent["moderator"],root)
+            backup=conference_set_backup(state,intent["backup"],root)
+            scripted.append({"resident_id":moderator,"display_name":moderator.title(),"content":f"I am now serving as moderator. {backup.title()} is designated backup and remains a regular participant until activated."})
+        elif intent["intent"] == "clear_backup":
+            conference_set_backup(state,None,root)
+            scripted.append({"resident_id":state["current_moderator"],"display_name":state["current_moderator"].title(),"content":"The backup moderator designation is cleared."})
+        elif intent["intent"] == "transfer":
+            rid=conference_transfer(state,intent["resident"],root)
+            scripted.append({"resident_id":rid,"display_name":rid.title(),"content":"I acknowledge the transfer and am now serving as moderator."})
+        elif intent["intent"] in {"depart","remove"}:
+            result=conference_depart(state,intent["resident"],removed=intent["intent"]=="remove",root=root)
+            speaker=result.get("successor") or state.get("current_moderator")
+            content=f"{result['resident_id'].title()} has left the conference."
+            if result.get("successor"): content += f" {result['successor'].title()} has succeeded as moderator."
+            elif state.get("current_moderator") is None: content += " Moderator-dependent operations are paused pending Steward direction."
+            if speaker: scripted.append({"resident_id":speaker,"display_name":speaker.title(),"content":content})
+        elif intent["intent"] == "close":
+            state["status"]="closed"
+            scripted.append({"resident_id":state.get("current_moderator") or state["active_participants"][1],"display_name":(state.get("current_moderator") or state["active_participants"][1]).title(),"content":"The conference is closed by Steward direction."})
+        else:
+            addressed=intent.get("residents") or requested
+            targets=[rid for rid in addressed if rid in state["active_participants"]]
+            if not targets and state.get("current_moderator") in state["active_participants"]: targets=[state["current_moderator"]]
+        save_session(state, root)
+    except ValueError as exc:
+        state["audit_events"].append({"event":"operation_rejected","reason":str(exc),"initiating_authority":"steward"})
+        save_session(state,root)
+        return 409,{"error":{"message":str(exc),"type":"invalid_request_error","code":"conference_operation_rejected"},"estate":{"conference_state":state}}
+    room = create_room(display_name="Open WebUI Estate room", created_by="steward", session_reference={"session_id": session_id})
+    active_residents=[rid for rid in state["active_participants"] if rid != "steward"]
+    for rid in active_residents:
         room = invite_participant(room, participant_id=rid, kind="resident", display_name=rid.title())
         room = accept_participant(room, rid)
+    if scripted:
+        body=attributed_response_envelope(model=DEFAULT_ROOM_MODEL,room_id=state["room_id"],resident_turns=scripted,stream=bool(payload.get("stream") is True))
+        body["estate"]["conference_state"] = state
+        return 200,body
     room = submit_user_turn(room, text=user_message, submitted_by="openwebui", idempotency_key=normalized.get("session_id") or user_message, target_resident_ids=targets)
     user_turn_id = room["pending_questions"][-1]["user_turn_id"]
     resident_turns = []
     attachments = _gateway_attachments(payload)
     for plan in plan_resident_turns(room, user_turn_id, target_resident_ids=targets):
         participant_session_id = f"{normalized.get('session_id')}_{plan['resident_id']}" if normalized.get("session_id") else None
-        composition = compose_resident_identity(plan["resident_id"], surface_id="conference-room-gateway", root=root, task_instructions=user_message, room_context=plan.get("context_packet"))
+        dispatched_message = ("You have been admitted to this conference. Acknowledge your own admission briefly as yourself; do not speak for or acknowledge any other resident."
+                              if plan["resident_id"] in acknowledgements else user_message)
+        composition = compose_resident_identity(plan["resident_id"], surface_id="conference-room-gateway", root=root, task_instructions=dispatched_message, room_context=plan.get("context_packet"))
         result = process_chat(
             plan["resident_id"],
-            user_message,
+            dispatched_message,
             session_id=participant_session_id,
             participant_role="Steward",
             action="conversation",
@@ -332,7 +415,8 @@ def _room_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, d
         resident_turns.append({"resident_id": plan["resident_id"], "display_name": turn.get("resident_display_name") or plan.get("display_name"), "content": turn.get("resident_response", ""), "turn_id": turn.get("turn_id"), "identity_hash": (turn.get("identity_composition") or {}).get("identity_version_or_source_hash")})
         room = record_resident_turn(room, plan, text=turn.get("resident_response", ""), model_metadata=turn.get("llm") or {})
     body = attributed_response_envelope(model=DEFAULT_ROOM_MODEL, room_id=room["room_id"], resident_turns=resident_turns, stream=bool(payload.get("stream") is True))
-    body["estate"]["room_snapshot"] = {"room_id": room["room_id"], "participant_count": len(targets), "turn_count": len(room.get("turns", [])), "privileged_action_executed": False}
+    body["estate"]["room_snapshot"] = {"room_id": state["room_id"], "participant_count": len(active_residents), "turn_count": len(room.get("turns", [])), "privileged_action_executed": False}
+    body["estate"]["conference_state"] = state
     return 200, body
 
 def _content_delta_chunks(body: dict[str, Any]) -> Iterable[dict[str, Any]]:

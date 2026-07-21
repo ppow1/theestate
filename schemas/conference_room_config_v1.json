@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/conference_room_config.v1",
+  "type": "object",
+  "required": ["schema_version", "default_moderator_resident_id", "auto_invite_all_residents", "initial_participant_policy", "require_join_acknowledgement", "moderator_absence_policy"],
+  "properties": {
+    "schema_version": {"const": "conference_room_config.v1"},
+    "default_moderator_resident_id": {"type": "string", "minLength": 1},
+    "auto_invite_all_residents": {"const": false},
+    "initial_participant_policy": {"const": "steward_and_default_moderator"},
+    "require_join_acknowledgement": {"type": "boolean"},
+    "allow_steward_moderator_override": {"type": "boolean"},
+    "allow_moderator_transfer": {"type": "boolean"},
+    "allow_optional_backup_moderator": {"type": "boolean"},
+    "moderator_absence_policy": {"enum": ["pause_for_steward_or_activate_backup"]}
+  },
+  "additionalProperties": false
+}

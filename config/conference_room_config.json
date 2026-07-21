@@ -1,0 +1,11 @@
+{
+  "schema_version": "conference_room_config.v1",
+  "default_moderator_resident_id": "RES-000001",
+  "auto_invite_all_residents": false,
+  "initial_participant_policy": "steward_and_default_moderator",
+  "require_join_acknowledgement": true,
+  "allow_steward_moderator_override": true,
+  "allow_moderator_transfer": true,
+  "allow_optional_backup_moderator": true,
+  "moderator_absence_policy": "pause_for_steward_or_activate_backup"
+}
