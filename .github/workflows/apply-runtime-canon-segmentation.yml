@@ -1,0 +1,163 @@
+name: Apply runtime canon segmentation patch
+
+on:
+  push:
+    branches:
+      - agent/mhtml-runtime-canon-recovery
+    paths:
+      - .github/workflows/apply-runtime-canon-segmentation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/mhtml-runtime-canon-recovery
+          fetch-depth: 0
+
+      - name: Apply reviewed segmentation changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source_path = Path('src/estate/core/runtime_canon_recovery.py')
+          test_path = Path('tests/test_runtime_canon_recovery.py')
+          source = source_path.read_text(encoding='utf-8')
+          tests = test_path.read_text(encoding='utf-8')
+
+          anchor = 'SECTION = re.compile(r"(?m)^#{1,6}\\s+(.+?)\\s*$")\n'
+          constants = '''SECTION = re.compile(r"(?m)^#{1,6}\\s+(.+?)\\s*$")
+          TITLE_LINE = re.compile(
+              r"(?im)^\\s*(?:#{1,6}\\s*|\\*{1,2}\\s*)?"
+              r"(?P<identifier>WP[- _]\\d{4}|(?:(?:WP|CORE|OPS)-[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+))\\b"
+              r"(?P<title>[^\\n]{0,220})$"
+          )
+          CANON_MARKER = re.compile(
+              r"(?i)(?:supporting\\s+runtime\\s+canon|runtime\\s+canon(?:\\s+and\\s+design\\s+specification)?|supporting\\s+design\\s+document)"
+          )
+          EXPLICIT_CANON_CLOSE = re.compile(
+              r"(?im)^\\s*(?:#{1,6}\\s*)?(?:\\*{1,2})?"
+              r"(?:this\\s+canon\\s+covers\\s+the\\s+design\\s+requirements\\s+of\\s+|"
+              r"this\\s+supporting\\s+runtime\\s+canon\\s+for\\s+|"
+              r"end\\s+of\\s+(?:the\\s+)?supporting\\s+runtime\\s+canon\\s+for\\s+)"
+              r"(?:\\*{1,2})?(?P<identifier>WP[- _]\\d{4}|(?:(?:WP|CORE|OPS)-[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)+))\\b[^\\n]*$"
+          )
+          '''
+          if 'TITLE_LINE = re.compile(' not in source:
+              if anchor not in source:
+                  raise SystemExit('SECTION anchor not found')
+              source = source.replace(anchor, constants, 1)
+
+          start = source.index('class RuntimeCanonCandidateDetector:\n')
+          end = source.index('\n\nDIMENSIONS = {', start)
+          detector = '''class RuntimeCanonCandidateDetector:
+              def detect_all(self, record: dict[str, Any], source: dict[str, Any], previous: dict[str, Any] | None, following: dict[str, Any] | None) -> list[dict[str, Any]]:
+                  if record.get("role") != "assistant":
+                      return []
+                  text = record.get("formatted_text") or record.get("text", "")
+                  qualified: list[tuple[re.Match[str], str, re.Match[str]]] = []
+                  for title in TITLE_LINE.finditer(text):
+                      normalized_id, _ = normalize_identifier(title.group("identifier"))
+                      if not normalized_id:
+                          continue
+                      marker = CANON_MARKER.search(text, title.end(), min(len(text), title.end() + 1200))
+                      if marker:
+                          qualified.append((title, normalized_id, marker))
+                  decisions = []
+                  provenance = record.get("provenance", {})
+                  for index, (title, normalized_id, marker) in enumerate(qualified):
+                      next_start = qualified[index + 1][0].start() if index + 1 < len(qualified) else len(text)
+                      closure = next((item for item in EXPLICIT_CANON_CLOSE.finditer(text, title.start(), next_start)
+                                      if normalize_identifier(item.group("identifier"))[0] == normalized_id), None)
+                      end = closure.end() if closure else next_start
+                      body = text[title.start():end].strip()
+                      words = re.findall(r"\\b\\w+\\b", body)
+                      sections = SECTION.findall(body)
+                      implementation_terms = sorted({term for term in ("schema", "runtime", "test", "validation", "boundary", "diagnostic", "CLI", "integration", "acceptance", "must") if re.search(rf"\\b{re.escape(term)}\\b", body, re.I)})
+                      quoted_seed = len(re.findall(r"(?m)^\\s*>", body)) >= 3 or "authoritative work package" in body.lower() and "implement" in body.lower()
+                      declaration = bool(re.search(r"\\b(?:I will|will now|plan to)\\s+(?:produce|write|implement)\\b", body, re.I))
+                      substantive = bool(len(words) >= 80 and (len(sections) >= 2 or len(implementation_terms) >= 4) and not quoted_seed and not declaration)
+                      normalized = _normalized(body)
+                      reasons = [] if substantive else (["quoted_or_startup_seed"] if quoted_seed else ["insufficient_substantive_structure"])
+                      decisions.append({
+                          "candidate_id": _sha(source["sha256"] + ":" + str(record["sequence"]) + ":" + str(title.start()) + ":" + normalized)[:20],
+                          "candidate_wp_identifier": normalized_id, "detected": substantive,
+                          "decision": "substantive_candidate_detected" if substantive else "identifier_only_false_positive",
+                          "rejection_reasons": reasons, "detector_signals": {"recognized_title": True, "canon_marker": True, "explicit_closure": bool(closure), "word_count": len(words), "section_count": len(sections), "implementation_terms": implementation_terms, "quoted_seed": quoted_seed, "future_declaration": declaration},
+                          "source_archive": source.get("path", ""), "source_archive_sha256": source["sha256"],
+                          "conversation_identifier": source.get("content_location") or source["sha256"][:16],
+                          "source_message_sequence": record["sequence"], "source_message_id": record.get("source_message_id"),
+                          "source_role": record["role"], "original_text": body, "normalized_text": normalized,
+                          "line_boundaries": {"start": provenance.get("line_start"), "end": provenance.get("line_end")},
+                          "character_boundaries": {"start": title.start(), "end": end},
+                          "preceding_message_reference": previous.get("source_message_id") if previous else None,
+                          "following_message_reference": following.get("source_message_id") if following else None,
+                          "candidate_hash": _sha(normalized), "parser_version": GENERATOR_VERSION,
+                          "extraction_timestamp": GENERATED_AT, "segments": [{"sequence": record["sequence"], "hash": record.get("formatted_text_sha256") or record.get("text_sha256"), "character_start": title.start(), "character_end": end}],
+                          "join_reason": "explicit_closure" if closure else ("next_qualified_runtime_canon_title" if index + 1 < len(qualified) else "message_end_review_required"), "assignment_diagnostics": [],
+                      })
+                  return decisions
+
+              def detect(self, record: dict[str, Any], source: dict[str, Any], previous: dict[str, Any] | None, following: dict[str, Any] | None) -> dict[str, Any] | None:
+                  """Compatibility wrapper for callers expecting at most one candidate."""
+                  decisions = self.detect_all(record, source, previous, following)
+                  return decisions[0] if decisions else None
+          '''
+          source = source[:start] + detector + source[end:]
+
+          old_pipeline = '''                decision = detector.detect(record, manifest["source"], records[pos - 1] if pos else None, records[pos + 1] if pos + 1 < len(records) else None)
+                          if decision and (not identifier_filter or decision["candidate_wp_identifier"] == identifier_filter.upper()): decisions.append(decision)'''
+          new_pipeline = '''                found = detector.detect_all(record, manifest["source"], records[pos - 1] if pos else None, records[pos + 1] if pos + 1 < len(records) else None)
+                          decisions.extend(item for item in found if not identifier_filter or item["candidate_wp_identifier"] == identifier_filter.upper())'''
+          if old_pipeline not in source:
+              raise SystemExit('pipeline anchor not found')
+          source = source.replace(old_pipeline, new_pipeline, 1)
+
+          additions = '''
+
+          def test_multiline_title_and_canon_subtitle_are_detected():
+              text = canon().replace("# Runtime Canon — WP-4212", "# WP-4212 — Recovery\\n\\n## Supporting Runtime Canon and Design Specification")
+              decision = detect(text)
+              assert decision["detected"]
+              assert decision["candidate_wp_identifier"] == "WP-4212"
+
+
+          def test_multiple_canons_in_one_assistant_message_are_isolated():
+              first = canon("WP-4212", "This canon covers the design requirements of **WP-4212 — Recovery** and is ready to be converted into repository artifacts and implementation work.")
+              second = canon("WP-4213", "This canon covers the design requirements of **WP-4213 — Activation** and is ready to be converted into repository artifacts and implementation work.")
+              detector = RuntimeCanonCandidateDetector()
+              decisions = detector.detect_all(record(first + "\\n\\n" + second), {"path": "a.txt", "sha256": "1" * 64}, None, None)
+              assert [item["candidate_wp_identifier"] for item in decisions] == ["WP-4212", "WP-4213"]
+              assert all(item["detector_signals"]["explicit_closure"] for item in decisions)
+              assert decisions[0]["character_boundaries"]["end"] <= decisions[1]["character_boundaries"]["start"]
+
+
+          def test_quoted_large_seed_is_not_promoted_by_structure_alone():
+              text = "> authoritative work package\\n> implement WP-4212\\n> required implementation\\n" + canon()
+              decision = detect(text)
+              assert decision is None or not decision["detected"]
+          '''
+          if 'test_multiple_canons_in_one_assistant_message_are_isolated' not in tests:
+              tests = tests.rstrip() + '\n' + additions + '\n'
+
+          source_path.write_text(source, encoding='utf-8')
+          test_path.write_text(tests, encoding='utf-8')
+          PY
+
+      - name: Run targeted tests
+        run: python -m pytest -q tests/test_runtime_canon_recovery.py
+
+      - name: Commit applied patch
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/estate/core/runtime_canon_recovery.py tests/test_runtime_canon_recovery.py
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: segment multiple runtime canons per assistant message"
+          git push origin HEAD:agent/mhtml-runtime-canon-recovery

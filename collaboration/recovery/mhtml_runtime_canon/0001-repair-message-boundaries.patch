@@ -1,0 +1,131 @@
+*** Begin Patch
+*** Update File: src/estate/core/conversation_archive_ingestion.py
+@@
+ class _MessageHTMLParser(HTMLParser):
+-    """Capture text contained by ChatGPT message-role elements using stdlib only."""
++    """Recover role-bearing ChatGPT messages without trusting malformed DOM depth.
++
++    Browser-saved ChatGPT MHTML can contain unbalanced or implicitly closed HTML.
++    The previous parser ended a message when a ``div`` depth counter returned to
++    zero. That silently collapsed large assistant messages in real Edge exports.
++
++    A role-bearing element is a stronger boundary than HTML nesting: a message
++    starts when ``data-message-author-role`` is encountered and ends immediately
++    before the next role-bearing element (or at EOF).
++    """
+@@
+-        self.capture_div_depth = 0
++        self.capturing = False
+@@
+-        if not self.capture_div_depth and values.get("data-message-author-role"):
+-            self.capture_div_depth = 1
++        if values.get("data-message-author-role"):
++            self._finish_message()
++            self.capturing = True
+             self.role = values["data-message-author-role"] or ""
+             self.message_id = values.get("data-message-id") or ""
+             self.parts = []
+             self.formatted_parts = []
+-        elif self.capture_div_depth and tag == "div":
+-            self.capture_div_depth += 1
+-        if self.capture_div_depth and tag in {"br", "p", "li", "pre", "h1", "h2", "h3"}:
++        if self.capturing and tag in {"br", "p", "li", "pre", "h1", "h2", "h3", "h4", "h5", "h6"}:
+             self.parts.append("\n")
+-        if self.capture_div_depth:
++        if self.capturing:
+             prefixes = {"h1": "\n# ", "h2": "\n## ", "h3": "\n### ", "h4": "\n#### ",
++                        "h5": "\n##### ", "h6": "\n###### ",
+                         "p": "\n\n", "br": "\n", "li": "\n- ", "pre": "\n```\n",
+                         "blockquote": "\n> ", "tr": "\n| ", "th": "**", "td": ""}
+             self.formatted_parts.append(prefixes.get(tag, ""))
+@@
+-        if self.capture_div_depth:
++        if self.capturing:
+             self.parts.append(data)
+             self.formatted_parts.append(data)
+@@
+-        if self.capture_div_depth and tag == "div":
+-            self.capture_div_depth -= 1
+-            if not self.capture_div_depth:
+-                formatted = "".join(self.formatted_parts).strip()
+-                formatted = re.sub(r"\n{3,}", "\n\n", formatted)
+-                self.messages.append((self.role, self.message_id, _normalize("".join(self.parts)), formatted))
+-        elif self.capture_div_depth:
++        if self.capturing:
+             suffixes = {"pre": "\n```\n", "th": "** | ", "td": " | ", "tr": "", "p": "\n"}
+             self.formatted_parts.append(suffixes.get(tag, ""))
++
++    def close(self) -> None:
++        super().close()
++        self._finish_message()
++
++    def _finish_message(self) -> None:
++        if not self.capturing:
++            return
++        formatted = "".join(self.formatted_parts).strip()
++        formatted = re.sub(r"\n{3,}", "\n\n", formatted)
++        self.messages.append((self.role, self.message_id, _normalize("".join(self.parts)), formatted))
++        self.capturing = False
+@@
+ def extract_messages(archive: Path, source_sha256: str) -> tuple[list[Message], str, dict[str, object]]:
+@@
+-        primary = max(html_parts, key=lambda part: len(part.get_payload(decode=True) or b""))
+-        payload = primary.get_payload(decode=True) or b""
+-        declared = primary.get_content_charset()
+-        location = _safe_header(primary.get("Content-Location"))
+-        filename = _safe_header(primary.get_filename())
+-    decoded, decoding = _decode_html(payload, declared)
+-    decoding["mime_filename"] = filename or None
+-    parser = _MessageHTMLParser()
+-    parser.feed(decoded)
+-    if not parser.messages:
++    representations = [None] if archive.suffix.lower() in {".html", ".htm"} else html_parts
++    recovered: list[tuple[str, str, str, str, dict[str, object]]] = []
++    decoding_records: list[dict[str, object]] = []
++    seen: set[tuple[str, str]] = set()
++    location = ""
++    for part_index, part in enumerate(representations):
++        if part is None:
++            current_payload, current_declared, current_location, filename = payload, declared, "", ""
++        else:
++            current_payload = part.get_payload(decode=True) or b""
++            current_declared = part.get_content_charset()
++            current_location = _safe_header(part.get("Content-Location"))
++            filename = _safe_header(part.get_filename())
++        decoded, decoding = _decode_html(current_payload, current_declared)
++        decoding.update({"mime_filename": filename or None, "mime_part_index": part_index,
++                         "content_location": current_location or None})
++        decoding_records.append(decoding)
++        location = location or current_location
++        parser = _MessageHTMLParser()
++        parser.feed(decoded)
++        parser.close()
++        for role, source_id, text, formatted_text in parser.messages:
++            key = (source_id, _sha256(formatted_text.encode("utf-8")))
++            if key in seen:
++                continue
++            seen.add(key)
++            recovered.append((role, source_id, text, formatted_text, {
++                "mime_part_index": part_index,
++                "mime_content_location": current_location,
++            }))
++    if not recovered:
+         raise IngestionError("HTML contains no data-message-author-role elements")
+     messages = []
+-    for sequence, (role, source_id, text, formatted_text) in enumerate(parser.messages, 1):
++    for sequence, (role, source_id, text, formatted_text, representation) in enumerate(recovered, 1):
+@@
+                 "archive_sha256": source_sha256,
+-                "mime_content_location": location,
++                **representation,
+                 "selector": f'[data-message-id="{source_id}"]' if source_id else None,
+@@
+-    return messages, location, decoding
++    return messages, location, {
++        "representations_scanned": len(decoding_records),
++        "representations": decoding_records,
++        "fallback_occurred": any(bool(item.get("fallback_occurred")) for item in decoding_records),
++        "replacement_character_count": sum(int(item.get("replacement_character_count", 0)) for item in decoding_records),
++        "diagnostics": [message for item in decoding_records for message in item.get("diagnostics", [])],
++    }
+*** End Patch
