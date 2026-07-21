@@ -1,0 +1,14 @@
+{
+  "schema_version": "full_body_steward_review_v1",
+  "resident_id": "PENDING",
+  "category": "PENDING",
+  "asset_id": null,
+  "sha256": null,
+  "authority": "steward",
+  "decision": "pending",
+  "decision_options": ["pending", "approve", "reject", "request_revision", "supersede"],
+  "canonical_promotion": false,
+  "reviewed_at": null,
+  "notes": [],
+  "findings": []
+}

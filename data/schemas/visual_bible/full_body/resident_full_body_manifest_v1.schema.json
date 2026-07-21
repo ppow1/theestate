@@ -1,0 +1,14 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema", "$id":"estate.visual_bible.resident_full_body_manifest.v1", "type":"object",
+  "required":["schema_version","resident","source_references","categories","camera_standard","prompt_templates","candidates","canonical","generation_state","steward_review","validation_report","campaign_03_boundary"],
+  "properties":{
+    "schema_version":{"const":"resident_full_body_manifest_v1"},
+    "resident":{"type":"object","required":["resident_id","display_name","access_tier"]},
+    "source_references":{"type":"array","minItems":4,"items":{"type":"string"}},
+    "categories":{"type":"array","minItems":10},
+    "generation_state":{"enum":["pending_generation","candidate","pending_review","approved","canonical","rejected","superseded"]},
+    "candidates":{"type":"array"}, "canonical":{"type":"object"},
+    "steward_review":{"type":"object","required":["state","authority"]},
+    "campaign_03_boundary":{"const":"No three-variant 360-degree measurement comparison is performed by WP-4120."}
+  }, "additionalProperties":true
+}

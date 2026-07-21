@@ -1,0 +1,8 @@
+{
+  "schema_version": "full_body_prompt_template_v1",
+  "template_id": "wp4120-positive-v1",
+  "resident_binding_required": true,
+  "resident_binding": "{{resident_id}}",
+  "template": "{{resident_identity_sources}}; adult {{resident_name}}; {{category_pose}}; preserve documented canonical height, silhouette, posture, limb proportions and facial fingerprint; {{wardrobe_reference_and_garments}}; {{footwear_type_heel_height_and_posture_effect}}; complete body with crown, all hair and both entire shoes visible with clearance; 85 mm full-frame-equivalent portrait intent, distant level camera at mid-torso, level visible floor; neutral gray background; soft neutral standardized light; {{scale_cue_if_applicable}}; realistic anatomy and material behavior.",
+  "forbidden": ["cross-resident fragments", "invented unresolved measurements", "explicit or clinical nudity", "Campaign 03 A/B/C variants"]
+}

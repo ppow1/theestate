@@ -1,0 +1,6 @@
+{
+  "schema_version": "full_body_prompt_template_v1",
+  "template_id": "wp4120-negative-v1",
+  "extends": "data/visual_bibles/_shared/internal/negative_prompts/templates/full_body.json",
+  "template": "cropped feet, cropped shoes, cropped crown, cropped hair, missing major body region, hidden limbs, malformed anatomy, extra or missing limbs or digits, incorrect footwear, undocumented heel, altered height, shortened or elongated limbs, generic shared body, cross-resident identity, childlike presentation, wide-angle distortion, foreshortening, dutch angle, camera tilt, floating feet, broken floor contact, false scale cue, dramatic light, busy background, explicit nudity, clinical nudity, transparent clothing, candidate presented as canonical, watermark, text"
+}

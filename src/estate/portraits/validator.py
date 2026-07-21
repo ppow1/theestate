@@ -10,6 +10,9 @@ MANIFEST_STATES = {"not_started", "candidate_generation", "steward_review", "can
 TERMINAL_NONCANON = {"rejected", "superseded"}
 OFFICE_STATES = {"candidate", "canonical", "anchor", "rejected", "superseded", "pending"}
 OFFICE_SCENES = {"seated_desk", "standing_environmental", "conversational", "candid_work"}
+FULL_BODY_CATEGORIES = {"neutral_front", "relaxed_front", "three_quarter", "side", "rear", "walking", "seated", "signature_pose", "scale_reference", "footwear_variant"}
+FULL_BODY_STATES = {"pending_generation", "candidate", "pending_review", "approved", "canonical", "rejected", "superseded"}
+MAJOR_BODY_REGIONS = {"crown_hair", "head", "neck", "torso", "pelvis", "left_arm_hand", "right_arm_hand", "left_leg", "right_leg", "left_foot_shoe", "right_foot_shoe"}
 REQUIRED_DIRS = {"candidates", "canonical", "derivatives", "metadata", "reviews", "comparison_boards", "rejected", "superseded", "locks", "generation_queue"}
 
 
@@ -116,6 +119,70 @@ def validate_office_manifest(manifest: dict, *, root: Path, registry_record: dic
         _require(anchor.get("asset_id") in anchor_ids, f"unapproved anchor promotion for {registry_record['id']}")
 
 
+def validate_full_body_sidecar(sidecar: dict, *, root: Path, resident_id: str) -> None:
+    asset_id = sidecar.get("asset_id", "<unknown>")
+    required = {"resident_id", "category", "lifecycle_state", "access_tier", "asset_path", "sha256", "source_references", "prompts", "generation", "camera", "crop", "pose", "physical_fidelity", "wardrobe", "footwear", "scale_reference", "provenance", "validation", "steward_review", "canonical", "lineage"}
+    _require(sidecar.get("schema_version") == "full_body_asset_metadata_v1", f"asset {asset_id} has unsupported full-body schema")
+    _require(not (required - sidecar.keys()), f"asset {asset_id} is missing full-body metadata: {sorted(required-sidecar.keys())}")
+    _require(sidecar["resident_id"] == resident_id, f"cross-resident template inheritance for asset {asset_id}")
+    _require(sidecar["category"] in FULL_BODY_CATEGORIES and sidecar["lifecycle_state"] in FULL_BODY_STATES-{"pending_generation"}, f"invalid full-body category/state for asset {asset_id}")
+    _require(sidecar["source_references"] and sidecar["provenance"].get("created_at") and sidecar["provenance"].get("operator"), f"missing provenance for asset {asset_id}")
+    _require(sidecar["prompts"].get("resident_binding") == resident_id, f"cross-resident template inheritance for asset {asset_id}")
+    camera = sidecar["camera"]
+    focal = camera.get("focal_length_equivalent_mm", 0)
+    _require(70 <= focal <= 105 and camera.get("distance_m") and camera.get("height") and camera.get("floor_plane") == "level", f"perspective distortion or missing camera calibration for asset {asset_id}")
+    crop = sidecar["crop"]
+    visible = set(crop.get("visible_major_regions", []))
+    _require(crop.get("crown_hair_complete") is True, f"cropped crown or hair for asset {asset_id}")
+    _require(crop.get("both_feet_and_footwear_complete") is True, f"cropped feet for asset {asset_id}")
+    _require(MAJOR_BODY_REGIONS <= visible, f"missing major body regions for asset {asset_id}")
+    footwear = sidecar["footwear"]
+    _require(footwear.get("type") and footwear.get("heel_height_in") is not None and footwear.get("source_reference"), f"incorrect or undocumented footwear for asset {asset_id}")
+    _require(footwear.get("posture_effect_documented") is True, f"unexplained heel or posture changes for asset {asset_id}")
+    physical = sidecar["physical_fidelity"]
+    _require(physical.get("height_check") in {"pass", "flag", "fail"} and physical.get("proportion_check") in {"pass", "flag", "fail"} and physical.get("posture_check") in {"pass", "flag", "fail"}, f"missing physical validation for asset {asset_id}")
+    scale = sidecar["scale_reference"]
+    _require(scale.get("consistency_check") in {"pass", "flag", "fail"}, f"missing scale validation for asset {asset_id}")
+    asset_path = root / sidecar["asset_path"]
+    _require(asset_path.is_file(), f"asset path does not exist: {sidecar['asset_path']}")
+    actual_hash = _sha256(asset_path)
+    _require(sidecar["sha256"] == actual_hash, f"stale hash for asset {asset_id}")
+    canonical = sidecar["canonical"].get("declared") is True
+    _require(not (sidecar["lifecycle_state"] in TERMINAL_NONCANON and canonical), f"terminal full-body asset {asset_id} cannot be canonical")
+    _require(sidecar["steward_review"].get("state"), f"missing Steward review state for asset {asset_id}")
+    blocking = any(value in {"flag", "fail"} for value in (physical["height_check"], physical["proportion_check"], physical["posture_check"], scale["consistency_check"]))
+    if canonical:
+        _require(sidecar["lifecycle_state"] == "canonical", f"candidate asset {asset_id} presented as canon")
+        _require(not blocking, f"flagged asset {asset_id} cannot be canonical")
+        approval_path = sidecar["canonical"].get("steward_approval")
+        _require(approval_path, f"candidate asset {asset_id} presented as canon without Steward approval")
+        approval = _load(root / approval_path)
+        _require(approval.get("authority") == "steward" and approval.get("decision") == "approve" and approval.get("asset_id") == asset_id and approval.get("sha256") == actual_hash, f"candidate asset {asset_id} presented as canon without matching approval")
+
+
+def validate_full_body_manifest(manifest: dict, *, root: Path, registry_record: dict) -> None:
+    _require(manifest.get("schema_version") == "resident_full_body_manifest_v1", "unsupported full-body manifest schema")
+    resident_id = registry_record["id"]
+    _require(manifest.get("resident", {}).get("resident_id") == resident_id, f"full-body resident mismatch for {resident_id}")
+    _require(manifest.get("resident_template_binding") == resident_id and manifest.get("cross_resident_inheritance") is False, f"cross-resident template inheritance for {resident_id}")
+    _require(manifest.get("source_references") and len(manifest["source_references"]) >= 4, f"missing provenance for {resident_id}")
+    categories = manifest.get("categories", [])
+    _require({c.get("category") for c in categories if c.get("required")} == FULL_BODY_CATEGORIES, f"missing required full-body categories for {resident_id}")
+    _require(manifest.get("steward_review", {}).get("state"), f"missing Steward review state for {resident_id}")
+    _require(manifest.get("campaign_03_boundary") == "No three-variant 360-degree measurement comparison is performed by WP-4120.", f"Campaign 03 boundary missing for {resident_id}")
+    candidates = {}
+    for record in manifest.get("candidates", []):
+        sidecar = _load(root / record["metadata_path"])
+        validate_full_body_sidecar(sidecar, root=root, resident_id=resident_id)
+        candidates[sidecar["asset_id"]] = sidecar
+    for category in categories:
+        if category.get("state") == "pending_generation":
+            _require(category.get("evidence") is None and not category.get("candidate_asset_ids") and category.get("canonical_asset_id") is None, f"pending category presented as evidence for {resident_id}")
+        canonical_id = category.get("canonical_asset_id")
+        if canonical_id:
+            _require(canonical_id in candidates and candidates[canonical_id]["canonical"].get("declared") is True, f"candidate asset presented as canon for {resident_id}/{category['category']}")
+
+
 def validate_resident_manifest(manifest: dict, *, root: Path | None = None) -> None:
     _require(manifest.get("schema_version") == "resident_portrait_manifest_v1", "unsupported resident portrait schema")
     _require(manifest.get("resident_id"), "resident_id is required")
@@ -188,6 +255,9 @@ def validate_catalog(root: Path) -> None:
         _require(office_path, f"office portrait manifest catalog link missing for {resident['resident_id']}")
         _require(manifest.get("portrait_slots", {}).get("professional_office", {}).get("office_manifest_path") == office_path, f"office manifest slot/catalog mismatch for {resident['resident_id']}")
         validate_office_manifest(_load(root / office_path), root=root, registry_record=registry[resident["resident_id"]])
+        full_body_path = resident.get("full_body_manifest_path")
+        _require(full_body_path and manifest.get("portrait_slots", {}).get("full_body", {}).get("full_body_manifest_path") == full_body_path, f"full-body manifest catalog/slot link missing for {resident['resident_id']}")
+        validate_full_body_manifest(_load(root / full_body_path), root=root, registry_record=registry[resident["resident_id"]])
 
 
 def main() -> int:
@@ -195,7 +265,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     validate_catalog(args.root.resolve())
-    print("Portrait catalog, WP-4118 hero canon, and WP-4119 office canon validation passed.")
+    print("Portrait catalog and WP-4118 through WP-4120 runtime canon validation passed.")
     return 0
 
 

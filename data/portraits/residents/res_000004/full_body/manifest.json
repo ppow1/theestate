@@ -1,0 +1,175 @@
+{
+  "schema_version": "resident_full_body_manifest_v1",
+  "manifest_revision": 1,
+  "resident": {
+    "resident_id": "RES-000004",
+    "display_name": "Eleanor",
+    "access_tier": "Estate Internal",
+    "adult_presentation_required": true
+  },
+  "source_references": [
+    "data/visual_bibles/residents/eleanor/visual_bible_manifest.json",
+    "data/visual_bibles/residents/eleanor/internal/wardrobe_activity_library.json",
+    "data/registry/residents.json",
+    "docs/visual_bible/wp4111_height_proportion_scale_runtime_canon.md",
+    "docs/visual_bible/wp4114_visual_prompt_engineering_runtime_canon.md",
+    "docs/visual_bible/wp4115_visual_negative_prompt_runtime_canon.md"
+  ],
+  "resident_template_binding": "RES-000004",
+  "cross_resident_inheritance": false,
+  "categories": [
+    {
+      "category": "neutral_front",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "relaxed_front",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "three_quarter",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "side",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "rear",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "walking",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "seated",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "signature_pose",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "scale_reference",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    },
+    {
+      "category": "footwear_variant",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; generation, validation, and Steward review are pending."
+    }
+  ],
+  "camera_standard": {
+    "focal_length_equivalent_mm": 85,
+    "permitted_range_mm": [
+      70,
+      105
+    ],
+    "camera_distance_m": "record_at_generation",
+    "camera_height": "mid_torso",
+    "eye_level_intent": "level; no pitch",
+    "floor_plane": "level and visible",
+    "background": "matte neutral mid-gray",
+    "lighting": "soft neutral 5000-5600K",
+    "minimum_clearance_percent": 5
+  },
+  "prompt_templates": {
+    "positive": "data/portraits/templates/full_body_positive_prompt_template.json",
+    "negative": "data/portraits/templates/full_body_negative_prompt_template.json"
+  },
+  "wardrobe": {
+    "source": "data/visual_bibles/residents/eleanor/internal/wardrobe_activity_library.json",
+    "selection_state": "pending_steward",
+    "explicit_or_clinical_nudity_forbidden": true
+  },
+  "footwear": {
+    "selection_state": "pending_steward",
+    "heel_height_required_per_asset": true,
+    "posture_effect_required_per_asset": true,
+    "applicable_female_3_inch_plus_variant": "pending_steward_determination"
+  },
+  "scale_reference": {
+    "cue_state": "pending_steward",
+    "dimensioned_cue_required": true,
+    "unverified_furniture_forbidden": true
+  },
+  "candidates": [],
+  "canonical": {
+    "neutral_front": null,
+    "relaxed_front": null,
+    "three_quarter": null,
+    "side": null,
+    "rear": null,
+    "walking": null,
+    "seated": null,
+    "signature_pose": null,
+    "scale_reference": null,
+    "footwear_variant": null
+  },
+  "generation_state": "pending_generation",
+  "generation_note": "No candidate or canonical image exists. Empty slots are intentional and do not constitute evidence.",
+  "steward_review": {
+    "state": "pending",
+    "authority": "steward",
+    "records": []
+  },
+  "validation_report": {
+    "state": "pending_generation",
+    "path": "data/portraits/residents/res_000004/full_body/validation/validation_report.json"
+  },
+  "campaign_03_boundary": "No three-variant 360-degree measurement comparison is performed by WP-4120.",
+  "history": {
+    "rejections": [],
+    "supersessions": []
+  }
+}
