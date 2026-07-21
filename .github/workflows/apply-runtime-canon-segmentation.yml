@@ -1,0 +1,26 @@
+name: Apply runtime canon segmentation patch
+
+on:
+  push:
+    branches:
+      - agent/mhtml-runtime-canon-recovery
+    paths:
+      - .github/workflows/apply-runtime-canon-segmentation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/mhtml-runtime-canon-recovery
+          fetch-depth: 0
+
+      - name: Apply reviewed segmentation changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
