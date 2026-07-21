@@ -1,0 +1,30 @@
+{
+  "recipe_id": "wp4124-square-lanczos-v1",
+  "source_requirement": "canonical higher-resolution master",
+  "operations": [
+    "apply approved normalized crop",
+    "convert to sRGB",
+    "resize once from master with Lanczos",
+    "apply size-specific output sharpening",
+    "strip unapproved metadata"
+  ],
+  "sizes": [
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "variants": [
+    "square",
+    "circular_mask_preview",
+    "light_ui",
+    "dark_ui",
+    "monochrome"
+  ],
+  "alpha": {
+    "allowed_only_for": "transparent_cutout",
+    "format": "PNG"
+  },
+  "deterministic": true
+}

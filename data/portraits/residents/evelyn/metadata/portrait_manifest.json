@@ -113,7 +113,8 @@
         "canonical": "data/portraits/residents/evelyn/canonical",
         "metadata": "data/portraits/residents/evelyn/metadata",
         "reviews": "data/portraits/residents/evelyn/reviews"
-      }
+      },
+      "headshot_manifest_path": "data/portraits/residents/evelyn/headshots/manifest.json"
     },
     "thumbnail": {
       "status": "not_started",
@@ -126,7 +127,8 @@
         "canonical": "data/portraits/residents/evelyn/canonical",
         "metadata": "data/portraits/residents/evelyn/metadata",
         "reviews": "data/portraits/residents/evelyn/reviews"
-      }
+      },
+      "headshot_manifest_path": "data/portraits/residents/evelyn/headshots/manifest.json"
     }
   },
   "assets": [],

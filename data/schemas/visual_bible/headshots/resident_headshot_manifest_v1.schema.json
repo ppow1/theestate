@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$id": "estate://schemas/resident-headshot-manifest-v1",
+  "title": "Resident headshot manifest",
+  "required": [
+    "schema_version",
+    "resident",
+    "resident_template_binding",
+    "cross_resident_inheritance",
+    "naming_convention",
+    "master_slots",
+    "derivative_plan",
+    "assets",
+    "recognizability_review",
+    "steward_review"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "resident_headshot_manifest_v1"
+    },
+    "resident": {
+      "type": "object"
+    },
+    "resident_template_binding": {
+      "type": "string"
+    },
+    "cross_resident_inheritance": {
+      "const": false
+    },
+    "naming_convention": {
+      "type": "string"
+    },
+    "master_slots": {
+      "type": "array",
+      "minItems": 4
+    },
+    "derivative_plan": {
+      "type": "array",
+      "minItems": 5
+    },
+    "assets": {
+      "type": "array"
+    },
+    "recognizability_review": {
+      "type": "object"
+    },
+    "steward_review": {
+      "type": "object"
+    }
+  }
+}

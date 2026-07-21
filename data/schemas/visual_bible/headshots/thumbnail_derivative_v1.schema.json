@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$id": "estate://schemas/thumbnail-derivative-v1",
+  "title": "Thumbnail derivative metadata",
+  "required": [
+    "schema_version",
+    "asset_id",
+    "resident_id",
+    "asset_kind",
+    "use",
+    "lifecycle_state",
+    "scope",
+    "asset_path",
+    "sha256",
+    "dimensions",
+    "crop",
+    "safe_area",
+    "identity_fidelity",
+    "provenance",
+    "lineage",
+    "steward_review",
+    "canonical"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "thumbnail_derivative_v1"
+    },
+    "asset_id": {
+      "type": "string"
+    },
+    "resident_id": {
+      "type": "string"
+    },
+    "asset_kind": {
+      "const": "derivative"
+    },
+    "use": {
+      "enum": [
+        "avatar",
+        "model_card",
+        "dashboard",
+        "dossier",
+        "thumbnail"
+      ]
+    },
+    "lifecycle_state": {
+      "enum": [
+        "candidate",
+        "canonical",
+        "rejected",
+        "superseded",
+        "pending"
+      ]
+    },
+    "scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private",
+        "review_only",
+        "rejected",
+        "canonical"
+      ]
+    },
+    "asset_path": {
+      "type": "string"
+    },
+    "sha256": {
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "dimensions": {
+      "$ref": "#/$defs/dimensions"
+    },
+    "crop": {
+      "$ref": "#/$defs/crop"
+    },
+    "safe_area": {
+      "$ref": "#/$defs/safe"
+    },
+    "identity_fidelity": {
+      "type": "object"
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "lineage": {
+      "type": "object"
+    },
+    "steward_review": {
+      "type": "object"
+    },
+    "canonical": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "width",
+        "height",
+        "aspect_ratio"
+      ]
+    },
+    "crop": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height",
+        "hair_silhouette_preserved",
+        "jawline_preserved"
+      ]
+    },
+    "safe": {
+      "type": "object",
+      "required": [
+        "face_inside",
+        "radius_ratio"
+      ]
+    }
+  }
+}
