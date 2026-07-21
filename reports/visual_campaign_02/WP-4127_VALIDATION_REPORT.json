@@ -1,0 +1,29 @@
+{
+  "schema_version": "wp4127_validation_report_v1",
+  "generated_at": "2026-07-21T00:00:00Z",
+  "status": "pass",
+  "canonical_production_lock_count": 0,
+  "infrastructure_complete": true,
+  "visual_production_complete": false,
+  "commands": [
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_wp4127_portrait_lock.py tests/test_wp4126_portrait_catalog.py tests/test_wp4125_portrait_consistency.py",
+      "status": "pass",
+      "result": "21 passed"
+    },
+    {
+      "command": "PYTHONPATH=src pytest -q tests/test_wp4118_hero_portrait.py ... tests/test_openwebui_campaign_02.py",
+      "status": "partial_failure",
+      "result": "90 passed, 3 failed; failures are pre-existing OpenWebUI state-contract mismatches unrelated to WP-4127"
+    },
+    {
+      "command": "PYTHONPATH=src python -m estate.portraits.lock data/visual_bibles/locks/evelyn_portrait_lock.provisional.example.json --root .",
+      "status": "pass",
+      "result": "noncanonical, zero diagnostics"
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    }
+  ]
+}

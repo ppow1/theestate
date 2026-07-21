@@ -1,0 +1,98 @@
+{
+  "schema_version": "canonical_portrait_lock_v1",
+  "lock_id": "evelyn-portrait-lock-proposal-v1",
+  "lock_version": 1,
+  "resident_id": "evelyn",
+  "state": "provisional",
+  "required_categories": [
+    "expression_sheet",
+    "front_three_quarter_reference",
+    "full_body_standing_reference",
+    "headshot_set",
+    "hero_portrait",
+    "professional_office_portrait",
+    "profile_reference",
+    "rear_reference",
+    "rear_three_quarter_reference",
+    "thumbnail_set"
+  ],
+  "visual_bible_revision": "unapproved",
+  "catalog_ref": "data/visual_bibles/catalog/estate_portrait_catalog.example.json",
+  "consistency_report_ref": "reports/visual_campaign_02/WP-4125_VALIDATION_REPORT.json",
+  "reviewed_at": "2026-07-21T00:00:00Z",
+  "stale_after_days": 365,
+  "slots": [
+    {
+      "category": "expression_sheet",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "front_three_quarter_reference",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "full_body_standing_reference",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "headshot_set",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "hero_portrait",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "professional_office_portrait",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "profile_reference",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "rear_reference",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "rear_three_quarter_reference",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    },
+    {
+      "category": "thumbnail_set",
+      "state": "provisional",
+      "asset": {},
+      "acceptance_evidence": {}
+    }
+  ],
+  "steward_decision": {
+    "explicit_approval": false,
+    "decision": "pending"
+  },
+  "blocking_findings": [
+    "Production portrait generation and Steward selection are pending."
+  ],
+  "unresolved_tolerated_limitations": [],
+  "downstream_references": [],
+  "supersedes": null,
+  "rollback_target": null,
+  "lock_hash": "sha256:54fecd6c03c1685fc5182fa804880c9ae344fbe29c3078a2634916f413023ec9"
+}
