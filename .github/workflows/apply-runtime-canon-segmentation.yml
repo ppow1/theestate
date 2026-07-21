@@ -19,8 +19,3 @@ jobs:
           ref: agent/mhtml-runtime-canon-recovery
           fetch-depth: 0
 
-      - name: Apply reviewed segmentation changes
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
