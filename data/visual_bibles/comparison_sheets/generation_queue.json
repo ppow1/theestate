@@ -1,0 +1,19 @@
+{
+  "schema_version": "vertical_comparison_sheet_generation_queue_v1",
+  "state": "blocked_inputs",
+  "created_at": "2026-07-21T00:00:00Z",
+  "generator": "python -m estate.portraits.comparison_sheet",
+  "items": [
+    {
+      "sheet_id": "evelyn_bust_range_r001",
+      "manifest_ref": "data/visual_bibles/comparison_sheets/evelyn_bust_range_r001.queue.json",
+      "state": "blocked_inputs",
+      "required_cells": 15,
+      "materialized_cells": 0,
+      "blockers": [
+        "WP-4128 capture assets are not materialized; source linkage and hashes cannot be supplied honestly."
+      ]
+    }
+  ],
+  "fabricated_outputs": false
+}

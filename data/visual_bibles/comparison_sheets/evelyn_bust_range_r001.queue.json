@@ -1,0 +1,203 @@
+{
+  "schema_version": "vertical_comparison_sheet_manifest_v1",
+  "sheet_id": "evelyn_bust_range_r001",
+  "resident_id": "evelyn",
+  "review_date": "2026-07-21",
+  "layout": {
+    "template": "tall_three_variant",
+    "angle_set": "five",
+    "canvas_width_px": 3600,
+    "canvas_height_px": 6000,
+    "cell_width_px": 560,
+    "cell_height_px": 960,
+    "gap_px": 32,
+    "label_gutter_px": 520,
+    "background": "#eeeeee",
+    "zoomable": true,
+    "source_link_behavior": "relative_clickthrough"
+  },
+  "variables": {
+    "intended": [
+      "bust_cm"
+    ],
+    "fixed": {
+      "identity": {
+        "reference": "asset:evelyn_lock"
+      },
+      "age_presentation": "canonical",
+      "hairstyle": "canonical",
+      "expression": "neutral",
+      "camera": {
+        "height_cm": 90,
+        "focal_length_mm": 85,
+        "distance_m": 6
+      },
+      "crop": "full_body_5pct_margin",
+      "scale": "1px_per_0.2cm",
+      "wardrobe": {
+        "id": "review_neutral",
+        "fabric_behavior": "locked"
+      },
+      "pose": "neutral_a",
+      "lighting": "studio_soft_v1",
+      "background": "#eeeeee",
+      "footwear": {
+        "id": "neutral_flat",
+        "heel_height_cm": 0
+      }
+    }
+  },
+  "variants": [
+    {
+      "variant_id": "lower",
+      "order": 1,
+      "label": "1. Lower \u2014 bust 91 cm",
+      "measurements": {
+        "height_cm": 170,
+        "bust_cm": 91,
+        "waist_cm": 68,
+        "hip_cm": 96
+      },
+      "cells": [
+        {
+          "angle_id": "front",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "front_left_45",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "left_profile",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "rear_left_45",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "rear",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        }
+      ]
+    },
+    {
+      "variant_id": "candidate",
+      "order": 2,
+      "label": "2. Candidate \u2014 bust 93 cm",
+      "measurements": {
+        "height_cm": 170,
+        "bust_cm": 93,
+        "waist_cm": 68,
+        "hip_cm": 96
+      },
+      "cells": [
+        {
+          "angle_id": "front",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "front_left_45",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "left_profile",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "rear_left_45",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "rear",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        }
+      ]
+    },
+    {
+      "variant_id": "upper",
+      "order": 3,
+      "label": "3. Upper \u2014 bust 95 cm",
+      "measurements": {
+        "height_cm": 170,
+        "bust_cm": 95,
+        "waist_cm": 68,
+        "hip_cm": 96
+      },
+      "cells": [
+        {
+          "angle_id": "front",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "front_left_45",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "left_profile",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "rear_left_45",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        },
+        {
+          "angle_id": "rear",
+          "state": "pending",
+          "source": {},
+          "fixed_fingerprint": "sha256:572a4cb134dffd24221d146cea2135c3224f3a9bde419b9214e812b2815fcc3f"
+        }
+      ]
+    }
+  ],
+  "review": {
+    "status": "pending",
+    "steward_id": null,
+    "decided_at": null,
+    "difference_visible": null,
+    "annotation_ref": null,
+    "annotations": []
+  },
+  "revision": {
+    "number": 1,
+    "supersedes": null,
+    "change_summary": "Initial queued comparison set.",
+    "packet_ref": "revision_packets/evelyn_bust_range_r001.json"
+  },
+  "output": {
+    "state": "queued",
+    "path": "data/visual_bibles/comparison_sheets/outputs/evelyn_bust_range_r001.html",
+    "format": "html",
+    "sha256": null,
+    "input_manifest_sha256": null,
+    "generated_at": null
+  }
+}

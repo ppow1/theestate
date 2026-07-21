@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://visual-bible/vertical-comparison-sheet-manifest-v1",
+  "title": "Vertical Comparison Sheet Manifest v1",
+  "type": "object",
+  "required": ["schema_version", "sheet_id", "resident_id", "review_date", "layout", "variables", "variants", "review", "revision", "output"],
+  "properties": {
+    "schema_version": {"const": "vertical_comparison_sheet_manifest_v1"},
+    "sheet_id": {"type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"},
+    "resident_id": {"type": "string"},
+    "review_date": {"type": "string", "format": "date"},
+    "layout": {
+      "type": "object",
+      "required": ["template", "angle_set", "canvas_width_px", "canvas_height_px", "cell_width_px", "cell_height_px", "gap_px", "label_gutter_px", "background", "zoomable", "source_link_behavior"],
+      "properties": {"angle_set": {"enum": ["five", "eight"]}, "template": {"enum": ["portrait", "landscape", "tall_three_variant"]}, "canvas_width_px": {"type": "integer", "minimum": 1600}, "canvas_height_px": {"type": "integer", "minimum": 1200}, "cell_width_px": {"type": "integer", "minimum": 240}, "cell_height_px": {"type": "integer", "minimum": 480}, "gap_px": {"type": "integer", "minimum": 8}, "label_gutter_px": {"type": "integer", "minimum": 240}, "background": {"type": "string"}, "zoomable": {"const": true}, "source_link_behavior": {"const": "relative_clickthrough"}},
+      "additionalProperties": true
+    },
+    "variables": {"type": "object", "required": ["intended", "fixed"], "properties": {"intended": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "fixed": {"type": "object"}}},
+    "variants": {"type": "array", "minItems": 2, "items": {"type": "object", "required": ["variant_id", "order", "label", "measurements", "cells"], "properties": {"order": {"type": "integer", "minimum": 1}, "cells": {"type": "array", "minItems": 5}}}},
+    "review": {"type": "object", "required": ["status", "annotations", "difference_visible"]},
+    "revision": {"type": "object", "required": ["number", "supersedes", "change_summary", "packet_ref"]},
+    "output": {"type": "object", "required": ["state", "path", "format"], "properties": {"state": {"enum": ["queued", "generated"]}, "format": {"enum": ["html", "png", "pdf", "tiff"]}}}
+  },
+  "additionalProperties": false
+}
