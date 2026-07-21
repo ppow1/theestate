@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://estate.local/operator-deck/state-contract.schema.json",
+  "title": "Estate Operator Deck State Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "observed_at", "capability", "state", "confidence", "evidence"],
+  "properties": {
+    "contract_version": { "const": "1.0" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "capability": { "type": "string", "minLength": 1 },
+    "state": { "type": "string", "enum": ["off", "ready", "listening", "error", "unknown"] },
+    "confidence": { "type": "string", "enum": ["high", "medium", "low", "none"] },
+    "evidence": { "type": "array", "items": { "type": "object" } },
+    "diagnostic": { "type": "string" }
+  }
+}
