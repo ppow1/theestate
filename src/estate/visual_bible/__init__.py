@@ -29,3 +29,5 @@ from .prompts import (LAYERS, canonical_json, compose, digest, load_prompt_recor
     validate_adapter, validate_fragment, validate_receipt)
 __all__ += ["LAYERS","canonical_json","compose","digest","load_prompt_record",
     "validate_adapter","validate_fragment","validate_receipt"]
+
+from .negative_prompts import compose_negative, validate_adapter as validate_negative_adapter, validate_library as validate_negative_library, validate_observation as validate_defect_observation, validate_resident_extension

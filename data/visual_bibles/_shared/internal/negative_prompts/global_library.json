@@ -1,0 +1,347 @@
+{
+  "library_id": "estate-global-negative-library-v1",
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-anatomy",
+      "category": "anatomy",
+      "text": "no extra, duplicated, fused, missing, or malformed limbs, hands, fingers, feet, toes, joints, heads, faces, teeth, ears, eyes, or hairlines",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-identity",
+      "category": "identity",
+      "text": "no facial identity drift, undefined asymmetry, generic stock expression, or resemblance substitution",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-age",
+      "category": "age",
+      "text": "no age drift or childlike presentation",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-scale",
+      "category": "scale",
+      "text": "no height inflation, relative-scale drift, or mismatched camera scale",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-proportion",
+      "category": "proportion",
+      "text": "no body-proportion drift or unintended body exaggeration",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-appearance",
+      "category": "appearance",
+      "text": "no incorrect eye color, hair color, hair length, or hair texture",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-rendering",
+      "category": "rendering",
+      "text": "no plastic, waxy, or over-smoothed skin; no inconsistent lighting or lens distortion",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-artifact",
+      "category": "artifact",
+      "text": "no text, watermark, logo, caption, interface artifact, or unintended duplicate object",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "global-framing",
+      "category": "framing",
+      "text": "no cut-off head, hands, or feet; no poor crop",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "professional-presentation",
+      "category": "rendering",
+      "text": "no oversexualized pose in professional, casual, documentary, or reference modes",
+      "asset_types": [
+        "all"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "wardrobe-protection",
+      "category": "wardrobe",
+      "text": "no garment substitution, fit drift, color drift, repeated clothing, missing signature accessory, footwear or heel-height change unless declared",
+      "asset_types": [
+        "wardrobe",
+        "full_body",
+        "turnaround",
+        "comparison",
+        "group",
+        "movement"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "comparison-lock",
+      "category": "comparison",
+      "text": "no camera angle, pose, expression, wardrobe, heel height, lighting, focal length, body orientation, framing, independent rescaling, or perspective change except the declared variable; do not hide waist, hips, shoulders, or legs",
+      "asset_types": [
+        "comparison"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "turnaround-lock",
+      "category": "comparison",
+      "text": "no identity, grooming, expression, wardrobe, lighting, focal length, distance, scale, or background changes between views; only declared body orientation may change",
+      "asset_types": [
+        "turnaround"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "group-separation",
+      "category": "group_separation",
+      "text": "no face blending, identity swapping, repeated faces, duplicated bodies, inherited hair, height, build, wardrobe, homogenized pose, expression, posture, or relative-height drift",
+      "asset_types": [
+        "group"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "movement-integrity",
+      "category": "movement",
+      "text": "no frozen or implausible motion, impossible joints, lost identity, wardrobe physics failure, or motion-blurred face",
+      "asset_types": [
+        "movement"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "rule_id": "environment-integrity",
+      "category": "environment",
+      "text": "no resident-environment scale mismatch, impossible shadows, spatial collision, warped architecture, or environmental identity contamination",
+      "asset_types": [
+        "environment"
+      ],
+      "audience_scope": "internal",
+      "status": "approved",
+      "severity": "error",
+      "positive_binding_ids": [],
+      "supersedes": null,
+      "provenance": {
+        "source_ids": [
+          "WP-4115"
+        ],
+        "created_at": "2026-07-21T00:00:00Z",
+        "created_by": "WP-4115 implementation"
+      }
+    }
+  ]
+}
