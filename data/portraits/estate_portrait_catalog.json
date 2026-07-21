@@ -10,7 +10,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/res_000001/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/res_000001/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/res_000001/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/res_000001/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/res_000001/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/res_000001/expressions/manifest.json"
     },
     {
       "resident_id": "RES-000002",
@@ -20,7 +21,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/res_000002/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/res_000002/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/res_000002/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/res_000002/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/res_000002/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/res_000002/expressions/manifest.json"
     },
     {
       "resident_id": "RES-000003",
@@ -30,7 +32,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/res_000003/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/res_000003/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/res_000003/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/res_000003/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/res_000003/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/res_000003/expressions/manifest.json"
     },
     {
       "resident_id": "RES-000004",
@@ -40,7 +43,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/res_000004/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/res_000004/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/res_000004/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/res_000004/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/res_000004/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/res_000004/expressions/manifest.json"
     },
     {
       "resident_id": "RES-000005",
@@ -50,7 +54,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/res_000005/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/res_000005/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/res_000005/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/res_000005/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/res_000005/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/res_000005/expressions/manifest.json"
     },
     {
       "resident_id": "RES-000006",
@@ -60,7 +65,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/res_000006/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/res_000006/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/res_000006/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/res_000006/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/res_000006/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/res_000006/expressions/manifest.json"
     },
     {
       "resident_id": "evelyn",
@@ -70,7 +76,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/evelyn/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/evelyn/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/evelyn/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/evelyn/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/evelyn/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/evelyn/expressions/manifest.json"
     },
     {
       "resident_id": "grace",
@@ -80,7 +87,8 @@
       "office_portrait_manifest_path": "data/portraits/residents/grace/metadata/office_portrait_manifest.json",
       "full_body_manifest_path": "data/portraits/residents/grace/full_body/manifest.json",
       "profile_rear_manifest_path": "data/portraits/residents/grace/profile_rear/manifest.json",
-      "three_quarter_manifest_path": "data/portraits/residents/grace/three_quarter/manifest.json"
+      "three_quarter_manifest_path": "data/portraits/residents/grace/three_quarter/manifest.json",
+      "expression_manifest_path": "data/portraits/residents/grace/expressions/manifest.json"
     }
   ],
   "estate_index": {
@@ -111,5 +119,8 @@
   "full_body_asset_metadata_schema": "data/schemas/visual_bible/full_body/full_body_asset_metadata_v1.schema.json",
   "profile_rear_canon": "docs/visual_bible/wp4121_profile_rear_reference_runtime_canon.md",
   "profile_rear_manifest_schema": "data/schemas/visual_bible/profile_rear/resident_profile_rear_manifest_v1.schema.json",
-  "profile_rear_asset_metadata_schema": "data/schemas/visual_bible/profile_rear/profile_rear_asset_metadata_v1.schema.json"
+  "profile_rear_asset_metadata_schema": "data/schemas/visual_bible/profile_rear/profile_rear_asset_metadata_v1.schema.json",
+  "expression_sheet_canon": "docs/visual_bible/wp4123_resident_expression_sheet_runtime_canon.md",
+  "expression_manifest_schema": "data/schemas/visual_bible/expressions/resident_expression_manifest_v1.schema.json",
+  "expression_asset_metadata_schema": "data/schemas/visual_bible/expressions/expression_asset_metadata_v1.schema.json"
 }

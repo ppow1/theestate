@@ -1,0 +1,294 @@
+{
+  "schema_version": "resident_expression_manifest_v1",
+  "manifest_revision": 1,
+  "resident": {
+    "resident_id": "RES-000001",
+    "display_name": "Alfred",
+    "office": "Manager of Administration",
+    "adult_presentation_required": true
+  },
+  "resident_template_binding": "RES-000001",
+  "cross_resident_inheritance": false,
+  "source_references": [
+    "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+    "data/portraits/residents/res_000001/metadata/hero_manifest.json",
+    "data/portraits/residents/res_000001/three_quarter/manifest.json",
+    "residents/alfred.md"
+  ],
+  "approved_vocabulary": [
+    "neutral_resting",
+    "warm_greeting",
+    "attentive_listening",
+    "quiet_smile",
+    "genuine_laugh",
+    "thoughtful_reflection",
+    "concern",
+    "encouragement",
+    "confidence",
+    "determination",
+    "mild_amusement",
+    "celebration_or_pride",
+    "formal_attention",
+    "analytical_skepticism",
+    "restrained_approval",
+    "eyes_softening",
+    "slight_eyebrow_lift",
+    "restrained_grin",
+    "beginning_to_laugh",
+    "looking_up_from_work",
+    "brief_concern_before_speaking",
+    "subtle_head_tilt",
+    "quiet_recognition",
+    "controlled_skepticism",
+    "private_amusement"
+  ],
+  "required_expression_slots": [
+    {
+      "expression_id": "neutral_resting",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "warm_greeting",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "attentive_listening",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "quiet_smile",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "genuine_laugh",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "thoughtful_reflection",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "concern",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "encouragement",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "confidence",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "determination",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "mild_amusement",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "celebration_or_pride",
+      "category": "core",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "formal_attention",
+      "category": "role_specific",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "analytical_skepticism",
+      "category": "role_specific",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "restrained_approval",
+      "category": "role_specific",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "expression_id": "restrained_approval",
+      "category": "emotional_anchor",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    }
+  ],
+  "micro_expressions": [
+    {
+      "expression_id": "eyes_softening",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "slight_eyebrow_lift",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "restrained_grin",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "beginning_to_laugh",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "looking_up_from_work",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "brief_concern_before_speaking",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "subtle_head_tilt",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "quiet_recognition",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "controlled_skepticism",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    },
+    {
+      "expression_id": "private_amusement",
+      "intensity": "subtle",
+      "state": "pending_generation",
+      "anatomy_must_remain_canonical": true
+    }
+  ],
+  "emotional_anchor": {
+    "expression_id": "restrained_approval",
+    "resident_specific": true,
+    "approval_state": "pending_steward",
+    "asset_ids": [],
+    "note": "Provisional hypothesis only; not an emotional fact or reusable template."
+  },
+  "normalization": {
+    "focal_length_equivalent_mm": 85,
+    "camera": "locked position and distance",
+    "crop": "head-and-shoulders; matched head scale",
+    "lighting": "soft neutral 5000-5600K",
+    "background": "matte neutral mid-gray",
+    "grooming": "canonical and locked",
+    "wardrobe": "role-aligned neckline/accessories and locked",
+    "dimensions_px": [
+      4096,
+      4096
+    ]
+  },
+  "layout": {
+    "core_grid": [
+      4,
+      3
+    ],
+    "role_grid": [
+      3,
+      1
+    ],
+    "micro_grid": [
+      5,
+      2
+    ],
+    "cell_order": "manifest order",
+    "visible_captions": true,
+    "hidden_caption_test_required": true
+  },
+  "prompt_templates": {
+    "positive": "data/portraits/templates/expression_positive_prompt_template.json",
+    "negative": "data/portraits/templates/expression_negative_prompt_template.json"
+  },
+  "naming_convention": "{resident_id}__expression__{category}__{expression_id}__v{revision:03d}__{asset_id}.{ext}",
+  "candidates": [],
+  "canonical": {},
+  "generation_state": "pending_generation",
+  "generation_note": "No expression images exist. Generation, drift validation, hidden-caption testing, and independent Steward review remain pending.",
+  "steward_review": {
+    "state": "pending",
+    "authority": "steward",
+    "records": [],
+    "notes": []
+  },
+  "history": {
+    "rejections": [],
+    "revisions": [],
+    "supersessions": []
+  }
+}

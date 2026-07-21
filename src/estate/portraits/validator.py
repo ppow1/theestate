@@ -466,6 +466,51 @@ def validate_three_quarter_manifest(manifest: dict, *, root: Path, registry_reco
             asset = candidates.get(slot["canonical_asset_id"])
             _require(asset and asset["angle"] == slot["angle"] and asset["canonical"].get("declared"), f"candidate three-quarter asset presented as canon for {resident_id}/{slot['angle']}")
 
+CORE_EXPRESSIONS = {"neutral_resting", "warm_greeting", "attentive_listening", "quiet_smile", "genuine_laugh", "thoughtful_reflection", "concern", "encouragement", "confidence", "determination", "mild_amusement", "celebration_or_pride"}
+EXPRESSION_STATES = {"candidate", "canonical", "rejected", "superseded"}
+
+def validate_expression_sidecar(sidecar: dict, *, root: Path, resident_id: str) -> None:
+    asset_id = sidecar.get("asset_id", "<unknown>")
+    required = {"resident_id", "expression_id", "category", "lifecycle_state", "asset_path", "sha256", "identity_source", "facial_action", "micro_expression", "emotional_claim", "normalization", "prompts", "generation", "provenance", "identity_fidelity", "hidden_caption_test", "validation", "steward_review", "canonical", "lineage"}
+    _require(sidecar.get("schema_version") == "expression_asset_metadata_v1" and not (required-set(sidecar)), f"asset {asset_id} is missing expression metadata")
+    _require(sidecar["resident_id"] == resident_id and sidecar["prompts"].get("resident_binding") == resident_id, f"cross-resident expression binding for {asset_id}")
+    _require(sidecar["category"] in {"core", "role_specific", "micro", "emotional_anchor"} and sidecar["lifecycle_state"] in EXPRESSION_STATES, f"invalid expression category/state for {asset_id}")
+    actions = sidecar["facial_action"]
+    _require(set(actions) >= {"eyes", "brows", "mouth", "cheeks", "jaw", "head_angle", "posture"}, f"missing facial behavior for {asset_id}")
+    _require(sidecar["micro_expression"].get("intensity") in {"none", "subtle"}, f"exaggerated micro-expression for {asset_id}")
+    claim = sidecar["emotional_claim"]
+    _require(claim.get("supported_by") and claim.get("approved_vocabulary") is True, f"unsupported emotional claim for {asset_id}")
+    norm = sidecar["normalization"]
+    _require(70 <= norm.get("focal_length_equivalent_mm", 0) <= 105 and norm.get("camera_locked") and norm.get("crop_locked") and norm.get("lighting_locked") and norm.get("grooming_locked") and norm.get("wardrobe_locked") and norm.get("background_locked"), f"expression comparison normalization failure for {asset_id}")
+    fidelity = sidecar["identity_fidelity"]
+    _require(set(fidelity) >= {"eye_geometry", "nose_geometry", "mouth_geometry", "jaw_geometry", "cheek_geometry", "age", "skin", "hair", "visual_fingerprint", "personality"}, f"missing identity drift diagnostics for {asset_id}")
+    _require(all(v in {"pass", "flag", "fail"} for v in fidelity.values()), f"invalid identity diagnostics for {asset_id}")
+    asset_path=root/sidecar["asset_path"]; _require(asset_path.is_file(), f"asset path does not exist: {sidecar['asset_path']}")
+    actual=_sha256(asset_path); _require(actual == sidecar["sha256"], f"stale hash for asset {asset_id}")
+    declared=sidecar["canonical"].get("declared") is True
+    _require(not(sidecar["lifecycle_state"] in TERMINAL_NONCANON and declared), f"terminal expression asset {asset_id} cannot be canonical")
+    if declared:
+        _require(sidecar["lifecycle_state"] == "canonical" and all(v == "pass" for v in fidelity.values()) and sidecar["hidden_caption_test"].get("state") == "pass", f"identity drift or untested expression {asset_id} presented as canon")
+        approval_path=sidecar["canonical"].get("steward_approval"); _require(approval_path, f"expression canon requires Steward approval for {asset_id}")
+        approval=_load(root/approval_path)
+        _require(approval.get("authority") == "steward" and approval.get("decision") == "approve" and approval.get("asset_id") == asset_id and approval.get("expression_id") == sidecar["expression_id"] and approval.get("sha256") == actual, f"expression approval does not match asset/hash/expression for {asset_id}")
+
+def validate_expression_manifest(manifest: dict, *, root: Path, registry_record: dict) -> None:
+    resident_id=registry_record["id"]
+    _require(manifest.get("schema_version") == "resident_expression_manifest_v1", "unsupported expression manifest schema")
+    _require(manifest.get("resident",{}).get("resident_id") == resident_id and manifest.get("resident_template_binding") == resident_id and manifest.get("cross_resident_inheritance") is False, f"cross-resident expression identity binding for {resident_id}")
+    slots=manifest.get("required_expression_slots",[])
+    _require({s.get("expression_id") for s in slots if s.get("category") == "core"} == CORE_EXPRESSIONS, f"missing required expressions for {resident_id}")
+    _require(any(s.get("category") == "role_specific" for s in slots) and any(s.get("category") == "emotional_anchor" for s in slots), f"missing resident-specific expressions for {resident_id}")
+    _require(manifest.get("micro_expressions") and all(x.get("intensity") == "subtle" for x in manifest["micro_expressions"]), f"missing or unrestrained micro-expressions for {resident_id}")
+    _require(manifest.get("emotional_anchor",{}).get("approval_state") == "pending_steward", f"fabricated emotional-anchor approval for {resident_id}")
+    candidates={}
+    for record in manifest.get("candidates",[]):
+        sidecar=_load(root/record["metadata_path"]); validate_expression_sidecar(sidecar,root=root,resident_id=resident_id); candidates[sidecar["asset_id"]]=sidecar
+    for slot in slots:
+        if slot.get("state") == "pending_generation": _require(slot.get("evidence") is None and not slot.get("candidate_asset_ids") and slot.get("canonical_asset_id") is None, f"pending expression presented as evidence for {resident_id}")
+        if slot.get("canonical_asset_id"): _require(candidates.get(slot["canonical_asset_id"],{}).get("canonical",{}).get("declared"), f"unapproved canonical promotion for {resident_id}/{slot['expression_id']}")
+
 
 def validate_resident_manifest(manifest: dict, *, root: Path | None = None) -> None:
     _require(manifest.get("schema_version") == "resident_portrait_manifest_v1", "unsupported resident portrait schema")
@@ -548,6 +593,9 @@ def validate_catalog(root: Path) -> None:
         three_quarter_path = resident.get("three_quarter_manifest_path")
         _require(three_quarter_path and manifest.get("portrait_slots", {}).get("three_quarter", {}).get("three_quarter_manifest_path") == three_quarter_path, f"three-quarter manifest catalog/slot link missing for {resident['resident_id']}")
         validate_three_quarter_manifest(_load(root / three_quarter_path), root=root, registry_record=registry[resident["resident_id"]])
+        expression_path = resident.get("expression_manifest_path")
+        _require(expression_path, f"expression manifest catalog link missing for {resident['resident_id']}")
+        validate_expression_manifest(_load(root / expression_path), root=root, registry_record=registry[resident["resident_id"]])
 
 
 def main() -> int:
@@ -555,7 +603,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     validate_catalog(args.root.resolve())
-    print("Portrait catalog and WP-4118 through WP-4122 runtime canon validation passed.")
+    print("Portrait catalog and WP-4118 through WP-4123 runtime canon validation passed.")
     return 0
 
 
