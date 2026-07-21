@@ -31,3 +31,9 @@ __all__ += ["LAYERS","canonical_json","compose","digest","load_prompt_record",
     "validate_adapter","validate_fragment","validate_receipt"]
 
 from .negative_prompts import compose_negative, validate_adapter as validate_negative_adapter, validate_library as validate_negative_library, validate_observation as validate_defect_observation, validate_resident_extension
+from .steward_review import (create_rollback, validate_anchor, validate_approval,
+    validate_comparison_manifest, validate_note, validate_queue,
+    validate_recognition_test, validate_revision_packet, validate_transition as validate_review_transition)
+__all__ += ["create_rollback", "validate_anchor", "validate_approval",
+    "validate_comparison_manifest", "validate_note", "validate_queue",
+    "validate_recognition_test", "validate_revision_packet", "validate_review_transition"]

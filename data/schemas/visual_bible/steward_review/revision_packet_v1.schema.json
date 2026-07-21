@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/revision_packet_v1.schema.json",
+  "title": "revision_packet_v1",
+  "type": "object",
+  "required": [
+    "packet_id",
+    "resident_ids",
+    "source_asset_ids",
+    "steward_note_ids",
+    "approved_elements_to_preserve",
+    "defects_to_correct",
+    "exact_requested_changes",
+    "variables_to_change",
+    "variables_to_hold_fixed",
+    "positive_prompt_fragments",
+    "negative_prompt_fragments",
+    "comparison_layout_requirements",
+    "acceptance_tests",
+    "audience_scope",
+    "provenance"
+  ],
+  "properties": {
+    "packet_id": {},
+    "resident_ids": {
+      "type": "array"
+    },
+    "source_asset_ids": {
+      "type": "array"
+    },
+    "steward_note_ids": {
+      "type": "array"
+    },
+    "approved_elements_to_preserve": {
+      "type": "array"
+    },
+    "defects_to_correct": {
+      "type": "array"
+    },
+    "exact_requested_changes": {
+      "type": "array"
+    },
+    "variables_to_change": {
+      "type": "array"
+    },
+    "variables_to_hold_fixed": {
+      "type": "array"
+    },
+    "positive_prompt_fragments": {
+      "type": "array"
+    },
+    "negative_prompt_fragments": {
+      "type": "array"
+    },
+    "comparison_layout_requirements": {},
+    "acceptance_tests": {
+      "type": "array"
+    },
+    "audience_scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ]
+    },
+    "provenance": {}
+  },
+  "additionalProperties": true
+}

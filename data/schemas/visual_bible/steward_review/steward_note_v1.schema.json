@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/steward_note_v1.schema.json",
+  "title": "steward_note_v1",
+  "type": "object",
+  "required": [
+    "note_id",
+    "resident_id",
+    "recorded_at",
+    "steward_id",
+    "authority",
+    "exact_text",
+    "exact_text_preserved",
+    "target_refs",
+    "dimension",
+    "provenance"
+  ],
+  "properties": {
+    "note_id": {},
+    "resident_id": {},
+    "recorded_at": {},
+    "steward_id": {},
+    "authority": {},
+    "exact_text": {},
+    "exact_text_preserved": {},
+    "target_refs": {
+      "type": "array"
+    },
+    "dimension": {},
+    "provenance": {}
+  },
+  "additionalProperties": true
+}

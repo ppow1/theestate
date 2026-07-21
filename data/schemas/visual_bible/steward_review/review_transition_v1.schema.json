@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/review_transition_v1.schema.json",
+  "title": "review_transition_v1",
+  "type": "object",
+  "required": [
+    "transition_id",
+    "subject_id",
+    "from_state",
+    "to_state",
+    "occurred_at",
+    "reviewer_id",
+    "reviewer_authority",
+    "reason",
+    "source_asset_ids",
+    "provenance"
+  ],
+  "properties": {
+    "transition_id": {},
+    "subject_id": {},
+    "from_state": {},
+    "to_state": {},
+    "occurred_at": {},
+    "reviewer_id": {},
+    "reviewer_authority": {},
+    "reason": {},
+    "source_asset_ids": {
+      "type": "array"
+    },
+    "provenance": {}
+  },
+  "additionalProperties": true
+}

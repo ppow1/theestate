@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/review_queue_v1.schema.json",
+  "title": "review_queue_v1",
+  "type": "object",
+  "required": [
+    "queue_id",
+    "audience_scope",
+    "items",
+    "created_at",
+    "provenance"
+  ],
+  "properties": {
+    "queue_id": {},
+    "audience_scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ]
+    },
+    "items": {
+      "type": "array"
+    },
+    "created_at": {},
+    "provenance": {}
+  },
+  "additionalProperties": true
+}
