@@ -1,0 +1,174 @@
+{
+  "schema_version": "resident_360_capture_manifest_v1",
+  "resident_id": "marie",
+  "capture_set_id": "marie_canonical_flat_360_r001",
+  "variant_id": "canonical_flat",
+  "revision": 1,
+  "state": "incomplete",
+  "measurement_record": {
+    "ref": "pending:marie:canonical-physical-specification",
+    "version": "unresolved",
+    "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "canonical_height_cm": 165,
+  "controls": {
+    "identity_ref": {
+      "ref": "pending:wp4127-canonical-portrait",
+      "version": "unresolved"
+    },
+    "expression": "neutral",
+    "grooming": {
+      "ref": "pending:resident-canonical-grooming"
+    },
+    "wardrobe": {
+      "id": "campaign03_neutral_review",
+      "version": "v1"
+    },
+    "pose_family": "normalized_turnaround_standing_v1",
+    "camera": {
+      "body": "pending_generation_selection",
+      "sensor": "pending",
+      "height_cm": 100,
+      "pitch_degrees": 0,
+      "roll_degrees": 0
+    },
+    "focal_length_mm": 85,
+    "distance_m": 4.5,
+    "lighting": {
+      "rig": "neutral_comparison_v1",
+      "status": "specified_not_executed"
+    },
+    "background": "neutral_mid_gray_v1",
+    "floor_plane": {
+      "id": "level_marked_floor_v1",
+      "status": "specified_not_executed"
+    },
+    "scale": {
+      "calibration": "centimeter_marker_v1",
+      "pixels_per_cm": null
+    },
+    "footwear": {
+      "id": "neutral_flat_pending",
+      "variant": "flat_foot"
+    }
+  },
+  "prompt": {
+    "template_ref": "templates/visual_bible/capture_360/prompt_template_v1.txt",
+    "version": "v1",
+    "sha256": "sha256:221415769f976e020a41a89f546683be421a680421289eb9a27dfdd776045cfd"
+  },
+  "negative_prompt": {
+    "template_ref": "templates/visual_bible/capture_360/negative_prompt_template_v1.txt",
+    "version": "v1",
+    "sha256": "sha256:dac03d13e7f5eb425a8c6d51483486b094be52de31a0ad345c76f33b0577fd4f"
+  },
+  "provenance": {
+    "source_refs": [
+      "pending:resolved-upstream-identity-and-physical-locks"
+    ],
+    "workflow": {
+      "id": "pending",
+      "version": "pending"
+    },
+    "seed": "pending_generation",
+    "settings": {
+      "status": "pending_generation"
+    },
+    "adapter": {
+      "id": "pending",
+      "version": "pending",
+      "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "record_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "angles": [
+    {
+      "angle_id": "front",
+      "nominal_degrees": 0,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "front_left_45",
+      "nominal_degrees": 45,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "left_profile",
+      "nominal_degrees": 90,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "rear_left_45",
+      "nominal_degrees": 135,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "rear",
+      "nominal_degrees": 180,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "rear_right_45",
+      "nominal_degrees": 225,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "right_profile",
+      "nominal_degrees": 270,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    },
+    {
+      "angle_id": "front_right_45",
+      "nominal_degrees": 315,
+      "observed_degrees": null,
+      "tolerance_degrees": 3,
+      "controls_fingerprint": "eeb2b3368985777f4192abf19c65cc3d05e8eda691536777872e38f3a5451977",
+      "state": "pending",
+      "asset": {},
+      "queue_ref": "data/visual_bibles/capture_360/queues/marie_canonical_flat_360_r001.json"
+    }
+  ],
+  "review": {
+    "status": "pending",
+    "comparison_sheet_ref": "",
+    "steward_decision": null,
+    "findings": [
+      "Generation not performed; measurements, identity lock, workflow, adapter, seed and settings require production resolution."
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"estate://visual-bible/capture-360/resident-manifest/v1",
+  "title":"Resident 360 Capture Manifest v1","type":"object","additionalProperties":false,
+  "required":["schema_version","resident_id","capture_set_id","variant_id","revision","state","measurement_record","canonical_height_cm","controls","prompt","negative_prompt","provenance","angles","review"],
+  "properties":{
+    "schema_version":{"const":"resident_360_capture_manifest_v1"},"resident_id":{"$ref":"#/$defs/id"},"capture_set_id":{"$ref":"#/$defs/id"},"variant_id":{"$ref":"#/$defs/id"},"revision":{"type":"integer","minimum":1},
+    "state":{"enum":["pending","incomplete","candidate","review","accepted","rejected","superseded"]},
+    "measurement_record":{"type":"object","required":["ref","version","sha256"],"properties":{"ref":{"type":"string","minLength":1},"version":{"type":"string","minLength":1},"sha256":{"$ref":"#/$defs/hash"}},"additionalProperties":true},
+    "canonical_height_cm":{"type":"number","exclusiveMinimum":0},
+    "controls":{"type":"object","required":["identity_ref","expression","grooming","wardrobe","pose_family","camera","focal_length_mm","distance_m","lighting","background","floor_plane","scale","footwear"],"additionalProperties":true},
+    "prompt":{"$ref":"#/$defs/prompt"},"negative_prompt":{"$ref":"#/$defs/prompt"},
+    "provenance":{"type":"object","required":["source_refs","workflow","seed","settings","adapter","record_sha256"],"additionalProperties":true},
+    "angles":{"type":"array","minItems":8,"items":{"type":"object","required":["angle_id","nominal_degrees","observed_degrees","tolerance_degrees","controls_fingerprint","state","asset","queue_ref"],"properties":{"angle_id":{"enum":["front","front_left_45","left_profile","rear_left_45","rear","rear_right_45","right_profile","front_right_45"]},"nominal_degrees":{"type":"number"},"observed_degrees":{"type":["number","null"]},"tolerance_degrees":{"type":"number","minimum":0,"maximum":5},"controls_fingerprint":{"type":"string","pattern":"^[a-f0-9]{64}$"},"state":{"enum":["pending","candidate","review","accepted","rejected","superseded"]},"asset":{"type":"object"},"queue_ref":{"type":"string"}},"additionalProperties":false}},
+    "review":{"type":"object","required":["status","comparison_sheet_ref","steward_decision","findings"],"additionalProperties":true}
+  },
+  "$defs":{"id":{"type":"string","pattern":"^[a-z0-9]+(?:_[a-z0-9]+)*$"},"hash":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},"prompt":{"type":"object","required":["template_ref","version","sha256"],"properties":{"template_ref":{"type":"string","minLength":1},"version":{"type":"string","minLength":1},"sha256":{"$ref":"#/$defs/hash"}},"additionalProperties":true}}
+}

@@ -1,0 +1,206 @@
+{
+  "schema_version": "capture_360_campaign_queue_v1",
+  "state": "pending",
+  "capture_sets": [
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "alfred_canonical_flat_360_r001",
+      "resident_id": "alfred",
+      "capture_set_ref": "data/visual_bibles/residents/alfred/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "eleanor_canonical_flat_360_r001",
+      "resident_id": "eleanor",
+      "capture_set_ref": "data/visual_bibles/residents/eleanor/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "evelyn_canonical_flat_360_r001",
+      "resident_id": "evelyn",
+      "capture_set_ref": "data/visual_bibles/residents/evelyn/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "grace_canonical_flat_360_r001",
+      "resident_id": "grace",
+      "capture_set_ref": "data/visual_bibles/residents/grace/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "helen_canonical_flat_360_r001",
+      "resident_id": "helen",
+      "capture_set_ref": "data/visual_bibles/residents/helen/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "ingrid_canonical_flat_360_r001",
+      "resident_id": "ingrid",
+      "capture_set_ref": "data/visual_bibles/residents/ingrid/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "judy_canonical_flat_360_r001",
+      "resident_id": "judy",
+      "capture_set_ref": "data/visual_bibles/residents/judy/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    },
+    {
+      "schema_version": "capture_360_generation_queue_v1",
+      "queue_id": "marie_canonical_flat_360_r001",
+      "resident_id": "marie",
+      "capture_set_ref": "data/visual_bibles/residents/marie/internal/capture_360/review/canonical_flat/capture_set_manifest.pending.json",
+      "state": "blocked_pending_inputs",
+      "required_angles": [
+        "front",
+        "front_left_45",
+        "left_profile",
+        "rear_left_45",
+        "rear",
+        "rear_right_45",
+        "right_profile",
+        "front_right_45"
+      ],
+      "materialized_angles": [],
+      "blockers": [
+        "resolve canonical physical measurements and anatomical height",
+        "resolve accepted portrait identity reference",
+        "select and record workflow, model adapters, seed and settings",
+        "generate eight genuine captures",
+        "run human comparison and Steward review"
+      ]
+    }
+  ]
+}

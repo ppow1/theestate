@@ -1,0 +1,5 @@
+[IDENTITY_REF] [PHYSICAL_SPEC_AND_CANONICAL_HEIGHT] [FACIAL_FINGERPRINT]
+Neutral [EXPRESSION] with identical [GROOMING]. Exact [WARDROBE_RECORD] and [FOOTWEAR_RECORD].
+Normalized [POSE_FAMILY], subject yaw [ANGLE_ID] at [NOMINAL_DEGREES] degrees; subject rotates on axis, camera fixed.
+[CAMERA] at [CAMERA_HEIGHT], [FOCAL_LENGTH] lens, [DISTANCE], [FRAMING_AND_SCALE].
+Identical [LIGHTING], [BACKGROUND], level [FLOOR_PLANE]. Full silhouette visible. [OUTPUT_SETTINGS].
