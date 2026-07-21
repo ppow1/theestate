@@ -1,0 +1,6 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema", "$id":"estate.visual_bible.full_body_asset_metadata.v1", "type":"object",
+  "required":["schema_version","asset_id","resident_id","category","lifecycle_state","access_tier","asset_path","sha256","source_references","prompts","generation","camera","crop","pose","physical_fidelity","wardrobe","footwear","scale_reference","provenance","validation","steward_review","canonical","lineage"],
+  "properties":{"schema_version":{"const":"full_body_asset_metadata_v1"},"category":{"enum":["neutral_front","relaxed_front","three_quarter","side","rear","walking","seated","signature_pose","scale_reference","footwear_variant"]},"lifecycle_state":{"enum":["candidate","pending_review","approved","canonical","rejected","superseded"]}},
+  "additionalProperties":true
+}

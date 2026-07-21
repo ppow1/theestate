@@ -55,7 +55,8 @@
         "canonical": "data/portraits/residents/res_000005/canonical",
         "metadata": "data/portraits/residents/res_000005/metadata",
         "reviews": "data/portraits/residents/res_000005/reviews"
-      }
+      },
+      "full_body_manifest_path": "data/portraits/residents/res_000005/full_body/manifest.json"
     },
     "profile_rear": {
       "status": "not_started",

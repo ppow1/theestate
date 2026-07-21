@@ -1,7 +1,7 @@
 # WP-4120 — Full-Body Reference Library
 
 ## Status
-Pending
+Complete — runtime canon and repository implementation; image generation and Steward review remain pending
 
 ## Series
 Visual Estate Initiative — Campaign 02: Canonical Portrait Library

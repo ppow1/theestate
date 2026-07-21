@@ -1,0 +1,21 @@
+{
+  "schema_version": "full_body_validation_report_v1",
+  "resident_id": "grace",
+  "status": "pending_generation",
+  "asset_id": null,
+  "checks": {
+    "height": "pending_generation",
+    "proportion": "pending_generation",
+    "posture": "pending_generation",
+    "crop": "pending_generation",
+    "scale": "pending_generation",
+    "identity": "pending_generation",
+    "perspective": "pending_generation",
+    "wardrobe": "pending_generation",
+    "footwear": "pending_generation",
+    "provenance": "pending_generation",
+    "steward_review": "pending_generation"
+  },
+  "blocking_findings": [],
+  "note": "No asset exists to validate; this does not represent a pass."
+}

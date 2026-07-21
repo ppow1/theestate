@@ -58,7 +58,8 @@
         "canonical": "data/portraits/residents/grace/canonical",
         "metadata": "data/portraits/residents/grace/metadata",
         "reviews": "data/portraits/residents/grace/reviews"
-      }
+      },
+      "full_body_manifest_path": "data/portraits/residents/grace/full_body/manifest.json"
     },
     "profile_rear": {
       "status": "not_started",
