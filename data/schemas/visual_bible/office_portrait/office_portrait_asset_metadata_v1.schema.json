@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.visual_bible.office_portrait_asset_metadata.v1",
+  "title": "Professional Office Portrait Asset Metadata v1",
+  "type": "object",
+  "required": ["schema_version", "asset_id", "resident_id", "office", "role", "scene", "lifecycle_state", "asset_path", "sha256", "environment", "wardrobe_reference", "narrative_action", "physical_fidelity", "technical", "provenance", "review", "hidden_caption_test", "canonical", "emotional_anchor", "lineage"],
+  "properties": {
+    "schema_version": {"const": "office_portrait_asset_metadata_v1"},
+    "lifecycle_state": {"enum": ["candidate", "canonical", "anchor", "rejected", "superseded", "pending"]},
+    "sha256": {"pattern": "^[a-f0-9]{64}$"},
+    "environment": {"type": "object", "required": ["classification", "version", "source_references", "provenance_status"]},
+    "canonical": {"type": "object", "required": ["declared", "steward_approval"]},
+    "emotional_anchor": {"type": "object", "required": ["declared", "narrative_label", "truth_rationale", "steward_approval"]}
+  },
+  "additionalProperties": true
+}

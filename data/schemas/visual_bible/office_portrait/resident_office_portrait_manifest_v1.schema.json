@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.visual_bible.resident_office_portrait_manifest.v1",
+  "title": "Resident Professional Office Portrait Manifest v1",
+  "type": "object",
+  "required": ["schema_version", "resident", "authority", "environment", "required_scenes", "candidates", "canonical_office_portrait", "emotional_anchors", "wardrobe_references", "environment_references", "generation_state", "steward_notes", "history"],
+  "properties": {
+    "schema_version": {"const": "resident_office_portrait_manifest_v1"},
+    "resident": {"type": "object", "required": ["resident_id", "display_name", "office", "role"], "properties": {"resident_id": {"type": "string"}, "display_name": {"type": "string"}, "office": {"type": "string"}, "role": {"type": "string"}}},
+    "authority": {"type": "object", "required": ["source", "registry_record_status"], "properties": {"source": {"type": "string"}, "registry_record_status": {"const": "Active"}}},
+    "environment": {"type": "object", "required": ["environment_id", "classification", "version", "provenance_status", "source_references", "approval_state"], "properties": {"classification": {"enum": ["canonical_architecture", "approved_interpretation", "placeholder"]}, "source_references": {"type": "array", "minItems": 1}, "provenance_status": {"enum": ["verified", "pending_steward"]}, "approval_state": {"enum": ["approved", "pending_steward"]}}},
+    "required_scenes": {"type": "array", "minItems": 4},
+    "candidates": {"type": "array"},
+    "canonical_office_portrait": {"type": ["object", "null"]},
+    "emotional_anchors": {"type": "array"},
+    "wardrobe_references": {"type": "array", "minItems": 1},
+    "environment_references": {"type": "array", "minItems": 1},
+    "generation_state": {"enum": ["pending", "candidate", "steward_review", "canonical", "rejected", "superseded"]},
+    "steward_notes": {"type": "array"},
+    "history": {"type": "object", "required": ["rejections", "supersessions", "rollbacks"]}
+  },
+  "additionalProperties": true
+}

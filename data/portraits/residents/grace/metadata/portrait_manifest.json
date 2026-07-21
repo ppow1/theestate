@@ -44,7 +44,8 @@
         "canonical": "data/portraits/residents/grace/canonical",
         "metadata": "data/portraits/residents/grace/metadata",
         "reviews": "data/portraits/residents/grace/reviews"
-      }
+      },
+      "office_manifest_path": "data/portraits/residents/grace/metadata/office_portrait_manifest.json"
     },
     "full_body": {
       "status": "not_started",
