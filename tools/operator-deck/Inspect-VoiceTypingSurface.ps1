@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-public static class EstateWindowInventory {
+public static class EstateWindowInventoryV2 {
     public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
     [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
     [DllImport("user32.dll")] public static extern bool EnumWindows(EnumWindowsProc callback, IntPtr extraData);
@@ -47,7 +47,9 @@ public static class EstateWindowInventory {
 '@
 
 try {
-    Add-Type -TypeDefinition $nativeSource -ErrorAction SilentlyContinue
+    if (-not ('EstateWindowInventoryV2' -as [type])) {
+        Add-Type -TypeDefinition $nativeSource -ErrorAction Stop
+    }
     Add-Type -AssemblyName UIAutomationClient
     Add-Type -AssemblyName UIAutomationTypes
 
@@ -55,32 +57,32 @@ try {
     $surfacePattern = '(?i)voice typing|dictation|listening|microphone'
     $windows = [System.Collections.Generic.List[object]]::new()
 
-    $callback = [EstateWindowInventory+EnumWindowsProc]{
+    $callback = [EstateWindowInventoryV2+EnumWindowsProc]{
         param([IntPtr]$hWnd, [IntPtr]$lParam)
-        if (-not [EstateWindowInventory]::IsWindowVisible($hWnd)) { return $true }
+        if (-not [EstateWindowInventoryV2]::IsWindowVisible($hWnd)) { return $true }
 
         [uint32]$processId = 0
-        [void][EstateWindowInventory]::GetWindowThreadProcessId($hWnd, [ref]$processId)
+        [void][EstateWindowInventoryV2]::GetWindowThreadProcessId($hWnd, [ref]$processId)
         $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
         if (-not $process) { return $true }
 
-        $length = [EstateWindowInventory]::GetWindowTextLength($hWnd)
+        $length = [EstateWindowInventoryV2]::GetWindowTextLength($hWnd)
         $builder = [System.Text.StringBuilder]::new($length + 1)
-        [void][EstateWindowInventory]::GetWindowText($hWnd, $builder, $builder.Capacity)
+        [void][EstateWindowInventoryV2]::GetWindowText($hWnd, $builder, $builder.Capacity)
         $title = $builder.ToString()
 
         $classBuilder = [System.Text.StringBuilder]::new(256)
-        [void][EstateWindowInventory]::GetClassName($hWnd, $classBuilder, $classBuilder.Capacity)
+        [void][EstateWindowInventoryV2]::GetClassName($hWnd, $classBuilder, $classBuilder.Capacity)
         $windowClass = $classBuilder.ToString()
 
-        $rect = [EstateWindowInventory+RECT]::new()
-        [void][EstateWindowInventory]::GetWindowRect($hWnd, [ref]$rect)
+        $rect = [EstateWindowInventoryV2+RECT]::new()
+        [void][EstateWindowInventoryV2]::GetWindowRect($hWnd, [ref]$rect)
         $windowRect = [ordered]@{
             left = $rect.Left; top = $rect.Top; right = $rect.Right; bottom = $rect.Bottom
             width = $rect.Right - $rect.Left; height = $rect.Bottom - $rect.Top
         }
         [int]$cloakedValue = 0
-        $dwmResult = [EstateWindowInventory]::DwmGetWindowAttribute($hWnd, 14, [ref]$cloakedValue, 4)
+        $dwmResult = [EstateWindowInventoryV2]::DwmGetWindowAttribute($hWnd, 14, [ref]$cloakedValue, 4)
         $isCloaked = if ($dwmResult -eq 0) { [bool]$cloakedValue } else { $null }
 
         if (($processNames -notcontains $process.ProcessName) -and ($title -notmatch $surfacePattern)) { return $true }
@@ -119,20 +121,20 @@ try {
 
         if ($process.ProcessName -eq 'TextInputHost') {
             $childList = [System.Collections.Generic.List[object]]::new()
-            $childCallback = [EstateWindowInventory+EnumWindowsProc]{
+            $childCallback = [EstateWindowInventoryV2+EnumWindowsProc]{
                 param([IntPtr]$childHwnd, [IntPtr]$childData)
                 $childClassBuilder = [System.Text.StringBuilder]::new(256)
-                [void][EstateWindowInventory]::GetClassName($childHwnd, $childClassBuilder, $childClassBuilder.Capacity)
-                $childLength = [EstateWindowInventory]::GetWindowTextLength($childHwnd)
+                [void][EstateWindowInventoryV2]::GetClassName($childHwnd, $childClassBuilder, $childClassBuilder.Capacity)
+                $childLength = [EstateWindowInventoryV2]::GetWindowTextLength($childHwnd)
                 $childTitleBuilder = [System.Text.StringBuilder]::new($childLength + 1)
-                [void][EstateWindowInventory]::GetWindowText($childHwnd, $childTitleBuilder, $childTitleBuilder.Capacity)
-                $childRect = [EstateWindowInventory+RECT]::new()
-                [void][EstateWindowInventory]::GetWindowRect($childHwnd, [ref]$childRect)
+                [void][EstateWindowInventoryV2]::GetWindowText($childHwnd, $childTitleBuilder, $childTitleBuilder.Capacity)
+                $childRect = [EstateWindowInventoryV2+RECT]::new()
+                [void][EstateWindowInventoryV2]::GetWindowRect($childHwnd, [ref]$childRect)
                 $childList.Add([pscustomobject]@{
                     hwnd = ('0x{0:X}' -f $childHwnd.ToInt64())
                     class_name = $childClassBuilder.ToString()
                     title = $childTitleBuilder.ToString()
-                    visible = [EstateWindowInventory]::IsWindowVisible($childHwnd)
+                    visible = [EstateWindowInventoryV2]::IsWindowVisible($childHwnd)
                     rect = [ordered]@{
                         left = $childRect.Left; top = $childRect.Top
                         right = $childRect.Right; bottom = $childRect.Bottom
@@ -142,7 +144,7 @@ try {
                 })
                 return $true
             }
-            [void][EstateWindowInventory]::EnumChildWindows($hWnd, $childCallback, [IntPtr]::Zero)
+            [void][EstateWindowInventoryV2]::EnumChildWindows($hWnd, $childCallback, [IntPtr]::Zero)
             $nativeChildren = @($childList)
         }
 
@@ -152,10 +154,10 @@ try {
             process_name = $process.ProcessName
             title = $title
             class_name = $windowClass
-            visible = [EstateWindowInventory]::IsWindowVisible($hWnd)
+            visible = [EstateWindowInventoryV2]::IsWindowVisible($hWnd)
             cloaked = $isCloaked
-            style = ('0x{0:X}' -f ([EstateWindowInventory]::GetWindowLongPtr($hWnd, -16)).ToInt64())
-            extended_style = ('0x{0:X}' -f ([EstateWindowInventory]::GetWindowLongPtr($hWnd, -20)).ToInt64())
+            style = ('0x{0:X}' -f ([EstateWindowInventoryV2]::GetWindowLongPtr($hWnd, -16)).ToInt64())
+            extended_style = ('0x{0:X}' -f ([EstateWindowInventoryV2]::GetWindowLongPtr($hWnd, -20)).ToInt64())
             rect = $windowRect
             automation_name = $automationName
             automation_control_type = $automationType
@@ -165,7 +167,7 @@ try {
         return $true
     }
 
-    [void][EstateWindowInventory]::EnumWindows($callback, [IntPtr]::Zero)
+    [void][EstateWindowInventoryV2]::EnumWindows($callback, [IntPtr]::Zero)
 
     $text = (($windows | ForEach-Object {
         $childText = ($_.automation_descendants | ForEach-Object { "$($_.name) $($_.automation_id) $($_.help_text)" }) -join ' '
