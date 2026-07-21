@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/visual-bible/resident-hero-manifest-v1",
+  "type": "object",
+  "required": ["resident_id", "status", "canonical_asset_id", "candidate_asset_ids"],
+  "properties": {
+    "resident_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["not_started", "candidate_generation", "steward_review", "canonical_locked"]},
+    "canonical_asset_id": {"type": ["string", "null"]},
+    "candidate_asset_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+  }
+}

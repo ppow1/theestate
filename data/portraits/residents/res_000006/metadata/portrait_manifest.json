@@ -1,0 +1,133 @@
+{
+  "schema_version": "resident_portrait_manifest_v1",
+  "campaign": "VISUAL-CAMPAIGN-02",
+  "resident_id": "RES-000006",
+  "display_name": "Judy",
+  "visual_bible_ref": null,
+  "status": "not_started",
+  "adult_presentation_required": true,
+  "identity_anchors": [
+    "General Counsel",
+    "Reviews legal risk, contracts, claims, compliance, licensing, and gray-area exposure."
+  ],
+  "canonical_traits": [],
+  "unresolved_fields": [
+    "resident-specific visual identity inputs require completion",
+    "final images pending production",
+    "Steward visual acceptance pending"
+  ],
+  "portrait_slots": {
+    "hero": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "professional_office": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "full_body": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "profile_rear": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "three_quarter": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "expression_sheet": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "headshot": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    },
+    "thumbnail": {
+      "status": "not_started",
+      "required": true,
+      "canonical_asset_id": null,
+      "steward_approval_required": true,
+      "canonical_status": "not_canonical",
+      "asset_destinations": {
+        "candidates": "data/portraits/residents/res_000006/candidates",
+        "canonical": "data/portraits/residents/res_000006/canonical",
+        "metadata": "data/portraits/residents/res_000006/metadata",
+        "reviews": "data/portraits/residents/res_000006/reviews"
+      }
+    }
+  },
+  "assets": [],
+  "canonical_locks": [],
+  "generation_queue": [
+    {
+      "slot": "hero",
+      "reason": "No candidate or approved local generation output exists; production and Steward review are pending."
+    }
+  ]
+}

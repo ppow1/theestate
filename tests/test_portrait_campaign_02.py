@@ -33,7 +33,7 @@ def test_rejected_or_superseded_asset_cannot_be_canonical():
         "steward_approval": {"approved": True},
     })
     with pytest.raises(PortraitValidationError, match="rejected or superseded"):
-        validate_resident_manifest(manifest, root=ROOT)
+        validate_resident_manifest(manifest)
 
 
 def test_canonical_asset_requires_steward_approval():
@@ -47,7 +47,7 @@ def test_canonical_asset_requires_steward_approval():
         "steward_approval": {"approved": False},
     })
     with pytest.raises(PortraitValidationError, match="Steward"):
-        validate_resident_manifest(manifest, root=ROOT)
+        validate_resident_manifest(manifest)
 
 
 def test_duplicate_canonical_assets_rejected_per_slot():
@@ -62,4 +62,4 @@ def test_duplicate_canonical_assets_rejected_per_slot():
             "steward_approval": {"approved": True},
         })
     with pytest.raises(PortraitValidationError, match="duplicate canonical"):
-        validate_resident_manifest(manifest, root=ROOT)
+        validate_resident_manifest(manifest)
