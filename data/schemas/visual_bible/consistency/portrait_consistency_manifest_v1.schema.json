@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "portrait_consistency_manifest_v1.schema.json",
+  "title": "Portrait consistency evidence manifest",
+  "type": "object",
+  "required": ["schema_version", "resident_id", "visual_fingerprint_id", "assets", "steward_reviews"],
+  "properties": {
+    "schema_version": {"const": "portrait_consistency_manifest_v1"},
+    "resident_id": {"type": "string", "minLength": 1},
+    "visual_fingerprint_id": {"type": "string", "minLength": 1},
+    "assets": {"type": "array", "items": {"type": "object", "required": ["asset_id", "category", "asset_path", "sha256", "source_path", "source_sha256", "workflow", "identity_binding"]}},
+    "steward_reviews": {"type": "object"},
+    "automated_scores": {"type": "array", "items": {"type": "object", "required": ["check", "value", "provider", "model_version"], "properties": {"value": {"type": "number", "minimum": 0, "maximum": 1}}}}
+  },
+  "additionalProperties": true
+}

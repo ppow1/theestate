@@ -1,0 +1,2601 @@
+{
+  "schema_version": "portrait_consistency_run_v1",
+  "generated_at": "2026-07-21T22:46:21.323169+00:00",
+  "implementation_claim": "structural and recorded-evidence validation only; no computer vision",
+  "results": [
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "RES-000001",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "RES-000001",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "RES-000002",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "RES-000002",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "RES-000003",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "RES-000003",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "RES-000004",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "RES-000004",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "RES-000005",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "RES-000005",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "RES-000006",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "RES-000006",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "evelyn",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "evelyn",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    },
+    {
+      "schema_version": "portrait_consistency_result_v1",
+      "resident_id": "grace",
+      "status": "review_required",
+      "canonical_promotion_eligible": false,
+      "structural_validation": "executed",
+      "visual_validation": "steward_records_only_no_computer_vision",
+      "diagnostics": [
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: expression.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: front_three_quarter.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: full_body.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: headshot.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: hero.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: office.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: profile.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: rear_three_quarter.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_32.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-COVERAGE-001",
+          "severity": "major",
+          "message": "Missing required category: thumbnail_64.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Generate or register evidence and rerun validation."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: age.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: expression.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: eyes.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: face.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: hair.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: height.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: identity.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: posture.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: proportion.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: resident_separation.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: scale.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: thumbnail_recognizability.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "code": "PCV-REVIEW-MISSING-001",
+          "severity": "major",
+          "message": "Steward review missing: wardrobe.",
+          "resident_id": "grace",
+          "asset_id": null,
+          "remediation": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ],
+      "remediation_packet": [
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-COVERAGE-001",
+          "asset_id": null,
+          "action": "Generate or register evidence and rerun validation."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        },
+        {
+          "diagnostic_code": "PCV-REVIEW-MISSING-001",
+          "asset_id": null,
+          "action": "Add a named, dated Steward decision against immutable asset hashes."
+        }
+      ]
+    }
+  ],
+  "estate_diagnostics": [],
+  "status": "review_required"
+}

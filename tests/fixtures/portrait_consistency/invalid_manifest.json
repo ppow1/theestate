@@ -1,0 +1,404 @@
+{
+  "schema_version": "portrait_consistency_manifest_v1",
+  "resident_id": "evelyn",
+  "visual_fingerprint_id": "evelyn-vf-v1",
+  "assets": [
+    {
+      "asset_id": "evelyn-hero",
+      "category": "hero",
+      "asset_path": "tests/fixtures/portrait_consistency/hero.bin",
+      "sha256": "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "grace"
+    },
+    {
+      "asset_id": "evelyn-office",
+      "category": "office",
+      "asset_path": "tests/fixtures/portrait_consistency/office.bin",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-full_body",
+      "category": "full_body",
+      "asset_path": "tests/fixtures/portrait_consistency/full_body.bin",
+      "sha256": "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-profile",
+      "category": "profile",
+      "asset_path": "tests/fixtures/portrait_consistency/profile.bin",
+      "sha256": "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-rear",
+      "category": "rear",
+      "asset_path": "tests/fixtures/portrait_consistency/rear.bin",
+      "sha256": "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-front_three_quarter",
+      "category": "front_three_quarter",
+      "asset_path": "tests/fixtures/portrait_consistency/front_three_quarter.bin",
+      "sha256": "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-rear_three_quarter",
+      "category": "rear_three_quarter",
+      "asset_path": "tests/fixtures/portrait_consistency/rear_three_quarter.bin",
+      "sha256": "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-expression",
+      "category": "expression",
+      "asset_path": "tests/fixtures/portrait_consistency/expression.bin",
+      "sha256": "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    },
+    {
+      "asset_id": "evelyn-headshot",
+      "category": "headshot",
+      "asset_path": "tests/fixtures/portrait_consistency/headshot.bin",
+      "sha256": "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+      "source_path": "tests/fixtures/portrait_consistency/canonical-source.bin",
+      "source_sha256": "6b8320b3c0b89615839b4b9db0fe45eb14ab56e6764f3c58cfa740e825b49a75",
+      "workflow": {
+        "id": "fixture-workflow",
+        "model": "fixture-only",
+        "version": "1",
+        "prompt_version": "1",
+        "negative_prompt_version": "1",
+        "seed_supported": false
+      },
+      "identity_binding": "evelyn"
+    }
+  ],
+  "steward_reviews": {
+    "identity": {
+      "decision": "fail",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "face": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "hair": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "eyes": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "age": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "height": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "proportion": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "posture": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "wardrobe": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "expression": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "scale": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "resident_separation": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    },
+    "thumbnail_recognizability": {
+      "decision": "pass",
+      "reviewer": "steward-fixture",
+      "reviewed_at": "2026-07-21T00:00:00Z",
+      "evidence_hashes": [
+        "c53af6acc99134b6a2a980ff0ddabd9e668a39ae8cd5b671ae3e9a9764a36318",
+        "e793e169fac96c33733729fb2fd6a36a644294dbfad701234d449add476f5cfe",
+        "f8b1eb569d3c7bde54f2341b4bb0dabfbdcbfc4fcf794c07a7840e89e6b1bb24",
+        "4d5fd5739bc8977b9004af4061c14de70b37399e611c5515fa2d3b35a57e6364",
+        "aa9240c168956de75645be2cb5ed6052c49e67d7bce816a1a2af982867ca1826",
+        "026045750c8ab88a97f27146a8cb3cdabf66fa6fec8346378c83f0e1b072c35f",
+        "6f6354e0573d7de0d1f3345c8c478720c58d853c9f2e82f6e2b2412f3cae6a64",
+        "54a6beddfd4480e85fdea5a1aa7fef25e1bce6ab7e06dc06fe64ad98de3cef7e",
+        "4c9fcaf30f96f01bc0c7671bd2a1a9fe68022d8a135317b09268f93800636fd4",
+        "b3db8a0707cba64d8fa61097276ae6d43dcba0b1b45e641109f22703ed3fff84",
+        "a2c74eb82afd01f1c7032121df2c1e388405846f29b0c529eea1c6e79418cf9b"
+      ]
+    }
+  },
+  "automated_scores": [
+    {
+      "check": "external_identity_advisory",
+      "value": 0.72,
+      "provider": "fixture-provider",
+      "model_version": "fixture-v1"
+    }
+  ]
+}
