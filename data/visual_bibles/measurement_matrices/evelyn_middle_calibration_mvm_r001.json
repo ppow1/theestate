@@ -1,0 +1,202 @@
+{
+  "schema_version": "measurement_variant_matrix_v1",
+  "matrix_id": "evelyn_middle_calibration_mvm_r001",
+  "resident_id": "evelyn",
+  "authority": {
+    "resident_id": "evelyn",
+    "authority_type": "resident_visual_bible"
+  },
+  "provenance": {
+    "physical_specification_ref": "docs/visual_bible/wp4109_canonical_physical_specification_runtime_canon.md#evelyn",
+    "scale_profile_ref": "data/visual_bibles/residents/evelyn/internal/scale_profile.json",
+    "created_by": "codex-wp4130",
+    "created_at": "2026-07-21T00:00:00Z",
+    "measurement_authority": "Steward-approved resident physical specification; pending confirmation"
+  },
+  "intended_variable": {
+    "name": "waist_circumference",
+    "category": "middle",
+    "reason": "Calibrate Evelyn's narrow resident-specific waist range; hip is held at baseline in this one-variable cycle."
+  },
+  "fixed_variables": {
+    "resident_height": {
+      "value": 167.64,
+      "unit": "cm"
+    },
+    "frame": "evelyn_canonical_frame",
+    "proportions": "evelyn_proportions_r001",
+    "posture": "neutral_upright",
+    "face": "evelyn_portrait_lock",
+    "hair": "canonical",
+    "expression": "neutral",
+    "wardrobe": {
+      "id": "measurement_neutral_r001",
+      "fit": "locked"
+    },
+    "footwear": {
+      "id": "neutral_flat",
+      "heel_height": {
+        "value": 0,
+        "unit": "cm"
+      }
+    },
+    "camera": {
+      "profile": "wp4128_canonical_flat",
+      "focal_length": {
+        "value": 85,
+        "unit": "mm"
+      }
+    },
+    "lighting": "studio_soft_v1",
+    "crop": "full_body_5pct_margin",
+    "background": "comparison_gray_v1"
+  },
+  "resident_constraints": {
+    "resident_id": "evelyn",
+    "source_resident_id": "evelyn",
+    "tolerance_profile": "narrow",
+    "hook": "resident_visual_bible",
+    "ranges": {
+      "waist_circumference": {
+        "min": 50.8,
+        "max": 55.88,
+        "unit": "cm"
+      },
+      "hip_circumference": {
+        "min": 76.2,
+        "max": 81.28,
+        "unit": "cm"
+      },
+      "bust_band": {
+        "min": 83.82,
+        "max": 83.82,
+        "unit": "cm"
+      }
+    },
+    "note": "Calibration example only; never an Estate-wide default."
+  },
+  "variants": [
+    {
+      "variant_id": "evelyn-middle:baseline:r001",
+      "role": "baseline",
+      "label": "Baseline \u2014 33B\u201321\u201331 in",
+      "state": "unresolved",
+      "measurements": {
+        "bust_band": {
+          "value": 83.82,
+          "unit": "cm"
+        },
+        "waist_circumference": {
+          "value": 53.34,
+          "unit": "cm"
+        },
+        "hip_circumference": {
+          "value": 78.74,
+          "unit": "cm"
+        }
+      },
+      "fixed_fingerprint": "sha256:707ead8399c5ba7d716117f2fa193ea9c1792f02068c1f0ac23f75935c4f5ba3",
+      "disposition_reason": null
+    },
+    {
+      "variant_id": "evelyn-middle:lower:r001",
+      "role": "lower",
+      "label": "Lower \u2014 33B\u201320\u201331 in",
+      "state": "candidate",
+      "measurements": {
+        "bust_band": {
+          "value": 83.82,
+          "unit": "cm"
+        },
+        "waist_circumference": {
+          "value": 50.8,
+          "unit": "cm"
+        },
+        "hip_circumference": {
+          "value": 78.74,
+          "unit": "cm"
+        }
+      },
+      "fixed_fingerprint": "sha256:707ead8399c5ba7d716117f2fa193ea9c1792f02068c1f0ac23f75935c4f5ba3",
+      "disposition_reason": null
+    },
+    {
+      "variant_id": "evelyn-middle:target:r001",
+      "role": "target",
+      "label": "Target \u2014 33B\u201321\u201331 in",
+      "state": "candidate",
+      "measurements": {
+        "bust_band": {
+          "value": 83.82,
+          "unit": "cm"
+        },
+        "waist_circumference": {
+          "value": 53.34,
+          "unit": "cm"
+        },
+        "hip_circumference": {
+          "value": 78.74,
+          "unit": "cm"
+        }
+      },
+      "fixed_fingerprint": "sha256:707ead8399c5ba7d716117f2fa193ea9c1792f02068c1f0ac23f75935c4f5ba3",
+      "disposition_reason": null
+    },
+    {
+      "variant_id": "evelyn-middle:higher:r001",
+      "role": "higher",
+      "label": "Higher \u2014 33B\u201322\u201331 in",
+      "state": "candidate",
+      "measurements": {
+        "bust_band": {
+          "value": 83.82,
+          "unit": "cm"
+        },
+        "waist_circumference": {
+          "value": 55.88,
+          "unit": "cm"
+        },
+        "hip_circumference": {
+          "value": 78.74,
+          "unit": "cm"
+        }
+      },
+      "fixed_fingerprint": "sha256:707ead8399c5ba7d716117f2fa193ea9c1792f02068c1f0ac23f75935c4f5ba3",
+      "disposition_reason": null
+    }
+  ],
+  "capture_relationship": {
+    "angles": [
+      "front",
+      "front_left_45",
+      "left_profile",
+      "rear_left_45",
+      "rear"
+    ],
+    "capture_set_refs": {
+      "baseline": null,
+      "lower": null,
+      "target": null,
+      "higher": null
+    },
+    "vertical_sheet_ref": "data/visual_bibles/comparison_sheets/evelyn_middle_calibration_r001.queue.json",
+    "state": "queued_pending_generation"
+  },
+  "steward_review": {
+    "status": "pending",
+    "steward_id": null,
+    "selected_variant_id": null,
+    "rationale": null,
+    "decided_at": null,
+    "discernible_at_normal_size": null
+  },
+  "revision": {
+    "number": 1,
+    "supersedes": null,
+    "rollback_target": null,
+    "lock_state": "unlocked_pending_steward"
+  },
+  "integrity": {
+    "manifest_sha256": null
+  }
+}

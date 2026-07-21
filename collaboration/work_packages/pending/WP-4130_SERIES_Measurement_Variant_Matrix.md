@@ -2,7 +2,7 @@
 
 **Series:** Visual Estate Initiative — Campaign 03
 
-**Status:** Pending
+**Status:** Implemented — production generation and Steward selection pending
 
 ## Objective
 
@@ -66,3 +66,15 @@ Her likely canonical target remains 33B–21–31 unless the Steward changes it.
 - Variant ranges are resident-specific.
 - The selected canonical variant and rationale are recorded.
 - Rejected variants remain traceable but cannot be mistaken for canonical data.
+
+
+## Implementation Evidence (2026-07-21)
+
+- Runtime canon: `docs/visual_bible/wp4130_measurement_variant_matrix_runtime_canon.md`
+- Schema: `data/schemas/visual_bible/measurement_matrix/measurement_variant_matrix_v1.schema.json`
+- Runtime/CLI: `src/estate/portraits/measurement_matrix.py`
+- Evelyn example and honest queue: `data/visual_bibles/measurement_matrices/`
+- Tests: `tests/test_wp4130_measurement_matrix.py`
+- Completion receipt: `collaboration/work_packages/completions/WP-4130_completion_receipt.md`
+
+All repository deliverables and acceptance mechanisms are implemented. Genuine image generation, visual discernibility review, and Steward selection remain explicitly pending; no image or decision was fabricated.
