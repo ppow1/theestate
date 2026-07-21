@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/anchor_review_v1.schema.json",
+  "title": "anchor_review_v1",
+  "type": "object",
+  "required": [
+    "anchor_record_id",
+    "resident_id",
+    "anchor_type",
+    "asset_ids",
+    "technical_assessment",
+    "emotional_assessment",
+    "review_state",
+    "audience_scope",
+    "provenance"
+  ],
+  "properties": {
+    "anchor_record_id": {},
+    "resident_id": {},
+    "anchor_type": {},
+    "asset_ids": {
+      "type": "array"
+    },
+    "technical_assessment": {},
+    "emotional_assessment": {},
+    "review_state": {},
+    "audience_scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ]
+    },
+    "provenance": {}
+  },
+  "additionalProperties": true
+}

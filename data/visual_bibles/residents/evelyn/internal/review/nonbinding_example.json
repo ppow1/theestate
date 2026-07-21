@@ -1,0 +1,27 @@
+{
+  "example_status": "nonbinding_unreviewed_example",
+  "warning": "Illustrative workflow data only. This is not Steward feedback, approval, or canon.",
+  "steward_note": {
+    "note_id": "example-note-evelyn-001", "resident_id": "evelyn", "recorded_at": "2026-07-21T00:00:00Z", "steward_id": "example-steward-placeholder", "authority": "Steward",
+    "exact_text": "retain the slight head tilt", "exact_text_preserved": true, "normalized_summary": "Preserve head angle.",
+    "target_refs": [{"asset_id":"candidate-evelyn-coffee-001","angle":"front_three_quarter"}], "dimension": "both",
+    "provenance": {"created_at":"2026-07-21T00:00:00Z","created_by":"fixture-author","source_ids":["WP-4116"],"content_hash":"sha256:example-not-a-file-digest","lineage":["nonbinding-example"],"revision":"1"}
+  },
+  "anchor_review": {
+    "anchor_record_id":"example-anchor-evelyn-001","resident_id":"evelyn","anchor_type":"emotional_presence","asset_ids":["candidate-evelyn-coffee-001"],
+    "technical_assessment":{"status":"imperfect","notes":"Example only: technical reference remains separate."},
+    "emotional_assessment":{"status":"candidate","notes":"Example only: leaning forward with coffee cup and ready-to-listen posture."},
+    "review_state":"draft","audience_scope":"internal",
+    "provenance":{"created_at":"2026-07-21T00:00:00Z","created_by":"fixture-author","source_ids":["WP-4116"],"content_hash":"sha256:example-not-a-file-digest","lineage":["nonbinding-example"],"revision":"1"}
+  },
+  "revision_packet": {
+    "packet_id":"example-revision-evelyn-001","resident_ids":["evelyn"],"source_asset_ids":["candidate-evelyn-coffee-001"],"steward_note_ids":["example-note-evelyn-001"],
+    "approved_elements_to_preserve":["eye warmth","slight head tilt"],"defects_to_correct":["example: scale relative to chair"],
+    "exact_requested_changes":[{"steward_note_id":"example-note-evelyn-001","exact_text":"retain the slight head tilt"}],
+    "variables_to_change":["resident_to_furniture_scale"],"variables_to_hold_fixed":["identity","facial_fingerprint","expression","pose","camera","lighting","wardrobe"],
+    "positive_prompt_fragments":["fragment-evelyn-presence-example"],"negative_prompt_fragments":["rule-scale-drift"],
+    "comparison_layout_requirements":{"vertical_stack":true,"angle_order":["front","front_three_quarter","side","rear_three_quarter","rear"]},
+    "acceptance_tests":[{"test":"Scale reads consistently against the same chair.","pass_condition":"Steward explicitly accepts the next pass.","authority":"Steward"}],
+    "audience_scope":"internal","provenance":{"created_at":"2026-07-21T00:00:00Z","created_by":"fixture-author","source_ids":["candidate-evelyn-coffee-001","example-note-evelyn-001"],"content_hash":"sha256:example-not-a-file-digest","lineage":["nonbinding-example"],"revision":"1"}
+  }
+}

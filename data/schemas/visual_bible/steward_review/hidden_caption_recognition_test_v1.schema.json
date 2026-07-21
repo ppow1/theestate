@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/hidden_caption_recognition_test_v1.schema.json",
+  "title": "hidden_caption_recognition_test_v1",
+  "type": "object",
+  "required": [
+    "test_id",
+    "group_asset_id",
+    "expected_resident_ids",
+    "captions_hidden",
+    "steward_responses",
+    "recognition_result",
+    "review_state",
+    "reviewer_authority",
+    "provenance"
+  ],
+  "properties": {
+    "test_id": {},
+    "group_asset_id": {},
+    "expected_resident_ids": {
+      "type": "array"
+    },
+    "captions_hidden": {},
+    "steward_responses": {
+      "type": "array"
+    },
+    "recognition_result": {},
+    "review_state": {},
+    "reviewer_authority": {},
+    "provenance": {}
+  },
+  "additionalProperties": true
+}

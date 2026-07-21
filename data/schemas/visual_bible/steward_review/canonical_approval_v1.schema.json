@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/canonical_approval_v1.schema.json",
+  "title": "canonical_approval_v1",
+  "type": "object",
+  "required": [
+    "approval_id",
+    "subject_ids",
+    "approved_version",
+    "approved_at",
+    "approver_id",
+    "approver_authority",
+    "explicit_approval",
+    "steward_note_ids",
+    "preserved_elements",
+    "scope",
+    "provenance"
+  ],
+  "properties": {
+    "approval_id": {},
+    "subject_ids": {
+      "type": "array"
+    },
+    "approved_version": {},
+    "approved_at": {},
+    "approver_id": {},
+    "approver_authority": {},
+    "explicit_approval": {},
+    "steward_note_ids": {
+      "type": "array"
+    },
+    "preserved_elements": {
+      "type": "array"
+    },
+    "scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ]
+    },
+    "provenance": {}
+  },
+  "additionalProperties": true
+}

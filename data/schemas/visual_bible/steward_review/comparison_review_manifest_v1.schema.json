@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/visual_bible/steward_review/comparison_review_manifest_v1.schema.json",
+  "title": "comparison_review_manifest_v1",
+  "type": "object",
+  "required": [
+    "manifest_id",
+    "resident_ids",
+    "comparison_type",
+    "layout",
+    "assets",
+    "intended_variables",
+    "fixed_variables",
+    "difference_summary",
+    "review_dimensions",
+    "audience_scope",
+    "provenance"
+  ],
+  "properties": {
+    "manifest_id": {},
+    "resident_ids": {
+      "type": "array"
+    },
+    "comparison_type": {},
+    "layout": {},
+    "assets": {
+      "type": "array"
+    },
+    "intended_variables": {
+      "type": "array"
+    },
+    "fixed_variables": {
+      "type": "array"
+    },
+    "difference_summary": {},
+    "review_dimensions": {
+      "type": "array"
+    },
+    "audience_scope": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted",
+        "private"
+      ]
+    },
+    "provenance": {}
+  },
+  "additionalProperties": true
+}
