@@ -41,7 +41,8 @@
         "canonical": "data/portraits/residents/res_000006/canonical",
         "metadata": "data/portraits/residents/res_000006/metadata",
         "reviews": "data/portraits/residents/res_000006/reviews"
-      }
+      },
+      "office_manifest_path": "data/portraits/residents/res_000006/metadata/office_portrait_manifest.json"
     },
     "full_body": {
       "status": "not_started",

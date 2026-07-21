@@ -1,0 +1,97 @@
+{
+  "schema_version": "resident_office_portrait_manifest_v1",
+  "manifest_revision": 1,
+  "resident": {
+    "resident_id": "RES-000004",
+    "display_name": "Eleanor",
+    "office": "Manager of Archives / Registrar",
+    "role": "Preserves institutional memory, lineage, provenance, revisions, Palace Memory, and the Estate Ledger."
+  },
+  "authority": {
+    "source": "data/registry/residents.json",
+    "registry_record_status": "Active",
+    "authority_note": "Exact active registry office and role; no authority inferred from imagery."
+  },
+  "environment": {
+    "environment_id": "res_000004-office-placeholder-v1",
+    "classification": "placeholder",
+    "version": "v1",
+    "provenance_status": "pending_steward",
+    "source_references": [
+      "data/visual_bibles/residents/eleanor/internal/environment_spatial_presence_library.json",
+      "data/registry/residents.json"
+    ],
+    "approval_state": "pending_steward",
+    "unsupported_details_policy": "omit"
+  },
+  "required_scenes": [
+    {
+      "scene_type": "seated_desk",
+      "required": true,
+      "status": "pending",
+      "candidate_asset_ids": [],
+      "notes": "Generation and review pending; no image exists."
+    },
+    {
+      "scene_type": "standing_environmental",
+      "required": true,
+      "status": "pending",
+      "candidate_asset_ids": [],
+      "notes": "Generation and review pending; no image exists."
+    },
+    {
+      "scene_type": "conversational",
+      "required": true,
+      "status": "pending",
+      "candidate_asset_ids": [],
+      "notes": "Generation and review pending; no image exists."
+    },
+    {
+      "scene_type": "candid_work",
+      "required": true,
+      "status": "pending",
+      "candidate_asset_ids": [],
+      "notes": "Generation and review pending; no image exists."
+    },
+    {
+      "scene_type": "doorway_arrival",
+      "required": false,
+      "status": "pending",
+      "candidate_asset_ids": [],
+      "notes": "Optional; no image exists."
+    },
+    {
+      "scene_type": "close_environmental",
+      "required": false,
+      "status": "pending",
+      "candidate_asset_ids": [],
+      "notes": "Optional; no image exists."
+    }
+  ],
+  "candidates": [],
+  "canonical_office_portrait": null,
+  "emotional_anchors": [],
+  "wardrobe_references": [
+    "data/visual_bibles/residents/eleanor/internal/wardrobe_activity_library.json"
+  ],
+  "environment_references": [
+    "data/visual_bibles/residents/eleanor/internal/environment_spatial_presence_library.json"
+  ],
+  "generation_state": "pending",
+  "generation_note": "No final or candidate image file has been generated. Environment selection and Steward review are pending.",
+  "steward_notes": [],
+  "history": {
+    "rejections": [],
+    "supersessions": [],
+    "rollbacks": []
+  },
+  "hidden_caption_testing": {
+    "status": "pending",
+    "captions_nameplates_logos_hidden": true,
+    "results": []
+  },
+  "unresolved_steward_decisions": [
+    "Approve or identify office architecture/interpretation and its environmental cues.",
+    "Approve candidate selection, any canonical promotion, and any emotional-anchor promotion after generation and review."
+  ]
+}

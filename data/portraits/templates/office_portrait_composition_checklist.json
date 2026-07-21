@@ -1,0 +1,6 @@
+{
+  "schema_version": "office_portrait_composition_checklist_v1",
+  "required_checks": ["role_bounded_lived_action", "identity_without_caption", "canonical_face_and_body", "adult_presentation", "approved_wardrobe", "environment_provenance", "scale_reference", "footwear_and_posture", "furniture_contact", "hands_and_prop_function", "privacy_and_record_correctness", "non_stock_specificity", "master_and_derivative_safety"],
+  "required_scenes": ["seated_desk", "standing_environmental", "conversational", "candid_work"],
+  "optional_scenes": ["doorway_arrival", "close_environmental"]
+}

@@ -6,49 +6,57 @@
       "resident_id": "RES-000001",
       "display_name": "Alfred",
       "manifest_path": "data/portraits/residents/res_000001/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/res_000001/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "RES-000002",
       "display_name": "Ingrid",
       "manifest_path": "data/portraits/residents/res_000002/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/res_000002/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "RES-000003",
       "display_name": "Helen",
       "manifest_path": "data/portraits/residents/res_000003/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/res_000003/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "RES-000004",
       "display_name": "Eleanor",
       "manifest_path": "data/portraits/residents/res_000004/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/res_000004/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "RES-000005",
       "display_name": "Marie",
       "manifest_path": "data/portraits/residents/res_000005/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/res_000005/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "RES-000006",
       "display_name": "Judy",
       "manifest_path": "data/portraits/residents/res_000006/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/res_000006/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "evelyn",
       "display_name": "Evelyn",
       "manifest_path": "data/portraits/residents/evelyn/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/evelyn/metadata/office_portrait_manifest.json"
     },
     {
       "resident_id": "grace",
       "display_name": "Grace",
       "manifest_path": "data/portraits/residents/grace/metadata/portrait_manifest.json",
-      "status": "not_started"
+      "status": "not_started",
+      "office_portrait_manifest_path": "data/portraits/residents/grace/metadata/office_portrait_manifest.json"
     }
   ],
   "estate_index": {
@@ -69,5 +77,9 @@
   },
   "templates_ref": "data/portraits/templates/portrait_production_templates.json",
   "hero_portrait_canon": "docs/visual_bible/wp4118_hero_portrait_runtime_canon.md",
-  "hero_metadata_schema": "data/schemas/visual_bible/hero_portrait/hero_portrait_metadata_v1.schema.json"
+  "hero_metadata_schema": "data/schemas/visual_bible/hero_portrait/hero_portrait_metadata_v1.schema.json",
+  "office_portrait_canon": "docs/visual_bible/wp4119_professional_office_portrait_runtime_canon.md",
+  "office_portrait_metadata_schema": "data/schemas/visual_bible/office_portrait/office_portrait_asset_metadata_v1.schema.json",
+  "office_portrait_manifest_schema": "data/schemas/visual_bible/office_portrait/resident_office_portrait_manifest_v1.schema.json",
+  "office_portrait_review_template": "data/portraits/templates/office_portrait_review_sheet.md"
 }

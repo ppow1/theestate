@@ -8,6 +8,8 @@ from pathlib import Path
 REQUIRED_SLOTS = {"hero", "professional_office", "full_body", "profile_rear", "three_quarter", "expression_sheet", "headshot", "thumbnail"}
 MANIFEST_STATES = {"not_started", "candidate_generation", "steward_review", "canonical_locked"}
 TERMINAL_NONCANON = {"rejected", "superseded"}
+OFFICE_STATES = {"candidate", "canonical", "anchor", "rejected", "superseded", "pending"}
+OFFICE_SCENES = {"seated_desk", "standing_environmental", "conversational", "candid_work"}
 REQUIRED_DIRS = {"candidates", "canonical", "derivatives", "metadata", "reviews", "comparison_boards", "rejected", "superseded", "locks", "generation_queue"}
 
 
@@ -57,6 +59,61 @@ def validate_hero_sidecar(sidecar: dict, *, root: Path) -> None:
         _require(approval.get("decision") == "approved", f"canonical asset {asset_id} has unapproved promotion")
         _require(approval.get("authority") == "steward", f"canonical asset {asset_id} approval authority is not Steward")
         _require(approval.get("asset_id") == asset_id and approval.get("sha256") == actual_hash, f"canonical asset {asset_id} approval does not match asset/hash")
+
+
+def validate_office_sidecar(sidecar: dict, *, root: Path, authority: dict) -> None:
+    asset_id = sidecar.get("asset_id", "<unknown>")
+    required = {"resident_id", "office", "role", "scene", "lifecycle_state", "asset_path", "sha256", "environment", "wardrobe_reference", "narrative_action", "physical_fidelity", "technical", "provenance", "review", "hidden_caption_test", "canonical", "emotional_anchor", "lineage"}
+    _require(sidecar.get("schema_version") == "office_portrait_asset_metadata_v1", f"asset {asset_id} has unsupported office metadata schema")
+    _require(not (required - sidecar.keys()), f"asset {asset_id} is missing office metadata fields: {sorted(required - sidecar.keys())}")
+    _require(sidecar["office"] == authority["office"], f"asset {asset_id} has incorrect office authority")
+    _require(sidecar["role"] == authority["role"], f"asset {asset_id} has incorrect role")
+    _require(sidecar["lifecycle_state"] in OFFICE_STATES, f"asset {asset_id} has invalid lifecycle state")
+    env = sidecar["environment"]
+    _require(env.get("classification") in {"canonical_architecture", "approved_interpretation", "placeholder"}, f"asset {asset_id} has invalid environment classification")
+    _require(env.get("source_references") and env.get("version") and env.get("provenance_status"), f"asset {asset_id} has absent environment provenance")
+    asset_path = root / sidecar["asset_path"]
+    _require(asset_path.is_file(), f"asset path does not exist: {sidecar['asset_path']}")
+    actual_hash = _sha256(asset_path)
+    _require(sidecar["sha256"] == actual_hash, f"stale hash for asset {asset_id}")
+    canonical = sidecar["canonical"].get("declared") is True
+    anchor = sidecar["emotional_anchor"].get("declared") is True
+    _require(not (sidecar["lifecycle_state"] in TERMINAL_NONCANON and (canonical or anchor)), f"terminal office asset {asset_id} cannot be promoted")
+    _require(not (env["classification"] == "placeholder" and (canonical or anchor)), f"placeholder office asset {asset_id} cannot be promoted")
+    for designation, record in (("canonical", sidecar["canonical"]), ("anchor", sidecar["emotional_anchor"])):
+        if record.get("declared") is not True:
+            continue
+        approval_path = record.get("steward_approval")
+        _require(approval_path, f"unapproved {designation} promotion for asset {asset_id}")
+        approval = _load(root / approval_path)
+        _require(approval.get("authority") == "steward" and approval.get("decision") == "approved", f"unapproved {designation} promotion for asset {asset_id}")
+        _require(approval.get("asset_id") == asset_id and approval.get("sha256") == actual_hash, f"{designation} approval does not match asset/hash")
+        if designation == "anchor":
+            _require(record.get("narrative_label") and record.get("truth_rationale"), f"anchor asset {asset_id} needs narrative truth rationale")
+
+
+def validate_office_manifest(manifest: dict, *, root: Path, registry_record: dict) -> None:
+    _require(manifest.get("schema_version") == "resident_office_portrait_manifest_v1", "unsupported office portrait manifest schema")
+    resident = manifest.get("resident", {})
+    _require(manifest.get("authority", {}).get("source"), f"missing office authority for {resident.get('resident_id', '<unknown>')}")
+    _require(resident.get("resident_id") == registry_record["id"], "office manifest resident mismatch")
+    _require(resident.get("office") == registry_record["office"], f"incorrect office authority for {registry_record['id']}")
+    _require(resident.get("role") == registry_record["role"], f"incorrect role for {registry_record['id']}")
+    environment = manifest.get("environment", {})
+    _require(environment.get("source_references") and environment.get("version") and environment.get("provenance_status"), f"absent environment provenance for {registry_record['id']}")
+    required = {s.get("scene_type") for s in manifest.get("required_scenes", []) if s.get("required")}
+    _require(required >= OFFICE_SCENES, f"missing required office scenes for {registry_record['id']}")
+    canonical_ids, anchor_ids = [], []
+    for candidate in manifest.get("candidates", []):
+        sidecar = _load(root / candidate["metadata_path"])
+        validate_office_sidecar(sidecar, root=root, authority=registry_record)
+        if sidecar["canonical"].get("declared"): canonical_ids.append(sidecar["asset_id"])
+        if sidecar["emotional_anchor"].get("declared"): anchor_ids.append(sidecar["asset_id"])
+    _require(len(canonical_ids) <= 1, f"duplicate canonical office portraits for {registry_record['id']}")
+    declared = manifest.get("canonical_office_portrait")
+    _require(declared is None or declared.get("asset_id") in canonical_ids, f"office canon declaration does not resolve for {registry_record['id']}")
+    for anchor in manifest.get("emotional_anchors", []):
+        _require(anchor.get("asset_id") in anchor_ids, f"unapproved anchor promotion for {registry_record['id']}")
 
 
 def validate_resident_manifest(manifest: dict, *, root: Path | None = None) -> None:
@@ -111,7 +168,8 @@ def validate_catalog(root: Path) -> None:
     _require(catalog.get("validation_rules", {}).get("steward_approval_required_for_canonical") is True, "Steward canonical rule is required")
     residents = catalog.get("residents", [])
     _require(residents, "catalog must include commissioned residents")
-    commissioned = {item["id"] for item in _load(root / "data" / "registry" / "residents.json") if item.get("status") == "Active"}
+    registry = {item["id"]: item for item in _load(root / "data" / "registry" / "residents.json") if item.get("status") == "Active"}
+    commissioned = set(registry)
     catalogued = {item["resident_id"] for item in residents}
     _require(catalogued == commissioned, f"catalog resident coverage differs: missing={sorted(commissioned-catalogued)}, extra={sorted(catalogued-commissioned)}")
     for resident in residents:
@@ -126,6 +184,10 @@ def validate_catalog(root: Path) -> None:
         hero_manifest = _load(base / "metadata" / "hero_manifest.json")
         _require(hero_manifest.get("resident_id") == resident["resident_id"], f"hero manifest resident mismatch for {resident['resident_id']}")
         _require(hero_manifest.get("status") == manifest.get("portrait_slots", {}).get("hero", {}).get("status"), f"hero state mismatch for {resident['resident_id']}")
+        office_path = resident.get("office_portrait_manifest_path")
+        _require(office_path, f"office portrait manifest catalog link missing for {resident['resident_id']}")
+        _require(manifest.get("portrait_slots", {}).get("professional_office", {}).get("office_manifest_path") == office_path, f"office manifest slot/catalog mismatch for {resident['resident_id']}")
+        validate_office_manifest(_load(root / office_path), root=root, registry_record=registry[resident["resident_id"]])
 
 
 def main() -> int:
@@ -133,7 +195,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     validate_catalog(args.root.resolve())
-    print("Portrait catalog and WP-4118 hero canon validation passed.")
+    print("Portrait catalog, WP-4118 hero canon, and WP-4119 office canon validation passed.")
     return 0
 
 

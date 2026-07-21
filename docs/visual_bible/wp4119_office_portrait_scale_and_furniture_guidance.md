@@ -1,0 +1,3 @@
+# Office Portrait Scale and Furniture Cue Guidance
+
+Use a cited known-scale item—not a guessed “standard” desk—to check stature and reach. Record dimensions, source, camera height, focal/perspective notes, footwear/heel height, posture, contact points, seat compression, and whether feet contact floor or a supported rest. Compare standing scenes to doors or approved architecture; seated scenes to seat height/depth and desk height. Reject floating limbs, resized furniture, impossible reach, furniture/body intersections, unexplained heel changes, perspective-driven height drift, or adult residents presented as children. Unknown measurements remain `pending_steward`; they are not estimated.
