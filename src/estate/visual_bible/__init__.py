@@ -37,3 +37,10 @@ from .steward_review import (create_rollback, validate_anchor, validate_approval
 __all__ += ["create_rollback", "validate_anchor", "validate_approval",
     "validate_comparison_manifest", "validate_note", "validate_queue",
     "validate_recognition_test", "validate_revision_packet", "validate_review_transition"]
+from .canonical_lock import (canonical_digest as canonical_lock_digest,
+    eligibility as canonical_lock_eligibility, validate_asset_manifest,
+    validate_lock_record, validate_rollback as validate_lock_rollback,
+    validate_supersession, validate_transition as validate_lock_transition)
+__all__ += ["canonical_lock_digest", "canonical_lock_eligibility",
+    "validate_asset_manifest", "validate_lock_record", "validate_lock_rollback",
+    "validate_supersession", "validate_lock_transition"]

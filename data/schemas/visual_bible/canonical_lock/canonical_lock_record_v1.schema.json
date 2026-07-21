@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://visual-bible/canonical-lock-record/v1",
+  "title": "Visual Bible canonical lock record",
+  "type": "object",
+  "required": ["schema_version", "record_id", "resident_id", "canonical_version", "state", "visibility", "evidence", "asset_completeness", "recognition", "group_compatibility", "prompt_reproducibility", "steward_decision", "tolerated_limitations", "blocking_findings", "change_control"],
+  "properties": {
+    "schema_version": {"const": "visual_bible_canonical_lock_v1"},
+    "record_id": {"type": "string", "minLength": 1},
+    "resident_id": {"type": "string", "minLength": 1},
+    "canonical_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "state": {"enum": ["exploratory", "candidate", "preferred", "provisional", "canonical", "superseded", "rejected"]},
+    "visibility": {"enum": ["public", "internal", "restricted", "private"]},
+    "evidence": {"type": "object"},
+    "asset_completeness": {"type": "object", "required": ["resident_id", "entries"]},
+    "recognition": {"type": "object", "required": ["hidden_caption_status"]},
+    "group_compatibility": {"type": "object", "required": ["readiness"]},
+    "prompt_reproducibility": {"type": "object", "required": ["status"]},
+    "steward_decision": {"type": "object", "required": ["explicit_approval"]},
+    "tolerated_limitations": {"type": "array", "items": {"type": "object", "required": ["limitation", "impact", "accepted_by_steward"]}},
+    "blocking_findings": {"type": "array", "items": {"type": "string"}},
+    "change_control": {"type": "object", "required": ["silent_replacement_prohibited", "downstream_version_reference_required"]},
+    "supersedes": {"type": ["string", "null"]},
+    "superseded_by": {"type": ["string", "null"]}
+  },
+  "allOf": [{"if": {"properties": {"state": {"const": "canonical"}}}, "then": {"properties": {"steward_decision": {"properties": {"explicit_approval": {"const": true}, "authority": {"const": "Steward"}}, "required": ["authority", "decision_id", "decided_at", "evidence_ref"]}}}}],
+  "additionalProperties": true
+}
