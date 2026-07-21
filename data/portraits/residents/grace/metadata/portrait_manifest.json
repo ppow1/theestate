@@ -86,7 +86,8 @@
         "canonical": "data/portraits/residents/grace/canonical",
         "metadata": "data/portraits/residents/grace/metadata",
         "reviews": "data/portraits/residents/grace/reviews"
-      }
+      },
+      "three_quarter_manifest_path": "data/portraits/residents/grace/three_quarter/manifest.json"
     },
     "expression_sheet": {
       "status": "not_started",

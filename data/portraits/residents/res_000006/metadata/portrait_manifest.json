@@ -83,7 +83,8 @@
         "canonical": "data/portraits/residents/res_000006/canonical",
         "metadata": "data/portraits/residents/res_000006/metadata",
         "reviews": "data/portraits/residents/res_000006/reviews"
-      }
+      },
+      "three_quarter_manifest_path": "data/portraits/residents/res_000006/three_quarter/manifest.json"
     },
     "expression_sheet": {
       "status": "not_started",

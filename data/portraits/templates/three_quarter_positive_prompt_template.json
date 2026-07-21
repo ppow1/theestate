@@ -1,0 +1,6 @@
+{
+  "schema_version":"three_quarter_positive_prompt_v1",
+  "required_order":["resident_binding","adult_presentation","identity_sources","angle_and_tolerance","facial_visual_fingerprint","hair_ears_jaw_neck","shoulders_back_waist_hips_limbs","height_scale_silhouette","pose_weight_distribution","head_eye_orientation","wardrobe_accessories","camera_lens_distance_crop","lighting_background","provenance_receipt"],
+  "angle_tokens":{"front_left_three_quarter":"body yaw -45 degrees, tolerance 5 degrees","front_right_three_quarter":"body yaw +45 degrees, tolerance 5 degrees","rear_left_three_quarter":"body yaw -135 degrees, tolerance 5 degrees","rear_right_three_quarter":"body yaw +135 degrees, tolerance 5 degrees"},
+  "rule":"Bind every trait to the named resident and authoritative source; never fill an unresolved trait with a generic default."
+}

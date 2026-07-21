@@ -1,0 +1,13 @@
+{
+  "schema_version": "three_quarter_validation_report_v1",
+  "resident_id": "evelyn",
+  "state": "pending_generation",
+  "angles": {
+    "front_left_three_quarter": "pending_generation",
+    "front_right_three_quarter": "pending_generation",
+    "rear_left_three_quarter": "pending_generation",
+    "rear_right_three_quarter": "pending_generation"
+  },
+  "hidden_caption": "pending",
+  "diagnostics": []
+}
