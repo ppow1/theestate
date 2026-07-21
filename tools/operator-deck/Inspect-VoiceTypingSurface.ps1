@@ -200,6 +200,26 @@ try {
 
     [void][EstateWindowInventoryV2]::EnumWindows($callback, [IntPtr]::Zero)
 
+    $microphoneUsage = @()
+    $microphoneRoot = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone'
+    if (Test-Path -LiteralPath $microphoneRoot) {
+        $microphoneUsage = Get-ChildItem -LiteralPath $microphoneRoot -Recurse -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                $properties = Get-ItemProperty -LiteralPath $_.PSPath -ErrorAction SilentlyContinue
+                if ($null -ne $properties.LastUsedTimeStart -or $null -ne $properties.LastUsedTimeStop) {
+                    $start = [int64]$properties.LastUsedTimeStart
+                    $stop = [int64]$properties.LastUsedTimeStop
+                    [pscustomobject]@{
+                        evidence_type = 'microphone_capability_usage'
+                        registry_path = $_.Name
+                        last_used_time_start = $start
+                        last_used_time_stop = $stop
+                        active = ($start -gt 0 -and ($stop -eq 0 -or $start -gt $stop))
+                    }
+                }
+            }
+    }
+
     $text = (($windows | ForEach-Object {
         $childText = ($_.automation_descendants | ForEach-Object { "$($_.name) $($_.automation_id) $($_.help_text)" }) -join ' '
         $desktopText = ($_.desktop_process_elements | ForEach-Object { "$($_.name) $($_.automation_id) $($_.help_text)" }) -join ' '
@@ -208,8 +228,11 @@ try {
     $state = 'unknown'
     $confidence = 'none'
     $diagnostic = 'No reliable state selector has been calibrated on this workstation.'
+    $activeMicrophoneUsage = @($microphoneUsage | Where-Object active)
     if ($text -match '(?i)listening') {
         $state = 'listening'; $confidence = 'medium'; $diagnostic = 'A visible candidate surface contains the word listening.'
+    } elseif ($activeMicrophoneUsage.Count -gt 0) {
+        $state = 'listening'; $confidence = 'low'; $diagnostic = 'Windows reports active microphone capability use; calibration must confirm which entry belongs to Voice Typing.'
     } elseif ($text -match '(?i)voice typing|dictation') {
         $state = 'ready'; $confidence = 'low'; $diagnostic = 'A visible candidate surface identifies Voice Typing or dictation, but listening state was not proven.'
     } elseif ($windows.Count -eq 0) {
@@ -222,7 +245,7 @@ try {
         capability = 'dictation.status'
         state = $state
         confidence = $confidence
-        evidence = @($windows)
+        evidence = @($windows) + @($microphoneUsage)
         diagnostic = $diagnostic
     }
 
