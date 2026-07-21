@@ -116,3 +116,29 @@ If the Stream Deck action has separate fields for application and arguments, use
 ## Future expansion notes
 
 Future work may add richer target discovery, profile-aware commands, workspace profiles, service integration, dynamic Stream Deck feedback, or other adapters. Those are intentionally outside this prototype. This version stays focused on a readable local window-control adapter that proves the target launcher and window swapper concept.
+
+
+## Device-neutral action and state contracts
+
+The `contracts/` schemas define the small boundary between physical controls and Operator Deck capabilities. A Stream Deck, gaming mouse, keyboard, rotary control, command line, or later spatial adapter emits the same action request shape. Device-specific gesture handling stays in its adapter:
+
+- Stream Deck controls may emit `single`, `double`, or `long`.
+- The Redragon mouse currently emits `single` only.
+- A long-press adapter must suppress the release click so shutdown-style actions do not also trigger the single-click action.
+- State observations use `off`, `ready`, `listening`, `error`, or `unknown`, with an explicit confidence and evidence list.
+
+These contracts are an interface seam, not a new service or native Stream Deck plugin. The existing AutoHotkey commands remain unchanged.
+
+## Voice Typing surface calibration
+
+`Inspect-VoiceTypingSurface.ps1` is a read-only Windows diagnostic. It inventories visible candidate windows and their top-level UI Automation names, writes a JSON state observation, prints it, and copies it to the clipboard. It does not move the Voice Typing toolbar, press `Win+H`, or claim a reliable listening state without observable evidence.
+
+Run it while Voice Typing is off, ready, and actively listening so the three reports can be compared:
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+.\Inspect-VoiceTypingSurface.ps1
+```
+
+The default report path is `tools/operator-deck/runtime/voice-typing-surface.json`. That runtime output is workstation evidence and should remain local; do not commit it. Paste each clipboard report back for selector calibration. Until that calibration is complete, `unknown` and low-confidence results are expected and honest.
