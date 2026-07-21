@@ -22,4 +22,61 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          from
+          from pathlib import Path
+
+          patch_path = Path('collaboration/recovery/mhtml_runtime_canon/0002-segment-runtime-canons.patch')
+          lines = patch_path.read_text(encoding='utf-8').splitlines(keepends=True)
+          i = 0
+          applied = 0
+
+          while i < len(lines):
+              line = lines[i]
+              if not line.startswith('*** Update File: '):
+                  i += 1
+                  continue
+
+              target = Path(line[len('*** Update File: '):].strip())
+              i += 1
+              hunks = []
+
+              while i < len(lines) and not lines[i].startswith('*** Update File: ') and not lines[i].startswith('*** End Patch'):
+                  if lines[i].startswith('@@'):
+                      i += 1
+                      hunk = []
+                      while i < len(lines) and not lines[i].startswith('@@') and not lines[i].startswith('*** Update File: ') and not lines[i].startswith('*** End Patch'):
+                          hunk.append(lines[i])
+                          i += 1
+                      hunks.append(hunk)
+                  else:
+                      i += 1
+
+              text = target.read_text(encoding='utf-8')
+              for hunk in hunks:
+                  old = ''.join(row[1:] for row in hunk if row.startswith((' ', '-')))
+                  new = ''.join(row[1:] for row in hunk if row.startswith((' ', '+')))
+                  if old in text:
+                      text = text.replace(old, new, 1)
+                      applied += 1
+                  elif new in text:
+                      continue
+                  else:
+                      raise SystemExit(f'Unable to locate hunk context in {target}')
+              target.write_text(text, encoding='utf-8')
+
+          if applied == 0:
+              raise SystemExit('Patch produced no changes')
+          print(f'Applied {applied} hunks')
+          PY
+
+      - name: Run targeted tests
+        run: python -m pytest -q tests/test_runtime_canon_recovery.py
+
+      - name: Commit implementation and remove temporary workflows
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/estate/core/runtime_canon_recovery.py tests/test_runtime_canon_recovery.py
+          git rm -f .github/workflows/runtime-canon-recovery-oneshot.yml .github/workflows/runtime-canon-recovery.yml
+          git commit -m "fix: segment multiple runtime canons per assistant message"
+          git push origin HEAD:agent/mhtml-runtime-canon-recovery
