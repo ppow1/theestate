@@ -1,0 +1,65 @@
+{
+  "schema_version": "estate.visual_bible.wardrobe.wardrobe_prompt_fragment.v1",
+  "record_id": "pf-evelyn-white-linen-prompt-v1",
+  "revision": 1,
+  "resident_id": "evelyn",
+  "audience_scope": "internal",
+  "lifecycle_state": "draft",
+  "canon_class": "provisional",
+  "active": true,
+  "created_at": "2026-07-21T00:00:00Z",
+  "created_by": "codex-wp4113-example-author",
+  "updated_at": "2026-07-21T00:00:00Z",
+  "provenance": {
+    "source_refs": [
+      "docs/visual_bible/wp4113_wardrobe_signature_look_runtime_canon.md"
+    ],
+    "parent_record_ids": [],
+    "replacement_for": null,
+    "content_digest": "sha256:5ca1527ae9f05e8ba2c8c29f698a9cb307ba2c947b07ab5e2960c907f6d0e136",
+    "schema_digest": "sha256:f76fdc04189aad5b12c76b5e3a8c7c7a7a31b9b5d8b81e708a656e1c7b05b603"
+  },
+  "steward_decision_id": null,
+  "positive": {
+    "adult_presentation": "adult Evelyn in a professional-relational context",
+    "garment": "white linen mid-knee dress, provisional direction",
+    "fabric_behavior": "natural linen drape, restrained wrinkling, non-plastic texture",
+    "fit_behavior": "petite custom tailoring, fitted without body reshaping",
+    "proportion_preservation": "preserve 4 ft 10 in canonical height, extremely petite adult scale, provisional 33B-21-31 and subtle hourglass; clothing does not change physical canon",
+    "footwear_and_posture": "three-inch heels, warm approachable posture and gentle head tilt; presentation effect only",
+    "styling": "elegant and understated",
+    "camera_and_pose": "applicable WP-4111 profile; uncropped footwear for full-body review"
+  },
+  "negative": {
+    "identity_drift": [
+      "generic fashion-model substitution"
+    ],
+    "proportion_drift": [
+      "taller or average-scale body",
+      "altered measurements",
+      "exaggerated hourglass",
+      "heel added to canonical height"
+    ],
+    "garment_failures": [
+      "non-white",
+      "non-linen",
+      "wrong hemline",
+      "revealing-by-default"
+    ],
+    "fit_failures": [
+      "adult infantilization",
+      "painted-on fabric",
+      "physique mutation"
+    ],
+    "footwear_failures": [
+      "wrong heel height",
+      "cropped feet",
+      "unsafe geometry"
+    ],
+    "age_and_context": [
+      "minor-coded presentation",
+      "decontextualized presentation"
+    ]
+  },
+  "model_overlays": []
+}

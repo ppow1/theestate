@@ -1,0 +1,15 @@
+{
+  "schema_version": "estate.visual_bible.wardrobe.RECORD_TYPE.v1",
+  "record_id": "TYPE-resident-semantic-v1",
+  "revision": 1,
+  "resident_id": "resident",
+  "audience_scope": "internal",
+  "lifecycle_state": "draft",
+  "canon_class": "experimental",
+  "active": true,
+  "created_at": "2026-07-21T00:00:00Z",
+  "created_by": "authenticated-principal-id",
+  "updated_at": "2026-07-21T00:00:00Z",
+  "provenance": {"source_refs": [], "parent_record_ids": [], "replacement_for": null, "content_digest": "sha256:REPLACE", "schema_digest": "sha256:REPLACE"},
+  "steward_decision_id": null
+}

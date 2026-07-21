@@ -1,0 +1,180 @@
+{
+  "schema_version": "estate.visual_bible.wardrobe.wardrobe_manifest.v1",
+  "record_id": "wd-evelyn-internal-library-v1",
+  "revision": 1,
+  "resident_id": "evelyn",
+  "audience_scope": "internal",
+  "lifecycle_state": "draft",
+  "canon_class": "provisional",
+  "active": true,
+  "created_at": "2026-07-21T00:00:00Z",
+  "created_by": "codex-wp4113-example-author",
+  "updated_at": "2026-07-21T00:00:00Z",
+  "provenance": {
+    "source_refs": [
+      "docs/visual_bible/wp4113_wardrobe_signature_look_runtime_canon.md"
+    ],
+    "parent_record_ids": [],
+    "replacement_for": null,
+    "content_digest": "sha256:c0de00d73a72092137825fbc608884f2d76d4c0d2942471551c632f3005064e2",
+    "schema_digest": "sha256:b13260015fece26bd697dbecb6387a021fcb2c7d6a0e8ec41c2f83a685b0964d"
+  },
+  "steward_decision_id": null,
+  "library_id": "wardrobe-evelyn-internal-v1",
+  "physical_specification_ref": {
+    "id": "wps-evelyn-provisional-v1",
+    "revision": 1,
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "facial_fingerprint_ref": {
+    "id": "fingerprint-evelyn-provisional-v1",
+    "revision": 1,
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "scale_profile_ref": {
+    "id": "scale-evelyn-provisional-v1",
+    "revision": 1,
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "category_coverage": [
+    {
+      "category": "office-authoritative",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "office-approachable",
+      "applicability": "required",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": [
+        "wd-evelyn-white-linen-dress-v1"
+      ]
+    },
+    {
+      "category": "business-casual",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "casual-day",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "casual-evening",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "home-relaxed",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "formal-day",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "cocktail",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "formal-evening",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "ceremony",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "seasonal-summer",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "seasonal-winter",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "rain-travel",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "fitness",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "dance",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "hobby-specific",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "swim",
+      "applicability": "optional",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": []
+    },
+    {
+      "category": "signature-look",
+      "applicability": "required",
+      "rationale": "Evelyn-specific coverage awaits Steward selection.",
+      "entry_ids": [
+        "wd-evelyn-white-linen-dress-v1"
+      ]
+    },
+    {
+      "category": "private-audience",
+      "applicability": "not_applicable",
+      "rationale": "No private-audience look is authorized.",
+      "entry_ids": []
+    }
+  ],
+  "entries": [
+    "wd-evelyn-white-linen-dress-v1"
+  ],
+  "signature_look_ids": [
+    "sl-evelyn-white-linen-professional-v1"
+  ],
+  "fit_rule_ids": [
+    "fit-evelyn-white-linen-petite-v1"
+  ],
+  "footwear_ids": [
+    "fw-evelyn-three-inch-heel-v1"
+  ],
+  "accessory_ids": [
+    "acc-evelyn-understated-jewelry-v1"
+  ],
+  "prompt_fragment_ids": [
+    "pf-evelyn-white-linen-prompt-v1"
+  ],
+  "review_ids": [
+    "wr-evelyn-white-linen-pending-v1"
+  ]
+}
