@@ -51,7 +51,7 @@ try {
     Add-Type -AssemblyName UIAutomationClient
     Add-Type -AssemblyName UIAutomationTypes
 
-    $processNames = @('TextInputHost', 'ShellExperienceHost', 'ApplicationFrameHost', 'explorer')
+    $processNames = @('TextInputHost')
     $surfacePattern = '(?i)voice typing|dictation|listening|microphone'
     $windows = [System.Collections.Generic.List[object]]::new()
 
