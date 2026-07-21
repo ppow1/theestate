@@ -1,0 +1,338 @@
+{
+  "schema_version": "estate.measurement_comparison_set.v1",
+  "comparison_set_id": "mcs-test-001",
+  "comparison_cycle_id": "cycle-test-001",
+  "resident_id": "resident-test-adult",
+  "visual_bible_revision": "vb-test-1",
+  "source_physical_specification_id": "phys-test-provisional-1",
+  "scale_profile_id": "wp4111-scale-test-1",
+  "camera_profile_id": "wp4111-camera-neutral-v1",
+  "tested_dimensions": [
+    "waist"
+  ],
+  "locked_variables": [
+    "resident_identity",
+    "facial_fingerprint",
+    "age_presentation",
+    "hairstyle",
+    "expression",
+    "pose",
+    "camera_profile_id",
+    "lighting_profile_id",
+    "background_id",
+    "wardrobe_specification_id",
+    "footwear_id",
+    "heel_height",
+    "image_dimensions",
+    "generation_model",
+    "model_version",
+    "seed",
+    "prompt",
+    "negative_prompt",
+    "generation_settings"
+  ],
+  "authorized_custom_dimensions": [],
+  "variants": {
+    "A": {
+      "variant_id": "mv-a",
+      "label": "A",
+      "position": "lower_or_narrower",
+      "measurements": {
+        "waist": {
+          "value": "27.50",
+          "unit": "in"
+        },
+        "hips": {
+          "value": "38.00",
+          "unit": "in"
+        }
+      },
+      "angles": [
+        "front",
+        "front_three_quarter",
+        "side",
+        "rear_three_quarter",
+        "rear"
+      ],
+      "candidate_state": "comparison_ready",
+      "canonical_state": "noncanonical",
+      "asset_references": [
+        "asset-a-front",
+        "asset-a-front_three_quarter",
+        "asset-a-side",
+        "asset-a-rear_three_quarter",
+        "asset-a-rear"
+      ]
+    },
+    "B": {
+      "variant_id": "mv-b",
+      "label": "B",
+      "position": "center_baseline",
+      "measurements": {
+        "waist": {
+          "value": "28.00",
+          "unit": "in"
+        },
+        "hips": {
+          "value": "38.00",
+          "unit": "in"
+        }
+      },
+      "angles": [
+        "front",
+        "front_three_quarter",
+        "side",
+        "rear_three_quarter",
+        "rear"
+      ],
+      "candidate_state": "comparison_ready",
+      "canonical_state": "noncanonical",
+      "asset_references": [
+        "asset-b-front",
+        "asset-b-front_three_quarter",
+        "asset-b-side",
+        "asset-b-rear_three_quarter",
+        "asset-b-rear"
+      ]
+    },
+    "C": {
+      "variant_id": "mv-c",
+      "label": "C",
+      "position": "higher_or_fuller",
+      "measurements": {
+        "waist": {
+          "value": "28.50",
+          "unit": "in"
+        },
+        "hips": {
+          "value": "38.00",
+          "unit": "in"
+        }
+      },
+      "angles": [
+        "front",
+        "front_three_quarter",
+        "side",
+        "rear_three_quarter",
+        "rear"
+      ],
+      "candidate_state": "comparison_ready",
+      "canonical_state": "noncanonical",
+      "asset_references": [
+        "asset-c-front",
+        "asset-c-front_three_quarter",
+        "asset-c-side",
+        "asset-c-rear_three_quarter",
+        "asset-c-rear"
+      ]
+    }
+  },
+  "controls": {
+    "resident_identity": {
+      "A": "locked-resident_identity",
+      "B": "locked-resident_identity",
+      "C": "locked-resident_identity"
+    },
+    "facial_fingerprint": {
+      "A": "locked-facial_fingerprint",
+      "B": "locked-facial_fingerprint",
+      "C": "locked-facial_fingerprint"
+    },
+    "age_presentation": {
+      "A": "locked-age_presentation",
+      "B": "locked-age_presentation",
+      "C": "locked-age_presentation"
+    },
+    "hairstyle": {
+      "A": "locked-hairstyle",
+      "B": "locked-hairstyle",
+      "C": "locked-hairstyle"
+    },
+    "expression": {
+      "A": "locked-expression",
+      "B": "locked-expression",
+      "C": "locked-expression"
+    },
+    "pose": {
+      "A": "locked-pose",
+      "B": "locked-pose",
+      "C": "locked-pose"
+    },
+    "camera_profile_id": {
+      "A": "wp4111-camera-neutral-v1",
+      "B": "wp4111-camera-neutral-v1",
+      "C": "wp4111-camera-neutral-v1"
+    },
+    "lighting_profile_id": {
+      "A": "locked-lighting_profile_id",
+      "B": "locked-lighting_profile_id",
+      "C": "locked-lighting_profile_id"
+    },
+    "background_id": {
+      "A": "locked-background_id",
+      "B": "locked-background_id",
+      "C": "locked-background_id"
+    },
+    "wardrobe_specification_id": {
+      "A": "locked-wardrobe_specification_id",
+      "B": "locked-wardrobe_specification_id",
+      "C": "locked-wardrobe_specification_id"
+    },
+    "footwear_id": {
+      "A": "locked-footwear_id",
+      "B": "locked-footwear_id",
+      "C": "locked-footwear_id"
+    },
+    "heel_height": {
+      "A": {
+        "value": "3.25",
+        "unit": "in"
+      },
+      "B": {
+        "value": "3.25",
+        "unit": "in"
+      },
+      "C": {
+        "value": "3.25",
+        "unit": "in"
+      }
+    },
+    "image_dimensions": {
+      "A": "locked-image_dimensions",
+      "B": "locked-image_dimensions",
+      "C": "locked-image_dimensions"
+    },
+    "generation_model": {
+      "A": "locked-generation_model",
+      "B": "locked-generation_model",
+      "C": "locked-generation_model"
+    },
+    "model_version": {
+      "A": "locked-model_version",
+      "B": "locked-model_version",
+      "C": "locked-model_version"
+    },
+    "seed": {
+      "A": "locked-seed",
+      "B": "locked-seed",
+      "C": "locked-seed"
+    },
+    "prompt": {
+      "A": "locked-prompt",
+      "B": "locked-prompt",
+      "C": "locked-prompt"
+    },
+    "negative_prompt": {
+      "A": "locked-negative_prompt",
+      "B": "locked-negative_prompt",
+      "C": "locked-negative_prompt"
+    },
+    "generation_settings": {
+      "A": "locked-generation_settings",
+      "B": "locked-generation_settings",
+      "C": "locked-generation_settings"
+    }
+  },
+  "artifacts": {
+    "primary_vertical_sheet": {
+      "asset_id": "sheet-test-001",
+      "layout": "vertical_A_B_C",
+      "variant_order": [
+        "A",
+        "B",
+        "C"
+      ],
+      "normal_review_size": "1600x2400",
+      "direct_single_surface": true
+    },
+    "same_angle_matrix": {
+      "asset_id": "matrix-test-001",
+      "supplemental_only": true,
+      "angles": [
+        "front",
+        "front_three_quarter",
+        "side",
+        "rear_three_quarter",
+        "rear"
+      ],
+      "anatomical_guides": [
+        "top_of_head",
+        "shoulder_line",
+        "natural_waist",
+        "fullest_hip",
+        "knee_center",
+        "floor_line"
+      ],
+      "independent_scaling_prohibited": true
+    }
+  },
+  "wardrobe_protocol": {
+    "category": "fitted",
+    "opaque": true,
+    "non_explicit": true,
+    "adult_appropriate": true,
+    "identity_preserving": true,
+    "cut": "locked",
+    "material": "locked"
+  },
+  "footwear_protocol": {
+    "heels_applicable": true,
+    "heel_height": {
+      "value": "3.25",
+      "unit": "in"
+    },
+    "canonical_standing_height_unchanged": true,
+    "footwear_adjusted_presentation_height": {
+      "value": "synthetic-test-only",
+      "unit": "descriptor"
+    },
+    "posture_separate_from_measurements": true
+  },
+  "provenance": {
+    "generation_model": "test-model-not-rendered",
+    "model_version": "test-v1",
+    "seed": 4112,
+    "prompt": "fixture prompt reference only; no image generated",
+    "negative_prompt": "fixture negative prompt reference only",
+    "workflow_hash": "sha256:test-fixture",
+    "asset_references": [
+      "synthetic-manifest-reference-no-image"
+    ],
+    "lineage": [
+      "phys-test-provisional-1",
+      "vb-test-1"
+    ],
+    "revision_history": [
+      {
+        "revision": 1,
+        "status": "fixture"
+      }
+    ]
+  },
+  "resident_range_policy": {
+    "resident_id": "resident-test-adult",
+    "policy_type": "resident_specific",
+    "scope": "synthetic_validation_only",
+    "approved_bounds": {
+      "waist": {
+        "minimum": "27.00",
+        "maximum": "29.00",
+        "unit": "in"
+      }
+    },
+    "automatic_widening": false
+  },
+  "legibility_assessment": {
+    "status": "pass",
+    "normal_review_size": "1600x2400",
+    "evidence_reference": "synthetic-validation-assertion-only"
+  },
+  "review_status": "review_pending",
+  "canonical_promotion_status": "not_requested",
+  "supersedes_comparison_set_id": null,
+  "superseded_by_comparison_set_id": null,
+  "privacy": {
+    "classification": "restricted",
+    "public_export": false
+  }
+}

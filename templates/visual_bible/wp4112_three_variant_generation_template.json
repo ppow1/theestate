@@ -1,0 +1,11 @@
+{
+  "notice": "TEMPLATE ONLY — no measurements, assets, or approvals are asserted",
+  "labels": {"A": "lower_or_narrower", "B": "center_baseline", "C": "higher_or_fuller"},
+  "variant_order": ["A", "B", "C"],
+  "required_angles": ["front", "front_three_quarter", "side", "rear_three_quarter", "rear"],
+  "tested_dimensions": [],
+  "locked_variables": ["resident_identity", "facial_fingerprint", "age_presentation", "hairstyle", "expression", "pose", "camera_profile_id", "lighting_profile_id", "background_id", "wardrobe_specification_id", "footwear_id", "heel_height", "image_dimensions", "generation_model", "model_version", "seed", "prompt", "negative_prompt", "generation_settings"],
+  "primary_artifact": {"layout": "vertical_A_B_C", "direct_single_surface": true},
+  "secondary_artifact": {"layout": "same_angle_matrix", "supplemental_only": true},
+  "canonical_effect": "none_until_explicit_steward_approval"
+}

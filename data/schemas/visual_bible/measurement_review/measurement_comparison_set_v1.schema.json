@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.measurement_comparison_set.v1",
+  "title": "WP-4112 Measurement Comparison Set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "comparison_set_id", "comparison_cycle_id", "resident_id", "visual_bible_revision", "source_physical_specification_id", "scale_profile_id", "camera_profile_id", "tested_dimensions", "locked_variables", "variants", "controls", "artifacts", "wardrobe_protocol", "footwear_protocol", "provenance", "resident_range_policy", "legibility_assessment", "review_status", "canonical_promotion_status", "privacy"],
+  "properties": {
+    "schema_version": {"const": "estate.measurement_comparison_set.v1"},
+    "comparison_set_id": {"type": "string", "minLength": 1}, "comparison_cycle_id": {"type": "string", "minLength": 1},
+    "resident_id": {"type": "string", "minLength": 1}, "visual_bible_revision": {"type": "string", "minLength": 1},
+    "source_physical_specification_id": {"type": "string", "minLength": 1}, "scale_profile_id": {"type": "string", "minLength": 1}, "camera_profile_id": {"type": "string", "minLength": 1},
+    "tested_dimensions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "locked_variables": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "authorized_custom_dimensions": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "variants": {"type": "object", "additionalProperties": false, "required": ["A", "B", "C"], "properties": {"A": {"$ref": "#/$defs/variant"}, "B": {"$ref": "#/$defs/variant"}, "C": {"$ref": "#/$defs/variant"}}},
+    "controls": {"type": "object"}, "artifacts": {"type": "object"}, "wardrobe_protocol": {"type": "object"}, "footwear_protocol": {"type": "object"}, "provenance": {"type": "object"}, "resident_range_policy": {"type": "object"}, "legibility_assessment": {"type": "object"},
+    "regeneration_request": {"type": "object"},
+    "review_status": {"enum": ["generated", "comparison_ready", "review_pending", "failed", "rejected", "selected_but_unapproved", "steward_approved", "superseded"]},
+    "canonical_promotion_status": {"enum": ["not_requested", "pending_explicit_steward_approval", "approved", "promoted", "superseded"]},
+    "supersedes_comparison_set_id": {"type": ["string", "null"]}, "superseded_by_comparison_set_id": {"type": ["string", "null"]}, "privacy": {"type": "object"}
+  },
+  "$defs": {"variant": {"type": "object", "required": ["variant_id", "label", "position", "measurements", "angles", "candidate_state", "canonical_state", "asset_references"], "properties": {"variant_id": {"type": "string"}, "label": {"enum": ["A", "B", "C"]}, "position": {"enum": ["lower_or_narrower", "center_baseline", "higher_or_fuller"]}, "measurements": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "object", "required": ["value", "unit"], "properties": {"value": {"type": "string", "minLength": 1}, "unit": {"enum": ["in", "cm", "ratio", "descriptor"]}}}}, "angles": {"const": ["front", "front_three_quarter", "side", "rear_three_quarter", "rear"]}, "candidate_state": {"enum": ["generated", "comparison_ready", "review_pending", "rejected", "failed", "selected_but_unapproved", "steward_approved"]}, "canonical_state": {"const": "noncanonical"}, "asset_references": {"type": "array", "minItems": 5}}}}
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.measurement_review_records.v1",
+  "title": "WP-4112 Auditable Review Records",
+  "oneOf": [
+    {"$ref": "#/$defs/provenance_manifest"},
+    {"$ref": "#/$defs/steward_decision"},
+    {"$ref": "#/$defs/regeneration_request"},
+    {"$ref": "#/$defs/canonical_promotion"}
+  ],
+  "$defs": {
+    "provenance_manifest": {"type": "object", "required": ["record_type", "comparison_set_id", "resident_id", "physical_specification_id", "visual_bible_revision", "model", "model_version", "seed", "prompt", "negative_prompt", "camera_profile_id", "lighting_profile_id", "wardrobe_specification_id", "footwear_id", "heel_height", "asset_references", "revision_history", "lineage"], "properties": {"record_type": {"const": "provenance_manifest"}}},
+    "steward_decision": {"type": "object", "required": ["record_type", "decision_id", "comparison_set_id", "chosen_candidate", "rejected_candidates", "steward_notes", "selection_rationale", "confidence_level", "unresolved_concerns", "approval_timestamp", "reviewer_identity", "reviewer_authority", "superseded_decision_ids", "retained_rejected_evidence", "approval_state"], "properties": {"record_type": {"const": "steward_decision"}, "chosen_candidate": {"enum": ["A", "B", "C", null]}, "confidence_level": {"enum": ["low", "moderate", "high"]}, "reviewer_authority": {"const": "Steward"}, "approval_state": {"enum": ["unapproved", "explicitly_approved"]}}},
+    "regeneration_request": {"type": "object", "required": ["record_type", "comparison_set_id", "comparison_cycle_id", "diagnostic_codes", "correction_codes", "approved_bounds_unchanged", "source_range_policy"], "properties": {"record_type": {"const": "regeneration_request"}, "approved_bounds_unchanged": {"const": true}}},
+    "canonical_promotion": {"type": "object", "required": ["record_type", "promotion_id", "decision_id", "selected_variant", "approved_by", "approval_authority", "new_physical_specification_version", "supersedes_physical_specification_version", "preserve_rejected_evidence"], "properties": {"record_type": {"const": "canonical_promotion"}, "approval_authority": {"const": "Steward"}, "preserve_rejected_evidence": {"const": true}}}
+  }
+}
