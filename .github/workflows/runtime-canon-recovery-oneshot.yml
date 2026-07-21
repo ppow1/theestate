@@ -1,0 +1,25 @@
+name: One-shot runtime canon recovery
+
+on:
+  push:
+    branches:
+      - agent/mhtml-runtime-canon-recovery
+
+permissions:
+  contents: write
+
+jobs:
+  apply-test-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/mhtml-runtime-canon-recovery
+          fetch-depth: 0
+
+      - name: Apply reviewed apply-patch artifact
+        shell: bash
+        run: |
+          python - <<'PY'
+          from
