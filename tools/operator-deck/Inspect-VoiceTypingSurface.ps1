@@ -57,10 +57,33 @@ try {
 
         $automationName = $null
         $automationType = $null
+        $automationChildren = @()
         try {
             $element = [System.Windows.Automation.AutomationElement]::FromHandle($hWnd)
             $automationName = $element.Current.Name
             $automationType = $element.Current.ControlType.ProgrammaticName
+            if ($process.ProcessName -eq 'TextInputHost') {
+                $descendants = $element.FindAll(
+                    [System.Windows.Automation.TreeScope]::Descendants,
+                    [System.Windows.Automation.Condition]::TrueCondition
+                )
+                $limit = [Math]::Min($descendants.Count, 250)
+                $automationChildren = for ($index = 0; $index -lt $limit; $index++) {
+                    $child = $descendants.Item($index)
+                    $current = $child.Current
+                    if ($current.Name -or $current.AutomationId -or $current.HelpText) {
+                        [pscustomobject]@{
+                            name = $current.Name
+                            automation_id = $current.AutomationId
+                            help_text = $current.HelpText
+                            control_type = $current.ControlType.ProgrammaticName
+                            class_name = $current.ClassName
+                            is_enabled = $current.IsEnabled
+                            is_offscreen = $current.IsOffscreen
+                        }
+                    }
+                }
+            }
         } catch { }
 
         $windows.Add([pscustomobject]@{
@@ -70,13 +93,17 @@ try {
             title = $title
             automation_name = $automationName
             automation_control_type = $automationType
+            automation_descendants = @($automationChildren)
         })
         return $true
     }
 
     [void][EstateWindowInventory]::EnumWindows($callback, [IntPtr]::Zero)
 
-    $text = (($windows | ForEach-Object { "$($_.title) $($_.automation_name)" }) -join ' ')
+    $text = (($windows | ForEach-Object {
+        $childText = ($_.automation_descendants | ForEach-Object { "$($_.name) $($_.automation_id) $($_.help_text)" }) -join ' '
+        "$($_.title) $($_.automation_name) $childText"
+    }) -join ' ')
     $state = 'unknown'
     $confidence = 'none'
     $diagnostic = 'No reliable state selector has been calibrated on this workstation.'
