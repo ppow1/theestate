@@ -1,0 +1,19 @@
+{
+  "schema_version": "measurement_matrix_generation_queue_v1",
+  "queue_id": "wp4130_generation_queue",
+  "state": "blocked_inputs",
+  "fabricated_outputs": false,
+  "items": [
+    {
+      "matrix_id": "evelyn_middle_calibration_mvm_r001",
+      "resident_id": "evelyn",
+      "state": "queued",
+      "blockers": [
+        "genuine variant-specific WP-4128 capture sets",
+        "WP-4129 vertical comparison sheet generation",
+        "normal-size discernibility assessment",
+        "Steward selection"
+      ]
+    }
+  ]
+}
