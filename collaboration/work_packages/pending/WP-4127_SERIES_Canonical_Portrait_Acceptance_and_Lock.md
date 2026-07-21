@@ -1,7 +1,7 @@
 # WP-4127 — Canonical Portrait Acceptance and Lock
 
 ## Status
-Pending
+Complete — runtime implementation; production portrait acceptance remains pending (see completion report)
 
 ## Series
 Visual Estate Initiative — Campaign 02: Canonical Portrait Library
