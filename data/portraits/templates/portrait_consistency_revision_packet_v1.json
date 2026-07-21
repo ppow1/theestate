@@ -1,0 +1,16 @@
+{
+  "schema_version": "portrait_consistency_revision_packet_v1",
+  "resident_id": null,
+  "prior_asset_id": null,
+  "prior_sha256": null,
+  "diagnostic_codes": [],
+  "drift_categories": [],
+  "affected_views": [],
+  "steward_notes": null,
+  "prompt_workflow_delta": null,
+  "target_category": null,
+  "owner": null,
+  "state": "pending",
+  "replacement_asset_id": null,
+  "replacement_sha256": null
+}

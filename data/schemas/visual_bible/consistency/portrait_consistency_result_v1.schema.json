@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "portrait_consistency_result_v1.schema.json",
+  "type": "object",
+  "required": ["schema_version", "resident_id", "status", "canonical_promotion_eligible", "structural_validation", "visual_validation", "diagnostics", "remediation_packet"],
+  "properties": {
+    "schema_version": {"const": "portrait_consistency_result_v1"},
+    "status": {"enum": ["pass", "fail", "review_required"]},
+    "canonical_promotion_eligible": {"type": "boolean"},
+    "diagnostics": {"type": "array", "items": {"type": "object", "required": ["code", "severity", "message"]}},
+    "remediation_packet": {"type": "array"}
+  },
+  "additionalProperties": true
+}

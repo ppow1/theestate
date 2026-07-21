@@ -1,0 +1,69 @@
+{
+  "schema_version": "portrait_consistency_estate_input_v1",
+  "residents": [
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "RES-000001",
+      "visual_fingerprint_id": "RES-000001-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "RES-000002",
+      "visual_fingerprint_id": "RES-000002-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "RES-000003",
+      "visual_fingerprint_id": "RES-000003-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "RES-000004",
+      "visual_fingerprint_id": "RES-000004-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "RES-000005",
+      "visual_fingerprint_id": "RES-000005-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "RES-000006",
+      "visual_fingerprint_id": "RES-000006-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "evelyn",
+      "visual_fingerprint_id": "evelyn-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    },
+    {
+      "schema_version": "portrait_consistency_manifest_v1",
+      "resident_id": "grace",
+      "visual_fingerprint_id": "grace-pending-steward-fingerprint",
+      "assets": [],
+      "steward_reviews": {},
+      "automated_scores": []
+    }
+  ]
+}
