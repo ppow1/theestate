@@ -1,0 +1,6 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema", "$id":"estate.visual_bible.profile_rear_asset_metadata.v1", "type":"object",
+  "required":["schema_version","asset_id","resident_id","category","lifecycle_state","access_tier","asset_path","sha256","source_references","prompts","generation","camera","crop","pose","identity_fidelity","geometry","physical_fidelity","wardrobe_grooming","provenance","validation","hidden_caption_test","steward_review","canonical","lineage"],
+  "properties":{"schema_version":{"const":"profile_rear_asset_metadata_v1"},"category":{"enum":["left_face_profile","right_face_profile","left_full_body_profile","right_full_body_profile","rear_head_shoulders","rear_full_body","rear_three_quarter_left","rear_three_quarter_right","rear_hair_silhouette","rear_posture_shoulders"]},"lifecycle_state":{"enum":["candidate","pending_review","approved","canonical","rejected","superseded"]},"sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}},
+  "additionalProperties":true
+}

@@ -1,0 +1,237 @@
+{
+  "schema_version": "resident_profile_rear_manifest_v1",
+  "manifest_revision": 1,
+  "resident": {
+    "resident_id": "RES-000001",
+    "display_name": "Alfred",
+    "access_tier": "Estate Internal",
+    "adult_presentation_required": true
+  },
+  "source_references": [
+    "data/visual_bibles/residents/alfred/visual_bible_manifest.json",
+    "data/portraits/residents/res_000001/metadata/hero_manifest.json",
+    "data/portraits/residents/res_000001/metadata/office_portrait_manifest.json",
+    "data/portraits/residents/res_000001/full_body/manifest.json",
+    "docs/visual_bible/wp4110_facial_geometry_visual_fingerprint_runtime_canon.md",
+    "docs/visual_bible/wp4111_height_proportion_scale_runtime_canon.md",
+    "docs/visual_bible/wp4113_wardrobe_signature_look_runtime_canon.md",
+    "docs/visual_bible/wp4114_visual_prompt_engineering_runtime_canon.md",
+    "docs/visual_bible/wp4115_visual_negative_prompt_runtime_canon.md"
+  ],
+  "resident_template_binding": "RES-000001",
+  "cross_resident_inheritance": false,
+  "naming_convention": "{resident_id}__profile-rear__{category}__{crop}__v{revision:03d}__{asset_id}.{ext}",
+  "directory_convention": "data/portraits/residents/res_000001/profile_rear/{candidates|canonical|rejected|superseded|comparison_sheets|metadata|reviews|validation|generation_queue}",
+  "categories": [
+    {
+      "category": "left_face_profile",
+      "classification": "profile",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "right_face_profile",
+      "classification": "profile",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "left_full_body_profile",
+      "classification": "profile",
+      "crop_requirement": "whole_body",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "right_full_body_profile",
+      "classification": "profile",
+      "crop_requirement": "whole_body",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "rear_head_shoulders",
+      "classification": "rear",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "rear_full_body",
+      "classification": "rear",
+      "crop_requirement": "whole_body",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "rear_three_quarter_left",
+      "classification": "rear_three_quarter",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "rear_three_quarter_right",
+      "classification": "rear_three_quarter",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "rear_hair_silhouette",
+      "classification": "rear",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    },
+    {
+      "category": "rear_posture_shoulders",
+      "classification": "rear",
+      "crop_requirement": "portrait",
+      "required": true,
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null,
+      "note": "No image has been generated; identity validation and Steward review are pending."
+    }
+  ],
+  "matched_comparison_sheet": {
+    "state": "pending_generation",
+    "asset_id": null,
+    "angles": [
+      "left_face_profile",
+      "right_face_profile",
+      "left_full_body_profile",
+      "right_full_body_profile",
+      "rear_head_shoulders",
+      "rear_full_body",
+      "rear_three_quarter_left",
+      "rear_three_quarter_right"
+    ],
+    "normalization_required": true
+  },
+  "geometry_notes": {
+    "state": "pending_steward",
+    "facial_profile_fields": [
+      "nose",
+      "lips",
+      "chin",
+      "jaw",
+      "brow",
+      "ear",
+      "hairline",
+      "distinguishing_features",
+      "asymmetry"
+    ],
+    "rear_fields": [
+      "hair_fall",
+      "hair_density",
+      "hair_texture",
+      "part",
+      "movement",
+      "neck",
+      "shoulder_line",
+      "back",
+      "posture",
+      "silhouette"
+    ]
+  },
+  "camera_pose_standard": {
+    "focal_length_equivalent_mm": 85,
+    "permitted_range_mm": [
+      70,
+      105
+    ],
+    "distance": "matched_and_recorded",
+    "eye_level": "crop_center; level",
+    "yaw_pitch_roll": "record_exact_degrees",
+    "floor_plane": "level; visible for whole_body",
+    "background": "matte neutral mid-gray",
+    "lighting": "soft neutral 5000-5600K",
+    "expression": "neutral matched",
+    "pose": "anatomically neutral; no sexualized emphasis"
+  },
+  "continuity": {
+    "canonical_height_and_proportions": "preserve_authoritative_source",
+    "wardrobe_footwear_grooming_accessories": "source-bound and matched; unresolved selections pending Steward",
+    "left_right_asymmetry": "record; never mirror-normalize"
+  },
+  "prompt_templates": {
+    "positive": "data/portraits/templates/profile_rear_positive_prompt_template.json",
+    "negative": "data/portraits/templates/profile_rear_negative_prompt_template.json"
+  },
+  "candidates": [],
+  "canonical": {
+    "left_face_profile": null,
+    "right_face_profile": null,
+    "left_full_body_profile": null,
+    "right_full_body_profile": null,
+    "rear_head_shoulders": null,
+    "rear_full_body": null,
+    "rear_three_quarter_left": null,
+    "rear_three_quarter_right": null,
+    "rear_hair_silhouette": null,
+    "rear_posture_shoulders": null
+  },
+  "generation_state": "pending_generation",
+  "generation_note": "No visual asset, comparison sheet, or hidden-caption result exists. Empty slots are not evidence.",
+  "steward_review": {
+    "state": "pending",
+    "authority": "steward",
+    "independent_angle_decisions_required": true,
+    "records": [],
+    "unresolved": [
+      "resident-specific profile geometry notes",
+      "rear hair and posture notes",
+      "wardrobe/grooming selection",
+      "candidate generation and hidden-caption identity review"
+    ]
+  },
+  "validation_report": {
+    "state": "pending_generation",
+    "path": "data/portraits/residents/res_000001/profile_rear/validation/validation_report.json"
+  },
+  "history": {
+    "rejections": [],
+    "supersessions": []
+  }
+}

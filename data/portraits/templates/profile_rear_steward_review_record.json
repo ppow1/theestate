@@ -1,0 +1,3 @@
+{
+  "schema_version": "profile_rear_steward_review_v1", "resident_id": "REQUIRED", "category": "REQUIRED", "asset_id": "REQUIRED", "sha256": "REQUIRED", "authority": "steward", "decision": "pending", "identity_match": "pending", "hidden_caption_result": "pending", "geometry_findings": [], "continuity_findings": [], "revision_request": null, "decided_at": null
+}

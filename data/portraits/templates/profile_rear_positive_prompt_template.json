@@ -1,0 +1,6 @@
+{
+  "schema_version": "profile_rear_positive_prompt_template_v1",
+  "required_order": ["resident_binding", "authoritative_identity", "angle_and_pose", "visible_geometry", "height_and_proportions", "wardrobe_footwear_grooming_accessories", "camera_crop", "lighting_floor_background", "reference_images", "reproducibility"],
+  "template": "[resident_id; adult; hero/office/full-body identity bindings]; [exact left/right/rear category and neutral pose]; preserve canonical nose, lips, chin, jaw, brow, ear, hairline, neck, shoulders, back, posture, silhouette, asymmetries and distinguishing features as applicable; preserve canonical height and body proportions; [source-bound wardrobe, footwear, grooming, accessories]; 85mm full-frame equivalent, matched distance, level eye line, exact yaw/pitch/roll, [portrait or complete whole-body crop]; neutral 5000-5600K light, level floor, matte mid-gray background; [hash-bound reference images and influence]; [model/version/seed/settings].",
+  "rule": "Unknown resident-specific attributes remain pending; never borrow another resident's prose."
+}
