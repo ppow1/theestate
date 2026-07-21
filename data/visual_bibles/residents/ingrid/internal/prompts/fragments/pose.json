@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "fragment_id": "ingrid-pose-v1",
+  "resident_id": "ingrid",
+  "audience_scope": "internal",
+  "layer": "pose",
+  "version": 1,
+  "status": "review_required",
+  "text": "standing at ease, hands visible, balanced natural weight",
+  "bindings": {},
+  "provenance": {
+    "source_ids": [
+      "resident:ingrid",
+      "wp4114:pose"
+    ],
+    "created_at": "2026-07-21T00:00:00Z",
+    "created_by": "WP-4114",
+    "supersedes": null
+  }
+}

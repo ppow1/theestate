@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "fragment_id": "evelyn-identity-v1",
+  "resident_id": "evelyn",
+  "audience_scope": "internal",
+  "layer": "identity",
+  "version": 1,
+  "status": "review_required",
+  "text": "Evelyn, resident evelyn, unambiguously adult woman, 4 ft 10 in maximum, extremely petite frame, warm hazel eyes, soft brunette hair with natural movement, Evelyn-specific facial fingerprint",
+  "bindings": {},
+  "provenance": {
+    "source_ids": [
+      "resident:evelyn",
+      "wp4114:identity"
+    ],
+    "created_at": "2026-07-21T00:00:00Z",
+    "created_by": "WP-4114",
+    "supersedes": null
+  }
+}

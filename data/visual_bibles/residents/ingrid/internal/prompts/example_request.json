@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "request_id": "ingrid-full-body-example-v1",
+  "audience_scope": "internal",
+  "purpose": "full_body",
+  "residents": [
+    "ingrid"
+  ],
+  "layers": {
+    "identity": [
+      "ingrid-identity-v1"
+    ],
+    "presence": [
+      "ingrid-presence-v1"
+    ],
+    "wardrobe": [
+      "ingrid-wardrobe-v1"
+    ],
+    "pose": [
+      "ingrid-pose-v1"
+    ],
+    "environment": [
+      "ingrid-environment-v1"
+    ],
+    "camera": [
+      "ingrid-camera-v1"
+    ],
+    "rendering": [
+      "ingrid-rendering-v1"
+    ],
+    "exclusion": [
+      "ingrid-exclusion-v1"
+    ]
+  },
+  "adapter": "ingrid-reference-adapter-v1",
+  "controls": {
+    "example_only": true,
+    "asset_generated": false
+  }
+}

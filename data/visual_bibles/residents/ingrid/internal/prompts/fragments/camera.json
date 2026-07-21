@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "fragment_id": "ingrid-camera-v1",
+  "resident_id": "ingrid",
+  "audience_scope": "internal",
+  "layer": "camera",
+  "version": 1,
+  "status": "review_required",
+  "text": "full-body eye-level camera, 50 mm lens intent, uncropped feet, controlled neutral lighting",
+  "bindings": {},
+  "provenance": {
+    "source_ids": [
+      "resident:ingrid",
+      "wp4114:camera"
+    ],
+    "created_at": "2026-07-21T00:00:00Z",
+    "created_by": "WP-4114",
+    "supersedes": null
+  }
+}

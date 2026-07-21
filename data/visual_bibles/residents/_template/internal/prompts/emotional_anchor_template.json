@@ -1,0 +1,18 @@
+{
+  "template_id": "emotional-anchor-v1",
+  "required": [
+    "resident_id",
+    "identity_fragment",
+    "resident_specific_emotional_intent",
+    "posture",
+    "expression",
+    "gaze",
+    "energy",
+    "environment"
+  ],
+  "prohibited": [
+    "copying another resident anchor",
+    "wardrobe-only characterization",
+    "identity mutation"
+  ]
+}

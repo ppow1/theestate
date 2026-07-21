@@ -25,3 +25,7 @@ __all__ += [
     "validate_footwear", "validate_wardrobe_manifest", "validate_private_activation",
     "validate_prompt_fragment", "validate_signature_look", "validate_transition",
 ]
+from .prompts import (LAYERS, canonical_json, compose, digest, load_prompt_record,
+    validate_adapter, validate_fragment, validate_receipt)
+__all__ += ["LAYERS","canonical_json","compose","digest","load_prompt_record",
+    "validate_adapter","validate_fragment","validate_receipt"]

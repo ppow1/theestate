@@ -1,0 +1,26 @@
+{
+  "template_id": "turnaround-v1",
+  "required_angles": [
+    "front",
+    "front_three_quarter",
+    "side",
+    "rear_three_quarter",
+    "rear"
+  ],
+  "locks": [
+    "identity",
+    "grooming",
+    "expression",
+    "wardrobe",
+    "camera",
+    "focal_length",
+    "distance",
+    "lighting",
+    "background",
+    "scale"
+  ],
+  "vary_only": [
+    "angle"
+  ],
+  "alignment": "same-size angle-aligned output"
+}
