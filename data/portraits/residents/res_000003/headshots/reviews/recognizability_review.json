@@ -1,0 +1,19 @@
+{
+  "schema_version": "headshot_recognizability_review_v1",
+  "resident_id": "RES-000003",
+  "state": "pending",
+  "reviewer": null,
+  "reviewed_at": null,
+  "native_size_results": {
+    "32": "pending",
+    "64": "pending",
+    "128": "pending",
+    "256": "pending",
+    "512": "pending"
+  },
+  "identity_confusions": [],
+  "light_ui": "pending",
+  "dark_ui": "pending",
+  "steward_decision": "pending",
+  "notes": []
+}

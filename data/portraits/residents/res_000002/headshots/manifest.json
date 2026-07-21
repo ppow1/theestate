@@ -1,0 +1,147 @@
+{
+  "schema_version": "resident_headshot_manifest_v1",
+  "resident": {
+    "resident_id": "RES-000002",
+    "display_name": "Ingrid"
+  },
+  "resident_template_binding": "RES-000002",
+  "cross_resident_inheritance": false,
+  "status": "pending_generation",
+  "naming_convention": "{resident_id}__{slot_id}__{variant}__{width}x{height}__v{revision:03d}.{ext}",
+  "master_slots": [
+    {
+      "slot_id": "canonical_neutral",
+      "required": true,
+      "expression_source": "WP-4123:neutral_resting",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "slot_id": "shoulders_up_professional",
+      "required": true,
+      "expression_source": "WP-4123:neutral_resting",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "slot_id": "warm_conversational",
+      "required": true,
+      "expression_source": "WP-4123:warm_greeting",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    },
+    {
+      "slot_id": "role_specific",
+      "required": true,
+      "expression_source": "WP-4123:role_specific",
+      "state": "pending_generation",
+      "candidate_asset_ids": [],
+      "canonical_asset_id": null,
+      "evidence": null
+    }
+  ],
+  "derivative_plan": [
+    {
+      "width": 32,
+      "height": 32,
+      "aspect_ratio": "1:1",
+      "states": {
+        "square": "pending_generation",
+        "circular": "pending_generation",
+        "light_ui": "pending_generation",
+        "dark_ui": "pending_generation",
+        "monochrome": "pending_generation"
+      },
+      "source_asset_id": null,
+      "source_sha256": null
+    },
+    {
+      "width": 64,
+      "height": 64,
+      "aspect_ratio": "1:1",
+      "states": {
+        "square": "pending_generation",
+        "circular": "pending_generation",
+        "light_ui": "pending_generation",
+        "dark_ui": "pending_generation",
+        "monochrome": "pending_generation"
+      },
+      "source_asset_id": null,
+      "source_sha256": null
+    },
+    {
+      "width": 128,
+      "height": 128,
+      "aspect_ratio": "1:1",
+      "states": {
+        "square": "pending_generation",
+        "circular": "pending_generation",
+        "light_ui": "pending_generation",
+        "dark_ui": "pending_generation",
+        "monochrome": "pending_generation"
+      },
+      "source_asset_id": null,
+      "source_sha256": null
+    },
+    {
+      "width": 256,
+      "height": 256,
+      "aspect_ratio": "1:1",
+      "states": {
+        "square": "pending_generation",
+        "circular": "pending_generation",
+        "light_ui": "pending_generation",
+        "dark_ui": "pending_generation",
+        "monochrome": "pending_generation"
+      },
+      "source_asset_id": null,
+      "source_sha256": null
+    },
+    {
+      "width": 512,
+      "height": 512,
+      "aspect_ratio": "1:1",
+      "states": {
+        "square": "pending_generation",
+        "circular": "pending_generation",
+        "light_ui": "pending_generation",
+        "dark_ui": "pending_generation",
+        "monochrome": "pending_generation"
+      },
+      "source_asset_id": null,
+      "source_sha256": null
+    }
+  ],
+  "transparent_cutout": {
+    "state": "pending_generation",
+    "format": "PNG",
+    "background": "transparent",
+    "evidence": null
+  },
+  "assets": [],
+  "recognizability_review": {
+    "state": "pending",
+    "native_sizes": [
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "hidden_caption_required": true,
+    "all_residents_together_required": true,
+    "duplicate_resident_check": "pending",
+    "record_path": "data/portraits/residents/res_000002/headshots/reviews/recognizability_review.json"
+  },
+  "steward_review": {
+    "state": "pending",
+    "canonical_promotions": [],
+    "no_silent_replacement": true
+  }
+}

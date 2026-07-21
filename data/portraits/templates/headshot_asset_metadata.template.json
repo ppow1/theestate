@@ -1,0 +1,53 @@
+{
+  "schema_version": "headshot_master_v1",
+  "asset_id": "REQUIRED",
+  "resident_id": "REQUIRED",
+  "asset_kind": "master",
+  "use": "headshot",
+  "lifecycle_state": "pending",
+  "scope": "review_only",
+  "asset_path": "REQUIRED",
+  "sha256": "REQUIRED_AFTER_GENERATION",
+  "dimensions": {
+    "width": 2048,
+    "height": 2560,
+    "aspect_ratio": "4:5"
+  },
+  "crop": {
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1,
+    "hair_silhouette_preserved": true,
+    "jawline_preserved": true
+  },
+  "safe_area": {
+    "face_inside": true,
+    "radius_ratio": 0.42
+  },
+  "identity_fidelity": {
+    "facial_geometry": "pending",
+    "eyes": "pending",
+    "hair": "pending",
+    "age": "pending",
+    "expression": "pending",
+    "recognizable_at_32px": "pending"
+  },
+  "provenance": {
+    "source_uri": null,
+    "source_sha256": null,
+    "created_at": null,
+    "generator": null
+  },
+  "lineage": {
+    "predecessor_asset_id": null
+  },
+  "steward_review": {
+    "state": "pending",
+    "record": null
+  },
+  "canonical": {
+    "declared": false,
+    "steward_approval": null
+  }
+}

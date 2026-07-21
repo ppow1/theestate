@@ -468,6 +468,54 @@ def validate_three_quarter_manifest(manifest: dict, *, root: Path, registry_reco
 
 CORE_EXPRESSIONS = {"neutral_resting", "warm_greeting", "attentive_listening", "quiet_smile", "genuine_laugh", "thoughtful_reflection", "concern", "encouragement", "confidence", "determination", "mild_amusement", "celebration_or_pride"}
 EXPRESSION_STATES = {"candidate", "canonical", "rejected", "superseded"}
+HEADSHOT_STATES = {"candidate", "canonical", "rejected", "superseded", "pending"}
+HEADSHOT_USES = {"headshot", "avatar", "icon_source", "model_card", "dashboard", "dossier", "thumbnail"}
+HEADSHOT_SCOPES = {"public", "internal", "restricted", "private", "review_only", "rejected", "canonical"}
+REQUIRED_HEADSHOT_SLOTS = {"canonical_neutral", "shoulders_up_professional", "warm_conversational", "role_specific"}
+SUPPORTED_THUMBNAILS = {(32, 32), (64, 64), (128, 128), (256, 256), (512, 512)}
+
+def validate_headshot_sidecar(sidecar: dict, *, root: Path, resident_id: str) -> None:
+    asset_id = sidecar.get("asset_id", "<unknown>")
+    required = {"asset_id", "resident_id", "asset_kind", "use", "lifecycle_state", "scope", "asset_path", "sha256", "dimensions", "crop", "safe_area", "identity_fidelity", "provenance", "lineage", "steward_review", "canonical"}
+    _require(sidecar.get("schema_version") in {"headshot_master_v1", "thumbnail_derivative_v1"} and not (required-set(sidecar)), f"asset {asset_id} is missing headshot metadata")
+    _require(sidecar["resident_id"] == resident_id, f"cross-resident headshot binding for {asset_id}")
+    _require(sidecar["lifecycle_state"] in HEADSHOT_STATES and sidecar["scope"] in HEADSHOT_SCOPES and sidecar["use"] in HEADSHOT_USES, f"invalid headshot state/scope/use for {asset_id}")
+    dims=(sidecar["dimensions"].get("width"), sidecar["dimensions"].get("height"))
+    _require(dims[0] and dims[1] and sidecar["dimensions"].get("aspect_ratio") in {"1:1", "4:5"}, f"unsupported dimensions/aspect ratio for {asset_id}")
+    crop=sidecar["crop"]; safe=sidecar["safe_area"]
+    _require(all(0 <= crop.get(k, -1) <= 1 for k in ("x", "y", "width", "height")) and crop.get("hair_silhouette_preserved") and crop.get("jawline_preserved"), f"invalid crop for {asset_id}")
+    _require(safe.get("face_inside") and 0 <= safe.get("radius_ratio", -1) <= .5, f"invalid safe area for {asset_id}")
+    fidelity=sidecar["identity_fidelity"]
+    _require(set(fidelity) >= {"facial_geometry", "eyes", "hair", "age", "expression", "recognizable_at_32px"} and all(v in {"pass", "flag", "fail", "pending"} for v in fidelity.values()), f"missing identity/readability diagnostics for {asset_id}")
+    path=root/sidecar["asset_path"]; _require(path.is_file(), f"asset path does not exist: {sidecar['asset_path']}")
+    actual=_sha256(path); _require(actual == sidecar["sha256"], f"stale hash for asset {asset_id}")
+    declared=sidecar["canonical"].get("declared") is True
+    _require(not(sidecar["lifecycle_state"] in {"rejected", "superseded"} and declared), f"terminal headshot asset {asset_id} cannot be canonical")
+    if sidecar["asset_kind"] == "derivative":
+        _require(dims in SUPPORTED_THUMBNAILS, f"unsupported thumbnail size for {asset_id}")
+        lineage=sidecar["lineage"]
+        _require(lineage.get("source_asset_id") and lineage.get("source_sha256") and lineage.get("recipe_id"), f"missing master-to-derivative lineage for {asset_id}")
+    if declared:
+        _require(sidecar["lifecycle_state"] == "canonical" and sidecar["scope"] == "canonical" and all(v == "pass" for v in fidelity.values()), f"unreviewed or drifted headshot {asset_id} presented as canon")
+        approval_path=sidecar["canonical"].get("steward_approval"); _require(approval_path, f"headshot canon requires Steward approval for {asset_id}")
+        approval=_load(root/approval_path)
+        _require(approval.get("authority") == "steward" and approval.get("decision") == "approve" and approval.get("asset_id") == asset_id and approval.get("sha256") == actual, f"headshot approval does not match asset/hash for {asset_id}")
+
+def validate_headshot_manifest(manifest: dict, *, root: Path, registry_record: dict) -> None:
+    resident_id=registry_record["id"]
+    _require(manifest.get("schema_version") == "resident_headshot_manifest_v1", "unsupported headshot manifest schema")
+    _require(manifest.get("resident",{}).get("resident_id") == resident_id and manifest.get("resident_template_binding") == resident_id and manifest.get("cross_resident_inheritance") is False, f"cross-resident headshot identity binding for {resident_id}")
+    _require({x.get("slot_id") for x in manifest.get("master_slots",[]) if x.get("required")} == REQUIRED_HEADSHOT_SLOTS, f"missing required headshot slots for {resident_id}")
+    _require(manifest.get("naming_convention") == "{resident_id}__{slot_id}__{variant}__{width}x{height}__v{revision:03d}.{ext}", f"non-deterministic headshot naming for {resident_id}")
+    assets={}
+    for record in manifest.get("assets",[]):
+        asset=_load(root/record["metadata_path"]); validate_headshot_sidecar(asset,root=root,resident_id=resident_id)
+        _require(asset["asset_id"] not in assets, f"duplicate headshot asset id for {resident_id}"); assets[asset["asset_id"]]=asset
+    hashes=[a["sha256"] for a in assets.values() if a["asset_kind"] == "derivative"]
+    _require(len(hashes) == len(set(hashes)), f"duplicate derivative content for {resident_id}")
+    for slot in manifest["master_slots"]:
+        if slot.get("state") == "pending_generation": _require(slot.get("canonical_asset_id") is None and not slot.get("candidate_asset_ids") and slot.get("evidence") is None, f"pending headshot presented as evidence for {resident_id}")
+    _require(manifest.get("recognizability_review",{}).get("state") in {"pending", "pass", "fail"}, f"missing recognizability review for {resident_id}")
 
 def validate_expression_sidecar(sidecar: dict, *, root: Path, resident_id: str) -> None:
     asset_id = sidecar.get("asset_id", "<unknown>")
@@ -596,6 +644,9 @@ def validate_catalog(root: Path) -> None:
         expression_path = resident.get("expression_manifest_path")
         _require(expression_path, f"expression manifest catalog link missing for {resident['resident_id']}")
         validate_expression_manifest(_load(root / expression_path), root=root, registry_record=registry[resident["resident_id"]])
+        headshot_path = resident.get("headshot_manifest_path")
+        _require(headshot_path, f"headshot manifest catalog link missing for {resident['resident_id']}")
+        validate_headshot_manifest(_load(root / headshot_path), root=root, registry_record=registry[resident["resident_id"]])
 
 
 def main() -> int:
@@ -603,7 +654,7 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args()
     validate_catalog(args.root.resolve())
-    print("Portrait catalog and WP-4118 through WP-4123 runtime canon validation passed.")
+    print("Portrait catalog and WP-4118 through WP-4124 runtime canon validation passed.")
     return 0
 
 

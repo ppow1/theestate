@@ -113,7 +113,8 @@
         "canonical": "data/portraits/residents/res_000003/canonical",
         "metadata": "data/portraits/residents/res_000003/metadata",
         "reviews": "data/portraits/residents/res_000003/reviews"
-      }
+      },
+      "headshot_manifest_path": "data/portraits/residents/res_000003/headshots/manifest.json"
     },
     "thumbnail": {
       "status": "not_started",
@@ -126,7 +127,8 @@
         "canonical": "data/portraits/residents/res_000003/canonical",
         "metadata": "data/portraits/residents/res_000003/metadata",
         "reviews": "data/portraits/residents/res_000003/reviews"
-      }
+      },
+      "headshot_manifest_path": "data/portraits/residents/res_000003/headshots/manifest.json"
     }
   },
   "assets": [],
