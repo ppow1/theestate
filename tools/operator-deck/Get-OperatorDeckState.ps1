@@ -89,14 +89,223 @@ function Get-SelectionState {
 
 function Get-PlacementChoiceState {
     $path = Join-Path $PSScriptRoot 'runtime\placement-choice.ini'
-    $choice = Read-IniSection -Path $path -Section 'Placement'
-    if ($choice.Count -eq 0) {
+    if (-not (Test-Path -LiteralPath $path)) {
         return [ordered]@{ armed = $false; monitor = ''; shape = '' }
     }
+    $monitor = ''
+    $shape = ''
+    foreach ($line in Get-Content -LiteralPath $path) {
+        if ($line -match '^monitor=(.*)
+
+function Get-PromotionState {
+    $path = Join-Path $PSScriptRoot 'runtime\window-promotion.ini'
+    $promotion = Read-IniSection -Path $path -Section 'Promotion'
+    if ($promotion.Count -eq 0) { return [ordered]@{ available = $false } }
+    $hwnd = [int64]$promotion.hwnd
+    $processId = [int64]$promotion.pid
+    $valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
     return [ordered]@{
-        armed = $true
-        monitor = if ($choice.Contains('monitor')) { $choice.monitor } else { '' }
-        shape = if ($choice.Contains('shape')) { $choice.shape } else { '' }
+        available = $valid
+        valid = $valid
+        hwnd = ('0x{0:X}' -f $hwnd)
+        process_id = $processId
+        origin = [ordered]@{
+            x = [int]$promotion.x
+            y = [int]$promotion.y
+            width = [int]$promotion.w
+            height = [int]$promotion.h
+        }
+    }
+}
+
+function Get-BindingState {
+    $path = Join-Path $PSScriptRoot 'runtime\window-bindings.ini'
+    $bindings = Read-IniSection -Path $path -Section 'Bindings'
+    $result = @()
+    foreach ($target in $bindings.Keys | Sort-Object) {
+        $metadata = Read-IniSection -Path $path -Section "BindingMeta:$target"
+        $hwnd = [int64]$bindings[$target]
+        $processId = [int64]$metadata.pid
+        $result += [ordered]@{
+            target = $target
+            valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
+            hwnd = ('0x{0:X}' -f $hwnd)
+            process_id = $processId
+            process = $metadata.process
+            title = $metadata.title
+        }
+    }
+    return $result
+}
+
+function Get-OperatorDeckObservation {
+    return [ordered]@{
+        schema_version = 'operator_deck_state_v1'
+        observed_at = (Get-Date).ToUniversalTime().ToString('o')
+        dictation = Get-VoiceTypingState
+        selection = Get-SelectionState
+        placement = Get-PlacementChoiceState
+        promotion = Get-PromotionState
+        bindings = @(Get-BindingState)
+    }
+}
+
+function Publish-State {
+    param([System.Collections.IDictionary]$State)
+    $directory = Split-Path -Parent $OutputPath
+    if ($directory) { New-Item -ItemType Directory -Path $directory -Force | Out-Null }
+    $json = $State | ConvertTo-Json -Depth 7
+    $temporaryPath = "$OutputPath.tmp"
+    $json | Set-Content -LiteralPath $temporaryPath -Encoding utf8
+    Move-Item -LiteralPath $temporaryPath -Destination $OutputPath -Force
+    return $json
+}
+
+try {
+    if (-not ('EstateWindowIdentityV1' -as [type])) {
+        Add-Type -TypeDefinition $nativeSource -ErrorAction Stop
+    }
+
+    $lastFingerprint = $null
+    do {
+        $state = Get-OperatorDeckObservation
+        $json = Publish-State -State $state
+        $fingerprint = "$($state.dictation.state)|$($state.selection.armed)|$(($state.bindings | ForEach-Object { "$($_.target):$($_.valid)" }) -join ',')"
+
+        if (-not $Quiet -and (-not $Watch -or $fingerprint -ne $lastFingerprint)) {
+            if ($Watch) {
+                Write-Host ("{0}  Dictation: {1}; Selection armed: {2}; Valid bindings: {3}" -f
+                    $state.observed_at,
+                    $state.dictation.state.ToUpperInvariant(),
+                    $state.selection.armed,
+                    @($state.bindings | Where-Object valid).Count)
+            } else {
+                $json | Write-Output
+                Write-Host "State written to: $OutputPath"
+            }
+        }
+
+        if (-not $Watch -and -not $NoClipboard) {
+            $json | Set-Clipboard
+            if (-not $Quiet) { Write-Host 'The Operator Deck state is on the clipboard.' }
+        }
+        $lastFingerprint = $fingerprint
+        if ($Watch) { Start-Sleep -Milliseconds $IntervalMilliseconds }
+    } while ($Watch)
+    exit 0
+} catch {
+    Write-Error "Operator Deck state publication failed: $($_.Exception.Message)"
+    exit 1
+}
+) { $monitor = $Matches[1].Trim() }
+        if ($line -match '^shape=(.*)
+
+function Get-PromotionState {
+    $path = Join-Path $PSScriptRoot 'runtime\window-promotion.ini'
+    $promotion = Read-IniSection -Path $path -Section 'Promotion'
+    if ($promotion.Count -eq 0) { return [ordered]@{ available = $false } }
+    $hwnd = [int64]$promotion.hwnd
+    $processId = [int64]$promotion.pid
+    $valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
+    return [ordered]@{
+        available = $valid
+        valid = $valid
+        hwnd = ('0x{0:X}' -f $hwnd)
+        process_id = $processId
+        origin = [ordered]@{
+            x = [int]$promotion.x
+            y = [int]$promotion.y
+            width = [int]$promotion.w
+            height = [int]$promotion.h
+        }
+    }
+}
+
+function Get-BindingState {
+    $path = Join-Path $PSScriptRoot 'runtime\window-bindings.ini'
+    $bindings = Read-IniSection -Path $path -Section 'Bindings'
+    $result = @()
+    foreach ($target in $bindings.Keys | Sort-Object) {
+        $metadata = Read-IniSection -Path $path -Section "BindingMeta:$target"
+        $hwnd = [int64]$bindings[$target]
+        $processId = [int64]$metadata.pid
+        $result += [ordered]@{
+            target = $target
+            valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
+            hwnd = ('0x{0:X}' -f $hwnd)
+            process_id = $processId
+            process = $metadata.process
+            title = $metadata.title
+        }
+    }
+    return $result
+}
+
+function Get-OperatorDeckObservation {
+    return [ordered]@{
+        schema_version = 'operator_deck_state_v1'
+        observed_at = (Get-Date).ToUniversalTime().ToString('o')
+        dictation = Get-VoiceTypingState
+        selection = Get-SelectionState
+        placement = Get-PlacementChoiceState
+        promotion = Get-PromotionState
+        bindings = @(Get-BindingState)
+    }
+}
+
+function Publish-State {
+    param([System.Collections.IDictionary]$State)
+    $directory = Split-Path -Parent $OutputPath
+    if ($directory) { New-Item -ItemType Directory -Path $directory -Force | Out-Null }
+    $json = $State | ConvertTo-Json -Depth 7
+    $temporaryPath = "$OutputPath.tmp"
+    $json | Set-Content -LiteralPath $temporaryPath -Encoding utf8
+    Move-Item -LiteralPath $temporaryPath -Destination $OutputPath -Force
+    return $json
+}
+
+try {
+    if (-not ('EstateWindowIdentityV1' -as [type])) {
+        Add-Type -TypeDefinition $nativeSource -ErrorAction Stop
+    }
+
+    $lastFingerprint = $null
+    do {
+        $state = Get-OperatorDeckObservation
+        $json = Publish-State -State $state
+        $fingerprint = "$($state.dictation.state)|$($state.selection.armed)|$(($state.bindings | ForEach-Object { "$($_.target):$($_.valid)" }) -join ',')"
+
+        if (-not $Quiet -and (-not $Watch -or $fingerprint -ne $lastFingerprint)) {
+            if ($Watch) {
+                Write-Host ("{0}  Dictation: {1}; Selection armed: {2}; Valid bindings: {3}" -f
+                    $state.observed_at,
+                    $state.dictation.state.ToUpperInvariant(),
+                    $state.selection.armed,
+                    @($state.bindings | Where-Object valid).Count)
+            } else {
+                $json | Write-Output
+                Write-Host "State written to: $OutputPath"
+            }
+        }
+
+        if (-not $Watch -and -not $NoClipboard) {
+            $json | Set-Clipboard
+            if (-not $Quiet) { Write-Host 'The Operator Deck state is on the clipboard.' }
+        }
+        $lastFingerprint = $fingerprint
+        if ($Watch) { Start-Sleep -Milliseconds $IntervalMilliseconds }
+    } while ($Watch)
+    exit 0
+} catch {
+    Write-Error "Operator Deck state publication failed: $($_.Exception.Message)"
+    exit 1
+}
+) { $shape = $Matches[1].Trim() }
+    }
+    return [ordered]@{
+        armed = ($monitor -ne '' -or $shape -ne '')
+        monitor = $monitor
+        shape = $shape
     }
 }
 
