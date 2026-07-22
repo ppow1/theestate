@@ -46,6 +46,13 @@ Branch: `work/operator-deck-maiden-voyage`
    - Key rendered `VOICE / OFF`.
    - Physical tap activated Voice Typing.
    - Key rendered green `VOICE / ON` while listening.
+7. Stream Deck quadrant installation:
+   - Guarded 19-to-35-action preflight passed without writes.
+   - Timestamped backup created at `A:\AI\Tools\EstateStreamDeckPlugin\backups\operator-deck-quadrants-20260721-224645`.
+   - Sixteen quadrant action UUIDs installed.
+   - Source and installed JS/manifests matched after patch.
+   - Node and JSON validation passed.
+   - Stream Deck profile layout was not modified automatically.
 
 ## Important distinctions
 
