@@ -11,7 +11,7 @@
     "action": {
       "type": "string",
       "enum": [
-        "window.activate", "window.target", "window.swap", "window.move_active",
+        "window.activate", "window.target", "window.swap", "window.move_active", "window.place_target",
         "dictation.toggle", "dictation.status", "capture.region",
         "clipboard.copy", "clipboard.paste", "clipboard.history"
       ]
