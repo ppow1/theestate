@@ -87,6 +87,27 @@ function Get-SelectionState {
     }
 }
 
+function Get-PromotionState {
+    $path = Join-Path $PSScriptRoot 'runtime\window-promotion.ini'
+    $promotion = Read-IniSection -Path $path -Section 'Promotion'
+    if ($promotion.Count -eq 0) { return [ordered]@{ available = $false } }
+    $hwnd = [int64]$promotion.hwnd
+    $processId = [int64]$promotion.pid
+    $valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
+    return [ordered]@{
+        available = $valid
+        valid = $valid
+        hwnd = ('0x{0:X}' -f $hwnd)
+        process_id = $processId
+        origin = [ordered]@{
+            x = [int]$promotion.x
+            y = [int]$promotion.y
+            width = [int]$promotion.w
+            height = [int]$promotion.h
+        }
+    }
+}
+
 function Get-BindingState {
     $path = Join-Path $PSScriptRoot 'runtime\window-bindings.ini'
     $bindings = Read-IniSection -Path $path -Section 'Bindings'
@@ -113,6 +134,7 @@ function Get-OperatorDeckObservation {
         observed_at = (Get-Date).ToUniversalTime().ToString('o')
         dictation = Get-VoiceTypingState
         selection = Get-SelectionState
+        promotion = Get-PromotionState
         bindings = @(Get-BindingState)
     }
 }
