@@ -8,6 +8,8 @@ configPath := A_ScriptDir "\config.ini"
 if !FileExist(configPath)
     configPath := A_ScriptDir "\config.example.ini"
 
+bindingsPath := A_ScriptDir "\runtime\window-bindings.ini"
+
 settings := LoadSettings(configPath)
 slots := LoadSlots(configPath)
 targets := LoadTargets(configPath)
@@ -33,6 +35,12 @@ switch command {
         ActivateTarget(GetTarget(targets, argument), false)
     case "dictation-toggle":
         ToggleDictation()
+    case "bind":
+        RequireArgument(argument, "target name")
+        BindActiveTarget(GetTarget(targets, argument))
+    case "unbind":
+        RequireArgument(argument, "target name")
+        UnbindTarget(GetTarget(targets, argument))
     default:
         DieWithUsage("Unknown command: " command)
 }
@@ -97,7 +105,7 @@ GetIniSectionNames(configFile) {
 }
 
 ActivateOrLaunch(target, slots, settings) {
-    hwnd := FindWindow(target["match"])
+    hwnd := FindTargetWindow(target)
     if !hwnd {
         launch := target["launch"]
         if launch = ""
@@ -106,18 +114,19 @@ ActivateOrLaunch(target, slots, settings) {
         Sleep(settings["PostLaunchDelayMs"])
         if !WinWait(target["match"], , settings["DefaultWaitSeconds"])
             throw Error("Timed out waiting for target window: " target["name"])
-        hwnd := FindWindow(target["match"])
+        hwnd := FindTargetWindow(target)
     }
     MoveWindowToConfiguredSlot(hwnd, target, slots)
     WinActivate("ahk_id " hwnd)
 }
 
 ActivateTarget(target, moveToSlot := false, slots := unset) {
-    hwnd := FindWindow(target["match"])
+    hwnd := FindTargetWindow(target)
     if !hwnd
         throw Error("Target window not found: " target["name"])
     if moveToSlot
         MoveWindowToConfiguredSlot(hwnd, target, slots)
+    WinRestore("ahk_id " hwnd)
     WinActivate("ahk_id " hwnd)
 }
 
@@ -125,14 +134,16 @@ SwapWithTarget(target) {
     activeHwnd := WinExist("A")
     if !activeHwnd
         throw Error("No active window found.")
-    targetHwnd := FindWindow(target["match"])
+    targetHwnd := FindTargetWindow(target)
     if !targetHwnd
         throw Error("Target window not found: " target["name"])
     if activeHwnd = targetHwnd {
+        WinRestore("ahk_id " targetHwnd)
         WinActivate("ahk_id " targetHwnd)
         return
     }
 
+    WinRestore("ahk_id " targetHwnd)
     activeRect := GetWindowRect(activeHwnd)
     targetRect := GetWindowRect(targetHwnd)
     MoveWindow(activeHwnd, targetRect)
@@ -158,10 +169,43 @@ MoveWindowToConfiguredSlot(hwnd, target, slots) {
     MoveWindow(hwnd, GetSlot(slots, slotName))
 }
 
-FindWindow(matchRule) {
+FindTargetWindow(target) {
+    global bindingsPath
+
+    if FileExist(bindingsPath) {
+        boundHwnd := IniRead(bindingsPath, "Bindings", target["name"], "")
+        if boundHwnd != "" {
+            if WinExist("ahk_id " boundHwnd)
+                return Integer(boundHwnd)
+            IniDelete(bindingsPath, "Bindings", target["name"])
+        }
+    }
+
+    matchRule := target["match"]
     if matchRule = ""
         throw Error("Target is missing a window match rule.")
     return WinExist(matchRule)
+}
+
+BindActiveTarget(target) {
+    global bindingsPath
+
+    hwnd := WinExist("A")
+    if !hwnd
+        throw Error("No active window found to bind.")
+    DirCreate(A_ScriptDir "\runtime")
+    IniWrite(hwnd, bindingsPath, "Bindings", target["name"])
+    IniWrite(WinGetTitle("ahk_id " hwnd), bindingsPath, "BindingMeta:" target["name"], "title")
+    IniWrite(WinGetProcessName("ahk_id " hwnd), bindingsPath, "BindingMeta:" target["name"], "process")
+}
+
+UnbindTarget(target) {
+    global bindingsPath
+
+    if !FileExist(bindingsPath)
+        return
+    IniDelete(bindingsPath, "Bindings", target["name"])
+    IniDelete(bindingsPath, "BindingMeta:" target["name"])
 }
 
 GetWindowRect(hwnd) {
@@ -204,6 +248,8 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk move-active <SlotName>`n"
         . "  OperatorDeck.ahk activate <TargetName>`n"
         . "  OperatorDeck.ahk dictation-toggle`n"
+        . "  OperatorDeck.ahk bind <TargetName>`n"
+        . "  OperatorDeck.ahk unbind <TargetName>`n"
     MsgBox(usage, "Operator Deck", "Icon!")
     ExitApp(1)
 }
