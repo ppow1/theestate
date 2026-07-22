@@ -83,6 +83,7 @@ function Get-SelectionState {
         process_id = $processId
         process = $selection.process
         title = $selection.title
+        source_slot = if ($selection.Contains('source_slot')) { $selection.source_slot } else { '' }
     }
 }
 
