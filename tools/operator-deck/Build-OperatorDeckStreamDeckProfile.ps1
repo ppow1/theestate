@@ -14,7 +14,7 @@ if ($env:OS -ne 'Windows_NT') {
 
 $pluginUuid = 'com.estate.statusbridge'
 $pluginName = 'Estate Status Bridge'
-$pluginVersion = '0.4.0'
+$pluginVersion = '0.5.0'
 $deviceModel = '20GAT9902'
 $profileName = 'Operator Deck - Four Monitor Wall'
 
@@ -58,7 +58,7 @@ function New-PluginAction([string]$Name, [string]$Uuid) {
     }
 }
 
-function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath) {
+function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath, [string]$PlacementPageManifestPath) {
     $page = Get-Content -LiteralPath $PageManifestPath -Raw | ConvertFrom-Json
     $actions = $page.Controllers[0].Actions
     $properties = @($actions.PSObject.Properties)
@@ -83,6 +83,29 @@ function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath) {
         $control = $actions.PSObject.Properties[$position]
         if (-not $control -or $control.Value.UUID -ne $expectedControls[$position]) { throw "Control action is missing from $position." }
     }
+    $placementPage = Get-Content -LiteralPath $PlacementPageManifestPath -Raw | ConvertFrom-Json
+    $placementActions = $placementPage.Controllers[0].Actions
+    $placementExpected = [ordered]@{
+        '0,0' = 'com.estate.statusbridge.operator_deck.monitor.m1'
+        '1,0' = 'com.estate.statusbridge.operator_deck.monitor.m2'
+        '2,0' = 'com.estate.statusbridge.operator_deck.monitor.m3'
+        '3,0' = 'com.estate.statusbridge.operator_deck.monitor.m4'
+        '0,1' = 'com.estate.statusbridge.operator_deck.shape.full'
+        '1,1' = 'com.estate.statusbridge.operator_deck.shape.left'
+        '2,1' = 'com.estate.statusbridge.operator_deck.shape.right'
+        '3,1' = 'com.estate.statusbridge.operator_deck.shape.top'
+        '4,1' = 'com.estate.statusbridge.operator_deck.shape.bottom'
+        '4,0' = 'com.estate.statusbridge.operator_deck.undo'
+        '5,0' = 'com.estate.statusbridge.operator_deck.clear_selection'
+        '6,0' = 'com.estate.statusbridge.operator_deck.select_active'
+        '6,1' = 'com.estate.statusbridge.operator_deck.dictation'
+        '7,0' = 'com.estate.statusbridge.operator_deck.return'
+    }
+    if (@($placementActions.PSObject.Properties).Count -ne 14) { throw "Expected 14 mixed-placement actions." }
+    foreach ($position in $placementExpected.Keys) {
+        $action = $placementActions.PSObject.Properties[$position]
+        if (-not $action -or $action.Value.UUID -ne $placementExpected[$position]) { throw "Mixed-placement action is missing from $position." }
+    }
     foreach ($required in @('package.json', 'Profiles')) {
         if (-not (Test-Path -LiteralPath (Join-Path $Root $required))) { throw "Package component missing: $required" }
     }
@@ -93,9 +116,12 @@ $temporaryRoot = Join-Path $env:TEMP ('operator-deck-profile-' + [guid]::NewGuid
 try {
     $profileUuid = [guid]::NewGuid().ToString().ToUpperInvariant()
     $pageUuid = [guid]::NewGuid().ToString().ToUpperInvariant()
+    $placementPageUuid = [guid]::NewGuid().ToString().ToUpperInvariant()
     $profileRoot = Join-Path $temporaryRoot ('Profiles\' + $profileUuid + '.sdProfile')
     $pageRoot = Join-Path $profileRoot ('Profiles\' + $pageUuid)
+    $placementPageRoot = Join-Path $profileRoot ('Profiles\' + $placementPageUuid)
     New-Item -ItemType Directory -Path $pageRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $placementPageRoot -Force | Out-Null
 
     $actions = [ordered]@{}
     foreach ($entry in $layout) {
@@ -115,6 +141,29 @@ try {
     $pageManifestPath = Join-Path $pageRoot 'manifest.json'
     $pageManifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $pageManifestPath -Encoding utf8
 
+    $placementActions = [ordered]@{}
+    $placementActions['0,0'] = New-PluginAction -Name 'Operator Deck Destination M1' -Uuid 'com.estate.statusbridge.operator_deck.monitor.m1'
+    $placementActions['1,0'] = New-PluginAction -Name 'Operator Deck Destination M2' -Uuid 'com.estate.statusbridge.operator_deck.monitor.m2'
+    $placementActions['2,0'] = New-PluginAction -Name 'Operator Deck Destination M3' -Uuid 'com.estate.statusbridge.operator_deck.monitor.m3'
+    $placementActions['3,0'] = New-PluginAction -Name 'Operator Deck Destination M4' -Uuid 'com.estate.statusbridge.operator_deck.monitor.m4'
+    $placementActions['0,1'] = New-PluginAction -Name 'Operator Deck Shape Full' -Uuid 'com.estate.statusbridge.operator_deck.shape.full'
+    $placementActions['1,1'] = New-PluginAction -Name 'Operator Deck Shape Left' -Uuid 'com.estate.statusbridge.operator_deck.shape.left'
+    $placementActions['2,1'] = New-PluginAction -Name 'Operator Deck Shape Right' -Uuid 'com.estate.statusbridge.operator_deck.shape.right'
+    $placementActions['3,1'] = New-PluginAction -Name 'Operator Deck Shape Top' -Uuid 'com.estate.statusbridge.operator_deck.shape.top'
+    $placementActions['4,1'] = New-PluginAction -Name 'Operator Deck Shape Bottom' -Uuid 'com.estate.statusbridge.operator_deck.shape.bottom'
+    $placementActions['4,0'] = New-PluginAction -Name 'Operator Deck Undo' -Uuid 'com.estate.statusbridge.operator_deck.undo'
+    $placementActions['5,0'] = New-PluginAction -Name 'Operator Deck Clear Selection' -Uuid 'com.estate.statusbridge.operator_deck.clear_selection'
+    $placementActions['6,0'] = New-PluginAction -Name 'Operator Deck Select Active' -Uuid 'com.estate.statusbridge.operator_deck.select_active'
+    $placementActions['6,1'] = New-PluginAction -Name 'Operator Deck Voice Typing' -Uuid 'com.estate.statusbridge.operator_deck.dictation'
+    $placementActions['7,0'] = New-PluginAction -Name 'Operator Deck Return Promoted Window' -Uuid 'com.estate.statusbridge.operator_deck.return'
+    $placementPageManifest = [ordered]@{
+        Controllers = @([ordered]@{ Actions = $placementActions; Type = 'Keypad' })
+        Icon = ''
+        Name = 'Mixed Placement'
+    }
+    $placementPageManifestPath = Join-Path $placementPageRoot 'manifest.json'
+    $placementPageManifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $placementPageManifestPath -Encoding utf8
+
     $profileManifest = [ordered]@{
         AppIdentifier = '*'
         Device = [ordered]@{ Model = $deviceModel; UUID = $DeviceUuid }
@@ -122,7 +171,7 @@ try {
         Pages = [ordered]@{
             Current = '00000000-0000-0000-0000-000000000000'
             Default = $pageUuid.ToLowerInvariant()
-            Pages = @($pageUuid.ToLowerInvariant())
+            Pages = @($pageUuid.ToLowerInvariant(), $placementPageUuid.ToLowerInvariant())
         }
         Version = '3.0'
     }
@@ -139,7 +188,7 @@ try {
     }
     $package | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $temporaryRoot 'package.json') -Encoding utf8
 
-    Assert-ProfilePackage -Root $temporaryRoot -PageManifestPath $pageManifestPath
+    Assert-ProfilePackage -Root $temporaryRoot -PageManifestPath $pageManifestPath -PlacementPageManifestPath $placementPageManifestPath
 
     $outputDirectory = Split-Path -Parent $OutputPath
     New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
@@ -156,9 +205,9 @@ try {
         'OPERATOR DECK STREAM DECK PROFILE: VALIDATED'
         "Profile: $profileName"
         "Package: $OutputPath"
-        'Placed actions: 20 (16 quadrants + UNDO + CLEAR + SELECT + Voice Typing)'
-        'Quadrant matrix: columns 0-3, rows 0-3'
-        'Reserved expansion area: columns 4-7'
+        'Page 1: 20 actions (16 quadrants + UNDO + CLEAR + SELECT + Voice Typing)'
+        'Page 2: 14 actions (M1-M4 + FULL/LEFT/RIGHT/TOP/BOTTOM + UNDO/CLEAR/SELECT + Voice Typing + RETURN)'
+        'The validated Page 1 quadrant matrix remains unchanged.'
         $(if ($previousPackageBackup) { "Previous package backup: $previousPackageBackup" })
         'The existing Stream Deck profiles were not modified.'
         $(if ($OpenImport) { 'Opening the Stream Deck profile import dialog.' } else { 'Re-run with -OpenImport to open the import dialog.' })
