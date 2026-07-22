@@ -184,3 +184,19 @@ Adapters should read the published JSON and render its `state` rather than reimp
 ### Continuous validation
 
 Continuous polling was validated on 2026-07-21 with the visible Microsoft Voice Typing toolbar. The publisher observed `OFF -> LISTENING -> OFF`, with high confidence for every transition. No raw screenshot or workstation report is committed.
+
+
+## Calibrated four-monitor layout
+
+The example configuration now carries the workstation-validated 16-quadrant layout:
+
+| Logical monitor | Windows device | Wall position | Work area |
+|---|---|---|---|
+| M1 | DISPLAY4 | upper left | 3840 × 2160 |
+| M2 | DISPLAY1 | upper right | 3840 × 2160 |
+| M3 | DISPLAY3 | lower left, primary | 3840 × 2076 after the 84-pixel taskbar |
+| M4 | DISPLAY2 | lower right | 3840 × 2160 |
+
+All monitors report 175% effective scaling. Slots use observed Windows virtual-desktop coordinates, including the small 5–6 pixel alignment offsets and negative upper-row coordinates. Existing `MAIN_WORK` and `PARK_*` names remain as compatibility aliases.
+
+Before copying these slots into an existing local `config.ini`, preserve any locally tuned target matches and launch commands. The calibrated `config.example.ini` is review evidence; it does not automatically overwrite local configuration.
