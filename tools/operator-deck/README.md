@@ -321,3 +321,25 @@ This lets a control surface render three unambiguous postures without duplicatin
 - available destination: a selection is armed and the key represents another slot.
 
 Selections created by `select <TargetName>` or `select-active` intentionally publish an empty `source_slot`, because they did not originate from a quadrant. Pressing any quadrant still places that selection and clears it.
+
+
+## Guarded Stream Deck quadrant patch
+
+`Install-OperatorDeck-QuadrantActions.ps1` prepares 16 distinct Stream Deck actions, one for each calibrated quadrant. It requires the previously validated 19-action Voice Typing baseline and refuses partial quadrant installations or source/installed plugin drift.
+
+The default invocation is preflight-only:
+
+```powershell
+Set-Location A:\theestate\tools\operator-deck
+.\Install-OperatorDeck-QuadrantActions.ps1
+```
+
+Preflight performs the complete transformation in a temporary directory, validates a 35-action manifest, checks all 16 UUIDs, and runs Node syntax checks without changing plugin or command files. `-Apply` is intentionally a separate reviewed operation. Apply creates a timestamped backup, writes matching source and installed plugin files, creates one command wrapper per quadrant, validates the result, and does not restart Stream Deck.
+
+The quadrant keys render:
+
+- `READY` when no valid selection is armed;
+- green `SELECT` on the quadrant that supplied the current selection;
+- blue `PLACE` on every other quadrant while a selection is armed.
+
+The action set does not inject or rearrange a Stream Deck profile. Keys remain available for deliberate manual placement.
