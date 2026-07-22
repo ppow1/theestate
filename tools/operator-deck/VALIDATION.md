@@ -60,6 +60,13 @@ Branch: `work/operator-deck-maiden-voyage`
    - Timestamped backup created at `A:\AI\Tools\EstateStreamDeckPlugin\backups\shared-command-launcher-20260721-230235`.
    - All plugin command actions now use hidden `cmd.exe /c call` execution.
    - Source and installed `plugin.js` matched after repair; Node validation passed.
+9. Shared Operator Deck state polling:
+   - After the launcher repair, quadrant keys reported `READY` without terminals while Voice Typing reported `ERR`.
+   - Competing Voice Typing and quadrant publications targeted the same temporary state file.
+   - Guarded shared-polling preflight passed with one remaining publisher call.
+   - Timestamped backup created at `A:\AI\Tools\EstateStreamDeckPlugin\backups\operator-deck-state-polling-20260721-231334`.
+   - Voice Typing and quadrant actions now consume one cached state publication.
+   - Source and installed `status.js` matched after repair; Node validation passed.
 
 ## Important distinctions
 
