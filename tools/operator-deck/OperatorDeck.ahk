@@ -43,6 +43,9 @@ switch command {
     case "place-selected":
         RequireArgument(argument, "slot name")
         PlaceSelectedWindow(GetSlot(slots, argument))
+    case "slot":
+        RequireArgument(argument, "slot name")
+        HandleSlotPress(GetSlot(slots, argument))
     case "clear-selection":
         ClearWindowSelection()
     case "activate":
@@ -205,18 +208,63 @@ SelectWindow(hwnd) {
 }
 
 PlaceSelectedWindow(slot) {
-    selectionPath := A_ScriptDir "\runtime\window-selection.ini"
-    if !FileExist(selectionPath)
-        throw Error("No window is currently selected.")
-    hwnd := Integer(IniRead(selectionPath, "Selection", "hwnd", "0"))
-    expectedPid := Integer(IniRead(selectionPath, "Selection", "pid", "0"))
-    if !hwnd || !WinExist("ahk_id " hwnd) || !expectedPid || WinGetPID("ahk_id " hwnd) != expectedPid {
-        ClearWindowSelection()
-        throw Error("The selected window is no longer available.")
-    }
+    hwnd := GetSelectedWindow()
+    if !hwnd
+        throw Error("No valid window is currently selected.")
     MoveWindow(hwnd, slot)
     WinActivate("ahk_id " hwnd)
     ClearWindowSelection()
+}
+
+HandleSlotPress(slot) {
+    selectedHwnd := GetSelectedWindow()
+    if selectedHwnd {
+        MoveWindow(selectedHwnd, slot)
+        WinActivate("ahk_id " selectedHwnd)
+        ClearWindowSelection()
+        return
+    }
+
+    hwnd := FindWindowInSlot(slot)
+    if !hwnd
+        throw Error("No movable window occupies the selected slot.")
+    SelectWindow(hwnd)
+}
+
+GetSelectedWindow() {
+    selectionPath := A_ScriptDir "\runtime\window-selection.ini"
+    if !FileExist(selectionPath)
+        return 0
+    hwnd := Integer(IniRead(selectionPath, "Selection", "hwnd", "0"))
+    expectedPid := Integer(IniRead(selectionPath, "Selection", "pid", "0"))
+    if hwnd && WinExist("ahk_id " hwnd) && expectedPid && WinGetPID("ahk_id " hwnd) = expectedPid
+        return hwnd
+    ClearWindowSelection()
+    return 0
+}
+
+FindWindowInSlot(slot) {
+    bestHwnd := 0
+    bestArea := 0
+    for hwnd in WinGetList() {
+        try {
+            if WinGetMinMax("ahk_id " hwnd) = -1
+                continue
+            title := WinGetTitle("ahk_id " hwnd)
+            className := WinGetClass("ahk_id " hwnd)
+            if title = "" || className = "Progman" || className = "WorkerW"
+                continue
+            WinGetPos(&x, &y, &w, &h, "ahk_id " hwnd)
+            overlapWidth := Max(0, Min(x + w, slot["x"] + slot["w"]) - Max(x, slot["x"]))
+            overlapHeight := Max(0, Min(y + h, slot["y"] + slot["h"]) - Max(y, slot["y"]))
+            overlapArea := overlapWidth * overlapHeight
+            if overlapArea > bestArea {
+                bestArea := overlapArea
+                bestHwnd := hwnd
+            }
+        }
+    }
+    return bestHwnd
 }
 
 ClearWindowSelection() {
@@ -316,6 +364,7 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk select <TargetName>`n"
         . "  OperatorDeck.ahk select-active`n"
         . "  OperatorDeck.ahk place-selected <SlotName>`n"
+        . "  OperatorDeck.ahk slot <SlotName>`n"
         . "  OperatorDeck.ahk clear-selection`n"
         . "  OperatorDeck.ahk activate <TargetName>`n"
         . "  OperatorDeck.ahk dictation-toggle`n"
