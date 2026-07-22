@@ -32,6 +32,7 @@ Branch: `work/operator-deck-maiden-voyage`
    - Bound target placement across monitors validated.
    - Two-step select/place validated.
    - Context-sensitive quadrant source/destination placement validated.
+   - Quadrant-origin selection published `source_slot: M1_BOTTOM_RIGHT` for the valid bound Chrome window.
 5. Recovery:
    - Single-window movement undo validated.
    - Two-window swap and transactional undo validated.
