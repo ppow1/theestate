@@ -299,3 +299,25 @@ Set-Location A:\theestate\tools\operator-deck
 ```
 
 The watcher prints only meaningful transitions. A Stream Deck, tray indicator, rotary/LCD device, LED controller, or future spatial adapter can poll the JSON without learning registry paths, HWND validation rules, or AutoHotkey runtime file formats.
+
+
+### Quadrant source-state feedback
+
+When a quadrant button selects its occupying window, the temporary selection now records the logical quadrant as `source_slot`. The unified state publisher exposes that field while selection remains valid:
+
+```json
+{
+  "selection": {
+    "armed": true,
+    "source_slot": "M1_BOTTOM_RIGHT"
+  }
+}
+```
+
+This lets a control surface render three unambiguous postures without duplicating window-identification logic:
+
+- neutral: no selection is armed;
+- selected source: the key's slot matches `selection.source_slot`;
+- available destination: a selection is armed and the key represents another slot.
+
+Selections created by `select <TargetName>` or `select-active` intentionally publish an empty `source_slot`, because they did not originate from a quadrant. Pressing any quadrant still places that selection and clears it.
