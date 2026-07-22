@@ -87,6 +87,19 @@ function Get-SelectionState {
     }
 }
 
+function Get-PlacementChoiceState {
+    $path = Join-Path $PSScriptRoot 'runtime\placement-choice.ini'
+    $choice = Read-IniSection -Path $path -Section 'Placement'
+    if ($choice.Count -eq 0) {
+        return [ordered]@{ armed = $false; monitor = ''; shape = '' }
+    }
+    return [ordered]@{
+        armed = $true
+        monitor = if ($choice.Contains('monitor')) { $choice.monitor } else { '' }
+        shape = if ($choice.Contains('shape')) { $choice.shape } else { '' }
+    }
+}
+
 function Get-PromotionState {
     $path = Join-Path $PSScriptRoot 'runtime\window-promotion.ini'
     $promotion = Read-IniSection -Path $path -Section 'Promotion'
@@ -134,6 +147,7 @@ function Get-OperatorDeckObservation {
         observed_at = (Get-Date).ToUniversalTime().ToString('o')
         dictation = Get-VoiceTypingState
         selection = Get-SelectionState
+        placement = Get-PlacementChoiceState
         promotion = Get-PromotionState
         bindings = @(Get-BindingState)
     }
