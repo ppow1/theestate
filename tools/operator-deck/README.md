@@ -286,3 +286,16 @@ The first press selects the principal window in the primary monitor's upper-left
 ## Movement undo
 
 `OperatorDeck.ahk undo` restores the rectangle of every window affected by the most recent move or swap. Single-window placement records one window; swap records both windows as one transaction. Undo validates each HWND and PID before changing anything and fails closed if a recorded window is stale. The record is cleared after successful restoration, so this prototype intentionally provides one-step undo.
+
+
+## Unified state publisher
+
+`Get-OperatorDeckState.ps1` publishes a single adapter-facing state document containing calibrated dictation state, temporary-selection state, and named-binding validity. It writes `runtime/operator-deck-state.json` atomically.
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+.\Get-OperatorDeckState.ps1 -Watch -IntervalMilliseconds 500
+```
+
+The watcher prints only meaningful transitions. A Stream Deck, tray indicator, rotary/LCD device, LED controller, or future spatial adapter can poll the JSON without learning registry paths, HWND validation rules, or AutoHotkey runtime file formats.
