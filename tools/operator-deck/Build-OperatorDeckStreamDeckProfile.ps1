@@ -14,7 +14,7 @@ if ($env:OS -ne 'Windows_NT') {
 
 $pluginUuid = 'com.estate.statusbridge'
 $pluginName = 'Estate Status Bridge'
-$pluginVersion = '0.3.0'
+$pluginVersion = '0.4.0'
 $deviceModel = '20GAT9902'
 $profileName = 'Operator Deck - Four Monitor Wall'
 
@@ -62,7 +62,7 @@ function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath) {
     $page = Get-Content -LiteralPath $PageManifestPath -Raw | ConvertFrom-Json
     $actions = $page.Controllers[0].Actions
     $properties = @($actions.PSObject.Properties)
-    if ($properties.Count -ne 17) { throw "Expected 17 placed actions; found $($properties.Count)." }
+    if ($properties.Count -ne 20) { throw "Expected 20 placed actions; found $($properties.Count)." }
     foreach ($entry in $layout) {
         $uuid = 'com.estate.statusbridge.operator_deck.slot.' + $entry.Slot.ToLowerInvariant()
         $property = $actions.PSObject.Properties[$entry.Position]
@@ -73,6 +73,15 @@ function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath) {
     $voice = $actions.PSObject.Properties['7,0']
     if (-not $voice -or $voice.Value.UUID -ne 'com.estate.statusbridge.operator_deck.dictation') {
         throw 'Voice Typing action is missing from position 7,0.'
+    }
+    $expectedControls = [ordered]@{
+        '4,0' = 'com.estate.statusbridge.operator_deck.undo'
+        '5,0' = 'com.estate.statusbridge.operator_deck.clear_selection'
+        '6,0' = 'com.estate.statusbridge.operator_deck.select_active'
+    }
+    foreach ($position in $expectedControls.Keys) {
+        $control = $actions.PSObject.Properties[$position]
+        if (-not $control -or $control.Value.UUID -ne $expectedControls[$position]) { throw "Control action is missing from $position." }
     }
     foreach ($required in @('package.json', 'Profiles')) {
         if (-not (Test-Path -LiteralPath (Join-Path $Root $required))) { throw "Package component missing: $required" }
@@ -94,6 +103,9 @@ try {
         $actions[$entry.Position] = New-PluginAction -Name ("Operator Deck " + $entry.Display) -Uuid $uuid
     }
     $actions['7,0'] = New-PluginAction -Name 'Operator Deck Voice Typing' -Uuid 'com.estate.statusbridge.operator_deck.dictation'
+    $actions['4,0'] = New-PluginAction -Name 'Operator Deck Undo' -Uuid 'com.estate.statusbridge.operator_deck.undo'
+    $actions['5,0'] = New-PluginAction -Name 'Operator Deck Clear Selection' -Uuid 'com.estate.statusbridge.operator_deck.clear_selection'
+    $actions['6,0'] = New-PluginAction -Name 'Operator Deck Select Active' -Uuid 'com.estate.statusbridge.operator_deck.select_active'
 
     $pageManifest = [ordered]@{
         Controllers = @([ordered]@{ Actions = $actions; Type = 'Keypad' })
@@ -144,7 +156,7 @@ try {
         'OPERATOR DECK STREAM DECK PROFILE: VALIDATED'
         "Profile: $profileName"
         "Package: $OutputPath"
-        'Placed actions: 17 (16 quadrants + Voice Typing)'
+        'Placed actions: 20 (16 quadrants + UNDO + CLEAR + SELECT + Voice Typing)'
         'Quadrant matrix: columns 0-3, rows 0-3'
         'Reserved expansion area: columns 4-7'
         $(if ($previousPackageBackup) { "Previous package backup: $previousPackageBackup" })
