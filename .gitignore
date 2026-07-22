@@ -30,3 +30,7 @@ operations/validation/validation_metrics_dashboard.md
 
 # Private conversation production intake
 ingestion/conversations/private/
+
+
+# Operator Deck workstation-specific configuration
+tools/operator-deck/config.ini
