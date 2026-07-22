@@ -14,10 +14,20 @@ $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $destination = Join-Path $ExportRoot "OperatorDeck-StreamDeck-Context-$timestamp"
 $zipPath = "$destination.zip"
 
+function Get-CompatibleRelativePath {
+    param([string]$Root, [string]$FullPath)
+    $normalizedRoot = [System.IO.Path]::GetFullPath($Root).TrimEnd('\') + '\'
+    $normalizedPath = [System.IO.Path]::GetFullPath($FullPath)
+    if (-not $normalizedPath.StartsWith($normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Path is outside the expected root: $FullPath"
+    }
+    return $normalizedPath.Substring($normalizedRoot.Length)
+}
+
 function Test-IncludedFile {
     param([System.IO.FileInfo]$File, [string]$Root)
     if ($allowedExtensions -notcontains $File.Extension.ToLowerInvariant()) { return $false }
-    $relative = [System.IO.Path]::GetRelativePath($Root, $File.FullName)
+    $relative = Get-CompatibleRelativePath -Root $Root -FullPath $File.FullName
     $segments = $relative -split '[\\/]'
     foreach ($segment in $segments) {
         if ($excludedSegments -contains $segment) { return $false }
@@ -35,7 +45,7 @@ function Copy-ContextTree {
     $records = @()
     foreach ($file in Get-ChildItem -LiteralPath $Root -File -Recurse) {
         if (-not (Test-IncludedFile -File $file -Root $Root)) { continue }
-        $relative = [System.IO.Path]::GetRelativePath($Root, $file.FullName)
+        $relative = Get-CompatibleRelativePath -Root $Root -FullPath $file.FullName
         $archiveRelative = Join-Path $ArchivePrefix $relative
         $target = Join-Path $destination $archiveRelative
         $targetDirectory = Split-Path -Parent $target
