@@ -175,9 +175,11 @@ FindTargetWindow(target) {
     if FileExist(bindingsPath) {
         boundHwnd := IniRead(bindingsPath, "Bindings", target["name"], "")
         if boundHwnd != "" {
-            if WinExist("ahk_id " boundHwnd)
+            expectedPid := Integer(IniRead(bindingsPath, "BindingMeta:" target["name"], "pid", "0"))
+            if WinExist("ahk_id " boundHwnd) && expectedPid != 0 && WinGetPID("ahk_id " boundHwnd) = expectedPid
                 return Integer(boundHwnd)
             IniDelete(bindingsPath, "Bindings", target["name"])
+            IniDelete(bindingsPath, "BindingMeta:" target["name"])
         }
     }
 
@@ -197,6 +199,7 @@ BindActiveTarget(target) {
     IniWrite(hwnd, bindingsPath, "Bindings", target["name"])
     IniWrite(WinGetTitle("ahk_id " hwnd), bindingsPath, "BindingMeta:" target["name"], "title")
     IniWrite(WinGetProcessName("ahk_id " hwnd), bindingsPath, "BindingMeta:" target["name"], "process")
+    IniWrite(WinGetPID("ahk_id " hwnd), bindingsPath, "BindingMeta:" target["name"], "pid")
 }
 
 UnbindTarget(target) {
