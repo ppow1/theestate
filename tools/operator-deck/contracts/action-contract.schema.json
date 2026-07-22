@@ -12,6 +12,7 @@
       "type": "string",
       "enum": [
         "window.activate", "window.target", "window.swap", "window.move_active", "window.place_target",
+        "window.select_target", "window.select_active", "window.place_selected", "window.clear_selection",
         "dictation.toggle", "dictation.status", "capture.region",
         "clipboard.copy", "clipboard.paste", "clipboard.history"
       ]
