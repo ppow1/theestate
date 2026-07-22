@@ -281,3 +281,8 @@ OperatorDeck.ahk slot M2_BOTTOM_RIGHT
 ```
 
 The first press selects the principal window in the primary monitor's upper-left quadrant. The second moves it to the upper-right monitor's lower-right quadrant. Named-target selection remains available for minimized windows and ambiguous overlapping layouts.
+
+
+## Movement undo
+
+`OperatorDeck.ahk undo` restores the rectangle of every window affected by the most recent move or swap. Single-window placement records one window; swap records both windows as one transaction. Undo validates each HWND and PID before changing anything and fails closed if a recorded window is stale. The record is cleared after successful restoration, so this prototype intentionally provides one-step undo.
