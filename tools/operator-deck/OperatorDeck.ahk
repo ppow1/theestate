@@ -35,6 +35,16 @@ switch command {
         RequireArgument(argument, "target name")
         RequireArgument(secondArgument, "slot name")
         PlaceTargetInSlot(GetTarget(targets, argument), GetSlot(slots, secondArgument))
+    case "select":
+        RequireArgument(argument, "target name")
+        SelectTarget(GetTarget(targets, argument))
+    case "select-active":
+        SelectWindow(WinExist("A"))
+    case "place-selected":
+        RequireArgument(argument, "slot name")
+        PlaceSelectedWindow(GetSlot(slots, argument))
+    case "clear-selection":
+        ClearWindowSelection()
     case "activate":
         RequireArgument(argument, "target name")
         ActivateTarget(GetTarget(targets, argument), false)
@@ -175,6 +185,46 @@ PlaceTargetInSlot(target, slot) {
     WinActivate("ahk_id " hwnd)
 }
 
+SelectTarget(target) {
+    hwnd := FindTargetWindow(target)
+    if !hwnd
+        throw Error("Target window not found: " target["name"])
+    SelectWindow(hwnd)
+}
+
+SelectWindow(hwnd) {
+    if !hwnd
+        throw Error("No window found to select.")
+    global bindingsPath
+    selectionPath := A_ScriptDir "\runtime\window-selection.ini"
+    DirCreate(A_ScriptDir "\runtime")
+    IniWrite(hwnd, selectionPath, "Selection", "hwnd")
+    IniWrite(WinGetPID("ahk_id " hwnd), selectionPath, "Selection", "pid")
+    IniWrite(WinGetTitle("ahk_id " hwnd), selectionPath, "Selection", "title")
+    IniWrite(WinGetProcessName("ahk_id " hwnd), selectionPath, "Selection", "process")
+}
+
+PlaceSelectedWindow(slot) {
+    selectionPath := A_ScriptDir "\runtime\window-selection.ini"
+    if !FileExist(selectionPath)
+        throw Error("No window is currently selected.")
+    hwnd := Integer(IniRead(selectionPath, "Selection", "hwnd", "0"))
+    expectedPid := Integer(IniRead(selectionPath, "Selection", "pid", "0"))
+    if !hwnd || !WinExist("ahk_id " hwnd) || !expectedPid || WinGetPID("ahk_id " hwnd) != expectedPid {
+        ClearWindowSelection()
+        throw Error("The selected window is no longer available.")
+    }
+    MoveWindow(hwnd, slot)
+    WinActivate("ahk_id " hwnd)
+    ClearWindowSelection()
+}
+
+ClearWindowSelection() {
+    selectionPath := A_ScriptDir "\runtime\window-selection.ini"
+    if FileExist(selectionPath)
+        FileDelete(selectionPath)
+}
+
 MoveWindowToConfiguredSlot(hwnd, target, slots) {
     slotName := target["slot"]
     if slotName = ""
@@ -263,6 +313,10 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk swap <TargetName>`n"
         . "  OperatorDeck.ahk move-active <SlotName>`n"
         . "  OperatorDeck.ahk place <TargetName> <SlotName>`n"
+        . "  OperatorDeck.ahk select <TargetName>`n"
+        . "  OperatorDeck.ahk select-active`n"
+        . "  OperatorDeck.ahk place-selected <SlotName>`n"
+        . "  OperatorDeck.ahk clear-selection`n"
         . "  OperatorDeck.ahk activate <TargetName>`n"
         . "  OperatorDeck.ahk dictation-toggle`n"
         . "  OperatorDeck.ahk bind <TargetName>`n"
