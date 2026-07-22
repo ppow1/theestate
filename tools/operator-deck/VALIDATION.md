@@ -67,6 +67,13 @@ Branch: `work/operator-deck-maiden-voyage`
    - Timestamped backup created at `A:\AI\Tools\EstateStreamDeckPlugin\backups\operator-deck-state-polling-20260721-231334`.
    - Voice Typing and quadrant actions now consume one cached state publication.
    - Source and installed `status.js` matched after repair; Node validation passed.
+10. Complete Stream Deck profile:
+   - Generated `Operator-Deck-Four-Monitor-Wall.streamDeckProfile` with 17 placed actions.
+   - Imported as a separate `Operator Deck - Four Monitor Wall` profile.
+   - All 16 quadrant keys appeared in the intended spatial 4x4 matrix.
+   - Voice Typing appeared at the upper-right key and reported `OFF`, confirming recovery from the earlier polling error.
+   - Columns 4-7 remained reserved for later controls.
+   - Existing Stream Deck profiles were not replaced.
 
 ## Important distinctions
 
