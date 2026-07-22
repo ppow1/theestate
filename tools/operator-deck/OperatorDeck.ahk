@@ -300,7 +300,7 @@ HandleDestinationMonitor(slots, monitorName, armOnly) {
 
 HandleDestinationShape(slots, shapeName) {
     shape := StrLower(shapeName)
-    if !InStr("|left|right|top|bottom|", "|" shape "|")
+    if !InStr("|full|left|right|top|bottom|", "|" shape "|")
         throw Error("Unknown destination shape: " shapeName)
     choicePath := A_ScriptDir "\\runtime\\placement-choice.ini"
     monitor := FileExist(choicePath) ? IniRead(choicePath, "Placement", "monitor", "") : ""
