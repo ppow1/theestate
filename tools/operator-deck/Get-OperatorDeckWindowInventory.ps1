@@ -73,7 +73,7 @@ try {
 
     Write-Host 'Inventorying visible top-level application windows (read-only)...'
     $windows = foreach ($window in [EstateTopLevelWindowsV1]::Enumerate()) {
-        if (-not $window.Visible -or $window.Cloaked -or [string]::IsNullOrWhiteSpace($window.Title)) { continue }
+        if (-not $window.Visible -or [string]::IsNullOrWhiteSpace($window.Title)) { continue }
         if ($ExcludeMinimized -and $window.ShowCommand -eq 2) { continue }
         $process = Get-Process -Id $window.ProcessId -ErrorAction SilentlyContinue
         if (-not $process) { continue }
@@ -89,6 +89,7 @@ try {
             executable_path = $executablePath
             title = $window.Title
             class_name = $window.ClassName
+            cloaked = $window.Cloaked
             window_state = switch ($window.ShowCommand) { 2 { 'minimized' } 3 { 'maximized' } default { 'normal' } }
             rect = [ordered]@{
                 left = $window.Rect.Left; top = $window.Rect.Top
