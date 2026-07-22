@@ -46,6 +46,10 @@ switch command {
     case "promote-selected":
         RequireArgument(argument, "slot name")
         PromoteSelectedWindow(GetSlot(slots, argument))
+    case "promote-monitor":
+        RequireArgument(argument, "monitor name")
+        RequireArgument(secondArgument, "shape")
+        PromoteSelectedWindow(GetMonitorShape(slots, argument, secondArgument))
     case "return-promoted":
         ReturnPromotedWindow()
     case "slot":
@@ -234,6 +238,39 @@ PromoteSelectedWindow(slot) {
     MoveWindow(hwnd, slot)
     WinActivate("ahk_id " hwnd)
     ClearWindowSelection()
+}
+
+GetMonitorShape(slots, monitorName, shapeName) {
+    prefix := StrUpper(monitorName)
+    topLeft := GetSlot(slots, prefix "_TOP_LEFT")
+    topRight := GetSlot(slots, prefix "_TOP_RIGHT")
+    bottomLeft := GetSlot(slots, prefix "_BOTTOM_LEFT")
+    bottomRight := GetSlot(slots, prefix "_BOTTOM_RIGHT")
+
+    left := Min(topLeft["x"], bottomLeft["x"])
+    top := Min(topLeft["y"], topRight["y"])
+    right := Max(topRight["x"] + topRight["w"], bottomRight["x"] + bottomRight["w"])
+    bottom := Max(bottomLeft["y"] + bottomLeft["h"], bottomRight["y"] + bottomRight["h"])
+    width := right - left
+    height := bottom - top
+    shape := StrLower(shapeName)
+
+    switch shape {
+        case "full":
+            return Map("x", left, "y", top, "w", width, "h", height)
+        case "left":
+            return Map("x", left, "y", top, "w", Floor(width / 2), "h", height)
+        case "right":
+            half := Floor(width / 2)
+            return Map("x", left + half, "y", top, "w", width - half, "h", height)
+        case "top":
+            return Map("x", left, "y", top, "w", width, "h", Floor(height / 2))
+        case "bottom":
+            half := Floor(height / 2)
+            return Map("x", left, "y", top + half, "w", width, "h", height - half)
+        default:
+            throw Error("Unknown monitor shape: " shapeName)
+    }
 }
 
 SavePromotionOrigin(hwnd) {
@@ -474,6 +511,7 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk select-active`n"
         . "  OperatorDeck.ahk place-selected <SlotName>`n"
         . "  OperatorDeck.ahk promote-selected <SlotName>`n"
+        . "  OperatorDeck.ahk promote-monitor <M1|M2|M3|M4> <full|left|right|top|bottom>`n"
         . "  OperatorDeck.ahk return-promoted`n"
         . "  OperatorDeck.ahk slot <SlotName>`n"
         . "  OperatorDeck.ahk clear-selection`n"
