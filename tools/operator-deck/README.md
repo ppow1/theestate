@@ -239,3 +239,28 @@ Set-Location A:\theestate\tools\operator-deck
 ```
 
 This separates window identity from destination. A control surface can therefore devote one group of buttons to logical windows and another group to the 16 monitor quadrants. The adapter restores a minimized target, places it using the selected work-area rectangle, and activates it. `activate` intentionally restores the window's prior normal rectangle without assigning a quadrant; use `place` when deterministic geometry is required.
+
+
+## Two-step control-surface placement
+
+Operator Deck can hold one temporary window selection between physical button presses.
+
+Select a configured/bound target:
+
+```text
+OperatorDeck.ahk select ChatGPT-1
+```
+
+Or select whichever window is active without requiring a configured target:
+
+```text
+OperatorDeck.ahk select-active
+```
+
+Then place that selection with a quadrant button:
+
+```text
+OperatorDeck.ahk place-selected M4_BOTTOM_RIGHT
+```
+
+The temporary selection stores HWND, PID, title, and process under ignored runtime state. It is validated before use and cleared after successful placement, after an invalid-window failure, or by `clear-selection`. A 32-key surface can therefore reserve controls for window/target selection and controls for destination quadrants without encoding every source/destination combination.
