@@ -50,6 +50,15 @@ switch command {
         RequireArgument(argument, "monitor name")
         RequireArgument(secondArgument, "shape")
         PromoteSelectedWindow(GetMonitorShape(slots, argument, secondArgument))
+    case "destination-monitor":
+        RequireArgument(argument, "monitor name")
+        HandleDestinationMonitor(slots, argument, false)
+    case "arm-monitor":
+        RequireArgument(argument, "monitor name")
+        HandleDestinationMonitor(slots, argument, true)
+    case "destination-shape":
+        RequireArgument(argument, "shape")
+        HandleDestinationShape(slots, argument)
     case "return-promoted":
         ReturnPromotedWindow()
     case "slot":
@@ -238,6 +247,7 @@ PromoteSelectedWindow(slot) {
     MoveWindow(hwnd, slot)
     WinActivate("ahk_id " hwnd)
     ClearWindowSelection()
+    ClearPlacementChoice()
 }
 
 GetMonitorShape(slots, monitorName, shapeName) {
@@ -271,6 +281,41 @@ GetMonitorShape(slots, monitorName, shapeName) {
         default:
             throw Error("Unknown monitor shape: " shapeName)
     }
+}
+
+HandleDestinationMonitor(slots, monitorName, armOnly) {
+    choicePath := A_ScriptDir "\\runtime\\placement-choice.ini"
+    shape := FileExist(choicePath) ? IniRead(choicePath, "Placement", "shape", "") : ""
+    if shape != "" {
+        PromoteSelectedWindow(GetMonitorShape(slots, monitorName, shape))
+        return
+    }
+    if armOnly {
+        DirCreate(A_ScriptDir "\\runtime")
+        IniWrite(StrUpper(monitorName), choicePath, "Placement", "monitor")
+        return
+    }
+    PromoteSelectedWindow(GetMonitorShape(slots, monitorName, "full"))
+}
+
+HandleDestinationShape(slots, shapeName) {
+    shape := StrLower(shapeName)
+    if !InStr("|left|right|top|bottom|", "|" shape "|")
+        throw Error("Unknown destination shape: " shapeName)
+    choicePath := A_ScriptDir "\\runtime\\placement-choice.ini"
+    monitor := FileExist(choicePath) ? IniRead(choicePath, "Placement", "monitor", "") : ""
+    if monitor != "" {
+        PromoteSelectedWindow(GetMonitorShape(slots, monitor, shape))
+        return
+    }
+    DirCreate(A_ScriptDir "\\runtime")
+    IniWrite(shape, choicePath, "Placement", "shape")
+}
+
+ClearPlacementChoice() {
+    choicePath := A_ScriptDir "\\runtime\\placement-choice.ini"
+    if FileExist(choicePath)
+        FileDelete(choicePath)
 }
 
 SavePromotionOrigin(hwnd) {
@@ -363,6 +408,7 @@ ClearWindowSelection() {
     selectionPath := A_ScriptDir "\runtime\window-selection.ini"
     if FileExist(selectionPath)
         FileDelete(selectionPath)
+    ClearPlacementChoice()
 }
 
 MoveWindowToConfiguredSlot(hwnd, target, slots) {
@@ -512,6 +558,9 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk place-selected <SlotName>`n"
         . "  OperatorDeck.ahk promote-selected <SlotName>`n"
         . "  OperatorDeck.ahk promote-monitor <M1|M2|M3|M4> <full|left|right|top|bottom>`n"
+        . "  OperatorDeck.ahk destination-monitor <M1|M2|M3|M4>`n"
+        . "  OperatorDeck.ahk arm-monitor <M1|M2|M3|M4>`n"
+        . "  OperatorDeck.ahk destination-shape <left|right|top|bottom>`n"
         . "  OperatorDeck.ahk return-promoted`n"
         . "  OperatorDeck.ahk slot <SlotName>`n"
         . "  OperatorDeck.ahk clear-selection`n"
