@@ -48,6 +48,8 @@ switch command {
         HandleSlotPress(GetSlot(slots, argument))
     case "clear-selection":
         ClearWindowSelection()
+    case "undo":
+        UndoLastMove()
     case "activate":
         RequireArgument(argument, "target name")
         ActivateTarget(GetTarget(targets, argument), false)
@@ -164,8 +166,9 @@ SwapWithTarget(target) {
     WinRestore("ahk_id " targetHwnd)
     activeRect := GetWindowRect(activeHwnd)
     targetRect := GetWindowRect(targetHwnd)
-    MoveWindow(activeHwnd, targetRect)
-    MoveWindow(targetHwnd, activeRect)
+    SaveUndoTransaction([activeHwnd, targetHwnd])
+    MoveWindow(activeHwnd, targetRect, false)
+    MoveWindow(targetHwnd, activeRect, false)
     WinActivate("ahk_id " targetHwnd)
 }
 
@@ -327,9 +330,63 @@ GetWindowRect(hwnd) {
     return Map("x", x, "y", y, "w", w, "h", h)
 }
 
-MoveWindow(hwnd, rect) {
+MoveWindow(hwnd, rect, recordUndo := true) {
     WinRestore("ahk_id " hwnd)
+    if recordUndo
+        SaveUndoTransaction([hwnd])
     WinMove(rect["x"], rect["y"], rect["w"], rect["h"], "ahk_id " hwnd)
+}
+
+SaveUndoTransaction(hwnds) {
+    undoPath := A_ScriptDir "\runtime\window-undo.ini"
+    DirCreate(A_ScriptDir "\runtime")
+    if FileExist(undoPath)
+        FileDelete(undoPath)
+    IniWrite(hwnds.Length, undoPath, "Undo", "count")
+    for index, hwnd in hwnds {
+        rect := GetWindowRect(hwnd)
+        section := "Window:" index
+        IniWrite(hwnd, undoPath, section, "hwnd")
+        IniWrite(WinGetPID("ahk_id " hwnd), undoPath, section, "pid")
+        IniWrite(rect["x"], undoPath, section, "x")
+        IniWrite(rect["y"], undoPath, section, "y")
+        IniWrite(rect["w"], undoPath, section, "w")
+        IniWrite(rect["h"], undoPath, section, "h")
+    }
+}
+
+UndoLastMove() {
+    undoPath := A_ScriptDir "\runtime\window-undo.ini"
+    if !FileExist(undoPath)
+        throw Error("No window movement is available to undo.")
+
+    count := Integer(IniRead(undoPath, "Undo", "count", "0"))
+    if count < 1
+        throw Error("The undo record is invalid.")
+
+    restoreItems := []
+    Loop count {
+        section := "Window:" A_Index
+        hwnd := Integer(IniRead(undoPath, section, "hwnd", "0"))
+        expectedPid := Integer(IniRead(undoPath, section, "pid", "0"))
+        if !hwnd || !WinExist("ahk_id " hwnd) || !expectedPid || WinGetPID("ahk_id " hwnd) != expectedPid {
+            FileDelete(undoPath)
+            throw Error("An undo window is no longer available.")
+        }
+        restoreItems.Push(Map(
+            "hwnd", hwnd,
+            "rect", Map(
+                "x", Integer(IniRead(undoPath, section, "x", "0")),
+                "y", Integer(IniRead(undoPath, section, "y", "0")),
+                "w", Integer(IniRead(undoPath, section, "w", "0")),
+                "h", Integer(IniRead(undoPath, section, "h", "0"))
+            )
+        ))
+    }
+
+    for item in restoreItems
+        MoveWindow(item["hwnd"], item["rect"], false)
+    FileDelete(undoPath)
 }
 
 GetTarget(targets, name) {
@@ -366,6 +423,7 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk place-selected <SlotName>`n"
         . "  OperatorDeck.ahk slot <SlotName>`n"
         . "  OperatorDeck.ahk clear-selection`n"
+        . "  OperatorDeck.ahk undo`n"
         . "  OperatorDeck.ahk activate <TargetName>`n"
         . "  OperatorDeck.ahk dictation-toggle`n"
         . "  OperatorDeck.ahk bind <TargetName>`n"
