@@ -200,3 +200,28 @@ The example configuration now carries the workstation-validated 16-quadrant layo
 All monitors report 175% effective scaling. Slots use observed Windows virtual-desktop coordinates, including the small 5–6 pixel alignment offsets and negative upper-row coordinates. Existing `MAIN_WORK` and `PARK_*` names remain as compatibility aliases.
 
 Before copying these slots into an existing local `config.ini`, preserve any locally tuned target matches and launch commands. The calibrated `config.example.ini` is review evidence; it does not automatically overwrite local configuration.
+
+
+## Exact runtime window binding
+
+The workstation inventory found multiple simultaneous Chrome windows with identical `ChatGPT - Google Chrome` titles and the same executable. Static AutoHotkey title rules cannot distinguish them. Bind a logical target to the currently active window instead:
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+.\OperatorDeck.ahk bind ChatGPT-1
+.\OperatorDeck.ahk bind ChatGPT-2
+```
+
+A physical control can call `bind` without changing desktop focus. For keyboard testing from PowerShell, start a delay and click the intended window before it expires:
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+Start-Sleep -Seconds 5
+.\OperatorDeck.ahk bind ChatGPT-1
+```
+
+Bindings live under ignored `runtime/window-bindings.ini`. A binding records the HWND, process name, title, and PID. Operator Deck validates that the handle still belongs to the recorded process before using it; stale bindings are deleted and normal configured matching resumes. Remove a binding with `OperatorDeck.ahk unbind <TargetName>`.
+
+Bound minimized windows are restored before activation or swapping, preventing the synthetic `-32000,-32000` minimized rectangle from corrupting placement.
