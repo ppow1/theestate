@@ -74,13 +74,13 @@ function Get-SelectionState {
     $selection = Read-IniSection -Path $path -Section 'Selection'
     if ($selection.Count -eq 0) { return [ordered]@{ armed = $false } }
     $hwnd = [int64]$selection.hwnd
-    $pid = [int64]$selection.pid
-    $valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $pid
+    $processId = [int64]$selection.pid
+    $valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
     return [ordered]@{
         armed = $valid
         valid = $valid
         hwnd = ('0x{0:X}' -f $hwnd)
-        process_id = $pid
+        process_id = $processId
         process = $selection.process
         title = $selection.title
     }
@@ -93,12 +93,12 @@ function Get-BindingState {
     foreach ($target in $bindings.Keys | Sort-Object) {
         $metadata = Read-IniSection -Path $path -Section "BindingMeta:$target"
         $hwnd = [int64]$bindings[$target]
-        $pid = [int64]$metadata.pid
+        $processId = [int64]$metadata.pid
         $result += [ordered]@{
             target = $target
-            valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $pid
+            valid = Test-WindowIdentity -Hwnd $hwnd -ExpectedPid $processId
             hwnd = ('0x{0:X}' -f $hwnd)
-            process_id = $pid
+            process_id = $processId
             process = $metadata.process
             title = $metadata.title
         }
