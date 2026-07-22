@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$OutputPath = (Join-Path $PSScriptRoot 'runtime\window-inventory.json'),
-    [switch]$IncludeMinimized,
+    [switch]$ExcludeMinimized,
     [switch]$NoClipboard
 )
 
@@ -74,7 +74,7 @@ try {
     Write-Host 'Inventorying visible top-level application windows (read-only)...'
     $windows = foreach ($window in [EstateTopLevelWindowsV1]::Enumerate()) {
         if (-not $window.Visible -or $window.Cloaked -or [string]::IsNullOrWhiteSpace($window.Title)) { continue }
-        if (-not $IncludeMinimized -and $window.ShowCommand -eq 2) { continue }
+        if ($ExcludeMinimized -and $window.ShowCommand -eq 2) { continue }
         $process = Get-Process -Id $window.ProcessId -ErrorAction SilentlyContinue
         if (-not $process) { continue }
         $width = $window.Rect.Right - $window.Rect.Left
