@@ -19,6 +19,7 @@ if A_Args.Length < 1
 
 command := StrLower(A_Args[1])
 argument := A_Args.Length >= 2 ? A_Args[2] : ""
+secondArgument := A_Args.Length >= 3 ? A_Args[3] : ""
 
 switch command {
     case "target":
@@ -30,6 +31,10 @@ switch command {
     case "move-active":
         RequireArgument(argument, "slot name")
         MoveActiveToSlot(GetSlot(slots, argument))
+    case "place":
+        RequireArgument(argument, "target name")
+        RequireArgument(secondArgument, "slot name")
+        PlaceTargetInSlot(GetTarget(targets, argument), GetSlot(slots, secondArgument))
     case "activate":
         RequireArgument(argument, "target name")
         ActivateTarget(GetTarget(targets, argument), false)
@@ -162,6 +167,14 @@ MoveActiveToSlot(slot) {
     MoveWindow(hwnd, slot)
 }
 
+PlaceTargetInSlot(target, slot) {
+    hwnd := FindTargetWindow(target)
+    if !hwnd
+        throw Error("Target window not found: " target["name"])
+    MoveWindow(hwnd, slot)
+    WinActivate("ahk_id " hwnd)
+}
+
 MoveWindowToConfiguredSlot(hwnd, target, slots) {
     slotName := target["slot"]
     if slotName = ""
@@ -249,6 +262,7 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk target <TargetName>`n"
         . "  OperatorDeck.ahk swap <TargetName>`n"
         . "  OperatorDeck.ahk move-active <SlotName>`n"
+        . "  OperatorDeck.ahk place <TargetName> <SlotName>`n"
         . "  OperatorDeck.ahk activate <TargetName>`n"
         . "  OperatorDeck.ahk dictation-toggle`n"
         . "  OperatorDeck.ahk bind <TargetName>`n"
