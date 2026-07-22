@@ -225,3 +225,17 @@ Start-Sleep -Seconds 5
 Bindings live under ignored `runtime/window-bindings.ini`. A binding records the HWND, process name, title, and PID. Operator Deck validates that the handle still belongs to the recorded process before using it; stale bindings are deleted and normal configured matching resumes. Remove a binding with `OperatorDeck.ahk unbind <TargetName>`.
 
 Bound minimized windows are restored before activation or swapping, preventing the synthetic `-32000,-32000` minimized rectangle from corrupting placement.
+
+
+## Bound target placement
+
+Use `place <TargetName> <SlotName>` to put an exact bound window into any calibrated quadrant:
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+.\OperatorDeck.ahk place ChatGPT-1 M1_TOP_LEFT
+.\OperatorDeck.ahk place ChatGPT-2 M4_BOTTOM_RIGHT
+```
+
+This separates window identity from destination. A control surface can therefore devote one group of buttons to logical windows and another group to the 16 monitor quadrants. The adapter restores a minimized target, places it using the selected work-area rectangle, and activates it. `activate` intentionally restores the window's prior normal rectangle without assigning a quadrant; use `place` when deterministic geometry is required.
