@@ -154,3 +154,26 @@ Calibration on the Steward's Windows 11 workstation established this read-only s
 - Other active microphone records, including long-lived `svchost.exe` entries, are excluded.
 
 The paired listening/off observations were confirmed on 2026-07-21. Raw workstation reports remain local-only. The current contract intentionally treats an idle-but-visible toolbar as `off`; a distinct `ready` state requires a separate supported signal.
+
+
+## Voice Typing status publisher
+
+After calibration, use `Get-VoiceTypingStatus.ps1` for normal operation. It reads only the calibrated CBS microphone record and atomically publishes `runtime/voice-typing-status.json`. The calibration inspector is not required during routine use.
+
+One-shot status:
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+.\Get-VoiceTypingStatus.ps1
+```
+
+Continuous publication, sampled twice per second until `Ctrl+C`:
+
+```powershell
+CLS
+Set-Location A:\theestate\tools\operator-deck
+.\Get-VoiceTypingStatus.ps1 -Watch -IntervalMilliseconds 500
+```
+
+Adapters should read the published JSON and render its `state` rather than reimplementing Windows detection. Suggested presentation is red or unlit for `off`, green or pulsing for `listening`, and amber for `unknown` or an execution error. The publisher writes only on-machine runtime state; it does not press `Win+H`, move the toolbar, or control dictation.
