@@ -228,11 +228,16 @@ try {
     $state = 'unknown'
     $confidence = 'none'
     $diagnostic = 'No reliable state selector has been calibrated on this workstation.'
-    $activeMicrophoneUsage = @($microphoneUsage | Where-Object active)
+    $voiceTypingUsage = @($microphoneUsage | Where-Object {
+        $_.registry_path -match '\\MicrosoftWindows\.Client\.CBS_cw5n1h2txyewy$'
+    })
+    $activeVoiceTypingUsage = @($voiceTypingUsage | Where-Object active)
     if ($text -match '(?i)listening') {
         $state = 'listening'; $confidence = 'medium'; $diagnostic = 'A visible candidate surface contains the word listening.'
-    } elseif ($activeMicrophoneUsage.Count -gt 0) {
-        $state = 'listening'; $confidence = 'low'; $diagnostic = 'Windows reports active microphone capability use; calibration must confirm which entry belongs to Voice Typing.'
+    } elseif ($activeVoiceTypingUsage.Count -gt 0) {
+        $state = 'listening'; $confidence = 'high'; $diagnostic = 'The calibrated Windows Client CBS microphone capability record is active.'
+    } elseif ($voiceTypingUsage.Count -gt 0) {
+        $state = 'off'; $confidence = 'high'; $diagnostic = 'The calibrated Windows Client CBS microphone capability record is inactive.'
     } elseif ($text -match '(?i)voice typing|dictation') {
         $state = 'ready'; $confidence = 'low'; $diagnostic = 'A visible candidate surface identifies Voice Typing or dictation, but listening state was not proven.'
     } elseif ($windows.Count -eq 0) {
@@ -245,7 +250,7 @@ try {
         capability = 'dictation.status'
         state = $state
         confidence = $confidence
-        evidence = @($windows) + @($microphoneUsage)
+        evidence = @($windows) + @($voiceTypingUsage)
         diagnostic = $diagnostic
     }
 
