@@ -87,6 +87,7 @@ LoadSlots(configFile) {
         if coords.Length != 4
             throw Error("Slot '" name "' must use x,y,width,height format.")
         slotMap[name] := Map(
+            "name", name,
             "x", Integer(Trim(coords[1])),
             "y", Integer(Trim(coords[2])),
             "w", Integer(Trim(coords[3])),
@@ -198,7 +199,7 @@ SelectTarget(target) {
     SelectWindow(hwnd)
 }
 
-SelectWindow(hwnd) {
+SelectWindow(hwnd, sourceSlot := "") {
     if !hwnd
         throw Error("No window found to select.")
     global bindingsPath
@@ -208,6 +209,7 @@ SelectWindow(hwnd) {
     IniWrite(WinGetPID("ahk_id " hwnd), selectionPath, "Selection", "pid")
     IniWrite(WinGetTitle("ahk_id " hwnd), selectionPath, "Selection", "title")
     IniWrite(WinGetProcessName("ahk_id " hwnd), selectionPath, "Selection", "process")
+    IniWrite(sourceSlot, selectionPath, "Selection", "source_slot")
 }
 
 PlaceSelectedWindow(slot) {
@@ -231,7 +233,7 @@ HandleSlotPress(slot) {
     hwnd := FindWindowInSlot(slot)
     if !hwnd
         throw Error("No movable window occupies the selected slot.")
-    SelectWindow(hwnd)
+    SelectWindow(hwnd, slot["name"])
 }
 
 GetSelectedWindow() {
