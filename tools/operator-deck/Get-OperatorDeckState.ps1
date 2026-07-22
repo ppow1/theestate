@@ -92,10 +92,16 @@ function Get-PlacementChoiceState {
     if (-not (Test-Path -LiteralPath $path)) {
         return [ordered]@{ armed = $false; monitor = ''; shape = '' }
     }
-    $monitor = ''
-    $shape = ''
-    foreach ($line in Get-Content -LiteralPath $path) {
-        if ($line -match '^monitor=(.*)
+    $lines = @(Get-Content -LiteralPath $path | Where-Object { $_ -and -not $_.StartsWith('[') })
+    $choice = if ($lines.Count -gt 0) { $lines -join [Environment]::NewLine | ConvertFrom-StringData } else { @{} }
+    $monitor = if ($null -ne $choice.monitor) { [string]$choice.monitor } else { '' }
+    $shape = if ($null -ne $choice.shape) { [string]$choice.shape } else { '' }
+    return [ordered]@{
+        armed = ($monitor -ne '' -or $shape -ne '')
+        monitor = $monitor
+        shape = $shape
+    }
+}
 
 function Get-PromotionState {
     $path = Join-Path $PSScriptRoot 'runtime\window-promotion.ini'
