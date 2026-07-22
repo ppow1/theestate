@@ -264,3 +264,20 @@ OperatorDeck.ahk place-selected M4_BOTTOM_RIGHT
 ```
 
 The temporary selection stores HWND, PID, title, and process under ignored runtime state. It is validated before use and cleared after successful placement, after an invalid-window failure, or by `clear-selection`. A 32-key surface can therefore reserve controls for window/target selection and controls for destination quadrants without encoding every source/destination combination.
+
+
+## Context-sensitive quadrant buttons
+
+Map each of the 16 quadrant controls to `slot <SlotName>`. The same command changes behavior according to selection state:
+
+1. With no selection, it selects the visible non-minimized window having the greatest overlap with that quadrant.
+2. With a valid selection, it moves the selected window into the pressed quadrant and clears selection.
+
+Example two-button sequence:
+
+```text
+OperatorDeck.ahk slot M3_TOP_LEFT
+OperatorDeck.ahk slot M2_BOTTOM_RIGHT
+```
+
+The first press selects the principal window in the primary monitor's upper-left quadrant. The second moves it to the upper-right monitor's lower-right quadrant. Named-target selection remains available for minimized windows and ambiguous overlapping layouts.
