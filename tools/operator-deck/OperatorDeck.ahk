@@ -31,6 +31,8 @@ switch command {
     case "activate":
         RequireArgument(argument, "target name")
         ActivateTarget(GetTarget(targets, argument), false)
+    case "dictation-toggle":
+        ToggleDictation()
     default:
         DieWithUsage("Unknown command: " command)
 }
@@ -138,6 +140,10 @@ SwapWithTarget(target) {
     WinActivate("ahk_id " targetHwnd)
 }
 
+ToggleDictation() {
+    Send("#h")
+}
+
 MoveActiveToSlot(slot) {
     hwnd := WinExist("A")
     if !hwnd
@@ -197,6 +203,7 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk swap <TargetName>`n"
         . "  OperatorDeck.ahk move-active <SlotName>`n"
         . "  OperatorDeck.ahk activate <TargetName>`n"
+        . "  OperatorDeck.ahk dictation-toggle`n"
     MsgBox(usage, "Operator Deck", "Icon!")
     ExitApp(1)
 }
