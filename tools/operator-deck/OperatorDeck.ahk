@@ -43,6 +43,11 @@ switch command {
     case "place-selected":
         RequireArgument(argument, "slot name")
         PlaceSelectedWindow(GetSlot(slots, argument))
+    case "promote-selected":
+        RequireArgument(argument, "slot name")
+        PromoteSelectedWindow(GetSlot(slots, argument))
+    case "return-promoted":
+        ReturnPromotedWindow()
     case "slot":
         RequireArgument(argument, "slot name")
         HandleSlotPress(GetSlot(slots, argument))
@@ -219,6 +224,51 @@ PlaceSelectedWindow(slot) {
     MoveWindow(hwnd, slot)
     WinActivate("ahk_id " hwnd)
     ClearWindowSelection()
+}
+
+PromoteSelectedWindow(slot) {
+    hwnd := GetSelectedWindow()
+    if !hwnd
+        throw Error("No valid window is currently selected.")
+    SavePromotionOrigin(hwnd)
+    MoveWindow(hwnd, slot)
+    WinActivate("ahk_id " hwnd)
+    ClearWindowSelection()
+}
+
+SavePromotionOrigin(hwnd) {
+    promotionPath := A_ScriptDir "\\runtime\\window-promotion.ini"
+    rect := GetWindowRect(hwnd)
+    DirCreate(A_ScriptDir "\\runtime")
+    if FileExist(promotionPath)
+        FileDelete(promotionPath)
+    IniWrite(hwnd, promotionPath, "Promotion", "hwnd")
+    IniWrite(WinGetPID("ahk_id " hwnd), promotionPath, "Promotion", "pid")
+    IniWrite(rect["x"], promotionPath, "Promotion", "x")
+    IniWrite(rect["y"], promotionPath, "Promotion", "y")
+    IniWrite(rect["w"], promotionPath, "Promotion", "w")
+    IniWrite(rect["h"], promotionPath, "Promotion", "h")
+}
+
+ReturnPromotedWindow() {
+    promotionPath := A_ScriptDir "\\runtime\\window-promotion.ini"
+    if !FileExist(promotionPath)
+        throw Error("No promoted window is available to return.")
+    hwnd := Integer(IniRead(promotionPath, "Promotion", "hwnd", "0"))
+    expectedPid := Integer(IniRead(promotionPath, "Promotion", "pid", "0"))
+    if !hwnd || !WinExist("ahk_id " hwnd) || !expectedPid || WinGetPID("ahk_id " hwnd) != expectedPid {
+        FileDelete(promotionPath)
+        throw Error("The promoted window is no longer available.")
+    }
+    rect := Map(
+        "x", Integer(IniRead(promotionPath, "Promotion", "x", "0")),
+        "y", Integer(IniRead(promotionPath, "Promotion", "y", "0")),
+        "w", Integer(IniRead(promotionPath, "Promotion", "w", "0")),
+        "h", Integer(IniRead(promotionPath, "Promotion", "h", "0"))
+    )
+    MoveWindow(hwnd, rect)
+    WinActivate("ahk_id " hwnd)
+    FileDelete(promotionPath)
 }
 
 HandleSlotPress(slot) {
@@ -423,6 +473,8 @@ DieWithUsage(message := "") {
         . "  OperatorDeck.ahk select <TargetName>`n"
         . "  OperatorDeck.ahk select-active`n"
         . "  OperatorDeck.ahk place-selected <SlotName>`n"
+        . "  OperatorDeck.ahk promote-selected <SlotName>`n"
+        . "  OperatorDeck.ahk return-promoted`n"
         . "  OperatorDeck.ahk slot <SlotName>`n"
         . "  OperatorDeck.ahk clear-selection`n"
         . "  OperatorDeck.ahk undo`n"
