@@ -53,6 +53,13 @@ Branch: `work/operator-deck-maiden-voyage`
    - Source and installed JS/manifests matched after patch.
    - Node and JSON validation passed.
    - Stream Deck profile layout was not modified automatically.
+8. Shared command launcher repair:
+   - Physical quadrant presses moved windows correctly but exposed persistent terminal windows.
+   - Root cause was the shared plugin launcher invoking CMD targets through `cmd.exe /c start`.
+   - Guarded shared-launcher preflight passed.
+   - Timestamped backup created at `A:\AI\Tools\EstateStreamDeckPlugin\backups\shared-command-launcher-20260721-230235`.
+   - All plugin command actions now use hidden `cmd.exe /c call` execution.
+   - Source and installed `plugin.js` matched after repair; Node validation passed.
 
 ## Important distinctions
 
