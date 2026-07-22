@@ -74,6 +74,7 @@ Run commands from this folder or call the script by full path:
 .\OperatorDeck.ahk swap ChatGPT-2
 .\OperatorDeck.ahk move-active PARK_1
 .\OperatorDeck.ahk activate VSCode
+.\OperatorDeck.ahk dictation-toggle
 ```
 
 Command behavior:
@@ -82,6 +83,7 @@ Command behavior:
 - `swap <TargetName>`: Swap the currently active window rectangle with the target window rectangle, then activate the target.
 - `move-active <SlotName>`: Move the currently active window to a configured slot.
 - `activate <TargetName>`: Activate an existing target window without launching if it is missing.
+- `dictation-toggle`: Send Windows `Win+H` to toggle Voice Typing. This command is device-neutral at the CLI boundary and may be called by Stream Deck, a keyboard, the mouse software, or another adapter.
 
 ## Stream Deck usage
 
@@ -177,3 +179,8 @@ Set-Location A:\theestate\tools\operator-deck
 ```
 
 Adapters should read the published JSON and render its `state` rather than reimplementing Windows detection. Suggested presentation is red or unlit for `off`, green or pulsing for `listening`, and amber for `unknown` or an execution error. The publisher writes only on-machine runtime state; it does not press `Win+H`, move the toolbar, or control dictation.
+
+
+### Continuous validation
+
+Continuous polling was validated on 2026-07-21 with the visible Microsoft Voice Typing toolbar. The publisher observed `OFF -> LISTENING -> OFF`, with high confidence for every transition. No raw screenshot or workstation report is committed.
