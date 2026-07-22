@@ -98,7 +98,7 @@ function Add-ActionDefinitions([string]$Text) {
     name: "Operator Deck $($slot.Display)",
     kind: "operatorDeckSlot",
     slot: "$($slot.Name)",
-    commandPath: "$($CommandRoot.Replace('\', '\\'))\\$($slot.Name).vbs",
+    commandPath: "$($CommandRoot.Replace('\', '\\'))\\$($slot.Name).cmd",
     icon: "images/health"
   }
 "@.TrimEnd()
@@ -180,10 +180,11 @@ function Write-Wrappers([string]$Root) {
     New-Item -ItemType Directory -Path $Root -Force | Out-Null
     foreach ($slot in $slots) {
         $content = @"
-Set shell = CreateObject("WScript.Shell")
-shell.Run """A:\theestate\tools\operator-deck\OperatorDeck.ahk"" slot $($slot.Name)", 0, False
+@echo off
+start "" "A:\theestate\tools\operator-deck\OperatorDeck.ahk" slot $($slot.Name)
+exit /b %ERRORLEVEL%
 "@
-        $content | Set-Content -LiteralPath (Join-Path $Root ($slot.Name + '.vbs')) -Encoding ascii
+        $content | Set-Content -LiteralPath (Join-Path $Root ($slot.Name + '.cmd')) -Encoding ascii
     }
 }
 
@@ -250,7 +251,7 @@ try {
 
     Assert-CurrentBaseline
     Test-Candidate $paths.sourceActions $paths.sourceStatus $paths.sourceManifest
-    foreach ($slot in $slots) { Assert-File (Join-Path $CommandRoot ($slot.Name + '.vbs')) }
+    foreach ($slot in $slots) { Assert-File (Join-Path $CommandRoot ($slot.Name + '.cmd')) }
 
     $report = @(
         'OPERATOR DECK QUADRANT PATCH: VALIDATED'
