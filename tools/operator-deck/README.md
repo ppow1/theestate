@@ -142,3 +142,15 @@ Set-Location A:\theestate\tools\operator-deck
 ```
 
 The default report path is `tools/operator-deck/runtime/voice-typing-surface.json`. That runtime output is workstation evidence and should remain local; do not commit it. Paste each clipboard report back for selector calibration. Until that calibration is complete, `unknown` and low-confidence results are expected and honest.
+
+
+### Calibration result
+
+Calibration on the Steward's Windows 11 workstation established this read-only signal:
+
+- Package record: `MicrosoftWindows.Client.CBS_cw5n1h2txyewy`
+- `LastUsedTimeStart > 0` and `LastUsedTimeStop = 0`: `listening`, high confidence.
+- A nonzero `LastUsedTimeStop`: `off`, high confidence.
+- Other active microphone records, including long-lived `svchost.exe` entries, are excluded.
+
+The paired listening/off observations were confirmed on 2026-07-21. Raw workstation reports remain local-only. The current contract intentionally treats an idle-but-visible toolbar as `off`; a distinct `ready` state requires a separate supported signal.
