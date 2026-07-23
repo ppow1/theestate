@@ -98,7 +98,8 @@ function Add-CycleTransient([string]$Text) {
       const longDetail = action.kind === "operatorDeckSlot" ? "Entering or completing quadrant cycle mode" : `Stopping ${action.name}`;
       showTransient(context, action, longValue, longColor, longDetail);
 '@.TrimEnd()
-    $regex = [regex]::new($pattern,[System.Text.RegularExpressions.RegexOptions]::Multiline)\n    return $regex.Replace($Text,[System.Text.RegularExpressions.MatchEvaluator]{ param($m) $replacement },1)
+    $regex = [regex]::new($pattern,[System.Text.RegularExpressions.RegexOptions]::Multiline)
+    return $regex.Replace($Text,[System.Text.RegularExpressions.MatchEvaluator]{ param($m) $replacement },1)
 }
 
 function Write-Wrappers {
