@@ -111,6 +111,20 @@ function Get-PlacementChoiceState {
     }
 }
 
+function Get-CycleState {
+    $path = Join-Path $PSScriptRoot 'runtime\window-cycle.ini'
+    $cycle = Read-IniSection -Path $path -Section 'Cycle'
+    if ($cycle.Count -eq 0) {
+        return [ordered]@{ active = $false; slot = ''; index = 0; count = 0 }
+    }
+    return [ordered]@{
+        active = $true
+        slot = [string]$cycle.slot
+        index = [int]$cycle.index
+        count = [int]$cycle.count
+    }
+}
+
 function Get-PromotionState {
     $path = Join-Path $PSScriptRoot 'runtime\window-promotion.ini'
     $promotion = Read-IniSection -Path $path -Section 'Promotion'
@@ -159,6 +173,7 @@ function Get-OperatorDeckObservation {
         dictation = Get-VoiceTypingState
         selection = Get-SelectionState
         placement = Get-PlacementChoiceState
+        cycle = Get-CycleState
         promotion = Get-PromotionState
         bindings = @(Get-BindingState)
     }
