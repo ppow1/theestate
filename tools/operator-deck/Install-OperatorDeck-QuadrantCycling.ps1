@@ -59,9 +59,14 @@ function Add-CycleCommands([string]$Text) {
 }
 
 function Add-CycleStatus([string]$Text) {
-    $pattern = '(?s)export async function getOperatorDeckSlotStatus\(action, config\) \{.*?\r?\n\}\r?\n\r?\n'
-    $matches = [regex]::Matches($Text,$pattern)
-    if ($matches.Count -ne 1) { throw "Expected one quadrant status provider; found $($matches.Count)." }
+    $startAnchor = 'export async function getOperatorDeckSlotStatus(action, config) {'
+    $endAnchor = 'export async function getActionStatus(action, config) {'
+    $start = $Text.IndexOf($startAnchor, [StringComparison]::Ordinal)
+    $end = $Text.IndexOf($endAnchor, [StringComparison]::Ordinal)
+    if ($start -lt 0) { throw 'Quadrant status provider anchor is missing.' }
+    if ($end -lt 0) { throw 'getActionStatus export anchor is missing.' }
+    if ($end -le $start) { throw 'Status provider anchors are out of order.' }
+
     $replacement = @'
 export async function getOperatorDeckSlotStatus(action, config) {
   try {
@@ -84,7 +89,7 @@ export async function getOperatorDeckSlotStatus(action, config) {
 }
 
 '@
-    return [regex]::Replace($Text,$pattern,[System.Text.RegularExpressions.MatchEvaluator]{ param($m) $replacement },1)
+    return $Text.Substring(0, $start) + $replacement + $Text.Substring($end)
 }
 
 function Add-CycleTransient([string]$Text) {
@@ -118,6 +123,7 @@ function Test-Candidate([string]$Actions,[string]$Status,[string]$Plugin) {
     if (([regex]::Matches($actionsText,'longPressCommandPath:.*OperatorDeck.*Cycle')).Count -ne 16) { throw 'Expected 16 cycle long-press commands.' }
     $statusText = Get-Content $Status -Raw
     if (-not $statusText.Contains('cycle.index')) { throw 'Cycle status publishing is missing.' }
+    if (-not $statusText.Contains('export async function getActionStatus')) { throw 'getActionStatus export was not preserved.' }
     $pluginText = Get-Content $Plugin -Raw
     if (-not $pluginText.Contains('action.kind === "operatorDeckSlot" ? "CYCLE"')) { throw 'Cycle transient behavior is missing.' }
     $node=Get-Command node.exe -ErrorAction Stop
