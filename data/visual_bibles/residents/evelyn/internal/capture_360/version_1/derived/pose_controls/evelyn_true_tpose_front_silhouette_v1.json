@@ -1,0 +1,19 @@
+{
+  "canonical": false,
+  "canvas": {
+    "height": 1152,
+    "width": 1024
+  },
+  "constraints": [
+    "front view",
+    "arms horizontal",
+    "feet visible",
+    "head-to-toe framing",
+    "non-OpenPose fallback control"
+  ],
+  "description": "Derived 2D front T-pose silhouette control image for candidate generation only.",
+  "image": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\pose_controls\\evelyn_true_tpose_front_silhouette_v1.png",
+  "pose_id": "evelyn_true_tpose_front_silhouette_v1",
+  "schema_version": "evelyn_pose_control.v1",
+  "sha256": "sha256:8e8b26966b4c37625e714431f220d567510421c9c7721151463620ec5f3ffcc8"
+}

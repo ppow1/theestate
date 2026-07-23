@@ -1,0 +1,100 @@
+{
+  "canonical": false,
+  "outputs": {
+    "front": {
+      "background_rgb": [
+        128,
+        128,
+        128
+      ],
+      "bbox": [
+        0,
+        1,
+        832,
+        1213
+      ],
+      "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\evelyn_v1_front_normalized_gray.png",
+      "sha256": "sha256:6a5ed3d20799806fae2cf71c4b0643b6444c1ec25dfbc80f918018d3c10b81af",
+      "source": {
+        "bytes": 613624,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Front_V1_Candidate.png",
+        "sha256": "3DB210EE5CA4379C757B580C4B691E06755A4A1920BEA27BF17D68EFF9E287DD"
+      }
+    },
+    "left": {
+      "background_rgb": [
+        128,
+        128,
+        128
+      ],
+      "bbox": [
+        292,
+        68,
+        540,
+        1169
+      ],
+      "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\evelyn_v1_left_normalized_gray.png",
+      "sha256": "sha256:f88276268ee0d155552cf2d1403b5ce0c70d2b056a5f34240d815cd24ddeedf3",
+      "source": {
+        "bytes": 353741,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Left_V1_Candidate.png",
+        "sha256": "F68E80C0A277F0F82518C322F487F0A5CDB53239FA59637DD30FED4BDD059CBF"
+      }
+    },
+    "rear": {
+      "background_rgb": [
+        128,
+        128,
+        128
+      ],
+      "bbox": [
+        73,
+        18,
+        832,
+        1193
+      ],
+      "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\evelyn_v1_rear_normalized_gray.png",
+      "sha256": "sha256:8dd8610f72fa9a414dfaa82e8a90b82365ae779ad30fe9aab2a99d363904ec22",
+      "source": {
+        "bytes": 347686,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Rear_V1_Candidate.png",
+        "sha256": "BA3B83770515EF3B67A3B080EB303C9FC550AF0F98DFB82395F533A4375551E4"
+      }
+    }
+  },
+  "policy": {
+    "background_rgb": [
+      128,
+      128,
+      128
+    ],
+    "derived_candidate_inputs": true,
+    "source_images_modified": false
+  },
+  "resident_id": "evelyn",
+  "schema_version": "evelyn_normalized_source_manifest.v1",
+  "source_verification": {
+    "diagnostics": [],
+    "manifest": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_V1_Source_Manifest.yaml",
+    "manifest_sha256": "1748998E6DAEC61B83285810E180B3952840311A3E1EFB16B7818487265D2355",
+    "schema_version": "evelyn_source_verification.v1",
+    "sources": {
+      "front": {
+        "bytes": 613624,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Front_V1_Candidate.png",
+        "sha256": "3DB210EE5CA4379C757B580C4B691E06755A4A1920BEA27BF17D68EFF9E287DD"
+      },
+      "left": {
+        "bytes": 353741,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Left_V1_Candidate.png",
+        "sha256": "F68E80C0A277F0F82518C322F487F0A5CDB53239FA59637DD30FED4BDD059CBF"
+      },
+      "rear": {
+        "bytes": 347686,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Rear_V1_Candidate.png",
+        "sha256": "BA3B83770515EF3B67A3B080EB303C9FC550AF0F98DFB82395F533A4375551E4"
+      }
+    },
+    "status": "pass"
+  }
+}

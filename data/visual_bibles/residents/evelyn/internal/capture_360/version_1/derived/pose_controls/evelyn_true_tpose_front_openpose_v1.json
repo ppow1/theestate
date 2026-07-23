@@ -1,0 +1,76 @@
+{
+  "canonical": false,
+  "canvas": {
+    "height": 1152,
+    "width": 1024
+  },
+  "constraints": [
+    "front view",
+    "arms horizontal",
+    "feet visible",
+    "head-to-toe framing"
+  ],
+  "description": "Derived 2D front T-pose OpenPose-style control image for candidate generation only.",
+  "image": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\pose_controls\\evelyn_true_tpose_front_openpose_v1.png",
+  "points": {
+    "l_ankle": [
+      634,
+      1082
+    ],
+    "l_elbow": [
+      839,
+      264
+    ],
+    "l_hip": [
+      593,
+      576
+    ],
+    "l_knee": [
+      614,
+      829
+    ],
+    "l_shoulder": [
+      706,
+      264
+    ],
+    "l_wrist": [
+      952,
+      264
+    ],
+    "neck": [
+      512,
+      236
+    ],
+    "nose": [
+      512,
+      144
+    ],
+    "r_ankle": [
+      389,
+      1082
+    ],
+    "r_elbow": [
+      184,
+      264
+    ],
+    "r_hip": [
+      430,
+      576
+    ],
+    "r_knee": [
+      409,
+      829
+    ],
+    "r_shoulder": [
+      317,
+      264
+    ],
+    "r_wrist": [
+      71,
+      264
+    ]
+  },
+  "pose_id": "evelyn_true_tpose_front_openpose_v1",
+  "schema_version": "evelyn_pose_control.v1",
+  "sha256": "sha256:a1514d44bbe3bcdd048c17880012c8d90c46582834044962147f80bf22b91b5a"
+}

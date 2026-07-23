@@ -1,0 +1,205 @@
+{
+  "canonical": false,
+  "normalized_sources": {
+    "canonical": false,
+    "manifest_path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\normalized_source_manifest.json",
+    "outputs": {
+      "front": {
+        "background_rgb": [
+          128,
+          128,
+          128
+        ],
+        "bbox": [
+          0,
+          1,
+          832,
+          1213
+        ],
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\evelyn_v1_front_normalized_gray.png",
+        "sha256": "sha256:6a5ed3d20799806fae2cf71c4b0643b6444c1ec25dfbc80f918018d3c10b81af",
+        "source": {
+          "bytes": 613624,
+          "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Front_V1_Candidate.png",
+          "sha256": "3DB210EE5CA4379C757B580C4B691E06755A4A1920BEA27BF17D68EFF9E287DD"
+        }
+      },
+      "left": {
+        "background_rgb": [
+          128,
+          128,
+          128
+        ],
+        "bbox": [
+          292,
+          68,
+          540,
+          1169
+        ],
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\evelyn_v1_left_normalized_gray.png",
+        "sha256": "sha256:f88276268ee0d155552cf2d1403b5ce0c70d2b056a5f34240d815cd24ddeedf3",
+        "source": {
+          "bytes": 353741,
+          "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Left_V1_Candidate.png",
+          "sha256": "F68E80C0A277F0F82518C322F487F0A5CDB53239FA59637DD30FED4BDD059CBF"
+        }
+      },
+      "rear": {
+        "background_rgb": [
+          128,
+          128,
+          128
+        ],
+        "bbox": [
+          73,
+          18,
+          832,
+          1193
+        ],
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\normalized\\evelyn_v1_rear_normalized_gray.png",
+        "sha256": "sha256:8dd8610f72fa9a414dfaa82e8a90b82365ae779ad30fe9aab2a99d363904ec22",
+        "source": {
+          "bytes": 347686,
+          "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Rear_V1_Candidate.png",
+          "sha256": "BA3B83770515EF3B67A3B080EB303C9FC550AF0F98DFB82395F533A4375551E4"
+        }
+      }
+    },
+    "policy": {
+      "background_rgb": [
+        128,
+        128,
+        128
+      ],
+      "derived_candidate_inputs": true,
+      "source_images_modified": false
+    },
+    "resident_id": "evelyn",
+    "schema_version": "evelyn_normalized_source_manifest.v1",
+    "source_verification": {
+      "diagnostics": [],
+      "manifest": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_V1_Source_Manifest.yaml",
+      "manifest_sha256": "1748998E6DAEC61B83285810E180B3952840311A3E1EFB16B7818487265D2355",
+      "schema_version": "evelyn_source_verification.v1",
+      "sources": {
+        "front": {
+          "bytes": 613624,
+          "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Front_V1_Candidate.png",
+          "sha256": "3DB210EE5CA4379C757B580C4B691E06755A4A1920BEA27BF17D68EFF9E287DD"
+        },
+        "left": {
+          "bytes": 353741,
+          "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Left_V1_Candidate.png",
+          "sha256": "F68E80C0A277F0F82518C322F487F0A5CDB53239FA59637DD30FED4BDD059CBF"
+        },
+        "rear": {
+          "bytes": 347686,
+          "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Rear_V1_Candidate.png",
+          "sha256": "BA3B83770515EF3B67A3B080EB303C9FC550AF0F98DFB82395F533A4375551E4"
+        }
+      },
+      "status": "pass"
+    }
+  },
+  "pose_controls": {
+    "front_tpose_openpose": {
+      "canonical": false,
+      "canvas": {
+        "height": 1152,
+        "width": 1024
+      },
+      "constraints": [
+        "front view",
+        "arms horizontal",
+        "feet visible",
+        "head-to-toe framing"
+      ],
+      "description": "Derived 2D front T-pose OpenPose-style control image for candidate generation only.",
+      "image": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\pose_controls\\evelyn_true_tpose_front_openpose_v1.png",
+      "points": {
+        "l_ankle": [
+          634,
+          1082
+        ],
+        "l_elbow": [
+          839,
+          264
+        ],
+        "l_hip": [
+          593,
+          576
+        ],
+        "l_knee": [
+          614,
+          829
+        ],
+        "l_shoulder": [
+          706,
+          264
+        ],
+        "l_wrist": [
+          952,
+          264
+        ],
+        "neck": [
+          512,
+          236
+        ],
+        "nose": [
+          512,
+          144
+        ],
+        "r_ankle": [
+          389,
+          1082
+        ],
+        "r_elbow": [
+          184,
+          264
+        ],
+        "r_hip": [
+          430,
+          576
+        ],
+        "r_knee": [
+          409,
+          829
+        ],
+        "r_shoulder": [
+          317,
+          264
+        ],
+        "r_wrist": [
+          71,
+          264
+        ]
+      },
+      "pose_id": "evelyn_true_tpose_front_openpose_v1",
+      "schema_version": "evelyn_pose_control.v1",
+      "sha256": "sha256:a1514d44bbe3bcdd048c17880012c8d90c46582834044962147f80bf22b91b5a",
+      "spec_path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\pose_controls\\evelyn_true_tpose_front_openpose_v1.json"
+    },
+    "front_tpose_silhouette": {
+      "canonical": false,
+      "canvas": {
+        "height": 1152,
+        "width": 1024
+      },
+      "constraints": [
+        "front view",
+        "arms horizontal",
+        "feet visible",
+        "head-to-toe framing",
+        "non-OpenPose fallback control"
+      ],
+      "description": "Derived 2D front T-pose silhouette control image for candidate generation only.",
+      "image": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\pose_controls\\evelyn_true_tpose_front_silhouette_v1.png",
+      "pose_id": "evelyn_true_tpose_front_silhouette_v1",
+      "schema_version": "evelyn_pose_control.v1",
+      "sha256": "sha256:8e8b26966b4c37625e714431f220d567510421c9c7721151463620ec5f3ffcc8",
+      "spec_path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\derived\\pose_controls\\evelyn_true_tpose_front_silhouette_v1.json"
+    }
+  },
+  "resident_id": "evelyn",
+  "schema_version": "evelyn_pipeline_prepared_assets.v1"
+}

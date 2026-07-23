@@ -1,0 +1,142 @@
+{
+  "comfyui_inventory": {
+    "checkpoints": [
+      "CyberRealisticXLPlay_V10.0_FP16.safetensors",
+      "DreamShaperXL1.0Alpha2_fixedVae_half_00001_.safetensors",
+      "Juggernaut-XI-byRunDiffusion.safetensors",
+      "RealVisXL_V5.0_fp16.safetensors",
+      "flux1-dev.safetensors",
+      "flux1-schnell.safetensors",
+      "realisticVisionV60B1_v51HyperVAE.safetensors",
+      "sd_xl_base_1.0.safetensors",
+      "sd_xl_refiner_1.0.safetensors"
+    ],
+    "clip_vision": [
+      "clip_l.safetensors",
+      "split_files\\text_encoders\\umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "t5xxl_fp16.safetensors"
+    ],
+    "controlnets": [
+      "diffusion_pytorch_model_promax.safetensors",
+      "sdxl_models\\ip-adapter-plus_sdxl_vit-h.safetensors",
+      "sdxl_models\\ip-adapter_sdxl.safetensors"
+    ],
+    "endpoint": "http://127.0.0.1:8188",
+    "ipadapter_files": [],
+    "node_count": 1005
+  },
+  "profile_validation": {
+    "profiles": [
+      {
+        "checkpoint": "RealVisXL_V5.0_fp16.safetensors",
+        "compatible": true,
+        "disabled_reason": null,
+        "enabled": true,
+        "id": "sdxl_realvisxl_v5_pose_control_tpose",
+        "label": "RealVisXL V5 SDXL T-Pose Control",
+        "missing": [],
+        "workflow": "sdxl_pose_control_text_reference_v1"
+      },
+      {
+        "checkpoint": "Juggernaut-XI-byRunDiffusion.safetensors",
+        "compatible": true,
+        "disabled_reason": null,
+        "enabled": true,
+        "id": "sdxl_juggernaut_xi_pose_control_tpose",
+        "label": "Juggernaut XI SDXL T-Pose Control",
+        "missing": [],
+        "workflow": "sdxl_pose_control_text_reference_v1"
+      },
+      {
+        "checkpoint": "CyberRealisticXLPlay_V10.0_FP16.safetensors",
+        "compatible": true,
+        "disabled_reason": null,
+        "enabled": true,
+        "id": "sdxl_cyberrealistic_v10_pose_control_tpose",
+        "label": "CyberRealistic XL V10 SDXL T-Pose Control",
+        "missing": [],
+        "workflow": "sdxl_pose_control_text_reference_v1"
+      },
+      {
+        "checkpoint": "DreamShaperXL1.0Alpha2_fixedVae_half_00001_.safetensors",
+        "compatible": true,
+        "disabled_reason": null,
+        "enabled": true,
+        "id": "sdxl_dreamshaper_alpha2_pose_control_tpose",
+        "label": "DreamShaper XL Alpha2 SDXL T-Pose Control",
+        "missing": [],
+        "workflow": "sdxl_pose_control_text_reference_v1"
+      },
+      {
+        "checkpoint": "RealVisXL_V5.0_fp16.safetensors",
+        "compatible": false,
+        "disabled_reason": "ComfyUI runtime does not currently expose IPAdapterModelLoader files or the CLIP-ViT-H vision model.",
+        "enabled": false,
+        "id": "sdxl_ipadapter_identity_reference",
+        "label": "SDXL IPAdapter Identity Reference",
+        "missing": [
+          "ipadapter:ip-adapter-plus_sdxl_vit-h.safetensors",
+          "clip_vision:CLIP-ViT-H-14"
+        ],
+        "workflow": "sdxl_ipadapter_identity_reference_v1"
+      },
+      {
+        "checkpoint": "realisticVisionV60B1_v51HyperVAE.safetensors",
+        "compatible": false,
+        "disabled_reason": "Pipeline v1 is SDXL-first; no validated SD1.5 pose and identity conditioning path is enabled in this handoff.",
+        "enabled": false,
+        "id": "sd15_realisticvision_hypervae",
+        "label": "Realistic Vision SD1.5",
+        "missing": [],
+        "workflow": "sd15_reference_v1"
+      },
+      {
+        "checkpoint": "flux1-dev.safetensors",
+        "compatible": false,
+        "disabled_reason": "Flux workflow is not compatible with SDXL OpenPose ControlNet or current identity adapter runtime.",
+        "enabled": false,
+        "id": "flux_dev",
+        "label": "Flux Dev",
+        "missing": [],
+        "workflow": "flux_reference_v1"
+      },
+      {
+        "checkpoint": "flux1-schnell.safetensors",
+        "compatible": false,
+        "disabled_reason": "Flux workflow is not compatible with SDXL OpenPose ControlNet or current identity adapter runtime.",
+        "enabled": false,
+        "id": "flux_schnell",
+        "label": "Flux Schnell",
+        "missing": [],
+        "workflow": "flux_reference_v1"
+      }
+    ],
+    "schema_version": "evelyn_profile_validation.v1",
+    "status": "pass"
+  },
+  "schema_version": "evelyn_turnaround_pipeline.v1",
+  "source_verification": {
+    "diagnostics": [],
+    "manifest": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_V1_Source_Manifest.yaml",
+    "manifest_sha256": "1748998E6DAEC61B83285810E180B3952840311A3E1EFB16B7818487265D2355",
+    "schema_version": "evelyn_source_verification.v1",
+    "sources": {
+      "front": {
+        "bytes": 613624,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Front_V1_Candidate.png",
+        "sha256": "3DB210EE5CA4379C757B580C4B691E06755A4A1920BEA27BF17D68EFF9E287DD"
+      },
+      "left": {
+        "bytes": 353741,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Left_V1_Candidate.png",
+        "sha256": "F68E80C0A277F0F82518C322F487F0A5CDB53239FA59637DD30FED4BDD059CBF"
+      },
+      "rear": {
+        "bytes": 347686,
+        "path": "data\\visual_bibles\\residents\\evelyn\\internal\\capture_360\\version_1\\originals\\Evelyn_Rear_V1_Candidate.png",
+        "sha256": "BA3B83770515EF3B67A3B080EB303C9FC550AF0F98DFB82395F533A4375551E4"
+      }
+    },
+    "status": "pass"
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "9": {
+      "display_node": "9",
+      "node_id": "9",
+      "parent_node": null,
+      "real_node_id": "9"
+    }
+  },
+  "outputs": {
+    "9": {
+      "images": [
+        {
+          "filename": "front_tpose_candidate_001_00001_.png",
+          "subfolder": "EstateEvelyn\\evelyn_front_tpose_20260723_075326\\sdxl_realvisxl_v5_pose_control_tpose",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "prompt": [
+    63,
+    "9ac88b7d-c613-4841-b94f-92d77855d206",
+    {
+      "10": {
+        "class_type": "ControlNetLoader",
+        "inputs": {
+          "control_net_name": "diffusion_pytorch_model_promax.safetensors"
+        }
+      },
+      "11": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "evelyn_true_tpose_front_silhouette_v1.png"
+        }
+      },
+      "12": {
+        "class_type": "ControlNetApplyAdvanced",
+        "inputs": {
+          "control_net": [
+            "10",
+            0
+          ],
+          "end_percent": 0.92,
+          "image": [
+            "11",
+            0
+          ],
+          "negative": [
+            "7",
+            0
+          ],
+          "positive": [
+            "6",
+            0
+          ],
+          "start_percent": 0.0,
+          "strength": 0.48,
+          "vae": [
+            "4",
+            2
+          ]
+        }
+      },
+      "3": {
+        "class_type": "KSampler",
+        "inputs": {
+          "cfg": 5.5,
+          "denoise": 1.0,
+          "latent_image": [
+            "5",
+            0
+          ],
+          "model": [
+            "4",
+            0
+          ],
+          "negative": [
+            "12",
+            1
+          ],
+          "positive": [
+            "12",
+            0
+          ],
+          "sampler_name": "dpmpp_2m_sde",
+          "scheduler": "karras",
+          "seed": 413014710,
+          "steps": 30
+        }
+      },
+      "4": {
+        "class_type": "CheckpointLoaderSimple",
+        "inputs": {
+          "ckpt_name": "RealVisXL_V5.0_fp16.safetensors"
+        }
+      },
+      "5": {
+        "class_type": "EmptyLatentImage",
+        "inputs": {
+          "batch_size": 1,
+          "height": 1152,
+          "width": 1024
+        }
+      },
+      "6": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+          "clip": [
+            "4",
+            1
+          ],
+          "text": "full-body professional studio character reference photograph of Evelyn\none unambiguously adult woman, adult age presentation\nextremely petite 4 feet 10 inch adult frame, compact proportions\nsmall delicate bone structure, subtle hourglass silhouette\nwarm hazel eyes, soft brunette hair with natural movement\ntasteful neutral one-piece swimsuit, barefoot, no accessories\ntrue T-pose, both arms extended horizontally in a straight line\nstanding upright, legs straight, feet visible, head-to-toe framing\nhands and fingertips fully visible inside the frame with clear side margins\nfront view, neutral gray studio background\ncamera at body-center height, 50 mm reference lens intent\nphotorealistic skin texture, natural anatomy, identity reference candidate\ncandidate review artifact only, not canonical and not approved"
+        }
+      },
+      "7": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+          "clip": [
+            "4",
+            1
+          ],
+          "text": "child, teenager, minor, underage, juvenile\naverage height, tall woman, long legs, elongated torso, runway proportions\nsexualized pose, provocative pose, lingerie, transparent fabric\narms down, arms bent, asymmetric arms, cropped arms, cropped hands, cropped fingertips, cropped feet, cropped head\nskeleton, bones, stick figure, wireframe, pose rig, mannequin, puppet\nmultiple people, duplicate body, extra limbs, missing limbs\nextra fingers, missing fingers, deformed anatomy, distorted face\ncartoon, anime, illustration, painting, text, caption, watermark, logo"
+        }
+      },
+      "8": {
+        "class_type": "VAEDecode",
+        "inputs": {
+          "samples": [
+            "3",
+            0
+          ],
+          "vae": [
+            "4",
+            2
+          ]
+        }
+      },
+      "9": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "filename_prefix": "EstateEvelyn/evelyn_front_tpose_20260723_075326/sdxl_realvisxl_v5_pose_control_tpose/front_tpose_candidate_001",
+          "images": [
+            "8",
+            0
+          ]
+        }
+      }
+    },
+    {
+      "client_id": "evelyn_front_tpose_20260723_075326",
+      "create_time": 1784807606118
+    },
+    [
+      "9"
+    ]
+  ],
+  "status": {
+    "completed": true,
+    "messages": [
+      [
+        "execution_start",
+        {
+          "prompt_id": "9ac88b7d-c613-4841-b94f-92d77855d206",
+          "timestamp": 1784807606119
+        }
+      ],
+      [
+        "execution_cached",
+        {
+          "nodes": [
+            "10"
+          ],
+          "prompt_id": "9ac88b7d-c613-4841-b94f-92d77855d206",
+          "timestamp": 1784807606123
+        }
+      ],
+      [
+        "execution_success",
+        {
+          "prompt_id": "9ac88b7d-c613-4841-b94f-92d77855d206",
+          "timestamp": 1784807624119
+        }
+      ]
+    ],
+    "status_str": "success"
+  }
+}
