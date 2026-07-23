@@ -52,7 +52,7 @@ function Add-CycleCommands([string]$Text) {
         $matches = [regex]::Matches($Text,$blockPattern)
         if ($matches.Count -ne 1) { throw "Expected one action block for $slot; found $($matches.Count)." }
         if ($matches[0].Value.Contains('longPressCommandPath')) { continue }
-        $replacement = $matches[0].Value + "`r`n    longPressCommandPath: `"$root\\$slot.cmd`,"
+        $replacement = $matches[0].Value + "`r`n    longPressCommandPath: `"$root\\$slot.cmd`","
         $Text = $Text.Remove($matches[0].Index,$matches[0].Length).Insert($matches[0].Index,$replacement)
     }
     return $Text
