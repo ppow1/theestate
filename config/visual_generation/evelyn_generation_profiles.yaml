@@ -1,0 +1,187 @@
+schema_version: evelyn_generation_profiles.v1
+resident_id: evelyn
+profile_set_id: evelyn_multimodel_tpose_pipeline_v1
+default_endpoint: http://127.0.0.1:8188
+campaign_defaults:
+  bounded_front_tpose_candidates_per_profile: 1
+  relaxed_candidates_per_angle: 4
+  true_tpose_front_candidates_per_profile: 6
+  true_tpose_turnaround_candidates_per_angle: 4
+common_generation:
+  width: 1024
+  height: 1152
+  steps: 30
+  cfg: 5.5
+  sampler_name: dpmpp_2m_sde
+  scheduler: karras
+  denoise: 1.0
+  controlnet_strength: 0.48
+  controlnet_start_percent: 0.0
+  controlnet_end_percent: 0.92
+  seed_base: 413014710
+source_set:
+  root: data/visual_bibles/residents/evelyn/internal/capture_360/version_1/originals
+  manifest: Evelyn_V1_Source_Manifest.yaml
+derived_output_root: data/visual_bibles/residents/evelyn/internal/capture_360/version_1/generated/evelyn_turnaround_v1
+normalized_output_root: data/visual_bibles/residents/evelyn/internal/capture_360/version_1/derived/normalized
+pose_asset_root: data/visual_bibles/residents/evelyn/internal/capture_360/version_1/derived/pose_controls
+profiles:
+  - id: sdxl_realvisxl_v5_pose_control_tpose
+    label: RealVisXL V5 SDXL T-Pose Control
+    enabled: true
+    model_family: sdxl
+    checkpoint: RealVisXL_V5.0_fp16.safetensors
+    workflow: sdxl_pose_control_text_reference_v1
+    intents:
+      - true_t_pose_front
+      - true_t_pose_turnaround
+      - relaxed_turnaround
+    conditioning:
+      pose_control: tpose_silhouette_png
+      identity_reference: normalized_source_triplet
+      identity_adapter: unavailable_until_ipadapter_visible
+    required_nodes:
+      - CheckpointLoaderSimple
+      - CLIPTextEncode
+      - EmptyLatentImage
+      - KSampler
+      - VAEDecode
+      - SaveImage
+      - LoadImage
+      - ControlNetLoader
+      - ControlNetApplyAdvanced
+    required_models:
+      checkpoint:
+        - RealVisXL_V5.0_fp16.safetensors
+      controlnet:
+        - diffusion_pytorch_model_promax.safetensors
+  - id: sdxl_juggernaut_xi_pose_control_tpose
+    label: Juggernaut XI SDXL T-Pose Control
+    enabled: true
+    model_family: sdxl
+    checkpoint: Juggernaut-XI-byRunDiffusion.safetensors
+    workflow: sdxl_pose_control_text_reference_v1
+    intents:
+      - true_t_pose_front
+      - true_t_pose_turnaround
+      - relaxed_turnaround
+    conditioning:
+      pose_control: tpose_silhouette_png
+      identity_reference: normalized_source_triplet
+      identity_adapter: unavailable_until_ipadapter_visible
+    required_nodes:
+      - CheckpointLoaderSimple
+      - CLIPTextEncode
+      - EmptyLatentImage
+      - KSampler
+      - VAEDecode
+      - SaveImage
+      - LoadImage
+      - ControlNetLoader
+      - ControlNetApplyAdvanced
+    required_models:
+      checkpoint:
+        - Juggernaut-XI-byRunDiffusion.safetensors
+      controlnet:
+        - diffusion_pytorch_model_promax.safetensors
+  - id: sdxl_cyberrealistic_v10_pose_control_tpose
+    label: CyberRealistic XL V10 SDXL T-Pose Control
+    enabled: true
+    model_family: sdxl
+    checkpoint: CyberRealisticXLPlay_V10.0_FP16.safetensors
+    workflow: sdxl_pose_control_text_reference_v1
+    intents:
+      - true_t_pose_front
+      - true_t_pose_turnaround
+      - relaxed_turnaround
+    conditioning:
+      pose_control: tpose_silhouette_png
+      identity_reference: normalized_source_triplet
+      identity_adapter: unavailable_until_ipadapter_visible
+    required_nodes:
+      - CheckpointLoaderSimple
+      - CLIPTextEncode
+      - EmptyLatentImage
+      - KSampler
+      - VAEDecode
+      - SaveImage
+      - LoadImage
+      - ControlNetLoader
+      - ControlNetApplyAdvanced
+    required_models:
+      checkpoint:
+        - CyberRealisticXLPlay_V10.0_FP16.safetensors
+      controlnet:
+        - diffusion_pytorch_model_promax.safetensors
+  - id: sdxl_dreamshaper_alpha2_pose_control_tpose
+    label: DreamShaper XL Alpha2 SDXL T-Pose Control
+    enabled: true
+    model_family: sdxl
+    checkpoint: DreamShaperXL1.0Alpha2_fixedVae_half_00001_.safetensors
+    workflow: sdxl_pose_control_text_reference_v1
+    intents:
+      - true_t_pose_front
+      - true_t_pose_turnaround
+      - relaxed_turnaround
+    conditioning:
+      pose_control: tpose_silhouette_png
+      identity_reference: normalized_source_triplet
+      identity_adapter: unavailable_until_ipadapter_visible
+    required_nodes:
+      - CheckpointLoaderSimple
+      - CLIPTextEncode
+      - EmptyLatentImage
+      - KSampler
+      - VAEDecode
+      - SaveImage
+      - LoadImage
+      - ControlNetLoader
+      - ControlNetApplyAdvanced
+    required_models:
+      checkpoint:
+        - DreamShaperXL1.0Alpha2_fixedVae_half_00001_.safetensors
+      controlnet:
+        - diffusion_pytorch_model_promax.safetensors
+  - id: sdxl_ipadapter_identity_reference
+    label: SDXL IPAdapter Identity Reference
+    enabled: false
+    model_family: sdxl
+    checkpoint: RealVisXL_V5.0_fp16.safetensors
+    workflow: sdxl_ipadapter_identity_reference_v1
+    disabled_reason: ComfyUI runtime does not currently expose IPAdapterModelLoader files or the CLIP-ViT-H vision model.
+    intents:
+      - identity_lock
+      - true_t_pose_front
+    conditioning:
+      pose_control: openpose_png
+      identity_reference: ipadapter_plus_sdxl_vit_h
+    required_nodes:
+      - IPAdapterUnifiedLoader
+      - IPAdapterModelLoader
+      - CLIPVisionLoader
+    required_models:
+      ipadapter:
+        - ip-adapter-plus_sdxl_vit-h.safetensors
+      clip_vision:
+        - CLIP-ViT-H-14
+  - id: sd15_realisticvision_hypervae
+    label: Realistic Vision SD1.5
+    enabled: false
+    model_family: sd15
+    checkpoint: realisticVisionV60B1_v51HyperVAE.safetensors
+    workflow: sd15_reference_v1
+    disabled_reason: Pipeline v1 is SDXL-first; no validated SD1.5 pose and identity conditioning path is enabled in this handoff.
+  - id: flux_dev
+    label: Flux Dev
+    enabled: false
+    model_family: flux
+    checkpoint: flux1-dev.safetensors
+    workflow: flux_reference_v1
+    disabled_reason: Flux workflow is not compatible with SDXL OpenPose ControlNet or current identity adapter runtime.
+  - id: flux_schnell
+    label: Flux Schnell
+    enabled: false
+    model_family: flux
+    checkpoint: flux1-schnell.safetensors
+    workflow: flux_reference_v1
+    disabled_reason: Flux workflow is not compatible with SDXL OpenPose ControlNet or current identity adapter runtime.
