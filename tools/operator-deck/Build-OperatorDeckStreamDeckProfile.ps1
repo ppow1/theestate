@@ -58,11 +58,26 @@ function New-PluginAction([string]$Name, [string]$Uuid) {
     }
 }
 
+function New-PageAction([ValidateSet('previous','next')][string]$Direction) {
+    $name = if ($Direction -eq 'previous') { 'Previous Page' } else { 'Next Page' }
+    return [ordered]@{
+        ActionID = [guid]::NewGuid().ToString()
+        LinkedTitle = $true
+        Name = $name
+        Plugin = [ordered]@{ Name = 'Pages'; UUID = 'com.elgato.streamdeck.page'; Version = '1.0' }
+        Resources = $null
+        Settings = [pscustomobject]@{}
+        State = 0
+        States = @([ordered]@{})
+        UUID = 'com.elgato.streamdeck.page.' + $Direction
+    }
+}
+
 function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath, [string]$PlacementPageManifestPath) {
     $page = Get-Content -LiteralPath $PageManifestPath -Raw | ConvertFrom-Json
     $actions = $page.Controllers[0].Actions
     $properties = @($actions.PSObject.Properties)
-    if ($properties.Count -ne 20) { throw "Expected 20 placed actions; found $($properties.Count)." }
+    if ($properties.Count -ne 22) { throw "Expected 22 placed actions; found $($properties.Count)." }
     foreach ($entry in $layout) {
         $uuid = 'com.estate.statusbridge.operator_deck.slot.' + $entry.Slot.ToLowerInvariant()
         $property = $actions.PSObject.Properties[$entry.Position]
@@ -83,6 +98,11 @@ function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath, [string
         $control = $actions.PSObject.Properties[$position]
         if (-not $control -or $control.Value.UUID -ne $expectedControls[$position]) { throw "Control action is missing from $position." }
     }
+    foreach ($position in @('6,3','7,3')) {
+        $direction = if ($position -eq '6,3') { 'previous' } else { 'next' }
+        $navigation = $actions.PSObject.Properties[$position]
+        if (-not $navigation -or $navigation.Value.UUID -ne ('com.elgato.streamdeck.page.' + $direction)) { throw "Page navigation is missing from $position." }
+    }
     $placementPage = Get-Content -LiteralPath $PlacementPageManifestPath -Raw | ConvertFrom-Json
     $placementActions = $placementPage.Controllers[0].Actions
     $placementExpected = [ordered]@{
@@ -101,10 +121,15 @@ function Assert-ProfilePackage([string]$Root, [string]$PageManifestPath, [string
         '6,1' = 'com.estate.statusbridge.operator_deck.dictation'
         '7,0' = 'com.estate.statusbridge.operator_deck.return'
     }
-    if (@($placementActions.PSObject.Properties).Count -ne 14) { throw "Expected 14 mixed-placement actions." }
+    if (@($placementActions.PSObject.Properties).Count -ne 16) { throw "Expected 16 mixed-placement actions." }
     foreach ($position in $placementExpected.Keys) {
         $action = $placementActions.PSObject.Properties[$position]
         if (-not $action -or $action.Value.UUID -ne $placementExpected[$position]) { throw "Mixed-placement action is missing from $position." }
+    }
+    foreach ($position in @('6,3','7,3')) {
+        $direction = if ($position -eq '6,3') { 'previous' } else { 'next' }
+        $navigation = $placementActions.PSObject.Properties[$position]
+        if (-not $navigation -or $navigation.Value.UUID -ne ('com.elgato.streamdeck.page.' + $direction)) { throw "Mixed-placement page navigation is missing from $position." }
     }
     foreach ($required in @('package.json', 'Profiles')) {
         if (-not (Test-Path -LiteralPath (Join-Path $Root $required))) { throw "Package component missing: $required" }
@@ -132,6 +157,8 @@ try {
     $actions['4,0'] = New-PluginAction -Name 'Operator Deck Undo' -Uuid 'com.estate.statusbridge.operator_deck.undo'
     $actions['5,0'] = New-PluginAction -Name 'Operator Deck Clear Selection' -Uuid 'com.estate.statusbridge.operator_deck.clear_selection'
     $actions['6,0'] = New-PluginAction -Name 'Operator Deck Select Active' -Uuid 'com.estate.statusbridge.operator_deck.select_active'
+    $actions['6,3'] = New-PageAction -Direction previous
+    $actions['7,3'] = New-PageAction -Direction next
 
     $pageManifest = [ordered]@{
         Controllers = @([ordered]@{ Actions = $actions; Type = 'Keypad' })
@@ -156,6 +183,8 @@ try {
     $placementActions['6,0'] = New-PluginAction -Name 'Operator Deck Select Active' -Uuid 'com.estate.statusbridge.operator_deck.select_active'
     $placementActions['6,1'] = New-PluginAction -Name 'Operator Deck Voice Typing' -Uuid 'com.estate.statusbridge.operator_deck.dictation'
     $placementActions['7,0'] = New-PluginAction -Name 'Operator Deck Return Promoted Window' -Uuid 'com.estate.statusbridge.operator_deck.return'
+    $placementActions['6,3'] = New-PageAction -Direction previous
+    $placementActions['7,3'] = New-PageAction -Direction next
     $placementPageManifest = [ordered]@{
         Controllers = @([ordered]@{ Actions = $placementActions; Type = 'Keypad' })
         Icon = ''
@@ -184,7 +213,10 @@ try {
         FormatVersion = 1
         OSType = 'Windows'
         OSVersion = [System.Environment]::OSVersion.Version.ToString()
-        RequiredPlugins = @([ordered]@{ Name = $pluginName; UUID = $pluginUuid; Version = $pluginVersion })
+        RequiredPlugins = @(
+            [ordered]@{ Name = $pluginName; UUID = $pluginUuid; Version = $pluginVersion },
+            [ordered]@{ Name = 'Pages'; UUID = 'com.elgato.streamdeck.page'; Version = '1.0' }
+        )
     }
     $package | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $temporaryRoot 'package.json') -Encoding utf8
 
@@ -205,8 +237,8 @@ try {
         'OPERATOR DECK STREAM DECK PROFILE: VALIDATED'
         "Profile: $profileName"
         "Package: $OutputPath"
-        'Page 1: 20 actions (16 quadrants + UNDO + CLEAR + SELECT + Voice Typing)'
-        'Page 2: 14 actions (M1-M4 + FULL/LEFT/RIGHT/TOP/BOTTOM + UNDO/CLEAR/SELECT + Voice Typing + RETURN)'
+        'Page 1: 22 actions (16 quadrants + UNDO + CLEAR + SELECT + Voice Typing + Previous/Next Page)'
+        'Page 2: 16 actions (M1-M4 + FULL/LEFT/RIGHT/TOP/BOTTOM + UNDO/CLEAR/SELECT + Voice Typing + RETURN + Previous/Next Page)'
         'The validated Page 1 quadrant matrix remains unchanged.'
         $(if ($previousPackageBackup) { "Previous package backup: $previousPackageBackup" })
         'The existing Stream Deck profiles were not modified.'
