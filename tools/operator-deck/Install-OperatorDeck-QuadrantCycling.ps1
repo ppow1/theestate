@@ -89,19 +89,16 @@ export async function getOperatorDeckSlotStatus(action, config) {
 
 function Add-CycleTransient([string]$Text) {
     if ($Text.Contains('action.kind === "operatorDeckSlot" ? "CYCLE"')) { return $Text }
-    $old = @'
-      showTransient(context, action, "STOPPING", "orange", `Stopping ${action.name}`);
-      runCommand(action.longPressCommandPath);
-'@
-    $new = @'
+    $pattern = '^[ \t]*showTransient\(context, action, "STOPPING", "orange", `Stopping \$\{action\.name\}`\);[ \t]*$'
+    $matches = [regex]::Matches($Text,$pattern,[System.Text.RegularExpressions.RegexOptions]::Multiline)
+    if ($matches.Count -ne 1) { throw "Expected one STOPPING transient line; found $($matches.Count)." }
+    $replacement = @'
       const longValue = action.kind === "operatorDeckSlot" ? "CYCLE" : "STOPPING";
       const longColor = action.kind === "operatorDeckSlot" ? "yellow" : "orange";
       const longDetail = action.kind === "operatorDeckSlot" ? "Entering or completing quadrant cycle mode" : `Stopping ${action.name}`;
       showTransient(context, action, longValue, longColor, longDetail);
-      runCommand(action.longPressCommandPath);
-'@
-    if (-not $Text.Contains($old)) { throw 'Plugin long-press execution anchor is missing.' }
-    return $Text.Replace($old,$new)
+'@.TrimEnd()
+    return [regex]::Replace($Text,$pattern,[System.Text.RegularExpressions.MatchEvaluator]{ param($m) $replacement },1,[System.Text.RegularExpressions.RegexOptions]::Multiline)
 }
 
 function Write-Wrappers {
