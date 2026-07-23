@@ -64,6 +64,9 @@ switch command {
     case "slot":
         RequireArgument(argument, "slot name")
         HandleSlotPress(GetSlot(slots, argument))
+    case "cycle-slot":
+        RequireArgument(argument, "slot name")
+        EnterOrCommitCycleMode(GetSlot(slots, argument))
     case "clear-selection":
         ClearWindowSelection()
     case "undo":
@@ -354,7 +357,22 @@ ReturnPromotedWindow() {
 }
 
 HandleSlotPress(slot) {
+    cyclePath := A_ScriptDir "\\runtime\\window-cycle.ini"
     selectedHwnd := GetSelectedWindow()
+    if selectedHwnd && FileExist(cyclePath) {
+        cycleSlot := IniRead(cyclePath, "Cycle", "slot", "")
+        if cycleSlot = slot["name"] {
+            CycleSelectedWindow(slot)
+            return
+        }
+        MoveWindow(selectedHwnd, slot)
+        WinActivate("ahk_id " selectedHwnd)
+        ClearWindowSelection()
+        return
+    }
+    if FileExist(cyclePath)
+        ClearCycleMode()
+
     if selectedHwnd {
         MoveWindow(selectedHwnd, slot)
         WinActivate("ahk_id " selectedHwnd)
@@ -366,6 +384,85 @@ HandleSlotPress(slot) {
     if !hwnd
         throw Error("No movable window occupies the selected slot.")
     SelectWindow(hwnd, slot["name"])
+    WinRestore("ahk_id " hwnd)
+    WinActivate("ahk_id " hwnd)
+}
+
+EnterOrCommitCycleMode(slot) {
+    cyclePath := A_ScriptDir "\\runtime\\window-cycle.ini"
+    selectedHwnd := GetSelectedWindow()
+    if !selectedHwnd
+        throw Error("Select a window from this quadrant before entering cycle mode.")
+
+    selectionPath := A_ScriptDir "\\runtime\\window-selection.ini"
+    sourceSlot := IniRead(selectionPath, "Selection", "source_slot", "")
+    if sourceSlot != slot["name"]
+        throw Error("Cycle mode must be entered from the selected source quadrant.")
+
+    if FileExist(cyclePath) && IniRead(cyclePath, "Cycle", "slot", "") = slot["name"] {
+        MoveWindow(selectedHwnd, slot)
+        WinActivate("ahk_id " selectedHwnd)
+        ClearWindowSelection()
+        return
+    }
+
+    candidates := FindWindowsInSlot(slot)
+    if candidates.Length < 1
+        throw Error("No cycle candidates occupy the selected quadrant.")
+
+    DirCreate(A_ScriptDir "\\runtime")
+    if FileExist(cyclePath)
+        FileDelete(cyclePath)
+    IniWrite(slot["name"], cyclePath, "Cycle", "slot")
+    IniWrite(candidates.Length, cyclePath, "Cycle", "count")
+    selectedIndex := 0
+    for index, hwnd in candidates {
+        section := "Window:" index
+        IniWrite(hwnd, cyclePath, section, "hwnd")
+        IniWrite(WinGetPID("ahk_id " hwnd), cyclePath, section, "pid")
+        if hwnd = selectedHwnd
+            selectedIndex := index
+    }
+    if selectedIndex = 0 {
+        selectedIndex := 1
+        SelectWindow(candidates[1], slot["name"])
+        WinRestore("ahk_id " candidates[1])
+        WinActivate("ahk_id " candidates[1])
+    }
+    IniWrite(selectedIndex, cyclePath, "Cycle", "index")
+}
+
+CycleSelectedWindow(slot) {
+    cyclePath := A_ScriptDir "\\runtime\\window-cycle.ini"
+    count := Integer(IniRead(cyclePath, "Cycle", "count", "0"))
+    index := Integer(IniRead(cyclePath, "Cycle", "index", "0"))
+    if count < 1 {
+        ClearCycleMode()
+        throw Error("The cycle candidate list is empty.")
+    }
+
+    Loop count {
+        index := Mod(index, count) + 1
+        section := "Window:" index
+        hwnd := Integer(IniRead(cyclePath, section, "hwnd", "0"))
+        expectedPid := Integer(IniRead(cyclePath, section, "pid", "0"))
+        if hwnd && WinExist("ahk_id " hwnd) && expectedPid && WinGetPID("ahk_id " hwnd) = expectedPid {
+            IniWrite(index, cyclePath, "Cycle", "index")
+            SelectWindow(hwnd, slot["name"])
+            WinRestore("ahk_id " hwnd)
+            WinActivate("ahk_id " hwnd)
+            return
+        }
+    }
+    ClearCycleMode()
+    ClearWindowSelection()
+    throw Error("No cycle candidate windows remain available.")
+}
+
+ClearCycleMode() {
+    cyclePath := A_ScriptDir "\\runtime\\window-cycle.ini"
+    if FileExist(cyclePath)
+        FileDelete(cyclePath)
 }
 
 GetSelectedWindow() {
@@ -380,9 +477,8 @@ GetSelectedWindow() {
     return 0
 }
 
-FindWindowInSlot(slot) {
-    bestHwnd := 0
-    bestArea := 0
+FindWindowsInSlot(slot) {
+    candidates := []
     for hwnd in WinGetList() {
         try {
             if WinGetMinMax("ahk_id " hwnd) = -1
@@ -394,14 +490,16 @@ FindWindowInSlot(slot) {
             WinGetPos(&x, &y, &w, &h, "ahk_id " hwnd)
             overlapWidth := Max(0, Min(x + w, slot["x"] + slot["w"]) - Max(x, slot["x"]))
             overlapHeight := Max(0, Min(y + h, slot["y"] + slot["h"]) - Max(y, slot["y"]))
-            overlapArea := overlapWidth * overlapHeight
-            if overlapArea > bestArea {
-                bestArea := overlapArea
-                bestHwnd := hwnd
-            }
+            if overlapWidth * overlapHeight > 0
+                candidates.Push(hwnd)
         }
     }
-    return bestHwnd
+    return candidates
+}
+
+FindWindowInSlot(slot) {
+    candidates := FindWindowsInSlot(slot)
+    return candidates.Length > 0 ? candidates[1] : 0
 }
 
 ClearWindowSelection() {
@@ -409,6 +507,7 @@ ClearWindowSelection() {
     if FileExist(selectionPath)
         FileDelete(selectionPath)
     ClearPlacementChoice()
+    ClearCycleMode()
 }
 
 MoveWindowToConfiguredSlot(hwnd, target, slots) {
