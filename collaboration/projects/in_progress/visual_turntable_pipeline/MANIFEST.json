@@ -1,0 +1,11 @@
+{
+  "project_id": "visual_turntable_pipeline",
+  "status": "in_progress",
+  "established": "2026-07-24",
+  "canonical_identity": false,
+  "test_fixture_name": "TEMP_EVELYN_CANON_TEST_FIXTURE",
+  "target_views": ["000", "045", "090", "135", "180", "225", "270", "315"],
+  "current_best_generation_workflow": "workflows/TPose_24_Absolute_ViewPool_Timestamped_v1.1_workflow.json",
+  "background_removal_workflow": "workflows/BiRefNet_Transparent_Background_v1.0_workflow.json",
+  "next_gate": "visual_canon_validation"
+}
