@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "fixture_id": "temporary_visual_canon_test_fixture",
+  "capture_type": "canonical_flat",
+  "revision": "r001",
+  "source_directory": "input_selected_8",
+  "output_directory": "input_selected_8/transparent_review",
+  "overwrite": false,
+  "selections": [
+    {"angle": "front", "source_file": "000.png"},
+    {"angle": "front_left_45", "source_file": "045.png"},
+    {"angle": "left_profile", "source_file": "090.png"},
+    {"angle": "rear_left_45", "source_file": "135.png"},
+    {"angle": "rear", "source_file": "180.png"},
+    {"angle": "rear_right_45", "source_file": "225.png"},
+    {"angle": "right_profile", "source_file": "270.png"},
+    {"angle": "front_right_45", "source_file": "315.png"}
+  ]
+}
