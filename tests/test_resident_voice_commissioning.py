@@ -23,7 +23,7 @@ def _install_fake_tts(tmp_path, monkeypatch):
         #!/usr/bin/env python3
         import math, sys, wave
         out = sys.argv[1]
-        rate = 16000
+        rate = 24000
         frames = [int(0.15 * math.sin(2 * math.pi * 220 * (i / rate)) * 32767) for i in range(rate // 4)]
         with wave.open(out, "wb") as wav:
             wav.setnchannels(1); wav.setsampwidth(2); wav.setframerate(rate)
@@ -57,7 +57,7 @@ def test_synthesis_creates_playable_wav_sample(tmp_path, monkeypatch):
     assert result["ok"] is True
     with wave.open(result["audio_path"], "rb") as wav:
         assert wav.getnchannels() == 1
-        assert wav.getframerate() in {16000, 24000}
+        assert wav.getframerate() == 24000
         assert wav.getnframes() > 0
 
 
@@ -107,3 +107,15 @@ def test_no_fake_audio_created_on_synthesis_failure(tmp_path, monkeypatch):
     assert result["ok"] is False
     assert result["placeholder_generated"] is False
     assert not safe_audio_path(tmp_path, "helen", "failure").exists()
+
+
+def test_wrong_sample_rate_is_rejected(tmp_path, monkeypatch):
+    script = _install_fake_tts(tmp_path, monkeypatch)
+    source = script.read_text(encoding="utf-8").replace("rate = 24000", "rate = 16000")
+    script.write_text(source, encoding="utf-8")
+    result = synthesize_resident_sample("helen", "Invalid rate.", root=tmp_path, sample_name="wrong_rate")
+    assert result["ok"] is False
+    assert "wav_sample_rate_must_be_24000_hz" in result["reason"]
+    code, _, served = audio_metadata_for_request("helen", "wrong_rate.wav", root=tmp_path)
+    assert code == 404
+    assert served is None

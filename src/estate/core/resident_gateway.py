@@ -36,7 +36,7 @@ def models_payload(root=None) -> dict[str, Any]:
     try:
         from estate.core.openwebui_resident_surface import resident_model_catalog
         payload = resident_model_catalog(root)
-        payload["data"].append({"id": DEFAULT_ROOM_MODEL, "object":"model", "created":0, "owned_by":"estate", "estate":{"surface":"multi_resident_room", "display_name":"Estate multi-resident room", "multi_resident_gateway_capable": True, "privileged_actions_enabled": False}})
+        payload["data"].append({"id": DEFAULT_ROOM_MODEL, "object":"model", "created":0, "owned_by":"estate", "name":"Estate conference room", "estate":{"surface":"multi_resident_room", "display_name":"Estate conference room", "office":"Estate conference room", "role":"Identity-preserving multi-resident conversation", "visual_state":"unavailable", "voice_state":"unavailable", "tts_available":False, "multi_resident_gateway_capable": True, "privileged_actions_enabled": False}})
         return payload
     except Exception:
         data = [{"id": mid,"object":"model","created":0,"owned_by":"estate","estate":{"resident_id": rid,"privileged_actions_enabled":False}} for mid, rid in ACTIVE_RESIDENT_MODELS.items()]
@@ -276,8 +276,8 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
     audio = {"requested": bool((payload.get("metadata") or {}).get("synthesize_audio") or payload.get("synthesize_audio")), "state": "not_requested"}
     if audio["requested"]:
         from estate.core.resident_voice_commissioning import synthesize_resident_sample
-        audio = synthesize_resident_sample(turn["resident_id"], turn["resident_response"], root=root, sample_name=f"{turn['turn_id']}")
-    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":package["identity_source_hash"],"identity_schema_version":package["identity_schema_version"],"identity_failed_closed":package["identity_failed_closed"],"identity_sources":package["identity_sources"],"resident_package":package,"voice":{"state":package["voice_state"],"engine":package["voice_engine"],"voice_id":package["voice_id"],"speed":package["voice_speed"],"approval_state":package["voice_approval_state"],"tts_available":package["tts_available"]},"visual":{"state":package["visual_state"],"avatar_uri":package["avatar_uri"],"provenance":package["visual_provenance"]},"audio":audio}}
+        audio = synthesize_resident_sample(turn["resident_id"], turn["resident_response"], root=root, sample_name=f"{turn['turn_id']}", turn_id=turn["turn_id"])
+    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"privileged_actions_enabled":False,"identity_hash":package["identity_source_hash"],"identity_schema_version":package["identity_schema_version"],"identity_failed_closed":package["identity_failed_closed"],"identity_sources":package["identity_sources"],"resident_package":package,"voice":{"state":"unavailable" if package["voice_state"] == "uncommissioned" else package["voice_state"],"commissioning_state":package["voice_state"],"engine":package["voice_engine"],"voice_id":package["voice_id"],"speed":package["voice_speed"],"approval_state":package["voice_approval_state"],"tts_available":package["tts_available"]},"visual":{"state":package["visual_state"],"avatar_uri":package["avatar_uri"],"provenance":package["visual_provenance"]},"audio":audio}}
     _attach_optional_gateway_diagnostics(body, result)
     return 200, body
 
@@ -464,6 +464,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.rstrip("/") == "/v1/models": self._send(200, models_payload(self.root)); return
         if self.path.rstrip("/") == "/status": self._send(200, gateway_status(self.root)); return
+        if self.path.startswith("/v1/estate/residents/") and self.path.rstrip("/").endswith("/ready"):
+            rid=self.path.split("/")[4].lower()
+            model=f"estate/{rid}"
+            if model not in ACTIVE_RESIDENT_MODELS: self._send(404,{"error":{"message":"resident not found","code":"resident_not_found"}}); return
+            package=resident_package(model, rid, self.root)
+            self._send(200,{"resident_id":rid,"ready_state":package["ready_state"],"resident_package":package}); return
         if self.path.startswith("/v1/estate/audio/"):
             from estate.core.resident_voice_commissioning import audio_metadata_for_request
             parts = self.path.split("/", 5)
