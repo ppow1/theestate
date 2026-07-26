@@ -167,6 +167,30 @@
       "requires_approval": false,
       "requires_validation": false,
       "supports_offline": false
+    },
+    {
+      "capability_id": "image_generation",
+      "category": "media",
+      "description": "Local image-generation capability requiring governed provider selection and validation.",
+      "display_name": "Image Generation",
+      "input_artifacts": ["workflow_request"],
+      "metadata": {"live_execution_authorized": false},
+      "output_artifacts": ["image_artifact_reference"],
+      "requires_approval": true,
+      "requires_validation": true,
+      "supports_offline": true
+    },
+    {
+      "capability_id": "image_iteration",
+      "category": "media",
+      "description": "Governed iterative image workflow preparation and execution capability.",
+      "display_name": "Image Iteration",
+      "input_artifacts": ["workflow_request", "iteration_brief"],
+      "metadata": {"live_execution_authorized": false},
+      "output_artifacts": ["image_artifact_reference", "iteration_evidence"],
+      "requires_approval": true,
+      "requires_validation": true,
+      "supports_offline": true
     }
   ],
   "providers": [
@@ -254,6 +278,40 @@
       "requires_network": false,
       "status": "implemented",
       "supports_artifacts": true,
+      "supports_offline": true,
+      "supports_validation": true
+    },
+    {
+      "capabilities": [
+        "image_generation",
+        "image_iteration"
+      ],
+      "classification_ceiling": "Local Only",
+      "cost_model": "no_spend_local",
+      "display_name": "ComfyUI Local Image Provider",
+      "implementation_kind": "python",
+      "limitations": [
+        "Requires current health and capacity evidence before Engineering selection.",
+        "Does not authorize live workflow submission, image generation, work-package acceptance, architecture acceptance, or Chief Architect acceptance.",
+        "Only the loopback endpoint defined by the ComfyUI service manifest is permitted."
+      ],
+      "metadata": {
+        "endpoint": "http://127.0.0.1:8188",
+        "execution_authorization": "selection_and_dispatch_required; live_submission_separately_authorized",
+        "health_operation": "GET /system_stats",
+        "local_only": true,
+        "loopback_only": true,
+        "service_id": "comfyui",
+        "service_manifest": "runtime/ai_services/implementations/comfyui/service.manifest.json"
+      },
+      "provider_id": "comfyui.local.image",
+      "provider_type": "media",
+      "requires_boundary_review": true,
+      "requires_network": false,
+      "routing_notes": "Admitted for governed local request preparation only; Engineering selection and Dispatch require fresh health/capacity evidence.",
+      "status": "implemented",
+      "supports_artifacts": true,
+      "supports_events": true,
       "supports_offline": true,
       "supports_validation": true
     }
