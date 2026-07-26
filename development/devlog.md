@@ -743,3 +743,9 @@ Implemented WP-0532 with an advisory Engineering Capacity Runtime that combines 
 EC-000094 - Added Codex CLI capability discovery policy
 
 Implemented WP-0534 with a metadata-only Codex CLI capability discovery runtime, `codex-cli-capability-discovery` CLI command, conservative manual/disabled status polling policy, Office handoff artifacts, tests, and concise integration documentation. Discovery binds to the shared provider catalog and does not mutate provider status automatically.
+
+2026-07-26 16:00:00
+
+EC-000095 - Preserved Command Chair HID integration checkpoint
+
+Documented and operationally validated the Command Chair trigger namespaces for two identical white encoder controllers, the E9s Vial controller, and the two-profile UtechSmart Venus Pro mouse. Preserved the AI-KSEN LCKEY identity, protocol incompatibility evidence, official-software dependency, and safe continuation path. Added a Restricted six-file backup bundle containing the E9s factory backup and all Venus Pro source/intermediate/final profiles, plus a PowerShell decoder that verifies every restored file by SHA-256.
