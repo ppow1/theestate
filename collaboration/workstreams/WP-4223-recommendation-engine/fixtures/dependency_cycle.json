@@ -1,0 +1,81 @@
+{
+  "dashboard_snapshot": {
+    "panels": {
+      "execution_queue": {
+        "records": [
+          {
+            "blockers": [],
+            "dependencies": [
+              "WP-B"
+            ],
+            "diagnostics": [],
+            "duration_estimate_reference": null,
+            "evidence_completeness": "complete",
+            "git_readiness_reference": "git-ok",
+            "item_identifier": "WP-A",
+            "merge_risk_classification": "low",
+            "parallel_group": null,
+            "parallel_safety_classification": "safe",
+            "priority": {
+              "score": 50
+            },
+            "readiness_classification": "blocked",
+            "reconciliation_classification": "authored_but_not_implemented",
+            "source_evidence_references": [
+              "work/WP-A.md"
+            ]
+          },
+          {
+            "blockers": [],
+            "dependencies": [
+              "WP-A"
+            ],
+            "diagnostics": [],
+            "duration_estimate_reference": null,
+            "evidence_completeness": "complete",
+            "git_readiness_reference": "git-ok",
+            "item_identifier": "WP-B",
+            "merge_risk_classification": "low",
+            "parallel_group": null,
+            "parallel_safety_classification": "safe",
+            "priority": {
+              "score": 50
+            },
+            "readiness_classification": "blocked",
+            "reconciliation_classification": "authored_but_not_implemented",
+            "source_evidence_references": [
+              "work/WP-B.md"
+            ]
+          }
+        ]
+      }
+    },
+    "snapshot_identifier": "fixture",
+    "snapshot_schema_version": "estate.engineering-campaign-dashboard/v1",
+    "source_queue_generation_identifier": "fixture-gen"
+  },
+  "degradation_reasons": [],
+  "deterministic_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "health": "healthy",
+  "integration_schema_version": "estate.engineering-dashboard-integration/v1",
+  "provider_diagnostics": [
+    {
+      "provider_id": "wp4220_queue",
+      "status": "healthy"
+    },
+    {
+      "provider_id": "wp4221_projection",
+      "status": "healthy"
+    }
+  ],
+  "provider_payloads": {
+    "wp4214_duration": {
+      "records": [
+        {
+          "estimated_hours": 4,
+          "item_identifier": "WP-FAST"
+        }
+      ]
+    }
+  }
+}
