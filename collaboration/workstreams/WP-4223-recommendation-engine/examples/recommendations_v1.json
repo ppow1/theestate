@@ -1,0 +1,497 @@
+{
+  "advisory_only": true,
+  "authority": "none",
+  "deterministic_content_hash": "5f45af1b9449b7b96bb030964f79da6d645b5a68c29bfd1e97f317be22935efd",
+  "diagnostics": [
+    "wp4214_duration:artifact_not_found",
+    "wp4215_parallel:artifact_not_found",
+    "wp4217_git:artifact_not_found"
+  ],
+  "policy_version": "wp4223-deterministic-policy/v1",
+  "provider_health": "degraded",
+  "recommendation_schema_version": "estate.engineering-campaign-recommendations/v1",
+  "recommendation_sets": {
+    "dependency_unblock_opportunities": [
+      {
+        "category": "dependency_unblock_opportunities",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-CYCLE-A"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-CYCLE-A",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-CYCLE-A matches deterministic dependency_unblock_opportunities policy",
+        "recommendation_id": "dependency_unblock_opportunities:WP-CYCLE-A",
+        "score": 0,
+        "score_components": [
+          {
+            "evidence": 0,
+            "rule": "queue_priority",
+            "value": 0
+          },
+          {
+            "evidence": 1,
+            "rule": "dependent_unblock",
+            "value": 12
+          },
+          {
+            "evidence": "low",
+            "rule": "low_merge_risk",
+            "value": 8
+          },
+          {
+            "evidence": 1,
+            "rule": "blocker",
+            "value": -10
+          },
+          {
+            "evidence": null,
+            "rule": "missing_git",
+            "value": -5
+          },
+          {
+            "evidence": "missing",
+            "rule": "low_confidence",
+            "value": -5
+          }
+        ]
+      }
+    ],
+    "highest_value_next_work": [
+      {
+        "category": "highest_value_next_work",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-ADAPTERS"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-ADAPTERS",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-ADAPTERS matches deterministic highest_value_next_work policy",
+        "recommendation_id": "highest_value_next_work:WP-ADAPTERS",
+        "score": 128,
+        "score_components": [
+          {
+            "evidence": 100,
+            "rule": "queue_priority",
+            "value": 100
+          },
+          {
+            "evidence": 0,
+            "rule": "dependent_unblock",
+            "value": 0
+          },
+          {
+            "evidence": "ready",
+            "rule": "ready",
+            "value": 25
+          },
+          {
+            "evidence": "low",
+            "rule": "low_merge_risk",
+            "value": 8
+          },
+          {
+            "evidence": 0,
+            "rule": "blocker",
+            "value": 0
+          },
+          {
+            "evidence": "missing",
+            "rule": "low_confidence",
+            "value": -5
+          }
+        ]
+      }
+    ],
+    "merge_risk_reductions": [
+      {
+        "category": "merge_risk_reductions",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-RISK"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-RISK",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-RISK matches deterministic merge_risk_reductions policy",
+        "recommendation_id": "merge_risk_reductions:WP-RISK",
+        "score": 75,
+        "score_components": [
+          {
+            "evidence": 75,
+            "rule": "queue_priority",
+            "value": 75
+          },
+          {
+            "evidence": 0,
+            "rule": "dependent_unblock",
+            "value": 0
+          },
+          {
+            "evidence": "ready",
+            "rule": "ready",
+            "value": 25
+          },
+          {
+            "evidence": "high",
+            "rule": "high_merge_risk",
+            "value": -15
+          },
+          {
+            "evidence": 0,
+            "rule": "blocker",
+            "value": 0
+          },
+          {
+            "evidence": null,
+            "rule": "missing_git",
+            "value": -5
+          },
+          {
+            "evidence": "missing",
+            "rule": "low_confidence",
+            "value": -5
+          }
+        ]
+      }
+    ],
+    "parallel_work_groups": [
+      {
+        "category": "parallel_work_groups",
+        "duration_evidence": "member estimates",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-SAFE"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-SAFE",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-4215/queue parallel group advisory-group-a is marked safe",
+        "recommendation_id": "parallel_work_groups:advisory-group-a",
+        "score": 123,
+        "score_components": [
+          {
+            "evidence": [
+              "WP-SAFE"
+            ],
+            "rule": "member_scores",
+            "value": 123
+          }
+        ]
+      }
+    ],
+    "parking_lot_promotion_candidates": [],
+    "quick_wins": [],
+    "stale_work_requiring_review": [
+      {
+        "category": "stale_work_requiring_review",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "PL-STALE"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "PL-STALE",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "PL-STALE matches deterministic stale_work_requiring_review policy",
+        "recommendation_id": "stale_work_requiring_review:PL-STALE",
+        "score": -50,
+        "score_components": [
+          {
+            "evidence": -10,
+            "rule": "queue_priority",
+            "value": -10
+          },
+          {
+            "evidence": 0,
+            "rule": "dependent_unblock",
+            "value": 0
+          },
+          {
+            "evidence": 0,
+            "rule": "blocker",
+            "value": 0
+          },
+          {
+            "evidence": "stale",
+            "rule": "stale",
+            "value": -30
+          },
+          {
+            "evidence": null,
+            "rule": "missing_git",
+            "value": -5
+          },
+          {
+            "evidence": "missing",
+            "rule": "low_confidence",
+            "value": -5
+          }
+        ]
+      }
+    ],
+    "superseded_work": [
+      {
+        "category": "superseded_work",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-OLD"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-OLD",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-OLD matches deterministic superseded_work policy",
+        "recommendation_id": "superseded_work:WP-OLD",
+        "score": -102,
+        "score_components": [
+          {
+            "evidence": 0,
+            "rule": "queue_priority",
+            "value": 0
+          },
+          {
+            "evidence": 0,
+            "rule": "dependent_unblock",
+            "value": 0
+          },
+          {
+            "evidence": "low",
+            "rule": "low_merge_risk",
+            "value": 8
+          },
+          {
+            "evidence": 0,
+            "rule": "blocker",
+            "value": 0
+          },
+          {
+            "evidence": "superseded",
+            "rule": "superseded",
+            "value": -100
+          },
+          {
+            "evidence": null,
+            "rule": "missing_git",
+            "value": -5
+          },
+          {
+            "evidence": "missing",
+            "rule": "low_confidence",
+            "value": -5
+          }
+        ]
+      }
+    ],
+    "technical_debt_opportunities": [
+      {
+        "category": "technical_debt_opportunities",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-8002"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-8002",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-8002 matches deterministic technical_debt_opportunities policy",
+        "recommendation_id": "technical_debt_opportunities:WP-8002",
+        "score": 5,
+        "score_components": [
+          {
+            "evidence": 10,
+            "rule": "queue_priority",
+            "value": 10
+          },
+          {
+            "evidence": 0,
+            "rule": "dependent_unblock",
+            "value": 0
+          },
+          {
+            "evidence": 0,
+            "rule": "blocker",
+            "value": 0
+          },
+          {
+            "evidence": null,
+            "rule": "missing_git",
+            "value": -5
+          }
+        ]
+      }
+    ],
+    "validation_priority": [
+      {
+        "category": "validation_priority",
+        "duration_evidence": "missing",
+        "duration_hours": null,
+        "item_identifiers": [
+          "WP-8003"
+        ],
+        "provenance": {
+          "integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+          "item_identifier": "WP-8003",
+          "provider_status": {
+            "wp4214_duration": "missing",
+            "wp4215_parallel": "missing",
+            "wp4217_git": "missing",
+            "wp4220_queue": "healthy",
+            "wp4221_projection": "healthy"
+          },
+          "queue_generation_identifier": "737344cc015fef47477e",
+          "snapshot_identifier": "d323ffa95b1e6cff3c5f",
+          "source_evidence_references": [
+            "source.json"
+          ]
+        },
+        "reason": "WP-8003 matches deterministic validation_priority policy",
+        "recommendation_id": "validation_priority:WP-8003",
+        "score": 43,
+        "score_components": [
+          {
+            "evidence": 20,
+            "rule": "queue_priority",
+            "value": 20
+          },
+          {
+            "evidence": 0,
+            "rule": "dependent_unblock",
+            "value": 0
+          },
+          {
+            "evidence": "validation",
+            "rule": "validation",
+            "value": 20
+          },
+          {
+            "evidence": "low",
+            "rule": "low_merge_risk",
+            "value": 8
+          },
+          {
+            "evidence": 0,
+            "rule": "blocker",
+            "value": 0
+          },
+          {
+            "evidence": null,
+            "rule": "missing_git",
+            "value": -5
+          }
+        ]
+      }
+    ]
+  },
+  "source_integration_hash": "029ad5fa449fd136f08a33ef0b3843e81bdd27f58ec2f7c6ad9fcdfc63ef1a9e",
+  "weights": {
+    "blocker": -10,
+    "dependent_unblock": 12,
+    "high_merge_risk": -15,
+    "low_confidence": -5,
+    "low_merge_risk": 8,
+    "missing_git": -5,
+    "queue_priority": 1,
+    "ready": 25,
+    "short_duration": 15,
+    "stale": -30,
+    "superseded": -100,
+    "validation": 20
+  }
+}
