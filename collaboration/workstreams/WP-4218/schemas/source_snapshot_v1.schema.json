@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"estate://wp-4218/source-snapshot/v1","type":"object","required":["schema_version","records"],"properties":{"schema_version":{"const":"estate.reconciliation-source/v1"},"records":{"type":"array","items":{"type":"object","required":["id","title"]}}}}

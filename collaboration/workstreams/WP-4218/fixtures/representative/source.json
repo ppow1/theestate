@@ -1,0 +1,22 @@
+{"schema_version":"estate.reconciliation-source/v1","records":[
+{"id":"PL-001","title":"Newly captured","source_category":"parking_lot","lane":"Governance"},
+{"id":"PL-002","title":"Promoted item","source_category":"parking_lot","work_package":"WP-8001","lane":"Governance"},
+{"id":"WP-8001","title":"Authored only","lane":"Documentation","touch_points":["docs/new.md"]},
+{"id":"WP-8002","title":"Partial implementation","lane":"Runtime","touch_points":["src/part.py"],"evidence":{"implemented_criteria":1,"total_criteria":3}},
+{"id":"WP-8003","title":"Implementation without validation","lane":"Testing","touch_points":["tests/test_one.py"],"evidence":{"implementation":true}},
+{"id":"WP-8004","title":"Fully completed","lane":"Validation","touch_points":["operations/validation/report.md"],"evidence":{"implementation":true,"validation":true,"completion_receipt":true,"merge":true}},
+{"id":"PL-STALE","title":"Stale parking lot","source_category":"parking_lot","lane":"Governance","stale":true},
+{"id":"WP-WIP-STALE","title":"Stale WIP","source_category":"wip","lane":"Runtime","touch_points":["src/wip.py"],"stale":true},
+{"id":"WP-DUP","title":"Duplicate first","lane":"Documentation","touch_points":["docs/dup.md"]},
+{"id":"WP-DUP-ALIAS","alias_of":"WP-DUP","title":"Duplicate alias","lane":"Documentation","touch_points":["docs/dup.md"]},
+{"id":"WP-OLD","title":"Explicitly superseded","lane":"Infrastructure","touch_points":["config/old.json"],"supersedes":"WP-NEW","supersession_coverage":"full"},
+{"id":"WP-MAYBE","title":"Possible supersession","lane":"Infrastructure","touch_points":["config/maybe.json"],"possible_supersedes":"WP-OLD"},
+{"id":"WP-MISSING","title":"Missing dependency","lane":"Testing","touch_points":["tests/test_missing.py"],"dependencies":["WP-NOT-FOUND"]},
+{"id":"WP-CYCLE-A","title":"Cycle A","lane":"Registry","touch_points":["data/schemas/a.json"],"dependencies":["WP-CYCLE-B"]},
+{"id":"WP-CYCLE-B","title":"Cycle B","lane":"Registry","touch_points":["data/schemas/b.json"],"dependencies":["WP-CYCLE-A"]},
+{"id":"WP-CONFLICT","title":"Conflicting touch points","lane":"Runtime","touch_points":["src/**"],"blockers":["conflicting_touch_points"]},
+{"id":"WP-SAFE","title":"Parallel safe","lane":"Documentation","touch_points":["docs/safe.md"],"wp4215_adapter":{"group":"advisory-group-a"}},
+{"id":"WP-RISK","title":"High merge risk","lane":"Runtime","touch_points":["src/","src/**"]},
+{"id":"WP-AMBIG","title":"Ambiguous evidence","touch_points":["docs/a.md","src/a.py"],"ambiguous":true},
+{"id":"WP-ADAPTERS","title":"Optional adapter consumer","lane":"Infrastructure","touch_points":["config/adapters.json"],"wp4214_adapter":{"reference":"estimate-1"},"wp4217_adapter":{"reference":"git-ready-1"}}
+]}
