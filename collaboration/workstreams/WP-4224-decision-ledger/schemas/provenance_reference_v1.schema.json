@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"estate.engineering-recommendation-provenance/v1","type":"object","properties":{"integration_hash":{"type":"string"},"snapshot_identifier":{"type":["string","null"]},"queue_generation_identifier":{"type":["string","null"]},"source_evidence_references":{"type":"array"}},"additionalProperties":true}

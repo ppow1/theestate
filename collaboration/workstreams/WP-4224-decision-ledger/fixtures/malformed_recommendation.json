@@ -1,0 +1,9 @@
+{
+  "deterministic_content_hash": "bad",
+  "recommendation_schema_version": "estate.engineering-campaign-recommendations/v1",
+  "recommendation_sets": {
+    "x": [
+      {}
+    ]
+  }
+}
