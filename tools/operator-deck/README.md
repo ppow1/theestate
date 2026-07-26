@@ -116,3 +116,11 @@ If the Stream Deck action has separate fields for application and arguments, use
 ## Future expansion notes
 
 Future work may add richer target discovery, profile-aware commands, workspace profiles, service integration, dynamic Stream Deck feedback, or other adapters. Those are intentionally outside this prototype. This version stays focused on a readable local window-control adapter that proves the target launcher and window swapper concept.
+
+## Command Chair HID checkpoint
+
+The verified Command Chair controller identities, trigger namespaces, backup artifacts, UtechSmart profile-format findings, and AI-KSEN LCKEY continuation procedure are preserved at:
+
+`tools/operator-deck/command-chair/COMMAND_CHAIR_HID_CHECKPOINT_2026-07-26.md`
+
+The Restricted backup bundle and its SHA-256 restore tool live beside that checkpoint. Read the checkpoint before changing or re-provisioning any Command Chair HID device.
