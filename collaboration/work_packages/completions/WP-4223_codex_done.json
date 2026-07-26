@@ -1,0 +1,17 @@
+{
+  "work_package": "WP-4223",
+  "title": "Engineering Campaign Dashboard Operator Surface Installation",
+  "classification": "implemented_and_complete",
+  "canonical_surface": "Office of the Steward local command center",
+  "read_only": true,
+  "advisory_only": true,
+  "implementation_paths": [
+    "src/estate/core/engineering_campaign_dashboard.py",
+    "src/estate/core/steward_command_center.py",
+    "config/engineering_campaign_dashboard.json"
+  ],
+  "validation_report": "validation/WP-4223_VALIDATION_REPORT.md",
+  "operator_documentation": "docs/integration/engineering_campaign_dashboard_operator_surface.md",
+  "rollback": "disable config without altering WP-4220 through WP-4222 or source authorities",
+  "ready_for_ca_review": true
+}
