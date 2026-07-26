@@ -1,0 +1,100 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "estate://wp-4218/engineering-queue/v1",
+    "title": "WP-4218 advisory engineering queue",
+    "type": "object",
+    "required": [
+        "queue_schema_version",
+        "generation_identifier",
+        "generation_timestamp",
+        "source_revision",
+        "rows",
+        "deterministic_content_hash",
+        "advisory_only"
+    ],
+    "properties": {
+        "queue_schema_version": {
+            "const": "estate.engineering-queue/v1"
+        },
+        "generation_identifier": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{20}$"
+        },
+        "generation_timestamp": {
+            "type": "string"
+        },
+        "source_revision": {
+            "type": "string",
+            "minLength": 1
+        },
+        "deterministic_content_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+        },
+        "advisory_only": {
+            "const": true
+        },
+        "rows": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/row"
+            }
+        }
+    },
+    "$defs": {
+        "row": {
+            "type": "object",
+            "required": [
+                "item_identifier",
+                "item_title",
+                "source_category",
+                "current_lifecycle_state",
+                "reconciliation_classification",
+                "readiness_classification",
+                "priority",
+                "engineering_lane",
+                "dependencies",
+                "blockers",
+                "repository_touch_points",
+                "parallel_safety_classification",
+                "merge_risk_classification",
+                "estimated_complexity",
+                "duration_estimate_reference",
+                "evidence_completeness",
+                "diagnostics",
+                "provenance"
+            ],
+            "properties": {
+                "reconciliation_classification": {
+                    "enum": [
+                        "captured",
+                        "promoted",
+                        "authored_but_not_implemented",
+                        "partially_implemented",
+                        "implemented_but_not_validated",
+                        "implemented_and_complete",
+                        "blocked",
+                        "duplicate",
+                        "superseded",
+                        "stale",
+                        "ambiguous_requires_review"
+                    ]
+                },
+                "readiness_classification": {
+                    "enum": [
+                        "ready",
+                        "ready_with_coordination",
+                        "blocked",
+                        "needs_definition",
+                        "needs_evidence",
+                        "needs_review",
+                        "in_progress",
+                        "validation",
+                        "complete",
+                        "superseded"
+                    ]
+                }
+            }
+        }
+    }
+}
