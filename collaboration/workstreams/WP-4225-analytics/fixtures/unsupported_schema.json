@@ -1,0 +1,51 @@
+{
+  "observed_at": "2026-07-02T00:00:00Z",
+  "sources": {
+    "dashboard": {
+      "dashboard_snapshot": {
+        "panels": {
+          "completed_work": {
+            "records": []
+          },
+          "execution_queue": {
+            "records": []
+          },
+          "merge_risk": {
+            "records": []
+          },
+          "validation_status": {
+            "records": []
+          }
+        }
+      },
+      "deterministic_content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "decision_ledger": {
+      "decisions": [
+        {
+          "linked_recommendation": "r1",
+          "review_timestamp": "2026-07-02T00:00:00Z",
+          "state": "accepted_for_future_planning"
+        }
+      ],
+      "deterministic_content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "ledger_schema_version": "estate.engineering-recommendation-ledger/v999",
+      "recommendations": [
+        {
+          "generation_timestamp": "2026-07-01T00:00:00Z",
+          "recommendation_identifier": "r1"
+        }
+      ]
+    },
+    "integration": {
+      "deterministic_content_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    "queue": {
+      "candidates": [],
+      "deterministic_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "recommendations": {
+      "deterministic_content_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    }
+  }
+}
