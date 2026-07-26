@@ -1,0 +1,50 @@
+{
+  "schema_version": "estate.engineering-resident-operationalization-scope.v1",
+  "generated_on": "2026-07-26",
+  "repository": "theestate",
+  "mission": "bounded implementation reconciliation and first-slice design for Grace, Helen, Alfred, and the Engineering Department",
+  "disposition": "stop_after_reconciliation",
+  "implementation_authorized": false,
+  "implementation_pr_warranted": false,
+  "reconciliation_pr_warranted": true,
+  "proof_task": "Produce and validate one Evelyn image-iteration run through Engineering",
+  "authorization_basis_reviewed": [
+    "CAMPAIGN_0670_ENGINEERING_DEPARTMENT_OPERATIONALIZATION",
+    "WP-0670 through WP-0675 definitions and completion submissions",
+    "CAMPAIGN_0681_CAMPAIGN_0670_BOUNDED_REUSE_AUTHORIZATION",
+    "CAMPAIGN_0681 G8 acceptance and implementation closeout",
+    "WP-0694 through WP-0700 implementation contracts"
+  ],
+  "authorizing_packages_if_resolved": [
+    "WP-0671",
+    "WP-0672",
+    "WP-0673",
+    "WP-0674",
+    "WP-0675",
+    "WP-0694",
+    "WP-0695",
+    "WP-0696",
+    "WP-0697",
+    "WP-0700"
+  ],
+  "blocking_ambiguity": "No protected record authorizes a follow-on live Engineering composition adapter to mutate existing canonical stores under Campaign-0670-shaped lifecycle rules while Campaign 0670 remains unaccepted; Campaign 0681 permits bounded reuse and has accepted observation/adaptor building blocks but leaves live-provider qualification and rollout incomplete.",
+  "required_authority_resolution": "Explicitly authorize the bounded composition adapter and proof package, or first disposition Campaign 0670 protected gates/acceptance; identify the canonical adapter location and permitted dry-run/live boundary.",
+  "current_change_set": [
+    "Temp/engineering-resident-operationalization/CURRENT_STATE_RECONCILIATION.md",
+    "Temp/engineering-resident-operationalization/FIRST_VERTICAL_SLICE_PLAN.md",
+    "Temp/engineering-resident-operationalization/implementation_scope.json"
+  ],
+  "prohibited_changes": [
+    "tools/operator-deck",
+    "Command Chair files",
+    "Campaign 03 implementation",
+    "new resident, voice, officeholder, Engineering Director, or authority role",
+    "new scheduler, queue, mailbox, momentum engine, provider registry, campaign state store, validator, or acceptance path",
+    "runtime implementation before authority resolution"
+  ],
+  "targeted_reconciliation_checks": [
+    "python -m json.tool Temp/engineering-resident-operationalization/implementation_scope.json",
+    "required-output and stop-disposition assertions",
+    "git diff --check"
+  ]
+}
