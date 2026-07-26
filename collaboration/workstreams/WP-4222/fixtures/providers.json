@@ -1,0 +1,10 @@
+{
+  "manifest_schema_version": "estate.engineering-dashboard-provider-manifest/v1",
+  "providers": [
+    {"provider_id":"wp4220_queue","contract_version":"estate.engineering-queue/v1","kind":"json","path":"../../WP-4218/examples/engineering_queue_v1.json","required":true},
+    {"provider_id":"wp4221_projection","contract_version":"estate.engineering-campaign-dashboard/v1","kind":"python_module","path":"../../WP-4219/dashboard/projection.py","required":true},
+    {"provider_id":"wp4214_duration","contract_version":"estate.work-package-duration/v1","kind":"json","path":"missing/duration.json","required":false},
+    {"provider_id":"wp4215_parallel","contract_version":"estate.parallel-worker-plan/v1","kind":"json","path":"missing/parallel.json","required":false},
+    {"provider_id":"wp4217_git","contract_version":"estate.local-git-readiness/v1","kind":"json","path":"missing/git.json","required":false}
+  ]
+}
