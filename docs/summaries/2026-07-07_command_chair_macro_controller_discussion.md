@@ -182,3 +182,28 @@ The two ordered devices will provide practical information:
 - AI-KSEN tests a small mode-aware LCD controller with one encoder and three keys.
 
 The final controller can evolve after real chair use, software inspection, and physical mounting tests.
+
+## 2026-07-26 Operational Validation Checkpoint
+
+The prototype hardware investigation has moved beyond discussion into operational validation.
+
+Verified outcomes:
+
+- The two matching white three-button/one-encoder controllers were assigned distinct LEFT and RIGHT roles and verified with F13-F24 trigger namespaces.
+- The E9s nine-key/two-encoder Vial controller was provisioned and verified with Ctrl/Alt plus F13-F24 namespaces.
+- The UtechSmart Venus Pro retains Pat's established muscle-memory profile and now has a second onboard Command Chair profile with twelve verified Ctrl+Shift+F1-F12 triggers.
+- The AI-KSEN LCKEY LCD controller is fully identified, but provisioning is paused because its proprietary LCD firmware rejected the generic 1189:8890 configuration protocol.
+
+The complete findings, HID identities, mappings, failure evidence, security concept, exact recovery bundle, and LCKEY resume procedure are preserved at:
+
+`tools/operator-deck/command-chair/COMMAND_CHAIR_HID_CHECKPOINT_2026-07-26.md`
+
+Backup bundle:
+
+`tools/operator-deck/command-chair/backups/command-chair-backups-2026-07-26.json`
+
+Restore and SHA-256 verification tool:
+
+`tools/operator-deck/command-chair/Restore-CommandChairBackupBundle.ps1`
+
+The backup bundle is classified Estate Restricted because the historical Venus Pro profile contains obsolete credential macros. It must not be published.
