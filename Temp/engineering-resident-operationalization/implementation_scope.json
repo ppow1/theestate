@@ -3,10 +3,10 @@
   "generated_on": "2026-07-26",
   "repository": "theestate",
   "mission": "bounded implementation reconciliation and first-slice design for Grace, Helen, Alfred, and the Engineering Department",
-  "disposition": "stop_after_reconciliation",
-  "implementation_authorized": false,
-  "implementation_pr_warranted": false,
-  "reconciliation_pr_warranted": true,
+  "disposition": "authorized_first_vertical_slice_implemented",
+  "implementation_authorized": true,
+  "implementation_pr_warranted": true,
+  "reconciliation_pr_warranted": false,
   "proof_task": "Produce and validate one Evelyn image-iteration run through Engineering",
   "authorization_basis_reviewed": [
     "CAMPAIGN_0670_ENGINEERING_DEPARTMENT_OPERATIONALIZATION",
@@ -27,24 +27,35 @@
     "WP-0697",
     "WP-0700"
   ],
-  "blocking_ambiguity": "No protected record authorizes a follow-on live Engineering composition adapter to mutate existing canonical stores under Campaign-0670-shaped lifecycle rules while Campaign 0670 remains unaccepted; Campaign 0681 permits bounded reuse and has accepted observation/adaptor building blocks but leaves live-provider qualification and rollout incomplete.",
-  "required_authority_resolution": "Explicitly authorize the bounded composition adapter and proof package, or first disposition Campaign 0670 protected gates/acceptance; identify the canonical adapter location and permitted dry-run/live boundary.",
+  "blocking_ambiguity": "resolved by the Steward authorization recorded on 2026-07-26; resolution is limited to this single dry-run slice",
+  "required_authority_resolution": "satisfied for the bounded adapter only; Campaign 0670 acceptance and all protected gates remain unresolved and preserved",
   "current_change_set": [
     "Temp/engineering-resident-operationalization/CURRENT_STATE_RECONCILIATION.md",
     "Temp/engineering-resident-operationalization/FIRST_VERTICAL_SLICE_PLAN.md",
-    "Temp/engineering-resident-operationalization/implementation_scope.json"
+    "Temp/engineering-resident-operationalization/implementation_scope.json",
+    "src/estate/core/engineering_lifecycle_slice.py",
+    "tests/test_engineering_lifecycle_first_slice.py"
   ],
   "prohibited_changes": [
     "tools/operator-deck",
     "Command Chair files",
     "Campaign 03 implementation",
     "new resident, voice, officeholder, Engineering Director, or authority role",
-    "new scheduler, queue, mailbox, momentum engine, provider registry, campaign state store, validator, or acceptance path",
-    "runtime implementation before authority resolution"
+    "new scheduler, queue, mailbox, momentum engine, provider registry, campaign state store, validator, or acceptance path"
   ],
   "targeted_reconciliation_checks": [
     "python -m json.tool Temp/engineering-resident-operationalization/implementation_scope.json",
     "required-output and stop-disposition assertions",
+    "git diff --check"
+  ],
+  "authority_resolution": "Steward authorized one bounded Campaign-0681 follow-on Engineering composition adapter using a deterministic dry-run image worker; Campaign 0670 remains unaccepted.",
+  "canonical_adapter": "src/estate/core/engineering_lifecycle_slice.py",
+  "authorized_campaign_id": "CAMPAIGN-0670",
+  "authorized_work_package_id": "WP-0675",
+  "execution_boundary": "deterministic_dry_run_no_live_provider_no_spend",
+  "targeted_implementation_checks": [
+    "pytest -q tests/test_engineering_lifecycle_first_slice.py",
+    "directly affected Campaign 0681, Grace, Helen, Dispatch, handoff, reconciliation, Alfred, and CME suites",
     "git diff --check"
   ]
 }

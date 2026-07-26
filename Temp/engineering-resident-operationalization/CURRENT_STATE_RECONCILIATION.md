@@ -75,3 +75,7 @@ No runtime or test file may change before the ambiguity above is resolved. If au
 ## PR disposition
 
 A reconciliation-only PR is warranted because the requested durable outputs are new repository artifacts. An implementation PR is **not** warranted until protected authority resolves the stated ambiguity. This PR must not claim Campaign 0670 acceptance, operational rollout, or proof-task execution.
+
+## Steward authorization resolution — 2026-07-26
+
+The Steward subsequently authorized exactly one bounded follow-on composition adapter under the accepted Campaign 0681 framework. That decision resolves the ambiguity above for the single dry-run proof only; it does not accept Campaign 0670 or grant rollout, spending, live-provider, protected-gate, or acceptance authority. The implementation associates the proof with Campaign 0670 / WP-0675, uses a deterministic no-spend fixture, and preserves Chief Architect acceptance.

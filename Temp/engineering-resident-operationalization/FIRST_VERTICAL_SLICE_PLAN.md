@@ -66,3 +66,7 @@ Existing Dispatch, provider catalog, mailbox, Alfred routing, result reconciliat
 ## Stop points
 
 Stop and escalate rather than infer authority when encountering protected approval, architecture acceptance, spending, privacy/safety confirmation, an unadmitted provider, stale/contradictory evidence, validation failure, or a request to accept/merge/deploy. Stop after the single proof task and report evidence before any expansion.
+
+## Authorized implementation disposition — 2026-07-26
+
+The Steward authorized this plan's one-task composition boundary. The implemented adapter is `src/estate/core/engineering_lifecycle_slice.py`; its sole focused proof is `tests/test_engineering_lifecycle_first_slice.py`. Execution remains deterministic dry-run evidence and does not claim that an Evelyn image was generated.
