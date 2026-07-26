@@ -1,0 +1,71 @@
+{
+  "engineering_queue": {
+    "queue_schema_version": "estate.engineering-queue/v1",
+    "candidates": [
+      {
+        "item_identifier": "WP-1",
+        "priority": {
+          "score": 10
+        },
+        "dependencies": [],
+        "current_lifecycle_state": "ready"
+      }
+    ],
+    "dependency_graph": {
+      "nodes": [
+        "WP-1",
+        "WP-2"
+      ],
+      "edges": [
+        [
+          "WP-1",
+          "WP-2"
+        ],
+        [
+          "WP-2",
+          "WP-1"
+        ]
+      ]
+    }
+  },
+  "dashboard": {
+    "snapshot_schema_version": "estate.engineering-campaign-dashboard/v1",
+    "panels": {
+      "dependency_graph": {
+        "nodes": [
+          "WP-1"
+        ],
+        "edges": []
+      },
+      "merge_risk": {
+        "records": []
+      }
+    }
+  },
+  "integration": {
+    "integration_schema_version": "estate.engineering-dashboard-integration/v1",
+    "provider_diagnostics": [
+      {
+        "provider_id": "queue",
+        "status": "healthy"
+      }
+    ],
+    "freshness": "fresh",
+    "degradation_reasons": []
+  },
+  "recommendations": {
+    "recommendation_schema_version": "estate.engineering-campaign-recommendations/v1",
+    "recommendation_sets": {}
+  },
+  "decision_ledger": {
+    "ledger_schema_version": "estate.engineering-recommendation-ledger/v1",
+    "decisions": []
+  },
+  "analytics": {
+    "analytics_schema_version": "estate.engineering-campaign-analytics/v1",
+    "metrics": {
+      "engineering_throughput": 0,
+      "blocker_frequency": 0.0
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/campaign_snapshot_v1.schema.json",
+  "title": "campaign_snapshot_v1",
+  "type": "object",
+  "required": [
+    "snapshot_schema_version",
+    "generation_timestamp",
+    "source_records",
+    "provenance",
+    "deterministic_content_hash"
+  ],
+  "properties": {
+    "snapshot_schema_version": {
+      "const": "estate.engineering-campaign-snapshot/v1"
+    }
+  },
+  "additionalProperties": true
+}
