@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/conversation-specification-reconciliation/v1",
+  "title": "WP-4210 reconciliation artifact envelope",
+  "type": "object",
+  "required": ["schema_version", "reconciliation_run_id"],
+  "properties": {
+    "schema_version": {"const": "estate.conversation-specification-reconciliation/v1"},
+    "reconciliation_run_id": {"type": "string", "pattern": "^[a-f0-9]{20}$"},
+    "canonical_status": {"enum": ["non_canonical_review_required"]},
+    "status": {"enum": ["ready_for_human_review", "review_blocked"]},
+    "source_hashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["extraction_run_id", "source_archive_sha256", "validation_report_sha256"],
+        "properties": {
+          "extraction_run_id": {"type": "string", "minLength": 1},
+          "source_archive_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "validation_report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}
