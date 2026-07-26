@@ -1039,3 +1039,13 @@ Classification: Estate Internal
 
 Summary:
 Implemented WP-0534 with metadata-only Codex CLI capability discovery, provider catalog binding for `codex.execution.cli`, conservative polling policy artifacts, CLI inspection command, tests, and integration documentation without submitting prompts or executing provider work.
+
+EC-000095 - Preserved Command Chair HID integration checkpoint
+
+Timestamp: 2026-07-26 16:00:00
+Location: A:\\theestate
+Status: Operationally Validated
+Classification: Estate Internal / Restricted backup payload
+
+Summary:
+Preserved the verified Command Chair HID identities and trigger namespaces for the paired white controllers, E9s macropad, UtechSmart Venus Pro, and AI-KSEN LCKEY; recorded the failed generic LCKEY provisioning path and safe resume procedure; added an exact six-file base64 recovery bundle with SHA-256 metadata; and added a PowerShell restore/verification tool. The historical Venus Pro profile remains Restricted because it contains obsolete credential macros.
