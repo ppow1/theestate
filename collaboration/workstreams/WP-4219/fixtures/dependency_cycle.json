@@ -1,0 +1,115 @@
+{
+  "advisory_only": true,
+  "deterministic_content_hash": "737344cc015fef47477e79cef6f2f6a0216c575e96f5e80cd05878c98a4e7842",
+  "generation_identifier": "737344cc015fef47477e",
+  "generation_timestamp": "2026-07-26T00:00:00Z",
+  "policy_version": "wp4218-policy/v1",
+  "queue_schema_version": "estate.engineering-queue/v1",
+  "rows": [
+    {
+      "blockers": [
+        "dependency_cycle"
+      ],
+      "candidate_identifier": "WP-CYCLE-A",
+      "current_lifecycle_state": "pending",
+      "dependencies": [
+        "WP-CYCLE-B"
+      ],
+      "diagnostics": [
+        "dependency_cycle"
+      ],
+      "duration_estimate_reference": null,
+      "engineering_lane": {
+        "primary": "Registry",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "missing",
+      "git_readiness_reference": null,
+      "item_identifier": "WP-CYCLE-A",
+      "item_title": "Cycle A",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": null,
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "held",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 0
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "c933cd387c2c20ceed873f0f25a525a4d400df58a8f6ea9e9a61404194be3f18",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "blocked",
+      "reconciliation_classification": "blocked",
+      "repository_touch_points": [
+        "data/schemas/a.json"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    },
+    {
+      "blockers": [
+        "dependency_cycle"
+      ],
+      "candidate_identifier": "WP-CYCLE-B",
+      "current_lifecycle_state": "pending",
+      "dependencies": [
+        "WP-CYCLE-A"
+      ],
+      "diagnostics": [
+        "dependency_cycle"
+      ],
+      "duration_estimate_reference": null,
+      "engineering_lane": {
+        "primary": "Registry",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "missing",
+      "git_readiness_reference": null,
+      "item_identifier": "WP-CYCLE-B",
+      "item_title": "Cycle B",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": null,
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "held",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 0
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "b089654482fd70026080e5905c31e1e93588559e6c8f48aa0c582bafe284ec4b",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "blocked",
+      "reconciliation_classification": "blocked",
+      "repository_touch_points": [
+        "data/schemas/b.json"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    }
+  ],
+  "source_revision": "b2ff3f4e7c77acbd7c39e823280b94b2ad9b9685"
+}

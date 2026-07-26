@@ -1,0 +1,9 @@
+{
+  "advisory_only": true,
+  "deterministic_content_hash": "737344cc015fef47477e79cef6f2f6a0216c575e96f5e80cd05878c98a4e7842",
+  "generation_identifier": "737344cc015fef47477e",
+  "generation_timestamp": "2026-07-26T00:00:00Z",
+  "policy_version": "wp4218-policy/v1",
+  "queue_schema_version": "estate.engineering-queue/v1",
+  "source_revision": "b2ff3f4e7c77acbd7c39e823280b94b2ad9b9685"
+}

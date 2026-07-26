@@ -1,0 +1,103 @@
+{
+  "advisory_only": true,
+  "deterministic_content_hash": "737344cc015fef47477e79cef6f2f6a0216c575e96f5e80cd05878c98a4e7842",
+  "generation_identifier": "737344cc015fef47477e",
+  "generation_timestamp": "2026-07-26T00:00:00Z",
+  "policy_version": "wp4218-policy/v1",
+  "queue_schema_version": "estate.engineering-queue/v1",
+  "rows": [
+    {
+      "blockers": [],
+      "candidate_identifier": "WP-8001",
+      "current_lifecycle_state": "pending",
+      "dependencies": [],
+      "diagnostics": [],
+      "duration_estimate_reference": null,
+      "engineering_lane": {
+        "primary": "Documentation",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "missing",
+      "git_readiness_reference": null,
+      "item_identifier": "WP-8001",
+      "item_title": "Authored only",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": null,
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "high",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 100
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "5cd5dda9d5840e6c84c3c55076d85cd9d8fc9b7320700712fe730d2f8ecb35cf",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "ready",
+      "reconciliation_classification": "authored_but_not_implemented",
+      "repository_touch_points": [
+        "docs/new.md"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    },
+    {
+      "blockers": [],
+      "candidate_identifier": "WP-8004",
+      "current_lifecycle_state": "pending",
+      "dependencies": [],
+      "diagnostics": [],
+      "duration_estimate_reference": null,
+      "engineering_lane": {
+        "primary": "Validation",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "complete",
+      "git_readiness_reference": null,
+      "item_identifier": "WP-8004",
+      "item_title": "Fully completed",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": null,
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "held",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 0
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "db5e6dffbf1c7d501f7f342bc24409a19d29e5520baa434f88c3e1d21fde8d2c",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "complete",
+      "reconciliation_classification": "implemented_and_complete",
+      "repository_touch_points": [
+        "operations/validation/report.md"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    }
+  ],
+  "source_revision": "b2ff3f4e7c77acbd7c39e823280b94b2ad9b9685"
+}

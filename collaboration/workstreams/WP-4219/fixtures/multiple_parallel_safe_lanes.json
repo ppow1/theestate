@@ -1,0 +1,103 @@
+{
+  "advisory_only": true,
+  "deterministic_content_hash": "737344cc015fef47477e79cef6f2f6a0216c575e96f5e80cd05878c98a4e7842",
+  "generation_identifier": "737344cc015fef47477e",
+  "generation_timestamp": "2026-07-26T00:00:00Z",
+  "policy_version": "wp4218-policy/v1",
+  "queue_schema_version": "estate.engineering-queue/v1",
+  "rows": [
+    {
+      "blockers": [],
+      "candidate_identifier": "WP-ADAPTERS",
+      "current_lifecycle_state": "pending",
+      "dependencies": [],
+      "diagnostics": [],
+      "duration_estimate_reference": "estimate-1",
+      "engineering_lane": {
+        "primary": "Infrastructure",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "missing",
+      "git_readiness_reference": "git-ready-1",
+      "item_identifier": "WP-ADAPTERS",
+      "item_title": "Optional adapter consumer",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": null,
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "high",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 100
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "558f308ac1b17e8e6048511ec55c844f7181868fc5133c84aeb6459544d8299e",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "ready",
+      "reconciliation_classification": "authored_but_not_implemented",
+      "repository_touch_points": [
+        "config/adapters.json"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    },
+    {
+      "blockers": [],
+      "candidate_identifier": "WP-SAFE",
+      "current_lifecycle_state": "pending",
+      "dependencies": [],
+      "diagnostics": [],
+      "duration_estimate_reference": null,
+      "engineering_lane": {
+        "primary": "Documentation",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "missing",
+      "git_readiness_reference": null,
+      "item_identifier": "WP-SAFE",
+      "item_title": "Parallel safe",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": "advisory-group-a",
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "high",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 100
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "1f184a9b3a83846cc02cc5fc777bbe5352e64b1334122b26116f65ab5c54cd40",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "ready",
+      "reconciliation_classification": "authored_but_not_implemented",
+      "repository_touch_points": [
+        "docs/safe.md"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    }
+  ],
+  "source_revision": "b2ff3f4e7c77acbd7c39e823280b94b2ad9b9685"
+}
