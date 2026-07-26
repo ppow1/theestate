@@ -1,0 +1,44 @@
+{
+  "work_package_id": "WP-4210",
+  "status": "implementation_complete_remote_delivery_blocked",
+  "branch": "codex/seat1-wp4210-reconciliation",
+  "base_commit": "8f527a872a76b14d3938242bf230a232fc3e8839",
+  "baseline_note": "Implementation used the campaign-authorized repository snapshot; outbound GitHub fetch was unavailable due to proxy HTTP 403; final remote synchronization remains required before integration.",
+  "canonical_status": "non_canonical_review_required",
+  "files_changed": [
+    "src/estate/core/conversation_specification_reconciliation.py",
+    "data/schemas/conversation_specification_reconciliation_v1.json",
+    "tests/test_conversation_specification_reconciliation.py",
+    "tests/test_conversation_specification_reconciliation_integration.py",
+    "ingestion/conversations/RECONCILIATION.md",
+    "operations/validation/reports/WP-4210_conversation_specification_validation_and_reconciliation.md",
+    "collaboration/work_packages/completions/WP-4210_codex_done.json"
+  ],
+  "tests": [
+    {"command": "PYTHONPATH=src python -m pytest tests/test_conversation_specification_reconciliation.py tests/test_conversation_specification_reconciliation_integration.py -q", "result": "14 passed in 0.42s"},
+    {"command": "PYTHONPATH=src python -m pytest tests/test_conversation_specification_extraction.py -q", "result": "9 passed in 2.41s"},
+    {"command": "python -m py_compile src/estate/core/conversation_specification_reconciliation.py", "result": "passed"},
+    {"command": "git diff --check", "result": "passed"},
+    {"command": "PYTHONPATH=src python -m pytest tests/test_conversation_archive_ingestion.py -q", "result": "12 passed, 1 pre-existing charset alias assertion failure in authorized baseline"}
+  ],
+  "known_limitations": [
+    "Substantive mappings use deterministic keyword and minimum-content rules and expose uncertain or partial mappings for human review.",
+    "No suitable committed duplicate WP-4127 through WP-4130 archive set was available; synthetic duplicate fixtures cover the required reconciliation classes.",
+    "Remote fetch, push, and pull-request creation require a GitHub-enabled environment."
+  ],
+  "unresolved_review_conditions": [
+    "Every output requires human review and authority before promotion.",
+    "Material contradictions are never automatically resolved.",
+    "The baseline WP-4208 charset-label test reports cp1252 instead of the asserted windows-1252 alias."
+  ],
+  "confirmations": {
+    "outputs_remain_noncanonical": true,
+    "outputs_remain_review_required": true,
+    "pending_definitions_modified": false,
+    "canonical_artifacts_modified": false,
+    "pr_437_files_touched": false,
+    "resident_restoration_files_touched": false,
+    "excluded_workstream_files_touched": false,
+    "integration_or_merge_performed": false
+  }
+}
