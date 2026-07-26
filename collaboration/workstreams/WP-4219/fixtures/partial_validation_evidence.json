@@ -1,0 +1,57 @@
+{
+  "advisory_only": true,
+  "deterministic_content_hash": "737344cc015fef47477e79cef6f2f6a0216c575e96f5e80cd05878c98a4e7842",
+  "generation_identifier": "737344cc015fef47477e",
+  "generation_timestamp": "2026-07-26T00:00:00Z",
+  "policy_version": "wp4218-policy/v1",
+  "queue_schema_version": "estate.engineering-queue/v1",
+  "rows": [
+    {
+      "blockers": [],
+      "candidate_identifier": "WP-8003",
+      "current_lifecycle_state": "pending",
+      "dependencies": [],
+      "diagnostics": [],
+      "duration_estimate_reference": null,
+      "engineering_lane": {
+        "primary": "Testing",
+        "secondary": []
+      },
+      "estimated_complexity": "unknown",
+      "evidence_completeness": "partial",
+      "git_readiness_reference": null,
+      "item_identifier": "WP-8003",
+      "item_title": "Implementation without validation",
+      "merge_risk_classification": "low",
+      "merge_risk_reasons": [],
+      "parallel_group": null,
+      "parallel_safety_classification": "safe",
+      "priority": {
+        "band": "held",
+        "factors": [
+          "readiness",
+          "institutional_priority",
+          "merge_risk"
+        ],
+        "score": 20
+      },
+      "provenance": [
+        {
+          "adapter_version": "snapshot-json/v1",
+          "content_digest": "f82abd3c6c348287466ab2ac58cec08690731d8ec8edb0ec29f99c24b9bc7e5c",
+          "source_locator": "source.json"
+        }
+      ],
+      "readiness_classification": "validation",
+      "reconciliation_classification": "implemented_but_not_validated",
+      "repository_touch_points": [
+        "tests/test_one.py"
+      ],
+      "source_category": "work_package",
+      "source_evidence_references": [
+        "source.json"
+      ]
+    }
+  ],
+  "source_revision": "b2ff3f4e7c77acbd7c39e823280b94b2ad9b9685"
+}
