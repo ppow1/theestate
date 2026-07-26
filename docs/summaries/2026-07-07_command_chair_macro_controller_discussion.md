@@ -121,6 +121,8 @@ Concern: dynamic software control of the LCD and RGB is unknown.
 - Seller: Shenzhen Ai-Ksen Technology Co., Ltd.
 - Guaranteed delivery: 2026-07-15 to 2026-07-25
 - Item: AI-KSEN 3-Key Wired Custom Keyboard LCD Color Screen Display Game Keyboard DIY Accessories
+- Product listing: https://www.alibaba.com/product-detail/AI-KSEN-3-Key-Wired-Custom_1601663545705.html
+- Alibaba product ID: 1601663545705
 
 ## Proposed Software Architecture
 
