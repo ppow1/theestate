@@ -1,7 +1,7 @@
 """Canonical resident voice commissioning and local Kokoro synthesis."""
 from __future__ import annotations
 
-import json, os, re, shlex, shutil, subprocess, time, wave
+import hashlib, json, os, re, shlex, shutil, subprocess, time, wave
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -12,6 +12,7 @@ SCHEMA_VERSION = "resident-audible-voice-commissioning-v3"
 REGISTRY_PATH = Path("data/resident_voice_commissioning_registry.json")
 VOICE_BINDINGS_PATH = Path("runtime/voice/resident_voice_bindings.json")
 AUDIO_DIR = Path("runtime/voice/generated_audio")
+AUDIO_REGISTRY = AUDIO_DIR / "registry.json"
 SAMPLES_DIR = Path("runtime/voice/listening_samples")
 LOCAL_TTS_PROVIDER = "estate.local.kokoro"
 KNOWN_KOKORO = [r"A:\AI\TTS\kokoro_py311\Scripts\python.exe", r"A:\AI\TTS\kokoro_py311\Scripts\kokoro.exe"]
@@ -124,7 +125,9 @@ def write_voice_binding_matrix(root: str | Path | None = None) -> dict[str, Any]
     return payload
 
 def safe_audio_path(root: Path, resident_id: str, name: str) -> Path:
-    safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", name or "sample.wav")
+    if not name or Path(name).name != name or name in {".", ".."} or ".." in name:
+        raise ValueError("audio_path_traversal_rejected")
+    safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", name)
     if not safe_name.endswith(".wav"): safe_name += ".wav"
     base = (root/AUDIO_DIR/_key(resident_id)).resolve(); base.mkdir(parents=True, exist_ok=True)
     path = (base/safe_name).resolve()
@@ -144,8 +147,20 @@ def _assert_playable_audio(path: Path) -> None:
     if not path.exists() or path.stat().st_size <= 44: raise RuntimeError("missing_or_empty_wav")
     with wave.open(str(path), "rb") as wav:
         if wav.getnframes() <= 0: raise RuntimeError("wav_has_no_frames")
+        if wav.getframerate() != 24000: raise RuntimeError("wav_sample_rate_must_be_24000_hz")
 
-def synthesize_resident_sample(resident_id: str, text: str, *, root: str | Path | None = None, sample_name: str | None = None) -> dict[str, Any]:
+def _audio_registry(root: Path) -> dict[str, Any]:
+    return _read_json(root / AUDIO_REGISTRY) or {"schema_version":"estate.generated_audio.v1", "audio":{}}
+
+def _register_audio(root: Path, path: Path, metadata: dict[str, Any]) -> None:
+    registry = _audio_registry(root)
+    rel = str(path.relative_to(root / AUDIO_DIR)).replace("\\", "/")
+    registry.setdefault("audio", {})[rel] = {**metadata, "bytes":path.stat().st_size,
+        "sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+    target=root/AUDIO_REGISTRY; target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(registry, indent=2, sort_keys=True)+"\n", encoding="utf-8")
+
+def synthesize_resident_sample(resident_id: str, text: str, *, root: str | Path | None = None, sample_name: str | None = None, turn_id: str | None = None) -> dict[str, Any]:
     rootp = _root(root); proj = commissioned_voice_projection(resident_id, rootp)
     if proj["voice_state"] != "canonical": return {"ok":False,"resident_id":resident_id,"reason":"voice_not_commissioned","voice_state":proj["voice_state"],"placeholder_generated":False}
     engine = discover_kokoro(rootp)
@@ -157,13 +172,19 @@ def synthesize_resident_sample(resident_id: str, text: str, *, root: str | Path 
         _assert_playable_audio(path)
     except Exception as exc:
         return {"ok":False,"resident_id":resident_id,"reason":f"kokoro_failed: {type(exc).__name__}: {exc}","command":cmd,"voice_id":proj["voice_id"],"placeholder_generated":False}
-    return {"ok":True,"resident_id":resident_id,"provider":LOCAL_TTS_PROVIDER,"engine":"kokoro","voice_id":proj["voice_id"],"speed":proj["voice_speed"],"audio_path":str(path),"audio_url":f"/v1/estate/audio/{_key(resident_id)}/{path.name}","bytes":path.stat().st_size,"placeholder_generated":False,"provenance":proj["voice_provenance"]}
+    metadata={"resident_id":_key(resident_id),"turn_id":turn_id or path.stem,"voice_id":proj["voice_id"],"speed":proj["voice_speed"],"provenance":proj["voice_provenance"]}
+    _register_audio(rootp, path, metadata)
+    return {"ok":True,**metadata,"provider":LOCAL_TTS_PROVIDER,"engine":"kokoro","audio_path":str(path),"audio_url":f"/v1/estate/audio/{_key(resident_id)}/{path.name}","bytes":path.stat().st_size,"placeholder_generated":False}
 
 def audio_metadata_for_request(resident_id: str, filename: str, *, root: str | Path | None = None) -> tuple[int, dict[str, Any], Path | None]:
     try: path = safe_audio_path(_root(root), resident_id, filename)
     except ValueError: return 404, {"error":{"code":"audio_not_found","message":"audio unavailable"}}, None
-    if not path.exists(): return 404, {"error":{"code":"audio_not_found","message":"audio unavailable"}}, None
-    return 200, {"resident_id":_key(resident_id),"audio_path":str(path),"mime_type":"audio/wav","bytes":path.stat().st_size,"provenance":"estate_generated_audio"}, path
+    rel=f"{_key(resident_id)}/{path.name}"
+    registered=(_audio_registry(_root(root)).get("audio") or {}).get(rel)
+    if not path.exists() or not registered: return 404, {"error":{"code":"audio_not_found","message":"audio unavailable or not registered"}}, None
+    try: _assert_playable_audio(path)
+    except Exception: return 404, {"error":{"code":"audio_invalid","message":"registered audio is unavailable or invalid"}}, None
+    return 200, {**registered,"audio_path":str(path),"mime_type":"audio/wav","bytes":path.stat().st_size}, path
 
 def synthesize_open_webui_resident_response(payload: dict[str, Any], *, root: str | Path | None = None) -> tuple[int, dict[str, Any]]:
     from estate.core.resident_gateway import chat_completion

@@ -77,10 +77,10 @@ def test_generated_file_validation_and_audio_contract(tmp_path):
     path = safe_audio_path(tmp_path, "helen", "turn.wav")
     with wave.open(str(path), "wb") as wav:
         wav.setnchannels(1); wav.setsampwidth(2); wav.setframerate(24000); wav.writeframes(b"\x00\x00" * 10)
-    code, meta, served = audio_metadata_for_request("helen", "turn.wav", root=tmp_path)
-    assert code == 200
-    assert meta["mime_type"] == "audio/wav"
-    assert served == path
+    # A valid but unregistered file is intentionally not served.
+    code, _, served = audio_metadata_for_request("helen", "turn.wav", root=tmp_path)
+    assert code == 404
+    assert served is None
     code, _, _ = audio_metadata_for_request("helen", "../secret.wav", root=tmp_path)
     assert code == 404
 

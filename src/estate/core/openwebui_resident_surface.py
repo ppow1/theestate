@@ -24,6 +24,13 @@ PROMPTS = [
     ("natural_close", "Close a conversation naturally after a useful working session."),
 ]
 
+# Campaign 02 exposed audition identifiers before institutional commissioning.
+# Keep them only as explicitly provisional catalog metadata; they are never used
+# for synthesis and never override the Campaign 03 commissioning registry.
+PROVISIONAL_AUDITION_VOICES = {
+    "alfred": "estate-local-alfred-baritone",
+}
+
 
 def _root(root=None) -> Path:
     return Path(root) if root is not None else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
@@ -67,8 +74,8 @@ def resident_model_catalog(root=None) -> dict[str, Any]:
                 "availability_state": "available",
                 "provider_model_hidden_in_primary_selector": True,
                 "resident_gateway_capable": True,
-                "avatar": {"state": package["visual_state"], "avatar_uri": package["avatar_uri"], "provenance": package["visual_provenance"]},
-                "voice": {"state": package["voice_state"], "engine": package["voice_engine"], "voice_id": package["voice_id"], "speed": package["voice_speed"], "approval_state": package["voice_approval_state"], "tts_available": package["tts_available"], "tts_health": local_tts_health(rootp)},
+                "avatar": {"state": "provisional_placeholder" if package["visual_state"] == "placeholder" else package["visual_state"], "canonical_state": package["visual_state"], "avatar_path": package["avatar_uri"], "avatar_uri": package["avatar_uri"], "provenance": package["visual_provenance"]},
+                "voice": {"state": package["voice_state"], "engine": package["voice_engine"], "voice_id": package["voice_id"] or PROVISIONAL_AUDITION_VOICES.get(rid), "speed": package["voice_speed"], "approval_state": package["voice_approval_state"], "tts_available": package["tts_available"], "provisional_audition_only": bool(not package["voice_id"] and PROVISIONAL_AUDITION_VOICES.get(rid)), "tts_health": local_tts_health(rootp)},
                 "identity": {"schema_version": package["identity_schema_version"], "source_hash": package["identity_source_hash"], "failed_closed": package["identity_failed_closed"], "sources": package["identity_sources"]},
             },
         })
@@ -103,6 +110,8 @@ def run_validation(root=None, *, synthesize_voice: bool = True) -> dict[str, Any
         report["prompts"].append({"prompt_id": key, "prompt": prompt, "responses": by_resident, "comparison": compare_responses({r: v["response"] for r, v in by_resident.items()})})
     for rid, binding in voices.items():
         report["voice"][rid] = {"binding": binding.__dict__, "sample": synthesize_resident_sample(rid, f"This is {binding.display_name}, ready for local Estate review.", root=rootp, sample_name="campaign02_review") if synthesize_voice else {"ok": False, "reason": "not_attempted"}}
+    for rid in ACTIVE_RESIDENT_MODELS.values():
+        report["voice"].setdefault(rid, {"binding": None, "state": "uncommissioned", "sample": synthesize_resident_sample(rid, "Campaign 02 compatibility check.", root=rootp, sample_name="campaign02_review") if synthesize_voice else {"ok":False,"reason":"not_attempted","placeholder_generated":False}})
     machine = out / "validation_report.json"; machine.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     human = out / "VALIDATION_REPORT.md"; human.write_text(_human_report(report), encoding="utf-8")
     review = rootp / "STEWARD_LIVE_IDENTITY_VOICE_REVIEW.md"; review.write_text(_steward_review(report), encoding="utf-8")
