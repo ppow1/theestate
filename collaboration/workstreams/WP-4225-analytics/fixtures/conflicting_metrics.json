@@ -1,0 +1,8 @@
+{
+  "metric_versions": {
+    "acceptance_rate": [
+      "wp4225-metrics/v1",
+      "wp4225-metrics/v2"
+    ]
+  }
+}
