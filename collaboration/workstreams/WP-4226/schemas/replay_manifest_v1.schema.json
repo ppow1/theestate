@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/replay_manifest_v1.schema.json",
+  "title": "replay_manifest_v1",
+  "type": "object",
+  "required": [
+    "replay_manifest_schema_version",
+    "snapshot_identifier",
+    "snapshot_hash",
+    "read_only",
+    "deterministic_content_hash"
+  ],
+  "properties": {
+    "replay_manifest_schema_version": {
+      "const": "estate.engineering-campaign-replay-manifest/v1"
+    }
+  },
+  "additionalProperties": true
+}

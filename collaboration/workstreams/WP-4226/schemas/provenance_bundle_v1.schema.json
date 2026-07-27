@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/provenance_bundle_v1.schema.json",
+  "title": "provenance_bundle_v1",
+  "type": "object",
+  "required": [
+    "provenance_schema_version",
+    "source_hashes"
+  ],
+  "properties": {
+    "provenance_schema_version": {
+      "const": "estate.engineering-campaign-provenance/v1"
+    }
+  },
+  "additionalProperties": true
+}
