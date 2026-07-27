@@ -1050,6 +1050,7 @@ def generate_command_center(root=None, write=True):
     panels = {
         **resident_panels,
         "capability_dependency_visualization": {"available": True, "path": "runtime/capabilities/capability_dependency_visualization.json", "kind": "capability_dependency_visualization", "data": generate_capability_dependency_visualization(root, write=write)},
+        "mission_control_workspace": build_mission_control_workspace(root, write=write),
         "mission_control_workspace": build_mission_control_workspace(root),
         "engineering_campaign_dashboard": {"available": True, "path": "WP-4222 provider composition", "kind": "engineering_campaign_dashboard", "data": load_engineering_campaign_dashboard(root, write=write)},
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),

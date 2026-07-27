@@ -272,9 +272,17 @@ def cmd_grace_operations(args):
             owner=args.owner,
             checkpoint=args.checkpoint,
             evidence=args.evidence or [],
-            metadata={"summary_safe": args.summary_safe},
+            metadata={"summary_safe": args.summary_safe, "requires_engineering": bool(getattr(args, "request_engineering_commission", False))},
         )
         action, paths = runtime.conduct_objective(objective, request_dispatch=args.request_dispatch)
+        if getattr(args, "request_engineering_commission", False):
+            from estate.core.grace_helen_engineering_composition import GraceHelenEngineeringComposition
+            if not args.required_capability:
+                raise SystemExit("--request-engineering-commission requires --required-capability")
+            request = GraceHelenEngineeringComposition().request_capability(
+                objective.objective_id, args.required_capability, constraints=args.capability_constraint or []
+            )
+            paths["capability_verification_request"] = str(request["capability_request_id"])
         print(json.dumps({"action": action.to_dict(), "paths": paths}, indent=2, sort_keys=True) if args.json else format_grace_action(action, paths))
         return
     if args.grace_action == "close":
@@ -282,6 +290,25 @@ def cmd_grace_operations(args):
         print(json.dumps(paths, indent=2, sort_keys=True) if args.json else "Grace closure recorded: " + paths["closure"])
         return
     raise SystemExit(1)
+
+def cmd_grace_momentum(args):
+    from estate.core import grace_momentum_directive as g
+    if args.momentum_action == "authorize": payload=g.create(args.objective_id,args.grace_action_id,authority_reference=args.authority_reference,root=Path(args.root) if args.root else None)
+    elif args.momentum_action in {"pause","resume","stop","revoke"}: payload=g.transition(args.directive_id,{"pause":"paused","resume":"active","stop":"stopped","revoke":"revoked"}[args.momentum_action],root=Path(args.root) if args.root else None)
+    elif args.momentum_action == "inspect": payload=g.load(args.directive_id,Path(args.root) if args.root else None)
+    else: payload={"history": [g.load(args.directive_id,Path(args.root) if args.root else None)]}
+    print(json.dumps(payload,indent=2,sort_keys=True))
+
+def cmd_cme_progression(args):
+    from estate.core.cme_engineering_progression import evaluate_objective
+    payload=evaluate_objective(Path(args.root),args.directive_id,args.commission_id,mode=args.mode)
+    print(json.dumps(payload,indent=2,sort_keys=True))
+
+def cmd_engineering_progression(args):
+    from estate.core.engineering_commission_progression import EngineeringCommissionProgressionHandler
+    if args.engineering_progression_action=="progress-commission": payload=EngineeringCommissionProgressionHandler(Path(args.root)).progress(args.directive_id,args.commission_id)
+    else: payload={"commission_id":args.commission_id,"directive_id":args.directive_id,"status":"inspect requires canonical evaluation/commission records"}
+    print(json.dumps(payload,indent=2,sort_keys=True))
 
 def cmd_resident_lifecycle(args):
     try:
@@ -2835,8 +2862,16 @@ def main(argv=None):
     sp.add_argument("--work-package-id"); sp.add_argument("--classification", default="Estate Internal"); sp.add_argument("--priority", default="normal")
     sp.add_argument("--authority", choices=["delegated", "requires_steward", "unauthorized"], default="delegated")
     sp.add_argument("--dependency", action="append"); sp.add_argument("--blocker", action="append"); sp.add_argument("--owner"); sp.add_argument("--checkpoint")
-    sp.add_argument("--evidence", action="append"); sp.add_argument("--request-dispatch", action="store_true"); sp.add_argument("--summary-safe", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
+    sp.add_argument("--evidence", action="append"); sp.add_argument("--request-dispatch", action="store_true"); sp.add_argument("--request-engineering-commission", action="store_true", help="Create a Helen capability-verification request for technical work; does not Dispatch directly."); sp.add_argument("--required-capability"); sp.add_argument("--capability-constraint", action="append"); sp.add_argument("--summary-safe", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
     sp = go.add_parser("close"); sp.add_argument("objective_id"); sp.add_argument("--reviewed-by", required=True); sp.add_argument("--result", required=True); sp.add_argument("--accepted", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
+    p=sub.add_parser("grace-momentum"); q=p.add_subparsers(dest="momentum_action",required=True)
+    for n in ("pause","resume","stop","revoke","inspect","history"):
+        x=q.add_parser(n);x.add_argument("directive_id");x.add_argument("--root");x.set_defaults(func=cmd_grace_momentum)
+    x=q.add_parser("authorize");x.add_argument("objective_id");x.add_argument("grace_action_id");x.add_argument("--authority-reference",required=True);x.add_argument("--root");x.set_defaults(func=cmd_grace_momentum)
+    p=sub.add_parser("cme");q=p.add_subparsers(dest="cme_action",required=True);x=q.add_parser("evaluate-objective");x.add_argument("directive_id");x.add_argument("commission_id");x.add_argument("--root",required=True);x.add_argument("--mode",default="dry_run",choices=["dry_run","live","simulation"]);x.set_defaults(func=cmd_cme_progression)
+    p=sub.add_parser("engineering");q=p.add_subparsers(dest="engineering_progression_action",required=True)
+    for n in ("progress-commission","inspect-progression"):
+        x=q.add_parser(n);x.add_argument("directive_id");x.add_argument("commission_id");x.add_argument("--root",required=True);x.set_defaults(func=cmd_engineering_progression)
 
     p = sub.add_parser("change")
     p.add_argument("--title", required=True)

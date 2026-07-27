@@ -373,9 +373,9 @@ def test_mission_control_validation_health_includes_wp0073_fields(tmp_path):
     assert validation["artifact_links"]
 
 
-def test_operations_center_status_bar_exposes_wp0094_fields():
+def test_operations_center_status_bar_exposes_wp0094_fields(tmp_path):
     from estate.core.steward_command_center import generate_command_center
-    payload = generate_command_center(write=False)
+    payload = generate_command_center(tmp_path, write=False)
     status = payload["status_bar"]
     required = {"estate_status", "validation_state", "active_workers", "active_recall_count", "pending_decisions", "health_state", "recommended_next_action"}
     assert required <= set(status)

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from estate.core import comfyui_provider_health
 from estate.core.comfyui_execution_provider_adapter import ComfyUIExecutionProviderAdapter
 from estate.core.comfyui_provider_health import PROVIDER_ID, has_fresh_comfyui_evidence, probe_comfyui_health, validate_loopback_endpoint
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterRequest
@@ -47,6 +48,36 @@ def test_loopback_only_health_endpoint_rejects_external_hosts():
         validate_loopback_endpoint("http://example.com:8188/system_stats")
     with pytest.raises(ValueError, match="exactly /system_stats"):
         validate_loopback_endpoint("http://127.0.0.1:8188/prompt")
+
+
+def test_health_fetch_uses_get_and_blocks_redirects(monkeypatch):
+    captured = {}
+
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self):
+            return b"{}"
+
+    class Opener:
+        def open(self, request, timeout):
+            captured["method"] = request.get_method()
+            captured["timeout"] = timeout
+            return Response()
+
+    def build_opener(handler):
+        assert handler.redirect_request(None, None, 302, "found", {}, "http://example.com") is None
+        return Opener()
+
+    monkeypatch.setattr(comfyui_provider_health, "build_opener", build_opener)
+    assert comfyui_provider_health._default_fetch("http://127.0.0.1:8188/system_stats", 2.0) == (200, b"{}")
+    assert captured == {"method": "GET", "timeout": 2.0}
 
 
 def test_probe_writes_current_health_and_unknown_capacity_without_execution(tmp_path):
