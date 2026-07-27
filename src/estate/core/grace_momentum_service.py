@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -55,6 +57,21 @@ class OfficeIdentity:
     authenticated: bool = True
 
 
+@dataclass(frozen=True)
+class ProductionControlConfig:
+    """Persisted, non-secret service configuration; provider execution stays off."""
+    authentication_issuer: str = "estate-control"
+    replay_limit: int = 100
+    execution_mode: str = "shadow"
+
+
+def identity_from_claims(claims: dict[str, Any], *, issuer: str) -> OfficeIdentity:
+    """Map validated transport claims to the narrow Office context contract."""
+    if claims.get("iss") != issuer or not claims.get("sub") or not claims.get("office") or not claims.get("authority_source"):
+        raise AuthenticationError("invalid_or_expired_session")
+    return OfficeIdentity(str(claims["sub"]), str(claims["office"]), str(claims["authority_source"]), bool(claims.get("active", True)))
+
+
 TEST_IDENTITIES = {
     "grace": OfficeIdentity("test-grace", "Grace", "test/grace-authority"),
     "cme": OfficeIdentity("test-cme", "CME", "test/cme-delegation"),
@@ -71,6 +88,11 @@ class GraceMomentumService:
         self.root, self.mode = Path(root), mode
         self.base = self.root / PRODUCTION_ROOT
         self.base.mkdir(parents=True, exist_ok=True)
+
+    def configure(self, config: ProductionControlConfig) -> dict[str, Any]:
+        if config.execution_mode not in MODES: raise ControlError("unknown execution mode")
+        value = {"authentication_issuer": config.authentication_issuer, "replay_limit": config.replay_limit, "execution_mode": config.execution_mode, "provider_effects_enabled": False}
+        self._write("service_config.json", value); self.mode = config.execution_mode; return value
 
     def _path(self, name: str) -> Path: return self.base / name
     def _read(self, name: str, default: Any) -> Any:
@@ -156,17 +178,37 @@ class GraceMomentumService:
         else: raise ControlError("unknown query")
         return {"schema_version": SCHEMA_VERSION, "query": name, "result": result}
     def subscribe(self, cursor: int = 0) -> dict[str, Any]:
-        events = [event for event in self._events() if event["position"] > cursor]
-        return {"schema_version": EVENT_SCHEMA_VERSION, "cursor": cursor, "next_cursor": events[-1]["position"] if events else cursor, "events": events}
+        return self.replay(cursor)
+    def replay(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]:
+        """Canonical bounded polling API. Cursor is exclusive and resumable."""
+        if cursor < 0 or limit < 1 or limit > 1000: raise ControlError("invalid replay cursor or limit")
+        all_events = [event for event in self._events() if event["position"] > cursor]
+        events = all_events[:limit]
+        return {"schema_version": EVENT_SCHEMA_VERSION, "cursor": cursor, "next_cursor": events[-1]["position"] if events else cursor, "has_more": len(all_events) > len(events), "events": events}
     def checkpoint(self) -> dict[str, Any]:
         event_count = len(self._events()); snapshot = {"schema_version": SCHEMA_VERSION, "event_position": event_count, "directives": self._read("directives.json", {}), "completed_effects": list(self._read("idempotency.json", {})), "created_at": utc_now()}
         self._write("checkpoints/latest.json", snapshot); return snapshot
     def recover(self) -> dict[str, Any]:
         checkpoint = self._read("checkpoints/latest.json", None)
         if checkpoint is None: return {"recovered": False, "reason": "no checkpoint"}
-        return {"recovered": True, "checkpoint_position": checkpoint["event_position"], "replay": self.subscribe(checkpoint["event_position"])}
+        replay = self.replay(checkpoint["event_position"]); self._publish("recovery.performed", {"command_id":"recovery", "correlation_id":"recovery", "causation_id":"checkpoint", "idempotency_key":"recovery", "timestamp":utc_now(), "actor":"runtime", "represented_office":"Runtime", "authority_source":"recovery", "objective_id":None, "directive_id":None, "disposition":"recovered", "diagnostic_reference":None, "audit_reference":"audit:recovery"}, {"checkpoint_position": checkpoint["event_position"], "provider_effect_suppressed": True})
+        return {"recovered": True, "checkpoint_position": checkpoint["event_position"], "replay": replay}
     def health(self) -> dict[str, Any]: return {"service": "grace-momentum", "healthy": True, "mode": self.mode, "storage": str(self.base)}
     def readiness(self) -> dict[str, Any]: return {"service": "grace-momentum", "ready": self.mode != "disabled", "provider_effects_enabled": False, "mode": self.mode}
+    def availability(self) -> dict[str, Any]:
+        return {"schema_version": SCHEMA_VERSION, "health": self.health(), "readiness": self.readiness(), "event_consumption": {"api": "bounded_polling_replay", "max_limit": 1000, "cursor_semantics": "exclusive"}}
+    def lifecycle_projection(self, objective_id: str) -> dict[str, Any]:
+        """Client-visible projection; records facts without assigning new authority."""
+        stages = {"capability": None, "commission": None, "cme_evaluation": None, "provider_governance": {"provider_effects_enabled": False, "disposition": "fails_closed"}, "execution_authorization": None, "dispatch": None, "reconciliation": None, "validation": None, "grace_receipt": None, "completion": None}
+        event_stage = {"capability.determined":"capability", "commission.accepted":"commission", "cme.evaluation.persisted":"cme_evaluation", "execution.authorized":"execution_authorization", "dispatch.submitted":"dispatch", "dispatch.started":"dispatch", "dispatch.completed":"dispatch", "reconciliation.completed":"reconciliation", "validation.succeeded":"validation", "validation.failed":"validation", "grace.receipt.recorded":"grace_receipt", "objective.completed":"completion", "directive.completed":"completion", "blocker.raised":"provider_governance"}
+        timeline = []
+        for event in self._events():
+            if event.get("objective_id") != objective_id and event.get("payload", {}).get("objective_id") != objective_id: continue
+            timeline.append(event)
+            stage = event_stage.get(event["event_type"])
+            if stage: stages[stage] = {"event_type": event["event_type"], "position": event["position"], "occurred_at": event["occurred_at"], "payload": event["payload"]}
+        directives = [record for record in self._read("directives.json", {}).values() if record.get("objective_id") == objective_id]
+        return {"schema_version": SCHEMA_VERSION, "objective_id": objective_id, "timeline": timeline, "directive": directives[-1] if directives else None, "stages": stages, "current_responsible_office": "Grace", "current_blocker": None, "next_lawful_action": "inspect progression", "replay_cursor": timeline[-1]["position"] if timeline else 0}
 
 
 class FakeGraceMomentumService(GraceMomentumService):
@@ -184,6 +226,38 @@ class GraceMomentumClient:
     def query(self, name: str, **filters: Any) -> dict[str, Any]:
         try: return self.service.query(name, self.identity, **filters)
         except AuthenticationError as exc: return {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "invalid_or_expired_session", "message": str(exc), "retryable": False}}
+    def replay(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]: return self.service.replay(cursor, limit=limit)
+    def subscribe(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]: return self.replay(cursor, limit=limit)
+    def availability(self) -> dict[str, Any]: return self.service.availability()
+    def lifecycle_projection(self, objective_id: str) -> dict[str, Any]: return self.service.lifecycle_projection(objective_id)
+
+
+def make_http_handler(service: GraceMomentumService, *, authentication_issuer: str = "estate-control"):
+    """Production transport binding: JSON HTTP, intentionally dependency-free."""
+    class GraceMomentumHTTPHandler(BaseHTTPRequestHandler):
+        def _json(self, status: int, body: dict[str, Any]) -> None:
+            data = json.dumps(body, sort_keys=True).encode("utf-8"); self.send_response(status); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data)
+        def _identity(self) -> OfficeIdentity:
+            try: return identity_from_claims(json.loads(self.headers.get("X-Estate-Claims", "{}")), issuer=authentication_issuer)
+            except (json.JSONDecodeError, AuthenticationError) as exc: raise AuthenticationError("invalid_or_expired_session") from exc
+        def do_GET(self):
+            if self.path == "/v1/health": return self._json(200, service.health())
+            if self.path == "/v1/readiness": return self._json(200, service.readiness())
+            if self.path.startswith("/v1/events"):
+                cursor = int(self.path.split("cursor=")[-1]) if "cursor=" in self.path else 0; return self._json(200, service.replay(cursor))
+            if self.path.startswith("/v1/lifecycle/"):
+                return self._json(200, service.lifecycle_projection(self.path.rsplit("/", 1)[-1]))
+            return self._json(404, {"error": {"code": "not_found"}})
+        def do_POST(self):
+            try:
+                size = int(self.headers.get("Content-Length", "0")); command = json.loads(self.rfile.read(size)); return self._json(200, service.command(command, self._identity()))
+            except (ControlError, json.JSONDecodeError) as exc: return self._json(403, {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "unauthorized", "message": str(exc), "retryable": False}})
+        def log_message(self, format: str, *args: Any) -> None: return
+    return GraceMomentumHTTPHandler
+
+
+def production_http_server(service: GraceMomentumService, host: str = "127.0.0.1", port: int = 8765, *, authentication_issuer: str = "estate-control") -> ThreadingHTTPServer:
+    return ThreadingHTTPServer((host, port), make_http_handler(service, authentication_issuer=authentication_issuer))
 
 
 def reference_command(action: str, *, objective_id: str = "objective-demo", directive_id: str | None = None, idempotency_key: str = "demo-1") -> dict[str, Any]:

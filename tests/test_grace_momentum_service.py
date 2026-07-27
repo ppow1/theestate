@@ -24,6 +24,23 @@ def test_public_client_contract_actions_queries_and_unauthorized_shape(tmp_path)
     denied = GraceMomentumClient(service, TEST_IDENTITIES["observer"]).send(reference_command("momentum.authorize", idempotency_key="denied"))
     assert denied["error"]["code"] == "unauthorized"
 
+def test_bounded_replay_availability_and_lifecycle_projection(tmp_path):
+    service = FakeGraceMomentumService(tmp_path); client = GraceMomentumClient(service, TEST_IDENTITIES["grace"])
+    client.send(reference_command("objective.create_or_correlate", idempotency_key="one"))
+    client.send(reference_command("momentum.authorize", idempotency_key="two"))
+    replay = client.subscribe(0, limit=1)
+    assert replay["next_cursor"] == 1 and replay["has_more"] is True
+    assert client.availability()["event_consumption"]["api"] == "bounded_polling_replay"
+    projection = client.lifecycle_projection("objective-demo")
+    assert projection["directive"]["operational_owner"] == "Grace"
+    assert projection["stages"]["provider_governance"]["provider_effects_enabled"] is False
+
+def test_claim_mapping_and_config_fail_closed(tmp_path):
+    service = FakeGraceMomentumService(tmp_path)
+    assert service.configure(ProductionControlConfig(authentication_issuer="issuer", execution_mode="shadow"))["provider_effects_enabled"] is False
+    assert identity_from_claims({"iss":"issuer", "sub":"a", "office":"Grace", "authority_source":"a", "active":True}, issuer="issuer").actor_id == "a"
+    with pytest.raises(AuthenticationError): identity_from_claims({"iss":"wrong"}, issuer="issuer")
+
 @pytest.mark.parametrize("mode", ["fixture", "shadow", "bounded_live"])
 def test_every_mode_suppresses_provider_effects(tmp_path, mode):
     service = GraceMomentumService(tmp_path, mode=mode)

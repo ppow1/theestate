@@ -28,3 +28,26 @@ Clients use these canonical templates, URL-encoding identifiers:
 The optional `links` object on a response carries `objective_url`,
 `directive_url`, `lifecycle_url`, and `conversation_url`. Deep links are
 navigation only; they grant no authority.
+
+## Consumption, projections, and availability
+
+`client.replay(cursor, limit=100)` is the canonical bounded-polling/replay
+mechanism. `client.subscribe()` is an equivalent alias, not a long-lived socket.
+The cursor is an exclusive durable event position. The response contains
+`next_cursor`, `has_more`, and ordered events; consumers store `next_cursor`
+only after rendering or otherwise durably handling the full page.
+
+`client.availability()` exposes health, readiness, mode, and the replay policy.
+The production binding is JSON HTTP on loopback: `POST /v1/commands`,
+`GET /v1/events?cursor=N`, `GET /v1/lifecycle/{objective_id}`,
+`GET /v1/health`, and `GET /v1/readiness`. The JSON `X-Estate-Claims` mapping
+requires issuer (`iss`), actor (`sub`), office (`office`), authority source,
+and an active session. Deployment validates the issuer through
+`ProductionControlConfig`; missing/invalid claims fail closed.
+
+`client.lifecycle_projection(objective_id)` returns the full ordered timeline,
+directive state, responsible office, blocker, next lawful action, replay cursor,
+and fact-only stage records for Helen capability, Engineering commission, CME
+evaluation, provider governance, execution authorization, Dispatch,
+reconciliation, validation, Grace receipt, and completion. It is a read model;
+it cannot authorize a lifecycle transition.

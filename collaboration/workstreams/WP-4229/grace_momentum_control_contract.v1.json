@@ -5,5 +5,8 @@
   "event_schema_version": "estate.grace-momentum-event.v1",
   "required_envelope_fields": ["schema_version", "command_id", "correlation_id", "causation_id", "objective_id", "directive_id", "actor", "represented_office", "authority_source", "timestamp", "idempotency_key", "disposition", "diagnostic_reference", "audit_reference"],
   "execution_modes": ["fixture", "shadow", "bounded_live", "disabled"],
-  "provider_effect_policy": "suppressed in every mode; provider admission is external and fails closed"
+  "provider_effect_policy": "suppressed in every mode; provider admission is external and fails closed",
+  "persistence": {"root": "runtime/production/grace_momentum", "configuration": "service_config.json", "checkpoint": "checkpoints/latest.json", "event_log": "events.jsonl", "idempotency": "idempotency.json"},
+  "restart_recovery": {"operation": "recover()", "event": "recovery.performed", "replay_cursor": "exclusive event position"},
+  "transport": {"selected": "JSON HTTP/1.1", "endpoints": ["POST /v1/commands", "GET /v1/events?cursor={cursor}", "GET /v1/lifecycle/{objective_id}", "GET /v1/health", "GET /v1/readiness"], "provider_effects_enabled": false}
 }
