@@ -46,6 +46,7 @@ from estate.core.office_command_surface import controls_for_tab, execute_office_
 from estate.core.office_personnel_directory import build_office_personnel_directory
 from estate.core.engineering_campaign_dashboard import dashboard_operation, load_engineering_campaign_dashboard
 from estate.core.steward_awareness import generate_steward_awareness_runtime
+from estate.core.office_grace_momentum import build_grace_momentum_surface
 from urllib.parse import urlparse
 
 
@@ -1086,6 +1087,7 @@ def generate_command_center(root=None, write=True):
         "help": _help_panel(root),
         "about": _about_panel(root),
         "alfred_chat": _alfred_chat_panel(root),
+        "grace_momentum": {"available": True, "path": "GraceMomentumClient", "kind": "grace_momentum_client_v1", "data": build_grace_momentum_surface(str(root))},
     }
     panels["office_operational_command_dashboard"] = _office_operational_command_dashboard(root, panels)
     if isinstance(panels.get("mission_control_workspace"), dict) and isinstance(panels["mission_control_workspace"].get("data"), dict):
@@ -1155,6 +1157,36 @@ def _execution_control_html(panel):
     else:
         last_html = "<h3>Last Office action result</h3><p class='placeholder'>No durable Office action result has been recorded yet.</p>"
     return _panel("Execution Control Workspace", "<p class='source'>Use the controls above to invoke governed execution-session, attempt, and reconciliation runtimes. Enter IDs and authorization/result references in the labeled fields; confirmations must be explicit.</p><dl>" + rows + "</dl>" + last_html, "ready")
+
+def _grace_momentum_html(panel):
+    data = panel.get("data") or {}
+    links = data.get("links") or {}
+    events = data.get("events") or []
+    controls = data.get("controls") or []
+    projection = data.get("projection") or {}
+    projection_rows = "".join(
+        f"<dt>{html.escape(str(field).replace('_', ' ').title())}</dt>"
+        f"<dd><code>{html.escape(str(value if value is not None else 'Unavailable'))}</code></dd>"
+        for field, value in projection.items() if field != "stages"
+    )
+    stages = projection.get("stages") or {}
+    stage_rows = "".join(
+        f"<dt>{html.escape(str(stage).replace('_', ' ').title())}</dt>"
+        f"<dd><code>{html.escape(str(value if value is not None else 'Unavailable'))}</code></dd>"
+        for stage, value in stages.items()
+    ) or "<dt>Stages</dt><dd class='placeholder'>Unavailable</dd>"
+    link_html = "".join(f"<li><a href='{html.escape(url, quote=True)}'>{html.escape(label)}</a></li>" for label, url in (("Objective", links.get("objective_url")), ("Directive", links.get("directive_url")), ("Lifecycle", links.get("lifecycle_url")), ("Open WebUI conversation", links.get("conversation_url"))) if url)
+    controls_html = "".join(f"<li><code>{html.escape(c['action'])}</code> — {html.escape(c['availability'])}</li>" for c in controls)
+    event_html = "".join(f"<li>{html.escape(str(e.get('position')))}: {html.escape(str(e.get('event_type')))}</li>" for e in events) or "<li>No canonical events at this cursor.</li>"
+    body = ("<p class='source'>Read and command adapter: GraceMomentumClient; network transport binding is deferred. "
+            "Provider execution remains suppressed.</p>"
+            f"<p>Objective: <code>{html.escape(str(data.get('objective_id')))}</code>; Directive: <code>{html.escape(str(data.get('directive_id')))}</code>; Cursor: {html.escape(str(data.get('cursor')))}</p>"
+            "<h3>Correlation links</h3><ul>" + link_html + "</ul><h3>Lawful structured controls</h3><ul>" + controls_html +
+            "</ul><h3>Canonical lifecycle projection</h3><dl>" + projection_rows + "</dl>"
+            "<h4>Lifecycle stages</h4><dl>" + stage_rows + "</dl>"
+            "<h3>Canonical event timeline</h3><ul>" + event_html + "</ul>"
+            "<p>Recovery is read-only replay inspection plus <code>progression.inspect</code>; arbitrary rerun is unavailable.</p>")
+    return _panel("Grace Momentum Operations", body, "ready")
 
 def _operations_center_layout_framework(panels, generated_at):
     regions = [
@@ -2662,8 +2694,8 @@ def render_command_center_html(payload):
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("operational-dashboard", "Office Operational Command Dashboard", _office_action_controls_html(payload, "operational-dashboard") + _office_operational_command_dashboard_html(p.get("office_operational_command_dashboard", {}))),
-        ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _operations_control_surface_html(p.get("operations_control_surface", {})) + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
-        ("execution-control", "Execution Control", _office_action_controls_html(payload, "execution-control") + _execution_control_html(p.get("execution_control", {}))),
+        ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _grace_momentum_html(p.get("grace_momentum", {})) + _operations_control_surface_html(p.get("operations_control_surface", {})) + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),
+        ("execution-control", "Execution Control", _office_action_controls_html(payload, "execution-control") + _grace_momentum_html(p.get("grace_momentum", {})) + _execution_control_html(p.get("execution_control", {}))),
         ("projects", "Work Package Pipeline", _work_package_pipeline_html(p.get("work_package_pipeline", {}))),
         ("roadmap", "Expansion Roadmap", _expansion_roadmap_html(p.get("expansion_roadmap", {}))),
         ("parking", "Parking Lot", _daily_board_workspace_html(p.get("daily_board_workspace", {}), parking_only=True)),
@@ -2671,8 +2703,8 @@ def render_command_center_html(payload):
         ("mailboxes", "Mailbox Summary / Operations Center", _office_action_controls_html(payload, "mailboxes") + _mailbox_operations_center_html(p.get("mailbox_operations_center", {}))),
         ("personnel", "Personnel Directory / Org Chart", _office_action_controls_html(payload, "personnel") + _office_personnel_directory_html(p.get("office_personnel_directory", {}))),
         ("recalls", "Steward Recall Operations", _steward_recall_operations_html(p.get("steward_recall_operations", {}))),
-        ("notifications", "Operations Center Notification Center", _office_action_controls_html(payload, "notifications") + _operations_notification_center_html(p.get("operations_notification_center", {}))),
-        ("validation", "Validation and Estate Health", _office_action_controls_html(payload, "validation") + _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
+        ("notifications", "Operations Center Notification Center", _office_action_controls_html(payload, "notifications") + _grace_momentum_html(p.get("grace_momentum", {})) + _operations_notification_center_html(p.get("operations_notification_center", {}))),
+        ("validation", "Validation and Estate Health", _office_action_controls_html(payload, "validation") + _grace_momentum_html(p.get("grace_momentum", {})) + _validation_health_html(p.get("validation_health_dashboard", {})) + _panel("Validation Status", _artifact_html(p.get("validation_status", {})), "ready" if p.get("validation_status", {}).get("available") else "placeholder")),
         ("search", "Global Search and Command Palette", _global_search_html(p.get("search", {}))),
         ("settings", "Settings", _settings_html(p.get("settings", {})) + _layout_framework_html(p.get("operations_center_layout", {}))),
         ("help", "Help", _help_html(p.get("help", {}))),
