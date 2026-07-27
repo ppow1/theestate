@@ -74,8 +74,12 @@ def _valid_availability(payload: Any) -> tuple[bool, str]:
         return False, "availability readiness.ready must be boolean"
     if "provider_effects_enabled" in readiness and type(readiness["provider_effects_enabled"]) is not bool:
         return False, "availability readiness.provider_effects_enabled must be boolean"
-    if readiness.get("provider_effects_enabled") is True:
-        return False, "provider effects are enabled"
+    if readiness.get("provider_effects_enabled") is True and not (
+        readiness.get("governed_local_execution_enabled") is True and
+        readiness.get("local_only") is True and readiness.get("egress_disabled") is True and
+        readiness.get("spend_disabled") is True and readiness.get("mode") == "governed_local_test"
+    ):
+        return False, "provider effects are not governed local execution"
     if "mode" in readiness and (not isinstance(readiness["mode"], str) or readiness["mode"] == "disabled"):
         return False, "availability readiness.mode is invalid"
     if health["healthy"] is not True or readiness["ready"] is not True:

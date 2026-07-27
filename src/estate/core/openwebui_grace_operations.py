@@ -108,9 +108,14 @@ class OpenWebUIGraceOperations:
         if not isinstance(payload, dict):
             return False
         health, readiness = payload.get("health"), payload.get("readiness")
-        return (isinstance(health, dict) and health.get("healthy") is True and
-                isinstance(readiness, dict) and readiness.get("ready") is True and
-                readiness.get("provider_effects_enabled") is False and readiness.get("mode") != "disabled")
+        if not (isinstance(health, dict) and health.get("healthy") is True and
+                isinstance(readiness, dict) and readiness.get("ready") is True):
+            return False
+        if readiness.get("provider_effects_enabled") is True:
+            return (readiness.get("governed_local_execution_enabled") is True and
+                    readiness.get("local_only") is True and readiness.get("egress_disabled") is True and
+                    readiness.get("spend_disabled") is True and readiness.get("mode") == "governed_local_test")
+        return readiness.get("provider_effects_enabled") is False and readiness.get("mode") != "disabled"
 
     def refresh(self, correlation: GraceConversationCorrelation, cursor: int | None = None) -> dict[str, Any]:
         checkpoint = _DeliveryCheckpoint(self.state_root, correlation)
