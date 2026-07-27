@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/evidence_bundle_v1.schema.json",
+  "title": "Evidence bundle v1",
+  "type": "object",
+  "required": [
+    "evidence_bundle_schema_version",
+    "recommendation_id",
+    "source_hashes"
+  ],
+  "properties": {
+    "evidence_bundle_schema_version": {
+      "const": "estate.engineering-recommendation-evidence/v1"
+    },
+    "recommendation_id": {
+      "type": "string"
+    },
+    "source_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "source_references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "item_identifiers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}
