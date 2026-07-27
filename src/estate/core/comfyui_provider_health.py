@@ -10,8 +10,9 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
+from urllib.error import HTTPError
 from urllib.parse import urlparse
-from urllib.request import urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from estate.core.provider_capacity import ProviderCapacityRecord, latest_capacity_by_provider, write_capacity_record
 from estate.core.provider_health import ProviderHealthRecord, latest_health_by_provider, write_health_record
@@ -23,7 +24,10 @@ REQUIRED_CAPABILITIES = ("image_generation", "image_iteration")
 
 
 def _utc_now() -> datetime:
-    return datetime.now(timezone.utc).replace(microsecond=0)
+    # Health and capacity evidence may be written within one second.  Keep a
+    # common timestamp precision so the shared latest-record readers retain
+    # their chronological ordering.
+    return datetime.now(timezone.utc)
 
 
 def _iso(value: datetime) -> str:
@@ -39,9 +43,19 @@ def validate_loopback_endpoint(endpoint: str) -> str:
     return endpoint
 
 
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+        return None
+
+
 def _default_fetch(endpoint: str, timeout_seconds: float) -> tuple[int, bytes]:
-    with urlopen(endpoint, timeout=timeout_seconds) as response:  # nosec B310: endpoint is validated loopback-only
-        return int(response.status), response.read()
+    request = Request(endpoint, method="GET", headers={"Accept": "application/json"})
+    opener = build_opener(_NoRedirect())
+    try:
+        with opener.open(request, timeout=timeout_seconds) as response:  # nosec B310: endpoint is validated loopback-only
+            return int(response.status), response.read()
+    except HTTPError as exc:
+        return int(exc.code), b""
 
 
 def probe_comfyui_health(*, root: Path, endpoint: str = DEFAULT_ENDPOINT, timeout_seconds: float = 2.0,

@@ -224,6 +224,22 @@ def _validate_request(request: DispatchRequest) -> None:
         errors.append("provider is not in allowed_providers")
     if request.provider and request.provider in request.forbidden_providers:
         errors.append("provider is forbidden")
+    # Technical work is admitted to Dispatch only after Engineering has made a
+    # durable authorization.  This deliberately does not affect ordinary
+    # operational Dispatch items.
+    technical = (request.provider_metadata or {}).get("technical_execution") is True
+    if technical:
+        metadata = request.provider_metadata or {}
+        for key in (
+            "grace_objective_id",
+            "engineering_commission_id",
+            "engineering_authorization_id",
+            "helen_determination_id",
+        ):
+            if not str(metadata.get(key) or "").strip():
+                errors.append(f"technical execution requires {key}")
+        if metadata.get("capability_disposition") != "qualified_and_available":
+            errors.append("technical execution requires qualified_and_available capability determination")
     if errors:
         raise ValueError("; ".join(errors))
 

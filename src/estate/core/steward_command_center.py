@@ -1047,7 +1047,7 @@ def generate_command_center(root=None, write=True):
     panels = {
         **resident_panels,
         "capability_dependency_visualization": {"available": True, "path": "runtime/capabilities/capability_dependency_visualization.json", "kind": "capability_dependency_visualization", "data": generate_capability_dependency_visualization(root, write=write)},
-        "mission_control_workspace": build_mission_control_workspace(root),
+        "mission_control_workspace": build_mission_control_workspace(root, write=write),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
         "operations_control_surface": _operations_control_surface_panel(root),

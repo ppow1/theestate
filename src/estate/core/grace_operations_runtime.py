@@ -22,6 +22,7 @@ ACTIONS_DIR = GRACE_ROOT / "actions"
 ESCALATIONS_DIR = GRACE_ROOT / "escalations"
 CLOSURES_DIR = GRACE_ROOT / "closures"
 STATUS_DIR = GRACE_ROOT / "status"
+OBJECTIVE_STATES_DIR = GRACE_ROOT / "objective_states"
 
 ALLOWED_AUTHORITY = {"delegated", "requires_steward", "unauthorized"}
 ALLOWED_STATES = {"proposed", "ready", "blocked", "awaiting_approval", "dispatch_requested", "escalated", "closed"}
@@ -336,6 +337,8 @@ class GraceOperationsRuntime:
         return action
 
     def conduct_objective(self, objective: GraceObjective, *, request_dispatch: bool = False) -> tuple[GraceNextAction, dict[str, str]]:
+        if request_dispatch and objective.metadata.get("requires_engineering") is True:
+            raise PermissionError("Grace may not request low-level Dispatch for technical work; request an Engineering commission after Helen capability verification")
         self.intake_objective(objective)
         action = self.propose_next_action(objective)
         paths: dict[str, str] = {}
@@ -397,6 +400,16 @@ class GraceOperationsRuntime:
         _write_json(path, payload)
         self._write_status(closure=payload)
         return {"closure": str(path), "status": str(self.root / STATUS_DIR / "latest.json")}
+
+    def record_objective_transition(self, objective_id: str, state: str, **metadata: Any) -> dict[str, Any]:
+        """Persist Grace-owned operational state without granting acceptance."""
+        allowed = {"awaiting_capability_verification", "blocked_pending_capability", "awaiting_engineering_acceptance", "engineering_in_progress", "awaiting_operational_receipt", "completed", "failed", "cancelled", "escalation_required"}
+        if state not in allowed:
+            raise ValueError(f"unsupported Grace objective transition: {state}")
+        payload = {"objective_id": objective_id, "state": state, "owner": "Grace", "updated_at": utc_now_iso(), "institutional_acceptance_state": "not_granted", **metadata}
+        _write_json(self.root / OBJECTIVE_STATES_DIR / f"{objective_id}.json", payload)
+        self._write_status(objective_transition=payload)
+        return payload
 
     def status(self) -> dict[str, Any]:
         path = self.root / STATUS_DIR / "latest.json"
