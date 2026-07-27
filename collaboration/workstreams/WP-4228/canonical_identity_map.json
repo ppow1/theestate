@@ -1,0 +1,19 @@
+{
+  "schema_version":"canonical_identity_map.v1",
+  "aliases":[
+    {"work_packages":["WP-4214"],"canonical_id":"engineering.duration_estimation.v1","display_name":"Duration estimation"},
+    {"work_packages":["WP-4215"],"canonical_id":"engineering.parallel_planning.v1","display_name":"Parallel worker planning"},
+    {"work_packages":["WP-4216"],"canonical_id":"engineering.office_live_updates.v1","display_name":"Office live updates"},
+    {"work_packages":["WP-4217"],"canonical_id":"engineering.git_readiness.v1","display_name":"Git readiness"},
+    {"work_packages":["WP-4218","WP-4220"],"canonical_id":"engineering.backlog_reconciliation.v1","display_name":"Backlog reconciliation"},
+    {"work_packages":["WP-4219","WP-4221","WP-4222"],"canonical_id":"engineering.dashboard_projection.v1","display_name":"Dashboard projection"},
+    {"work_packages":["WP-4223"],"canonical_id":"engineering.dashboard.office_adapter.v1","display_name":"Office dashboard adapter"},
+    {"work_packages":["WP-4223"],"canonical_id":"engineering.recommendation_engine.v1","display_name":"Recommendation engine"},
+    {"work_packages":["WP-4224"],"canonical_id":"engineering.recommendation_decision_ledger.v1","display_name":"Decision ledger"},
+    {"work_packages":["WP-4225"],"canonical_id":"engineering.recommendation_analytics.v1","display_name":"Analytics"},
+    {"work_packages":["WP-4226"],"canonical_id":"engineering.campaign_replay.v1","display_name":"Snapshot and replay"},
+    {"work_packages":["WP-4227"],"canonical_id":"engineering.recommendation_confidence.v1","display_name":"Recommendation confidence"},
+    {"work_packages":["WP-4227"],"canonical_id":"engineering.campaign_closure.v1","display_name":"Campaign closure evidence"},
+    {"work_packages":["WP-4228"],"canonical_id":"engineering.campaign_operations.v1","display_name":"Campaign action integration"}
+  ]
+}
