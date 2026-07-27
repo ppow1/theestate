@@ -454,7 +454,8 @@ class GraceMomentumService:
             stage = event_stage.get(event["event_type"])
             if stage: stages[stage] = {"event_type": event["event_type"], "position": event["position"], "occurred_at": event["occurred_at"], "payload": event["payload"]}
         directives = [record for record in self._read("directives.json", {}).values() if record.get("objective_id") == objective_id]
-        return {"schema_version": SCHEMA_VERSION, "objective_id": objective_id, "timeline": timeline, "directive": directives[-1] if directives else None, "stages": stages, "current_responsible_office": "Grace", "current_blocker": None, "next_lawful_action": "inspect progression", "replay_cursor": timeline[-1]["position"] if timeline else 0}
+        completed = any(event.get("event_type") == "objective.completed" for event in timeline)
+        return {"schema_version": SCHEMA_VERSION, "objective_id": objective_id, "timeline": timeline, "directive": directives[-1] if directives else None, "stages": stages, "current_responsible_office": "Grace", "current_blocker": None, "next_lawful_action": "no further action" if completed else "inspect progression", "replay_cursor": timeline[-1]["position"] if timeline else 0}
 
 
 class FakeGraceMomentumService(GraceMomentumService):
