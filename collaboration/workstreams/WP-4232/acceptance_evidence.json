@@ -1,0 +1,2144 @@
+{
+  "blocker_classification": {
+    "dispatch.submitted": {
+      "canonical_path": "dispatch.request is accepted but emits dispatch.requested in the merged implementation",
+      "observed_path": "dispatch.request -> dispatch.requested",
+      "provider_dependency": true,
+      "status": "declared_but_unreachable_by_current_dispatch_command"
+    },
+    "grace.receipt.recorded": {
+      "canonical_path": "requires durable completion evidence after validation",
+      "observed_path": null,
+      "provider_dependency": true,
+      "status": "declared_but_no_command_or_emitter_in_merged_runtime"
+    },
+    "objective.completed": {
+      "canonical_path": "requires the completed lifecycle chain and Grace receipt",
+      "observed_path": null,
+      "provider_dependency": true,
+      "status": "declared_but_no_command_or_emitter_in_merged_runtime"
+    },
+    "progression.changed": {
+      "canonical_path": "engineering.progress_commission",
+      "observed_path": "engineering.authorize -> execution.authorized",
+      "provider_dependency": false,
+      "status": "declared_and_reachable_but_not_used_by_current_acceptance_path"
+    },
+    "reconciliation.completed": {
+      "canonical_path": "requires provider result persistence followed by reconciliation",
+      "observed_path": null,
+      "provider_dependency": true,
+      "status": "declared_but_no_command_or_emitter_in_merged_runtime"
+    },
+    "validation.succeeded": {
+      "canonical_path": "requires Engineering validation of a persisted provider result",
+      "observed_path": null,
+      "provider_dependency": true,
+      "status": "declared_but_no_command_or_emitter_in_merged_runtime"
+    }
+  },
+  "bounded_live_executed": false,
+  "bounded_live_task": {
+    "execution_status": "not_executed",
+    "expected_sha256": "0e4be6b139488cca08ccb0ac4aaac74ba2c219fa56499487834be0b6f482fed8",
+    "input_utf8": "WP-4232 bounded-live acceptance",
+    "name": "WP-4232 Bounded-Live Acceptance \u2014 Deterministic Local SHA-256 Proof"
+  },
+  "event_evidence": {
+    "fixture": {
+      "audit_references": [
+        "audit:command-wp4232-fixture:objective",
+        "audit:command-wp4232-fixture:authorize",
+        "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+        "audit:command-wp4232-fixture:stop"
+      ],
+      "event_ids": [
+        "gms-6b658de697e24f16a92ff742a65368b6",
+        "gms-ce18c8b7d58f478a850130489219e8dd",
+        "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+        "gms-0682616c6ea14ff2a9a367a7ec86f6e4"
+      ],
+      "event_types": [
+        "objective.created_or_correlated",
+        "directive.authorized",
+        "directive.authorized",
+        "directive.stopped"
+      ],
+      "lifecycle_cursor": 4,
+      "positions": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "shadow": {
+      "audit_references": [
+        "audit:command-wp4232-shadow:objective",
+        "audit:command-wp4232-shadow:authorize",
+        "audit:command-wp4232-shadow:cme",
+        "audit:command-wp4232-shadow:engineering",
+        "audit:command-wp4232-shadow:dispatch"
+      ],
+      "event_ids": [
+        "gms-bb4347ab02164aa1b239b9e702a6516e",
+        "gms-199e8b9616f4436fbcedc452c88c6794",
+        "gms-cc37b5763ec04ebfb078a17d2581d6b2",
+        "gms-c64e747e352b4d2fa3ccf1d066d2b20e",
+        "gms-9e00a0abdbeb44f1a574565da5978928"
+      ],
+      "event_types": [
+        "objective.created_or_correlated",
+        "directive.authorized",
+        "cme.evaluation.persisted",
+        "execution.authorized",
+        "dispatch.requested"
+      ],
+      "lifecycle_cursor": 5,
+      "positions": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  "event_schema_version": "estate.grace-momentum-event.v1",
+  "fixture": {
+    "authorized": {
+      "disposition": "accepted",
+      "event": {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-fixture:authorize",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-fixture:authorize",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": null,
+        "disposition": "accepted",
+        "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+        "event_type": "directive.authorized",
+        "idempotency_key": "wp4232-fixture:authorize",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "position": 2,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "continuation_mode": "event_driven",
+        "created_at": "2026-07-27T06:38:25Z",
+        "directive_id": "gmd-0ab55b7b74ba",
+        "objective_id": "wp4232-fixture",
+        "operational_owner": "Grace",
+        "status": "active"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "availability_after_stop": {
+      "event_consumption": {
+        "api": "bounded_polling_replay",
+        "cursor_semantics": "exclusive"
+      },
+      "health": {
+        "healthy": true,
+        "mode": "fixture",
+        "service": "grace-momentum",
+        "storage": "A:\\AI\\Temp\\tmp\\wp4232-w_tvwmqh\\fixture\\runtime\\production\\grace_momentum"
+      },
+      "operationally_available": true,
+      "readiness": {
+        "mode": "fixture",
+        "provider_effects_enabled": false,
+        "ready": true,
+        "service": "grace-momentum"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "directive_id": "gmd-0ab55b7b74ba",
+    "emergency_stop": {
+      "disposition": "accepted",
+      "event": {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-fixture:stop",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-fixture:stop",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": "gmd-0ab55b7b74ba",
+        "disposition": "accepted",
+        "event_id": "gms-0682616c6ea14ff2a9a367a7ec86f6e4",
+        "event_type": "directive.stopped",
+        "idempotency_key": "wp4232-fixture:stop",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "stopd",
+          "updated_at": "2026-07-27T06:38:25Z"
+        },
+        "position": 4,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "continuation_mode": "event_driven",
+        "created_at": "2026-07-27T06:38:25Z",
+        "directive_id": "gmd-0ab55b7b74ba",
+        "objective_id": "wp4232-fixture",
+        "operational_owner": "Grace",
+        "status": "stopd",
+        "updated_at": "2026-07-27T06:38:25Z"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "estate": {
+      "availability": {
+        "event_consumption": {
+          "api": "bounded_polling_replay",
+          "cursor_semantics": "exclusive"
+        },
+        "health": {
+          "healthy": true,
+          "mode": "fixture",
+          "service": "grace-momentum",
+          "storage": "A:\\AI\\Temp\\tmp\\wp4232-w_tvwmqh\\fixture\\runtime\\production\\grace_momentum"
+        },
+        "operationally_available": true,
+        "readiness": {
+          "mode": "fixture",
+          "provider_effects_enabled": false,
+          "ready": true,
+          "service": "grace-momentum"
+        },
+        "schema_version": "estate.grace-momentum-control.v1"
+      },
+      "available": true,
+      "contract": "estate.grace-momentum-client.v1",
+      "controls": [
+        {
+          "action": "momentum.authorize",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "directive.pause",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "directive.resume",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "directive.stop",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "directive.revoke",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "directive.supersede",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "cme.reevaluate",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "progression.inspect",
+          "availability": "provider_authorized"
+        },
+        {
+          "action": "escalation.request",
+          "availability": "provider_authorized"
+        }
+      ],
+      "cursor": 3,
+      "directive_id": "gmd-0ab55b7b74ba",
+      "events": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-fixture:objective",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-fixture:authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+          "event_type": "directive.authorized",
+          "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 3,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ],
+      "links": {
+        "conversation_url": "/open-webui/conversations/conversation-wp4232-fixture?objective_id=wp4232-fixture&directive_id=gmd-0ab55b7b74ba",
+        "directive_url": "/estate/directives/gmd-0ab55b7b74ba",
+        "lifecycle_url": "/estate/objectives/wp4232-fixture/lifecycle?cursor=3",
+        "objective_url": "/estate/objectives/wp4232-fixture"
+      },
+      "objective_id": "wp4232-fixture",
+      "projection": {
+        "current_blocker": null,
+        "current_responsible_office": "Grace",
+        "directive": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "next_lawful_action": "inspect progression",
+        "objective": "wp4232-fixture",
+        "replay_cursor": 3,
+        "stages": {
+          "capability": null,
+          "cme_evaluation": null,
+          "commission": null,
+          "completion": null,
+          "dispatch": null,
+          "execution_authorization": null,
+          "grace_receipt": null,
+          "provider_governance": {
+            "disposition": "fails_closed",
+            "provider_effects_enabled": false
+          },
+          "reconciliation": null,
+          "validation": null
+        }
+      },
+      "provider_effects_enabled": false,
+      "recovery": {
+        "arbitrary_rerun": false,
+        "lawful_action": "progression.inspect",
+        "replay": {
+          "cursor": 0,
+          "events": [
+            {
+              "actor": "test-grace",
+              "audit_reference": "audit:command-wp4232-fixture:objective",
+              "authority_source": "test/grace-authority",
+              "causation_id": "cause-demo",
+              "command_id": "command-wp4232-fixture:objective",
+              "correlation_id": "correlation-demo",
+              "diagnostic_reference": null,
+              "directive_id": null,
+              "disposition": "accepted",
+              "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+              "event_type": "objective.created_or_correlated",
+              "idempotency_key": "wp4232-fixture:objective",
+              "objective_id": "wp4232-fixture",
+              "occurred_at": "2026-07-27T06:38:25Z",
+              "payload": {
+                "correlation_id": "correlation-demo",
+                "disposition": "created_or_correlated",
+                "objective_id": "wp4232-fixture",
+                "operational_owner": "Grace"
+              },
+              "position": 1,
+              "represented_office": "Grace",
+              "schema_version": "estate.grace-momentum-event.v1",
+              "timestamp": "2026-07-26T00:00:00Z"
+            },
+            {
+              "actor": "test-grace",
+              "audit_reference": "audit:command-wp4232-fixture:authorize",
+              "authority_source": "test/grace-authority",
+              "causation_id": "cause-demo",
+              "command_id": "command-wp4232-fixture:authorize",
+              "correlation_id": "correlation-demo",
+              "diagnostic_reference": null,
+              "directive_id": null,
+              "disposition": "accepted",
+              "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+              "event_type": "directive.authorized",
+              "idempotency_key": "wp4232-fixture:authorize",
+              "objective_id": "wp4232-fixture",
+              "occurred_at": "2026-07-27T06:38:25Z",
+              "payload": {
+                "continuation_mode": "event_driven",
+                "created_at": "2026-07-27T06:38:25Z",
+                "directive_id": "gmd-0ab55b7b74ba",
+                "objective_id": "wp4232-fixture",
+                "operational_owner": "Grace",
+                "status": "active"
+              },
+              "position": 2,
+              "represented_office": "Grace",
+              "schema_version": "estate.grace-momentum-event.v1",
+              "timestamp": "2026-07-26T00:00:00Z"
+            },
+            {
+              "actor": "test-grace",
+              "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+              "authority_source": "test/grace-authority",
+              "causation_id": "cause-demo",
+              "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+              "correlation_id": "correlation-demo",
+              "diagnostic_reference": null,
+              "directive_id": "gmd-0ab55b7b74ba",
+              "disposition": "accepted",
+              "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+              "event_type": "directive.authorized",
+              "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+              "objective_id": "wp4232-fixture",
+              "occurred_at": "2026-07-27T06:38:25Z",
+              "payload": {
+                "continuation_mode": "event_driven",
+                "created_at": "2026-07-27T06:38:25Z",
+                "directive_id": "gmd-0ab55b7b74ba",
+                "objective_id": "wp4232-fixture",
+                "operational_owner": "Grace",
+                "status": "active"
+              },
+              "position": 3,
+              "represented_office": "Grace",
+              "schema_version": "estate.grace-momentum-event.v1",
+              "timestamp": "2026-07-26T00:00:00Z"
+            }
+          ],
+          "has_more": false,
+          "next_cursor": 3,
+          "schema_version": "estate.grace-momentum-event.v1"
+        }
+      },
+      "replay": {
+        "cursor": 0,
+        "events": [
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-wp4232-fixture:objective",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-wp4232-fixture:objective",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": null,
+            "disposition": "accepted",
+            "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+            "event_type": "objective.created_or_correlated",
+            "idempotency_key": "wp4232-fixture:objective",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "correlation_id": "correlation-demo",
+              "disposition": "created_or_correlated",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace"
+            },
+            "position": 1,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          },
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-wp4232-fixture:authorize",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-wp4232-fixture:authorize",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": null,
+            "disposition": "accepted",
+            "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+            "event_type": "directive.authorized",
+            "idempotency_key": "wp4232-fixture:authorize",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "continuation_mode": "event_driven",
+              "created_at": "2026-07-27T06:38:25Z",
+              "directive_id": "gmd-0ab55b7b74ba",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace",
+              "status": "active"
+            },
+            "position": 2,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          },
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": "gmd-0ab55b7b74ba",
+            "disposition": "accepted",
+            "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+            "event_type": "directive.authorized",
+            "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "continuation_mode": "event_driven",
+              "created_at": "2026-07-27T06:38:25Z",
+              "directive_id": "gmd-0ab55b7b74ba",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace",
+              "status": "active"
+            },
+            "position": 3,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          }
+        ],
+        "has_more": false,
+        "next_cursor": 3,
+        "schema_version": "estate.grace-momentum-event.v1"
+      },
+      "subscription": {
+        "cursor": 0,
+        "events": [
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-wp4232-fixture:objective",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-wp4232-fixture:objective",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": null,
+            "disposition": "accepted",
+            "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+            "event_type": "objective.created_or_correlated",
+            "idempotency_key": "wp4232-fixture:objective",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "correlation_id": "correlation-demo",
+              "disposition": "created_or_correlated",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace"
+            },
+            "position": 1,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          },
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-wp4232-fixture:authorize",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-wp4232-fixture:authorize",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": null,
+            "disposition": "accepted",
+            "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+            "event_type": "directive.authorized",
+            "idempotency_key": "wp4232-fixture:authorize",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "continuation_mode": "event_driven",
+              "created_at": "2026-07-27T06:38:25Z",
+              "directive_id": "gmd-0ab55b7b74ba",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace",
+              "status": "active"
+            },
+            "position": 2,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          },
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": "gmd-0ab55b7b74ba",
+            "disposition": "accepted",
+            "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+            "event_type": "directive.authorized",
+            "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "continuation_mode": "event_driven",
+              "created_at": "2026-07-27T06:38:25Z",
+              "directive_id": "gmd-0ab55b7b74ba",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace",
+              "status": "active"
+            },
+            "position": 3,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          }
+        ],
+        "has_more": false,
+        "next_cursor": 3,
+        "schema_version": "estate.grace-momentum-event.v1"
+      },
+      "transport": "loopback"
+    },
+    "exactly_once": {
+      "event_count": 3,
+      "same_response": true
+    },
+    "objective": {
+      "disposition": "created_or_correlated",
+      "event": {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-fixture:objective",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-fixture:objective",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": null,
+        "disposition": "accepted",
+        "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+        "event_type": "objective.created_or_correlated",
+        "idempotency_key": "wp4232-fixture:objective",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "correlation_id": "correlation-demo",
+          "disposition": "created_or_correlated",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace"
+        },
+        "position": 1,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "correlation_id": "correlation-demo",
+        "disposition": "created_or_correlated",
+        "objective_id": "wp4232-fixture",
+        "operational_owner": "Grace"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "openwebui": {
+      "action": "momentum.authorize",
+      "correlation": {
+        "approval_state": "not_requested",
+        "commission_id": null,
+        "completion_receipt_id": null,
+        "conversation_id": "conversation-wp4232-fixture",
+        "directive_id": "gmd-0ab55b7b74ba",
+        "evaluation_id": null,
+        "message_id": "approve",
+        "objective_id": "wp4232-fixture"
+      },
+      "kind": "command",
+      "links": {
+        "conversation": "/open-webui/conversations/conversation-wp4232-fixture?objective_id=wp4232-fixture&directive_id=gmd-0ab55b7b74ba",
+        "directive": "/estate/directives/gmd-0ab55b7b74ba",
+        "lifecycle": "/estate/objectives/wp4232-fixture/lifecycle?cursor=0",
+        "objective": "/estate/objectives/wp4232-fixture"
+      },
+      "result": {
+        "disposition": "accepted",
+        "event": {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+          "event_type": "directive.authorized",
+          "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 3,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        "provider_effect_suppressed": true,
+        "record": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "schema_version": "estate.grace-momentum-control.v1"
+      }
+    },
+    "openwebui_refresh": {
+      "availability": {
+        "event_consumption": {
+          "api": "bounded_polling_replay",
+          "cursor_semantics": "exclusive"
+        },
+        "health": {
+          "healthy": true,
+          "mode": "fixture",
+          "service": "grace-momentum",
+          "storage": "A:\\AI\\Temp\\tmp\\wp4232-w_tvwmqh\\fixture\\runtime\\production\\grace_momentum"
+        },
+        "operationally_available": true,
+        "readiness": {
+          "mode": "fixture",
+          "provider_effects_enabled": false,
+          "ready": true,
+          "service": "grace-momentum"
+        },
+        "schema_version": "estate.grace-momentum-control.v1"
+      },
+      "cursor": 3,
+      "events": [],
+      "kind": "refresh",
+      "links": {
+        "conversation": "/open-webui/conversations/conversation-wp4232-fixture?objective_id=wp4232-fixture&directive_id=gmd-0ab55b7b74ba",
+        "directive": "/estate/directives/gmd-0ab55b7b74ba",
+        "lifecycle": "/estate/objectives/wp4232-fixture/lifecycle?cursor=0",
+        "objective": "/estate/objectives/wp4232-fixture"
+      },
+      "projection": {
+        "current_blocker": null,
+        "current_responsible_office": "Grace",
+        "directive": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "next_lawful_action": "inspect progression",
+        "objective_id": "wp4232-fixture",
+        "replay_cursor": 3,
+        "schema_version": "estate.grace-momentum-control.v1",
+        "stages": {
+          "capability": null,
+          "cme_evaluation": null,
+          "commission": null,
+          "completion": null,
+          "dispatch": null,
+          "execution_authorization": null,
+          "grace_receipt": null,
+          "provider_governance": {
+            "disposition": "fails_closed",
+            "provider_effects_enabled": false
+          },
+          "reconciliation": null,
+          "validation": null
+        },
+        "timeline": [
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-wp4232-fixture:objective",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-wp4232-fixture:objective",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": null,
+            "disposition": "accepted",
+            "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+            "event_type": "objective.created_or_correlated",
+            "idempotency_key": "wp4232-fixture:objective",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "correlation_id": "correlation-demo",
+              "disposition": "created_or_correlated",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace"
+            },
+            "position": 1,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          },
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-wp4232-fixture:authorize",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-wp4232-fixture:authorize",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": null,
+            "disposition": "accepted",
+            "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+            "event_type": "directive.authorized",
+            "idempotency_key": "wp4232-fixture:authorize",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "continuation_mode": "event_driven",
+              "created_at": "2026-07-27T06:38:25Z",
+              "directive_id": "gmd-0ab55b7b74ba",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace",
+              "status": "active"
+            },
+            "position": 2,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          },
+          {
+            "actor": "test-grace",
+            "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+            "authority_source": "test/grace-authority",
+            "causation_id": "cause-demo",
+            "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+            "correlation_id": "correlation-demo",
+            "diagnostic_reference": null,
+            "directive_id": "gmd-0ab55b7b74ba",
+            "disposition": "accepted",
+            "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+            "event_type": "directive.authorized",
+            "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+            "objective_id": "wp4232-fixture",
+            "occurred_at": "2026-07-27T06:38:25Z",
+            "payload": {
+              "continuation_mode": "event_driven",
+              "created_at": "2026-07-27T06:38:25Z",
+              "directive_id": "gmd-0ab55b7b74ba",
+              "objective_id": "wp4232-fixture",
+              "operational_owner": "Grace",
+              "status": "active"
+            },
+            "position": 3,
+            "represented_office": "Grace",
+            "schema_version": "estate.grace-momentum-event.v1",
+            "timestamp": "2026-07-26T00:00:00Z"
+          }
+        ]
+      }
+    },
+    "raw_projection": {
+      "current_blocker": null,
+      "current_responsible_office": "Grace",
+      "directive": {
+        "continuation_mode": "event_driven",
+        "created_at": "2026-07-27T06:38:25Z",
+        "directive_id": "gmd-0ab55b7b74ba",
+        "objective_id": "wp4232-fixture",
+        "operational_owner": "Grace",
+        "status": "stopd",
+        "updated_at": "2026-07-27T06:38:25Z"
+      },
+      "next_lawful_action": "inspect progression",
+      "objective_id": "wp4232-fixture",
+      "replay_cursor": 4,
+      "schema_version": "estate.grace-momentum-control.v1",
+      "stages": {
+        "capability": null,
+        "cme_evaluation": null,
+        "commission": null,
+        "completion": null,
+        "dispatch": null,
+        "execution_authorization": null,
+        "grace_receipt": null,
+        "provider_governance": {
+          "disposition": "fails_closed",
+          "provider_effects_enabled": false
+        },
+        "reconciliation": null,
+        "validation": null
+      },
+      "timeline": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-fixture:objective",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-fixture:authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+          "event_type": "directive.authorized",
+          "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 3,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:stop",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:stop",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-0682616c6ea14ff2a9a367a7ec86f6e4",
+          "event_type": "directive.stopped",
+          "idempotency_key": "wp4232-fixture:stop",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "stopd",
+            "updated_at": "2026-07-27T06:38:25Z"
+          },
+          "position": 4,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ]
+    },
+    "replay": {
+      "cursor": 0,
+      "events": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-fixture:objective",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-fixture:authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+          "event_type": "directive.authorized",
+          "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 3,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ],
+      "has_more": false,
+      "next_cursor": 3,
+      "schema_version": "estate.grace-momentum-event.v1"
+    },
+    "replay_after_stop": {
+      "cursor": 0,
+      "events": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-fixture:objective",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-fixture:authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+          "event_type": "directive.authorized",
+          "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 3,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:stop",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:stop",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-0682616c6ea14ff2a9a367a7ec86f6e4",
+          "event_type": "directive.stopped",
+          "idempotency_key": "wp4232-fixture:stop",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "stopd",
+            "updated_at": "2026-07-27T06:38:25Z"
+          },
+          "position": 4,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ],
+      "has_more": false,
+      "next_cursor": 4,
+      "schema_version": "estate.grace-momentum-event.v1"
+    }
+  },
+  "readiness_gate": {
+    "blocking_reason": "real WP-4229 runtime has not emitted the complete lifecycle chain",
+    "bounded_live_authorized": false,
+    "complete_lifecycle": false,
+    "dual_surface_complete": false,
+    "dual_surface_projection_available": true,
+    "emergency_stop": true,
+    "fixture_acceptance": true,
+    "missing_event_types": [
+      "dispatch.submitted",
+      "grace.receipt.recorded",
+      "objective.completed",
+      "progression.changed",
+      "reconciliation.completed",
+      "validation.succeeded"
+    ],
+    "ready": false,
+    "required_event_types_observed": [
+      "cme.evaluation.persisted",
+      "directive.authorized",
+      "execution.authorized",
+      "objective.created_or_correlated"
+    ],
+    "restart_and_replay": true,
+    "rollback": true,
+    "shadow_acceptance": true
+  },
+  "restart_replay": {
+    "events": [
+      {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-fixture:objective",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-fixture:objective",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": null,
+        "disposition": "accepted",
+        "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+        "event_type": "objective.created_or_correlated",
+        "idempotency_key": "wp4232-fixture:objective",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "correlation_id": "correlation-demo",
+          "disposition": "created_or_correlated",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace"
+        },
+        "position": 1,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-fixture:authorize",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-fixture:authorize",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": null,
+        "disposition": "accepted",
+        "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+        "event_type": "directive.authorized",
+        "idempotency_key": "wp4232-fixture:authorize",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "position": 2,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": "gmd-0ab55b7b74ba",
+        "disposition": "accepted",
+        "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+        "event_type": "directive.authorized",
+        "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "position": 3,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-fixture:stop",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-fixture:stop",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": "gmd-0ab55b7b74ba",
+        "disposition": "accepted",
+        "event_id": "gms-0682616c6ea14ff2a9a367a7ec86f6e4",
+        "event_type": "directive.stopped",
+        "idempotency_key": "wp4232-fixture:stop",
+        "objective_id": "wp4232-fixture",
+        "occurred_at": "2026-07-27T06:38:25Z",
+        "payload": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:25Z",
+          "directive_id": "gmd-0ab55b7b74ba",
+          "objective_id": "wp4232-fixture",
+          "operational_owner": "Grace",
+          "status": "stopd",
+          "updated_at": "2026-07-27T06:38:25Z"
+        },
+        "position": 4,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      }
+    ],
+    "projection": {
+      "current_blocker": null,
+      "current_responsible_office": "Grace",
+      "directive": {
+        "continuation_mode": "event_driven",
+        "created_at": "2026-07-27T06:38:25Z",
+        "directive_id": "gmd-0ab55b7b74ba",
+        "objective_id": "wp4232-fixture",
+        "operational_owner": "Grace",
+        "status": "stopd",
+        "updated_at": "2026-07-27T06:38:25Z"
+      },
+      "next_lawful_action": "inspect progression",
+      "objective_id": "wp4232-fixture",
+      "replay_cursor": 4,
+      "schema_version": "estate.grace-momentum-control.v1",
+      "stages": {
+        "capability": null,
+        "cme_evaluation": null,
+        "commission": null,
+        "completion": null,
+        "dispatch": null,
+        "execution_authorization": null,
+        "grace_receipt": null,
+        "provider_governance": {
+          "disposition": "fails_closed",
+          "provider_effects_enabled": false
+        },
+        "reconciliation": null,
+        "validation": null
+      },
+      "timeline": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-6b658de697e24f16a92ff742a65368b6",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-fixture:objective",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-ce18c8b7d58f478a850130489219e8dd",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-fixture:authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-conversation-wp4232-fixture:approve:momentum.authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-d4fd2be2f5e64b7889b1ba1ccf9bbefe",
+          "event_type": "directive.authorized",
+          "idempotency_key": "conversation-wp4232-fixture:approve:momentum.authorize",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 3,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-fixture:stop",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-fixture:stop",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-0ab55b7b74ba",
+          "disposition": "accepted",
+          "event_id": "gms-0682616c6ea14ff2a9a367a7ec86f6e4",
+          "event_type": "directive.stopped",
+          "idempotency_key": "wp4232-fixture:stop",
+          "objective_id": "wp4232-fixture",
+          "occurred_at": "2026-07-27T06:38:25Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:25Z",
+            "directive_id": "gmd-0ab55b7b74ba",
+            "objective_id": "wp4232-fixture",
+            "operational_owner": "Grace",
+            "status": "stopd",
+            "updated_at": "2026-07-27T06:38:25Z"
+          },
+          "position": 4,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ]
+    },
+    "same_positions": true
+  },
+  "rollback": {
+    "after": {
+      "mode": "disabled",
+      "provider_effects_enabled": false,
+      "ready": false,
+      "service": "grace-momentum"
+    },
+    "before": {
+      "mode": "shadow",
+      "provider_effects_enabled": false,
+      "ready": true,
+      "service": "grace-momentum"
+    },
+    "configuration": {
+      "authentication_issuer": "estate-control",
+      "execution_mode": "disabled",
+      "provider_effects_enabled": false,
+      "replay_limit": 100
+    }
+  },
+  "runtime_schema_version": "estate.grace-momentum-control.v1",
+  "schema_version": "estate.wp4232-acceptance-evidence.v1",
+  "shadow": {
+    "authorized": {
+      "disposition": "accepted",
+      "event": {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-shadow:authorize",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-shadow:authorize",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": null,
+        "disposition": "accepted",
+        "event_id": "gms-199e8b9616f4436fbcedc452c88c6794",
+        "event_type": "directive.authorized",
+        "idempotency_key": "wp4232-shadow:authorize",
+        "objective_id": "wp4232-shadow",
+        "occurred_at": "2026-07-27T06:38:26Z",
+        "payload": {
+          "continuation_mode": "event_driven",
+          "created_at": "2026-07-27T06:38:26Z",
+          "directive_id": "gmd-529cabf8c3dc",
+          "objective_id": "wp4232-shadow",
+          "operational_owner": "Grace",
+          "status": "active"
+        },
+        "position": 2,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "continuation_mode": "event_driven",
+        "created_at": "2026-07-27T06:38:26Z",
+        "directive_id": "gmd-529cabf8c3dc",
+        "objective_id": "wp4232-shadow",
+        "operational_owner": "Grace",
+        "status": "active"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "availability": {
+      "event_consumption": {
+        "api": "bounded_polling_replay",
+        "cursor_semantics": "exclusive"
+      },
+      "health": {
+        "healthy": true,
+        "mode": "shadow",
+        "service": "grace-momentum",
+        "storage": "A:\\AI\\Temp\\tmp\\wp4232-w_tvwmqh\\shadow\\runtime\\production\\grace_momentum"
+      },
+      "operationally_available": true,
+      "readiness": {
+        "mode": "shadow",
+        "provider_effects_enabled": false,
+        "ready": true,
+        "service": "grace-momentum"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "cme": {
+      "disposition": "shadow_evaluated",
+      "event": {
+        "actor": "test-cme",
+        "audit_reference": "audit:command-wp4232-shadow:cme",
+        "authority_source": "test/cme-delegation",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-shadow:cme",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": "gmd-529cabf8c3dc",
+        "disposition": "accepted",
+        "event_id": "gms-cc37b5763ec04ebfb078a17d2581d6b2",
+        "event_type": "cme.evaluation.persisted",
+        "idempotency_key": "wp4232-shadow:cme",
+        "objective_id": "wp4232-shadow",
+        "occurred_at": "2026-07-27T06:38:26Z",
+        "payload": {
+          "continuation_owner": "CME",
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "shadow_evaluated",
+          "objective_id": "wp4232-shadow",
+          "operational_owner": "Grace",
+          "provider_effect_suppressed": true
+        },
+        "position": 3,
+        "represented_office": "CME",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "continuation_owner": "CME",
+        "directive_id": "gmd-529cabf8c3dc",
+        "disposition": "shadow_evaluated",
+        "objective_id": "wp4232-shadow",
+        "operational_owner": "Grace",
+        "provider_effect_suppressed": true
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "dispatch": {
+      "disposition": "recorded_no_provider_execution",
+      "event": {
+        "actor": "test-dispatch",
+        "audit_reference": "audit:command-wp4232-shadow:dispatch",
+        "authority_source": "test/dispatch-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-shadow:dispatch",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": "gmd-529cabf8c3dc",
+        "disposition": "accepted",
+        "event_id": "gms-9e00a0abdbeb44f1a574565da5978928",
+        "event_type": "dispatch.requested",
+        "idempotency_key": "wp4232-shadow:dispatch",
+        "objective_id": "wp4232-shadow",
+        "occurred_at": "2026-07-27T06:38:26Z",
+        "payload": {
+          "dispatch_id": "dispatch-a43668112a27",
+          "disposition": "recorded_no_provider_execution",
+          "logistics_owner": "Dispatch",
+          "objective_id": "wp4232-shadow",
+          "provider_effect_suppressed": true
+        },
+        "position": 5,
+        "represented_office": "Dispatch",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "dispatch_id": "dispatch-a43668112a27",
+        "disposition": "recorded_no_provider_execution",
+        "logistics_owner": "Dispatch",
+        "objective_id": "wp4232-shadow",
+        "provider_effect_suppressed": true
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "engineering": {
+      "disposition": "authorized_for_dispatch",
+      "event": {
+        "actor": "test-engineering",
+        "audit_reference": "audit:command-wp4232-shadow:engineering",
+        "authority_source": "test/engineering-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-shadow:engineering",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": "gmd-529cabf8c3dc",
+        "disposition": "accepted",
+        "event_id": "gms-c64e747e352b4d2fa3ccf1d066d2b20e",
+        "event_type": "execution.authorized",
+        "idempotency_key": "wp4232-shadow:engineering",
+        "objective_id": "wp4232-shadow",
+        "occurred_at": "2026-07-27T06:38:26Z",
+        "payload": {
+          "commission_id": null,
+          "disposition": "authorized_for_dispatch",
+          "objective_id": "wp4232-shadow",
+          "provider_effect_suppressed": true,
+          "technical_owner": "Engineering"
+        },
+        "position": 4,
+        "represented_office": "Engineering",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "commission_id": null,
+        "disposition": "authorized_for_dispatch",
+        "objective_id": "wp4232-shadow",
+        "provider_effect_suppressed": true,
+        "technical_owner": "Engineering"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "objective": {
+      "disposition": "created_or_correlated",
+      "event": {
+        "actor": "test-grace",
+        "audit_reference": "audit:command-wp4232-shadow:objective",
+        "authority_source": "test/grace-authority",
+        "causation_id": "cause-demo",
+        "command_id": "command-wp4232-shadow:objective",
+        "correlation_id": "correlation-demo",
+        "diagnostic_reference": null,
+        "directive_id": null,
+        "disposition": "accepted",
+        "event_id": "gms-bb4347ab02164aa1b239b9e702a6516e",
+        "event_type": "objective.created_or_correlated",
+        "idempotency_key": "wp4232-shadow:objective",
+        "objective_id": "wp4232-shadow",
+        "occurred_at": "2026-07-27T06:38:26Z",
+        "payload": {
+          "correlation_id": "correlation-demo",
+          "disposition": "created_or_correlated",
+          "objective_id": "wp4232-shadow",
+          "operational_owner": "Grace"
+        },
+        "position": 1,
+        "represented_office": "Grace",
+        "schema_version": "estate.grace-momentum-event.v1",
+        "timestamp": "2026-07-26T00:00:00Z"
+      },
+      "provider_effect_suppressed": true,
+      "record": {
+        "correlation_id": "correlation-demo",
+        "disposition": "created_or_correlated",
+        "objective_id": "wp4232-shadow",
+        "operational_owner": "Grace"
+      },
+      "schema_version": "estate.grace-momentum-control.v1"
+    },
+    "provider_effects_suppressed": true,
+    "raw_projection": {
+      "current_blocker": null,
+      "current_responsible_office": "Grace",
+      "directive": {
+        "continuation_mode": "event_driven",
+        "created_at": "2026-07-27T06:38:26Z",
+        "directive_id": "gmd-529cabf8c3dc",
+        "objective_id": "wp4232-shadow",
+        "operational_owner": "Grace",
+        "status": "active"
+      },
+      "next_lawful_action": "inspect progression",
+      "objective_id": "wp4232-shadow",
+      "replay_cursor": 5,
+      "schema_version": "estate.grace-momentum-control.v1",
+      "stages": {
+        "capability": null,
+        "cme_evaluation": {
+          "event_type": "cme.evaluation.persisted",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "continuation_owner": "CME",
+            "directive_id": "gmd-529cabf8c3dc",
+            "disposition": "shadow_evaluated",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace",
+            "provider_effect_suppressed": true
+          },
+          "position": 3
+        },
+        "commission": null,
+        "completion": null,
+        "dispatch": null,
+        "execution_authorization": {
+          "event_type": "execution.authorized",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "commission_id": null,
+            "disposition": "authorized_for_dispatch",
+            "objective_id": "wp4232-shadow",
+            "provider_effect_suppressed": true,
+            "technical_owner": "Engineering"
+          },
+          "position": 4
+        },
+        "grace_receipt": null,
+        "provider_governance": {
+          "disposition": "fails_closed",
+          "provider_effects_enabled": false
+        },
+        "reconciliation": null,
+        "validation": null
+      },
+      "timeline": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-shadow:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-bb4347ab02164aa1b239b9e702a6516e",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-shadow:objective",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-shadow:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-199e8b9616f4436fbcedc452c88c6794",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-shadow:authorize",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:26Z",
+            "directive_id": "gmd-529cabf8c3dc",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-cme",
+          "audit_reference": "audit:command-wp4232-shadow:cme",
+          "authority_source": "test/cme-delegation",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:cme",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "accepted",
+          "event_id": "gms-cc37b5763ec04ebfb078a17d2581d6b2",
+          "event_type": "cme.evaluation.persisted",
+          "idempotency_key": "wp4232-shadow:cme",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "continuation_owner": "CME",
+            "directive_id": "gmd-529cabf8c3dc",
+            "disposition": "shadow_evaluated",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace",
+            "provider_effect_suppressed": true
+          },
+          "position": 3,
+          "represented_office": "CME",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-engineering",
+          "audit_reference": "audit:command-wp4232-shadow:engineering",
+          "authority_source": "test/engineering-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:engineering",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "accepted",
+          "event_id": "gms-c64e747e352b4d2fa3ccf1d066d2b20e",
+          "event_type": "execution.authorized",
+          "idempotency_key": "wp4232-shadow:engineering",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "commission_id": null,
+            "disposition": "authorized_for_dispatch",
+            "objective_id": "wp4232-shadow",
+            "provider_effect_suppressed": true,
+            "technical_owner": "Engineering"
+          },
+          "position": 4,
+          "represented_office": "Engineering",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-dispatch",
+          "audit_reference": "audit:command-wp4232-shadow:dispatch",
+          "authority_source": "test/dispatch-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:dispatch",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "accepted",
+          "event_id": "gms-9e00a0abdbeb44f1a574565da5978928",
+          "event_type": "dispatch.requested",
+          "idempotency_key": "wp4232-shadow:dispatch",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "dispatch_id": "dispatch-a43668112a27",
+            "disposition": "recorded_no_provider_execution",
+            "logistics_owner": "Dispatch",
+            "objective_id": "wp4232-shadow",
+            "provider_effect_suppressed": true
+          },
+          "position": 5,
+          "represented_office": "Dispatch",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ]
+    },
+    "replay": {
+      "cursor": 0,
+      "events": [
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-shadow:objective",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:objective",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-bb4347ab02164aa1b239b9e702a6516e",
+          "event_type": "objective.created_or_correlated",
+          "idempotency_key": "wp4232-shadow:objective",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "correlation_id": "correlation-demo",
+            "disposition": "created_or_correlated",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace"
+          },
+          "position": 1,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-grace",
+          "audit_reference": "audit:command-wp4232-shadow:authorize",
+          "authority_source": "test/grace-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:authorize",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": null,
+          "disposition": "accepted",
+          "event_id": "gms-199e8b9616f4436fbcedc452c88c6794",
+          "event_type": "directive.authorized",
+          "idempotency_key": "wp4232-shadow:authorize",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "continuation_mode": "event_driven",
+            "created_at": "2026-07-27T06:38:26Z",
+            "directive_id": "gmd-529cabf8c3dc",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace",
+            "status": "active"
+          },
+          "position": 2,
+          "represented_office": "Grace",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-cme",
+          "audit_reference": "audit:command-wp4232-shadow:cme",
+          "authority_source": "test/cme-delegation",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:cme",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "accepted",
+          "event_id": "gms-cc37b5763ec04ebfb078a17d2581d6b2",
+          "event_type": "cme.evaluation.persisted",
+          "idempotency_key": "wp4232-shadow:cme",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "continuation_owner": "CME",
+            "directive_id": "gmd-529cabf8c3dc",
+            "disposition": "shadow_evaluated",
+            "objective_id": "wp4232-shadow",
+            "operational_owner": "Grace",
+            "provider_effect_suppressed": true
+          },
+          "position": 3,
+          "represented_office": "CME",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-engineering",
+          "audit_reference": "audit:command-wp4232-shadow:engineering",
+          "authority_source": "test/engineering-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:engineering",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "accepted",
+          "event_id": "gms-c64e747e352b4d2fa3ccf1d066d2b20e",
+          "event_type": "execution.authorized",
+          "idempotency_key": "wp4232-shadow:engineering",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "commission_id": null,
+            "disposition": "authorized_for_dispatch",
+            "objective_id": "wp4232-shadow",
+            "provider_effect_suppressed": true,
+            "technical_owner": "Engineering"
+          },
+          "position": 4,
+          "represented_office": "Engineering",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        },
+        {
+          "actor": "test-dispatch",
+          "audit_reference": "audit:command-wp4232-shadow:dispatch",
+          "authority_source": "test/dispatch-authority",
+          "causation_id": "cause-demo",
+          "command_id": "command-wp4232-shadow:dispatch",
+          "correlation_id": "correlation-demo",
+          "diagnostic_reference": null,
+          "directive_id": "gmd-529cabf8c3dc",
+          "disposition": "accepted",
+          "event_id": "gms-9e00a0abdbeb44f1a574565da5978928",
+          "event_type": "dispatch.requested",
+          "idempotency_key": "wp4232-shadow:dispatch",
+          "objective_id": "wp4232-shadow",
+          "occurred_at": "2026-07-27T06:38:26Z",
+          "payload": {
+            "dispatch_id": "dispatch-a43668112a27",
+            "disposition": "recorded_no_provider_execution",
+            "logistics_owner": "Dispatch",
+            "objective_id": "wp4232-shadow",
+            "provider_effect_suppressed": true
+          },
+          "position": 5,
+          "represented_office": "Dispatch",
+          "schema_version": "estate.grace-momentum-event.v1",
+          "timestamp": "2026-07-26T00:00:00Z"
+        }
+      ],
+      "has_more": false,
+      "next_cursor": 5,
+      "schema_version": "estate.grace-momentum-event.v1"
+    }
+  }
+}
