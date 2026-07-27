@@ -21,9 +21,24 @@ EVENT_SCHEMA_VERSION = "estate.grace-momentum-event.v1"
 PRODUCTION_ROOT = Path("runtime/production/grace_momentum")
 MODES = {"fixture", "shadow", "bounded_live", "disabled"}
 COMMAND_OFFICES = {
-    "directive.create": {"Grace"}, "directive.transition": {"Grace"},
-    "cme.evaluate": {"CME"}, "engineering.authorize": {"Engineering"},
-    "dispatch.request": {"Dispatch"},
+    "objective.create_or_correlate": {"Grace"}, "momentum.authorize": {"Grace"},
+    "directive.pause": {"Grace"}, "directive.resume": {"Grace"}, "directive.stop": {"Grace"},
+    "directive.revoke": {"Grace"}, "directive.supersede": {"Grace"}, "cme.reevaluate": {"CME"},
+    "engineering.progress_commission": {"Engineering"}, "progression.inspect": {"Grace", "CME", "Engineering", "Dispatch", "Observer"},
+    "escalation.request": {"Grace", "CME", "Engineering", "Dispatch"},
+    # Compatibility names retained for early consumers.
+    "directive.create": {"Grace"}, "directive.transition": {"Grace"}, "cme.evaluate": {"CME"},
+    "engineering.authorize": {"Engineering"}, "dispatch.request": {"Dispatch"},
+}
+QUERY_NAMES = {"objective.summary", "lifecycle.timeline", "responsibility.current", "blocker.current", "action.next_lawful", "directive.state", "capability.state", "commission.state", "provider_governance.state", "dispatch.state", "validation.state", "replay.state", "audit.trail"}
+EVENT_FOR_ACTION = {
+    "objective.create_or_correlate": "objective.created_or_correlated", "momentum.authorize": "directive.authorized",
+    "directive.pause": "directive.paused", "directive.resume": "directive.resumed", "directive.stop": "directive.stopped",
+    "directive.revoke": "directive.revoked", "directive.supersede": "directive.superseded",
+    "cme.reevaluate": "cme.evaluation.persisted", "engineering.progress_commission": "progression.changed",
+    "progression.inspect": "progression.inspected", "escalation.request": "escalation.requested",
+    "directive.create": "directive.authorized", "directive.transition": "directive.transitioned",
+    "cme.evaluate": "cme.evaluation.persisted", "engineering.authorize": "execution.authorized", "dispatch.request": "dispatch.submitted",
 }
 
 
@@ -100,18 +115,29 @@ class GraceMomentumService:
         self._assert_authority(action, identity)
         if prior := self._idempotent(command["idempotency_key"]): return prior
         directives = self._read("directives.json", {})
-        if action == "directive.create":
+        if action in {"directive.create", "momentum.authorize"}:
             directive_id = command.get("directive_id") or f"gmd-{uuid4().hex[:12]}"
             record = {"directive_id": directive_id, "objective_id": command["objective_id"], "status": "active", "operational_owner": "Grace", "continuation_mode": "event_driven", "created_at": utc_now()}
-            directives[directive_id] = record; self._write("directives.json", directives); kind = "grace.directive.activated"
-        elif action == "directive.transition":
+            directives[directive_id] = record; self._write("directives.json", directives); kind = EVENT_FOR_ACTION[action]
+        elif action in {"directive.transition", "directive.pause", "directive.resume", "directive.stop", "directive.revoke", "directive.supersede"}:
             record = directives.get(command.get("directive_id"))
-            if not record: raise ControlError("directive not found")
-            record = {**record, "status": command["status"], "updated_at": utc_now()}; directives[record["directive_id"]] = record; self._write("directives.json", directives); kind = "grace.directive.transitioned"
-        elif action == "cme.evaluate":
-            record = {"objective_id": command.get("objective_id"), "directive_id": command.get("directive_id"), "operational_owner": "Grace", "continuation_owner": "CME", "disposition": "shadow_evaluated" if self.mode == "shadow" else "evaluated", "provider_effect_suppressed": True}; kind = "cme.evaluated"
-        elif action == "engineering.authorize":
-            record = {"objective_id": command.get("objective_id"), "commission_id": command.get("commission_id"), "technical_owner": "Engineering", "disposition": "authorized_for_dispatch", "provider_effect_suppressed": True}; kind = "engineering.authorized"
+            if action == "directive.supersede":
+                directive_id = f"gmd-{uuid4().hex[:12]}"; record = {"directive_id": directive_id, "objective_id": command["objective_id"], "status": "active", "supersedes_directive_id": command.get("directive_id"), "operational_owner": "Grace", "created_at": utc_now()}
+            else:
+                if not record: raise ControlError("directive not found")
+                status = command.get("status") or action.rsplit(".", 1)[1] + "d"
+                record = {**record, "status": status, "updated_at": utc_now()}
+            directives[record["directive_id"]] = record; self._write("directives.json", directives); kind = EVENT_FOR_ACTION[action]
+        elif action in {"cme.evaluate", "cme.reevaluate"}:
+            record = {"objective_id": command.get("objective_id"), "directive_id": command.get("directive_id"), "operational_owner": "Grace", "continuation_owner": "CME", "disposition": "shadow_evaluated" if self.mode == "shadow" else "evaluated", "provider_effect_suppressed": True}; kind = EVENT_FOR_ACTION[action]
+        elif action in {"engineering.authorize", "engineering.progress_commission"}:
+            record = {"objective_id": command.get("objective_id"), "commission_id": command.get("commission_id"), "technical_owner": "Engineering", "disposition": "authorized_for_dispatch", "provider_effect_suppressed": True}; kind = EVENT_FOR_ACTION[action]
+        elif action == "objective.create_or_correlate":
+            record = {"objective_id": command.get("objective_id") or f"objective-{uuid4().hex[:12]}", "correlation_id": command["correlation_id"], "operational_owner": "Grace", "disposition": "created_or_correlated"}; kind = EVENT_FOR_ACTION[action]
+        elif action == "progression.inspect":
+            record = {"objective_id": command.get("objective_id"), "disposition": "inspection_recorded", "provider_effect_suppressed": True}; kind = EVENT_FOR_ACTION[action]
+        elif action == "escalation.request":
+            record = {"objective_id": command.get("objective_id"), "directive_id": command.get("directive_id"), "disposition": "escalation_requested", "provider_effect_suppressed": True}; kind = EVENT_FOR_ACTION[action]
         else:
             record = {"objective_id": command.get("objective_id"), "dispatch_id": command.get("dispatch_id") or f"dispatch-{uuid4().hex[:12]}", "logistics_owner": "Dispatch", "disposition": "recorded_no_provider_execution", "provider_effect_suppressed": True}; kind = "dispatch.requested"
         event = self._publish(kind, envelope, record)
@@ -123,6 +149,10 @@ class GraceMomentumService:
         if name == "lifecycle": result = self._read("directives.json", {})
         elif name == "audit": result = self._read("audit.jsonl", "")
         elif name == "governance": result = {"mode": self.mode, "provider_effects_enabled": False, "provider_governance": "fails_closed"}
+        elif name in QUERY_NAMES:
+            events = self._events(); objective_id = filters.get("objective_id")
+            related = [event for event in events if not objective_id or event.get("objective_id") == objective_id or event.get("payload", {}).get("objective_id") == objective_id]
+            result = {"objective_id": objective_id, "events": related, "directives": self._read("directives.json", {}), "provider_effects_enabled": False, "mode": self.mode}
         else: raise ControlError("unknown query")
         return {"schema_version": SCHEMA_VERSION, "query": name, "result": result}
     def subscribe(self, cursor: int = 0) -> dict[str, Any]:
@@ -142,6 +172,18 @@ class GraceMomentumService:
 class FakeGraceMomentumService(GraceMomentumService):
     """Contract-test fake; behavior and event envelopes match the reference service."""
     def __init__(self, root: str | Path, *, mode: str = "fixture") -> None: super().__init__(root, mode=mode)
+
+
+class GraceMomentumClient:
+    """Reference client used by both UI lanes; clients contain no lifecycle policy."""
+    def __init__(self, service: GraceMomentumService, identity: OfficeIdentity) -> None: self.service, self.identity = service, identity
+    def send(self, command: dict[str, Any]) -> dict[str, Any]:
+        try: return self.service.command(command, self.identity)
+        except (AuthenticationError, AuthorizationError) as exc:
+            return {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "unauthorized", "message": str(exc), "retryable": False}}
+    def query(self, name: str, **filters: Any) -> dict[str, Any]:
+        try: return self.service.query(name, self.identity, **filters)
+        except AuthenticationError as exc: return {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "invalid_or_expired_session", "message": str(exc), "retryable": False}}
 
 
 def reference_command(action: str, *, objective_id: str = "objective-demo", directive_id: str | None = None, idempotency_key: str = "demo-1") -> dict[str, Any]:

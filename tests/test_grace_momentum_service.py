@@ -14,6 +14,16 @@ def test_authority_and_disabled_mode_fail_closed(tmp_path):
     with pytest.raises(AuthorizationError): FakeGraceMomentumService(tmp_path).command(reference_command("directive.create"), TEST_IDENTITIES["observer"])
     with pytest.raises(AuthorizationError): GraceMomentumService(tmp_path, mode="disabled").command(reference_command("directive.create"), TEST_IDENTITIES["grace"])
 
+def test_public_client_contract_actions_queries_and_unauthorized_shape(tmp_path):
+    service = FakeGraceMomentumService(tmp_path); client = GraceMomentumClient(service, TEST_IDENTITIES["grace"])
+    objective = client.send(reference_command("objective.create_or_correlate", idempotency_key="objective"))
+    directive = client.send(reference_command("momentum.authorize", idempotency_key="directive"))
+    assert objective["event"]["event_type"] == "objective.created_or_correlated"
+    assert directive["event"]["event_type"] == "directive.authorized"
+    assert client.query("objective.summary", objective_id="objective-demo")["query"] == "objective.summary"
+    denied = GraceMomentumClient(service, TEST_IDENTITIES["observer"]).send(reference_command("momentum.authorize", idempotency_key="denied"))
+    assert denied["error"]["code"] == "unauthorized"
+
 @pytest.mark.parametrize("mode", ["fixture", "shadow", "bounded_live"])
 def test_every_mode_suppresses_provider_effects(tmp_path, mode):
     service = GraceMomentumService(tmp_path, mode=mode)
