@@ -1163,6 +1163,18 @@ def _grace_momentum_html(panel):
     links = data.get("links") or {}
     events = data.get("events") or []
     controls = data.get("controls") or []
+    projection = data.get("projection") or {}
+    projection_rows = "".join(
+        f"<dt>{html.escape(str(field).replace('_', ' ').title())}</dt>"
+        f"<dd><code>{html.escape(str(value if value is not None else 'Unavailable'))}</code></dd>"
+        for field, value in projection.items() if field != "stages"
+    )
+    stages = projection.get("stages") or {}
+    stage_rows = "".join(
+        f"<dt>{html.escape(str(stage).replace('_', ' ').title())}</dt>"
+        f"<dd><code>{html.escape(str(value if value is not None else 'Unavailable'))}</code></dd>"
+        for stage, value in stages.items()
+    ) or "<dt>Stages</dt><dd class='placeholder'>Unavailable</dd>"
     link_html = "".join(f"<li><a href='{html.escape(url, quote=True)}'>{html.escape(label)}</a></li>" for label, url in (("Objective", links.get("objective_url")), ("Directive", links.get("directive_url")), ("Lifecycle", links.get("lifecycle_url")), ("Open WebUI conversation", links.get("conversation_url"))) if url)
     controls_html = "".join(f"<li><code>{html.escape(c['action'])}</code> — {html.escape(c['availability'])}</li>" for c in controls)
     event_html = "".join(f"<li>{html.escape(str(e.get('position')))}: {html.escape(str(e.get('event_type')))}</li>" for e in events) or "<li>No canonical events at this cursor.</li>"
@@ -1170,7 +1182,9 @@ def _grace_momentum_html(panel):
             "Provider execution remains suppressed.</p>"
             f"<p>Objective: <code>{html.escape(str(data.get('objective_id')))}</code>; Directive: <code>{html.escape(str(data.get('directive_id')))}</code>; Cursor: {html.escape(str(data.get('cursor')))}</p>"
             "<h3>Correlation links</h3><ul>" + link_html + "</ul><h3>Lawful structured controls</h3><ul>" + controls_html +
-            "</ul><h3>Canonical event timeline</h3><ul>" + event_html + "</ul>"
+            "</ul><h3>Canonical lifecycle projection</h3><dl>" + projection_rows + "</dl>"
+            "<h4>Lifecycle stages</h4><dl>" + stage_rows + "</dl>"
+            "<h3>Canonical event timeline</h3><ul>" + event_html + "</ul>"
             "<p>Recovery is read-only replay inspection plus <code>progression.inspect</code>; arbitrary rerun is unavailable.</p>")
     return _panel("Grace Momentum Operations", body, "ready")
 
