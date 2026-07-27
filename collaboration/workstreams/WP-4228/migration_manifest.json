@@ -1,0 +1,8 @@
+{
+  "schema_version": "migration_manifest.v1",
+  "mode": "non_destructive_index",
+  "source": "canonical_identity_map.json",
+  "preserve_originals": true,
+  "reject_ambiguous": true,
+  "rollback": "remove generated index/store; staged artifacts remain unchanged"
+}

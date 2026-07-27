@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/comparison_report_v1.schema.json",
+  "title": "comparison_report_v1",
+  "type": "object",
+  "required": [
+    "comparison_schema_version",
+    "left_snapshot",
+    "right_snapshot",
+    "new_work",
+    "completed_work",
+    "removed_work",
+    "deterministic_content_hash"
+  ],
+  "properties": {
+    "comparison_schema_version": {
+      "const": "estate.engineering-campaign-snapshot-comparison/v1"
+    }
+  },
+  "additionalProperties": true
+}

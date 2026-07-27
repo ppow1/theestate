@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/confidence_metadata_v1.schema.json",
+  "title": "Confidence metadata v1",
+  "type": "object",
+  "required": [
+    "confidence_metadata_schema_version",
+    "policy_version",
+    "classification_thresholds"
+  ],
+  "properties": {
+    "confidence_metadata_schema_version": {
+      "const": "estate.engineering-confidence-metadata/v1"
+    },
+    "policy_version": {
+      "const": "wp4227-evidence-policy/v1"
+    },
+    "classification_thresholds": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

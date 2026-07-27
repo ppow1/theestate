@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering-campaign-recommendations/v1",
+  "type": "object",
+  "required": ["recommendation_schema_version", "policy_version", "advisory_only", "authority", "source_integration_hash", "recommendation_sets", "deterministic_content_hash"],
+  "properties": {
+    "recommendation_schema_version": {"const": "estate.engineering-campaign-recommendations/v1"},
+    "advisory_only": {"const": true},
+    "authority": {"const": "none"},
+    "recommendation_sets": {"type": "object", "additionalProperties": {"type": "array", "items": {"$ref": "#/$defs/recommendation"}}},
+    "deterministic_content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {"recommendation": {"type": "object", "required": ["recommendation_id", "category", "item_identifiers", "score", "score_components", "reason", "provenance"], "properties": {"recommendation_id": {"type": "string"}, "score": {"type": "integer"}, "provenance": {"type": "object"}}}}
+}

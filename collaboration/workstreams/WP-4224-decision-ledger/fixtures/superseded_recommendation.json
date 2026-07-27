@@ -1,0 +1,30 @@
+{
+  "deterministic_content_hash": "fc73c4b319321c497da160a08c315c7887b949c123d40a6063e86ce3df33a818",
+  "policy_version": "wp4223-deterministic-policy/v1",
+  "recommendation_schema_version": "estate.engineering-campaign-recommendations/v1",
+  "recommendation_sets": {
+    "superseded_work": [
+      {
+        "category": "superseded_work",
+        "provenance": {
+          "integration_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "queue_generation_identifier": "queue-001",
+          "snapshot_identifier": "snapshot-001",
+          "source_evidence_references": [
+            "evidence.json"
+          ]
+        },
+        "reason": "rec-superseded published explanation",
+        "recommendation_id": "rec-superseded",
+        "score": -50,
+        "score_components": [
+          {
+            "evidence": "published",
+            "rule": "fixture",
+            "value": -50
+          }
+        ]
+      }
+    ]
+  }
+}

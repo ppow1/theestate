@@ -1,0 +1,36 @@
+{
+  "dashboard_snapshot": {
+    "panels": {
+      "execution_queue": {
+        "records": []
+      }
+    },
+    "snapshot_identifier": "fixture",
+    "snapshot_schema_version": "estate.engineering-campaign-dashboard/v1",
+    "source_queue_generation_identifier": "fixture-gen"
+  },
+  "degradation_reasons": [],
+  "deterministic_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "health": "healthy",
+  "integration_schema_version": "estate.engineering-dashboard-integration/v1",
+  "provider_diagnostics": [
+    {
+      "provider_id": "wp4220_queue",
+      "status": "healthy"
+    },
+    {
+      "provider_id": "wp4221_projection",
+      "status": "healthy"
+    }
+  ],
+  "provider_payloads": {
+    "wp4214_duration": {
+      "records": [
+        {
+          "estimated_hours": 4,
+          "item_identifier": "WP-FAST"
+        }
+      ]
+    }
+  }
+}

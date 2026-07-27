@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/evidence_summary_v1.schema.json",
+  "title": "Evidence summary v1",
+  "type": "object",
+  "required": [
+    "evidence_summary_schema_version",
+    "checks_total",
+    "checks_covered",
+    "coverage_ratio",
+    "check_results"
+  ],
+  "properties": {
+    "evidence_summary_schema_version": {
+      "const": "estate.engineering-evidence-summary/v1"
+    },
+    "checks_total": {
+      "const": 8
+    },
+    "checks_covered": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8
+    },
+    "coverage_ratio": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "check_results": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    }
+  },
+  "additionalProperties": false
+}

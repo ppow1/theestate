@@ -1,0 +1,4 @@
+[
+  {"canonical_id":"engineering.backlog_reconciliation.v1","record_id":"work-WP-4228","source_class":"authoritative","priority":1,"state":"ready"},
+  {"canonical_id":"engineering.git_readiness.v1","record_id":"git-local","source_class":"derived","state":"clean"}
+]

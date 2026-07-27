@@ -1,0 +1,7 @@
+{
+  "schema_version": "implementation_scope.v1",
+  "production_module": "src/estate/core/engineering_campaign_operations.py",
+  "cli": "src/estate/cli/engineering_campaign_operations.py",
+  "real_provider_execution_authorized": false,
+  "fixture_proof_authorized": true
+}

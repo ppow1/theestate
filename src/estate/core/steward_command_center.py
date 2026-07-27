@@ -44,6 +44,7 @@ from estate.core.resident_interaction import resident_surface, process_chat, loa
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
 from estate.core.office_personnel_directory import build_office_personnel_directory
+from estate.core.engineering_campaign_dashboard import dashboard_operation, load_engineering_campaign_dashboard
 from estate.core.steward_awareness import generate_steward_awareness_runtime
 from urllib.parse import urlparse
 
@@ -51,6 +52,7 @@ from urllib.parse import urlparse
 OFFICE_NAVIGATION = [
     {"id": "home", "label": "Home", "panel": "home", "tab": "home"},
     {"id": "mission-control", "label": "Mission Control", "panel": "mission_control_workspace", "tab": "mission-control"},
+    {"id": "engineering-dashboard", "label": "Engineering Dashboard", "panel": "engineering_campaign_dashboard", "tab": "engineering-dashboard"},
     {"id": "alfred", "label": "Alfred", "panel": "alfred_resident_card", "tab": "alfred"},
     {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
@@ -75,6 +77,7 @@ OFFICE_NAVIGATION = [
 OFFICE_TABS = [
     {"id": "home", "label": "Home"},
     {"id": "mission-control", "label": "Mission Control"},
+    {"id": "engineering-dashboard", "label": "Engineering Dashboard"},
     {"id": "alfred", "label": "Alfred"},
     {"id": "helen", "label": "Helen"},
     {"id": "resident-conversations", "label": "Resident Conversations"},
@@ -1048,6 +1051,8 @@ def generate_command_center(root=None, write=True):
         **resident_panels,
         "capability_dependency_visualization": {"available": True, "path": "runtime/capabilities/capability_dependency_visualization.json", "kind": "capability_dependency_visualization", "data": generate_capability_dependency_visualization(root, write=write)},
         "mission_control_workspace": build_mission_control_workspace(root, write=write),
+        "mission_control_workspace": build_mission_control_workspace(root),
+        "engineering_campaign_dashboard": {"available": True, "path": "WP-4222 provider composition", "kind": "engineering_campaign_dashboard", "data": load_engineering_campaign_dashboard(root, write=write)},
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
         "operations_control_surface": _operations_control_surface_panel(root),
@@ -2617,11 +2622,40 @@ def _steward_awareness_html(panel):
     """
     return _panel("Steward Awareness Runtime", body, "ready")
 
+def _engineering_campaign_dashboard_html(artifact):
+    data = artifact.get("data") or {}
+    snapshot = data.get("dashboard_snapshot") or {}
+    provenance = data.get("provenance") or {}
+    panels = snapshot.get("panels") or {}
+    if not data.get("available"):
+        return _panel("Engineering Campaign Dashboard", "<p class='placeholder'>" + html.escape(data.get("state", "unavailable")) +
+                      ": " + html.escape("; ".join(data.get("diagnostics") or ["no valid snapshot"])) + "</p>", "placeholder")
+    panel_rows = "".join(
+        "<details><summary>" + html.escape(name.replace("_", " ").title()) + " — " +
+        html.escape(str(panel.get("state", "unavailable"))) + "</summary><pre>" +
+        html.escape(json.dumps(panel, indent=2, sort_keys=True)) + "</pre></details>"
+        for name, panel in ((name, panels.get(name) or {}) for name in snapshot.get("panel_index", []))
+    )
+    diagnostics = (data.get("integration") or {}).get("provider_diagnostics") or []
+    return (
+        "<section class='engineering-campaign-dashboard'><p><strong>Read-only advisory view.</strong> "
+        "No assignment, dispatch, merge, approval, or lifecycle controls are provided.</p>"
+        f"<p><strong>State:</strong> {html.escape(str(data.get('state')))}; <strong>freshness:</strong> {html.escape(str(data.get('freshness_status')))}; "
+        f"<strong>current:</strong> {html.escape(str(data.get('current')))}; <strong>last-known-valid:</strong> {html.escape(str(data.get('last_known_valid')))}</p>"
+        "<button type='button' onclick=\"fetch('/api/engineering-dashboard/refresh',{headers:{'X-Estate-Operator-Role':'estate_operator'}}).then(()=>location.reload())\">Manual refresh</button>"
+        f"<h3>Provenance</h3><pre>{html.escape(json.dumps(provenance, indent=2, sort_keys=True))}</pre>"
+        f"<h3>Executive Summary</h3><pre>{html.escape(json.dumps(snapshot.get('executive_summary'), indent=2, sort_keys=True))}</pre>"
+        f"<h3>Provider compatibility and degradation</h3><pre>{html.escape(json.dumps(diagnostics, indent=2, sort_keys=True))}</pre>"
+        f"<h3>Dashboard panels</h3>{panel_rows}</section>"
+    )
+
+
 def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
         ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {})) + _steward_awareness_html(p.get("steward_awareness_runtime", {}))),
+        ("engineering-dashboard", "Engineering Campaign Dashboard", _engineering_campaign_dashboard_html(p.get("engineering_campaign_dashboard", {}))),
         ("alfred", "Alfred Office", "<h3>Alfred Resident Card</h3>" + _alfred_chat_html(p.get("alfred_chat", {})) + _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _office_action_controls_html(payload, "resident-task-board") + _resident_task_board_html(p.get("resident_task_board", {})) + _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
@@ -2974,6 +3008,14 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 payload = generate_command_center(root=root, write=False)
                 body = json.dumps({"payload_version": payload.get("payload_version"), "generated_at": payload.get("generated_at"), "stale": False, "tabs": payload.get("tabs"), "navigation": payload.get("navigation")}, indent=2, sort_keys=True).encode("utf-8")
                 self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
+            if parsed.path.startswith("/api/engineering-dashboard/"):
+                operation = parsed.path.rsplit("/", 1)[-1]
+                role = self.headers.get("X-Estate-Operator-Role", "")
+                panel_id = dict(item.split("=", 1) for item in parsed.query.split("&") if "=" in item).get("panel")
+                payload = dashboard_operation(root, operation, role=role, panel_id=panel_id)
+                body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
+                status = 403 if payload.get("state") == "unauthorized" else (200 if payload.get("ok", payload.get("available", False)) else 503)
+                self.send_response(status); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Cache-Control", "no-store"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
             if self.path == "/status.json":
                 if os.environ.get("ESTATE_BOOTSTRAP_STATUS_FAST") == "1":
                     body = json.dumps({"generated_at": _now(), "status": "running", "local_only": True}).encode("utf-8")

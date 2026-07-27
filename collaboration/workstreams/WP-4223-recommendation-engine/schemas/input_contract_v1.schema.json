@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering-recommendation-input/v1",
+  "description": "Existing WP-4222 integration envelope consumed without mutation",
+  "type": "object",
+  "required": ["integration_schema_version", "dashboard_snapshot"],
+  "properties": {"integration_schema_version": {"const": "estate.engineering-dashboard-integration/v1"}, "dashboard_snapshot": {"type": "object", "required": ["snapshot_schema_version", "panels"]}}
+}

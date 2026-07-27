@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"estate://wp-4219/dashboard-snapshot/v1",
+  "title":"Immutable engineering campaign dashboard snapshot",
+  "type":"object",
+  "required":["snapshot_schema_version","snapshot_identifier","source_queue_generation_identifier","source_revision","generation_time","freshness_status","degradation_status","provider_availability","executive_summary","panel_index","panels","campaign_health","queue_health","reconciliation_health","validation_health","source_provenance","diagnostics","deterministic_content_hash","advisory_only"],
+  "properties":{
+    "snapshot_schema_version":{"const":"estate.engineering-campaign-dashboard/v1"},
+    "snapshot_identifier":{"type":"string","pattern":"^[a-f0-9]{20}$"},
+    "freshness_status":{"enum":["fresh","aging","stale","unavailable","source_mismatch"]},
+    "degradation_status":{"enum":["none","degraded","stale","invalid","unavailable","partial","source_mismatch","unsupported_version"]},
+    "panel_index":{"type":"array","minItems":15,"maxItems":15,"uniqueItems":true},
+    "panels":{"type":"object","minProperties":15},
+    "deterministic_content_hash":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "advisory_only":{"const":true}
+  },
+  "additionalProperties":true
+}

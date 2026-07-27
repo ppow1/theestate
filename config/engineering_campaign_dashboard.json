@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "provider_manifest": "collaboration/workstreams/WP-4222/fixtures/providers.json",
+  "refresh_policy": "manual",
+  "freshness_threshold_seconds": 86400,
+  "last_known_valid": true,
+  "diagnostic_verbosity": "safe",
+  "access_roles": ["estate_operator", "steward"]
+}

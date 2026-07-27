@@ -1,0 +1,214 @@
+{
+  "history": [
+    {
+      "observed_at": "2026-07-01T00:00:00Z",
+      "sources": {
+        "dashboard": {
+          "dashboard_snapshot": {
+            "panels": {
+              "completed_work": {
+                "records": []
+              },
+              "execution_queue": {
+                "records": [
+                  {
+                    "blockers": [
+                      "blocked"
+                    ],
+                    "current_lifecycle_state": "pending",
+                    "dependencies": [
+                      "WP-X"
+                    ],
+                    "diagnostics": [
+                      "stale",
+                      "technical_debt"
+                    ],
+                    "engineering_lane": {
+                      "primary": "Core"
+                    },
+                    "merge_risk_classification": "high"
+                  }
+                ]
+              },
+              "merge_risk": {
+                "records": [
+                  {
+                    "blockers": [
+                      "blocked"
+                    ],
+                    "current_lifecycle_state": "pending",
+                    "dependencies": [
+                      "WP-X"
+                    ],
+                    "diagnostics": [
+                      "stale",
+                      "technical_debt"
+                    ],
+                    "engineering_lane": {
+                      "primary": "Core"
+                    },
+                    "merge_risk_classification": "high"
+                  }
+                ]
+              },
+              "validation_status": {
+                "records": []
+              }
+            }
+          },
+          "deterministic_content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "decision_ledger": {
+          "decisions": [
+            {
+              "linked_recommendation": "r1",
+              "review_timestamp": "2026-07-01T00:00:00Z",
+              "state": "deferred"
+            }
+          ],
+          "deterministic_content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "ledger_schema_version": "estate.engineering-recommendation-ledger/v1",
+          "recommendations": [
+            {
+              "generation_timestamp": "2026-07-01T00:00:00Z",
+              "recommendation_identifier": "r1"
+            }
+          ]
+        },
+        "integration": {
+          "deterministic_content_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "queue": {
+          "candidates": [
+            {
+              "blockers": [
+                "blocked"
+              ],
+              "current_lifecycle_state": "pending",
+              "dependencies": [
+                "WP-X"
+              ],
+              "diagnostics": [
+                "stale",
+                "technical_debt"
+              ],
+              "engineering_lane": {
+                "primary": "Core"
+              },
+              "merge_risk_classification": "high"
+            }
+          ],
+          "deterministic_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "recommendations": {
+          "deterministic_content_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      }
+    },
+    {
+      "observed_at": "2026-07-02T00:00:00Z",
+      "sources": {
+        "dashboard": {
+          "dashboard_snapshot": {
+            "panels": {
+              "completed_work": {
+                "records": []
+              },
+              "execution_queue": {
+                "records": [
+                  {
+                    "blockers": [
+                      "blocked"
+                    ],
+                    "current_lifecycle_state": "pending",
+                    "dependencies": [
+                      "WP-X"
+                    ],
+                    "diagnostics": [
+                      "stale",
+                      "technical_debt"
+                    ],
+                    "engineering_lane": {
+                      "primary": "Core"
+                    },
+                    "merge_risk_classification": "high"
+                  }
+                ]
+              },
+              "merge_risk": {
+                "records": [
+                  {
+                    "blockers": [
+                      "blocked"
+                    ],
+                    "current_lifecycle_state": "pending",
+                    "dependencies": [
+                      "WP-X"
+                    ],
+                    "diagnostics": [
+                      "stale",
+                      "technical_debt"
+                    ],
+                    "engineering_lane": {
+                      "primary": "Core"
+                    },
+                    "merge_risk_classification": "high"
+                  }
+                ]
+              },
+              "validation_status": {
+                "records": []
+              }
+            }
+          },
+          "deterministic_content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "decision_ledger": {
+          "decisions": [
+            {
+              "linked_recommendation": "r1",
+              "review_timestamp": "2026-07-02T00:00:00Z",
+              "state": "deferred"
+            }
+          ],
+          "deterministic_content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "ledger_schema_version": "estate.engineering-recommendation-ledger/v1",
+          "recommendations": [
+            {
+              "generation_timestamp": "2026-07-01T00:00:00Z",
+              "recommendation_identifier": "r1"
+            }
+          ]
+        },
+        "integration": {
+          "deterministic_content_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "queue": {
+          "candidates": [
+            {
+              "blockers": [
+                "blocked"
+              ],
+              "current_lifecycle_state": "pending",
+              "dependencies": [
+                "WP-X"
+              ],
+              "diagnostics": [
+                "stale",
+                "technical_debt"
+              ],
+              "engineering_lane": {
+                "primary": "Core"
+              },
+              "merge_risk_classification": "high"
+            }
+          ],
+          "deterministic_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "recommendations": {
+          "deterministic_content_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        }
+      }
+    }
+  ]
+}

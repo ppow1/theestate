@@ -1,0 +1,3 @@
+# Current State Reconciliation
+
+WP-4214–4217 are primarily authored contracts. WP-4218/4219/4222 have staged Python implementations. The two WP-4223 identities are an Office adapter and recommendation engine. WP-4224–4227 provide staged ledger, analytics, replay, confidence, and closure evidence. Existing production modules include campaign dashboard/replay/confidence and Estate Grace, Helen, Engineering lifecycle, Dispatch, worker assignment, Git, provider health, Office settings, and activity-stream authorities. WP-4228 composes rather than replaces them. Exact machine-readable dispositions are in `capability_inventory.json`.

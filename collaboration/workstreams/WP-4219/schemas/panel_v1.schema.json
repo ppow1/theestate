@@ -1,0 +1,17 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"estate://wp-4219/panel/v1",
+  "title":"Common versioned dashboard panel read model",
+  "type":"object",
+  "required":["panel_schema_version","panel_id","state","freshness","degradation","degradation_reason","source_record_ids","provenance","records"],
+  "properties":{
+    "panel_schema_version":{"const":"estate.engineering-campaign-panel/v1"},
+    "state":{"enum":["populated","empty","unavailable"]},
+    "freshness":{"enum":["fresh","aging","stale","unavailable","source_mismatch"]},
+    "degradation":{"enum":["none","partial","unavailable","invalid","source_mismatch","unsupported_version"]},
+    "source_record_ids":{"type":"array","items":{"type":"string"}},
+    "provenance":{"type":"object","required":["provider","renderer_rule"]},
+    "records":{"type":"array"}
+  },
+  "additionalProperties":true
+}
