@@ -66,6 +66,8 @@ def resident_model_catalog(root=None) -> dict[str, Any]:
         data.append({
             "id": model_id, "object": "model", "created": 0, "owned_by": "estate",
             "name": package["display_name"],
+            "info": {"meta": {"toolIds": ["grace_runtime_bridge"] if rid == "grace" else [],
+                                "filterIds": ["grace_runtime_grounding"] if rid == "grace" else []}},
             "estate": {
                 **package,
                 "display_name": package["display_name"],

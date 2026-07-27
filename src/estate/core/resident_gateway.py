@@ -1,6 +1,7 @@
 """Local OpenAI-compatible gateway for Estate residents."""
 from __future__ import annotations
 import base64, hashlib, json, os, time
+import re
 from urllib.parse import unquote_to_bytes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -10,7 +11,9 @@ from estate.core.multi_resident_room import create_room, invite_participant, acc
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
-from estate.core.openwebui_engineering_workflow import initiate_engineering_assignment_from_chat
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat
+from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
+from estate.core.grace_runtime_bridge import GraceRuntimeBridge
 from estate.core.conference_room_lifecycle import (
     depart as conference_depart, invite as conference_invite,
     load_or_create_session, names_from_text, recognize_intent, save_session,
@@ -78,6 +81,44 @@ def _latest_user_message(messages: Any) -> str:
             if text:
                 return text
     return ""
+
+
+def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> dict[str, Any] | None:
+    """Ground Grace operational questions through the registered read boundary.
+
+    This is a read-only compatibility handoff for resident backends that do not
+    emit native OpenAI tool calls. Conversation-only turns remain on the normal
+    resident path.
+    """
+    if payload.get("model") != "estate/grace":
+        return None
+    text = _latest_user_message(payload.get("messages") or [])
+    # Preserve the existing explicit governed mutation path.  Runtime reads
+    # must never intercept an assignment command merely because it mentions
+    # operational terms such as "dispatch" or "objective".
+    if detect_engineering_assignment_command(payload, text):
+        return None
+    if not re.search(r"\b(objective|readiness|availability|replay|checkpoint|dispatch|provider|reconciliation|validation|receipt|completion|blocker|operational state|runtime operations)\b", text, re.I):
+        return None
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    claims = {"iss": "estate-control", "sub": str(metadata.get("user_id") or "openwebui-grace"), "office": "Grace", "authority_source": "openwebui/grace-runtime-bridge", "active": True}
+    endpoint = os.environ.get("ESTATE_GRACE_MOMENTUM_URL", "http://127.0.0.1:8766")
+    try:
+        bridge = GraceRuntimeBridge(LoopbackGraceMomentumClient(endpoint, claims, timeout_seconds=2.0))
+        lower = text.lower()
+        if "operation" in lower and "list" in lower:
+            result = bridge.list_grace_runtime_operations()
+        elif "readiness" in lower:
+            result = bridge.get_runtime_readiness()
+        elif "replay" in lower or "checkpoint" in lower or "cursor" in lower:
+            result = bridge.get_replay_cursor()
+        elif "objective" in lower:
+            result = bridge.get_current_objective()
+        else:
+            result = {"schema_version": "estate.grace-runtime-bridge.v1", "status": "AUTHORITATIVE_RESULT", "source_system": "grace-momentum-runtime", "source_operation": "get_runtime_availability", "payload": {"availability": bridge.get_runtime_availability(), "current_objective": bridge.get_current_objective()}}
+        return result
+    except Exception as exc:
+        return {"schema_version": "estate.grace-runtime-bridge.v1", "status": "RUNTIME_UNAVAILABLE", "error": {"code": "runtime_unavailable", "message": str(exc)}}
 
 
 def _data_url_attachment(url: str, *, filename: str | None = None) -> dict[str, Any] | None:
@@ -263,6 +304,12 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
     user_message = _latest_user_message(payload.get("messages") or [])
     if not user_message:
         return 400, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
+    runtime_result = _grace_runtime_operation_response(payload, root=root)
+    if runtime_result is not None:
+        return 200, {"id": f"chatcmpl-grace-runtime-{int(time.time()*1000)}", "object": "chat.completion", "created": int(time.time()), "model": model,
+                      "choices": [{"index": 0, "message": {"role": "assistant", "content": json.dumps(runtime_result, sort_keys=True)}, "finish_reason": "stop"}],
+                      "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+                      "estate": {"resident_id": "grace", "authoritative_runtime": True, "runtime_source": "grace-momentum-runtime", "runtime_status": runtime_result.get("status")}}
     session_id, _session_field = _session_id_from_payload(payload)
     workflow_body = _engineering_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
     if workflow_body is not None:
@@ -286,6 +333,11 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
     user_message = _latest_user_message(payload.get("messages") or [])
     if not user_message:
         return 400, {"error":{"message":"A non-empty user message is required.","type":"invalid_request_error","code":"missing_user_message"}}
+    runtime_result = _grace_runtime_operation_response(payload, root=root)
+    if runtime_result is not None:
+        return 200, {"id": f"chatcmpl-grace-runtime-{int(time.time()*1000)}", "object": "chat.completion.chunk", "created": int(time.time()), "model": payload.get("model"),
+                      "choices": [{"index": 0, "delta": {"role": "assistant", "content": json.dumps(runtime_result, sort_keys=True)}, "finish_reason": "stop"}],
+                      "estate": {"resident_id": "grace", "authoritative_runtime": True, "runtime_source": "grace-momentum-runtime", "runtime_status": runtime_result.get("status")}}
     session_id, _session_field = _session_id_from_payload(payload)
     workflow_body = _engineering_assignment_chat_completion(
         payload, user_message=user_message, session_id=session_id, root=root, stream=True

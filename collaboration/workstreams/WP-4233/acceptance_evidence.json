@@ -1,0 +1,37 @@
+{
+  "schema_version": "estate.wp4233.acceptance.v1",
+  "authoritative_base": "50afd5c1a8fdc6fae6272457df38dac7abc1acd5",
+  "extension_mechanism": "Open WebUI 0.10.2 persisted Tool plus model-scoped Filter",
+  "tool_id": "grace_runtime_bridge",
+  "filter_id": "grace_runtime_grounding",
+  "registered_operation_count": 17,
+  "grace_model": "estate/grace",
+  "associated_model_metadata": {"toolIds": ["grace_runtime_bridge"], "filterIds": ["grace_runtime_grounding"]},
+  "other_resident_models_associated": false,
+  "runtime_endpoint": "http://127.0.0.1:8766",
+  "live_runtime": {
+    "health": {"healthy": true, "mode": "shadow"},
+    "readiness": {"ready": true, "provider_effects_enabled": false, "mode": "shadow"},
+    "current_objective": {"status": "NO_RECORD", "reason": "no_explicitly_active_objective"},
+    "replay_cursor": {"cursor": 0, "next_cursor": 0, "events": []}
+  },
+  "live_openwebui": {
+    "model": "estate/grace",
+    "operation_discovery": "AUTHORITATIVE_RESULT",
+    "readiness": "AUTHORITATIVE_RESULT",
+    "current_objective": "NO_RECORD",
+    "replay_cursor": 0,
+    "runtime_unavailable": "RUNTIME_UNAVAILABLE",
+    "restart_persistence": true
+  },
+  "cross_surface": {
+    "comparison_basis": "same loopback client and empty canonical runtime projection",
+    "objective": "NO_RECORD",
+    "replay_cursor": 0,
+    "blocker": "NO_RECORD",
+    "responsible_office": "NO_RECORD",
+    "next_lawful_action": "NO_RECORD"
+  },
+  "provider_execution_authority_added": false,
+  "live_browser_transcript": "not claimed; direct authenticated local acceptance evidence is recorded in browser_acceptance_report.md"
+}
