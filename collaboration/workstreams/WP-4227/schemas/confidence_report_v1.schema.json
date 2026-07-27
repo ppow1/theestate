@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theestate.local/schemas/confidence_report_v1.schema.json",
+  "title": "Confidence report v1",
+  "type": "object",
+  "required": [
+    "confidence_report_schema_version",
+    "advisory_only",
+    "authority",
+    "read_only",
+    "assessments",
+    "deterministic_content_hash"
+  ],
+  "properties": {
+    "confidence_report_schema_version": {
+      "const": "estate.engineering-recommendation-confidence/v1"
+    },
+    "advisory_only": {
+      "const": true
+    },
+    "authority": {
+      "const": "none"
+    },
+    "read_only": {
+      "const": true
+    },
+    "assessed_at": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "confidence_metadata_v1.schema.json"
+    },
+    "assessments": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "deterministic_content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}
