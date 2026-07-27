@@ -1,0 +1,324 @@
+{
+  "schema_version": "production_capability_inventory.v1",
+  "records": [
+    {
+      "capability_id": "engineering.duration_estimation.v1",
+      "work_package_references": [
+        "WP-4214"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "authored_only",
+      "target_status": "authored_only",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.parallel_planning.v1",
+      "work_package_references": [
+        "WP-4215"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "authored_only",
+      "target_status": "authored_only",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.office_live_updates.v1",
+      "work_package_references": [
+        "WP-4216"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "authored_only",
+      "target_status": "authored_only",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.git_readiness.v1",
+      "work_package_references": [
+        "WP-4217"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "production_read_only",
+      "target_status": "production_read_only",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.backlog_reconciliation.v1",
+      "work_package_references": [
+        "WP-4218",
+        "WP-4220"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "partially_integrated",
+      "target_status": "partially_integrated",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.dashboard_projection.v1",
+      "work_package_references": [
+        "WP-4219",
+        "WP-4221",
+        "WP-4222"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [
+        "Engineering Dashboard"
+      ],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "partially_integrated",
+      "target_status": "partially_integrated",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.dashboard.office_adapter.v1",
+      "work_package_references": [
+        "WP-4223"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [
+        "Engineering Dashboard"
+      ],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "production_read_only",
+      "target_status": "production_read_only",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.recommendation_engine.v1",
+      "work_package_references": [
+        "WP-4223"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "production_advisory",
+      "target_status": "production_advisory",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.recommendation_decision_ledger.v1",
+      "work_package_references": [
+        "WP-4224"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [
+        "record_chain.jsonl"
+      ],
+      "runtime_dependencies": [],
+      "authority_level": "governed_action",
+      "current_status": "production_action_capable",
+      "target_status": "complete",
+      "identified_gaps": [],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.recommendation_analytics.v1",
+      "work_package_references": [
+        "WP-4225"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "production_advisory",
+      "target_status": "production_advisory",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.campaign_replay.v1",
+      "work_package_references": [
+        "WP-4226"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "production_read_only",
+      "target_status": "production_read_only",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.recommendation_confidence.v1",
+      "work_package_references": [
+        "WP-4227"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "production_advisory",
+      "target_status": "production_advisory",
+      "identified_gaps": [
+        "Retained at truthful existing boundary; not falsely promoted"
+      ],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.campaign_closure.v1",
+      "work_package_references": [
+        "WP-4227"
+      ],
+      "implementation_files": [],
+      "production_files": [],
+      "schemas": [],
+      "cli_commands": [],
+      "ui_surfaces": [],
+      "stores": [],
+      "runtime_dependencies": [],
+      "authority_level": "advisory",
+      "current_status": "complete",
+      "target_status": "complete",
+      "identified_gaps": [],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    },
+    {
+      "capability_id": "engineering.campaign_operations.v1",
+      "work_package_references": [
+        "WP-4228"
+      ],
+      "implementation_files": [],
+      "production_files": [
+        "src/estate/core/engineering_campaign_operations.py"
+      ],
+      "schemas": [],
+      "cli_commands": [
+        "python -m estate.cli.engineering_campaign_operations"
+      ],
+      "ui_surfaces": [],
+      "stores": [
+        "record_chain.jsonl"
+      ],
+      "runtime_dependencies": [],
+      "authority_level": "governed_action",
+      "current_status": "production_action_capable",
+      "target_status": "complete",
+      "identified_gaps": [],
+      "migration_plan": "Index by canonical ID; preserve original path and hash",
+      "test_evidence": [
+        "collaboration/workstreams/WP-4228/tests/test_operations.py"
+      ],
+      "rollback_plan": "Remove canonical index and retain historical artifact"
+    }
+  ]
+}
