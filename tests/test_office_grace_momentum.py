@@ -1,4 +1,6 @@
+import copy
 import threading
+import pytest
 
 from estate.core.grace_momentum_service import (
     FakeGraceMomentumService, GraceMomentumClient, TEST_IDENTITIES,
@@ -71,3 +73,77 @@ def test_unavailable_loopback_fails_closed_and_no_inprocess_default(tmp_path):
     assert unavailable["provider_effects_enabled"] is False
     assert all(control["availability"] == "unavailable" for control in unavailable["controls"])
     assert "FakeGraceMomentumService" not in build_grace_momentum_surface.__code__.co_consts
+
+
+class _ProviderStub:
+    def __init__(self, availability, projection):
+        self._availability = availability
+        self._projection = projection
+        self.sent = 0
+
+    def availability(self): return self._availability
+    def lifecycle_projection(self, objective_id): return self._projection
+    def replay(self, cursor=0, *, limit=100): return {"events": [], "next_cursor": cursor}
+    def subscribe(self, cursor=0, *, limit=100): return {"events": [], "next_cursor": cursor}
+    def send(self, command): self.sent += 1; return {"disposition": "accepted"}
+
+
+def _valid_provider_payload(tmp_path):
+    service = FakeGraceMomentumService(tmp_path)
+    return service.availability(), service.lifecycle_projection("o")
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda value: value.pop("health"),
+    lambda value: value.pop("readiness"),
+    lambda value: value["health"].pop("healthy"),
+    lambda value: value["readiness"].pop("ready"),
+    lambda value: value["health"].update(healthy="true"),
+    lambda value: value["readiness"].update(ready=1),
+    lambda value: value["health"].update(healthy=None),
+    lambda value: value["readiness"].update(ready=None),
+    lambda value: value.clear() or value.update(available=True),
+    lambda value: value["readiness"].update(ready=False),
+])
+def test_malformed_availability_fails_closed(tmp_path, mutate):
+    availability, projection = _valid_provider_payload(tmp_path)
+    malformed = copy.deepcopy(availability)
+    mutate(malformed)
+    client = _ProviderStub(malformed, projection)
+    snapshot = GraceMomentumEstateUI(client).snapshot(objective_id="o")
+    assert snapshot["available"] is False
+    assert all(control["availability"] != "provider_authorized" for control in snapshot["controls"])
+    assert GraceMomentumEstateUI(client).command("momentum.authorize", objective_id="o")["disposition"] == "blocked"
+    assert client.sent == 0
+
+
+def test_exact_boolean_availability_allows_projection(tmp_path):
+    availability, projection = _valid_provider_payload(tmp_path)
+    client = _ProviderStub(availability, projection)
+    snapshot = GraceMomentumEstateUI(client).snapshot(objective_id="o")
+    assert snapshot["available"] is True
+    assert all(control["availability"] == "provider_authorized" for control in snapshot["controls"])
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda value: value.pop("objective_id"),
+    lambda value: value.pop("timeline"),
+    lambda value: value.update(replay_cursor="0"),
+    lambda value: value["stages"].update(execution_authorization="authorized"),
+    lambda value: value.update(current_responsible_office=1),
+    lambda value: value.update(current_blocker="blocked"),
+    lambda value: value.update(next_lawful_action=1),
+    lambda value: value.clear(),
+])
+def test_malformed_projection_fails_closed_and_cannot_mutate(tmp_path, mutate):
+    availability, projection = _valid_provider_payload(tmp_path)
+    malformed = copy.deepcopy(projection)
+    mutate(malformed)
+    client = _ProviderStub(availability, malformed)
+    surface = GraceMomentumEstateUI(client)
+    snapshot = surface.snapshot(objective_id="o")
+    assert snapshot["available"] is False
+    assert all(control["availability"] == "unavailable" for control in snapshot["controls"])
+    assert snapshot["projection"]["objective"] is None
+    assert surface.command("momentum.authorize", objective_id="o")["disposition"] == "blocked"
+    assert client.sent == 0
