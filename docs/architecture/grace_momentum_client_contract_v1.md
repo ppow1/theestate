@@ -45,6 +45,21 @@ requires issuer (`iss`), actor (`sub`), office (`office`), authority source,
 and an active session. Deployment validates the issuer through
 `ProductionControlConfig`; missing/invalid claims fail closed.
 
+`GraceMomentumClient` is explicitly an in-process client retained for the fake
+and embedded-runtime compatibility path. Production consumers use
+`LoopbackGraceMomentumClient(base_url, claims, timeout_seconds=2.0)` and may
+only target `127.0.0.1` or `localhost`. It sends commands, replay cursors,
+availability, and lifecycle reads through the HTTP binding. Refused connection,
+timeout, non-2xx response, malformed JSON, or a non-object response raises a
+fail-closed `TransportError` or `MalformedResponseError`; callers must not
+substitute cached lifecycle truth for a failed request.
+
+The documented availability interpretation is `operationally_available`: true
+only when `health.healthy` and `readiness.ready` are true,
+`readiness.provider_effects_enabled` is false, and mode is not `disabled`.
+Missing/malformed fields mean false. This is an interpretation field produced by
+the HTTP client, not a server-side authority or a new lifecycle state.
+
 `client.lifecycle_projection(objective_id)` returns the full ordered timeline,
 directive state, responsible office, blocker, next lawful action, replay cursor,
 and fact-only stage records for Helen capability, Engineering commission, CME

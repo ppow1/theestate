@@ -9,11 +9,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import socket
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 from estate.core.execution_provider_adapter import utc_now
@@ -47,6 +51,8 @@ EVENT_FOR_ACTION = {
 class ControlError(ValueError): pass
 class AuthenticationError(ControlError): pass
 class AuthorizationError(ControlError): pass
+class TransportError(ControlError): pass
+class MalformedResponseError(TransportError): pass
 
 
 @dataclass(frozen=True)
@@ -217,7 +223,12 @@ class FakeGraceMomentumService(GraceMomentumService):
 
 
 class GraceMomentumClient:
-    """Reference client used by both UI lanes; clients contain no lifecycle policy."""
+    """In-process client for the fake and embedded-runtime tests only.
+
+    Production consumers must use :class:`LoopbackGraceMomentumClient`; this
+    class intentionally requires a direct service object and never discovers a
+    network endpoint.  Keeping it preserves the v1 fake-service API.
+    """
     def __init__(self, service: GraceMomentumService, identity: OfficeIdentity) -> None: self.service, self.identity = service, identity
     def send(self, command: dict[str, Any]) -> dict[str, Any]:
         try: return self.service.command(command, self.identity)
@@ -232,6 +243,54 @@ class GraceMomentumClient:
     def lifecycle_projection(self, objective_id: str) -> dict[str, Any]: return self.service.lifecycle_projection(objective_id)
 
 
+def interpret_availability(payload: dict[str, Any]) -> bool:
+    """The normative client availability rule; no undocumented response flag."""
+    try:
+        return (payload["health"]["healthy"] is True and payload["readiness"]["ready"] is True
+                and payload["readiness"]["provider_effects_enabled"] is False
+                and payload["readiness"]["mode"] != "disabled")
+    except (KeyError, TypeError):
+        return False
+
+
+class LoopbackGraceMomentumClient:
+    """Supported production HTTP client for the loopback-only control service.
+
+    It owns only serialisation, claims propagation, response validation and
+    fail-closed transport handling; authority and lifecycle rules remain server
+    responsibilities.
+    """
+    def __init__(self, base_url: str, claims: dict[str, Any], *, timeout_seconds: float = 2.0) -> None:
+        if not base_url.startswith("http://127.0.0.1") and not base_url.startswith("http://localhost"):
+            raise ValueError("production control endpoint must be loopback")
+        self.base_url, self.claims, self.timeout_seconds = base_url.rstrip("/"), dict(claims), timeout_seconds
+    def _request(self, method: str, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        data = json.dumps(body).encode("utf-8") if body is not None else None
+        request = Request(self.base_url + path, data=data, method=method, headers={"Accept":"application/json", "Content-Type":"application/json", "X-Estate-Claims":json.dumps(self.claims)})
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                raw = response.read()
+                if response.status < 200 or response.status >= 300: raise TransportError(f"unexpected HTTP status {response.status}")
+        except HTTPError as exc:
+            raise TransportError(f"control service returned HTTP {exc.code}") from exc
+        except (URLError, socket.timeout, TimeoutError) as exc:
+            raise TransportError("control service unavailable") from exc
+        try: value = json.loads(raw)
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc: raise MalformedResponseError("control service returned malformed JSON") from exc
+        if not isinstance(value, dict): raise MalformedResponseError("control service response must be an object")
+        return value
+    def send(self, command: dict[str, Any]) -> dict[str, Any]: return self._request("POST", "/v1/commands", command)
+    def replay(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]: return self._request("GET", f"/v1/events?cursor={cursor}&limit={limit}")
+    def subscribe(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]: return self.replay(cursor, limit=limit)
+    def health(self) -> dict[str, Any]: return self._request("GET", "/v1/health")
+    def readiness(self) -> dict[str, Any]: return self._request("GET", "/v1/readiness")
+    def availability(self) -> dict[str, Any]:
+        payload = {"schema_version": SCHEMA_VERSION, "health": self.health(), "readiness": self.readiness(), "event_consumption": {"api":"bounded_polling_replay", "cursor_semantics":"exclusive"}}
+        # This is deliberately a client interpretation, not a new wire field.
+        return {**payload, "operationally_available": interpret_availability(payload)}
+    def lifecycle_projection(self, objective_id: str) -> dict[str, Any]: return self._request("GET", f"/v1/lifecycle/{objective_id}")
+
+
 def make_http_handler(service: GraceMomentumService, *, authentication_issuer: str = "estate-control"):
     """Production transport binding: JSON HTTP, intentionally dependency-free."""
     class GraceMomentumHTTPHandler(BaseHTTPRequestHandler):
@@ -244,7 +303,7 @@ def make_http_handler(service: GraceMomentumService, *, authentication_issuer: s
             if self.path == "/v1/health": return self._json(200, service.health())
             if self.path == "/v1/readiness": return self._json(200, service.readiness())
             if self.path.startswith("/v1/events"):
-                cursor = int(self.path.split("cursor=")[-1]) if "cursor=" in self.path else 0; return self._json(200, service.replay(cursor))
+                params = parse_qs(urlparse(self.path).query); cursor = int(params.get("cursor", ["0"])[0]); limit = int(params.get("limit", ["100"])[0]); return self._json(200, service.replay(cursor, limit=limit))
             if self.path.startswith("/v1/lifecycle/"):
                 return self._json(200, service.lifecycle_projection(self.path.rsplit("/", 1)[-1]))
             return self._json(404, {"error": {"code": "not_found"}})

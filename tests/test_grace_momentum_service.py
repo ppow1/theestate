@@ -1,4 +1,6 @@
+import threading
 import pytest
+import estate.core.grace_momentum_service as control
 from estate.core.grace_momentum_service import *
 
 def test_contract_fake_auth_idempotency_and_replay(tmp_path):
@@ -40,6 +42,49 @@ def test_claim_mapping_and_config_fail_closed(tmp_path):
     assert service.configure(ProductionControlConfig(authentication_issuer="issuer", execution_mode="shadow"))["provider_effects_enabled"] is False
     assert identity_from_claims({"iss":"issuer", "sub":"a", "office":"Grace", "authority_source":"a", "active":True}, issuer="issuer").actor_id == "a"
     with pytest.raises(AuthenticationError): identity_from_claims({"iss":"wrong"}, issuer="issuer")
+
+def _loopback(service):
+    server = production_http_server(service, port=0, authentication_issuer="issuer")
+    thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+    return server, f"http://127.0.0.1:{server.server_port}"
+
+def test_loopback_client_submission_replay_availability_and_projection(tmp_path):
+    service = FakeGraceMomentumService(tmp_path); server, url = _loopback(service)
+    try:
+        claims = {"iss":"issuer", "sub":"grace", "office":"Grace", "authority_source":"test/grace", "active":True}
+        client = LoopbackGraceMomentumClient(url, claims)
+        assert client.send(reference_command("objective.create_or_correlate", idempotency_key="http-one"))["record"]["objective_id"] == "objective-demo"
+        assert client.replay(0, limit=1)["next_cursor"] == 1
+        assert client.availability()["operationally_available"] is True
+        assert client.lifecycle_projection("objective-demo")["objective_id"] == "objective-demo"
+    finally: server.shutdown(); server.server_close()
+
+def test_loopback_client_fails_closed_for_transport_and_not_ready(tmp_path):
+    with pytest.raises(TransportError): LoopbackGraceMomentumClient("http://127.0.0.1:9", {}).health()
+    service = FakeGraceMomentumService(tmp_path, mode="disabled"); server, url = _loopback(service)
+    try:
+        client = LoopbackGraceMomentumClient(url, {"iss":"issuer", "sub":"grace", "office":"Grace", "authority_source":"test/grace", "active":True})
+        assert client.availability()["operationally_available"] is False
+    finally: server.shutdown(); server.server_close()
+
+def test_loopback_client_rejects_timeout_malformed_and_non_2xx(monkeypatch):
+    client = LoopbackGraceMomentumClient("http://127.0.0.1:8765", {})
+    monkeypatch.setattr(control, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError()))
+    with pytest.raises(TransportError): client.health()
+    class Reply:
+        status = 200
+        def read(self): return b"not-json"
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+    monkeypatch.setattr(control, "urlopen", lambda *args, **kwargs: Reply())
+    with pytest.raises(MalformedResponseError): client.health()
+    class FailedReply(Reply): status = 503
+    monkeypatch.setattr(control, "urlopen", lambda *args, **kwargs: FailedReply())
+    with pytest.raises(TransportError): client.health()
+
+def test_availability_interpretation_rejects_unhealthy_and_provider_enabled():
+    assert interpret_availability({"health":{"healthy":False}, "readiness":{"ready":True,"provider_effects_enabled":False,"mode":"shadow"}}) is False
+    assert interpret_availability({"health":{"healthy":True}, "readiness":{"ready":True,"provider_effects_enabled":True,"mode":"shadow"}}) is False
 
 @pytest.mark.parametrize("mode", ["fixture", "shadow", "bounded_live"])
 def test_every_mode_suppresses_provider_effects(tmp_path, mode):
