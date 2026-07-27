@@ -47,7 +47,7 @@ COMMAND_OFFICES = {
     "validation.fail": {"Engineering"}, "grace.record_receipt": {"Grace"},
     "objective.complete": {"Grace"}, "runtime.rollback": {"Engineering"},
 }
-QUERY_NAMES = {"objective.summary", "lifecycle.timeline", "responsibility.current", "blocker.current", "action.next_lawful", "directive.state", "capability.state", "commission.state", "provider_governance.state", "dispatch.state", "validation.state", "replay.state", "audit.trail"}
+QUERY_NAMES = {"objective.summary", "lifecycle.timeline", "responsibility.current", "blocker.current", "action.next_lawful", "directive.state", "capability.state", "commission.state", "provider_governance.state", "dispatch.state", "validation.state", "replay.state", "audit.trail", "provider_admission.record", "provider_result.last", "reconciliation.last", "validation.last", "grace_receipt.last", "objective.completion", "events.recent"}
 EVENT_FOR_ACTION = {
     "objective.create_or_correlate": "objective.created_or_correlated", "momentum.authorize": "directive.authorized",
     "directive.pause": "directive.paused", "directive.resume": "directive.resumed", "directive.stop": "directive.stopped",
@@ -409,6 +409,30 @@ class GraceMomentumService:
         if name == "lifecycle": result = self._read("directives.json", {})
         elif name == "audit": result = self._read("audit.jsonl", "")
         elif name == "governance": result = {"mode": self.mode, "provider_effects_enabled": False, "provider_governance": "fails_closed"}
+        elif name == "provider_admission.record": result = self._read("provider_admission.json", None)
+        elif name == "provider_result.last":
+            records = self._read("provider_results.json", {})
+            result = list(records.values())[-1] if isinstance(records, dict) and records else None
+        elif name == "reconciliation.last":
+            records = self._read("reconciliations.json", {})
+            result = list(records.values())[-1] if isinstance(records, dict) and records else None
+        elif name == "validation.last":
+            records = self._read("validations.json", {})
+            result = list(records.values())[-1] if isinstance(records, dict) and records else None
+        elif name == "grace_receipt.last":
+            records = self._read("receipts.json", {})
+            result = list(records.values())[-1] if isinstance(records, dict) and records else None
+        elif name == "objective.completion":
+            records = self._read("completions.json", {})
+            objective_id = filters.get("objective_id")
+            result = records.get(objective_id) if isinstance(records, dict) and objective_id else (list(records.values())[-1] if isinstance(records, dict) and records else None)
+        elif name == "dispatch.state":
+            records = self._read("dispatches.json", {})
+            objective_id = filters.get("objective_id")
+            candidates = [record for record in records.values() if not objective_id or record.get("objective_id") == objective_id] if isinstance(records, dict) else []
+            result = candidates[-1] if candidates else None
+        elif name == "events.recent":
+            events = self._events(); result = {"events": events[-int(filters.get("limit", 100)):], "cursor": int(filters.get("cursor", 0))}
         elif name in QUERY_NAMES:
             events = self._events(); objective_id = filters.get("objective_id")
             related = [event for event in events if not objective_id or event.get("objective_id") == objective_id or event.get("payload", {}).get("objective_id") == objective_id]
@@ -530,6 +554,10 @@ class LoopbackGraceMomentumClient:
         if not isinstance(value, dict): raise MalformedResponseError("control service response must be an object")
         return value
     def send(self, command: dict[str, Any]) -> dict[str, Any]: return self._request("POST", "/v1/commands", command)
+    def query(self, name: str, **filters: Any) -> dict[str, Any]:
+        params = {"name": name, **{key: value for key, value in filters.items() if value is not None}}
+        from urllib.parse import urlencode
+        return self._request("GET", "/v1/query?" + urlencode(params))
     def replay(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]: return self._request("GET", f"/v1/events?cursor={cursor}&limit={limit}")
     def subscribe(self, cursor: int = 0, *, limit: int = 100) -> dict[str, Any]: return self.replay(cursor, limit=limit)
     def health(self) -> dict[str, Any]: return self._request("GET", "/v1/health")
@@ -559,6 +587,11 @@ def make_http_handler(service: GraceMomentumService, *, authentication_issuer: s
                     params = parse_qs(urlparse(self.path).query); cursor = int(params.get("cursor", ["0"])[0]); limit = int(params.get("limit", ["100"])[0]); return self._json(200, service.replay(cursor, limit=limit))
                 if self.path.startswith("/v1/lifecycle/"):
                     return self._json(200, service.lifecycle_projection(self.path.rsplit("/", 1)[-1]))
+                if self.path.startswith("/v1/query"):
+                    parsed = urlparse(self.path); params = parse_qs(parsed.query)
+                    name = params.get("name", [""])[0]
+                    filters = {key: values[0] for key, values in params.items() if key != "name" and values}
+                    return self._json(200, service.query(name, identity, **filters))
                 return self._json(404, {"error": {"code": "not_found"}})
             except AuthenticationError as exc: return self._json(401, {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "invalid_or_expired_session", "message": str(exc), "retryable": False}})
             except AuthorizationError as exc: return self._json(403, {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "insufficient_read_authority", "message": str(exc), "retryable": False}})
