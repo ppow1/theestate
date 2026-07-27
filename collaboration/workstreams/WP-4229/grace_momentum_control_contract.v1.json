@@ -3,6 +3,7 @@
   "commands": ["directive.create", "directive.transition", "cme.evaluate", "engineering.authorize", "dispatch.request"],
   "queries": ["lifecycle", "audit", "governance"],
   "event_schema_version": "estate.grace-momentum-event.v1",
+  "event_types": ["objective.created_or_correlated", "directive.authorized", "directive.paused", "directive.resumed", "directive.stopped", "directive.revoked", "directive.superseded", "directive.transitioned", "capability.determined", "commission.accepted", "cme.evaluation.persisted", "progression.changed", "progression.inspected", "execution.authorized", "dispatch.submitted", "dispatch.requested", "dispatch.started", "dispatch.completed", "reconciliation.completed", "validation.succeeded", "validation.failed", "grace.receipt.recorded", "objective.completed", "directive.completed", "blocker.raised", "escalation.requested", "recovery.performed"],
   "required_envelope_fields": ["schema_version", "command_id", "correlation_id", "causation_id", "objective_id", "directive_id", "actor", "represented_office", "authority_source", "timestamp", "idempotency_key", "disposition", "diagnostic_reference", "audit_reference"],
   "execution_modes": ["fixture", "shadow", "bounded_live", "disabled"],
   "provider_effect_policy": "suppressed in every mode; provider admission is external and fails closed",

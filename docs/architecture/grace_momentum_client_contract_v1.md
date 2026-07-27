@@ -45,6 +45,10 @@ requires issuer (`iss`), actor (`sub`), office (`office`), authority source,
 and an active session. Deployment validates the issuer through
 `ProductionControlConfig`; missing/invalid claims fail closed.
 
+Every production GET route requires the same active `X-Estate-Claims` context
+as commands. Missing, malformed, unknown-issuer, incomplete, inactive, or
+read-unauthorized claims return a fail-closed 401/403 response.
+
 `GraceMomentumClient` is explicitly an in-process client retained for the fake
 and embedded-runtime compatibility path. Production consumers use
 `LoopbackGraceMomentumClient(base_url, claims, timeout_seconds=2.0)` and may
@@ -59,6 +63,11 @@ only when `health.healthy` and `readiness.ready` are true,
 `readiness.provider_effects_enabled` is false, and mode is not `disabled`.
 Missing/malformed fields mean false. This is an interpretation field produced by
 the HTTP client, not a server-side authority or a new lifecycle state.
+
+The emitted event inventory is identical in the client and control contracts.
+The runtime conformance test enumerates emitted command/recovery events against
+that declared set, including `directive.transitioned`, `progression.inspected`,
+and `dispatch.requested`; no undeclared event type is permitted.
 
 `client.lifecycle_projection(objective_id)` returns the full ordered timeline,
 directive state, responsible office, blocker, next lawful action, replay cursor,

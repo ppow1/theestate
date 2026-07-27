@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
@@ -53,6 +53,16 @@ class AuthenticationError(ControlError): pass
 class AuthorizationError(ControlError): pass
 class TransportError(ControlError): pass
 class MalformedResponseError(TransportError): pass
+READ_OFFICES = {"Grace", "CME", "Helen", "Engineering", "Dispatch", "Observer", "Runtime"}
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, new):
+        raise TransportError("redirects are not permitted for the loopback control service")
+
+
+def _http_open(request: Request, timeout: float):
+    return build_opener(_NoRedirect()).open(request, timeout=timeout)
 
 
 @dataclass(frozen=True)
@@ -73,9 +83,9 @@ class ProductionControlConfig:
 
 def identity_from_claims(claims: dict[str, Any], *, issuer: str) -> OfficeIdentity:
     """Map validated transport claims to the narrow Office context contract."""
-    if claims.get("iss") != issuer or not claims.get("sub") or not claims.get("office") or not claims.get("authority_source"):
+    if not isinstance(claims, dict) or claims.get("iss") != issuer or not isinstance(claims.get("sub"), str) or not claims["sub"] or not isinstance(claims.get("office"), str) or not claims["office"] or not isinstance(claims.get("authority_source"), str) or not claims["authority_source"] or claims.get("active") is not True:
         raise AuthenticationError("invalid_or_expired_session")
-    return OfficeIdentity(str(claims["sub"]), str(claims["office"]), str(claims["authority_source"]), bool(claims.get("active", True)))
+    return OfficeIdentity(claims["sub"], claims["office"], claims["authority_source"], True)
 
 
 TEST_IDENTITIES = {
@@ -174,6 +184,7 @@ class GraceMomentumService:
 
     def query(self, name: str, identity: OfficeIdentity, **filters: Any) -> dict[str, Any]:
         if not identity.authenticated: raise AuthenticationError("authenticated identity required")
+        if identity.represented_office not in READ_OFFICES: raise AuthorizationError("office is not authorized for inspection")
         if name == "lifecycle": result = self._read("directives.json", {})
         elif name == "audit": result = self._read("audit.jsonl", "")
         elif name == "governance": result = {"mode": self.mode, "provider_effects_enabled": False, "provider_governance": "fails_closed"}
@@ -261,14 +272,17 @@ class LoopbackGraceMomentumClient:
     responsibilities.
     """
     def __init__(self, base_url: str, claims: dict[str, Any], *, timeout_seconds: float = 2.0) -> None:
-        if not base_url.startswith("http://127.0.0.1") and not base_url.startswith("http://localhost"):
+        parsed = urlparse(base_url)
+        try: hostname = parsed.hostname
+        except ValueError as exc: raise ValueError("malformed loopback endpoint") from exc
+        if parsed.scheme != "http" or parsed.username is not None or parsed.password is not None or hostname not in {"127.0.0.1", "localhost", "::1"} or parsed.query or parsed.fragment:
             raise ValueError("production control endpoint must be loopback")
         self.base_url, self.claims, self.timeout_seconds = base_url.rstrip("/"), dict(claims), timeout_seconds
     def _request(self, method: str, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
         data = json.dumps(body).encode("utf-8") if body is not None else None
         request = Request(self.base_url + path, data=data, method=method, headers={"Accept":"application/json", "Content-Type":"application/json", "X-Estate-Claims":json.dumps(self.claims)})
         try:
-            with urlopen(request, timeout=self.timeout_seconds) as response:
+            with _http_open(request, self.timeout_seconds) as response:
                 raw = response.read()
                 if response.status < 200 or response.status >= 300: raise TransportError(f"unexpected HTTP status {response.status}")
         except HTTPError as exc:
@@ -300,13 +314,18 @@ def make_http_handler(service: GraceMomentumService, *, authentication_issuer: s
             try: return identity_from_claims(json.loads(self.headers.get("X-Estate-Claims", "{}")), issuer=authentication_issuer)
             except (json.JSONDecodeError, AuthenticationError) as exc: raise AuthenticationError("invalid_or_expired_session") from exc
         def do_GET(self):
-            if self.path == "/v1/health": return self._json(200, service.health())
-            if self.path == "/v1/readiness": return self._json(200, service.readiness())
-            if self.path.startswith("/v1/events"):
-                params = parse_qs(urlparse(self.path).query); cursor = int(params.get("cursor", ["0"])[0]); limit = int(params.get("limit", ["100"])[0]); return self._json(200, service.replay(cursor, limit=limit))
-            if self.path.startswith("/v1/lifecycle/"):
-                return self._json(200, service.lifecycle_projection(self.path.rsplit("/", 1)[-1]))
-            return self._json(404, {"error": {"code": "not_found"}})
+            try:
+                identity = self._identity()
+                if identity.represented_office not in READ_OFFICES: raise AuthorizationError("office is not authorized for inspection")
+                if self.path == "/v1/health": return self._json(200, service.health())
+                if self.path == "/v1/readiness": return self._json(200, service.readiness())
+                if self.path.startswith("/v1/events"):
+                    params = parse_qs(urlparse(self.path).query); cursor = int(params.get("cursor", ["0"])[0]); limit = int(params.get("limit", ["100"])[0]); return self._json(200, service.replay(cursor, limit=limit))
+                if self.path.startswith("/v1/lifecycle/"):
+                    return self._json(200, service.lifecycle_projection(self.path.rsplit("/", 1)[-1]))
+                return self._json(404, {"error": {"code": "not_found"}})
+            except AuthenticationError as exc: return self._json(401, {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "invalid_or_expired_session", "message": str(exc), "retryable": False}})
+            except AuthorizationError as exc: return self._json(403, {"schema_version": SCHEMA_VERSION, "disposition": "unauthorized", "error": {"code": "insufficient_read_authority", "message": str(exc), "retryable": False}})
         def do_POST(self):
             try:
                 size = int(self.headers.get("Content-Length", "0")); command = json.loads(self.rfile.read(size)); return self._json(200, service.command(command, self._identity()))
@@ -316,6 +335,7 @@ def make_http_handler(service: GraceMomentumService, *, authentication_issuer: s
 
 
 def production_http_server(service: GraceMomentumService, host: str = "127.0.0.1", port: int = 8765, *, authentication_issuer: str = "estate-control") -> ThreadingHTTPServer:
+    if host not in {"127.0.0.1", "localhost", "::1"}: raise ValueError("production control service must bind to loopback")
     return ThreadingHTTPServer((host, port), make_http_handler(service, authentication_issuer=authentication_issuer))
 
 

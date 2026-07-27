@@ -67,19 +67,46 @@ def test_loopback_client_fails_closed_for_transport_and_not_ready(tmp_path):
         assert client.availability()["operationally_available"] is False
     finally: server.shutdown(); server.server_close()
 
+def test_claim_mapper_requires_strict_active_boolean_and_get_routes_authenticate(tmp_path):
+    for claims in ({}, {"iss":"issuer","sub":"a","office":"Grace","authority_source":"x"}, {"iss":"issuer","sub":"a","office":"Grace","authority_source":"x","active":False}, {"iss":"issuer","sub":"a","office":"Grace","authority_source":"x","active":"false"}, {"iss":"wrong","sub":"a","office":"Grace","authority_source":"x","active":True}):
+        with pytest.raises(AuthenticationError): identity_from_claims(claims, issuer="issuer")
+    service = FakeGraceMomentumService(tmp_path); server, url = _loopback(service)
+    try:
+        from urllib.request import Request, urlopen
+        for path in ("/v1/events", "/v1/lifecycle/objective-demo", "/v1/health", "/v1/readiness"):
+            with pytest.raises(Exception): urlopen(Request(url + path), timeout=2)
+        active = {"iss":"issuer","sub":"a","office":"Grace","authority_source":"x","active":True}
+        client = LoopbackGraceMomentumClient(url, active); assert client.health()["healthy"] is True
+    finally: server.shutdown(); server.server_close()
+
+def test_event_emission_is_contract_declared(tmp_path):
+    import json, pathlib
+    contract = json.loads(pathlib.Path(r"A:\theestate-wp4229\collaboration\workstreams\WP-4229\grace_momentum_client_contract.v1.json").read_text())
+    declared = set(contract["event_schema"]["event_types"]); service = FakeGraceMomentumService(tmp_path)
+    for action, identity_name in (("objective.create_or_correlate","grace"),("momentum.authorize","grace"),("cme.reevaluate","cme"),("engineering.progress_commission","engineering"),("progression.inspect","observer"),("escalation.request","grace")):
+        command = reference_command(action, idempotency_key=action); service.command(command, TEST_IDENTITIES[identity_name])
+    assert {event["event_type"] for event in service.replay()["events"]} <= declared
+
+def test_loopback_endpoint_requires_structural_exact_host():
+    claims = {"iss":"issuer","sub":"a","office":"Grace","authority_source":"x","active":True}
+    for endpoint in ("http://127.0.0.1.evil", "http://localhost.evil", "http://user:pass@127.0.0.1", "https://127.0.0.1", "http://example.com"):
+        with pytest.raises(ValueError): LoopbackGraceMomentumClient(endpoint, claims)
+    assert LoopbackGraceMomentumClient("http://127.0.0.1:8765", claims)
+    assert LoopbackGraceMomentumClient("http://[::1]:8765", claims)
+
 def test_loopback_client_rejects_timeout_malformed_and_non_2xx(monkeypatch):
     client = LoopbackGraceMomentumClient("http://127.0.0.1:8765", {})
-    monkeypatch.setattr(control, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError()))
+    monkeypatch.setattr(control, "_http_open", lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError()))
     with pytest.raises(TransportError): client.health()
     class Reply:
         status = 200
         def read(self): return b"not-json"
         def __enter__(self): return self
         def __exit__(self, *args): return False
-    monkeypatch.setattr(control, "urlopen", lambda *args, **kwargs: Reply())
+    monkeypatch.setattr(control, "_http_open", lambda *args, **kwargs: Reply())
     with pytest.raises(MalformedResponseError): client.health()
     class FailedReply(Reply): status = 503
-    monkeypatch.setattr(control, "urlopen", lambda *args, **kwargs: FailedReply())
+    monkeypatch.setattr(control, "_http_open", lambda *args, **kwargs: FailedReply())
     with pytest.raises(TransportError): client.health()
 
 def test_availability_interpretation_rejects_unhealthy_and_provider_enabled():
