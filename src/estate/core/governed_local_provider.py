@@ -51,7 +51,23 @@ SHA256_DESCRIPTOR = AdapterDescriptor(
     rollback_capable=True,
 )
 
-ADAPTERS = {SHA256_DESCRIPTOR.adapter_id: SHA256_DESCRIPTOR}
+COMFYUI_DESCRIPTOR = AdapterDescriptor(
+    adapter_id="comfyui.local.image",
+    version="1.0.0",
+    capability="image_generation",
+    effect_type="local_image_generation",
+    locality="loopback_http",
+    egress=False,
+    spend=False,
+    mutates_machine_state=True,
+    deterministic=True,
+    input_schema={"type": "object", "required": ["workflow"], "properties": {"workflow": {"type": "object"}}},
+    output_schema={"type": "object", "required": ["artifact_id", "artifact_path", "prompt_id"]},
+    stop_capable=True,
+    rollback_capable=False,
+)
+
+ADAPTERS = {SHA256_DESCRIPTOR.adapter_id: SHA256_DESCRIPTOR, COMFYUI_DESCRIPTOR.adapter_id: COMFYUI_DESCRIPTOR}
 
 
 def descriptor(adapter_id: str) -> AdapterDescriptor:
@@ -77,11 +93,11 @@ def validate_admission(descriptor_value: AdapterDescriptor, admission: dict[str,
         raise ProviderAdmissionError("provider capability mismatch")
     if admission["admitting_authority"] != "Engineering" or not isinstance(admission["authority_source"], str) or not admission["authority_source"]:
         raise ProviderAdmissionError("Engineering admission authority is required")
-    if admission["locality_assertion"] != "in_process" or admission["no_egress_assertion"] is not True or admission["no_spend_assertion"] is not True or admission["deterministic_effect_assertion"] is not True:
+    if admission["locality_assertion"] != descriptor_value.locality or admission["no_egress_assertion"] is not (not descriptor_value.egress) or admission["no_spend_assertion"] is not (not descriptor_value.spend) or admission["deterministic_effect_assertion"] is not descriptor_value.deterministic:
         raise ProviderAdmissionError("locality, egress, spend, and determinism assertions failed")
     if admission["input_schema"] != descriptor_value.input_schema or admission["output_schema"] != descriptor_value.output_schema:
         raise ProviderAdmissionError("provider task schema mismatch")
-    if admission["stop_capable"] is not True or admission["rollback_capable"] is not True:
+    if admission["stop_capable"] is not descriptor_value.stop_capable or admission["rollback_capable"] is not descriptor_value.rollback_capable:
         raise ProviderAdmissionError("stop and rollback capability is required")
 
 

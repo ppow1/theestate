@@ -6,6 +6,7 @@ from urllib.parse import unquote_to_bytes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Iterable
+from uuid import uuid4
 from estate.core.resident_interaction import process_chat, local_llm_status, _root
 from estate.core.multi_resident_room import create_room, invite_participant, accept_participant, submit_user_turn, plan_resident_turns, record_resident_turn
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
@@ -14,6 +15,7 @@ from estate.core.openwebui_resident_package import resident_package
 from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat
 from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
 from estate.core.grace_runtime_bridge import GraceRuntimeBridge
+from estate.core.openwebui_grace_assignment import detect_grace_image_assignment, execute_grace_image_assignment
 from estate.core.conference_room_lifecycle import (
     depart as conference_depart, invite as conference_invite,
     load_or_create_session, names_from_text, recognize_intent, save_session,
@@ -351,6 +353,17 @@ def _engineering_assignment_chat_completion(
     }
 
 
+def _grace_image_assignment_chat_completion(payload: dict[str, Any], *, user_message: str, session_id: str | None, stream: bool = False) -> dict[str, Any] | None:
+    if not detect_grace_image_assignment(payload.get("model"), user_message):
+        return None
+    result = execute_grace_image_assignment(payload, user_message=user_message, session_id=session_id)
+    content = json.dumps(result, sort_keys=True)
+    estate = {"resident_id": "grace", "assignment_execution": result, "authoritative_runtime": True, "runtime_status": result.get("disposition"), "privileged_action_executed": False}
+    if stream:
+        return {"id": f"chatcmpl-{result.get('assignment_id', uuid4().hex)}", "object": "chat.completion.chunk", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "delta": {"role": "assistant", "content": content}, "finish_reason": None}], "estate": estate}
+    return {"id": f"chatcmpl-{result.get('assignment_id', uuid4().hex)}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "estate": estate}
+
+
 def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
     model = payload.get("model")
     user_message = _latest_user_message(payload.get("messages") or [])
@@ -363,6 +376,9 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
                       "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
                       "estate": {"resident_id": "grace", "authoritative_runtime": True, "runtime_source": "grace-momentum-runtime", "runtime_status": runtime_result.get("status")}}
     session_id, _session_field = _session_id_from_payload(payload)
+    image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id)
+    if image_assignment is not None:
+        return 200, image_assignment
     workflow_body = _engineering_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
     if workflow_body is not None:
         return 200, workflow_body
@@ -391,6 +407,9 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
                       "choices": [{"index": 0, "delta": {"role": "assistant", "content": json.dumps(runtime_result, sort_keys=True)}, "finish_reason": "stop"}],
                       "estate": {"resident_id": "grace", "authoritative_runtime": True, "runtime_source": "grace-momentum-runtime", "runtime_status": runtime_result.get("status")}}
     session_id, _session_field = _session_id_from_payload(payload)
+    image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, stream=True)
+    if image_assignment is not None:
+        return 200, image_assignment
     workflow_body = _engineering_assignment_chat_completion(
         payload, user_message=user_message, session_id=session_id, root=root, stream=True
     )

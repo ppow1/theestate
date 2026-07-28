@@ -1,6 +1,6 @@
 # Codex CLI Capability Discovery
 
-Generated: 2026-07-12T00:46:22Z
+Generated: 2026-07-28T18:20:31Z
 Provider ID: codex.execution.cli
 Codex CLI path: not found
 Installed state: not_discovered

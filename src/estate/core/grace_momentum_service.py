@@ -1,14 +1,15 @@
 """Production-only Grace Momentum control service.
 
 This module is intentionally transport-neutral: HTTP, CLI and worker adapters use
-the same authenticated command/query boundary.  It never writes fixture roots and
-never invokes a provider; bounded_live is a governed *recording* mode until a
-separate provider-admission package installs an adapter.
+the same authenticated command/query boundary.  It never writes fixture roots.
+Approved local assignments execute only after provider admission and governed
+local readiness have been established.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import os
 import socket
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -28,6 +29,7 @@ from estate.core.governed_local_provider import (
     normalize_task_input,
     validate_admission,
 )
+from estate.core.grace_comfyui_execution import execute_comfyui_image
 
 SCHEMA_VERSION = "estate.grace-momentum-control.v1"
 EVENT_SCHEMA_VERSION = "estate.grace-momentum-event.v1"
@@ -45,9 +47,9 @@ COMMAND_OFFICES = {
     "provider.admit": {"Engineering"}, "dispatch.submit": {"Dispatch"}, "provider.execute": {"Dispatch"},
     "reconciliation.complete": {"Engineering"}, "validation.succeed": {"Engineering"},
     "validation.fail": {"Engineering"}, "grace.record_receipt": {"Grace"},
-    "objective.complete": {"Grace"}, "runtime.rollback": {"Engineering"},
+    "objective.complete": {"Grace"}, "runtime.rollback": {"Engineering"}, "assignment.execute_local": {"Grace"},
 }
-QUERY_NAMES = {"objective.summary", "lifecycle.timeline", "responsibility.current", "blocker.current", "action.next_lawful", "directive.state", "capability.state", "commission.state", "provider_governance.state", "dispatch.state", "validation.state", "replay.state", "audit.trail", "provider_admission.record", "provider_result.last", "reconciliation.last", "validation.last", "grace_receipt.last", "objective.completion", "events.recent"}
+QUERY_NAMES = {"objective.summary", "lifecycle.timeline", "responsibility.current", "blocker.current", "action.next_lawful", "directive.state", "capability.state", "commission.state", "provider_governance.state", "dispatch.state", "validation.state", "replay.state", "audit.trail", "provider_admission.record", "provider_result.last", "reconciliation.last", "validation.last", "grace_receipt.last", "objective.completion", "events.recent", "assignment.record", "execution.progress", "execution.completion", "execution.failure", "execution.artifact"}
 EVENT_FOR_ACTION = {
     "objective.create_or_correlate": "objective.created_or_correlated", "momentum.authorize": "directive.authorized",
     "directive.pause": "directive.paused", "directive.resume": "directive.resumed", "directive.stop": "directive.stopped",
@@ -212,12 +214,14 @@ class GraceMomentumService:
         if not any(e["event_type"] == "progression.changed" and e.get("payload", {}).get("objective_id") == command.get("objective_id") for e in events):
             raise ControlError("Engineering progression is required before Dispatch submission")
         dispatch_id = command.get("dispatch_id") or f"dispatch-{uuid4().hex[:12]}"
-        task_input = normalize_task_input(command.get("task_input"))
         admission = self._read("provider_admission.json", {})
+        task_input = command.get("task_input") if admission.get("adapter_id") == "comfyui.local.image" else normalize_task_input(command.get("task_input"))
+        if not isinstance(task_input, (str, dict)) or not task_input:
+            raise ControlError("task_input is required for Dispatch submission")
         effect_id = self._effect_identity({**command, "dispatch_id": dispatch_id}, admission["adapter_id"], task_input)
         record = {"dispatch_id": dispatch_id, "objective_id": command.get("objective_id"), "directive_id": command.get("directive_id"),
                   "commission_id": command.get("commission_id"), "adapter_id": admission["adapter_id"], "adapter_version": admission["adapter_version"],
-                  "effect_identity": effect_id, "task_input_digest": hashlib.sha256(task_input.encode("utf-8")).hexdigest(),
+                  "effect_identity": effect_id, "task_input_digest": hashlib.sha256(json.dumps(task_input, sort_keys=True, separators=(",", ":")).encode("utf-8") if isinstance(task_input, dict) else task_input.encode("utf-8")).hexdigest(),
                   "submitted_at": utc_now(), "dispatch_authority": identity.represented_office, "disposition": "submitted",
                   "execution_status": "submitted", "audit_reference": f"audit:{command['command_id']}"}
         self._record("dispatches.json", dispatch_id, record)
@@ -245,12 +249,15 @@ class GraceMomentumService:
         task_input = command.get("task_input")
         if task_input is None:
             raise ControlError("task_input is required for first execution")
-        result_value = execute_sha256(task_input, stop_requested=self._read("emergency_stop.json", {}).get("active", False))
+        if admission.get("adapter_id") == "comfyui.local.image":
+            result_value = execute_comfyui_image(task_input, root=self.root, endpoint=os.environ.get("ESTATE_COMFYUI_ENDPOINT", "http://127.0.0.1:8188"), timeout_seconds=900)
+        else:
+            result_value = execute_sha256(task_input, stop_requested=self._read("emergency_stop.json", {}).get("active", False))
         result = {"effect_identity": dispatch["effect_identity"], "dispatch_id": dispatch_id,
                   "adapter_id": admission["adapter_id"], "adapter_version": admission["adapter_version"],
                   "input_digest": dispatch["task_input_digest"], "output_digest": hashlib.sha256(json.dumps(result_value, sort_keys=True).encode()).hexdigest(),
                   "output": result_value, "started_at": states[dispatch["effect_identity"]]["started_at"], "completed_at": utc_now(),
-                  "terminal_status": "completed", "deterministic_verification": True, "provider_effect_suppressed": False,
+                  "terminal_status": "completed", "deterministic_verification": admission.get("adapter_id") != "comfyui.local.image", "provider_effect_suppressed": False,
                   "stop_state": "inactive", "rollback_state": "not_requested", "audit_reference": f"audit:{command['command_id']}"}
         self._record("provider_results.json", dispatch["effect_identity"], result)
         states[dispatch["effect_identity"]] = {"status": "completed", "dispatch_id": dispatch_id, "completed_at": result["completed_at"]}
@@ -287,7 +294,11 @@ class GraceMomentumService:
             return {"schema_version": SCHEMA_VERSION, "disposition": "already_validated", "record": existing}
         dispatch = self._read("dispatches.json", {}).get(dispatch_id); result = self._read("provider_results.json", {}).get(dispatch["effect_identity"])
         expected = command.get("expected_sha256")
-        passed = not failed and result and result.get("terminal_status") == "completed" and (not expected or result["output"].get("sha256") == expected)
+        if dispatch.get("adapter_id") == "comfyui.local.image":
+            artifact = (result or {}).get("output", {}).get("artifact_path", "")
+            passed = not failed and result and result.get("terminal_status") == "completed" and result.get("output", {}).get("image_generated") is True and Path(artifact).is_file()
+        else:
+            passed = not failed and result and result.get("terminal_status") == "completed" and (not expected or result["output"].get("sha256") == expected)
         record = {"dispatch_id": dispatch_id, "objective_id": dispatch["objective_id"], "effect_identity": dispatch["effect_identity"],
                   "reconciliation_reference": dispatch_id, "expected_behavior": "sha256", "deterministic_output": bool(passed),
                   "exactly_once": True, "prohibited_side_effects": True, "status": "succeeded" if passed else "failed",
@@ -331,6 +342,54 @@ class GraceMomentumService:
         event = self._publish("objective.completed", self._envelope(command, identity), record)
         return {"schema_version": SCHEMA_VERSION, "disposition": "completed", "record": record, "event": event, "provider_effect_suppressed": False}
 
+    def _record_execution_failure(self, command: dict[str, Any], identity: OfficeIdentity, reason: str, dispatch_id: str | None = None) -> dict[str, Any]:
+        record = {"failure_id": "failure-" + uuid4().hex[:12], "assignment_id": command.get("assignment_id") or command.get("objective_id"), "objective_id": command.get("objective_id"), "dispatch_id": dispatch_id, "failed_at": utc_now(), "reason": reason, "audit_reference": f"audit:{command['command_id']}", "provider_effect_suppressed": False}
+        self._record("failures.json", record["failure_id"], record)
+        assignments = self._read("assignments.json", {})
+        assignment = assignments.get(record["assignment_id"])
+        if isinstance(assignment, dict):
+            assignment.update({"state": "failed", "failure_id": record["failure_id"], "failure_reason": reason, "failed_at": record["failed_at"]})
+            assignments[record["assignment_id"]] = assignment
+            self._write("assignments.json", assignments)
+        if dispatch_id:
+            dispatches = self._read("dispatches.json", {}); dispatch = dispatches.get(dispatch_id)
+            if isinstance(dispatch, dict):
+                dispatch.update({"execution_status": "failed", "failure_id": record["failure_id"], "failure_reason": reason, "failed_at": record["failed_at"]}); dispatches[dispatch_id] = dispatch; self._write("dispatches.json", dispatches)
+        event = self._publish("execution.failed", self._envelope(command, identity), record)
+        return {"schema_version": SCHEMA_VERSION, "disposition": "failed", "record": record, "event": event, "provider_effect_suppressed": False}
+
+    def _execute_approved_local_assignment(self, command: dict[str, Any], identity: OfficeIdentity) -> dict[str, Any]:
+        objective_id = command.get("objective_id") or "objective-" + uuid4().hex[:12]
+        assignment_id = command.get("assignment_id") or "assignment-" + uuid4().hex[:12]
+        directive_id = command.get("directive_id") or "directive-" + uuid4().hex[:12]
+        command = {**command, "objective_id": objective_id, "directive_id": directive_id, "assignment_id": assignment_id}
+        assignment = {"assignment_id": assignment_id, "objective_id": objective_id, "directive_id": directive_id, "title": command.get("title") or "Grace local assignment", "summary": command.get("summary") or "", "created_at": utc_now(), "state": "accepted", "requested_by": identity.actor_id, "audit_reference": f"audit:{command['command_id']}"}
+        self._record("assignments.json", assignment_id, assignment)
+        self._publish("objective.created_or_correlated", self._envelope(command, identity), {"objective_id": objective_id, "assignment_id": assignment_id, "disposition": "created_or_correlated"})
+        self._publish("directive.authorized", self._envelope(command, identity), {"directive_id": directive_id, "objective_id": objective_id, "disposition": "authorized"})
+        self._publish("cme.evaluation.persisted", self._envelope(command, identity), {"objective_id": objective_id, "disposition": "approved_local_workflow"})
+        self._publish("progression.changed", self._envelope(command, identity), {"objective_id": objective_id, "commission_id": "commission-" + uuid4().hex[:12], "disposition": "authorized_for_dispatch"})
+        self._publish("execution.authorized", self._envelope(command, identity), {"objective_id": objective_id, "assignment_id": assignment_id, "disposition": "authorized"})
+        dispatch_id = None
+        try:
+            admission_command = {**command, "action": "provider.admit", "adapter_id": command.get("adapter_id", "comfyui.local.image"), "idempotency_key": command["idempotency_key"] + ":admit"}
+            self._provider_admit(admission_command, OfficeIdentity(identity.actor_id, "Engineering", "grace/approved-local-workflow"))
+            submit_command = {**command, "action": "dispatch.submit", "dispatch_id": None, "task_input": command["task_input"], "idempotency_key": command["idempotency_key"] + ":submit"}
+            submitted = self._submit_dispatch(submit_command, OfficeIdentity(identity.actor_id, "Dispatch", "grace/approved-local-workflow")); dispatch_id = submitted["record"]["dispatch_id"]
+            self._publish("execution.progress", self._envelope(command, identity), {"assignment_id": assignment_id, "dispatch_id": dispatch_id, "state": "submitted", "percent": 10})
+            executed = self._execute_provider({**command, "action": "provider.execute", "dispatch_id": dispatch_id, "idempotency_key": command["idempotency_key"] + ":execute"}, OfficeIdentity(identity.actor_id, "Dispatch", "grace/approved-local-workflow"))
+            self._publish("execution.progress", self._envelope(command, identity), {"assignment_id": assignment_id, "dispatch_id": dispatch_id, "state": "provider_completed", "percent": 70, "artifact": executed.get("record", {}).get("output")})
+            self._reconcile({**command, "dispatch_id": dispatch_id, "action": "reconciliation.complete", "idempotency_key": command["idempotency_key"] + ":reconcile"}, OfficeIdentity(identity.actor_id, "Engineering", "grace/approved-local-workflow"))
+            self._validate_result({**command, "dispatch_id": dispatch_id, "action": "validation.succeed", "idempotency_key": command["idempotency_key"] + ":validate"}, OfficeIdentity(identity.actor_id, "Engineering", "grace/approved-local-workflow"))
+            self._record_receipt({**command, "dispatch_id": dispatch_id, "action": "grace.record_receipt", "idempotency_key": command["idempotency_key"] + ":receipt"}, identity)
+            completed = self._complete_objective({**command, "dispatch_id": dispatch_id, "action": "objective.complete", "idempotency_key": command["idempotency_key"] + ":complete"}, identity)
+            self._publish("execution.progress", self._envelope(command, identity), {"assignment_id": assignment_id, "dispatch_id": dispatch_id, "state": "completed", "percent": 100})
+            assignments = self._read("assignments.json", {}); assignment["state"] = "completed"; assignment["completed_at"] = utc_now(); assignments[assignment_id] = assignment; self._write("assignments.json", assignments)
+            return {"schema_version": SCHEMA_VERSION, "disposition": "completed", "assignment_id": assignment_id, "objective_id": objective_id, "dispatch_id": dispatch_id, "record": completed.get("record"), "artifact": executed.get("record", {}).get("output"), "provider_id": self._read("provider_admission.json", {}).get("adapter_id"), "execution_state": "completed"}
+        except (ControlError, ProviderAdmissionError, RuntimeError, ValueError, OSError) as exc:
+            failure = self._record_execution_failure(command, identity, str(exc), dispatch_id)
+            return {"schema_version": SCHEMA_VERSION, "disposition": "failed", "assignment_id": assignment_id, "objective_id": objective_id, "dispatch_id": dispatch_id, "failure": failure["record"], "execution_state": "failed"}
+
     def _rollback(self, command: dict[str, Any], identity: OfficeIdentity) -> dict[str, Any]:
         admission = self._read("provider_admission.json", None)
         record = {"objective_id": command.get("objective_id"), "directive_id": command.get("directive_id"),
@@ -351,6 +410,8 @@ class GraceMomentumService:
         if self.mode == "disabled": raise AuthorizationError("Grace Momentum runtime is disabled")
         self._assert_authority(action, identity)
         if prior := self._idempotent(command["idempotency_key"]): return prior
+        if action == "assignment.execute_local":
+            response = self._execute_approved_local_assignment(command, identity); self._remember(command["idempotency_key"], response); return response
         if action == "provider.admit":
             response = self._provider_admit(command, identity); self._remember(command["idempotency_key"], response); return response
         if action == "dispatch.submit":
@@ -428,8 +489,26 @@ class GraceMomentumService:
             result = records.get(objective_id) if isinstance(records, dict) and objective_id else (list(records.values())[-1] if isinstance(records, dict) and records else None)
         elif name == "dispatch.state":
             records = self._read("dispatches.json", {})
+            dispatch_id = filters.get("dispatch_id")
             objective_id = filters.get("objective_id")
-            candidates = [record for record in records.values() if not objective_id or record.get("objective_id") == objective_id] if isinstance(records, dict) else []
+            candidates = [record for record in records.values() if (not dispatch_id or record.get("dispatch_id") == dispatch_id) and (not objective_id or record.get("objective_id") == objective_id)] if isinstance(records, dict) else []
+            result = candidates[-1] if candidates else None
+        elif name == "assignment.record":
+            records = self._read("assignments.json", {}); assignment_id = filters.get("assignment_id")
+            result = records.get(assignment_id) if isinstance(records, dict) and assignment_id else (list(records.values())[-1] if isinstance(records, dict) and records else None)
+        elif name == "execution.progress":
+            objective_id = filters.get("objective_id"); assignment_id = filters.get("assignment_id"); events = self._events()
+            result = [event for event in events if event.get("event_type") == "execution.progress" and (not objective_id or event.get("objective_id") == objective_id or event.get("payload", {}).get("objective_id") == objective_id) and (not assignment_id or event.get("payload", {}).get("assignment_id") == assignment_id)]
+        elif name == "execution.completion":
+            records = self._read("completions.json", {}); objective_id = filters.get("objective_id")
+            result = records.get(objective_id) if isinstance(records, dict) and objective_id else (list(records.values())[-1] if isinstance(records, dict) and records else None)
+        elif name == "execution.failure":
+            records = self._read("failures.json", {}); assignment_id = filters.get("assignment_id"); objective_id = filters.get("objective_id")
+            candidates = [record for record in records.values() if (not assignment_id or record.get("assignment_id") == assignment_id) and (not objective_id or record.get("objective_id") == objective_id)] if isinstance(records, dict) else []
+            result = candidates[-1] if candidates else None
+        elif name == "execution.artifact":
+            records = self._read("provider_results.json", {}); dispatch_id = filters.get("dispatch_id")
+            candidates = [record.get("output") for record in records.values() if not dispatch_id or record.get("dispatch_id") == dispatch_id] if isinstance(records, dict) else []
             result = candidates[-1] if candidates else None
         elif name == "events.recent":
             events = self._events(); result = {"events": events[-int(filters.get("limit", 100)):], "cursor": int(filters.get("cursor", 0))}
