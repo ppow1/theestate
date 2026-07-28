@@ -98,7 +98,26 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     # operational terms such as "dispatch" or "objective".
     if detect_engineering_assignment_command(payload, text):
         return None
-    if not re.search(r"\b(objective|readiness|availability|replay|checkpoint|dispatch|provider|reconciliation|validation|receipt|completion|blocker|operational state|runtime operations)\b", text, re.I):
+    explicit_runtime_operations = (
+        "list_grace_runtime_operations",
+        "get_runtime_readiness",
+        "get_runtime_availability",
+        "get_replay_cursor",
+        "get_current_objective",
+    )
+
+    has_explicit_runtime_operation = any(
+        operation_name in text.lower()
+        for operation_name in explicit_runtime_operations
+    )
+
+    has_runtime_keyword = re.search(
+        r"\b(objective|readiness|availability|replay|checkpoint|dispatch|provider|reconciliation|validation|receipt|completion|blocker|operational state|runtime operations)\b",
+        text,
+        re.I,
+    )
+
+    if not has_explicit_runtime_operation and not has_runtime_keyword:
         return None
     metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
     claims = {"iss": "estate-control", "sub": str(metadata.get("user_id") or "openwebui-grace"), "office": "Grace", "authority_source": "openwebui/grace-runtime-bridge", "active": True}
@@ -106,16 +125,49 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     try:
         bridge = GraceRuntimeBridge(LoopbackGraceMomentumClient(endpoint, claims, timeout_seconds=2.0))
         lower = text.lower()
-        if "operation" in lower and "list" in lower:
+
+        # Exact registered operation names take precedence over natural-language
+        # keyword inference. Underscores are word characters, so a \b-based
+        # keyword search does not recognize names such as
+        # get_current_objective or get_runtime_readiness.
+        explicit_operations = (
+            ("list_grace_runtime_operations", bridge.list_grace_runtime_operations),
+            ("get_runtime_readiness", bridge.get_runtime_readiness),
+            ("get_runtime_availability", bridge.get_runtime_availability),
+            ("get_replay_cursor", bridge.get_replay_cursor),
+            ("get_current_objective", bridge.get_current_objective),
+        )
+
+        explicit_handler = next(
+            (
+                handler
+                for operation_name, handler in explicit_operations
+                if operation_name in lower
+            ),
+            None,
+        )
+
+        if explicit_handler is not None:
+            result = explicit_handler()
+        elif "operation" in lower and "list" in lower:
             result = bridge.list_grace_runtime_operations()
-        elif "readiness" in lower:
+        elif re.search(r"\breadiness\b", lower):
             result = bridge.get_runtime_readiness()
-        elif "replay" in lower or "checkpoint" in lower or "cursor" in lower:
+        elif re.search(r"\b(replay|cursor)\b", lower):
             result = bridge.get_replay_cursor()
-        elif "objective" in lower:
+        elif re.search(r"\bobjective\b", lower):
             result = bridge.get_current_objective()
         else:
-            result = {"schema_version": "estate.grace-runtime-bridge.v1", "status": "AUTHORITATIVE_RESULT", "source_system": "grace-momentum-runtime", "source_operation": "get_runtime_availability", "payload": {"availability": bridge.get_runtime_availability(), "current_objective": bridge.get_current_objective()}}
+            result = {
+                "schema_version": "estate.grace-runtime-bridge.v1",
+                "status": "AUTHORITATIVE_RESULT",
+                "source_system": "grace-momentum-runtime",
+                "source_operation": "get_runtime_availability",
+                "payload": {
+                    "availability": bridge.get_runtime_availability(),
+                    "current_objective": bridge.get_current_objective(),
+                },
+            }
         return result
     except Exception as exc:
         return {"schema_version": "estate.grace-runtime-bridge.v1", "status": "RUNTIME_UNAVAILABLE", "error": {"code": "runtime_unavailable", "message": str(exc)}}

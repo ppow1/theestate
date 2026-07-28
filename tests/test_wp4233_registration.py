@@ -19,6 +19,14 @@ def test_grace_model_is_the_only_resident_associated_with_bridge():
     assert all(not item["info"]["meta"]["toolIds"] and not item["info"]["meta"]["filterIds"] for item in others)
 
 
+def test_deployment_merges_bridge_ids_without_duplicates():
+    module = _load(Path(__file__).parents[1] / "scripts/deploy_openwebui_grace_bridge.py")
+    merged = module.merge_grace_bridge_metadata({"toolIds": ["existing"], "filterIds": ["existing-filter"]})
+    assert merged["toolIds"] == ["existing", "grace_runtime_bridge"]
+    assert merged["filterIds"] == ["existing-filter", "grace_runtime_grounding"]
+    assert module.merge_grace_bridge_metadata(merged) == merged
+
+
 def test_grounding_filter_requires_runtime_result_for_operational_claims():
     module = _load(Path(__file__).parents[1] / "deploy/openwebui/functions/grace_runtime_grounding.py")
     filter_ = module.Filter()
@@ -49,5 +57,21 @@ def test_grace_gateway_uses_runtime_bridge_for_operational_questions(tmp_path, m
         assert code == 200
         assert body["estate"]["authoritative_runtime"] is True
         assert '"status": "NO_RECORD"' in body["choices"][0]["message"]["content"]
+    finally:
+        server.shutdown(); server.server_close(); thread.join(timeout=2)
+
+
+def test_grace_gateway_routes_explicit_readiness_operation_name(tmp_path, monkeypatch):
+    from estate.core.grace_momentum_service import FakeGraceMomentumService, TEST_IDENTITIES, production_http_server
+    import threading
+    service = FakeGraceMomentumService(tmp_path)
+    server = production_http_server(service, port=0, authentication_issuer="estate-control")
+    thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
+    monkeypatch.setenv("ESTATE_GRACE_MOMENTUM_URL", f"http://127.0.0.1:{server.server_port}")
+    try:
+        code, body = chat_completion({"model": "estate/grace", "messages": [{"role": "user", "content": "Use get_runtime_readiness and return the complete result."}]}, root=tmp_path)
+        assert code == 200
+        assert body["estate"]["runtime_status"] == "AUTHORITATIVE_RESULT"
+        assert '"source_operation": "get_runtime_readiness"' in body["choices"][0]["message"]["content"]
     finally:
         server.shutdown(); server.server_close(); thread.join(timeout=2)
