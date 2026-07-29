@@ -1,8 +1,8 @@
 """
 title: Grace runtime grounding policy
 id: grace_runtime_grounding
-version: 1.1.0
-description: Prevents ungrounded operational claims without intercepting explicit image-generation work.
+version: 1.2.0
+description: Prevents ungrounded operational claims while preserving direct conversation and execution routing.
 """
 from __future__ import annotations
 
@@ -18,10 +18,6 @@ OPERATIONAL = re.compile(
     re.I,
 )
 
-# Creation/edit intent takes precedence over incidental operational vocabulary.  A request
-# such as "generate an image ... save the artifact and record the receipt" is an execution
-# request, not a request to inspect runtime state.  Without this guard the read-only bridge
-# can steal the turn from the admitted image-generation path.
 IMAGE_ACTION = re.compile(
     r"\b(generate|create|draw|render|make|produce|edit|modify|change|revise|redo|another)\b"
     r"[\s\S]{0,160}\b(image|picture|photo|photograph|portrait|headshot|visual|illustration|"
@@ -31,12 +27,23 @@ IMAGE_ACTION = re.compile(
     re.I,
 )
 
-# Explicit inspection language still requires authoritative grounding, even when the
-# subject is an image-generation job.
 STATE_INSPECTION = re.compile(
     r"\b(what is|what's|show|return|report|check|inspect|status|state|was|has|did|last|current)\b"
     r"[\s\S]{0,120}\b(readiness|availability|objective|dispatch|provider|receipt|completion|"
     r"validation|operational state)\b",
+    re.I,
+)
+
+# Informational and explanatory requests are conversation, not operational work orders.
+# This includes questions about how Grace would approach a small task.  Grace should answer
+# the substance directly and must not invent a ticket, handoff, dependency check, checkpoint,
+# or future execution merely to demonstrate Estate governance.
+DIRECT_INFORMATIONAL = re.compile(
+    r"\b(how|what|why|explain|describe|show me|teach me|walk me through|approach)\b"
+    r"[\s\S]{0,220}\b(code|program|javascript|python|html|css|sql|script|function|algorithm|"
+    r"hello world|technical|software|computer)\b|"
+    r"\b(code|program|javascript|python|html|css|sql|script|function|algorithm|hello world)\b"
+    r"[\s\S]{0,220}\b(how|what|why|approach|example|explain|describe)\b",
     re.I,
 )
 
@@ -79,6 +86,24 @@ class Filter:
                         "user explicitly names a new subject or object, replace stale subject context completely. "
                         "After successful execution, answer conversationally with the result and artifact reference; "
                         "do not expose raw execution JSON unless the user explicitly requests diagnostic output."
+                    ),
+                }
+            )
+            return body
+
+        if DIRECT_INFORMATIONAL.search(latest) and not state_inspection:
+            metadata["estate_direct_conversation"] = True
+            messages.append(
+                {
+                    "role": "system",
+                    "content": (
+                        "Direct-conversation policy: answer the Steward's actual informational or explanatory "
+                        "question directly. A hypothetical or small technical question is not automatically an "
+                        "Estate work order. Do not create or promise a Dispatch ticket, provider call, dependency "
+                        "check, checkpoint, closure, archive action, or future execution unless the user explicitly "
+                        "asks you to perform the work and an actual tool operation occurs in this response cycle. "
+                        "For a coding question, give the practical approach and a small code example when useful. "
+                        "Keep Grace's voice, but do not bury the answer under governance ceremony."
                     ),
                 }
             )
