@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Callable
@@ -35,7 +37,8 @@ from estate.core.execution_provider_adapter_runtime import (
 from estate.core.paths import ESTATE_ROOT
 
 SUPPORTED_PROVIDER_TYPES = {"codex-cli", "codex_bridge"}
-SUPPORTED_PROVIDER_IDS = set(ALLOWED_PROVIDER_PROFILES)
+CANONICAL_PROVIDER_ID = "codex.execution.cli"
+SUPPORTED_PROVIDER_IDS = set(ALLOWED_PROVIDER_PROFILES) | {CANONICAL_PROVIDER_ID}
 REPORTS_DIR = Path("runtime/execution_adapters/reports")
 
 
@@ -59,7 +62,7 @@ def bridge_request_from_adapter_request(request: ExecutionProviderAdapterRequest
         classification=request.classification,
         work_package_id=request.work_package_id,
         requested_by=str(_metadata(request, "requested_by", "traffic-controller")),
-        provider=request.provider_id,
+        provider=str(_metadata(request, "codex_provider_profile", "codex-cli-openai")) if request.provider_id == CANONICAL_PROVIDER_ID else request.provider_id,
         model=_metadata(request, "model"),
         codex_home_profile=str(_metadata(request, "codex_home_profile", request.profile_label or "default")),
         worker_label=str(_metadata(request, "worker_label", "codex-bridge-adapter")),
@@ -70,6 +73,7 @@ def bridge_request_from_adapter_request(request: ExecutionProviderAdapterRequest
         approval_policy=str(_metadata(request, "approval_policy", APPROVAL_POLICY)),
         json_mode=bool(_metadata(request, "json_mode", True)),
         session_persistence_required=bool(_metadata(request, "session_persistence_required", False)),
+        timeout_seconds=(int(_metadata(request, "timeout_seconds")) if _metadata(request, "timeout_seconds") is not None else None),
         cloud_allowed=bool(_metadata(request, "cloud_allowed", False)),
         cloud_apply_requested=bool(_metadata(request, "cloud_apply_requested", False)),
         cloud_dispatch_requested=bool(_metadata(request, "cloud_dispatch_requested", False)),
@@ -119,6 +123,8 @@ def adapter_result_from_bridge_result(
             "codex_bridge_provider": bridge_result.provider,
             "codex_bridge_profile_label": bridge_result.profile_label,
             "codex_bridge_sandbox": bridge_result.sandbox,
+            "exit_code": bridge_result.exit_code,
+            "command": bridge_result.command,
             "changed_files": bridge_result.changed_files,
             "tests_run": bridge_result.tests_run,
             "usage": bridge_result.usage,
@@ -248,3 +254,86 @@ def run_codex_bridge_adapter_dry_run(request: ExecutionProviderAdapterRequest, r
     payload = result.to_dict()
     payload.update({"request_path": str(request_path), "result_path": str(result_path), "report_path": str(report_path), **status_paths})
     return payload
+
+
+class CodexCliExecutionProviderAdapter(CodexBridgeExecutionProviderAdapter):
+    """Canonical bounded Codex CLI adapter with strict work-product evidence."""
+
+    adapter_id = "codex-cli-execution-adapter"
+    provider_id = CANONICAL_PROVIDER_ID
+    provider_type = "execution"
+    version = "1.0.0"
+
+    def __init__(self, *, root: str | Path | None = None, bridge_runner: Callable[..., CodexBridgeResult] | None = None) -> None:
+        super().__init__(root=root, bridge_runner=bridge_runner or run_codex_bridge_request)
+
+    def supports(self, request: ExecutionProviderAdapterRequest) -> bool:
+        return request.provider_id == self.provider_id and request.provider_type in {"execution", "codex-cli", "codex_bridge"}
+
+    def _write_provider_receipt(self, request: ExecutionProviderAdapterRequest, result: ExecutionProviderAdapterResult, artifacts: list[str]) -> str:
+        receipt_dir = self.root / "runtime" / "engineering_adapter_receipts"
+        receipt_dir.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "schema_version": "estate.provider-receipt.v1",
+            "receipt_id": f"receipt-{request.adapter_request_id}",
+            "provider_id": self.provider_id,
+            "adapter_id": self.adapter_id,
+            "adapter_version": self.version,
+            "dispatch_id": request.dispatch_id,
+            "adapter_request_id": request.adapter_request_id,
+            "codex_bridge_request_id": result.metadata.get("codex_bridge_request_id"),
+            "started_at": result.started_at,
+            "finished_at": result.finished_at,
+            "exit_code": result.metadata.get("exit_code"),
+            "status": result.status,
+            "artifacts": [{"path": path, "sha256": hashlib.sha256((self.root / path).read_bytes()).hexdigest()} for path in artifacts],
+            "command": result.metadata.get("command", []),
+            "validation": "provider_process_and_declared_artifacts_verified",
+        }
+        path = receipt_dir / f"{request.adapter_request_id}.json"
+        path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return str(path.relative_to(self.root)).replace("\\", "/")
+
+    def submit(self, request: ExecutionProviderAdapterRequest) -> ExecutionProviderAdapterResult:
+        if request.metadata.get("cancel_requested") is True:
+            now = utc_now()
+            return ExecutionProviderAdapterResult(
+                adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id,
+                provider_id=request.provider_id, status="blocked", started_at=now, finished_at=utc_now(),
+                summary="Codex execution was cancelled before provider invocation.", validation_status="failed",
+                errors=["cancellation requested before submit"], metadata={"adapter_id": self.adapter_id, "live_provider_called": False},
+            )
+        result = super().submit(request)
+        result.metadata["adapter_id"] = self.adapter_id
+        if result.status != "completed":
+            return result
+        if not request.expected_outputs:
+            result.status = "blocked"
+            result.validation_status = "failed"
+            result.errors.append("codex adapter requires explicit expected_outputs for truthful completion")
+            return result
+        artifacts: list[str] = []
+        for raw in request.expected_outputs:
+            path = (self.root / raw).resolve() if not Path(raw).is_absolute() else Path(raw).resolve()
+            try:
+                path.relative_to(self.root.resolve())
+            except ValueError:
+                result.status = "blocked"
+                result.validation_status = "failed"
+                result.errors.append(f"artifact outside authorized repository root: {raw}")
+                continue
+            if not path.is_file():
+                result.status = "blocked"
+                result.validation_status = "failed"
+                result.errors.append(f"missing declared artifact: {raw}")
+                continue
+            artifacts.append(str(path.relative_to(self.root.resolve())).replace("\\", "/"))
+        if result.status != "completed":
+            return result
+        receipt = self._write_provider_receipt(request, result, artifacts)
+        result.artifacts = artifacts + [receipt]
+        result.metadata["provider_receipt"] = receipt
+        result.metadata["receipt_reference"] = receipt
+        result.metadata["adapter_version"] = self.version
+        result.validation_status = "passed"
+        return result
