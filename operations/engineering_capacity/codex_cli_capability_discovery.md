@@ -1,6 +1,6 @@
 # Codex CLI Capability Discovery
 
-Generated: 2026-07-28T18:20:31Z
+Generated: 2026-07-30T19:11:09Z
 Provider ID: codex.execution.cli
 Codex CLI path: not found
 Installed state: not_discovered
@@ -8,6 +8,9 @@ Installed state: not_discovered
 ## Advertised Capabilities
 - repository_implementation
 - code_review
+- documentation_draft
+- test_execution
+- bounded_repository_work
 
 ## Polling Policy
 - Status polling: manual_or_disabled_until_billing_delta_verified

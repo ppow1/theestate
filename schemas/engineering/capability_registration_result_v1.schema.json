@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.capability-registration-result.v1",
+  "title": "Engineering Capability Registration Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registration_id", "capability_id", "provider_id", "adapter_id", "adapter_version", "state", "evidence_references", "created_at"],
+  "properties": {
+    "registration_id": {"type": "string", "minLength": 1},
+    "capability_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "adapter_id": {"type": "string", "minLength": 1},
+    "adapter_version": {"type": "string", "minLength": 1},
+    "state": {"enum": ["registered", "blocked", "failed", "superseded"]},
+    "declared_capabilities": {"type": "array", "items": {"type": "string"}},
+    "qualification_evidence": {"type": "array", "items": {"type": "string"}},
+    "health_evidence": {"type": "array", "items": {"type": "string"}},
+    "evidence_references": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "execution_authorized": {"type": "boolean"}
+  }
+}

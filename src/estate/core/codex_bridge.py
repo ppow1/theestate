@@ -97,6 +97,7 @@ class CodexBridgeRequest:
     bypass_flags: list[str] = field(default_factory=list)
     validation_commands: list[str] = field(default_factory=list)
     expected_outputs: list[str] = field(default_factory=list)
+    timeout_seconds: int | None = None
     attention_policy: str | None = None
     codex_binary: str = DEFAULT_CODEX_BINARY
 
@@ -463,6 +464,8 @@ def validate_bridge_request(request: CodexBridgeRequest, root: str | Path | None
 
     if request.session_persistence_required and request.sandbox != SANDBOX_WORKSPACE_WRITE:
         errors.append("session persistence is only allowed for explicit workspace-write requests")
+    if request.timeout_seconds is not None and request.timeout_seconds <= 0:
+        errors.append("timeout_seconds must be positive")
 
     return RequestValidation(accepted=not errors, errors=errors, warnings=warnings)
 
@@ -804,16 +807,21 @@ def run_codex_bridge_request(
     stderr_raw: bytes | str | None = b""
     exit_code: int | None = None
     try:
-        completed = process_runner(
-            _execution_command(command),
-            cwd=str(cwd),
-            input=_read_prompt(prompt_path).encode("utf-8"),
-            capture_output=True,
-            check=False,
-        )
+        process_kwargs = {
+            "cwd": str(cwd),
+            "input": _read_prompt(prompt_path).encode("utf-8"),
+            "capture_output": True,
+            "check": False,
+        }
+        if request.timeout_seconds is not None:
+            process_kwargs["timeout"] = request.timeout_seconds
+        completed = process_runner(_execution_command(command), **process_kwargs)
         stdout_raw = getattr(completed, "stdout", b"")
         stderr_raw = getattr(completed, "stderr", b"")
         exit_code = getattr(completed, "returncode", None)
+    except subprocess.TimeoutExpired as exc:
+        stderr_raw = f"Codex CLI timed out after {request.timeout_seconds} seconds: {exc}"
+        exit_code = 124
     except OSError as exc:
         stderr_raw = str(exc)
         exit_code = 1

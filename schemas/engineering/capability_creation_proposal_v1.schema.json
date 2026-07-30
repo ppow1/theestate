@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.capability-creation-proposal.v1",
+  "title": "Helen Capability Creation Proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["proposal_id", "gap_id", "specification_id", "proposed_by", "capability_id", "scope", "created_at", "state"],
+  "properties": {
+    "proposal_id": {"type": "string", "minLength": 1},
+    "gap_id": {"type": "string", "minLength": 1},
+    "specification_id": {"type": "string", "minLength": 1},
+    "proposed_by": {"const": "Helen"},
+    "capability_id": {"type": "string", "minLength": 1},
+    "scope": {"type": "object"},
+    "worker_boundaries": {"type": "object"},
+    "qualification_requirements": {"type": "array", "items": {"type": "object"}},
+    "validation_requirements": {"type": "array", "items": {"type": "object"}},
+    "bootstrap_dependencies": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "state": {"enum": ["proposed", "rejected", "superseded", "accepted_for_project_creation"]},
+    "authority_reference": {"type": "string", "minLength": 1}
+  }
+}

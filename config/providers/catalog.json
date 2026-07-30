@@ -73,6 +73,18 @@
       "supports_offline": true
     },
     {
+      "capability_id": "bounded_repository_work",
+      "category": "execution",
+      "description": "Bounded repository work executed within an explicitly authorized worktree and output contract.",
+      "display_name": "Bounded Repository Work",
+      "input_artifacts": ["structured_commission"],
+      "metadata": {"requires_explicit_write_scope": true},
+      "output_artifacts": ["structured_work_product", "provider_receipt"],
+      "requires_approval": true,
+      "requires_validation": true,
+      "supports_offline": false
+    },
+    {
       "capability_id": "code_review",
       "category": "validation",
       "description": "Code Review capability.",
@@ -235,7 +247,10 @@
     {
       "capabilities": [
         "repository_implementation",
-        "code_review"
+        "code_review",
+        "documentation_draft",
+        "test_execution",
+        "bounded_repository_work"
       ],
       "classification_ceiling": "Estate Internal",
       "cost_model": "usage_based",
@@ -244,9 +259,11 @@
       "provider_id": "codex.execution.cli",
       "provider_type": "execution",
       "requires_boundary_review": true,
-      "status": "designed",
+      "status": "implemented",
       "supports_artifacts": true,
-      "supports_events": true
+      "supports_events": true,
+      "supports_validation": true,
+      "routing_notes": "Bounded local Codex CLI adapter; requires explicit authorization, workspace-write scope, declared outputs, and provider receipt validation."
     },
     {
       "capabilities": [

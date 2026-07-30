@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.capability-inquiry.v1",
+  "title": "Engineering Capability Inquiry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["inquiry_id", "grace_objective_id", "required_capabilities", "created_at", "requested_by"],
+  "properties": {
+    "inquiry_id": {"type": "string", "minLength": 1},
+    "grace_objective_id": {"type": "string", "minLength": 1},
+    "required_capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "acceptance_criteria": {"type": "array", "items": {"type": "object"}},
+    "requested_by": {"const": "Grace"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["requested", "assessment_pending", "withdrawn", "superseded"]},
+    "source_references": {"type": "array", "items": {"type": "string"}}
+  }
+}

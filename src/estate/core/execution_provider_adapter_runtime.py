@@ -85,3 +85,17 @@ def run_dry_run_adapter(request: ExecutionProviderAdapterRequest, root: str | Pa
     payload = result.to_dict()
     payload.update({"request_path": str(request_path), "result_path": str(result_path), **status_paths})
     return payload
+
+
+def load_registered_adapter(request: ExecutionProviderAdapterRequest, *, root: str | Path | None = None, bridge_runner: Any = None):
+    """Resolve only adapters registered in the canonical provider catalog seam."""
+    from estate.core.codex_bridge_execution_provider_adapter import CodexCliExecutionProviderAdapter
+    from estate.core.provider_catalog import load_provider_catalog
+
+    catalog = load_provider_catalog(_root(root) / "config" / "providers" / "catalog.json")
+    provider = catalog.get_provider(request.provider_id)
+    if provider.status not in {"implemented", "operationally_validated", "institutionalized"}:
+        raise ValueError(f"provider '{request.provider_id}' is not registered for execution: {provider.status}")
+    if request.provider_id == "codex.execution.cli":
+        return CodexCliExecutionProviderAdapter(root=_root(root), bridge_runner=bridge_runner)
+    raise ValueError(f"no concrete adapter registered for provider '{request.provider_id}'")

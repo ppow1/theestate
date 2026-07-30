@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.capability-reevaluation.v1",
+  "title": "Helen Capability Re-evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reevaluation_id", "original_objective_id", "gap_id", "evaluated_by", "disposition", "created_at", "evidence_references"],
+  "properties": {
+    "reevaluation_id": {"type": "string", "minLength": 1},
+    "original_objective_id": {"type": "string", "minLength": 1},
+    "gap_id": {"type": "string", "minLength": 1},
+    "registration_id": {"type": "string", "minLength": 1},
+    "evaluated_by": {"const": "Helen"},
+    "disposition": {"enum": ["capability_available", "capability_unknown", "capability_gap_found", "blocked"]},
+    "evidence_references": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "freshness_checked": {"type": "boolean"},
+    "authorization_scope_checked": {"type": "boolean"}
+  }
+}

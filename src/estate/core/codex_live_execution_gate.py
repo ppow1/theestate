@@ -16,7 +16,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Callable
 
 from estate.core.codex_bridge import ALLOWED_PROVIDER_PROFILES, CodexBridgeResult, run_codex_bridge_request
-from estate.core.codex_bridge_execution_provider_adapter import CodexBridgeExecutionProviderAdapter
+from estate.core.codex_bridge_execution_provider_adapter import CodexCliExecutionProviderAdapter, CodexBridgeExecutionProviderAdapter
 from estate.core.execution_dispatch import inspect_dispatch_item, update_dispatch_state
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterRequest, ExecutionProviderAdapterResult, utc_now
 from estate.core.execution_attempt_runtime import ExecutionAttemptRuntime
@@ -207,7 +207,7 @@ class CodexLiveExecutionGate:
         if sandbox == "danger-full-access" or request.metadata.get("danger_full_access_requested"): errors.append("danger-full-access is prohibited")
         if request.metadata.get("bypass_flags"): errors.append("bypass flags are prohibited")
         profile = str(request.metadata.get("codex_home_profile") or request.profile_label or "default")
-        allowed_profiles = ALLOWED_PROVIDER_PROFILES.get(request.provider_id, set()) if isinstance(ALLOWED_PROVIDER_PROFILES, dict) else ALLOWED_PROVIDER_PROFILES
+        allowed_profiles = ALLOWED_PROVIDER_PROFILES.get("codex-cli-openai", set()) if request.provider_id == "codex.execution.cli" else ALLOWED_PROVIDER_PROFILES.get(request.provider_id, set())
         if profile != authorization.approved_codex_profile or profile not in allowed_profiles: errors.append("provider profile is not approved")
         if not authorization.allowed_read_paths: errors.append("allowed_read_paths are required")
         if sandbox == "workspace-write" and not authorization.allowed_write_paths: errors.append("workspace-write requires explicit approved write paths")
@@ -250,7 +250,10 @@ class CodexLiveExecutionGate:
         write_adapter_request(request, root=self.root)
         self._persist_decision(decision, authorization, request, "started")
         update_dispatch_state(dispatch_id, "Running", self.root, summary="Codex live execution gate approved provider call.")
-        result = CodexBridgeExecutionProviderAdapter(root=self.root, bridge_runner=self.bridge_runner).submit(request)
+        adapter = (CodexCliExecutionProviderAdapter(root=self.root, bridge_runner=self.bridge_runner)
+                   if request.provider_id == "codex.execution.cli"
+                   else CodexBridgeExecutionProviderAdapter(root=self.root, bridge_runner=self.bridge_runner))
+        result = adapter.submit(request)
         decision.status = result.status
         decision.live_provider_called = bool(result.metadata.get("live_provider_called", False))
         decision.result = result.to_dict()

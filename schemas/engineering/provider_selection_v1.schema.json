@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.provider-selection.v1",
+  "type": "object",
+  "required": ["assessment_id", "capability_id", "provider_id", "adapter_id", "selected_by", "authorization_required"],
+  "properties": {
+    "assessment_id": {"type": "string", "minLength": 1},
+    "objective_id": {"type": "string", "minLength": 1},
+    "capability_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "adapter_id": {"type": "string", "minLength": 1},
+    "selection_rationale": {"type": "string", "minLength": 1},
+    "selected_by": {"const": "Engineering"},
+    "status": {"enum": ["selected", "superseded", "revoked"]},
+    "authorization_required": {"const": true}
+  },
+  "additionalProperties": true
+}

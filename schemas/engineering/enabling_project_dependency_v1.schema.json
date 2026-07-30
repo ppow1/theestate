@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.enabling-project-dependency.v1",
+  "title": "Engineering Enabling Project Dependency",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dependency_id", "original_objective_id", "gap_id", "enabling_project_id", "state", "created_at"],
+  "properties": {
+    "dependency_id": {"type": "string", "minLength": 1},
+    "original_objective_id": {"type": "string", "minLength": 1},
+    "gap_id": {"type": "string", "minLength": 1},
+    "enabling_project_id": {"type": "string", "minLength": 1},
+    "enabling_work_package_id": {"type": "string", "minLength": 1},
+    "state": {"enum": ["waiting", "in_progress", "satisfied", "failed", "superseded"]},
+    "satisfaction_evidence": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "original_objective_mutation_forbidden": {"const": true}
+  }
+}
