@@ -54,7 +54,7 @@ export async function hydrateConversation<T extends HydrationSnapshot>(args: {
     topReached ||= current.topReached; virtualization ||= current.virtualizationDetected;
     stable = snapshotStable(previous, current, args.config.conversationTopPositionTolerancePx) ? stable + 1 : 0;
     args.report?.(current, pass, stable); previous = current;
-    if (stable >= args.config.conversationHydrationStablePasses) {
+    if (stable >= Math.max(args.config.conversationHydrationStablePasses, args.config.messageCountStabilityRequirement)) {
       const end = new Date(); return { snapshot: current, messages: virtualization ? ordered.map(key => accumulated.get(key)!).filter(Boolean) : lastBatch, metadata: { hydrationStartedAt: startedAt, hydrationEndedAt: end.toISOString(), hydrationDurationMs: end.getTime() - started.getTime(), hydrationPasses: pass, stablePassesObserved: stable, initialMessageCount: first.count, finalMessageCount: current.count, topReached, virtualizationDetected: virtualization, incrementalAccumulationUsed: virtualization, completenessStatus: 'complete', completenessWarnings: [] } };
     }
   }
