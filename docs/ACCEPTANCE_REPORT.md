@@ -36,6 +36,8 @@ The initialization flow starts ordinary Chrome with no Playwright launch/control
 
 The tests cover the operator authentication handshake prompts, process-close detection, post-login verification command, independent Chrome arguments without Playwright control arguments, profile repair, and prompt-free non-interactive sync.
 
+The initializer identifies the session by normalized `--user-data-dir` command lines rather than trusting the initial launcher PID, so a Chrome handoff is tolerated. It confirms the top-level dedicated window is gone and the profile locks are released before invoking the archive runtime.
+
 ### Interactive browser launch correction — 2026-07-30
 
 Interactive initialization now launches the installed stable Chrome directly, without Playwright. On the verification machine this is `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe`. It uses the dedicated persistent profile and only `--user-data-dir`, `--window-size=1400,900`, `--window-position=50,50`, `--disable-extensions`, and the ChatGPT URL. It adds no remote debugging, user-agent, stealth, cookie, JavaScript, sandbox, security, or CAPTCHA-bypass flags.
@@ -70,7 +72,7 @@ It contained no Playwright-generated arguments, no remote debugging argument, an
 | Browser safety | dedicated persistent profile under neutral tool path; no credential automation or secret logging | Implemented; authentication initialization remains manual |
 | Dependencies | `npm install` completed; 59 packages audited, 0 vulnerabilities | Pass |
 | TypeScript build | `npm run build` | Pass |
-| Unit tests | `npm test`: 2 files, 10 tests passed, including independent Chrome launch, process-close workflow, profile repair, and launcher regressions | Pass |
+| Unit tests | `npm test`: 2 files, 12 tests passed, including independent Chrome launch, PID handoff/path normalization, process-close workflow, profile-lock release, profile repair, and launcher regressions | Pass |
 | Playwright integration fixture | `npm run playwright:test`: 1 test passed; pinned Chromium installed | Pass |
 | CLI help | root and `validate --help` executed successfully | Pass |
 

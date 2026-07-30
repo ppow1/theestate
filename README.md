@@ -27,6 +27,8 @@ Initialization command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File
 
 After successful initialization, the full archive command is `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveFull.ps1`.
 
+The initializer identifies the dedicated session by enumerating Windows `chrome.exe` command lines for the normalized `--user-data-dir` profile path. It tolerates the initial launcher PID exiting during Chrome handoff, waits for the actual top-level window, and waits for the profile lock files to clear before verification.
+
 ### Interactive login troubleshooting
 
 Interactive initialization uses `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe` as an ordinary independent process with the dedicated profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`. Its arguments are `--user-data-dir`, `--window-size=1400,900`, `--window-position=50,50`, `--disable-extensions`, and `https://chatgpt.com/`. It has no Playwright defaults, remote-debugging pipe/port, automation control, cookie copying, or security-bypass behavior. The initializer verifies the effective Chrome process list and rejects forbidden automation or sandbox arguments.
