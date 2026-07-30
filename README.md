@@ -27,6 +27,12 @@ Initialization command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File
 
 After successful initialization, the full archive command is `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveFull.ps1`.
 
+### Interactive login troubleshooting
+
+Interactive initialization uses the locally installed stable Google Chrome executable when available, the dedicated profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`, a normal resizable 1400×900 desktop window, 100% browser zoom, device scale factor 1, and extensions disabled for that dedicated profile. It does not use the operator's normal Chrome profile or copy cookies and credentials. The only initializer-specific Chromium arguments are `--window-size=1400,900` and `--disable-extensions`; no user-agent, stealth, sandbox, JavaScript, cookie, or security-bypass arguments are supplied.
+
+If the browser remains on `Verifying you are human. This may take a few seconds.`, leave the legitimate verification page open and complete any challenge normally. Do not attempt to bypass or automate it. Press Enter in the console only after the ChatGPT conversation interface is visible. If the verification page remains active, initialization reports `LOGIN_VERIFICATION_INCOMPLETE`; close that dedicated window and retry later, or investigate normal Chrome/network/security conditions. Unattended full and sync commands do not wait for this prompt and continue to fail promptly with `AUTHENTICATION_REQUIRED` or `LOGIN_VERIFICATION_INCOMPLETE`.
+
 ## Archive and schema
 
 The archive is `archive-manifest.json`, `state/conversation-index.json`, `conversations/<stable-id>/latest.*`, immutable `revisions/<revision-id>/`, `reports/<run-id>/`, and `logs/`. Canonical JSON is schema version `1.0`; each message preserves role and ordered content blocks, with source URL, optional timestamps, metadata, attachments, export completeness, limitations, and revision links.

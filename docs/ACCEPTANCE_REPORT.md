@@ -36,6 +36,12 @@ The initialization flow keeps the dedicated browser open while the console displ
 
 The interactive authentication helper tests cover unauthenticated first run, browser availability during the manual-login wait, successful post-login verification, browser cancellation, and already-authenticated profiles. The launcher regression also verifies that non-interactive sync remains prompt-free and returns `AUTHENTICATION_REQUIRED` promptly.
 
+### Interactive browser launch correction — 2026-07-30
+
+Interactive initialization now prefers the installed stable Chrome executable. On the verification machine this resolves to `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe`. It uses the dedicated persistent profile, a headed resizable 1400×900 window, viewport 1400×900, device scale factor 1, default browser zoom, and disabled extensions. The initializer retains only `--window-size=1400,900` and `--disable-extensions` as custom arguments; it adds no user-agent, stealth, cookie, JavaScript, sandbox, security, or CAPTCHA-bypass flags.
+
+Cloudflare/browser verification is detected separately. If the page still presents human verification after the operator presses Enter, the result is `LOGIN_VERIFICATION_INCOMPLETE`, not a false authenticated success. The operator must complete the legitimate challenge in the dedicated Chrome window; no credentials, cookies, or security checks are automated.
+
 | Requirement | Evidence | Result |
 |---|---|---|
 | Estate-wide ownership and neutral naming | `tools/chatgpt-conversation-archive/`, root `README.md`, `docs/ARCHITECTURE.md`; no product filter or CueMastery path | Pass |
@@ -50,7 +56,7 @@ The interactive authentication helper tests cover unauthenticated first run, bro
 | Browser safety | dedicated persistent profile under neutral tool path; no credential automation or secret logging | Implemented; authentication initialization remains manual |
 | Dependencies | `npm install` completed; 59 packages audited, 0 vulnerabilities | Pass |
 | TypeScript build | `npm run build` | Pass |
-| Unit tests | `npm test`: 3 files, 13 tests passed, including interactive authentication and launcher regressions | Pass |
+| Unit tests | `npm test`: 3 files, 15 tests passed, including interactive authentication, browser configuration, and launcher regressions | Pass |
 | Playwright integration fixture | `npm run playwright:test`: 1 test passed; pinned Chromium installed | Pass |
 | CLI help | root and `validate --help` executed successfully | Pass |
 
