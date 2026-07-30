@@ -19,5 +19,8 @@
   "conversationOpenDelayMs": 1500,
   "paginationDelayMs": 500,
   "burstSize": 8,
-  "burstCooldownMs": 10000
+  "burstCooldownMs": 10000,
+  "progressHeartbeatMs": 10000,
+  "stallWarningMs": 60000,
+  "runtimeSeat": "local"
 }

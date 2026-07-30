@@ -38,6 +38,12 @@ The tests cover the operator authentication handshake prompts, process-close det
 
 The initializer identifies the session by normalized `--user-data-dir` command lines rather than trusting the initial launcher PID, so a Chrome handoff is tolerated. It confirms the top-level dedicated window is gone and the profile locks are released before invoking the archive runtime.
 
+### Exporter failure accounting and live progress correction — 2026-07-30
+
+The historical 325-conversation run is classified from its observed error sequence as approximately: 1 primary exporter failure (`roleOf is not defined`), 1 browser-context loss, 324 cascading/deferred conversations, and 0 successfully processed. The corrected exporter defines the role mapping inside the browser callback, audits the remaining `evaluate`/`evaluateAll` calls for Node-scope references, stops on context loss, checkpoints the next item, and records the three categories separately.
+
+Each run now emits console progress and periodic heartbeats, writes `A:\AI\Archives\ChatGPT\status\current-run.json`, and accumulates seat-aware counters in `A:\AI\Archives\ChatGPT\state\runtime-metrics.json`. A headed bounded live validation of one authenticated conversation completed successfully: 1 discovered, 1 processed, 0 failed, 0 context losses, 0 deferred, 856 requests, and 39 actions. The validation wrote status and metrics files under `A:\AI\Archives\ChatGPT-BoundedValidation-20260730-headed`. No throttle was induced.
+
 ### Throttle control correction — 2026-07-30
 
 The archive runtime now detects modal/body throttle wording and HTTP 429 responses, emits `RATE_LIMITED`, applies 5/10/20/30-minute adaptive backoff with bounded jitter, and stops opening new conversations while limited. Pacing defaults are 1.5 seconds per conversation open, 500 ms per pagination action, 8-action bursts, and 10-second burst cooldowns. Checkpoints and reports preserve completed work and retry metrics; `resume` continues without duplicating completed exports. Mocked tests cover detection, backoff, cap/jitter, cancellation, and pacing. No live throttling was induced.
@@ -76,7 +82,7 @@ It contained no Playwright-generated arguments, no remote debugging argument, an
 | Browser safety | dedicated persistent profile under neutral tool path; no credential automation or secret logging | Implemented; authentication initialization remains manual |
 | Dependencies | `npm install` completed; 59 packages audited, 0 vulnerabilities | Pass |
 | TypeScript build | `npm run build` | Pass |
-| Unit tests | `npm test`: 3 files, 16 tests passed, including throttle detection/backoff/cancellation/pacing plus independent Chrome launch, PID handoff/path normalization, process-close workflow, profile-lock release, profile repair, and launcher regressions | Pass |
+| Unit tests | `npm test`: 4 files, 20 tests passed, including exporter callback audit, context-loss classification, heartbeat/stall warnings, seat-aware metrics, throttle detection/backoff/cancellation/pacing, and launcher regressions | Pass |
 | Playwright integration fixture | `npm run playwright:test`: 1 test passed; pinned Chromium installed | Pass |
 | CLI help | root and `validate --help` executed successfully | Pass |
 

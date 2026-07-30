@@ -65,6 +65,12 @@ describe('operator launchers', () => {
     expect(script).toContain('Close the dedicated Chrome window now');
   });
 
+  it('keeps browser-evaluated callbacks free of Node outer-scope role helpers', () => {
+    const source = fs.readFileSync(path.join(toolRoot, 'src', 'browser.ts'), 'utf8');
+    expect(source).not.toContain('roleOf(');
+    expect(source).toContain("['user','assistant','tool','system'].includes(roleText)");
+  });
+
   it('matches handed-off Chrome processes by normalized profile path and selects the top-level window', () => {
     const helper = path.join(scriptRoot, 'Archive-ChatGPTConversationArchiveLifecycle.ps1').replace(/'/g, "''");
     const command = `. '${helper}'; $profile='A:\\AI\\Tools\\ChatGPTConversationArchive\\profile'; $quoted='chrome.exe --user-data-dir='+[char]34+$profile+[char]34+' --type=renderer'; $forward='chrome.exe --user-data-dir='+$profile.Replace('\\','/')+' --window-size=1400,900'; $other='chrome.exe --user-data-dir=A:/other/profile'; $fake=@([pscustomobject]@{ProcessId=101;CommandLine=$quoted;MainWindowHandle=0},[pscustomobject]@{ProcessId=202;CommandLine=$forward;MainWindowHandle=77},[pscustomobject]@{ProcessId=303;CommandLine=$other;MainWindowHandle=88}); $matched=@(Get-ArchiveProfileProcesses -ProfilePath $profile -Processes $fake); $main=@(Get-ArchiveMainBrowserProcesses -ProfilePath $profile -Processes $fake); $windows=@(Get-ArchiveBrowserWindows -ProfilePath $profile -Processes $fake); [pscustomobject]@{matched=$matched.Count;main=$main.Count;mainPid=$main[0].ProcessId;windowPid=$windows[0].ProcessId}|ConvertTo-Json -Compress`;

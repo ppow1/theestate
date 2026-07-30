@@ -29,6 +29,8 @@ After successful initialization, the full archive command is `powershell.exe -No
 
 The initializer identifies the dedicated session by enumerating Windows `chrome.exe` command lines for the normalized `--user-data-dir` profile path. It tolerates the initial launcher PID exiting during Chrome handoff, waits for the actual top-level window, and waits for the profile lock files to clear before verification.
 
+Every archive run writes live progress and heartbeat state to `A:\AI\Archives\ChatGPT\status\current-run.json` and cumulative seat-aware runtime counters to `A:\AI\Archives\ChatGPT\state\runtime-metrics.json`. The console shows discovered/processed counts, the current conversation, heartbeat activity, and stall warnings. A browser-context loss stops the run and defers the remaining items instead of recording hundreds of false independent export failures; rerun `resume` after diagnosis.
+
 ### Throttling and pacing
 
 The runtime detects rate-limit HTTP 429 responses and localized or changed wording around “Too many requests”, requests being too quick, and temporary conversation-access restrictions. It reports these as `RATE_LIMITED`, never as authentication or archive errors. Defaults are conservative: 1.5 seconds between conversation opens, 500 ms between pagination actions, an 8-action burst, and a 10-second burst cooldown. Faster settings can increase the chance of temporary account throttling.
