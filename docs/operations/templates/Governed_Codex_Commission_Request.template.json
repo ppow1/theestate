@@ -1,0 +1,73 @@
+{
+  "commission_id": "<REQUIRED: operator-supplied commission identifier>",
+  "grace_objective_id": "<REQUIRED: Grace objective record ID>",
+  "capability_inquiry_id": "<REQUIRED: capability inquiry record ID>",
+  "helen_assessment_reference": "<REQUIRED: Helen assessment record or evidence reference>",
+  "ptm_dependency_reference": "<REQUIRED: authoritative PTM package/dependency reference>",
+  "dispatch_id": "<REQUIRED: Dispatch handoff ID>",
+  "provider_id": "codex.execution.cli",
+  "adapter_id": "codex-cli-execution-adapter",
+  "adapter_version": "1.0.0",
+  "requested_capabilities": [
+    "<REQUIRED: repository_implementation|code_review|documentation_draft|test_execution|bounded_repository_work>"
+  ],
+  "classification": "<REQUIRED: classification>",
+  "repository_root": "<REQUIRED: repository-relative or approved local repository root>",
+  "source_commit": "<REQUIRED: source commit SHA>",
+  "sandbox_mode": "workspace-write",
+  "codex_provider_profile": "<REQUIRED: operator-approved local Codex profile>",
+  "approval_policy": "never",
+  "bypass_flags": [],
+  "cloud_allowed": false,
+  "cloud_apply_requested": false,
+  "cloud_dispatch_requested": false,
+  "danger_full_access_requested": false,
+  "authorized_read_paths": [
+    "<REQUIRED: repository-relative read path>"
+  ],
+  "authorized_write_paths": [
+    "<REQUIRED: exact repository-relative write path or bounded directory>"
+  ],
+  "prohibited_paths": [
+    ".git",
+    "archive",
+    "<OPTIONAL: additional prohibited path>"
+  ],
+  "exact_expected_outputs": [
+    "<REQUIRED: exact repository-relative output path>"
+  ],
+  "acceptance_criteria": [
+    "<REQUIRED: commission-specific acceptance criterion>"
+  ],
+  "validation_commands": [
+    "<REQUIRED: bounded validation command>"
+  ],
+  "timeout_seconds": "<REQUIRED: positive integer>",
+  "cancellation_state": "not_requested",
+  "steward_authorization_reference": "<REQUIRED: Steward authorization reference>",
+  "traffic_controller_authorization_reference": "<REQUIRED: Traffic Controller authorization reference>",
+  "decision_reference": "<REQUIRED: decision reference>",
+  "boundary_review_reference": "<REQUIRED: boundary review reference>",
+  "evidence": {
+    "observed_at": "<REQUIRED: UTC ISO-8601 timestamp>",
+    "expires_at": "<REQUIRED: UTC ISO-8601 timestamp>",
+    "qualification_references": [
+      "<REQUIRED: qualification evidence reference>"
+    ],
+    "health_references": [
+      "<REQUIRED: health evidence reference>"
+    ],
+    "availability_references": [
+      "<REQUIRED: availability evidence reference>"
+    ],
+    "capacity_references": [
+      "<REQUIRED: capacity evidence reference>"
+    ],
+    "authorization_references": [
+      "<REQUIRED: authorization evidence reference>"
+    ]
+  },
+  "unrestricted_shell_authority": false,
+  "automatic_merge_authority": false,
+  "autonomous_institutional_acceptance_authority": false
+}
