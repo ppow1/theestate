@@ -749,3 +749,9 @@ Implemented WP-0534 with a metadata-only Codex CLI capability discovery runtime,
 EC-000095 - Preserved Command Chair HID integration checkpoint
 
 Documented and operationally validated the Command Chair trigger namespaces for two identical white encoder controllers, the E9s Vial controller, and the two-profile UtechSmart Venus Pro mouse. Preserved the AI-KSEN LCKEY identity, protocol incompatibility evidence, official-software dependency, and safe continuation path. Added a Restricted six-file backup bundle containing the E9s factory backup and all Venus Pro source/intermediate/final profiles, plus a PowerShell decoder that verifies every restored file by SHA-256.
+
+2026-07-30 00:00:00
+
+EC-000096 - Added Estate-wide ChatGPT conversation archive tool
+
+Implemented the reusable neutral archive package at `tools/chatgpt-conversation-archive/`, including browser extraction, canonical JSON/Markdown/HTML revisions, incremental sync, reports, validation, CLI, operator scripts, tests, and documentation. Dependency installation timed out before execution validation and live authenticated acceptance; the limitation is recorded in `docs/ACCEPTANCE_REPORT.md`.

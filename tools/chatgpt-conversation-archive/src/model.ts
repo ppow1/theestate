@@ -1,0 +1,8 @@
+export type Role = 'user' | 'assistant' | 'tool' | 'system' | 'unknown';
+export interface ContentBlock { type: string; text?: string; language?: string; url?: string; metadata?: Record<string, unknown>; }
+export interface Message { id?: string; role: Role; author?: string; timestamp?: string; content: ContentBlock[]; metadata?: Record<string, unknown>; }
+export interface Conversation { schemaVersion: '1.0'; id: string; title: string; sourceUrl: string; messages: Message[]; attachments?: Record<string, unknown>[]; metadata?: Record<string, unknown>; exportMetadata?: { exportedAt: string; exporterVersion: string; complete: boolean; limitations: string[] }; revision?: { revisionId: string; contentHash: string; previousRevisionId?: string; }; }
+export interface IndexEntry { id: string; title: string; sourceUrl: string; firstArchivedAt?: string; lastDiscoveredAt: string; lastSuccessfulExportAt?: string; lastSynchronizedAt: string; contentHash?: string; metadataHash?: string; revisionCount: number; currentStatus: string; lastError?: string; lastSuccessfulRevisionId?: string; }
+export interface ArchiveConfig { archiveRoot: string; chromeExecutablePath?: string; profilePath: string; headless: boolean; retryLimit: number; timeoutMs: number; diagnosticsPath: string; concurrency: number; nonInteractive: boolean; conversationLimit?: number | null; exportMarkdown: boolean; exportHtml: boolean; }
+export interface DiscoveredConversation { id: string; title: string; sourceUrl: string; }
+export interface SyncReport { runId: string; startedAt: string; endedAt?: string; durationMs?: number; counts: Record<string, number>; ids: Record<string, string[]>; errors: { id?: string; category: string; message: string }[]; }

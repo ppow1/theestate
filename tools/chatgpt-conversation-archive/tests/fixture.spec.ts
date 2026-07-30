@@ -1,0 +1,2 @@
+import { test, expect } from '@playwright/test';
+test('controlled conversation fixture exposes resilient message semantics', async({page})=>{await page.setContent('<main><a href="https://chatgpt.com/c/one">One</a><div data-message-author-role="user">Hello</div><div data-message-author-role="assistant"><pre><code class="language-ts">const x=1</code></pre></div></main>');await expect(page.locator('a[href*="/c/"]')).toHaveCount(1);await expect(page.locator('[data-message-author-role]')).toHaveCount(2);});

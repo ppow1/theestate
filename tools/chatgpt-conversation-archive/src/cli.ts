@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+import { Command } from 'commander'; import fs from 'node:fs'; import { loadConfig } from './config.js'; import { runSync } from './sync.js'; import { validateArchive } from './validate.js'; import { ChatGPTBrowser } from './browser.js';
+const program=new Command(); program.name('chatgpt-archive').description('Estate-wide ChatGPT Conversation Archive').option('--config <file>','configuration file').option('--archive-root <path>','archive root override').option('--quiet','reduce console output');
+const valueAfter=(flag:string)=>{const i=process.argv.indexOf(flag); return i>=0?process.argv[i+1]:undefined;};
+const cfg=(cmd:any)=>{const options=cmd&&typeof cmd.opts==='function'?cmd.opts():{}; const archiveRoot=options.archiveRoot||program.opts().archiveRoot||valueAfter('--archive-root'); return loadConfig(options.config||program.opts().config||valueAfter('--config'),archiveRoot?{archiveRoot}:{});};
+program.command('init-profile').description('Open the dedicated profile for one-time interactive authentication').action(async(cmd)=>{const c=loadConfig(valueAfter('--config')||program.opts().config,{headless:false});const b=await ChatGPTBrowser.open(c,false);try{await b.ensureAuthenticated();console.log(`Profile ready: ${c.profilePath}`);}finally{await b.close();}});
+for(const name of ['full','sync','resume']) program.command(name).description(`${name} archive operation`).action(async(cmd)=>{const report=await runSync(cfg(cmd),name as 'full'|'sync'|'resume');console.log(JSON.stringify(report,null,2));if(report.counts.failed)process.exitCode=2;});
+program.command('inventory').action(async(cmd)=>{const c=cfg(cmd);const b=await ChatGPTBrowser.open(c,false);try{console.log(JSON.stringify(await b.inventory(),null,2));}finally{await b.close();}});
+program.command('validate').action(async(cmd)=>{const c=cfg(cmd);const r=validateArchive(c.archiveRoot);console.log(JSON.stringify(r,null,2));if(!r.valid)process.exitCode=2;});
+program.command('diagnostics').action(async(cmd)=>{const c=cfg(cmd);fs.mkdirSync(c.diagnosticsPath,{recursive:true});const b=await ChatGPTBrowser.open(c,true);try{await b.ensureAuthenticated();console.log(`Diagnostics succeeded: ${c.diagnosticsPath}`);}finally{await b.close(true);}});
+program.parseAsync().catch(e=>{console.error(e instanceof Error?e.message:e);process.exitCode=1;});

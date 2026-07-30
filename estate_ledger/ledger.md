@@ -1049,3 +1049,13 @@ Classification: Estate Internal / Restricted backup payload
 
 Summary:
 Preserved the verified Command Chair HID identities and trigger namespaces for the paired white controllers, E9s macropad, UtechSmart Venus Pro, and AI-KSEN LCKEY; recorded the failed generic LCKEY provisioning path and safe resume procedure; added an exact six-file base64 recovery bundle with SHA-256 metadata; and added a PowerShell restore/verification tool. The historical Venus Pro profile remains Restricted because it contains obsolete credential macros.
+
+EC-000096 - Added Estate-wide ChatGPT conversation archive tool
+
+Timestamp: 2026-07-30 00:00:00
+Location: A:\theestate
+Status: Implemented; Operational Validation Blocked by dependency/profile environment
+Classification: Estate Internal / Local Only archive outputs
+
+Summary:
+Added neutral Estate-wide TypeScript/Playwright archive infrastructure under tools/chatgpt-conversation-archive with persistent dedicated-profile strategy, incremental revisions and hashes, atomic archive state, differential reports, validation, CLI, operator scripts, tests, architecture documentation, and acceptance evidence. npm dependency installation timed out in the execution environment before automated or live validation could run; no credentials or conversation data were collected.

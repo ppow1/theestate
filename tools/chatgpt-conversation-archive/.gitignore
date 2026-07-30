@@ -1,0 +1,11 @@
+node_modules/
+.npm-cache/
+dist/
+.config.local.json
+profile/
+diagnostics/
+logs/
+archive/
+test-output/
+playwright-report/
+test-results/

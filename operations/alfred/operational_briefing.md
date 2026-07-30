@@ -1,13 +1,13 @@
 # Alfred Operational Briefing
 
-Created: 2026-07-09T12:29:38
+Created: 2026-07-30T10:56:42
 Ready: True
-Services Available: 5
+Services Available: 3
 Capabilities: 13
-Pending Work Packages: 177
-Messages Requiring Acknowledgement: 18
+Pending Work Packages: 510
+Messages Requiring Acknowledgement: 23
 CA Review Needs: 17
-Blocked Work: 0
+Blocked Work: 3
 Validation Candidates: 5
 
 ## Recommended Next Actions
@@ -17,7 +17,39 @@ Validation Candidates: 5
 - Promote validation candidates into CA review when operational evidence is sufficient.
 
 ## Active/Pending Work Packages
+- CONV-PTM-001 | CONV-PTM-001 — Resident governed PTM command contract | collaboration/work_packages/pending/CONV-PTM-001_Resident_governed_PTM_command_contract.md
+- CORE-PTM-001A | CORE-PTM-001A — Inventory collaboration and work-package sources | collaboration/work_packages/pending/CORE-PTM-001A_Inventory_collaboration_and_work_package_sources.md
+- CORE-PTM-001B | CORE-PTM-001B — Inventory dispatch, validation, resident, and operations sources | collaboration/work_packages/pending/CORE-PTM-001B_Inventory_dispatch_validation_resident_and_operations_sources.md
+- CORE-PTM-001C | CORE-PTM-001C — Draft read-only adapter contracts | collaboration/work_packages/pending/CORE-PTM-001C_Draft_read_only_adapter_contracts.md
+- CORE-PTM-002A | CORE-PTM-002A — Define append-only event schema and hash chain | collaboration/work_packages/pending/CORE-PTM-002A_Define_append_only_event_schema_and_hash_chain.md
+- CORE-PTM-002B | CORE-PTM-002B — Define PTM ID minting and command contracts | collaboration/work_packages/pending/CORE-PTM-002B_Define_PTM_ID_minting_and_command_contracts.md
+- CORE-PTM-003A | CORE-PTM-003A — Project task and portfolio projection contracts | collaboration/work_packages/pending/CORE-PTM-003A_Project_task_and_portfolio_projection_contracts.md
+- CORE-PTM-003B | CORE-PTM-003B — Schedule financial KPI projection contracts | collaboration/work_packages/pending/CORE-PTM-003B_Schedule_financial_KPI_projection_contracts.md
+- DISPATCH-PTM-001 | DISPATCH-PTM-001 — Task-to-dispatch evidence chain contract | collaboration/work_packages/pending/DISPATCH-PTM-001_Task_to_dispatch_evidence_chain_contract.md
+- FILE-PTM-001A | FILE-PTM-001A — File import parser format inventory | collaboration/work_packages/pending/FILE-PTM-001A_File_import_parser_format_inventory.md
+- FILE-PTM-001B | FILE-PTM-001B — File import report and SHA mapping contract | collaboration/work_packages/pending/FILE-PTM-001B_File_import_report_and_SHA_mapping_contract.md
+- FIN-PTM-001 | FIN-PTM-001 — Budget cost approval and reconciliation contract | collaboration/work_packages/pending/FIN-PTM-001_Budget_cost_approval_and_reconciliation_contract.md
+- INTAKE-PTM-001A | INTAKE-PTM-001A — Manual and Parking Lot intake contract | collaboration/work_packages/pending/INTAKE-PTM-001A_Manual_and_Parking_Lot_intake_contract.md
+- INTAKE-PTM-001B | INTAKE-PTM-001B — Conversation intake and dedupe confirmation contract | collaboration/work_packages/pending/INTAKE-PTM-001B_Conversation_intake_and_dedupe_confirmation_contract.md
+- KPI-PTM-001 | KPI-PTM-001 — KPI registry quality and dashboard contract | collaboration/work_packages/pending/KPI-PTM-001_KPI_registry_quality_and_dashboard_contract.md
+- MIG-PTM-001A | MIG-PTM-001A — Pilot migration source slice plan | collaboration/work_packages/pending/MIG-PTM-001A_Pilot_migration_source_slice_plan.md
+- MIG-PTM-001B | MIG-PTM-001B — Pilot migration execution package draft | collaboration/work_packages/pending/MIG-PTM-001B_Pilot_migration_execution_package_draft.md
+- PL-0014 | PL-0014 — External Worker Telemetry Adapter | collaboration/work_packages/pending/PL-0014_External_Worker_Telemetry_Adapter.md
+- PROD-PTM-001A | PROD-PTM-001A — Read-only adapter runtime foundation | collaboration/work_packages/pending/PROD-PTM-001A_Read_Only_Adapter_Runtime_Foundation.md
+- PROD-PTM-001B | PROD-PTM-001B — Read-only adapter contract fixtures | collaboration/work_packages/pending/PROD-PTM-001B_Read_Only_Adapter_Contract_Fixtures.md
+- PROD-PTM-001C | PROD-PTM-001C — Read-only pilot projection | collaboration/work_packages/pending/PROD-PTM-001C_Read_Only_Pilot_Projection.md
 - README | Pending Codex Work Packages | collaboration/work_packages/pending/README.md
+- ROLL-PTM-001A | ROLL-PTM-001A — Operational runbook and resident training plan | collaboration/work_packages/pending/ROLL-PTM-001A_Operational_runbook_and_resident_training_plan.md
+- ROLL-PTM-001B | ROLL-PTM-001B — Rollout acceptance and expansion gate package | collaboration/work_packages/pending/ROLL-PTM-001B_Rollout_acceptance_and_expansion_gate_package.md
+- SCHED-PTM-001A | SCHED-PTM-001A — Schedule dependency and readiness-gate contract | collaboration/work_packages/pending/SCHED-PTM-001A_Schedule_dependency_and_readiness_gate_contract.md
+- SCHED-PTM-001B | SCHED-PTM-001B — Schedule validation fixture and critical-path plan | collaboration/work_packages/pending/SCHED-PTM-001B_Schedule_validation_fixture_and_critical_path_plan.md
+- SPEC-PTM-001 | SPEC-PTM-001 — Accept PTM specification and boundaries | collaboration/work_packages/pending/SPEC-PTM-001_Accept_PTM_specification_and_boundaries.md
+- TEST-PTM-001A | TEST-PTM-001A — Automated replay gate and policy validation plan | collaboration/work_packages/pending/TEST-PTM-001A_Automated_replay_gate_and_policy_validation_plan.md
+- TEST-PTM-001B | TEST-PTM-001B — End-to-end acceptance validation package draft | collaboration/work_packages/pending/TEST-PTM-001B_End_to_end_acceptance_validation_package_draft.md
+- UI-PTM-001A | UI-PTM-001A — Workspace information architecture shell | collaboration/work_packages/pending/UI-PTM-001A_Workspace_information_architecture_shell.md
+- UI-PTM-001B | UI-PTM-001B — Workspace data binding and navigation contract | collaboration/work_packages/pending/UI-PTM-001B_Workspace_data_binding_and_navigation_contract.md
+- UI-PTM-002 | UI-PTM-002 — Office compact card and deep-link contract | collaboration/work_packages/pending/UI-PTM-002_Office_compact_card_and_deep_link_contract.md
+- UTIL-PTM-001 | UTIL-PTM-001 — Capacity and utilization observation contract | collaboration/work_packages/pending/UTIL-PTM-001_Capacity_and_utilization_observation_contract.md
 - WP-0014 | SERIES TASK WP-0014 — Mailbox Index Regeneration and Destination Coverage Fix | collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md
 - WP-0015 | SERIES TASK WP-0015 — Message Acknowledgement and Reply Flow | collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md
 - WP-0016 | ARCHITECTURE-FIRST TASK WP-0016 — Work Package Registry | collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md
@@ -180,6 +212,61 @@ Validation Candidates: 5
 - WP-0218 | SERIES TASK WP-0218 — Estate Model Control Plane and Selector Authority | collaboration/work_packages/pending/WP-0218_SERIES_estate_model_control_plane_and_selector_authority.md
 - WP-0219 | WP-0219 - Alfred Resident Package Validation and Platform Export Hardening | collaboration/work_packages/pending/WP-0219_CHARACTER_ARCHITECTURE_alfred_resident_package_validation_and_exports.md
 - WP-0220 | WP-0220 - Repair Alfred Ring 2 Findings and Validation Recipe Coverage | collaboration/work_packages/pending/WP-0220_CHARACTER_ARCHITECTURE_repair_alfred_ring2_findings.md
+- WP-0221 | WP-0221 - TextGen 4.9 Character Injection Adapter for Alfred | collaboration/work_packages/pending/WP-0221_CHARACTER_ARCHITECTURE_textgen49_character_injection_adapter.md
+- WP-0222 | WP-0222 - Repair TextGen 4.9 Alfred YAML Serialization | collaboration/work_packages/pending/WP-0222_CHARACTER_ARCHITECTURE_repair_textgen49_yaml_serialization.md
+- WP-0223 | WP-0223 - Alfred Standalone Resident Runtime and Event Intake Foundation | collaboration/work_packages/pending/WP-0223_CHARACTER_ARCHITECTURE_alfred_standalone_runtime_event_intake.md
+- WP-0224 | WP-0224 - Resident Standup Sprint Aligned to Background Operations Runtime | collaboration/work_packages/pending/WP-0224_CHARACTER_ARCHITECTURE_resident_standup_sprint_qmaster_return_gate.md
+- WP-0225 | WP-0225 - CueMastery and IONOGE Nomenclature Repair | collaboration/work_packages/pending/WP-0225_CHARACTER_ARCHITECTURE_CUEMASTERY_nomenclature_repair.md
+- WP-0226 | WP-0226 - Alfred Estate and Engineering Department Boundary | collaboration/work_packages/pending/WP-0226_CHARACTER_ARCHITECTURE_alfred_estate_engineering_boundary.md
+- WP-0501 | WP-0501 - Execution Provider Boundary Review After Background Operations Merge Wave | collaboration/work_packages/pending/WP-0501_Execution_Provider_Boundary_Review_After_Background_Operations_Merge_Wave.md
+- WP-0502 | WP-0502 - Institutional Operations Doctrine | collaboration/work_packages/pending/WP-0502_Institutional_Operations_Doctrine.md
+- WP-0503 | WP-0503 - Governed Dispatch-to-Adapter Handoff Runtime | collaboration/work_packages/pending/WP-0503_Governed_Dispatch_to_Adapter_Handoff_Runtime.md
+- WP-0504 | WP-0504 - Codex Bridge Execution Provider Adapter | collaboration/work_packages/pending/WP-0504_Codex_Bridge_Execution_Provider_Adapter.md
+- WP-0505 | WP-0505 - Execution Result Reconciliation and Dispatch Lifecycle Closure | collaboration/work_packages/pending/WP-0505_Execution_Result_Reconciliation_and_Dispatch_Lifecycle_Closure.md
+- WP-0506 | WP-0506 - Steward-Authorized Live Codex Execution Gate | collaboration/work_packages/pending/WP-0506_Steward_Authorized_Live_Codex_Execution_Gate.md
+- WP-0507 | WP-0507 - Execution Attempt Lease, Cancellation, and Recovery | collaboration/work_packages/pending/WP-0507_Execution_Attempt_Lease_Cancellation_and_Recovery.md
+- WP-0508 | WP-0508 - Governed Execution Session Controller | collaboration/work_packages/pending/WP-0508_Governed_Execution_Session_Controller.md
+- WP-0509 | WP-0509 - End-to-End Execution Chain Demonstration and Steward-Local Smoke Test | collaboration/work_packages/pending/WP-0509_End_to_End_Execution_Chain_Demonstration_and_Steward_Local_Smoke_Test.md
+- WP-0510 | WP-0510 - Office Execution Session Control Surface | collaboration/work_packages/pending/WP-0510_Office_Execution_Session_Control_Surface.md
+- WP-0511 | WP-0511 - Office Functional Audit and Settings Repair | collaboration/work_packages/pending/WP-0511_Office_Functional_Audit_and_Settings_Repair.md
+- WP-0512 | WP-0512 - Office Shell, Navigation, and Action Transport Reliability | collaboration/work_packages/pending/WP-0512_Office_Shell_Navigation_and_Action_Transport_Reliability.md
+- WP-0513 | WP-0513 - Parking Lot, Roadmap, and Priority Control Surface | collaboration/work_packages/pending/WP-0513_Parking_Lot_Roadmap_and_Priority_Control_Surface.md
+- WP-0514 | WP-0514 - Personnel Directory, Org Chart, and Employee File Control Surface | collaboration/work_packages/pending/WP-0514_Personnel_Directory_Org_Chart_and_Employee_File_Control_Surface.md
+- WP-0515 | WP-0515 - Alfred Primary Interaction and Resident Chat Control Surface | collaboration/work_packages/pending/WP-0515_Alfred_Primary_Interaction_and_Resident_Chat_Control_Surface.md
+- WP-0516 | WP-0516 - Mission Control, Daily Board, and Operational Activity Controls | collaboration/work_packages/pending/WP-0516_Mission_Control_Daily_Board_and_Operational_Activity_Controls.md
+- WP-0517 | WP-0517 - Projects, Work Packages, and Assignment Control Center | collaboration/work_packages/pending/WP-0517_Projects_Work_Packages_and_Assignment_Control_Center.md
+- WP-0518 | WP-0518 - Validation, Audit, and Verdict Control Center | collaboration/work_packages/pending/WP-0518_Validation_Audit_and_Verdict_Control_Center.md
+- WP-0519 | WP-0519 - Mailbox, Notifications, and Attention Control Center | collaboration/work_packages/pending/WP-0519_Mailbox_Notifications_and_Attention_Control_Center.md
+- WP-0520 | WP-0520 - AI Services, Local Runtime, Search, and Command Palette Controls | collaboration/work_packages/pending/WP-0520_AI_Services_Local_Runtime_Search_and_Command_Palette_Controls.md
+- WP-0521 | WP-0521 - Office End-to-End Regression, Recovery, and Operational Acceptance | collaboration/work_packages/pending/WP-0521_Office_End_to_End_Regression_Recovery_and_Operational_Acceptance.md
+- WP-0522 | WP-0522 - Executive Workspace and Steward Readiness | collaboration/work_packages/pending/WP-0522_PARALLEL_STAGED_Executive_Workspace_and_Steward_Readiness.md
+- WP-0523 | WP-0523 - Cross-Office Guided Action Framework | collaboration/work_packages/pending/WP-0523_PARALLEL_STAGED_Cross_Office_Guided_Action_Framework.md
+- WP-0524 | WP-0524 - Actionable Notifications and Follow-Up Center | collaboration/work_packages/pending/WP-0524_PARALLEL_STAGED_Actionable_Notifications_and_Follow_Up_Center.md
+- WP-0525 | WP-0525 - Resident Presence and Operational Activity | collaboration/work_packages/pending/WP-0525_PARALLEL_STAGED_Resident_Presence_and_Operational_Activity.md
+- WP-0526 | WP-0526 - Steward Workspace Personalization | collaboration/work_packages/pending/WP-0526_PARALLEL_STAGED_Steward_Workspace_Personalization.md
+- WP-0527 | WP-0527 - Unified Estate Search and Command Experience | collaboration/work_packages/pending/WP-0527_PARALLEL_STAGED_Unified_Estate_Search_and_Command_Experience.md
+- WP-0528 | WP-0528 - Estate Timeline and Operational History | collaboration/work_packages/pending/WP-0528_PARALLEL_STAGED_Estate_Timeline_and_Operational_History.md
+- WP-0529 | WP-0529 - Decision Support and Operational Recommendations | collaboration/work_packages/pending/WP-0529_PARALLEL_STAGED_Decision_Support_and_Operational_Recommendations.md
+- WP-0530 | WP-0530 - Guided Operational Workflows | collaboration/work_packages/pending/WP-0530_PARALLEL_STAGED_Guided_Operational_Workflows.md
+- WP-0531 | WP-0531 - Office Intelligence Wave Installation and Acceptance | collaboration/work_packages/pending/WP-0531_INSTALL_HANDOFF_Office_Intelligence_Wave_Installation_and_Acceptance.md
+- WP-0532 | WP-0532 - Engineering Capacity Runtime and Dashboard | collaboration/work_packages/pending/WP-0532_PARALLEL_INDEPENDENT_Engineering_Capacity_Runtime_and_Dashboard.md
+- WP-0533 | WP-0533 - Engineering Provider Routing and Codex Status Cost Characterization | collaboration/work_packages/pending/WP-0533_Engineering_Provider_Routing_and_Codex_Status_Cost_Characterization.md
+- WP-0534 | WP-0534 - Codex CLI Capability Discovery, Provider Registry, and Polling Policy | collaboration/work_packages/pending/WP-0534_PARALLEL_INDEPENDENT_Codex_CLI_Capability_Discovery_Provider_Registry_and_Polling_Policy.md
+- WP-0535 | WP-0535 - Engineering Provider Health and Telemetry Runtime | collaboration/work_packages/pending/WP-0535_PARALLEL_INDEPENDENT_Engineering_Provider_Health_and_Telemetry_Runtime.md
+- WP-0536 | WP-0536 — Engineering Project Intake and Mobilization Runtime | collaboration/work_packages/pending/WP-0536_Engineering_Project_Intake_and_Mobilization_Runtime.md
+- WP-0537 | WP-0537 — Engineering Workforce Role Catalog and Staffing Plan Runtime | collaboration/work_packages/pending/WP-0537_Engineering_Workforce_Role_Catalog_and_Staffing_Plan_Runtime.md
+- WP-0538 | WP-0538 — Local Engineering Worker Provisioning and Lifecycle Runtime | collaboration/work_packages/pending/WP-0538_Local_Engineering_Worker_Provisioning_and_Lifecycle_Runtime.md
+- WP-0539 | WP-0539 — External Repository Access and Workspace Runtime | collaboration/work_packages/pending/WP-0539_External_Repository_Access_and_Workspace_Runtime.md
+- WP-0540 | WP-0540 — Engineering Assignment and Workstream Planning Runtime | collaboration/work_packages/pending/WP-0540_Engineering_Assignment_and_Workstream_Planning_Runtime.md
+- WP-0541 | WP-0541 — Governed Provider Scheduling and Queue Coordination | collaboration/work_packages/pending/WP-0541_Governed_Provider_Scheduling_and_Queue_Coordination.md
+- WP-0545 | WP-0545 — Engineering Provider Benchmark Harness | collaboration/work_packages/pending/WP-0545_PARALLEL_INDEPENDENT_Engineering_Provider_Benchmark_001.md
+- WP-0546 | WP-0546 — Provider Benchmark Canonical Packet and Fair Rerun | collaboration/work_packages/pending/WP-0546_PROVIDER_BENCHMARK_CANONICAL_PACKET_AND_FAIR_RERUN.md
+- WP-0547 | WP-0547 — Provider Benchmark Cross-Run Evidence Import | collaboration/work_packages/pending/WP-0547_PROVIDER_BENCHMARK_CROSS_RUN_EVIDENCE_IMPORT.md
+- WP-0548 | WP-0548 — Estate Stream Deck Status Bridge — Local CLI Build | collaboration/work_packages/pending/WP-0548_Estate_Stream_Deck_Status_Bridge_Local_CLI_Build.md
+- WP-0548 | WP-0548 — Helen Engineering Workforce and Staffing Contract | collaboration/work_packages/pending/WP-0548_HELEN_ENGINEERING_WORKFORCE_AND_STAFFING_CONTRACT.md
+- WP-0549 | WP-0549 — Estate Stream Deck Control Actions and Profile Generator | collaboration/work_packages/pending/WP-0549_Estate_Stream_Deck_Control_Actions_And_Profile_Generator.md
+- WP-0550 | WP-0550 — Stream Deck Register All Control Actions | collaboration/work_packages/pending/WP-0550_Stream_Deck_Register_All_Control_Actions.md
+- WP-0553 | WP-0553 — Engineering Worker Runtime Extraction to AI Tools | collaboration/work_packages/pending/WP-0553_ENGINEERING_WORKER_RUNTIME_EXTRACTION_TO_AI_TOOLS.md
 - WP-0600 | WP-0600 - Planning Provider Framework | collaboration/work_packages/pending/WP-0600_Planning_Provider_Framework.md
 - WP-0601 | WP-0601 - Operational Event Feed and Office Status | collaboration/work_packages/pending/WP-0601_Operational_Event_Feed_and_Office_Status.md
 - WP-0602 | WP-0602 - Office Operational Activity Panel | collaboration/work_packages/pending/WP-0602_Office_Operational_Activity_Panel.md
@@ -193,10 +280,258 @@ Validation Candidates: 5
 - WP-0610 | WP-0610 - Traffic Controller / Operations Manager | collaboration/work_packages/pending/WP-0610_Traffic_Controller_Operations_Manager.md
 - WP-0611 | WP-0611 - Office Traffic Controller Panel | collaboration/work_packages/pending/WP-0611_Office_Traffic_Controller_Panel.md
 - WP-0612 | WP-0612 - Operations and Execution Integration Audit | collaboration/work_packages/pending/WP-0612_Operations_Execution_Integration_Audit.md
+- WP-0613 | WP-0613 - Execution Provider Adapter Contract | collaboration/work_packages/pending/WP-0613_Execution_Provider_Adapter_Contract.md
+- WP-0614 | WP-0614 - Execution Provider Routing Recommendations | collaboration/work_packages/pending/WP-0614_Execution_Provider_Routing_Recommendations.md
+- WP-0615 | WP-0615 - Office Provider Routing Recommendations Panel | collaboration/work_packages/pending/WP-0615_Office_Provider_Routing_Recommendations_Panel.md
+- WP-0616 | WP-0616 - Traffic Controller Movement Decision Loop | collaboration/work_packages/pending/WP-0616_Traffic_Controller_Movement_Decision_Loop.md
+- WP-0617 | WP-0617 - Background Operations Event Runtime | collaboration/work_packages/pending/WP-0617_Background_Operations_Event_Runtime.md
+- WP-0618 | WP-0618 - Background Operational Targets and Post-Merge Audit Function | collaboration/work_packages/pending/WP-0618_Background_Operational_Targets_and_Post_Merge_Audit.md
+- WP-0619 | WP-0619 - Operations Runtime Service Loop | collaboration/work_packages/pending/WP-0619_Operations_Runtime_Service_Loop.md
+- WP-0620 | WP-0620 - Repair WP-0619 Validation Recipe | collaboration/work_packages/pending/WP-0620_Repair_WP0619_Validation_Recipe.md
+- WP-0621 | WP-0621 - Automatic Post-Merge Validation Pipeline | collaboration/work_packages/pending/WP-0621_Automatic_Post_Merge_Validation_Pipeline.md
+- WP-0622 | WP-0622 - Operational Target Resolution and Validation Binding | collaboration/work_packages/pending/WP-0622_Operational_Target_Resolution_and_Validation_Binding.md
+- WP-0623 | WP-0623 - Automatic Merge and Receipt Discovery | collaboration/work_packages/pending/WP-0623_Automatic_Merge_and_Receipt_Discovery.md
+- WP-0624 | WP-0624 - Merge Discovery Consolidation and Backfill Control | collaboration/work_packages/pending/WP-0624_Merge_Discovery_Consolidation_and_Backfill_Control.md
+- WP-0625 | WP-0625 - Governed Automatic Admission and Bounded Audit Execution | collaboration/work_packages/pending/WP-0625_Governed_Automatic_Admission_and_Bounded_Audit_Execution.md
+- WP-0626 | WP-0626 - Cleanroom Post-Merge Audit Service | collaboration/work_packages/pending/WP-0626_Cleanroom_Post_Merge_Audit_Service.md
+- WP-0627 | WP-0627 - Continuous Operations Runtime Service | collaboration/work_packages/pending/WP-0627_Continuous_Operations_Runtime_Service.md
+- WP-0627 | WP-0627 - Operations Runtime Host and Autostart | collaboration/work_packages/pending/WP-0627_Operations_Runtime_Host_and_Autostart.md
+- WP-0628 | WP-0628 - Event-Driven Operations Scheduler | collaboration/work_packages/pending/WP-0628_Event_Driven_Operations_Scheduler.md
+- WP-0628 | WP-0628 - Unified Background Scheduler | collaboration/work_packages/pending/WP-0628_Unified_Background_Scheduler.md
+- WP-0629 | WP-0629 - Background Service Registry and Control Surface | collaboration/work_packages/pending/WP-0629_Background_Service_Registry_and_Control_Surface.md
+- WP-0629 | WP-0629 - Operational Watch Catalog and Control | collaboration/work_packages/pending/WP-0629_Operational_Watch_Catalog_and_Control.md
+- WP-0630 | WP-0630 - Operational Event Subscription Fabric | collaboration/work_packages/pending/WP-0630_Operational_Event_Subscription_Fabric.md
+- WP-0630 | WP-0630 - Operations Control Surface | collaboration/work_packages/pending/WP-0630_Operations_Control_Surface.md
+- WP-0631 | WP-0631 - Multi-Repository Operational Targets | collaboration/work_packages/pending/WP-0631_Multi_Repository_Operational_Targets.md
+- WP-0632 | WP-0632 - Operational Campaign Engine | collaboration/work_packages/pending/WP-0632_Operational_Campaign_Engine.md
+- WP-0633 | WP-0633 - Cross-Department Operational Coordination | collaboration/work_packages/pending/WP-0633_Cross_Department_Operational_Coordination.md
+- WP-0634 | WP-0634 - Runtime Persistence, Recovery, and Replay | collaboration/work_packages/pending/WP-0634_Runtime_Persistence_Recovery_and_Replay.md
+- WP-0635 | WP-0635 - Office Operational Command Dashboard | collaboration/work_packages/pending/WP-0635_Office_Operational_Command_Dashboard.md
+- WP-0636 | WP-0636 - Background Operations Extension Framework | collaboration/work_packages/pending/WP-0636_Background_Operations_Extension_Framework.md
+- WP-0637 | WP-0637 - Activate Merge-Gated Runtime Host and Windows Autostart | collaboration/work_packages/pending/WP-0637_Activate_Merge_Gated_Runtime_Host_and_Windows_Autostart.md
+- WP-0638 | WP-0638 - Repair Automatic Audit Queue and Runtime Host Integrity | collaboration/work_packages/pending/WP-0638_Repair_Automatic_Audit_Queue_and_Runtime_Host_Integrity.md
+- WP-0639 | WP-0639 - Automatic Validation Reconciliation, Queue Drain, and Runtime-State Integrity | collaboration/work_packages/pending/WP-0639_Automatic_Validation_Reconciliation_Queue_Drain_and_Runtime_State_Integrity.md
+- WP-0640 | WP-0640 - Windows-Safe Runtime Host PID Liveness and Duplicate-Lock Repair | collaboration/work_packages/pending/WP-0640_Windows_Safe_Runtime_Host_PID_Liveness_and_Duplicate_Lock_Repair.md
+- WP-0641 | WP-0641 - Windows Runtime Host Scheduled-Task Test Isolation and Production-Task Preservation | collaboration/work_packages/pending/WP-0641_Windows_Runtime_Host_Scheduled_Task_Test_Isolation_and_Production_Task_Preservation.md
+- WP-0642 | WP-0642 - Complete Windows Scheduled Task Test Isolation and Production Task Preservation | collaboration/work_packages/pending/WP-0642_Complete_Windows_Scheduled_Task_Test_Isolation_and_Production_Task_Preservation.md
+- WP-0643 | WP-0643 - Manifest-Only Host Test Isolation and Production Task Preservation | collaboration/work_packages/pending/WP-0643_Manifest_Only_Host_Test_Isolation_and_Production_Task_Preservation.md
+- WP-0644 | WP-0644 - Eliminate Real Windows Task Scheduler Access From Manifest-Only Host Tests | collaboration/work_packages/pending/WP-0644_Eliminate_Real_Windows_Task_Scheduler_Access_From_Manifest_Only_Host_Tests.md
+- WP-0645 | WP-0645 - Autonomous Ring 2 Provider Runtime and Evidence Contract | collaboration/work_packages/pending/WP-0645_Autonomous_Ring2_Provider_Runtime_and_Evidence_Contract.md
+- WP-0646 | WP-0646 - Multi-Model Ring 2 Arbitration and Adjudication | collaboration/work_packages/pending/WP-0646_Multi_Model_Ring_2_Arbitration_and_Adjudication.md
+- WP-0647 | WP-0647 - Estate Feature Activation and Orphaned Capacity Integration | collaboration/work_packages/pending/WP-0647_Estate_Feature_Activation_and_Orphaned_Capacity_Integration.md
+- WP-0648 | WP-0648 - Power-Loss-Safe Windows Runtime Lock Recovery | collaboration/work_packages/pending/WP-0648_Power_Loss_Safe_Windows_Runtime_Lock_Recovery.md
+- WP-0649 | WP-0649 — WebUI Helen/Grace Engineering Workflow Integration | collaboration/work_packages/pending/WP-0649_WebUI_Helen_Grace_Engineering_Workflow_Integration.md
+- WP-0650 | WP-0650 — Autonomous Post-Merge Operational Readiness Closure Loop | collaboration/work_packages/pending/WP-0650_Autonomous_Post_Merge_Operational_Readiness_Closure_Loop.md
+- WP-0651 | WP-0651 — Production Hardening of the Operational Readiness Closure Controller | collaboration/work_packages/pending/WP-0651_Production_Hardening_of_Operational_Readiness_Closure_Controller.md
+- WP-0652 | WP-0652 — Repair Transactional Activation Ledger Remediation | collaboration/work_packages/pending/WP-0652_Repair_Transactional_Activation_Ledger_Remediation.md
+- WP-0653 | WP-0653 — Complete Governed Publication and Production Readiness Policy Enforcement | collaboration/work_packages/pending/WP-0653_Complete_Governed_Publication_and_Production_Readiness_Policy_Enforcement.md
+- WP-0654 | WP-0654 — Wire `estate-main` Production Readiness Policy and Fail-Closed Intake | collaboration/work_packages/pending/WP-0654_Wire_Estate_Main_Production_Readiness_Policy_and_Fail_Closed_Intake.md
+- WP-0655 | WP-0655 — Open WebUI Streaming Engineering Assignment Bridge Repair | collaboration/work_packages/pending/WP-0655_Open_WebUI_Streaming_Engineering_Assignment_Bridge_Repair.md
+- WP-0656 | WP-0656 — Dispatch Queue to Engineering Worker Runtime Execution Bridge | collaboration/work_packages/pending/WP-0656_Dispatch_Queue_to_Engineering_Worker_Runtime_Execution_Bridge.md
+- WP-0657 | WP-0657 — Complete Open WebUI Engineering Dispatch Execution Metadata | collaboration/work_packages/pending/WP-0657_Complete_Open_WebUI_Engineering_Dispatch_Execution_Metadata.md
+- WP-0658 | WP-0658 — Estate Project and Task Management Specification and Implementation Roadmap | collaboration/work_packages/pending/WP-0658_Estate_Project_Task_Management_Specification_and_Implementation_Roadmap.md
+- WP-0659 | WP-0659 — Project Management Execution Lane, Parallelism, Campaigns, and Timeline Scenarios | collaboration/work_packages/pending/WP-0659_Project_Management_Execution_Lane_Parallelism_and_Timeline_Scenarios.md
+- WP-0660 | WP-0660 — Correct PTM Execution Decomposition and Hour-Scale Timeline Model | collaboration/work_packages/pending/WP-0660_Correct_PTM_Execution_Decomposition_and_Hour_Scale_Timeline_Model.md
+- WP-0661 | WP-0661 — PTM Parallel Campaign Execution and Midpoint Integration Plan | collaboration/work_packages/pending/WP-0661_PTM_Parallel_Campaign_Execution_and_Midpoint_Integration_Plan.md
+- WP-0662 | WP-0662 — Promote PTM Drafts and Create Executable Campaign Handoffs | collaboration/work_packages/pending/WP-0662_Promote_PTM_Drafts_and_Create_Executable_Campaign_Handoffs.md
+- WP-0663 | WP-0663 — EOC/CME Architectural Investigation and Current-State Reuse Map | collaboration/work_packages/pending/WP-0663_EOC_CME_Architectural_Investigation_and_Current_State_Reuse_Map.md
+- WP-0664 | WP-0664 — EOC/CME Operational State, Event, and Transition Model | collaboration/work_packages/pending/WP-0664_EOC_CME_Operational_State_Event_and_Transition_Model.md
+- WP-0665 | WP-0665 — EOC/CME Authority, Office Interaction, and Interface Contracts | collaboration/work_packages/pending/WP-0665_EOC_CME_Authority_Office_Interaction_and_Interface_Contracts.md
+- WP-0666 | WP-0666 — EOC/CME Operational Policy, Blocker, Notification, and Escalation Model | collaboration/work_packages/pending/WP-0666_EOC_CME_Operational_Policy_Blocker_Notification_and_Escalation_Model.md
+- WP-0667 | WP-0667 — EOC/CME Momentum Evaluation, Explainability, and Operational Observability | collaboration/work_packages/pending/WP-0667_EOC_CME_Momentum_Evaluation_Explainability_and_Operational_Observability.md
+- WP-0668 | WP-0668 — EOC/CME Validation, Simulation, and Constitutional Proof | collaboration/work_packages/pending/WP-0668_EOC_CME_Validation_Simulation_and_Constitutional_Proof.md
+- WP-0669 | WP-0669 — EOC/CME Architecture Synthesis, Implementation Campaign, and Acceptance Handoff | collaboration/work_packages/pending/WP-0669_EOC_CME_Architecture_Synthesis_Implementation_Campaign_and_Acceptance_Handoff.md
+- WP-0670 | WP-0670 — Engineering Department Current-State and Gap Assessment | collaboration/work_packages/pending/WP-0670_Engineering_Department_Current_State_and_Gap_Assessment.md
+- WP-0671 | WP-0671 — Engineering Campaign Intake, Decomposition, and Readiness Contract | collaboration/work_packages/pending/WP-0671_Engineering_Campaign_Intake_Decomposition_and_Readiness_Contract.md
+- WP-0672 | WP-0672 — Engineering Execution Lanes, Codex, Local AI, and Provider Routing | collaboration/work_packages/pending/WP-0672_Engineering_Execution_Lanes_Codex_Local_AI_and_Provider_Routing.md
+- WP-0673 | WP-0673 — Engineering Evidence, Validation, Integration, and Acceptance Lifecycle | collaboration/work_packages/pending/WP-0673_Engineering_Evidence_Validation_Integration_and_Acceptance_Lifecycle.md
+- WP-0674 | WP-0674 — Engineering Operations Metrics, Notebook, and Continuity Integration | collaboration/work_packages/pending/WP-0674_Engineering_Operations_Metrics_Notebook_and_Continuity_Integration.md
+- WP-0675 | WP-0675 — Engineering Department Operational Readiness and Campaign Acceptance | collaboration/work_packages/pending/WP-0675_Engineering_Department_Operational_Readiness_and_Campaign_Acceptance.md
+- WP-0676 | WP-0676 — Canonical Estate PTM Repository Verification Toolkit | collaboration/work_packages/pending/WP-0676_Canonical_Estate_PTM_Repository_Verification_Toolkit.md
+- WP-0677 | WP-0677 — PTM Reconciliation, Cleanup, and Production Implementation Transition | collaboration/work_packages/pending/WP-0677_PTM_Reconciliation_Cleanup_and_Production_Implementation_Transition.md
+- WP-0678 | WP-0678 — Campaign-Level Codex Execution Capability | collaboration/work_packages/pending/WP-0678_Campaign_Level_Codex_Execution_Capability.md
+- WP-0679 | WP-0679 — GitHub Codex Access Smoke Test | collaboration/work_packages/pending/WP-0679_GitHub_Codex_Access_Smoke_Test.md
+- WP-0688 | WP-0688 — Estate Operational Current-State and Canonical-Reuse Map | collaboration/work_packages/pending/WP-0688_Estate_Operational_Current_State_and_Canonical_Reuse_Map.md
+- WP-0689 | WP-0689 — Operational State, Event, and Transition Contract | collaboration/work_packages/pending/WP-0689_Operational_State_Event_and_Transition_Contract.md
+- WP-0690 | WP-0690 — Authority-Aware Operational Action Taxonomy | collaboration/work_packages/pending/WP-0690_Authority_Aware_Operational_Action_Taxonomy.md
+- WP-0691 | WP-0691 — Resident and Service Health Signal Integration | collaboration/work_packages/pending/WP-0691_Resident_and_Service_Health_Signal_Integration.md
+- WP-0692 | WP-0692 — Campaign and Work-Package Momentum Observer | collaboration/work_packages/pending/WP-0692_Campaign_and_Work_Package_Momentum_Observer.md
+- WP-0693 | WP-0693 — Operational Blocker and Escalation Classifier | collaboration/work_packages/pending/WP-0693_Operational_Blocker_and_Escalation_Classifier.md
+- WP-0694 | WP-0694 — Grace Operational Coordination Surface | collaboration/work_packages/pending/WP-0694_Grace_Operational_Coordination_Surface.md
+- WP-0695 | WP-0695 — Helen Staffing and Capability Request Integration | collaboration/work_packages/pending/WP-0695_Helen_Staffing_and_Capability_Request_Integration.md
+- WP-0696 | WP-0696 — Alfred Communication and Mailbox Routing Integration | collaboration/work_packages/pending/WP-0696_Alfred_Communication_and_Mailbox_Routing_Integration.md
+- WP-0697 | WP-0697 — Codex Campaign Final-Gate Precedence and Specification Alignment | collaboration/work_packages/pending/WP-0697_Codex_Campaign_Final_Gate_Precedence_and_Specification_Alignment.md
+- WP-0697 | WP-0697 — Engineering Department Operational Integration | collaboration/work_packages/pending/WP-0697_ENGINEERING_DEPARTMENT_OPERATIONAL_INTEGRATION.md
+- WP-0698 | WP-0698 — Readiness, Validation, and Evidence Signal Unification | collaboration/work_packages/pending/WP-0698_READINESS_VALIDATION_AND_EVIDENCE_SIGNAL_UNIFICATION.md
+- WP-0699 | WP-0699 — Operational Pause, Resume, Retry, and Recovery Controls | collaboration/work_packages/pending/WP-0699_OPERATIONAL_PAUSE_RESUME_RETRY_AND_RECOVERY_CONTROLS.md
+- WP-0700 | WP-0700 — Continuous Momentum Engine (Bounded Decision Loop) | collaboration/work_packages/pending/WP-0700_CONTINUOUS_MOMENTUM_ENGINE_BOUNDED_DECISION_LOOP.md
+- WP-0701 | WP-0701 — Operational Policy and Guardrail Enforcement | collaboration/work_packages/pending/WP-0701_OPERATIONAL_POLICY_AND_GUARDRAIL_ENFORCEMENT.md
+- WP-0702 | WP-0702 — Operational Audit Trail and Decision Explainability | collaboration/work_packages/pending/WP-0702_OPERATIONAL_AUDIT_TRAIL_AND_DECISION_EXPLAINABILITY.md
+- WP-0703 | WP-0703 — Operational Dashboard and Steward Visibility Surface | collaboration/work_packages/pending/WP-0703_OPERATIONAL_DASHBOARD_AND_STEWARD_VISIBILITY_SURFACE.md
+- WP-0704 | WP-0704 — Operational Acceptance, Graduation, and Campaign Closeout | collaboration/work_packages/pending/WP-0704_OPERATIONAL_ACCEPTANCE_GRADUATION_AND_CAMPAIGN_CLOSEOUT.md
+- WP-0705 | WP-0705 — Failure-Mode, Authority-Boundary, and Degraded-Service Validation | collaboration/work_packages/pending/WP-0705_FAILURE_MODE_AUTHORITY_BOUNDARY_AND_DEGRADED_SERVICE_VALIDATION.md
+- WP-0706 | WP-0706 — Bounded Real-Work Pilot Campaign | collaboration/work_packages/pending/WP-0706_BOUNDED_REAL_WORK_PILOT_CAMPAIGN.md
+- WP-0707 | WP-0707 — Estate Operationalization Integration and Acceptance | collaboration/work_packages/pending/WP-0707_ESTATE_OPERATIONALIZATION_INTEGRATION_AND_ACCEPTANCE.md
+- WP-0708 | WP-0708 — Repair Reflection Execution Handoff Reference | collaboration/work_packages/pending/WP-0708_REPAIR_REFLECTION_EXECUTION_HANDOFF_REFERENCE.md
+- WP-0709 | WP-0709 — Reflection and Continuity Process Adoption | collaboration/work_packages/pending/WP-0709_REFLECTION_AND_CONTINUITY_PROCESS_ADOPTION.md
+- WP-0710 | WP-0710 — Reflection Automation Integration | collaboration/work_packages/pending/WP-0710_REFLECTION_AUTOMATION_INTEGRATION.md
+- WP-4000 | WP-4000 — Helen Workforce Runtime Integration | collaboration/work_packages/pending/WP-4000_Helen_Workforce_Runtime_Integration.md
+- WP-4001 | WP-4001 — Estate Multi-Resident Chat Gateway and Helen Activation | collaboration/work_packages/pending/WP-4001_Estate_Multi_Resident_Chat_Gateway_and_Helen_Activation.md
+- WP-4002 | WP-4002 — Resident Layered Identity and Continuity Framework | collaboration/work_packages/pending/WP-4002_Resident_Layered_Identity_and_Continuity_Framework.md
+- WP-4003 | WP-4003 — Helen Operational Readiness and Grace Hiring Gate | collaboration/work_packages/pending/WP-4003_Helen_Operational_Readiness_and_Grace_Hiring_Gate.md
+- WP-4004 | WP-4004 — Character Continuity Records and Reflection Cycles | collaboration/work_packages/pending/WP-4004_Character_Continuity_Records_and_Reflection_Cycles.md
+- WP-4005 | WP-4005 — Grace Governed Hiring and Onboarding | collaboration/work_packages/pending/WP-4005_Grace_Governed_Hiring_and_Onboarding.md
+- WP-4006 | WP-4006 — Grace Operations Runtime Integration | collaboration/work_packages/pending/WP-4006_Grace_Operations_Runtime_Integration.md
+- WP-4007 | WP-4007 — Ingrid Privacy, Classification, and Boundary Inventory | collaboration/work_packages/pending/WP-4007_Ingrid_Privacy_Classification_and_Boundary_Inventory.md
+- WP-4008 | WP-4008 — Multi-Resident Behavioral Differentiation and Consistency | collaboration/work_packages/pending/WP-4008_Multi_Resident_Behavioral_Differentiation_and_Consistency.md
+- WP-4009 | WP-4009 — Workforce Cognitive Health and Intervention Runtime | collaboration/work_packages/pending/WP-4009_Workforce_Cognitive_Health_and_Intervention_Runtime.md
+- WP-4010 | WP-4010 — Institutional Learning and Lessons Intake | collaboration/work_packages/pending/WP-4010_Institutional_Learning_and_Lessons_Intake.md
+- WP-4011 | WP-4011 — Resident Communications and Task Visibility | collaboration/work_packages/pending/WP-4011_Resident_Communications_and_Task_Visibility.md
+- WP-4012 | WP-4012 — Estate Knowledge Index and Retrieval Service | collaboration/work_packages/pending/WP-4012_Estate_Knowledge_Index_and_Retrieval_Service.md
+- WP-4013 | WP-4013 — Worker Personal Journals and Protected Reflection Store | collaboration/work_packages/pending/WP-4013_Worker_Personal_Journals_and_Protected_Reflection_Store.md
+- WP-4014 | WP-4014 — Historian Office Runtime and Institutional Timeline | collaboration/work_packages/pending/WP-4014_Historian_Office_Runtime_and_Institutional_Timeline.md
+- WP-4015 | WP-4015 — Research Office Source Intelligence and Monitoring | collaboration/work_packages/pending/WP-4015_Research_Office_Source_Intelligence_and_Monitoring.md
+- WP-4016 | WP-4016 — Resident Mail and Conversation Bus | collaboration/work_packages/pending/WP-4016_Resident_Mail_and_Conversation_Bus.md
+- WP-4017 | WP-4017 — Office Resident Task Board | collaboration/work_packages/pending/WP-4017_Office_Resident_Task_Board.md
+- WP-4018 | WP-4018 — Steward Attention Management and Executive Briefing | collaboration/work_packages/pending/WP-4018_Steward_Attention_Management_and_Executive_Briefing.md
+- WP-4019 | WP-4019 — Estate Discovery and Rediscovery Engine | collaboration/work_packages/pending/WP-4019_Estate_Discovery_and_Rediscovery_Engine.md
+- WP-4020 | WP-4020 — Institutional Search Unification | collaboration/work_packages/pending/WP-4020_Institutional_Search_Unification.md
+- WP-4021 | WP-4021 — Resident Lifecycle Management | collaboration/work_packages/pending/WP-4021_Resident_Lifecycle_Management.md
+- WP-4022 | WP-4022 — Resident Capability and Tool Access Integration | collaboration/work_packages/pending/WP-4022_Resident_Capability_and_Tool_Access_Integration.md
+- WP-4023 | WP-4023 — Resident Work Delegation and Handoff Runtime | collaboration/work_packages/pending/WP-4023_Resident_Work_Delegation_and_Handoff_Runtime.md
+- WP-4024 | WP-4024 — Resident Context Assembly and Retrieval Pipeline | collaboration/work_packages/pending/WP-4024_Resident_Context_Assembly_and_Retrieval_Pipeline.md
+- WP-4025 | WP-4025 — Resident Session Management and Conversation Recovery | collaboration/work_packages/pending/WP-4025_Resident_Session_Management_and_Conversation_Recovery.md
+- WP-4026 | WP-4026 — Local Model Assignment, Evaluation, and Failover | collaboration/work_packages/pending/WP-4026_Local_Model_Assignment_Evaluation_and_Failover.md
+- WP-4027 | WP-4027 — Resident Performance and Reliability Evaluation | collaboration/work_packages/pending/WP-4027_Resident_Performance_and_Reliability_Evaluation.md
+- WP-4028 | WP-4028 — Local AI Service Supervision and Recovery | collaboration/work_packages/pending/WP-4028_Local_AI_Service_Supervision_and_Recovery.md
+- WP-4029 | WP-4029 — Resident Files, Attachments, and Working Artifact Exchange | collaboration/work_packages/pending/WP-4029_Resident_Files_Attachments_and_Working_Artifact_Exchange.md
+- WP-4030 | WP-4030 — Estate Backup, Restore, and Resident Continuity Recovery | collaboration/work_packages/pending/WP-4030_Estate_Backup_Restore_and_Resident_Continuity_Recovery.md
+- WP-4031 | WP-4031 — Resident Runtime Install Handoff and Operational Acceptance | collaboration/work_packages/pending/WP-4031_Resident_Runtime_Install_Handoff_and_Operational_Acceptance.md
+- WP-4032 | WP-4032 — Resident Gateway Streaming Compatibility | collaboration/work_packages/pending/WP-4032_Resident_Gateway_Streaming_Compatibility.md
+- WP-4033 | WP-4033 — Grace Steward Appointment and Lifecycle Activation | collaboration/work_packages/pending/WP-4033_Grace_Steward_Appointment_and_Lifecycle_Activation.md
+- WP-4034 | WP-4034 — Ingrid Live Resident Runtime, Avatar, and Voice | collaboration/work_packages/pending/WP-4034_Ingrid_Live_Resident_Runtime_Avatar_and_Voice.md
+- WP-4035 | WP-4035 — Grace Live Resident Runtime and Open WebUI Exposure | collaboration/work_packages/pending/WP-4035_Grace_Live_Resident_Runtime_and_Open_WebUI_Exposure.md
+- WP-4036 | WP-4036 — Evelyn Complete Character and Physical Identity Bible | collaboration/work_packages/pending/WP-4036_Evelyn_Complete_Character_and_Physical_Identity_Bible.md
+- WP-4037 | WP-4037 — Evelyn Restricted Continuity and Relationship-Layer Runtime | collaboration/work_packages/pending/WP-4037_Evelyn_Restricted_Continuity_and_Relationship_Layer_Runtime.md
+- WP-4038 | WP-4038 — PARALLEL-STAGED — Evelyn Model Entitlement, Voice, Portrait, and Open WebUI Exposure | collaboration/work_packages/pending/WP-4038_PARALLEL_STAGED_Evelyn_Model_Entitlement_Voice_Portrait_and_Open_WebUI_Exposure.md
+- WP-4039 | WP-4039 — Multi-Resident Conversation Room Core | collaboration/work_packages/pending/WP-4039_PARALLEL_STAGED_Multi_Resident_Conversation_Room_Core.md
+- WP-4040 | WP-4040 — Open WebUI Multi-Resident Gateway Integration | collaboration/work_packages/pending/WP-4040_PARALLEL_STAGED_Open_WebUI_Multi_Resident_Gateway_Integration.md
+- WP-4041 | WP-4041 — Resident Identity Package Standard | collaboration/work_packages/pending/WP-4041_PARALLEL_INDEPENDENT_Resident_Identity_Package_Standard.md
+- WP-4042 | WP-4042 — Resident Wave Install, Validation, and Acceptance | collaboration/work_packages/pending/WP-4042_INSTALL_HANDOFF_Resident_Wave_Install_Validation_and_Acceptance.md
+- WP-4043 | WP-4043 — Resident Runtime Identity Composition | collaboration/work_packages/pending/WP-4043_SERIES_Resident_Runtime_Identity_Composition.md
+- WP-4044 | WP-4044 — Resident Character Bible Runtime Loading | collaboration/work_packages/pending/WP-4044_SERIES_Resident_Character_Bible_Runtime_Loading.md
+- WP-4045 | WP-4045 — Resident Registry Synchronization | collaboration/work_packages/pending/WP-4045_SERIES_Resident_Registry_Synchronization.md
+- WP-4046 | WP-4046 — Grounded Estate Fact Provider | collaboration/work_packages/pending/WP-4046_SERIES_Grounded_Estate_Fact_Provider.md
+- WP-4047 | WP-4047 — Resident Conversation Isolation | collaboration/work_packages/pending/WP-4047_SERIES_Resident_Conversation_Isolation.md
+- WP-4048 | WP-4048 — Internal Resident Message Runtime | collaboration/work_packages/pending/WP-4048_SERIES_Internal_Resident_Message_Runtime.md
+- WP-4049 | WP-4049 — Resident Mailbox Processing | collaboration/work_packages/pending/WP-4049_SERIES_Resident_Mailbox_Processing.md
+- WP-4050 | WP-4050 — Resident Message Routing and Acknowledgment | collaboration/work_packages/pending/WP-4050_SERIES_Resident_Message_Routing_and_Acknowledgment.md
+- WP-4051 | WP-4051 — Resident Relationship Graph Runtime | collaboration/work_packages/pending/WP-4051_SERIES_Resident_Relationship_Graph_Runtime.md
+- WP-4052 | WP-4052 — Conference Room Context and Disclosure Rules | collaboration/work_packages/pending/WP-4052_SERIES_Conference_Room_Context_and_Disclosure_Rules.md
+- WP-4053 | WP-4053 — Dynamic Resident Preference and Personality Evolution | collaboration/work_packages/pending/WP-4053_Dynamic_Resident_Preference_and_Personality_Evolution.md
+- WP-4054 | WP-4054 — Multi-Resident Turn Management | collaboration/work_packages/pending/WP-4054_SERIES_Multi_Resident_Turn_Management.md
+- WP-4055 | WP-4055 — Resident Reflection Point Runtime Hooks | collaboration/work_packages/pending/WP-4055_SERIES_Resident_Reflection_Point_Runtime_Hooks.md
+- WP-4056 | WP-4056 — Resident Continuity Package Generator | collaboration/work_packages/pending/WP-4056_SERIES_Resident_Continuity_Package_Generator.md
+- WP-4057 | WP-4057 — Resident Renewal Validation | collaboration/work_packages/pending/WP-4057_SERIES_Resident_Renewal_Validation.md
+- WP-4058 | WP-4058 — Resident Rehydration Runtime | collaboration/work_packages/pending/WP-4058_SERIES_Resident_Rehydration_Runtime.md
+- WP-4059 | WP-4059 — Resident Self-Diagnostics | collaboration/work_packages/pending/WP-4059_SERIES_Resident_Self_Diagnostics.md
+- WP-4060 | WP-4060 — Resident Runtime Monitoring | collaboration/work_packages/pending/WP-4060_SERIES_Resident_Runtime_Monitoring.md
+- WP-4061 | WP-4061 — Resident Maturation Install Handoff and Commissioning | collaboration/work_packages/pending/WP-4061_SERIES_Resident_Maturation_Install_Handoff_and_Commissioning.md
+- WP-4062 | WP-4062 — Stateful Chat Runner and Work-Package Queue | collaboration/work_packages/pending/WP-4062_PARALLEL_INDEPENDENT_Stateful_Chat_Runner_and_Work_Package_Queue.md
+- WP-4063 | WP-4063 — Resident Memory Runtime | collaboration/work_packages/pending/WP-4063_SERIES_Resident_Memory_Runtime.md
+- WP-4064 | WP-4064 — Resident Episodic Memory | collaboration/work_packages/pending/WP-4064_SERIES_Resident_Episodic_Memory.md
+- WP-4065 | WP-4065 — Long-Term Personal Memory | collaboration/work_packages/pending/WP-4065_SERIES_Long_Term_Personal_Memory.md
+- WP-4066 | WP-4066 — Shared Institutional Memory | collaboration/work_packages/pending/WP-4066_SERIES_Shared_Institutional_Memory.md
+- WP-4067 | WP-4067 — Memory Inspection, Correction, and Repair | collaboration/work_packages/pending/WP-4067_SERIES_Memory_Inspection_Correction_and_Repair.md
+- WP-4068 | WP-4068 — Resident Trust and Familiarity Evolution | collaboration/work_packages/pending/WP-4068_SERIES_Resident_Trust_and_Familiarity_Evolution.md
+- WP-4069 | WP-4069 — Resident Affection, Teasing, and Playful Expression | collaboration/work_packages/pending/WP-4069_SERIES_Affection_and_Playful_Expression.md
+- WP-4070 | WP-4070 — Resident Conflict, Boundary, and Repair Runtime | collaboration/work_packages/pending/WP-4070_SERIES_Conflict_Resolution_and_Relationship_Repair.md
+- WP-4071 | WP-4071 — Resident Shared Rituals and Relationship Milestones | collaboration/work_packages/pending/WP-4071_SERIES_Shared_Rituals_and_Traditions.md
+- WP-4072 | WP-4072 — Resident Relationship Review and Coherence Audit | collaboration/work_packages/pending/WP-4072_SERIES_Relationship_Review_and_Calibration.md
+- WP-4073 | WP-4073 — Resident Visual Identity Framework | collaboration/work_packages/pending/WP-4073_SERIES_Resident_Visual_Identity_Framework.md
+- WP-4074 | WP-4074 — Estate Wardrobe Runtime | collaboration/work_packages/pending/WP-4074_SERIES_Estate_Wardrobe_Runtime.md
+- WP-4075 | WP-4075 — Canonical Estate Location Library | collaboration/work_packages/pending/WP-4075_SERIES_Canonical_Estate_Location_Library.md
+- WP-4076 | WP-4076 — Character Presentation and Pose Framework | collaboration/work_packages/pending/WP-4076_SERIES_Character_Presentation_and_Pose_Framework.md
+- WP-4077 | WP-4077 — Visual Continuity Runtime | collaboration/work_packages/pending/WP-4077_SERIES_Visual_Continuity_Runtime.md
+- WP-4078 | WP-4078 — Living Estate Gallery Runtime | collaboration/work_packages/pending/WP-4078_SERIES_Living_Estate_Gallery_Runtime.md
+- WP-4079 | WP-4079 — Resident Portrait Management | collaboration/work_packages/pending/WP-4079_SERIES_Resident_Portrait_Management.md
+- WP-4080 | WP-4080 — Estate Visual Historical Archive | collaboration/work_packages/pending/WP-4080_SERIES_Estate_Visual_Historical_Archive.md
+- WP-4081 | WP-4081 — Dynamic Estate Scene Generation | collaboration/work_packages/pending/WP-4081_SERIES_Dynamic_Estate_Scene_Generation.md
+- WP-4082 | WP-4082 — Estate Visual Timeline Runtime | collaboration/work_packages/pending/WP-4082_SERIES_Estate_Visual_Timeline_Runtime.md
+- WP-4083 | WP-4083 — Ambient Resident Activity Runtime | collaboration/work_packages/pending/WP-4083_Ambient_Resident_Activity_Runtime.md
+- WP-4084 | WP-4084 — Dynamic Estate Occupancy Runtime | collaboration/work_packages/pending/WP-4084_Dynamic_Estate_Occupancy_Runtime.md
+- WP-4085 | WP-4085 — Passive Resident Interaction Engine | collaboration/work_packages/pending/WP-4085_Passive_Resident_Interaction_Engine.md
+- WP-4086 | WP-4086 — Environmental Storytelling Runtime | collaboration/work_packages/pending/WP-4086_Environmental_Storytelling_Runtime.md
+- WP-4087 | WP-4087 — Resident Presence API | collaboration/work_packages/pending/WP-4087_Resident_Presence_API.md
+- WP-4088 | WP-4088 — Estate Traditions Runtime | collaboration/work_packages/pending/WP-4088_Estate_Traditions_Runtime.md
+- WP-4089 | WP-4089 — Shared Institutional Memory Integration | collaboration/work_packages/pending/WP-4089_Shared_Institutional_Memory_Integration.md
+- WP-4090 | WP-4090 — Friendly Rivalries and Running Jokes | collaboration/work_packages/pending/WP-4090_Friendly_Rivalries_and_Running_Jokes.md
+- WP-4091 | WP-4091 — Annual Estate Events Runtime | collaboration/work_packages/pending/WP-4091_Annual_Estate_Events_Runtime.md
+- WP-4092 | WP-4092 — Estate Culture Evolution Runtime | collaboration/work_packages/pending/WP-4092_Estate_Culture_Evolution_Runtime.md
+- WP-4093 | WP-4093 — Multi-Dimensional Resident Affinity Model | collaboration/work_packages/pending/WP-4093_Multi-Dimensional_Affinity_Model.md
+- WP-4094 | WP-4094 — Trust and Respect Evolution Runtime | collaboration/work_packages/pending/WP-4094_Trust_and_Respect_Evolution.md
+- WP-4095 | WP-4095 — Friendship and Mentorship Runtime | collaboration/work_packages/pending/WP-4095_Friendship_and_Mentorship_Runtime.md
+- WP-4096 | WP-4096 — Protective and Supportive Behaviors | collaboration/work_packages/pending/WP-4096_Protective_and_Supportive_Behaviors.md
+- WP-4097 | WP-4097 — Affinity Review and Calibration | collaboration/work_packages/pending/WP-4097_Affinity_Review_and_Calibration.md
+- WP-4098 | WP-4098 — Resident Experience Ledger | collaboration/work_packages/pending/WP-4098_Resident_Experience_Ledger.md
+- WP-4099 | WP-4099 — Resident Skill Growth | collaboration/work_packages/pending/WP-4099_Resident_Skill_Growth.md
+- WP-4100 | WP-4100 — Resident Confidence Evolution | collaboration/work_packages/pending/WP-4100_Resident_Confidence_Evolution.md
+- WP-4101 | WP-4101 — Resident Preference Refinement | collaboration/work_packages/pending/WP-4101_Resident_Preference_Refinement.md
+- WP-4102 | WP-4102 — Resident Legacy and Milestones | collaboration/work_packages/pending/WP-4102_Resident_Legacy_and_Milestones.md
+- WP-4103 | WP-4103 — Steward Working Style Learning | collaboration/work_packages/pending/WP-4103_Steward_Working_Style_Learning.md
+- WP-4104 | WP-4104 — Context-Aware Communication | collaboration/work_packages/pending/WP-4104_Context-Aware_Communication.md
+- WP-4105 | WP-4105 — Interaction Preference Adaptation | collaboration/work_packages/pending/WP-4105_Interaction_Preference_Adaptation.md
+- WP-4106 | WP-4106 — Steward Support Patterns | collaboration/work_packages/pending/WP-4106_Steward_Support_Patterns.md
+- WP-4107 | WP-4107 — Steward Relationship Review | collaboration/work_packages/pending/WP-4107_Steward_Relationship_Review.md
+- WP-4108 | WP-4108 — Visual Bible Schema and Repository Structure | collaboration/work_packages/pending/WP-4108_SERIES_Visual_Bible_Schema_and_Repository_Structure.md
+- WP-4109 | WP-4109 — Canonical Physical Specification Standard | collaboration/work_packages/pending/WP-4109_SERIES_Canonical_Physical_Specification_Standard.md
+- WP-4110 | WP-4110 — Facial Geometry and Visual Fingerprint | collaboration/work_packages/pending/WP-4110_SERIES_Facial_Geometry_and_Visual_Fingerprint.md
+- WP-4111 | WP-4111 — Height, Proportion, and Scale Reference System | collaboration/work_packages/pending/WP-4111_SERIES_Height_Proportion_and_Scale_Reference_System.md
+- WP-4112 | WP-4112 — Measurement Variant Review Workflow | collaboration/work_packages/pending/WP-4112_SERIES_Measurement_Variant_Review_Workflow.md
+- WP-4113 | WP-4113 SERIES — Wardrobe and Signature Look Library | collaboration/work_packages/pending/WP-4113_SERIES_Wardrobe_and_Signature_Look_Library.md
+- WP-4114 | WP-4114 SERIES — Visual Prompt Engineering Canon | collaboration/work_packages/pending/WP-4114_SERIES_Visual_Prompt_Engineering_Canon.md
+- WP-4115 | WP-4115 — Visual Negative Prompt Canon | collaboration/work_packages/pending/WP-4115_SERIES_Visual_Negative_Prompt_Canon.md
+- WP-4116 | WP-4116 — Steward Visual Review and Revision Workflow | collaboration/work_packages/pending/WP-4116_SERIES_Steward_Visual_Review_and_Revision_Workflow.md
+- WP-4117 | WP-4117 — Visual Bible Acceptance and Canonical Lock | collaboration/work_packages/pending/WP-4117_SERIES_Visual_Bible_Acceptance_and_Canonical_Lock.md
+- WP-4118 | WP-4118 SERIES — Hero Portrait Specification | collaboration/work_packages/pending/WP-4118_SERIES_Hero_Portrait_Specification.md
+- WP-4119 | WP-4119 SERIES — Professional Office Portrait Standard | collaboration/work_packages/pending/WP-4119_SERIES_Professional_Office_Portrait_Standard.md
+- WP-4120 | WP-4120 — Full-Body Reference Library | collaboration/work_packages/pending/WP-4120_SERIES_Full-Body_Reference_Library.md
+- WP-4121 | WP-4121 — Profile and Rear Reference Standard | collaboration/work_packages/pending/WP-4121_SERIES_Profile_and_Rear_Reference_Standard.md
+- WP-4122 | WP-4122 — Three-Quarter Portrait Standard | collaboration/work_packages/pending/WP-4122_SERIES_Three_Quarter_Portrait_Standard.md
+- WP-4123 | WP-4123 — Resident Expression Sheet Standard | collaboration/work_packages/pending/WP-4123_SERIES_Resident_Expression_Sheet_Standard.md
+- WP-4124 | WP-4124 — Headshot and Thumbnail Library | collaboration/work_packages/pending/WP-4124_SERIES_Headshot_and_Thumbnail_Library.md
+- WP-4125 | WP-4125 — Portrait Consistency Validation | collaboration/work_packages/pending/WP-4125_SERIES_Portrait_Consistency_Validation.md
+- WP-4126 | WP-4126 — Portrait Metadata and Asset Catalog | collaboration/work_packages/pending/WP-4126_SERIES_Portrait_Metadata_and_Asset_Catalog.md
+- WP-4127 | WP-4127 — Canonical Portrait Acceptance and Lock | collaboration/work_packages/pending/WP-4127_SERIES_Canonical_Portrait_Acceptance_and_Lock.md
+- WP-4128 | WP-4128 — 360° Capture Standard | collaboration/work_packages/pending/WP-4128_SERIES_360_Capture_Standard.md
+- WP-4129 | WP-4129 — Vertical Comparison Sheet Standard | collaboration/work_packages/pending/WP-4129_SERIES_Vertical_Comparison_Sheet_Standard.md
+- WP-4130 | WP-4130 — Measurement Variant Matrix | collaboration/work_packages/pending/WP-4130_SERIES_Measurement_Variant_Matrix.md
+- WP-4208 | WP-4208 — Conversation Archive Ingestion Engine | collaboration/work_packages/pending/WP-4208_Conversation_Archive_Ingestion_Engine.md
+- WP-4209 | WP-4209 — Conversation Specification Extraction and Repository Suggestion Engine | collaboration/work_packages/pending/WP-4209_Conversation_Specification_Extraction_and_Repository_Suggestion_Engine.md
+- WP-4210 | WP-4210 — Conversation Specification Validation and Reconciliation | collaboration/work_packages/pending/WP-4210_Conversation_Specification_Validation_and_Reconciliation.md
+- WP-4211 | WP-4211 — Conversation Plain-Text Scope and Canon Detection | collaboration/work_packages/pending/WP-4211_Conversation_Plain_Text_Scope_and_Canon_Detection.md
+- WP-4212 | WP-4212 — Pending-Definition-Matched Runtime-Canon Extraction | collaboration/work_packages/pending/WP-4212_Pending_Definition_Matched_Runtime_Canon_Extraction.md
+- WP-4213 | WP-4213 — Runtime-Canon Recovery Production Activation and Repository Index Repair | collaboration/work_packages/pending/WP-4213_Runtime_Canon_Recovery_Production_Activation_and_Repository_Index_Repair.md
+- WP-4214 | WP-4214 — Staged Work Package Duration Estimation | collaboration/work_packages/pending/WP-4214_Staged_Work_Package_Duration_Estimation.md
+- WP-4215 | WP-4215 — Staged Parallel Worker Orchestration | collaboration/work_packages/pending/WP-4215_Staged_Parallel_Worker_Orchestration.md
+- WP-4216 | WP-4216 — Staged Live Office State Updates | collaboration/work_packages/pending/WP-4216_Live_Office_State_Updates.md
+- WP-4217 | WP-4217 — Staged Local Git Synchronization Assistant | collaboration/work_packages/pending/WP-4217_Local_Git_Synchronization_Assistant.md
+- WP-4218 | WP-4218 — Engineering Backlog Reconciliation and Execution Queue | collaboration/work_packages/pending/WP-4218_Engineering_Backlog_Reconciliation_and_Execution_Queue.md
+- WP-4219 | WP-4219 — Engineering Campaign Dashboard | collaboration/work_packages/pending/WP-4219_Engineering_Campaign_Dashboard.md
+- WP-4220 | WP-4220 — Staged Engineering Backlog Reconciliation Engine | collaboration/work_packages/pending/WP-4220_Staged_Engineering_Backlog_Reconciliation_Engine.md
+- WP-4221 | WP-4221 — Staged Engineering Campaign Dashboard Read Model and Operator Projection | collaboration/work_packages/pending/WP-4221_Staged_Engineering_Campaign_Dashboard_Read_Model.md
+- WP-4222 | WP-4222 — Staged Engineering Campaign Dashboard Integration | collaboration/work_packages/pending/WP-4222_Staged_Engineering_Campaign_Dashboard_Integration.md
+- WP-4223 | WP-4223 — Engineering Campaign Dashboard Operator Surface Installation | collaboration/work_packages/pending/WP-4223_Engineering_Campaign_Dashboard_Operator_Surface_Installation.md
+- WP-4229 | WP-4229 — Grace Momentum Production Runtime and Shared Control Service | collaboration/work_packages/pending/WP-4229_Grace_Momentum_Production_Runtime_and_Shared_Control_Service.md
+- WP-4230 | WP-4230 — Open WebUI Grace Conversational Operations Integration | collaboration/work_packages/pending/WP-4230_Open_WebUI_Grace_Conversational_Operations_Integration.md
+- WP-4231 | WP-4231 — Estate UI Grace Momentum and Engineering Operations Control Surfaces | collaboration/work_packages/pending/WP-4231_Estate_UI_Grace_Momentum_and_Engineering_Operations_Control_Surfaces.md
+- WP-4232 | WP-4232 — Dual-Surface Integration, Shadow Production, and Bounded Live Acceptance | collaboration/work_packages/pending/WP-4232_Dual_Surface_Integration_Shadow_Production_and_Bounded_Live_Acceptance.md
 - WP-Operator-Deck-Prototype | Work Package: Operator Deck Prototype | collaboration/work_packages/pending/WP-Operator-Deck-Prototype.md
 
 ## Messages Requiring Acknowledgement
 - msg_20260701_000000_example_routing | queue | Example implementation routing message
+- MSG-2026-07-10-CA5-to-CA6-office-operational-roadmap | Chief Architect #6 | CA5 Office Operational Repair Roadmap and Coordination Boundaries
+- msg_bus_20260710200629_b722522915 | mailbox.6 | WP-4016-demo
 - msg_ca2_20260701_0001_mailbox_index_validation | office.chief_architect_3 | Mailbox Infrastructure Validation Message
 - msg_ca2_20260701_0002_mailbox_infrastructure_verification_to_ca3 | office.chief_architect_3 | None
 - msg_ca3_20260701_0001_alfred_capability_brief | office.chief_architect_2 | Architectural Review: Alfred Operational Coordination Capability
@@ -213,7 +548,10 @@ Validation Candidates: 5
 - msg_ca3_20260701_0012_roadmap_rebaseline_draft_to_ca4 | office.chief_architect_4 | Draft Roadmap Rebaseline for CA4 Review
 - msg_ca4_20260701_0001_reply_to_ca3_mailbox_check | employee.4 | CA4 Response: Check for Updates Review and Architectural Coordination
 - msg_ca4_20260702_0001_roadmap_rebaseline_response_to_ca3 | employee.4 | CA4 Response: Roadmap Rebaseline Review
+- msg_ca6_20260710_0001_operations_roadmap_to_ca5 | employee.5 | CA6 Operations Architecture Roadmap - WP-0626 through WP-0635
 - msg_helen_20260705_0001_ca5_hiring_onboarding_notice | office.chief_architect | Chief Architect #5 Hiring and Onboarding Notice
+- msg_helen_20260710_0001_grace_hiring_recommendation | steward.appointment_queue | Grace Director of Operations Hiring Recommendation
+- msg_steward_20260712_0001_helen_chatgpt_worker_reflection_continuity_process | mailbox.6 | Adopt ChatGPT Worker Reflection and Continuity Process Provisionally
 
 ## CA Review Needs
 - msg_ca2_20260701_0001_mailbox_index_validation | office.chief_architect_3 | Mailbox Infrastructure Validation Message
@@ -235,19 +573,21 @@ Validation Candidates: 5
 - msg_helen_20260705_0001_ca5_hiring_onboarding_notice | office.chief_architect | Chief Architect #5 Hiring and Onboarding Notice
 
 ## Codex-Ready Next Commands
-- Read A:/theestate/collaboration/work_packages/pending/README.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0014_SERIES_mailbox_destination_coverage.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0015_SERIES_message_acknowledgement_reply_flow.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0016_ARCHITECTURE_FIRST_work_package_registry.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0017_ARCHITECTURE_FIRST_work_package_state_machine.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0018_SERIES_codex_handoff_generator.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0019_SERIES_alfred_operational_activation.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0020_SERIES_helen_hr_operational_onboarding.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0020_SERIES_work_package_state_machine_implementation.md and do exactly what it says.
-- Read A:/theestate/collaboration/work_packages/pending/WP-0021_SERIES_personnel_identity_mailbox_resolver.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CONV-PTM-001_Resident_governed_PTM_command_contract.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-001A_Inventory_collaboration_and_work_package_sources.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-001B_Inventory_dispatch_validation_resident_and_operations_sources.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-001C_Draft_read_only_adapter_contracts.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-002A_Define_append_only_event_schema_and_hash_chain.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-002B_Define_PTM_ID_minting_and_command_contracts.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-003A_Project_task_and_portfolio_projection_contracts.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/CORE-PTM-003B_Schedule_financial_KPI_projection_contracts.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/DISPATCH-PTM-001_Task_to_dispatch_evidence_chain_contract.md and do exactly what it says.
+- Read A:/theestate-chatgpt-conversation-archive/collaboration/work_packages/pending/FILE-PTM-001A_File_import_parser_format_inventory.md and do exactly what it says.
 
 ## Blocked Work
-- None
+- job_20260730_105632 | summarize artifacts
+- job_20260730_105641 | prepare an operator summary
+- job_20260730_105642 | summarize Estate status
 
 ## Validation Candidates
 - CAP-000001 | RTX 4090 CUDA | Implemented capability with implementation and validation evidence found.
@@ -257,11 +597,13 @@ Validation Candidates: 5
 - CAP-000005 | FFmpeg / FFplay | Implemented capability with implementation and validation evidence found.
 
 ## Parking Lot Items Recently Relevant
-- PL-0023 | High | Garage command center cable bill of materials: build a purchase and installation list for extending workstation/server access to the garage, including long HDMI runs, powered USB extension options, Ethernet, power injection needs, attic and garage route planning, wall plates, conduit, pull strings, labels, and spare capacity before buying or pulling cable
-- PL-0024 | High | Reusable portable command node architecture: develop a reusable field/control-node pattern using commodity macro pads with buttons, encoders, RGB, or LCD; ESP32-S3-class USB host hardware; Wi-Fi; optional battery operation; and 3D-printed enclosures so command nodes can be deployed without custom PCBs or full Raspberry Pi builds. Potential uses include Command Chair controls, printer panels, CueMastery demo controls, robotic landscaping operator pendants, trailer maintenance consoles, garage nodes, and context-recovery buttons that can emit standard prompts such as GitHub/Parking Lot reorientation instructions when a conversation or connector drifts
-- PL-0025 | High | Role/task security classification should determine onboarding depth, so Ingrid can assign security levels appropriate to the role and work package; narrowly scoped workers receive bounded onboarding while higher-trust or broader-authority workers receive deeper governance, security, and institutional context
 - PL-0026 | High | Proposed onboarding addendum for lessons learned during initial Estate operations: add a section to the onboarding or new-hire handbook capturing conventions that were not obvious during ad hoc onboarding, including that user-pasted artifacts are review requests by default, screenshots and logs often represent engineering state transitions, audit is distinct from validation, validation should produce executable PowerShell command sequences using Estate formatting conventions, GitHub merge is not validation, the work package is the contract while handoff is only the standard Read path and Do exactly what it says instruction, and recurring operational conventions with institutional value should be captured in the Parking Lot at operations/boards/parking_lot.md. Include authoritative source paths: daily_board at operations/boards/daily_board.md, active_work at operations/boards/active_work.md, daily_board_integration at runtime/operations/daily_board_integration.json, parking_lot at operations/boards/parking_lot.md, work_package_pipeline at runtime/work_packages/assignment_queue.json, and alfred_operational_briefing at operations/alfred/operational_briefing.md
 - PL-0027 | High | Command Chair Architecture and Mobile Workstation Environment: redesign the Estate operator workstation around a tethered powered recliner command node, standing service station, separated KVM and daily-driver USB paths, voice-first command workflow, compact split keyboard, mouse shortcuts, control pod, Stream Deck strategy, modular chair accessories, and Bambu-printed mounting hardware
+- PL-0028 | High | Canonical nomenclature and dictation normalization guard: maintain a small Estate glossary for dictation-sensitive terms such as CueMastery and IONOGE, including canonical spelling, pronunciation, lowercase machine identifiers, forbidden variants, and validation hooks so speech-recognition errors do not propagate through resident, work-package, or Character Architecture artifacts
+- PL-0029 | Strategic | Orientation handbook update loop and onboarding coverage repair: create a mechanism to capture onboarding lessons discovered during active chats, update the orientation handbook or handbook addenda, and ensure new ChatGPT/Codex workers actually consume the relevant guidance instead of falsely claiming onboarding after reading only partial search excerpts; include discovered issues from this onboarding session such as standard Codex handoff format, Parking Lot procedure, merge-versus-validation distinction, work-package lane discipline, GitHub state verification before handoffs, canonical nomenclature, and the limitation that search snippets may not cover the full handbook
+- PL-0030 | High | Consolidate multiple Estate directory structures and worktree-specific roots created during testing into one canonical Estate directory structure, preserving unmerged work, runtime data, service dependencies, and recoverability through an inventory-first process
 
 ## Warnings
+- missing_artifact | runtime/operations/operations_board.json
 - missing_artifact | runtime/steward/dashboard.json
+- missing_artifact | runtime/capabilities/capability_lifecycle_report.json

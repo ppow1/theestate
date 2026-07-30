@@ -1,0 +1,14 @@
+{
+  "archiveRoot": "A:/AI/Archives/ChatGPT",
+  "chromeExecutablePath": "",
+  "profilePath": "A:/AI/Tools/ChatGPTConversationArchive/profile",
+  "headless": false,
+  "retryLimit": 3,
+  "timeoutMs": 30000,
+  "diagnosticsPath": "A:/AI/Tools/ChatGPTConversationArchive/diagnostics",
+  "concurrency": 1,
+  "nonInteractive": false,
+  "conversationLimit": null,
+  "exportMarkdown": true,
+  "exportHtml": true
+}
