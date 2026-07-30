@@ -136,11 +136,63 @@ function Has-ParentSegment([string]$NormalizedPath) {
   return (@($NormalizedPath -split '/') -contains '..')
 }
 
+# These roots mirror the existing runtime writers in:
+# codex_bridge_execution_provider_adapter.py,
+# execution_provider_adapter_runtime.py, execution_result_reconciliation_runtime.py,
+# grace_helen_engineering_composition.py, engineering_capability_enablement.py,
+# and execution_dispatch.py.  A root is never itself an authorized write scope.
+$canonicalRuntimeRoots = @(
+  'runtime/engineering_adapter_receipts',
+  'runtime/execution_adapters/requests',
+  'runtime/execution_adapters/results',
+  'runtime/execution_adapters/reconciliation',
+  'runtime/execution_adapters/reports',
+  'runtime/grace_helen_engineering/capability_enablement',
+  'runtime/grace_helen_engineering/engineering_commissions',
+  'runtime/grace_helen_engineering/engineering_authorizations',
+  'runtime/grace_helen_engineering/engineering_validations',
+  'runtime/grace_helen_engineering/engineering_completions',
+  'runtime/grace_helen_engineering/grace_receipts',
+  'runtime/operations/grace/objectives',
+  'runtime/operations/grace/actions',
+  'runtime/operations/grace/escalations',
+  'runtime/operations/grace/closures',
+  'runtime/operations/grace/status',
+  'runtime/operations/grace/objective_states',
+  'runtime/execution_dispatch'
+)
+function Get-CanonicalRuntimeRoot([string]$Scope) {
+  foreach ($root in $canonicalRuntimeRoots) {
+    if ($Scope -eq $root -or $Scope.StartsWith($root.TrimEnd('/') + '/')) { return $root }
+  }
+  return $null
+}
+function Test-NarrowCanonicalRuntimeScope([string]$Scope, [string]$Root) {
+  if ([string]::IsNullOrWhiteSpace($Root) -or $Scope -eq $Root) { return $false }
+  $suffix = $Scope.Substring($Root.Length).Trim('/')
+  $segments = @($suffix -split '/' | Where-Object { $_ })
+  if ($segments.Count -eq 0) { return $false }
+  $leaf = [string]$segments[-1]
+  # Canonical evidence is normally an exact JSON/Markdown/JSONL record.  A
+  # single commission/dispatch/adapter directory is also permitted when the
+  # caller has narrowed it to that identifier rather than the shared root.
+  if ($leaf -match '\.(json|jsonl|md)$') { return $true }
+  return ($segments.Count -eq 1 -and $leaf -match '^(commission|dispatch|adapter|eng(auth|comp|val)|cap|grace|objective|reconciliation)[A-Za-z0-9._-]*$')
+}
+
 $writeScopes = @($request.authorized_write_paths | ForEach-Object { Normalize-RelativePath ([string]$_) } | Where-Object { $_ })
-$prohibited = @('.git', '.codex', 'archive', 'runtime') + @($request.prohibited_paths | ForEach-Object { Normalize-RelativePath ([string]$_) } | Where-Object { $_ })
+$prohibited = @('.git', '.codex', 'archive') + @($request.prohibited_paths | ForEach-Object { Normalize-RelativePath ([string]$_) } | Where-Object { $_ })
 foreach ($scope in $writeScopes) {
   if ($scope -eq '.') { Add-ValidationError 'authorized write path is too broad: repository root is not an allowed write scope' }
   if (Is-AbsolutePath $scope -or Has-ParentSegment $scope) { Add-ValidationError "authorized write path must be repository-relative and traversal-free: $scope" }
+  if ($scope -eq 'runtime' -or $scope.StartsWith('runtime/')) {
+    $runtimeRoot = Get-CanonicalRuntimeRoot $scope
+    if ([string]::IsNullOrWhiteSpace($runtimeRoot)) {
+      Add-ValidationError "runtime write path is not a recognized canonical evidence location: $scope"
+    } elseif (-not (Test-NarrowCanonicalRuntimeScope $scope $runtimeRoot)) {
+      Add-ValidationError "runtime write scope must be a narrow commission-specific file or directory below '$runtimeRoot': $scope"
+    }
+  }
   foreach ($blocked in $prohibited) {
     if ($scope -eq $blocked -or $scope.StartsWith($blocked.TrimEnd('/') + '/')) { Add-ValidationError "authorized write path overlaps prohibited path '$blocked': $scope" }
   }

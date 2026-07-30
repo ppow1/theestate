@@ -6,6 +6,8 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "Validate-GovernedCodexCommission.ps1"
@@ -136,6 +138,42 @@ def test_paths_fail_closed(tmp_path):
     payload = valid_request(); payload["authorized_write_paths"] = ["runtime/output"]
     result, _, _ = run_validator(tmp_path, payload)
     assert result.returncode != 0
+
+
+def test_narrow_canonical_provider_receipt_runtime_path_is_allowed(tmp_path):
+    payload = valid_request()
+    payload["prohibited_paths"] = [".git", ".codex", "archive"]
+    payload["authorized_write_paths"] = ["runtime/engineering_adapter_receipts/receipt-commission-test-001.json"]
+    payload["exact_expected_outputs"] = ["runtime/engineering_adapter_receipts/receipt-commission-test-001.json"]
+    result, before, after = run_validator(tmp_path, payload)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert before == after
+
+
+@pytest.mark.parametrize("scope", [
+    "runtime",
+    "runtime/engineering_adapter_receipts",
+    "runtime/unrelated_application_data",
+])
+def test_broad_or_unrelated_runtime_scope_fails_closed(tmp_path, scope):
+    payload = valid_request()
+    payload["prohibited_paths"] = [".git", ".codex", "archive"]
+    payload["authorized_write_paths"] = [scope]
+    payload["exact_expected_outputs"] = [scope + "/output.json"]
+    result, _, _ = run_validator(tmp_path, payload)
+    assert result.returncode != 0
+    assert "runtime" in result.stdout
+
+
+def test_runtime_output_outside_explicit_canonical_scope_fails_closed(tmp_path):
+    payload = valid_request()
+    payload["prohibited_paths"] = [".git", ".codex", "archive"]
+    payload["authorized_write_paths"] = ["runtime/engineering_adapter_receipts/receipt-commission-test-001.json"]
+    payload["exact_expected_outputs"] = ["runtime/execution_adapters/results/result-other.json"]
+    result, _, _ = run_validator(tmp_path, payload, json_output=True)
+    body = json.loads(result.stdout)
+    assert result.returncode != 0
+    assert any("outside authorized write scopes" in error for error in body["errors"])
 
 
 def test_expired_evidence_authorization_and_required_lists_fail_closed(tmp_path):

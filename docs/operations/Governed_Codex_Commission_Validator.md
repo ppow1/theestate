@@ -60,9 +60,19 @@ Only `read-only` and `workspace-write` are accepted. `danger-full-access`,
 bypass flags, unrestricted shell authority, automatic merge authority, and
 autonomous institutional-acceptance authority are rejected. Expected outputs
 must be repository-relative, exact, free of `..` traversal, and inside an
-authorized write scope. `.git` and `archive` are prohibited by default;
-authorized runtime evidence paths are allowed only when the canonical
-implementation requires them and the request scopes them explicitly.
+authorized write scope. `.git`, `.codex`, and `archive` are prohibited by
+default. Runtime is not generally writable: the validator recognizes only
+the canonical evidence roots used by the adapter and lifecycle
+(`runtime/engineering_adapter_receipts`,
+`runtime/execution_adapters/{requests,results,reconciliation,reports}`,
+the specific `runtime/grace_helen_engineering` lifecycle record directories,
+the specific `runtime/operations/grace` record directories, and
+`runtime/execution_dispatch`). A request must explicitly name a narrow
+commission-specific file or directory below one of those roots; the shared
+root itself, all of `runtime`, unrelated runtime application data, and
+unrecognized runtime directories fail closed. Passing this check does not
+create authority to write runtime evidence: the actual Grace, Helen, PTM,
+Engineering, Dispatch, and provider gates remain authoritative.
 
 ## Illustrative valid request
 
@@ -94,7 +104,7 @@ authorization or execution evidence:
   "danger_full_access_requested": false,
   "authorized_read_paths": ["docs/operations", "src"],
   "authorized_write_paths": ["docs/operations/example-output/Runbook.md"],
-  "prohibited_paths": [".git", "archive", "runtime"],
+  "prohibited_paths": [".git", ".codex", "archive"],
   "exact_expected_outputs": ["docs/operations/example-output/Runbook.md"],
   "acceptance_criteria": ["exact artifact exists", "receipt validates"],
   "validation_commands": ["git diff --check"],

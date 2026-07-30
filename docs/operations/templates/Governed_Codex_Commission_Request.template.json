@@ -30,8 +30,9 @@
   ],
   "prohibited_paths": [
     ".git",
+    ".codex",
     "archive",
-    "<OPTIONAL: additional prohibited path>"
+    "<OPTIONAL: additional prohibited path; do not use runtime as a blanket prohibition>"
   ],
   "exact_expected_outputs": [
     "<REQUIRED: exact repository-relative output path>"
