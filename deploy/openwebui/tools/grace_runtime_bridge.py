@@ -78,11 +78,26 @@ class Tools:
 
     def list_grace_runtime_operations(self, __user__: dict | None = None) -> dict:
         """List exact registered authoritative read operations. No mutations are exposed."""
-        return {"schema_version": "estate.grace-runtime-bridge.v1", "status": "AUTHORITATIVE_RESULT", "source_system": "openwebui/grace-runtime-bridge", "operations": ["get_current_objective", "get_objective_by_id", "get_runtime_readiness", "get_runtime_availability", "get_lifecycle_projection", "get_replay_cursor", "get_recent_lifecycle_events", "get_provider_admission", "get_last_dispatch", "get_last_provider_result", "get_last_reconciliation", "get_last_validation", "get_last_grace_receipt", "get_current_blocker", "get_responsible_office", "get_next_lawful_action", "list_grace_runtime_operations"], "mutations_exposed": False}
+        return {"schema_version": "estate.grace-runtime-bridge.v1", "status": "AUTHORITATIVE_RESULT", "source_system": "openwebui/grace-runtime-bridge", "operations": ["get_current_objective", "get_objective_by_id", "get_runtime_readiness", "get_runtime_availability", "get_lifecycle_projection", "get_replay_cursor", "get_recent_lifecycle_events", "get_provider_admission", "get_last_dispatch", "get_last_provider_result", "get_last_reconciliation", "get_last_validation", "get_last_grace_receipt", "get_current_blocker", "get_responsible_office", "get_next_lawful_action", "get_assignment_record", "get_execution_progress", "get_execution_completion", "get_execution_failure", "get_execution_artifact", "list_grace_runtime_operations"], "mutations_exposed": False}
 
     def get_runtime_readiness(self, __user__: dict | None = None) -> dict:
         """Return the current readiness payload verbatim from Grace Momentum."""
         return self._authoritative("get_runtime_readiness", self._request("/v1/readiness", __user__))
+
+    def get_assignment_record(self, assignment_id: str | None = None, __user__: dict | None = None) -> dict:
+        return self._query("get_assignment_record", "assignment.record", __user__, assignment_id=assignment_id)
+
+    def get_execution_progress(self, assignment_id: str | None = None, __user__: dict | None = None) -> dict:
+        return self._query("get_execution_progress", "execution.progress", __user__, assignment_id=assignment_id)
+
+    def get_execution_completion(self, objective_id: str | None = None, __user__: dict | None = None) -> dict:
+        return self._query("get_execution_completion", "execution.completion", __user__, objective_id=objective_id)
+
+    def get_execution_failure(self, assignment_id: str | None = None, __user__: dict | None = None) -> dict:
+        return self._query("get_execution_failure", "execution.failure", __user__, assignment_id=assignment_id)
+
+    def get_execution_artifact(self, dispatch_id: str | None = None, __user__: dict | None = None) -> dict:
+        return self._query("get_execution_artifact", "execution.artifact", __user__, dispatch_id=dispatch_id)
 
     def get_runtime_availability(self, __user__: dict | None = None) -> dict:
         """Return the current health/readiness availability payload verbatim."""

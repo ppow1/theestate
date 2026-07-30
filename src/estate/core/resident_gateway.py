@@ -6,6 +6,7 @@ from urllib.parse import unquote_to_bytes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Iterable
+from uuid import uuid4
 from estate.core.resident_interaction import process_chat, local_llm_status, _root
 from estate.core.multi_resident_room import create_room, invite_participant, accept_participant, submit_user_turn, plan_resident_turns, record_resident_turn
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
@@ -14,6 +15,7 @@ from estate.core.openwebui_resident_package import resident_package
 from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat
 from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
 from estate.core.grace_runtime_bridge import GraceRuntimeBridge
+from estate.core.openwebui_grace_assignment import detect_grace_image_assignment, execute_grace_image_assignment
 from estate.core.conference_room_lifecycle import (
     depart as conference_depart, invite as conference_invite,
     load_or_create_session, names_from_text, recognize_intent, save_session,
@@ -98,7 +100,26 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     # operational terms such as "dispatch" or "objective".
     if detect_engineering_assignment_command(payload, text):
         return None
-    if not re.search(r"\b(objective|readiness|availability|replay|checkpoint|dispatch|provider|reconciliation|validation|receipt|completion|blocker|operational state|runtime operations)\b", text, re.I):
+    explicit_runtime_operations = (
+        "list_grace_runtime_operations",
+        "get_runtime_readiness",
+        "get_runtime_availability",
+        "get_replay_cursor",
+        "get_current_objective",
+    )
+
+    has_explicit_runtime_operation = any(
+        operation_name in text.lower()
+        for operation_name in explicit_runtime_operations
+    )
+
+    has_runtime_keyword = re.search(
+        r"\b(objective|readiness|availability|replay|checkpoint|dispatch|provider|reconciliation|validation|receipt|completion|blocker|operational state|runtime operations)\b",
+        text,
+        re.I,
+    )
+
+    if not has_explicit_runtime_operation and not has_runtime_keyword:
         return None
     metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
     claims = {"iss": "estate-control", "sub": str(metadata.get("user_id") or "openwebui-grace"), "office": "Grace", "authority_source": "openwebui/grace-runtime-bridge", "active": True}
@@ -106,16 +127,49 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     try:
         bridge = GraceRuntimeBridge(LoopbackGraceMomentumClient(endpoint, claims, timeout_seconds=2.0))
         lower = text.lower()
-        if "operation" in lower and "list" in lower:
+
+        # Exact registered operation names take precedence over natural-language
+        # keyword inference. Underscores are word characters, so a \b-based
+        # keyword search does not recognize names such as
+        # get_current_objective or get_runtime_readiness.
+        explicit_operations = (
+            ("list_grace_runtime_operations", bridge.list_grace_runtime_operations),
+            ("get_runtime_readiness", bridge.get_runtime_readiness),
+            ("get_runtime_availability", bridge.get_runtime_availability),
+            ("get_replay_cursor", bridge.get_replay_cursor),
+            ("get_current_objective", bridge.get_current_objective),
+        )
+
+        explicit_handler = next(
+            (
+                handler
+                for operation_name, handler in explicit_operations
+                if operation_name in lower
+            ),
+            None,
+        )
+
+        if explicit_handler is not None:
+            result = explicit_handler()
+        elif "operation" in lower and "list" in lower:
             result = bridge.list_grace_runtime_operations()
-        elif "readiness" in lower:
+        elif re.search(r"\breadiness\b", lower):
             result = bridge.get_runtime_readiness()
-        elif "replay" in lower or "checkpoint" in lower or "cursor" in lower:
+        elif re.search(r"\b(replay|cursor)\b", lower):
             result = bridge.get_replay_cursor()
-        elif "objective" in lower:
+        elif re.search(r"\bobjective\b", lower):
             result = bridge.get_current_objective()
         else:
-            result = {"schema_version": "estate.grace-runtime-bridge.v1", "status": "AUTHORITATIVE_RESULT", "source_system": "grace-momentum-runtime", "source_operation": "get_runtime_availability", "payload": {"availability": bridge.get_runtime_availability(), "current_objective": bridge.get_current_objective()}}
+            result = {
+                "schema_version": "estate.grace-runtime-bridge.v1",
+                "status": "AUTHORITATIVE_RESULT",
+                "source_system": "grace-momentum-runtime",
+                "source_operation": "get_runtime_availability",
+                "payload": {
+                    "availability": bridge.get_runtime_availability(),
+                    "current_objective": bridge.get_current_objective(),
+                },
+            }
         return result
     except Exception as exc:
         return {"schema_version": "estate.grace-runtime-bridge.v1", "status": "RUNTIME_UNAVAILABLE", "error": {"code": "runtime_unavailable", "message": str(exc)}}
@@ -299,6 +353,17 @@ def _engineering_assignment_chat_completion(
     }
 
 
+def _grace_image_assignment_chat_completion(payload: dict[str, Any], *, user_message: str, session_id: str | None, stream: bool = False) -> dict[str, Any] | None:
+    if not detect_grace_image_assignment(payload.get("model"), user_message):
+        return None
+    result = execute_grace_image_assignment(payload, user_message=user_message, session_id=session_id)
+    content = json.dumps(result, sort_keys=True)
+    estate = {"resident_id": "grace", "assignment_execution": result, "authoritative_runtime": True, "runtime_status": result.get("disposition"), "privileged_action_executed": False}
+    if stream:
+        return {"id": f"chatcmpl-{result.get('assignment_id', uuid4().hex)}", "object": "chat.completion.chunk", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "delta": {"role": "assistant", "content": content}, "finish_reason": None}], "estate": estate}
+    return {"id": f"chatcmpl-{result.get('assignment_id', uuid4().hex)}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "estate": estate}
+
+
 def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
     model = payload.get("model")
     user_message = _latest_user_message(payload.get("messages") or [])
@@ -311,6 +376,9 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
                       "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
                       "estate": {"resident_id": "grace", "authoritative_runtime": True, "runtime_source": "grace-momentum-runtime", "runtime_status": runtime_result.get("status")}}
     session_id, _session_field = _session_id_from_payload(payload)
+    image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id)
+    if image_assignment is not None:
+        return 200, image_assignment
     workflow_body = _engineering_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
     if workflow_body is not None:
         return 200, workflow_body
@@ -339,6 +407,9 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
                       "choices": [{"index": 0, "delta": {"role": "assistant", "content": json.dumps(runtime_result, sort_keys=True)}, "finish_reason": "stop"}],
                       "estate": {"resident_id": "grace", "authoritative_runtime": True, "runtime_source": "grace-momentum-runtime", "runtime_status": runtime_result.get("status")}}
     session_id, _session_field = _session_id_from_payload(payload)
+    image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, stream=True)
+    if image_assignment is not None:
+        return 200, image_assignment
     workflow_body = _engineering_assignment_chat_completion(
         payload, user_message=user_message, session_id=session_id, root=root, stream=True
     )

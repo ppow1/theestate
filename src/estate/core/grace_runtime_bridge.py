@@ -20,7 +20,7 @@ OPERATIONS = (
     "get_lifecycle_projection", "get_replay_cursor", "get_recent_lifecycle_events", "get_provider_admission",
     "get_last_dispatch", "get_last_provider_result", "get_last_reconciliation", "get_last_validation",
     "get_last_grace_receipt", "get_current_blocker", "get_responsible_office", "get_next_lawful_action",
-    "list_grace_runtime_operations",
+    "get_assignment_record", "get_execution_progress", "get_execution_completion", "get_execution_failure", "get_execution_artifact", "list_grace_runtime_operations",
 )
 
 
@@ -112,6 +112,12 @@ class GraceRuntimeBridge:
     def get_last_validation(self, objective_id: str | None = None): return self._record("get_last_validation", "validation.last", objective_id)
     def get_last_grace_receipt(self, objective_id: str | None = None): return self._record("get_last_grace_receipt", "grace_receipt.last", objective_id)
     def get_last_dispatch(self, objective_id: str | None = None): return self._record("get_last_dispatch", "dispatch.state", objective_id)
+
+    def get_assignment_record(self, assignment_id: str | None = None): return self._call("get_assignment_record", lambda: self.client.query("assignment.record", **({"assignment_id": assignment_id} if assignment_id else {})))
+    def get_execution_progress(self, assignment_id: str | None = None): return self._call("get_execution_progress", lambda: self.client.query("execution.progress", **({"assignment_id": assignment_id} if assignment_id else {})))
+    def get_execution_completion(self, objective_id: str | None = None): return self._call("get_execution_completion", lambda: self.client.query("execution.completion", **({"objective_id": objective_id} if objective_id else {})))
+    def get_execution_failure(self, assignment_id: str | None = None): return self._call("get_execution_failure", lambda: self.client.query("execution.failure", **({"assignment_id": assignment_id} if assignment_id else {})))
+    def get_execution_artifact(self, dispatch_id: str | None = None): return self._call("get_execution_artifact", lambda: self.client.query("execution.artifact", **({"dispatch_id": dispatch_id} if dispatch_id else {})))
 
     def _projection_field(self, operation: str, field: str, objective_id: str) -> dict[str, Any]:
         result = self.get_objective_by_id(objective_id)

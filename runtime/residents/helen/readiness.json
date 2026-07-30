@@ -42,8 +42,8 @@
       "evidence": [
         {
           "exists": true,
-          "fallback_active": true,
-          "llm_state": "no",
+          "fallback_active": false,
+          "llm_state": "yes",
           "path": "runtime/model_control/registry.json"
         }
       ],
@@ -177,7 +177,7 @@
       "status": "passed"
     }
   ],
-  "generated_at": "2026-07-13T02:07:38Z",
+  "generated_at": "2026-07-28T18:21:20Z",
   "grace_activation_authorized": true,
   "grace_hiring_gate": "eligible_for_steward_review",
   "grace_registered_or_active": true,
@@ -209,8 +209,8 @@
     "worker": null
   },
   "llm_status": {
-    "fallback_active": true,
-    "provider_reachable": "no",
+    "fallback_active": false,
+    "provider_reachable": "yes",
     "selection_source": "bootstrap_fallback"
   },
   "missing_evidence": [],
@@ -228,6 +228,7 @@
     "latest_request_id": null,
     "missing_evidence_assessment_count": 0,
     "open_requests": 0,
+    "operational_disposition_count": 0,
     "private_assessment_count": 0,
     "ready_for_action_requests": 0,
     "schema_version": "workforce_status_summary.v1",

@@ -9,16 +9,34 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from open_webui.models.functions import FunctionForm, FunctionMeta, Functions
-from open_webui.models.tools import ToolForm, ToolMeta, Tools
-from open_webui.models.users import Users
-from open_webui.utils.plugin import load_function_module_by_id, load_tool_module_by_id
-from open_webui.utils.tools import get_tool_specs
+GRACE_MODEL_ID = "estate/grace-grounded-test"
+GRACE_TOOL_ID = "grace_runtime_bridge"
+GRACE_FILTER_ID = "grace_runtime_grounding"
+
+
+def merge_grace_bridge_metadata(meta: dict | None) -> dict:
+    """Return model metadata with the Grace bridge associations preserved."""
+    merged = dict(meta or {})
+    tool_ids = list(merged.get("toolIds") or [])
+    filter_ids = list(merged.get("filterIds") or [])
+    if GRACE_TOOL_ID not in tool_ids:
+        tool_ids.append(GRACE_TOOL_ID)
+    if GRACE_FILTER_ID not in filter_ids:
+        filter_ids.append(GRACE_FILTER_ID)
+    merged["toolIds"] = tool_ids
+    merged["filterIds"] = filter_ids
+    return merged
 
 
 async def install(source: str | Path) -> dict:
+    from open_webui.models.functions import FunctionForm, FunctionMeta, Functions
+    from open_webui.models.tools import ToolForm, ToolMeta, Tools
+    from open_webui.models.users import Users
+    from open_webui.utils.plugin import load_tool_module_by_id
+    from open_webui.utils.tools import get_tool_specs
+
     content = Path(source).read_text(encoding="utf-8")
-    tool_id = "grace_runtime_bridge"
+    tool_id = GRACE_TOOL_ID
     module, _ = await load_tool_module_by_id(tool_id, content=content)
     specs = get_tool_specs(module)
     user = await Users.get_first_user()
@@ -37,8 +55,12 @@ async def install(source: str | Path) -> dict:
 
 
 async def install_grounding_filter(source: str | Path) -> dict:
+    from open_webui.models.functions import FunctionForm, FunctionMeta, Functions
+    from open_webui.models.users import Users
+    from open_webui.utils.plugin import load_function_module_by_id
+
     content = Path(source).read_text(encoding="utf-8")
-    function_id = "grace_runtime_grounding"
+    function_id = GRACE_FILTER_ID
     module, function_type, frontmatter = await load_function_module_by_id(function_id, content=content)
     user = await Users.get_first_user()
     if user is None:
@@ -57,8 +79,43 @@ async def install_grounding_filter(source: str | Path) -> dict:
     return {"action": action, "function_id": function_id, "type": function_type, "active": True, "global": False, "user_id": user.id, "result": result.model_dump() if result else None}
 
 
+async def associate_grace_model(model_id: str = GRACE_MODEL_ID) -> dict:
+    """Bind the persisted bridge and filter to the selected Grace custom model."""
+    from open_webui.models.models import ModelForm, ModelMeta, Models
+
+    model = await Models.get_model_by_id(model_id)
+    if model is None:
+        raise RuntimeError(f"Open WebUI model not found: {model_id}")
+    if model.base_model_id not in {"estate/grace", model_id}:
+        raise RuntimeError(
+            f"Open WebUI model {model_id} is not backed by estate/grace: "
+            f"{model.base_model_id!r}"
+        )
+    metadata = merge_grace_bridge_metadata(model.meta.model_dump())
+    updated = await Models.update_model_by_id(
+        model_id,
+        ModelForm(
+            id=model.id,
+            base_model_id=model.base_model_id,
+            name=model.name,
+            params=model.params,
+            meta=ModelMeta(**metadata),
+            is_active=model.is_active,
+        ),
+    )
+    return {
+        "action": "associated",
+        "model_id": model_id,
+        "base_model_id": model.base_model_id,
+        "tool_ids": metadata["toolIds"],
+        "filter_ids": metadata["filterIds"],
+        "updated": updated is not None,
+    }
+
+
 if __name__ == "__main__":
     import json
     root = Path(__file__).parents[1]
     print(json.dumps(asyncio.run(install(root / "deploy" / "openwebui" / "tools" / "grace_runtime_bridge.py")), indent=2, default=str))
     print(json.dumps(asyncio.run(install_grounding_filter(root / "deploy" / "openwebui" / "functions" / "grace_runtime_grounding.py")), indent=2, default=str))
+    print(json.dumps(asyncio.run(associate_grace_model()), indent=2, default=str))

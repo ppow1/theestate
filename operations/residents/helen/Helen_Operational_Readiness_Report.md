@@ -1,6 +1,6 @@
 # Helen Operational Readiness Report
 
-Generated: 2026-07-13T02:07:38Z
+Generated: 2026-07-28T18:21:20Z
 Overall status: `ready`
 Grace hiring gate: `eligible_for_steward_review`
 
