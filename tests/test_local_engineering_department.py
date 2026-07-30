@@ -110,7 +110,7 @@ def dispatch_payload_for_bridge():
         "dispatch_id": "dispatch-wp-0656",
         "work_package_id": "WP-0656",
         "title": "Dispatch bridge",
-        "provider": "codex-cli-openai",
+        "provider": "fixture-engineering-provider",
         "profile_label": "default",
         "classification": "Estate Internal",
         "state": "Ready",
@@ -118,10 +118,10 @@ def dispatch_payload_for_bridge():
         "sandbox": "workspace-write",
         "allowed_read_paths": ["collaboration/work_packages/pending"],
         "allowed_write_paths": ["runtime/local_engineering_department"],
-        "allowed_providers": ["codex-cli-openai"],
+        "allowed_providers": ["fixture-engineering-provider"],
         "provider_metadata": {
             "decision_reference": "traffic-controller/WP-0656/authorized",
-            "provider_type": "codex-cli",
+            "provider_type": "fixture",
             "authorization_reference": "steward/WP-0656/authorized",
         },
     }
@@ -153,3 +153,42 @@ def test_existing_dispatch_item_runs_through_external_worker_bridge(tmp_path):
     assert item["result_reference"].startswith(r"A:\AI\EngineeringRuns")
     assert (tmp_path / "runtime/operations/grace/closures").exists()
     assert (tmp_path / "runtime/local_engineering_department/latest_dispatch_bridge.json").exists()
+
+
+def test_provider_neutral_dispatch_reaches_engineering_selection_and_truthful_completion(tmp_path):
+    materialize_runtime(tmp_path)
+    dispatch = {
+        "dispatch_id": "dispatch-provider-neutral",
+        "work_package_id": "WP-GENERIC-COMMISSION",
+        "title": "Produce a bounded structured work product",
+        "requested_by": "Grace",
+        "assigned_worker": "engineering-worker",
+        "classification": "Estate Internal",
+        "state": "Ready",
+        "provider_metadata": {
+            "commission": {
+                "commission_id": "commission-provider-neutral",
+                "grace_objective_id": "objective-provider-neutral",
+                "requested_outcome": "Produce a structured engineering record.",
+                "artifact_type": "text_artifact",
+                "required_capabilities": ["documentation_draft"],
+                "acceptance_criteria": [{"kind": "artifact_exists"}, {"kind": "provider_receipt"}],
+            },
+            "provider_catalog": [{
+                "provider_id": "fixture-provider-neutral",
+                "provider_type": "fixture",
+                "implementation_kind": "deterministic_local_artifact",
+                "adapter_kind": "deterministic_local_artifact",
+                "capabilities": ["documentation_draft"],
+                "status": "implemented",
+            }],
+        },
+    }
+    enqueue_dispatch_request(dispatch, tmp_path)
+    result = LocalEngineeringDepartment(root=tmp_path).run_dispatch_bridge("dispatch-provider-neutral")
+    assert result.result == "completed"
+    assert result.evidence["engineering_result"]["provider_selection"]["provider_id"] == "fixture-provider-neutral"
+    queue = json.loads((tmp_path / "runtime/execution_dispatch/queue.json").read_text())
+    item = next(item for item in queue["items"] if item["dispatch_id"] == "dispatch-provider-neutral")
+    assert item["provider"] is None
+    assert item["state"] == "Completed"

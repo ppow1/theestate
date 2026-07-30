@@ -163,6 +163,10 @@ class GraceHelenEngineeringComposition:
         if result.dispatch_id != auth["dispatch_id"]: raise ValueError("unrelated raw result cannot satisfy authorization")
         result_path = write_adapter_result(result, self.root); reconciliation = reconcile_result(auth["dispatch_id"], result_path, self.root)
         if not validation_passed or result.status not in {"completed", "dry_run_completed"}: raise ValueError("Engineering validation failed; no successful completion created")
+        if result.validation_status != "passed": raise ValueError("commission-specific validation receipt is required before completion")
+        if not result.artifacts: raise ValueError("at least one produced artifact or work-product reference is required before completion")
+        if not (result.metadata.get("provider_receipt") or result.metadata.get("receipt_reference")):
+            raise ValueError("provider invocation receipt is required before completion")
         validation = {"validation_id": f"engval-{uuid4().hex[:12]}", "engineering_commission_id": commission["commission_id"], "dispatch_id": auth["dispatch_id"], "reconciliation_reference": reconciliation["reconciliation_path"], "artifact_references": result.artifacts, "disposition": "pass", "validated_by": "Engineering", "created_at": utc_now(), "idempotency_key": f"{authorization_id}:{reconciliation['result_content_hash']}"}
         _write(self._path(VALIDATIONS, validation["validation_id"]), validation)
         completion = {"completion_id": f"engcomp-{uuid4().hex[:12]}", "grace_objective_id": commission["grace_objective_id"], "engineering_commission_id": commission["commission_id"], "engineering_work_item_id": auth["engineering_work_item_id"], "disposition": "completed_successfully", "validation_record_id": validation["validation_id"], "dispatch_id": auth["dispatch_id"], "reconciliation_reference": reconciliation["reconciliation_path"], "artifact_references": result.artifacts, "completed_at": utc_now(), "idempotency_key": validation["idempotency_key"]}

@@ -38,7 +38,7 @@ def test_invalid_transition_rejected(tmp_path):
 def test_full_fixture_completion_then_terminal_directive(tmp_path):
  o,x,d,g,c=setup(tmp_path); ev=evaluate_objective(tmp_path,g["directive_id"],c["commission_id"],mode="live")
  auth=ev["action_result"]["authorization"]
- result=ExecutionProviderAdapterResult(adapter_request_id="fixture-result",dispatch_id=auth["dispatch_id"],provider_id="fixture-provider",status="completed",started_at=utc_now(),artifacts=["fixture.dwg"])
+ result=ExecutionProviderAdapterResult(adapter_request_id="fixture-result",dispatch_id=auth["dispatch_id"],provider_id="fixture-provider",status="completed",started_at=utc_now(),artifacts=["fixture.dwg"],validation_status="passed",metadata={"provider_receipt":"receipt://fixture/engineering"})
  completion=x.reconcile_validate_complete(auth["authorization_id"],result,validation_passed=True)
  x.receive_completion(completion["completion_id"],o.objective_id)
  final=transition(g["directive_id"],"completed",root=tmp_path)
