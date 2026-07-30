@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.capability-assessment.v1",
+  "title": "Helen Capability Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["assessment_id", "inquiry_id", "assessed_by", "capabilities", "created_at", "disposition"],
+  "properties": {
+    "assessment_id": {"type": "string", "minLength": 1},
+    "inquiry_id": {"type": "string", "minLength": 1},
+    "assessed_by": {"const": "Helen"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "disposition": {"enum": ["capability_available", "capability_unknown", "capability_gap_found", "blocked", "superseded"]},
+    "capabilities": {"type": "array", "items": {"$ref": "#/$defs/capability"}, "minItems": 1},
+    "conflicts": {"type": "array", "items": {"type": "string"}},
+    "evidence_references": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability_id", "worker_identity_state", "qualification_state", "health_state", "availability_state", "authorization_state"],
+      "properties": {
+        "capability_id": {"type": "string", "minLength": 1},
+        "worker_id": {"type": ["string", "null"]},
+        "provider_id": {"type": ["string", "null"]},
+        "adapter_id": {"type": ["string", "null"]},
+        "worker_identity_state": {"enum": ["identified", "missing", "ambiguous"]},
+        "qualification_state": {"enum": ["qualified", "unqualified", "unknown", "expired"]},
+        "health_state": {"enum": ["healthy", "unhealthy", "unknown", "stale"]},
+        "availability_state": {"enum": ["available", "unavailable", "reserved", "unknown", "stale"]},
+        "authorization_state": {"enum": ["authorized", "unauthorized", "unknown"]},
+        "evidence_references": {"type": "array", "items": {"type": "string"}},
+        "observed_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    }
+  }
+}

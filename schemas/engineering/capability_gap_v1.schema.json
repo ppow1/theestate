@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.capability-gap.v1",
+  "title": "Engineering Capability Gap",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["gap_id", "grace_objective_id", "inquiry_id", "missing_capabilities", "reason", "created_at", "state"],
+  "properties": {
+    "gap_id": {"type": "string", "minLength": 1},
+    "grace_objective_id": {"type": "string", "minLength": 1},
+    "inquiry_id": {"type": "string", "minLength": 1},
+    "missing_capabilities": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "bootstrap_capabilities": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "state": {"enum": ["open", "specification_requested", "enabling_project_linked", "satisfied", "unresolved", "superseded"]},
+    "evidence_references": {"type": "array", "items": {"type": "string"}}
+  }
+}
