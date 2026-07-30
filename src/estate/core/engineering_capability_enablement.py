@@ -10,7 +10,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Mapping
 from uuid import uuid4
 
 from estate.core.grace_operations_runtime import GraceOperationsRuntime
@@ -27,6 +27,7 @@ DISPOSITIONS = {
     "qualified_but_unhealthy", "healthy_but_unavailable", "available_but_unauthorized",
     "stale_evidence", "conflicting_evidence",
 }
+CanonicalDependencyResolver = Callable[[str], Mapping[str, Any] | None]
 
 
 def utc_now() -> str:
@@ -91,8 +92,10 @@ class CapabilityEvidence:
 class CapabilityEnablementLifecycle:
     """Append-only lifecycle records with explicit authority boundaries."""
 
-    def __init__(self, root: str | Path | None = None) -> None:
+    def __init__(self, root: str | Path | None = None,
+                 canonical_dependency_resolver: CanonicalDependencyResolver | None = None) -> None:
         self.root = _root(root)
+        self.canonical_dependency_resolver = canonical_dependency_resolver
 
     def _record(self, kind: str, prefix: str, payload: dict[str, Any]) -> dict[str, Any]:
         if kind not in KINDS:
@@ -289,23 +292,139 @@ class CapabilityEnablementLifecycle:
                    canonical_dependency_evidence: list[str] | None = None) -> dict[str, Any]:
         dependency = _find(self.root, "dependencies", dependency_id)
         registration = _find(self.root, "registrations", registration_id)
-        if registration["status"] != "registered":
-            raise ValueError("only registered capability may be re-evaluated")
-        dispositions = []
+        dependency_evidence = _list(canonical_dependency_evidence, "canonical_dependency_evidence")
+        reasons: list[str] = []
+        proposal = _find(self.root, "creation_proposals", dependency["proposal_id"])
+        gap = _find(self.root, "gaps", proposal["gap_id"])
+        inquiry = _find(self.root, "inquiries", gap["inquiry_id"])
+        required = sorted(set(inquiry.get("required_capabilities") or []))
+        claims = _list(registration.get("capability_claims"), "registration.capability_claims")
+        if registration.get("dependency_id") != dependency_id:
+            reasons.append("registration_dependency_mismatch")
+        if registration.get("status") != "registered":
+            reasons.append("registration_not_registered")
+        if not registration.get("provider_id"):
+            reasons.append("registration_provider_missing")
+        if not registration.get("adapter_id"):
+            reasons.append("registration_adapter_missing")
+        if not claims:
+            reasons.append("registration_capability_claims_missing")
+        if proposal.get("objective_id") != dependency.get("original_objective_id"):
+            reasons.append("proposal_objective_mismatch")
+        if gap.get("objective_id") != dependency.get("original_objective_id"):
+            reasons.append("gap_objective_mismatch")
+        if gap.get("inquiry_id") != inquiry.get("record_id"):
+            reasons.append("gap_inquiry_mismatch")
+        if inquiry.get("objective_id") != dependency.get("original_objective_id"):
+            reasons.append("inquiry_objective_mismatch")
+        if not required or gap.get("capability_id") not in required:
+            reasons.append("required_capability_chain_invalid")
+        missing_claims = sorted(set(required) - set(claims))
+        if missing_claims:
+            reasons.append("registration_missing_required_capability")
+
+        normalized: list[dict[str, Any]] = []
         for item in evidence:
             fact = item if isinstance(item, CapabilityEvidence) else CapabilityEvidence(**item)
-            dispositions.append({**fact.to_dict(), "available": all([
-                fact.qualification == "qualified", fact.health == "healthy",
-                fact.availability == "available", fact.authorization == "authorized",
-            ])})
-        dependency_evidence = _list(canonical_dependency_evidence, "canonical_dependency_evidence")
-        dependency_confirmed = bool(dependency.get("canonical_dependency_confirmed")) and bool(dependency_evidence)
-        passed = dependency_confirmed and bool(dispositions) and all(item["available"] for item in dispositions)
+            normalized.append(fact.to_dict())
+        evidence_capabilities = [item["capability_id"] for item in normalized]
+        duplicates = sorted({capability for capability in evidence_capabilities if evidence_capabilities.count(capability) > 1})
+        if duplicates:
+            reasons.append("duplicate_capability_evidence")
+        unexpected = sorted(set(evidence_capabilities) - set(required))
+        if unexpected:
+            reasons.append("unrelated_capability_evidence")
+        missing_evidence = sorted(set(required) - set(evidence_capabilities))
+        if missing_evidence:
+            reasons.append("missing_required_capability_evidence")
+
+        now = datetime.now(timezone.utc)
+        dispositions: list[dict[str, Any]] = []
+        for fact in normalized:
+            available = True
+            if fact["capability_id"] not in claims:
+                reasons.append("evidence_capability_not_claimed")
+                available = False
+            if fact.get("provider_id") != registration.get("provider_id"):
+                reasons.append("evidence_provider_mismatch")
+                available = False
+            if fact.get("adapter_id") != registration.get("adapter_id"):
+                reasons.append("evidence_adapter_mismatch")
+                available = False
+            if fact.get("declaration") not in {"declared", "qualified"}:
+                reasons.append("evidence_declaration_not_affirmative")
+                available = False
+            if fact.get("qualification") != "qualified":
+                reasons.append("evidence_not_qualified")
+                available = False
+            if fact.get("health") != "healthy":
+                reasons.append("evidence_not_healthy")
+                available = False
+            if fact.get("availability") != "available":
+                reasons.append("evidence_not_available")
+                available = False
+            if fact.get("authorization") != "authorized":
+                reasons.append("evidence_not_authorized")
+                available = False
+            if not fact.get("observed_at") or not fact.get("expires_at") or not fact.get("evidence_references"):
+                reasons.append("evidence_freshness_or_reference_missing")
+                available = False
+            else:
+                try:
+                    observed_at = datetime.fromisoformat(fact["observed_at"].replace("Z", "+00:00"))
+                    expires_at = datetime.fromisoformat(fact["expires_at"].replace("Z", "+00:00"))
+                    if observed_at > now or expires_at <= now or expires_at <= observed_at:
+                        reasons.append("evidence_stale_or_invalid_window")
+                        available = False
+                except (TypeError, ValueError):
+                    reasons.append("evidence_timestamp_invalid")
+                    available = False
+            if any(fact.get(field) == "conflicting" for field in ("declaration", "qualification", "health", "availability", "authorization")):
+                reasons.append("conflicting_capability_evidence")
+                available = False
+            dispositions.append({**fact, "available": available})
+
+        canonical = None
+        if self.canonical_dependency_resolver is None:
+            reasons.append("canonical_dependency_resolver_unavailable")
+        elif not dependency.get("canonical_ptm_dependency_id"):
+            reasons.append("canonical_dependency_id_missing")
+        else:
+            canonical = self.canonical_dependency_resolver(dependency["canonical_ptm_dependency_id"])
+            if not canonical:
+                reasons.append("canonical_dependency_unresolved")
+            else:
+                if canonical.get("record_id") != dependency.get("canonical_ptm_dependency_id"):
+                    reasons.append("canonical_dependency_identity_mismatch")
+                if canonical.get("original_objective_id") != dependency.get("original_objective_id"):
+                    reasons.append("canonical_dependency_objective_mismatch")
+                if canonical.get("enabling_project_id") != dependency.get("enabling_project_id"):
+                    reasons.append("canonical_dependency_project_mismatch")
+                if canonical.get("status") not in {"satisfied", "completed"}:
+                    reasons.append("canonical_dependency_not_satisfied")
+                if not canonical.get("evidence_references"):
+                    reasons.append("canonical_dependency_evidence_missing")
+                try:
+                    canonical_observed = datetime.fromisoformat(str(canonical["observed_at"]).replace("Z", "+00:00"))
+                    canonical_expires = datetime.fromisoformat(str(canonical["expires_at"]).replace("Z", "+00:00"))
+                    if canonical_observed > now or canonical_expires <= now or canonical_expires <= canonical_observed:
+                        reasons.append("canonical_dependency_evidence_stale")
+                except (KeyError, TypeError, ValueError):
+                    reasons.append("canonical_dependency_freshness_missing")
+                if any(reference not in canonical.get("evidence_references", []) for reference in dependency_evidence):
+                    reasons.append("canonical_dependency_evidence_reference_unverified")
+        if not dependency_evidence:
+            reasons.append("canonical_dependency_evidence_reference_missing")
+
+        reasons = sorted(set(reasons))
+        passed = not reasons and bool(required) and len(dispositions) == len(required) and all(item["available"] for item in dispositions)
         result = self._record("reevaluations", "capreval", {
             "dependency_id": dependency_id, "registration_id": registration_id,
-            "original_objective_id": dependency["original_objective_id"], "evidence": dispositions,
-            "disposition": "capability_available" if passed else ("dependency_not_confirmed" if not dependency_confirmed else "capability_gap_remains"),
-            "canonical_dependency_evidence": dependency_evidence,
+            "original_objective_id": dependency["original_objective_id"], "required_capabilities": required,
+            "evidence": dispositions, "blocking_reasons": reasons,
+            "disposition": "capability_available" if passed else "blocked",
+            "blocking_reason": reasons[0] if reasons else None,
+            "canonical_dependency_evidence": dependency_evidence, "canonical_dependency_record": dict(canonical) if canonical else None,
             "status": "passed" if passed else "blocked", "assessed_by": "Helen", "observed_at": utc_now(),
         })
         if passed:
