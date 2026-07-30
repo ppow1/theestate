@@ -22,23 +22,23 @@ The installation contains the compiled CLI, npm production dependencies, configu
 
 The first operator initialization from `A:\theestate-wp4233` exposed a launcher deployment defect: the installed package did not contain `tsconfig.json`, and initialization consequently reported `TS5058` while running `npm run build`. All four PowerShell launchers now resolve the installation root from `$PSScriptRoot`, explicitly set that directory as the process location, validate required files, and pass absolute CLI/configuration paths. The deployed installation was refreshed with the complete TypeScript build inputs and compiled output.
 
-Verification was performed from `A:\theestate-wp4233` for initialization, full, sync, and validate launchers. Initialization reached the expected manual-login boundary (`AUTHENTICATION_REQUIRED`) without the TypeScript path error; validation completed successfully. No credentials, cookies, or authentication bypass were automated.
+Verification was performed from `A:\theestate-wp4233` for initialization, full, sync, and validate launchers. The initializer now uses an independent stable Chrome process for manual login; archive-runtime verification occurs only after that process exits. No credentials, cookies, or authentication bypass were automated, and no VPN/proxy/endpoint/privacy/DNS security control was changed.
 
 Exact initialization command:
 
 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Initialize-ChatGPTConversationArchive.ps1`
 
-The operator should use the dedicated Chrome/Chromium window opened by the launcher, using the profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`; do not use a normal concurrently running Chrome profile. After manual login, rerun the initialization command above, then run:
+The operator should use the dedicated stable Chrome window opened by the launcher, using the profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`; do not use a normal concurrently running Chrome profile. Complete login, confirm the conversation interface, close that Chrome window, confirm the console prompt, and allow archive-runtime verification to run. After initialization succeeds, run:
 
 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveSync.ps1`
 
-The initialization flow keeps the dedicated browser open while the console displays `After login is complete in the dedicated browser, press Enter here to verify:`. Press Enter only after the conversation interface is visible. The CLI verifies authenticated state before reporting `Profile ready`. Browser closure or premature confirmation returns a nonzero actionable error. Normal full/sync runs do not use this prompt and continue to return `AUTHENTICATION_REQUIRED` promptly when unauthenticated.
+The initialization flow starts ordinary Chrome with no Playwright launch/control path. The console displays `When the ChatGPT conversation interface is visible, press Enter here`, then `Close the dedicated Chrome window now, then press Enter here for verification`. The script confirms Chrome has exited before invoking the archive runtime. Normal full/sync runs do not use either prompt and continue to return `AUTHENTICATION_REQUIRED` promptly when unauthenticated.
 
-The interactive authentication helper tests cover unauthenticated first run, browser availability during the manual-login wait, successful post-login verification, browser cancellation, and already-authenticated profiles. The launcher regression also verifies that non-interactive sync remains prompt-free and returns `AUTHENTICATION_REQUIRED` promptly.
+The tests cover the operator authentication handshake prompts, process-close detection, post-login verification command, independent Chrome arguments without Playwright control arguments, profile repair, and prompt-free non-interactive sync.
 
 ### Interactive browser launch correction — 2026-07-30
 
-Interactive initialization now prefers the installed stable Chrome executable. On the verification machine this resolves to `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe`. It uses the dedicated persistent profile, a headed resizable 1400×900 window, viewport 1400×900, device scale factor 1, default browser zoom, and disabled extensions. The initializer retains only `--window-size=1400,900` and `--disable-extensions` as custom arguments; it adds no user-agent, stealth, cookie, JavaScript, sandbox, security, or CAPTCHA-bypass flags.
+Interactive initialization now launches the installed stable Chrome directly, without Playwright. On the verification machine this is `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe`. It uses the dedicated persistent profile and only `--user-data-dir`, `--window-size=1400,900`, `--window-position=50,50`, `--disable-extensions`, and the ChatGPT URL. It adds no remote debugging, user-agent, stealth, cookie, JavaScript, sandbox, security, or CAPTCHA-bypass flags.
 
 Cloudflare/browser verification is detected separately. If the page still presents human verification after the operator presses Enter, the result is `LOGIN_VERIFICATION_INCOMPLETE`, not a false authenticated success. The operator must complete the legitimate challenge in the dedicated Chrome window; no credentials, cookies, or security checks are automated.
 
@@ -48,13 +48,13 @@ Live capture of the prior deployed build showed that Playwright injected `--no-s
 
 The profile contained `chatgpt.com` persisted zoom `-7.6035680338478615` and stale placement state. Initialization now repairs only `chatgpt.com`, `openai.com`, and `auth.openai.com` zoom records to Chrome's `zoom_level: 0` default and removes only `browser.window_placement`; it does not delete the profile or authentication data. Live verification observed the repaired origins at default 100% (no non-default origin zoom records) and measured the actual outer window at `left=50, top=50, width=1400, height=900`, with `maximized=false`.
 
-The complete live effective parent command was:
+That Playwright-controlled launch path is no longer used for manual authentication. The current manual-login effective command line is:
 
 ```text
-"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --window-size=1400,900 --window-position=50,50 --disable-extensions --user-data-dir=A:/AI/Tools/ChatGPTConversationArchive/profile --remote-debugging-pipe about:blank
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --user-data-dir=A:\AI\Tools\ChatGPTConversationArchive\profile --window-size=1400,900 --window-position=50,50 --disable-extensions https://chatgpt.com/
 ```
 
-It contained neither forbidden sandbox flag. The renderer retained the operating system's normal display scale (`--device-scale-factor=2` on this 4K machine); this is distinct from page zoom and was not artificially overridden.
+It contained no Playwright-generated arguments, no remote debugging argument, and no forbidden sandbox flag. The archive runtime is invoked only after this process exits; it does not control the manual-login window.
 
 | Requirement | Evidence | Result |
 |---|---|---|
@@ -70,7 +70,7 @@ It contained neither forbidden sandbox flag. The renderer retained the operating
 | Browser safety | dedicated persistent profile under neutral tool path; no credential automation or secret logging | Implemented; authentication initialization remains manual |
 | Dependencies | `npm install` completed; 59 packages audited, 0 vulnerabilities | Pass |
 | TypeScript build | `npm run build` | Pass |
-| Unit tests | `npm test`: 3 files, 15 tests passed, including interactive authentication, browser configuration, and launcher regressions | Pass |
+| Unit tests | `npm test`: 2 files, 10 tests passed, including independent Chrome launch, process-close workflow, profile repair, and launcher regressions | Pass |
 | Playwright integration fixture | `npm run playwright:test`: 1 test passed; pinned Chromium installed | Pass |
 | CLI help | root and `validate --help` executed successfully | Pass |
 

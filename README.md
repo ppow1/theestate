@@ -4,7 +4,7 @@ Estate-wide local archive and incremental synchronizer. It is deliberately indep
 
 ## Install and profile safety
 
-From this directory run `npm install` and `npm run build`. Run `node dist/cli.js init-profile --config config.example.json` once. This uses a dedicated persistent Chromium/Chrome profile and never enters credentials or copies cookies. Complete login interactively in that profile if prompted. Do not point it at a profile concurrently used by normal Chrome.
+From this directory run `npm install` and `npm run build`. Use the PowerShell initializer for first-time authentication. It starts an independent installed Chrome process with the dedicated profile and never enters credentials or copies cookies. Do not point it at a profile concurrently used by normal Chrome.
 
 The intended neutral machine installation is `A:\AI\Tools\ChatGPTConversationArchive`; the repository copy is the source and the PowerShell scripts can be copied there by the operator. The example archive root is `A:\AI\Archives\ChatGPT`. Both are configurable.
 
@@ -21,7 +21,7 @@ node dist/cli.js diagnostics --config config.example.json
 
 Routine Task Scheduler command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveSync.ps1`.
 
-The installed launchers are independent of the PowerShell caller's current directory. If initialization reports `TS5058` for `tsconfig.json`, refresh the deployed installation so it contains `tsconfig.json`, `src`, and `dist`; do not run the launcher from the repository checkout as a workaround. Initialization opens the dedicated profile and keeps it open while the console waits at `After login is complete in the dedicated browser, press Enter here to verify:`. Complete login and any security challenge in that dedicated window, confirm the conversation interface is visible, then press Enter in the console. The CLI verifies authentication before reporting success. Closing the browser or pressing Enter before login returns an actionable nonzero error; scheduled sync remains non-interactive and fails promptly with `AUTHENTICATION_REQUIRED`.
+The installed launchers are independent of the PowerShell caller's current directory. If initialization reports `TS5058` for `tsconfig.json`, refresh the deployed installation so it contains `tsconfig.json`, `src`, and `dist`; do not run the launcher from the repository checkout as a workaround. Interactive initialization starts ordinary stable Chrome directly; Playwright is not involved in the login window. Complete login and any security challenge there, confirm the conversation interface is visible, then close that dedicated Chrome window and confirm the second console prompt. Only after Chrome exits does the archive runtime reopen the profile to verify authentication. Scheduled sync remains non-interactive and fails promptly with `AUTHENTICATION_REQUIRED`.
 
 Initialization command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Initialize-ChatGPTConversationArchive.ps1`.
 
@@ -29,11 +29,11 @@ After successful initialization, the full archive command is `powershell.exe -No
 
 ### Interactive login troubleshooting
 
-Interactive initialization uses the locally installed stable Google Chrome executable when available, the dedicated profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`, and a real resizable 1400×900 outer desktop window. It leaves the browser's normal display scaling and page zoom in place, repairs targeted persisted zoom entries to the 100% default, and disables extensions for that dedicated profile. It does not use the operator's normal Chrome profile or copy cookies and credentials. The initializer-specific Chromium arguments are `--window-size=1400,900`, `--window-position=50,50`, and `--disable-extensions`; Playwright's generated `--no-sandbox` and `--disable-setuid-sandbox` defaults are explicitly excluded and Chromium sandboxing is enabled.
+Interactive initialization uses `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe` as an ordinary independent process with the dedicated profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`. Its arguments are `--user-data-dir`, `--window-size=1400,900`, `--window-position=50,50`, `--disable-extensions`, and `https://chatgpt.com/`. It has no Playwright defaults, remote-debugging pipe/port, automation control, cookie copying, or security-bypass behavior. The initializer verifies the effective Chrome process list and rejects forbidden automation or sandbox arguments.
 
-The initializer verifies the effective running Chrome command line and actual outer window bounds. If a forbidden sandbox argument is present or the window is not within the normal desktop-size range, initialization fails instead of reporting success.
+The archive runtime uses Playwright only after the operator closes ordinary Chrome. If that post-login verification is blocked by Cloudflare or authentication, the command reports the failure; VPN, proxy, endpoint protection, privacy tooling, and DNS security must remain unchanged.
 
-If the browser remains on `Verifying you are human. This may take a few seconds.`, leave the legitimate verification page open and complete any challenge normally. Do not attempt to bypass or automate it. Press Enter in the console only after the ChatGPT conversation interface is visible. If the verification page remains active, initialization reports `LOGIN_VERIFICATION_INCOMPLETE`; close that dedicated window and retry later, or investigate normal Chrome/network/security conditions. Unattended full and sync commands do not wait for this prompt and continue to fail promptly with `AUTHENTICATION_REQUIRED` or `LOGIN_VERIFICATION_INCOMPLETE`.
+If Chrome remains on `Verifying you are human. This may take a few seconds.`, leave the legitimate verification page open and complete any challenge normally. Do not attempt to bypass or automate it. If normal Chrome login succeeds but archive-runtime verification later reports `LOGIN_VERIFICATION_INCOMPLETE`, that is an external authentication/browser-automation boundary; do not weaken VPN, proxy, endpoint protection, privacy tooling, or DNS security. Unattended full and sync commands do not wait for this prompt and continue to fail promptly with `AUTHENTICATION_REQUIRED` or `LOGIN_VERIFICATION_INCOMPLETE`.
 
 ## Archive and schema
 
