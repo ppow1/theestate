@@ -1,6 +1,8 @@
 # Engineering Capability Enablement Discovery Report
 
-Status: Discovery and work-package authoring; no adapter implementation.
+Status: Historical discovery and work-package authoring baseline. The
+implementation is now authored by PR #496; this report intentionally preserves
+the pre-implementation findings.
 Date: 2026-07-30
 
 ## Baseline
@@ -39,9 +41,9 @@ modules contain fixtures and must not be treated as production registration.
 - `docs/architecture/engineering_magnetic_pogo_connector_validation_narrative.md`
 - `schemas/engineering/*_v1.schema.json`
 
-These are proposed contracts and discovery evidence; they are not runtime
-authoritative until an approved implementation package assigns ownership and
-adds tests and persistence through existing systems.
+The schemas began as proposed contracts and are now implemented or consumed by
+the review branch where noted. They are not merged, externally synchronized, or
+institutionally accepted runtime truth until the applicable review gates pass.
 
 ## Recommendation and authority boundary
 

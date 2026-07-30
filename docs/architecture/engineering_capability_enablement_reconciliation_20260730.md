@@ -1,6 +1,8 @@
 # Engineering Capability Enablement — Current-State Reconciliation
 
-Status: Proposed design; discovery only. No runtime behavior is changed by this document.
+Status: Historical discovery baseline. Runtime implementation is authored by
+PR #496; this document records the pre-implementation reconciliation and is not
+itself the runtime source of truth.
 Date: 2026-07-30
 Baseline: `main` at `2ae9b37c2f1c88bd8d09491a715ae69a838530c3` (PR #495)
 

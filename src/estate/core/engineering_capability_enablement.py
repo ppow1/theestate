@@ -248,7 +248,8 @@ class CapabilityEnablementLifecycle:
         })
 
     def link_enabling_project(self, *, proposal_id: str, enabling_project_id: str, original_objective_id: str,
-                              dependency_type: str = "capability_enablement") -> dict[str, Any]:
+                              dependency_type: str = "capability_enablement",
+                              canonical_ptm_dependency_id: str | None = None) -> dict[str, Any]:
         proposal = _find(self.root, "creation_proposals", proposal_id)
         if proposal["objective_id"] != original_objective_id:
             raise ValueError("enabling proposal does not belong to original objective")
@@ -256,6 +257,8 @@ class CapabilityEnablementLifecycle:
             "proposal_id": proposal_id, "original_objective_id": original_objective_id,
             "enabling_project_id": _required(enabling_project_id, "enabling_project_id"),
             "dependency_type": dependency_type, "status": "waiting_on_enabling_project",
+            "canonical_ptm_dependency_id": canonical_ptm_dependency_id,
+            "canonical_dependency_confirmed": bool(canonical_ptm_dependency_id),
             "scheduler_owner": "PTM_orchestrator", "resumption_owner": "Grace",
         })
         GraceOperationsRuntime(self.root).record_objective_transition(
@@ -282,7 +285,8 @@ class CapabilityEnablementLifecycle:
         })
         return registration
 
-    def reevaluate(self, *, dependency_id: str, registration_id: str, evidence: list[CapabilityEvidence | dict[str, Any]]) -> dict[str, Any]:
+    def reevaluate(self, *, dependency_id: str, registration_id: str, evidence: list[CapabilityEvidence | dict[str, Any]],
+                   canonical_dependency_evidence: list[str] | None = None) -> dict[str, Any]:
         dependency = _find(self.root, "dependencies", dependency_id)
         registration = _find(self.root, "registrations", registration_id)
         if registration["status"] != "registered":
@@ -294,11 +298,14 @@ class CapabilityEnablementLifecycle:
                 fact.qualification == "qualified", fact.health == "healthy",
                 fact.availability == "available", fact.authorization == "authorized",
             ])})
-        passed = bool(dispositions) and all(item["available"] for item in dispositions)
+        dependency_evidence = _list(canonical_dependency_evidence, "canonical_dependency_evidence")
+        dependency_confirmed = bool(dependency.get("canonical_dependency_confirmed")) and bool(dependency_evidence)
+        passed = dependency_confirmed and bool(dispositions) and all(item["available"] for item in dispositions)
         result = self._record("reevaluations", "capreval", {
             "dependency_id": dependency_id, "registration_id": registration_id,
             "original_objective_id": dependency["original_objective_id"], "evidence": dispositions,
-            "disposition": "capability_available" if passed else "capability_gap_remains",
+            "disposition": "capability_available" if passed else ("dependency_not_confirmed" if not dependency_confirmed else "capability_gap_remains"),
+            "canonical_dependency_evidence": dependency_evidence,
             "status": "passed" if passed else "blocked", "assessed_by": "Helen", "observed_at": utc_now(),
         })
         if passed:

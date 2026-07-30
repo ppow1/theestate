@@ -1,6 +1,8 @@
 # Capability Enablement Work-Package Proposal
 
-Status: Proposed; no new work-package IDs assigned.
+Status: Originally authored as a planning proposal; implementation authored by
+PR #496. No new work-package IDs were assigned; merge, qualification, and
+institutional acceptance remain pending.
 
 ## Numbering and ownership reconciliation
 
@@ -16,7 +18,7 @@ The repository already contains overlapping pending scopes:
 - WP-0536/WP-0537: project intake and workforce role/staffing runtime.
 
 Because CAMPAIGN-0670 and CAMPAIGN-0681 have separate package graphs and the
-namespace already contains unresolved legacy duplicates, this proposal does not
+namespace already contains unresolved legacy duplicates, this proposal did not
 claim a new WP number. The Chief Architect should either amend the existing
 packages or issue a new package after the campaign namespace authority resolves
 ownership. A new package must not silently compete with the listed packages.
@@ -32,7 +34,7 @@ source ownership, freshness, and conflict behavior.
 
 ### Phase 2 — Capability and worker specification records
 
-Implement the smallest adapters on `GraceHelenEngineeringComposition` and
+The smallest adapters on `GraceHelenEngineeringComposition` and
 `HelenWorkforceStore` that persist the proposed records. Add a bounded advisory
 Engineering consultation path through existing messages/mailboxes. No provider
 execution or catalog mutation occurs in this phase.
@@ -48,8 +50,9 @@ supersession, and resume waiting states.
 
 Amend WP-0672/WP-0613/WP-0604 as needed to define adapter registration result,
 versioned capability claims, health checks, cancellation, receipt/artifact
-schema, and qualification evidence. This phase is the first point at which a
-concrete adapter may be implemented, subject to a separate approved package.
+schema, and qualification evidence. The first concrete adapter is now authored
+by PR #496; formal qualification and acceptance remain subject to the existing
+review gates.
 
 ### Phase 5 — Helen verification and original-project resumption
 
@@ -69,6 +72,7 @@ existing acceptance/readiness lifecycle.
 
 ## Non-goals
 
-No provider is selected for implementation here. No live adapter is registered.
+No additional provider is selected here. The `codex.execution.cli` adapter is
+registered by PR #496, but is not yet merged or institutionally accepted.
 No catalog, health, capacity, Dispatch, scheduler, personnel, or acceptance
 system is duplicated.

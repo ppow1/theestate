@@ -1,6 +1,6 @@
 # Canonical Capability-Discovery and Enablement Lifecycle
 
-Status: Proposed contract; not implemented.
+Status: Contract authored and implemented on PR #496; not yet merged or institutionally accepted.
 
 ## Operating loop
 
@@ -99,6 +99,14 @@ the capability it is creating as a bootstrap dependency. If the specification,
 implementation, validation, or registration requires a missing bootstrap
 capability, Helen records a second gap and the enabling project is blocked or
 re-scoped; no recursive self-claim is permitted.
+
+## Implementation status
+
+The correlation records and Grace composition seams described here are
+implemented on the review branch and covered by focused tests. Provider
+qualification, health, availability, authorization, PTM dependency
+confirmation, merge, runtime synchronization, and institutional acceptance
+remain separate pending gates.
 
 ## Completion boundaries
 

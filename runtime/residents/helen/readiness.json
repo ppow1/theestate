@@ -177,7 +177,7 @@
       "status": "passed"
     }
   ],
-  "generated_at": "2026-07-28T18:21:20Z",
+  "generated_at": "2026-07-30T19:12:11Z",
   "grace_activation_authorized": true,
   "grace_hiring_gate": "eligible_for_steward_review",
   "grace_registered_or_active": true,
@@ -219,18 +219,18 @@
   "resident": "Helen",
   "schema_version": "helen_operational_readiness.v1",
   "workforce_status_summary": {
-    "assessment_count": 0,
+    "assessment_count": 2,
     "blocked_requests": 0,
     "boundary_review_count": 0,
     "cognitive_health_request_count": 0,
     "in_review_requests": 0,
-    "latest_assessment_id": null,
-    "latest_request_id": null,
+    "latest_assessment_id": "wfa-9ac88c28914c4443ab8277e7495c7d5b",
+    "latest_request_id": "wfr-3155a88e592d412cab983ef56e72ab1a",
     "missing_evidence_assessment_count": 0,
     "open_requests": 0,
     "operational_disposition_count": 0,
     "private_assessment_count": 0,
-    "ready_for_action_requests": 0,
+    "ready_for_action_requests": 2,
     "schema_version": "workforce_status_summary.v1",
     "steward_attention_count": 0
   }

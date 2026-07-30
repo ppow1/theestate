@@ -1,6 +1,9 @@
 # Capability Enablement Acceptance Scenarios
 
-Status: Proposed test matrix; no runtime behavior is changed.
+Status: Test matrix authored for PR #496. The implemented branch covers the
+capability assessment, registration, resumption, adapter, and fail-closed
+scenarios exercised by its focused suite; remaining scenarios are explicit
+follow-up qualification cases.
 
 | Scenario | Required truthful result |
 |---|---|

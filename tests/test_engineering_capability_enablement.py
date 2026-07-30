@@ -37,9 +37,9 @@ def test_available_capability_can_be_registered_and_resumed(tmp_path):
     assert selection["provider_id"] == "codex.execution.cli"
     assert selection["authorization_required"] is True
     proposal = lifecycle._record("creation_proposals", "capprop", {"objective_id": obj.objective_id, "worker_specification_id": "workerspec-existing", "gap_id": "gap-existing", "proposed_by": "Helen", "status": "proposed"})
-    dependency = lifecycle.link_enabling_project(proposal_id=proposal["record_id"], enabling_project_id="project-enable-codex", original_objective_id=obj.objective_id)
+    dependency = lifecycle.link_enabling_project(proposal_id=proposal["record_id"], enabling_project_id="project-enable-codex", original_objective_id=obj.objective_id, canonical_ptm_dependency_id="ptm-dep-codex")
     registration = lifecycle.record_registration(dependency_id=dependency["record_id"], provider_id="codex.execution.cli", adapter_id="codex-cli-execution-adapter", adapter_version="1.0.0", capability_claims=["repository_implementation"], qualification_evidence=["qualification/codex.json"], health_evidence=["health/codex.json"], authorization_evidence=["authorization/codex.json"], receipt_contract={"schema": "provider_receipt.v1"}, artifact_contract={"schema": "artifact_manifest.v1"})
-    result = lifecycle.reevaluate(dependency_id=dependency["record_id"], registration_id=registration["record_id"], evidence=[available()])
+    result = lifecycle.reevaluate(dependency_id=dependency["record_id"], registration_id=registration["record_id"], evidence=[available()], canonical_dependency_evidence=["ptm/dep-codex/confirmed"])
     assert result["status"] == "passed"
     assert (tmp_path / "runtime/grace_helen_engineering/capability_enablement/resumptions").exists()
     assert GraceOperationsRuntime(tmp_path).status()["available"] is True
@@ -84,3 +84,14 @@ def test_declared_capability_without_provider_and_adapter_evidence_is_not_availa
     assert assessment["capability_dispositions"]["repository_implementation"] == "conflicting_evidence"
     with pytest.raises(PermissionError):
         lifecycle.select_provider(assessment["record_id"], "repository_implementation")
+
+
+def test_local_enablement_record_cannot_resume_without_canonical_ptm_dependency(tmp_path):
+    obj = objective(tmp_path)
+    lifecycle = CapabilityEnablementLifecycle(tmp_path)
+    proposal = lifecycle._record("creation_proposals", "capprop", {"objective_id": obj.objective_id, "worker_specification_id": "workerspec-existing", "gap_id": "gap-existing", "proposed_by": "Helen", "status": "proposed"})
+    dependency = lifecycle.link_enabling_project(proposal_id=proposal["record_id"], enabling_project_id="project-enable-codex", original_objective_id=obj.objective_id)
+    registration = lifecycle.record_registration(dependency_id=dependency["record_id"], provider_id="codex.execution.cli", adapter_id="codex-cli-execution-adapter", adapter_version="1.0.0", capability_claims=["repository_implementation"], qualification_evidence=["qualification/codex.json"], health_evidence=["health/codex.json"], authorization_evidence=["authorization/codex.json"], receipt_contract={"schema": "provider_receipt.v1"}, artifact_contract={"schema": "artifact_manifest.v1"})
+    result = lifecycle.reevaluate(dependency_id=dependency["record_id"], registration_id=registration["record_id"], evidence=[available()])
+    assert result["disposition"] == "dependency_not_confirmed"
+    assert not list((tmp_path / "runtime/grace_helen_engineering/capability_enablement/resumptions").glob("*.json"))

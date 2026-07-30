@@ -35,6 +35,10 @@ Date: 2026-07-30
 - Broader suite: 126 passed, 1 unrelated existing Windows path-separator
   assertion failed in `tests/test_execution_result_reconciliation_runtime.py`.
 
+The base commit `2ae9b37c2f1c88bd8d09491a715ae69a838530c3` was tested in an
+isolated worktree with the exact same test and produced the same assertion.
+The failure is therefore pre-existing, not a PR regression.
+
 ## Runtime synchronization
 
 The source-controlled runtime remains authoritative. External runtime

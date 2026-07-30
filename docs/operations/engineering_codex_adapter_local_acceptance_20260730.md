@@ -35,6 +35,31 @@ and created a provider receipt. This proves the local invocation and evidence
 contract only. Engineering validation, Chief Architect review, Steward review,
 and institutional acceptance remain separate.
 
+## Qualification evidence for this disposable commission
+
+- Adapter implementation: `codex-cli-execution-adapter` `1.0.0`.
+- Executable discovery: `codex-cli` `0.146.0` observed with `codex --version`.
+- Authentication readiness: observed indirectly by the authorized bounded
+  `codex exec` completing with exit code `0`; no credential material was read
+  or recorded.
+- Local health observation: `2026-07-30T18:59:06Z` through
+  `2026-07-30T18:59:20Z`; the process completed within the 180-second limit.
+- Freshness window: acceptance evidence valid for this recorded commission
+  only; it is not a standing provider-health claim.
+- Capacity policy: one bounded local commission at a time; no saturation claim
+  is made beyond this run.
+- Qualification result: qualified for the narrow declared documentation
+  artifact scope only.
+- Authorization scope: the explicit `engineering_acceptance_workspace/output`
+  path and the two recorded decision/boundary references.
+- Revocation/expiration: existing execution authorization expiry/revocation
+  controls remain authoritative; the disposable evidence is not reusable after
+  its bounded scope or freshness window expires.
+
+Helen must report this capability unavailable when these evidence records are
+absent, stale, conflicting, or unauthorized. A catalog descriptor with
+`status=implemented` alone is insufficient.
+
 ## Fail-closed acceptance
 
 Request `adapter-engineering-failclosed-001` carried an explicit cancellation

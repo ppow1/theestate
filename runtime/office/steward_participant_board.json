@@ -1,6 +1,6 @@
 {
   "filters": {},
-  "generated_at": "2026-07-10T20:14:10+00:00",
+  "generated_at": "2026-07-30T19:17:27+00:00",
   "participants": [
     {
       "availability_state": "working",
@@ -12,8 +12,8 @@
         "resident_id": "RES-000001",
         "target_tab": "resident-task-board"
       },
-      "elapsed_seconds": 72850,
-      "elapsed_time": "20:14:10",
+      "elapsed_seconds": 1797446,
+      "elapsed_time": "20 days, 19:17:26",
       "employee_id": 7,
       "escalation_state": "attention_needed",
       "goal": "Protect Steward attention while coordinating Estate operational flow.",
@@ -26,15 +26,15 @@
       "resident_id": "RES-000001",
       "resident_name": "Alfred",
       "schema_version": "office_resident_task_board.v1",
-      "source_artifact": "runtime/residents/task_status.json",
+      "source_artifact": "runtime\\residents\\task_status.json",
       "source_last_updated": "2026-07-10T00:00:00+00:00",
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
-        "runtime/residents/task_status.json",
+        "runtime\\residents\\task_status.json",
         "runtime/residents/presence.json"
       ],
-      "stale_status": false,
+      "stale_status": true,
       "status": "waiting",
       "task_owner": "Alfred",
       "unread_message_count": 0,
@@ -64,12 +64,12 @@
       "resident_id": "RES-000002",
       "resident_name": "Ingrid",
       "schema_version": "office_resident_task_board.v1",
-      "source_artifact": "runtime/residents/task_status.json",
+      "source_artifact": "runtime\\residents\\task_status.json",
       "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
-        "runtime/residents/task_status.json",
+        "runtime\\residents\\task_status.json",
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
@@ -88,8 +88,8 @@
         "resident_id": "RES-000003",
         "target_tab": "resident-task-board"
       },
-      "elapsed_seconds": 72850,
-      "elapsed_time": "20:14:10",
+      "elapsed_seconds": 1797446,
+      "elapsed_time": "20 days, 19:17:26",
       "employee_id": 6,
       "escalation_state": "none",
       "goal": "Maintain privacy-safe workforce availability constraints.",
@@ -102,18 +102,18 @@
       "resident_id": "RES-000003",
       "resident_name": "Helen",
       "schema_version": "office_resident_task_board.v1",
-      "source_artifact": "runtime/residents/task_status.json",
+      "source_artifact": "runtime\\residents\\task_status.json",
       "source_last_updated": "2026-07-10T00:00:00+00:00",
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
-        "runtime/residents/task_status.json",
+        "runtime\\residents\\task_status.json",
         "runtime/residents/presence.json"
       ],
-      "stale_status": false,
+      "stale_status": true,
       "status": "waiting",
       "task_owner": "Helen",
-      "unread_message_count": 1,
+      "unread_message_count": 2,
       "waiting_on": "Current resident status records"
     },
     {
@@ -140,12 +140,12 @@
       "resident_id": "RES-000004",
       "resident_name": "Eleanor",
       "schema_version": "office_resident_task_board.v1",
-      "source_artifact": "runtime/residents/task_status.json",
+      "source_artifact": "runtime\\residents\\task_status.json",
       "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
-        "runtime/residents/task_status.json",
+        "runtime\\residents\\task_status.json",
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
@@ -178,12 +178,12 @@
       "resident_id": "RES-000005",
       "resident_name": "Marie",
       "schema_version": "office_resident_task_board.v1",
-      "source_artifact": "runtime/residents/task_status.json",
+      "source_artifact": "runtime\\residents\\task_status.json",
       "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
-        "runtime/residents/task_status.json",
+        "runtime\\residents\\task_status.json",
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
@@ -216,17 +216,93 @@
       "resident_id": "RES-000006",
       "resident_name": "Judy",
       "schema_version": "office_resident_task_board.v1",
-      "source_artifact": "runtime/residents/task_status.json",
+      "source_artifact": "runtime\\residents\\task_status.json",
       "source_last_updated": null,
       "source_links": [
         "data/registry/residents.json",
         "data/registry/personnel.json",
-        "runtime/residents/task_status.json",
+        "runtime\\residents\\task_status.json",
         "runtime/residents/presence.json"
       ],
       "stale_status": true,
       "status": "stale",
       "task_owner": "Judy",
+      "unread_message_count": 0,
+      "waiting_on": null
+    },
+    {
+      "availability_state": "unknown",
+      "blocker": "status stale or missing",
+      "current_goal": "Provides private Steward Relationship Layer counsel with restricted continuity, explicit retention approval, no institutional authority, and no private context exposure outside approved audiences.",
+      "current_task": "unknown",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "evelyn",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": null,
+      "elapsed_time": null,
+      "employee_id": null,
+      "escalation_state": "attention_needed",
+      "goal": "Provides private Steward Relationship Layer counsel with restricted continuity, explicit retention approval, no institutional authority, and no private context exposure outside approved audiences.",
+      "last_meaningful_movement": null,
+      "mailbox_id": null,
+      "next_action": null,
+      "next_checkpoint": null,
+      "office": "Steward Confidant",
+      "related_work_package_or_project": "unknown",
+      "resident_id": "evelyn",
+      "resident_name": "Evelyn",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime\\residents\\task_status.json",
+      "source_last_updated": null,
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime\\residents\\task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": true,
+      "status": "stale",
+      "task_owner": "Evelyn",
+      "unread_message_count": 0,
+      "waiting_on": null
+    },
+    {
+      "availability_state": "unknown",
+      "blocker": "status stale or missing",
+      "current_goal": "Sequences approved operational movement, dependencies, checkpoints, and governed Dispatch handoffs without provider execution or authority expansion.",
+      "current_task": "unknown",
+      "detail_navigation": {
+        "action_id": "resident_task_board.open_detail",
+        "resident_id": "grace",
+        "target_tab": "resident-task-board"
+      },
+      "elapsed_seconds": null,
+      "elapsed_time": null,
+      "employee_id": 12,
+      "escalation_state": "attention_needed",
+      "goal": "Sequences approved operational movement, dependencies, checkpoints, and governed Dispatch handoffs without provider execution or authority expansion.",
+      "last_meaningful_movement": null,
+      "mailbox_id": 12,
+      "next_action": null,
+      "next_checkpoint": null,
+      "office": "Office of Operations",
+      "related_work_package_or_project": "unknown",
+      "resident_id": "grace",
+      "resident_name": "Grace",
+      "schema_version": "office_resident_task_board.v1",
+      "source_artifact": "runtime\\residents\\task_status.json",
+      "source_last_updated": null,
+      "source_links": [
+        "data/registry/residents.json",
+        "data/registry/personnel.json",
+        "runtime\\residents\\task_status.json",
+        "runtime/residents/presence.json"
+      ],
+      "stale_status": true,
+      "status": "stale",
+      "task_owner": "Grace",
       "unread_message_count": 0,
       "waiting_on": null
     }

@@ -1,6 +1,9 @@
 # Engineering Capability Enablement Lifecycle Proposal
 
-Status: Planning proposal; no work-package ID assigned and no implementation authorized.
+Status: Originally authored as a planning proposal; implementation authored by
+PR #496. No work-package ID was assigned; merge, external-runtime
+synchronization, Chief Architect review, and institutional acceptance remain
+pending.
 
 ## Purpose
 
@@ -24,16 +27,18 @@ The eventual implementation package must reconcile and test:
 
 ## Non-goals
 
-This proposal does not create a provider, adapter, registry, scheduler, queue,
+The proposal did not create a provider, adapter, registry, scheduler, queue,
 approval shortcut, or direct Grace-to-provider path. It does not assign a new WP
 number because existing campaign packages overlap this scope.
 
 ## Required gates
 
-The implementing package must first name the authoritative source for every
+The implementation package named the required authoritative sources; remaining
+promotion gates must first name the authoritative source for every
 record, define evidence freshness and conflict rules, reconcile WP-0671/WP-0672/
 WP-0673 with WP-0695/WP-0697 and WP-0604/WP-0613, and obtain Chief Architect and
-Steward approval before adding runtime behavior. A missing bootstrap capability
+Steward approval before promotion or merge. Runtime behavior now exists on the
+review branch. A missing bootstrap capability
 must create another truthful gap; the capability being created may never satisfy
 its own bootstrap dependency.
 

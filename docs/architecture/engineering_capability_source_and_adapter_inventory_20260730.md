@@ -1,6 +1,8 @@
 # Engineering Capability and Adapter Inventory
 
-Status: Discovery only; no provider registration or adapter implementation is authorized.
+Status: Discovery inventory updated for PR #496. The Codex adapter is authored
+and locally validated on the review branch; provider qualification, health,
+authorization, merge, and institutional acceptance remain pending.
 Date: 2026-07-30
 
 ## Candidate inventory
@@ -24,9 +26,10 @@ adapter seams, but not one authoritative registration result that proves all of
 those facts for a concrete worker. The next governed package must define that
 join using the canonical reuse map before any live adapter is selected.
 
-## Recommendation
+## Recommendation and implementation state
 
-Recommend `codex.execution.cli` as the first concrete adapter candidate for a
+`codex.execution.cli` was recommended and is now implemented on PR #496 as the
+first concrete adapter for a
 bounded repository/code/document commission. This is a recommendation only. It
 requires an approved registration, capability claims, health/capacity evidence,
 qualification tests, authorization scope, receipt/artifact contract, timeout,

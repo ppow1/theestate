@@ -1,6 +1,8 @@
 # Engineering Capability Lifecycle — Source-of-Truth Matrix
 
-Status: Proposed reconciliation matrix.
+Status: Reconciliation matrix implemented as the review-branch design contract;
+runtime records are authored by PR #496 and remain pending merge, qualification,
+and acceptance.
 
 | Concept | Canonical source | Current evidence | Must not be used as substitute |
 |---|---|---|---|
