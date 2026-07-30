@@ -17,6 +17,9 @@ export interface HydrationMetadata {
   completenessWarnings: string[];
   containerDescription?: string;
   firstMessageHash?: string;
+  conversationContainerRole?: 'conversation-content';
+  sidebarContainerSelected?: boolean;
+  scrollTopChangesObserved?: boolean;
 }
 export interface HydrationSnapshot { count: number; firstMessageHash: string; scrollHeight: number; scrollTop: number; topReached: boolean; loading: boolean; nodeCount: number; virtualizationDetected: boolean; }
 export const hashText = (text: string) => crypto.createHash('sha256').update(text).digest('hex');
@@ -41,21 +44,22 @@ export async function hydrateConversation<T extends HydrationSnapshot>(args: {
   collect: () => Promise<Message[]>;
   report?: (snapshot: T, pass: number, stable: number) => void;
   isCancelled?: () => boolean;
+  scrollTopChangesObserved?: () => boolean;
 }): Promise<{ snapshot: T; messages: Message[]; metadata: HydrationMetadata }> {
   const started = new Date(); const startedAt = started.toISOString(); const first = await args.readSnapshot();
   const accumulated = new Map<string, Message>(); const ordered: string[] = []; let lastBatch: Message[] = [];
   const collectBatch = (batch: Message[]) => { lastBatch = batch; const keys = batch.map((message, index) => message.id || `${message.role}:${hashText(message.content.map(block => block.text || '').join('\n').trim())}:${index}`); const unseen = keys.filter(key => !accumulated.has(key)); for (const [index, message] of batch.entries()) { const key = keys[index]; if (!accumulated.has(key)) accumulated.set(key, { ...message, id: message.id || key }); } if (unseen.length) ordered.unshift(...unseen); };
   collectBatch(await args.collect());
-  let previous: T | undefined = first; let stable = 0; let pass = 0; let topReached = first.topReached; let virtualization = first.virtualizationDetected;
+  let previous: T | undefined = first; let stable = 0; let pass = 0; let topReached = first.topReached; let virtualization = first.virtualizationDetected; let scrollTopChanged = false;
   while (pass < args.config.conversationHydrationMaxPasses && Date.now() - started.getTime() < args.config.conversationHydrationMaxDurationMs) {
     if (args.isCancelled?.()) throw new Error('ARCHIVE_CANCELLED_DURING_HYDRATION');
     pass++; await args.scrollUp(); await new Promise(resolve => setTimeout(resolve, args.config.conversationHydrationPollingIntervalMs));
-    const current = await args.readSnapshot(); collectBatch(await args.collect());
+    const current = await args.readSnapshot(); scrollTopChanged ||= current.scrollTop !== previous?.scrollTop; collectBatch(await args.collect());
     topReached ||= current.topReached; virtualization ||= current.virtualizationDetected;
     stable = snapshotStable(previous, current, args.config.conversationTopPositionTolerancePx) ? stable + 1 : 0;
     args.report?.(current, pass, stable); previous = current;
     if (stable >= Math.max(args.config.conversationHydrationStablePasses, args.config.messageCountStabilityRequirement)) {
-      const end = new Date(); return { snapshot: current, messages: virtualization ? ordered.map(key => accumulated.get(key)!).filter(Boolean) : lastBatch, metadata: { hydrationStartedAt: startedAt, hydrationEndedAt: end.toISOString(), hydrationDurationMs: end.getTime() - started.getTime(), hydrationPasses: pass, stablePassesObserved: stable, initialMessageCount: first.count, finalMessageCount: current.count, topReached, virtualizationDetected: virtualization, incrementalAccumulationUsed: virtualization, completenessStatus: 'complete', completenessWarnings: [] } };
+      const end = new Date(); return { snapshot: current, messages: virtualization ? ordered.map(key => accumulated.get(key)!).filter(Boolean) : lastBatch, metadata: { hydrationStartedAt: startedAt, hydrationEndedAt: end.toISOString(), hydrationDurationMs: end.getTime() - started.getTime(), hydrationPasses: pass, stablePassesObserved: stable, initialMessageCount: first.count, finalMessageCount: current.count, topReached, virtualizationDetected: virtualization, incrementalAccumulationUsed: virtualization, completenessStatus: 'complete', completenessWarnings: [], conversationContainerRole: 'conversation-content', sidebarContainerSelected: false, scrollTopChangesObserved: scrollTopChanged || args.scrollTopChangesObserved?.() || false } };
     }
   }
   const end = new Date(); const timedOut = Date.now() - started.getTime() >= args.config.conversationHydrationMaxDurationMs;
