@@ -21,6 +21,8 @@ node dist/cli.js diagnostics --config config.example.json
 
 Routine Task Scheduler command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveSync.ps1`.
 
+The installed launchers are independent of the PowerShell caller's current directory. If initialization reports `TS5058` for `tsconfig.json`, refresh the deployed installation so it contains `tsconfig.json`, `src`, and `dist`; do not run the launcher from the repository checkout as a workaround. Initialization opens the dedicated profile and may end with `AUTHENTICATION_REQUIRED`; complete login manually in that window, then rerun the same initialization command.
+
 ## Archive and schema
 
 The archive is `archive-manifest.json`, `state/conversation-index.json`, `conversations/<stable-id>/latest.*`, immutable `revisions/<revision-id>/`, `reports/<run-id>/`, and `logs/`. Canonical JSON is schema version `1.0`; each message preserves role and ordered content blocks, with source URL, optional timestamps, metadata, attachments, export completeness, limitations, and revision links.

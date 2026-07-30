@@ -18,6 +18,20 @@ The installation contains the compiled CLI, npm production dependencies, configu
 
 ## Verification evidence
 
+### Production launcher correction — 2026-07-30
+
+The first operator initialization from `A:\theestate-wp4233` exposed a launcher deployment defect: the installed package did not contain `tsconfig.json`, and initialization consequently reported `TS5058` while running `npm run build`. All four PowerShell launchers now resolve the installation root from `$PSScriptRoot`, explicitly set that directory as the process location, validate required files, and pass absolute CLI/configuration paths. The deployed installation was refreshed with the complete TypeScript build inputs and compiled output.
+
+Verification was performed from `A:\theestate-wp4233` for initialization, full, sync, and validate launchers. Initialization reached the expected manual-login boundary (`AUTHENTICATION_REQUIRED`) without the TypeScript path error; validation completed successfully. No credentials, cookies, or authentication bypass were automated.
+
+Exact initialization command:
+
+`powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Initialize-ChatGPTConversationArchive.ps1`
+
+The operator should use the dedicated Chrome/Chromium window opened by the launcher, using the profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`; do not use a normal concurrently running Chrome profile. After manual login, rerun the initialization command above, then run:
+
+`powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveSync.ps1`
+
 | Requirement | Evidence | Result |
 |---|---|---|
 | Estate-wide ownership and neutral naming | `tools/chatgpt-conversation-archive/`, root `README.md`, `docs/ARCHITECTURE.md`; no product filter or CueMastery path | Pass |
@@ -32,7 +46,7 @@ The installation contains the compiled CLI, npm production dependencies, configu
 | Browser safety | dedicated persistent profile under neutral tool path; no credential automation or secret logging | Implemented; authentication initialization remains manual |
 | Dependencies | `npm install` completed; 59 packages audited, 0 vulnerabilities | Pass |
 | TypeScript build | `npm run build` | Pass |
-| Unit tests | `npm test`: 1 file, 3 tests passed | Pass |
+| Unit tests | `npm test`: 2 files, 8 tests passed, including unrelated-current-directory launcher regression | Pass |
 | Playwright integration fixture | `npm run playwright:test`: 1 test passed; pinned Chromium installed | Pass |
 | CLI help | root and `validate --help` executed successfully | Pass |
 
