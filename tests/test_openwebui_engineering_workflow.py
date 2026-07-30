@@ -53,12 +53,11 @@ def test_openwebui_dispatch_is_immediately_handoff_eligible(tmp_path):
     assert prepared["status"] == "handoff_validated"
     assert prepared["errors"] == []
     adapter_request = prepared["adapter_request"]
-    assert adapter_request["provider_id"] == "codex-cli-openai"
-    assert adapter_request["provider_type"] == "codex-cli"
-    assert adapter_request["prompt_source"] == "collaboration/work_packages/pending/WP-0649_WebUI_Helen_Grace_Engineering_Workflow_Integration.md"
-    assert adapter_request["read_scope_paths"]
-    assert adapter_request["decision_reference"]
-    assert adapter_request["metadata"]["authorization_reference"]
+    assert prepared["adapter_request"] is None
+    assert prepared["dispatch"]["provider"] is None
+    assert prepared["dispatch"]["provider_metadata"]["commission"]["requested_outcome"]
+    assert prepared["dispatch"]["provider_metadata"]["commission"]["acceptance_criteria"]
+    assert prepared["dispatch"]["provider_metadata"]["provider_execution_must_remain_behind_dispatch"] is True
 
 EXACT_COMMAND = (
     "Initiate Engineering Department assignment: verify the Open WebUI engineering assignment workflow "

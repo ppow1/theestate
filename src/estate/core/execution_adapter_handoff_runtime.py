@@ -158,6 +158,30 @@ def prepare_handoff(dispatch_id: str, root: str | Path | None = None, *, write: 
         item = inspect_dispatch_item(dispatch_id, base)
     except KeyError as exc:
         return HandoffStatus(status="not_ready", dispatch_id=dispatch_id, errors=[str(exc)]).to_dict()
+    # A Grace-originated Engineering commission is deliberately provider
+    # neutral. Engineering selects a provider after receiving this Dispatch
+    # handoff, so the generic handoff must not require an adapter request yet.
+    commission = (item.provider_metadata or {}).get("commission")
+    if not item.provider and isinstance(commission, dict):
+        payload = {
+            "schema_version": "estate.engineering.dispatch-handoff.v1",
+            "dispatch_id": dispatch_id,
+            "commission": commission,
+            "provider_id": None,
+            "provider_selection_owner": "Engineering",
+            "dispatch_authority": "Dispatch",
+            "created_at": _now(),
+        }
+        handoff_path = base / "runtime/execution_dispatch/handoffs" / f"{dispatch_id}_engineering_commission.json"
+        handoff_path.parent.mkdir(parents=True, exist_ok=True)
+        handoff_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        if write:
+            item.handoff_reference = _rel(handoff_path, base)
+            item.updated_at = _now()
+            _write_queue(base, _replace_item(load_dispatch_queue(base), item))
+            _emit_event(base, item, "dispatch_handoff_validated", f"Provider-neutral Engineering commission handoff validated for {dispatch_id}.")
+            generate_current_dispatch_snapshot(base, write=True)
+        return {"status": "handoff_validated", "dispatch_id": dispatch_id, "errors": [], "warnings": [], "adapter_request": None, "validation": {"status": "accepted", "provider_selection_owner": "Engineering"}, "artifacts": {"request_path": _rel(handoff_path, base)}, "dispatch": item.to_dict(), "handoff_reference": _rel(handoff_path, base), "live_provider_called": False}
     gate = _validate_item(item)
     if gate.errors:
         _emit_event(base, item, "dispatch_handoff_blocked", "; ".join(gate.errors))

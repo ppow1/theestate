@@ -365,24 +365,25 @@ class GraceOperationsRuntime:
                 decision_reference = f"operations-control/{decision.decision_id}"
                 authorization_reference = f"grace/{objective.objective_id}/delegated-engineering-assignment"
                 dispatch_payload.update({
-                    "provider": "codex-cli-openai",
-                    "profile_label": "default",
                     "state": "Ready",
-                    "prompt_source": "collaboration/work_packages/pending/WP-0649_WebUI_Helen_Grace_Engineering_Workflow_Integration.md",
-                    "sandbox": "workspace-write",
-                    "allowed_read_paths": ["collaboration/work_packages/pending", "src/estate/core", "external/engineering_worker_runtime"],
-                    "allowed_write_paths": ["runtime/local_engineering_department", "runtime/execution_adapters"],
-                    "allowed_providers": ["codex-cli-openai"],
-                    "validation_commands": ["pytest tests/test_openwebui_engineering_workflow.py tests/test_local_engineering_department.py"],
                     "provider_metadata": {
                         "grace_action_id": action.action_id,
                         "checkpoint": action.checkpoint,
                         "decision_reference": decision_reference,
                         "authorization_reference": authorization_reference,
                         "movement_authorization_reference": decision_reference,
-                        "provider_type": "codex-cli",
                         "open_webui_session_id": objective.metadata.get("open_webui_session_id"),
                         "provider_execution_must_remain_behind_dispatch": True,
+                        "commission": {
+                            "commission_id": f"engcom-{objective.objective_id}",
+                            "grace_objective_id": objective.objective_id,
+                            "requested_outcome": objective.summary,
+                            "artifact_type": objective.metadata.get("artifact_type", "structured_work_product"),
+                            "required_capabilities": list(objective.metadata.get("required_capabilities") or ["documentation_draft"]),
+                            "acceptance_criteria": list(objective.metadata.get("acceptance_criteria") or [{"kind": "artifact_exists"}, {"kind": "provider_receipt"}]),
+                            "constraints": list(objective.metadata.get("constraints") or []),
+                            "allowed_providers": list(objective.metadata.get("allowed_providers") or []),
+                        },
                     },
                 })
             dispatch_request = DispatchRequest(**dispatch_payload)

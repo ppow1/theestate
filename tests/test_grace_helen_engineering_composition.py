@@ -30,7 +30,7 @@ def test_fixture_normal_flow_preserves_authority_and_returns_to_grace(tmp_path):
     auth, dispatch = comp.authorize_dispatch(commission["commission_id"], provider_id="fixture-cad-provider", provider_type="fixture", adapter_reference="tests.fixture")
     assert dispatch["requested_by"] == "Engineering"
     assert dispatch["provider_metadata"]["technical_execution"] is True
-    result = ExecutionProviderAdapterResult(adapter_request_id="adapter-fixture", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), finished_at=utc_now(), summary="fixture worker finished", artifacts=["artifacts/project7.dwg"], validation_status="passed", metadata={"live_provider_called": False})
+    result = ExecutionProviderAdapterResult(adapter_request_id="adapter-fixture", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), finished_at=utc_now(), summary="fixture worker finished", artifacts=["artifacts/project7.dwg"], validation_status="passed", metadata={"live_provider_called": False, "provider_receipt": "receipt://fixture/project7"})
     completion = comp.reconcile_validate_complete(auth["authorization_id"], result, validation_passed=True)
     receipt = comp.receive_completion(completion["completion_id"], objective.objective_id)
     assert receipt["objective_transition_applied"] == "completed"
@@ -76,7 +76,7 @@ def test_mismatches_validation_failure_and_duplicate_receipt_fail_closed_or_idem
     bad = ExecutionProviderAdapterResult(adapter_request_id="bad", dispatch_id="dispatch-other", provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), artifacts=["bad.dwg"])
     with pytest.raises(ValueError, match="unrelated"):
         comp.reconcile_validate_complete(auth["authorization_id"], bad, validation_passed=True)
-    good = ExecutionProviderAdapterResult(adapter_request_id="good", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), artifacts=["good.dwg"])
+    good = ExecutionProviderAdapterResult(adapter_request_id="good", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), artifacts=["good.dwg"], validation_status="passed", metadata={"provider_receipt": "receipt://fixture/good"})
     with pytest.raises(ValueError, match="validation failed"):
         comp.reconcile_validate_complete(auth["authorization_id"], good, validation_passed=False)
     completion = comp.reconcile_validate_complete(auth["authorization_id"], good, validation_passed=True)
@@ -84,3 +84,15 @@ def test_mismatches_validation_failure_and_duplicate_receipt_fail_closed_or_idem
     assert comp.receive_completion(completion["completion_id"], objective.objective_id) == first
     with pytest.raises(ValueError, match="does not belong"):
         comp.receive_completion(completion["completion_id"], "grace-obj-unrelated")
+
+
+def test_completion_requires_artifact_and_provider_receipt(tmp_path):
+    objective = _objective(tmp_path); comp = GraceHelenEngineeringComposition(tmp_path)
+    determination = _available(comp, objective); commission = _commission(comp, objective, determination)
+    auth, _ = comp.authorize_dispatch(commission["commission_id"], provider_id="fixture-cad-provider", provider_type="fixture", adapter_reference="tests.fixture")
+    no_artifact = ExecutionProviderAdapterResult(adapter_request_id="no-artifact", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), validation_status="passed", metadata={"provider_receipt": "receipt://fixture/no-artifact"})
+    with pytest.raises(ValueError, match="artifact"):
+        comp.reconcile_validate_complete(auth["authorization_id"], no_artifact, validation_passed=True)
+    no_receipt = ExecutionProviderAdapterResult(adapter_request_id="no-receipt", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), artifacts=["artifact.dwg"], validation_status="passed")
+    with pytest.raises(ValueError, match="receipt"):
+        comp.reconcile_validate_complete(auth["authorization_id"], no_receipt, validation_passed=True)
