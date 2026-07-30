@@ -42,6 +42,20 @@ Interactive initialization now prefers the installed stable Chrome executable. O
 
 Cloudflare/browser verification is detected separately. If the page still presents human verification after the operator presses Enter, the result is `LOGIN_VERIFICATION_INCOMPLETE`, not a false authenticated success. The operator must complete the legitimate challenge in the dedicated Chrome window; no credentials, cookies, or security checks are automated.
 
+### Live unresolved-defect correction — 2026-07-30
+
+Live capture of the prior deployed build showed that Playwright injected `--no-sandbox` into the effective Chrome parent and child command lines despite the source custom-argument list not containing it. The corrected launch sets `chromiumSandbox: true`, excludes both `--no-sandbox` and `--disable-setuid-sandbox` from Playwright defaults, and asserts against every effective Chrome command line after launch. A corrected live launch produced zero forbidden sandbox arguments across six profile processes.
+
+The profile contained `chatgpt.com` persisted zoom `-7.6035680338478615` and stale placement state. Initialization now repairs only `chatgpt.com`, `openai.com`, and `auth.openai.com` zoom records to Chrome's `zoom_level: 0` default and removes only `browser.window_placement`; it does not delete the profile or authentication data. Live verification observed the repaired origins at default 100% (no non-default origin zoom records) and measured the actual outer window at `left=50, top=50, width=1400, height=900`, with `maximized=false`.
+
+The complete live effective parent command was:
+
+```text
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --window-size=1400,900 --window-position=50,50 --disable-extensions --user-data-dir=A:/AI/Tools/ChatGPTConversationArchive/profile --remote-debugging-pipe about:blank
+```
+
+It contained neither forbidden sandbox flag. The renderer retained the operating system's normal display scale (`--device-scale-factor=2` on this 4K machine); this is distinct from page zoom and was not artificially overridden.
+
 | Requirement | Evidence | Result |
 |---|---|---|
 | Estate-wide ownership and neutral naming | `tools/chatgpt-conversation-archive/`, root `README.md`, `docs/ARCHITECTURE.md`; no product filter or CueMastery path | Pass |

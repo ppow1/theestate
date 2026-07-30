@@ -1,8 +1,9 @@
 import { chromium, type BrowserContext, type Page } from 'playwright';
-import fs from 'node:fs'; import path from 'node:path';
+import fs from 'node:fs'; import path from 'node:path'; import { execFileSync } from 'node:child_process';
 import type { ArchiveConfig, Conversation, ContentBlock, DiscoveredConversation, Message, Role } from './model.js';
 const roleOf=(x:string):Role=>['user','assistant','tool','system'].includes(x)?x as Role:'unknown';
 export type AuthenticationState = 'authenticated'|'unauthenticated'|'verification-incomplete';
+const forbiddenSandboxArguments=['--no-sandbox','--disable-setuid-sandbox'];
 export function resolveStableChromeExecutable() {
   const candidates = [
     process.env.CHATGPT_ARCHIVE_CHROME,
@@ -16,15 +17,55 @@ export function interactiveLaunchOptions(config: ArchiveConfig): NonNullable<Par
   return {
     headless: false,
     executablePath: config.chromeExecutablePath || resolveStableChromeExecutable(),
-    viewport: {width:1400,height:900},
-    deviceScaleFactor: 1,
+    viewport: null,
     acceptDownloads: false,
-    args: ['--window-size=1400,900','--disable-extensions'],
+    chromiumSandbox: true,
+    ignoreDefaultArgs: forbiddenSandboxArguments,
+    args: ['--window-size=1400,900','--window-position=50,50','--disable-extensions'],
   };
+}
+export function repairInteractiveProfilePreferences(profilePath:string) {
+  const preferencesPath=path.join(profilePath,'Default','Preferences');
+  if(!fs.existsSync(preferencesPath)) return;
+  const preferences=JSON.parse(fs.readFileSync(preferencesPath,'utf8')) as any;
+  const levels=preferences.partition??={};
+  const perHost=levels.per_host_zoom_levels??={};
+  const repair=(value:any)=>{if(!value||typeof value!=='object')return; for(const [key,child] of Object.entries(value)){if(/^(?:https?:\/\/)?(?:www\.)?(?:chatgpt\.com|openai\.com|auth\.openai\.com)$/i.test(key)) (child as any).zoom_level=0; else repair(child);}};
+  repair(perHost);
+  const target=(perHost.x??= {});
+  for(const host of ['chatgpt.com','openai.com','auth.openai.com']) target[host]={...(target[host]??{}),zoom_level:0};
+  if(preferences.browser?.window_placement) delete preferences.browser.window_placement;
+  const temporary=`${preferencesPath}.tmp-${process.pid}`;
+  fs.writeFileSync(temporary,JSON.stringify(preferences)); fs.renameSync(temporary,preferencesPath);
+}
+export function effectiveChromeCommandLines(profilePath:string):string[] {
+  if(process.platform!=='win32') return [];
+  const query="$p=Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { $_.CommandLine -like ('*' + $env:CHATGPT_ARCHIVE_PROFILE_QUERY + '*') } | Select-Object -ExpandProperty CommandLine; if($p){$p | ConvertTo-Json -Compress}";
+  const output=execFileSync('powershell.exe',['-NoProfile','-Command',query],{encoding:'utf8',env:{...process.env,CHATGPT_ARCHIVE_PROFILE_QUERY:profilePath.replace(/\\/g,'/')}}).trim();
+  if(!output) return [];
+  const parsed=JSON.parse(output) as string|string[];
+  return Array.isArray(parsed)?parsed:[parsed];
+}
+export function setInteractiveWindowBounds(profilePath:string) {
+  if(process.platform!=='win32') return;
+  const source="Add-Type @'\nusing System; using System.Runtime.InteropServices; public static class Win32 { [DllImport(\"user32.dll\")] public static extern bool ShowWindow(IntPtr h, int n); [DllImport(\"user32.dll\")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags); }\n'@; $p=Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { $_.CommandLine -like ('*' + $env:CHATGPT_ARCHIVE_PROFILE_QUERY + '*') -and $_.CommandLine -notlike '*--type=*' } | Select-Object -First 1; if(-not $p){throw 'interactive Chrome window was not found'}; $h=(Get-Process -Id $p.ProcessId).MainWindowHandle; if($h -eq 0){throw 'interactive Chrome window handle was not available'}; [Win32]::ShowWindow($h,9)|Out-Null; [Win32]::SetWindowPos($h,[IntPtr]::Zero,50,50,1400,900,20)|Out-Null";
+  execFileSync('powershell.exe',['-NoProfile','-Command',source],{encoding:'utf8',env:{...process.env,CHATGPT_ARCHIVE_PROFILE_QUERY:profilePath.replace(/\\/g,'/')}});
+}
+export function interactiveWindowBounds(profilePath:string) {
+  if(process.platform!=='win32') return undefined;
+  const source="Add-Type @'\nusing System; using System.Runtime.InteropServices; public struct RECT { public int Left; public int Top; public int Right; public int Bottom; } public static class Win32 { [DllImport(\"user32.dll\")] public static extern bool GetWindowRect(IntPtr h, out RECT r); }\n'@; $p=Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { $_.CommandLine -like ('*' + $env:CHATGPT_ARCHIVE_PROFILE_QUERY + '*') -and $_.CommandLine -notlike '*--type=*' } | Select-Object -First 1; if(-not $p){throw 'interactive Chrome window was not found'}; $h=(Get-Process -Id $p.ProcessId).MainWindowHandle; $r=New-Object RECT; [Win32]::GetWindowRect($h,[ref]$r)|Out-Null; [pscustomobject]@{left=$r.Left;top=$r.Top;width=$r.Right-$r.Left;height=$r.Bottom-$r.Top}|ConvertTo-Json -Compress";
+  return JSON.parse(execFileSync('powershell.exe',['-NoProfile','-Command',source],{encoding:'utf8',env:{...process.env,CHATGPT_ARCHIVE_PROFILE_QUERY:profilePath.replace(/\\/g,'/')}}).trim());
+}
+export function assertInteractiveWindowBounds(profilePath:string) { const bounds=interactiveWindowBounds(profilePath); if(bounds && (bounds.width<1200||bounds.width>1600||bounds.height<750||bounds.height>1050)) throw new Error(`INTERACTIVE_BROWSER_WINDOW_SIZE_INVALID: ${bounds.width}x${bounds.height}`); return bounds; }
+export function assertNoForbiddenSandboxArguments(profilePath:string) {
+  const lines=effectiveChromeCommandLines(profilePath);
+  const violations=lines.flatMap(line=>forbiddenSandboxArguments.filter(argument=>line.includes(argument)));
+  if(violations.length) throw new Error(`INTERACTIVE_BROWSER_UNSAFE_ARGUMENTS: ${[...new Set(violations)].join(', ')}`);
+  return lines;
 }
 export class ChatGPTBrowser {
   private constructor(private context: BrowserContext, private page: Page, private config: ArchiveConfig) {}
-  static async open(config: ArchiveConfig, diagnostics=false, interactive=false) { fs.mkdirSync(config.profilePath,{recursive:true}); const options=interactive?interactiveLaunchOptions(config):{headless:config.headless,executablePath:config.chromeExecutablePath||undefined,viewport:{width:1440,height:1000},acceptDownloads:false}; const context=await chromium.launchPersistentContext(config.profilePath,options); const page=context.pages()[0]||await context.newPage(); page.setDefaultTimeout(config.timeoutMs); if(diagnostics) await context.tracing.start({screenshots:true,snapshots:true,sources:false}); return new ChatGPTBrowser(context,page,config); }
+  static async open(config: ArchiveConfig, diagnostics=false, interactive=false) { fs.mkdirSync(config.profilePath,{recursive:true}); if(interactive) { if(effectiveChromeCommandLines(config.profilePath).length) throw new Error('PROFILE_IN_USE: close any existing dedicated Chrome window before initialization'); repairInteractiveProfilePreferences(config.profilePath); } const options=interactive?interactiveLaunchOptions(config):{headless:config.headless,executablePath:config.chromeExecutablePath||undefined,viewport:{width:1440,height:1000},acceptDownloads:false}; const context=await chromium.launchPersistentContext(config.profilePath,options); try { if(interactive) { assertNoForbiddenSandboxArguments(config.profilePath); setInteractiveWindowBounds(config.profilePath); assertInteractiveWindowBounds(config.profilePath); } } catch(error) { await context.close(); throw error; } const page=context.pages()[0]||await context.newPage(); page.setDefaultTimeout(config.timeoutMs); if(diagnostics) await context.tracing.start({screenshots:true,snapshots:true,sources:false}); return new ChatGPTBrowser(context,page,config); }
   async close(diagnostics=false) { if(diagnostics) { fs.mkdirSync(this.config.diagnosticsPath,{recursive:true}); await this.context.tracing.stop({path:path.join(this.config.diagnosticsPath,`trace-${Date.now()}.zip`)}); } await this.context.close(); }
   async isAvailable() { return !this.page.isClosed(); }
   async authenticationState():Promise<AuthenticationState> { if (this.page.isClosed()) return 'unauthenticated'; await this.page.goto('https://chatgpt.com/',{waitUntil:'domcontentloaded'}); const body=(await this.page.locator('body').innerText().catch(()=>'')); if (/verifying you are human|checking your browser|challenge-platform|cf-chl/i.test(body)||/\/cdn-cgi\/challenge-platform|\/challenge\//i.test(this.page.url())) return 'verification-incomplete'; if (/log in|sign up/i.test(body)) return 'unauthenticated'; const interfaceElements=await this.page.locator('main,textarea,[contenteditable="true"],a[href*="/c/"]').count(); return interfaceElements>0?'authenticated':'unauthenticated'; }

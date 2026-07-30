@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { completeInteractiveAuthentication, type InteractiveAuthenticationBrowser } from '../src/interactive-auth.js';
-import { interactiveLaunchOptions, resolveStableChromeExecutable } from '../src/browser.js';
+import { interactiveLaunchOptions, repairInteractiveProfilePreferences, resolveStableChromeExecutable } from '../src/browser.js';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 const browser = (authenticated: boolean, available = true): InteractiveAuthenticationBrowser => ({
   isAvailable: vi.fn(async () => available),
@@ -43,10 +46,26 @@ describe('interactive first-time authentication', () => {
   it('uses a conventional headed desktop configuration for interactive login', () => {
     const options = interactiveLaunchOptions({ chromeExecutablePath: '', profilePath: '' } as any);
     expect(options.headless).toBe(false);
-    expect(options.viewport).toEqual({ width: 1400, height: 900 });
-    expect(options.deviceScaleFactor).toBe(1);
-    expect(options.args).toEqual(['--window-size=1400,900', '--disable-extensions']);
+    expect(options.deviceScaleFactor).toBeUndefined();
+    expect(options.viewport).toBeNull();
+    expect(options.args).toEqual(['--window-size=1400,900', '--window-position=50,50', '--disable-extensions']);
+    expect(options.chromiumSandbox).toBe(true);
+    expect(options.ignoreDefaultArgs).toEqual(['--no-sandbox', '--disable-setuid-sandbox']);
     expect(options.userAgent).toBeUndefined();
     expect(resolveStableChromeExecutable()?.toLowerCase()).toContain('chrome.exe');
+  });
+
+  it('repairs persisted origin zoom and stale maximized placement without replacing the profile', () => {
+    const root=fs.mkdtempSync(path.join(os.tmpdir(),'chatgpt-archive-profile-'));
+    const defaultDir=path.join(root,'Default'); fs.mkdirSync(defaultDir);
+    const preferencesPath=path.join(defaultDir,'Preferences');
+    fs.writeFileSync(preferencesPath,JSON.stringify({partition:{per_host_zoom_levels:{x:{'chatgpt.com':{zoom_level:-7.6},'openai.com':{zoom_level:-4}}}},browser:{window_placement:{maximized:true,left:-11}}}));
+    repairInteractiveProfilePreferences(root);
+    const repaired=JSON.parse(fs.readFileSync(preferencesPath,'utf8'));
+    expect(repaired.partition.per_host_zoom_levels.x['chatgpt.com'].zoom_level).toBe(0);
+    expect(repaired.partition.per_host_zoom_levels.x['openai.com'].zoom_level).toBe(0);
+    expect(repaired.partition.per_host_zoom_levels.x['auth.openai.com'].zoom_level).toBe(0);
+    expect(repaired.browser.window_placement).toBeUndefined();
+    fs.rmSync(root,{recursive:true,force:true});
   });
 });
