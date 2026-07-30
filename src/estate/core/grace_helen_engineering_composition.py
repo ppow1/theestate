@@ -16,6 +16,7 @@ from estate.core.execution_dispatch import DispatchRequest, enqueue_dispatch_req
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterResult, utc_now
 from estate.core.execution_provider_adapter_runtime import write_adapter_result
 from estate.core.execution_result_reconciliation_runtime import reconcile_result
+from estate.core.engineering_capability_enablement import CapabilityEnablementLifecycle, CapabilityEvidence
 from estate.core.grace_operations_runtime import GraceOperationsRuntime
 from estate.core.paths import ESTATE_ROOT
 
@@ -73,6 +74,21 @@ class GraceHelenEngineeringComposition:
     """Durable, correlation-first lifecycle composed from existing runtime seams."""
     def __init__(self, root: str | Path | None = None) -> None:
         self.root = _root(root)
+        self.capability_enablement = CapabilityEnablementLifecycle(self.root)
+
+    def create_capability_inquiry(self, **kwargs: Any) -> dict[str, Any]:
+        """Grace-owned inquiry entry point; provider selection remains outside Grace."""
+        return self.capability_enablement.create_inquiry(**kwargs)
+
+    def assess_required_capabilities(self, inquiry_id: str, evidence: list[CapabilityEvidence | dict[str, Any]]) -> dict[str, Any]:
+        """Helen-owned evidence assessment composed through the existing boundary."""
+        return self.capability_enablement.assess(inquiry_id, evidence)
+
+    def record_capability_registration(self, **kwargs: Any) -> dict[str, Any]:
+        return self.capability_enablement.record_registration(**kwargs)
+
+    def reevaluate_capability_and_resume(self, **kwargs: Any) -> dict[str, Any]:
+        return self.capability_enablement.reevaluate(**kwargs)
 
     def _path(self, directory: Path, record_id: str) -> Path:
         return self.root / directory / f"{record_id}.json"

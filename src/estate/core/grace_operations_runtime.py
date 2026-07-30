@@ -404,7 +404,7 @@ class GraceOperationsRuntime:
 
     def record_objective_transition(self, objective_id: str, state: str, **metadata: Any) -> dict[str, Any]:
         """Persist Grace-owned operational state without granting acceptance."""
-        allowed = {"awaiting_capability_verification", "blocked_pending_capability", "awaiting_engineering_acceptance", "engineering_in_progress", "awaiting_operational_receipt", "completed", "failed", "cancelled", "escalation_required"}
+        allowed = {"awaiting_capability_verification", "blocked_pending_capability", "awaiting_engineering_acceptance", "engineering_in_progress", "original_project_resumed", "awaiting_operational_receipt", "completed", "failed", "cancelled", "escalation_required"}
         if state not in allowed:
             raise ValueError(f"unsupported Grace objective transition: {state}")
         payload = {"objective_id": objective_id, "state": state, "owner": "Grace", "updated_at": utc_now_iso(), "institutional_acceptance_state": "not_granted", **metadata}
