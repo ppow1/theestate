@@ -4,6 +4,10 @@ Date: 2026-07-30
 Repository: `ppow1/theestate`  
 Branch: `work/chatgpt-conversation-archive`
 
+## Completeness repair acceptance gate
+
+The deployed fixed 30-wheel strategy was rejected: it scrolled the history sidebar and did not prove active conversation completeness. The repaired implementation uses measured containers, upward hydration, convergence, safety ceilings, virtualized accumulation, cancellation checkpoints, and completeness metadata. Full 325-conversation execution remains gated on bounded short, medium, and genuinely long live validation.
+
 ## Implementation and installation
 
 The implementation is under `tools/chatgpt-conversation-archive/` and is installed at:

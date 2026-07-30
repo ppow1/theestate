@@ -13,5 +13,13 @@ The JSON configuration is merged with safe defaults. Timing values are milliseco
 | `paginationDelayMs` | `500` | Delay between pagination/sidebar actions |
 | `burstSize` | `8` | Actions before a longer cooldown |
 | `burstCooldownMs` | `10000` | Cooldown after each burst |
+| `conversationHydrationPollingIntervalMs` | `1200` | Wait after each upward hydration pass for lazy loading |
+| `conversationHydrationStablePasses` | `4` | Consecutive stable passes required for completeness |
+| `conversationHydrationMaxDurationMs` | `1800000` | 30-minute safety duration; never success by itself |
+| `conversationHydrationMaxPasses` | `1200` | Safety pass ceiling; never success by itself |
+| `conversationTopPositionTolerancePx` | `8` | Near-zero tolerance for the measured content container |
+| `messageCountStabilityRequirement` | `4` | Required message-count stability policy |
 
 The defaults are deliberately conservative. Do not reduce them casually: faster settings can increase temporary ChatGPT restrictions. Reports include total requests/actions, conversations opened, throttle events, retries, and total backoff time.
+
+Hydration defaults favor correctness over speed. A ceiling before convergence yields an incomplete export and the index entry is not eligible for successful skip behavior.

@@ -22,5 +22,11 @@
   "burstCooldownMs": 10000,
   "progressHeartbeatMs": 10000,
   "stallWarningMs": 60000,
+  "conversationHydrationPollingIntervalMs": 1200,
+  "conversationHydrationStablePasses": 4,
+  "conversationHydrationMaxDurationMs": 1800000,
+  "conversationHydrationMaxPasses": 1200,
+  "conversationTopPositionTolerancePx": 8,
+  "messageCountStabilityRequirement": 4,
   "runtimeSeat": "local"
 }

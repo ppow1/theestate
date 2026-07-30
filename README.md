@@ -58,3 +58,22 @@ The live adapter depends on ChatGPT's accessible URL and `data-message-author-ro
 ## Privacy, recovery, uninstall
 
 Archives and profiles contain sensitive conversation data and are excluded from Git. Never publish them or place credentials in config. If interrupted, rerun `resume`; successful revisions remain intact and the next report records failures. To relocate, copy the tool and set `archiveRoot`/`profilePath`; to uninstall, remove the neutral installation and configured archive only after preserving any required institutional record.
+# ChatGPT Conversation Archive
+
+The exporter inventories the history sidebar separately from the active conversation. It identifies the conversation scroll container by walking message-node ancestry, checking computed `overflow-y`, `scrollHeight > clientHeight`, visible bounds, and a measured `scrollTop` change. It then hydrates upward from the newest view until message count, first-message hash, scroll height, top position, loading state, and DOM node stability converge for four passes.
+
+Completeness is evidence-based: `exportMetadata.complete` is true only for `completenessStatus: "complete"`. Safety ceilings produce `incomplete` or `timed-out`; they are never success. Virtualized DOMs are detected and records are accumulated and deduplicated by message id or role/content identity while preserving chronological order. Ctrl+C leaves the current item uncompleted and writes a cancellation checkpoint.
+
+Use `config.example.json` as the conservative baseline. Bounded validation should precede any full run:
+
+```powershell
+& .\scripts\Run-ChatGPTConversationArchiveSync.ps1
+```
+
+The repaired full command is:
+
+```powershell
+& .\scripts\Run-ChatGPTConversationArchiveFull.ps1
+```
+
+Do not run the full command until a genuinely long conversation has passed bounded live validation.
