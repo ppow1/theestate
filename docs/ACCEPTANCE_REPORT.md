@@ -32,6 +32,10 @@ The operator should use the dedicated Chrome/Chromium window opened by the launc
 
 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveSync.ps1`
 
+The initialization flow keeps the dedicated browser open while the console displays `After login is complete in the dedicated browser, press Enter here to verify:`. Press Enter only after the conversation interface is visible. The CLI verifies authenticated state before reporting `Profile ready`. Browser closure or premature confirmation returns a nonzero actionable error. Normal full/sync runs do not use this prompt and continue to return `AUTHENTICATION_REQUIRED` promptly when unauthenticated.
+
+The interactive authentication helper tests cover unauthenticated first run, browser availability during the manual-login wait, successful post-login verification, browser cancellation, and already-authenticated profiles. The launcher regression also verifies that non-interactive sync remains prompt-free and returns `AUTHENTICATION_REQUIRED` promptly.
+
 | Requirement | Evidence | Result |
 |---|---|---|
 | Estate-wide ownership and neutral naming | `tools/chatgpt-conversation-archive/`, root `README.md`, `docs/ARCHITECTURE.md`; no product filter or CueMastery path | Pass |
@@ -46,7 +50,7 @@ The operator should use the dedicated Chrome/Chromium window opened by the launc
 | Browser safety | dedicated persistent profile under neutral tool path; no credential automation or secret logging | Implemented; authentication initialization remains manual |
 | Dependencies | `npm install` completed; 59 packages audited, 0 vulnerabilities | Pass |
 | TypeScript build | `npm run build` | Pass |
-| Unit tests | `npm test`: 2 files, 8 tests passed, including unrelated-current-directory launcher regression | Pass |
+| Unit tests | `npm test`: 3 files, 13 tests passed, including interactive authentication and launcher regressions | Pass |
 | Playwright integration fixture | `npm run playwright:test`: 1 test passed; pinned Chromium installed | Pass |
 | CLI help | root and `validate --help` executed successfully | Pass |
 

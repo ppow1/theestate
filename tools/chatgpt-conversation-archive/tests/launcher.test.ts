@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +17,17 @@ describe('operator launchers', () => {
       { cwd: unrelatedCwd, encoding: 'utf8' },
     );
     expect(output).toContain('"valid": true');
+  });
+
+  it('keeps non-interactive sync prompt-free and returns authentication promptly', () => {
+    const result = spawnSync(process.execPath, [path.join(toolRoot, 'dist', 'cli.js'), 'sync', '--config', path.join(toolRoot, 'config.example.json'), '--quiet'], {
+      cwd: unrelatedCwd,
+      encoding: 'utf8',
+      timeout: 15000,
+    });
+    expect(result.status).not.toBe(0);
+    expect(`${result.stdout}\n${result.stderr}`).toContain('AUTHENTICATION_REQUIRED');
+    expect(result.error).toBeUndefined();
   });
 
   it.each([

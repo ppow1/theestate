@@ -21,7 +21,11 @@ node dist/cli.js diagnostics --config config.example.json
 
 Routine Task Scheduler command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveSync.ps1`.
 
-The installed launchers are independent of the PowerShell caller's current directory. If initialization reports `TS5058` for `tsconfig.json`, refresh the deployed installation so it contains `tsconfig.json`, `src`, and `dist`; do not run the launcher from the repository checkout as a workaround. Initialization opens the dedicated profile and may end with `AUTHENTICATION_REQUIRED`; complete login manually in that window, then rerun the same initialization command.
+The installed launchers are independent of the PowerShell caller's current directory. If initialization reports `TS5058` for `tsconfig.json`, refresh the deployed installation so it contains `tsconfig.json`, `src`, and `dist`; do not run the launcher from the repository checkout as a workaround. Initialization opens the dedicated profile and keeps it open while the console waits at `After login is complete in the dedicated browser, press Enter here to verify:`. Complete login and any security challenge in that dedicated window, confirm the conversation interface is visible, then press Enter in the console. The CLI verifies authentication before reporting success. Closing the browser or pressing Enter before login returns an actionable nonzero error; scheduled sync remains non-interactive and fails promptly with `AUTHENTICATION_REQUIRED`.
+
+Initialization command: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Initialize-ChatGPTConversationArchive.ps1`.
+
+After successful initialization, the full archive command is `powershell.exe -NoProfile -ExecutionPolicy Bypass -File A:\AI\Tools\ChatGPTConversationArchive\scripts\Run-ChatGPTConversationArchiveFull.ps1`.
 
 ## Archive and schema
 
