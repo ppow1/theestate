@@ -29,6 +29,12 @@ After successful initialization, the full archive command is `powershell.exe -No
 
 The initializer identifies the dedicated session by enumerating Windows `chrome.exe` command lines for the normalized `--user-data-dir` profile path. It tolerates the initial launcher PID exiting during Chrome handoff, waits for the actual top-level window, and waits for the profile lock files to clear before verification.
 
+### Throttling and pacing
+
+The runtime detects rate-limit HTTP 429 responses and localized or changed wording around “Too many requests”, requests being too quick, and temporary conversation-access restrictions. It reports these as `RATE_LIMITED`, never as authentication or archive errors. Defaults are conservative: 1.5 seconds between conversation opens, 500 ms between pagination actions, an 8-action burst, and a 10-second burst cooldown. Faster settings can increase the chance of temporary account throttling.
+
+The first throttle retry waits 5 minutes, then increases to 10, 20, and 30 minutes, with up to 30 seconds of jitter and a one-hour total retry window. These values are configurable in `config.example.json`. Completed exports and `state/run-state.json` are written before a throttle stop; rerun `resume` to continue without duplicating completed conversations. A retry-window exhaustion exits with status `RATE_LIMITED` and code 3. Interactive waits can be cancelled with Ctrl+C; completed work remains checkpointed.
+
 ### Interactive login troubleshooting
 
 Interactive initialization uses `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe` as an ordinary independent process with the dedicated profile at `A:\AI\Tools\ChatGPTConversationArchive\profile`. Its arguments are `--user-data-dir`, `--window-size=1400,900`, `--window-position=50,50`, `--disable-extensions`, and `https://chatgpt.com/`. It has no Playwright defaults, remote-debugging pipe/port, automation control, cookie copying, or security-bypass behavior. The initializer verifies the effective Chrome process list and rejects forbidden automation or sandbox arguments.

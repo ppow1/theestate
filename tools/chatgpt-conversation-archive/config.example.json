@@ -10,5 +10,14 @@
   "nonInteractive": false,
   "conversationLimit": null,
   "exportMarkdown": true,
-  "exportHtml": true
+  "exportHtml": true,
+  "backoffBaseMs": 300000,
+  "backoffMaxMs": 1800000,
+  "backoffJitterMs": 30000,
+  "retryWindowMs": 3600000,
+  "backoffResetAfterMs": 600000,
+  "conversationOpenDelayMs": 1500,
+  "paginationDelayMs": 500,
+  "burstSize": 8,
+  "burstCooldownMs": 10000
 }
