@@ -1,5 +1,7 @@
 # ENG-OPS-005 Remaining Blockers Closure
 
+Implementation commit: `64848d44aa3ef32f983522328f1a9eff7c75f137` on `engineering/close-remaining-operational-blockers`.
+
 ## Codex routing
 
 The Codex bridge now permits only immutable Grace action JSON records under `runtime/operations/grace/actions/` as prompt sources; other runtime, secret, and broad paths remain denied. Codex requests use the registered `codex.execution.cli` adapter, explicit `default` profile, `workspace-write` only when exact output scope requires it, approval policy `never`, and no bypass/cloud/full-access flags. Adapter-owned receipts remain in the governed write scope but are removed from the child-process write scope.
