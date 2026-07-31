@@ -422,22 +422,12 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             if published_document and staged_document_hash:
                 orphaned_artifacts = [{"path": document_path, "sha256": staged_document_hash}]
                 transaction_state = "failed_with_orphaned_document"
-            safe_primitive_unavailable = isinstance(exc, NotImplementedError) or "no-replace publication primitive" in str(exc)
             staging_disposition = "retained_for_reconciliation"
             staging_path = str(staging_dir)
-            cleanup_warning = None
-            if not safe_primitive_unavailable:
-                try:
-                    self._remove_staging_directory(staging_dir)
-                    staging_disposition = "removed_after_failure_receipt"
-                    staging_path = None
-                except Exception as cleanup_error:
-                    staging_disposition = "staging_cleanup_failed"
-                    cleanup_warning = str(cleanup_error)[:300]
-                    error_details.append(f"staging cleanup warning: {cleanup_warning}")
             failure_stage = self._new_staging_directory(request)
             failure_receipt = failure_stage / "failure-receipt"
             failure_receipt_ref = None
+            failure_stage_cleanup = "not_attempted"
             try:
                 self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True, receipt_target=failure_receipt, orphaned_artifacts=orphaned_artifacts, transaction_state=transaction_state, staging_disposition=staging_disposition, staging_path=staging_path)
                 self._publish_no_replace(failure_receipt, receipt_target)
@@ -445,13 +435,13 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             except Exception as receipt_error:
                 transaction_state = "failed_without_durable_receipt"
                 error_details.append(f"failure receipt persistence failed: {str(receipt_error)[:400]}")
-                if Path(failure_stage).is_dir():
-                    staging_disposition = "retained_for_reconciliation"
-                    staging_path = str(failure_stage)
+                failure_stage_cleanup = "retained_for_reconciliation"
             else:
                 try:
                     self._remove_staging_directory(failure_stage)
+                    failure_stage_cleanup = "removed_after_failure_receipt"
                 except Exception as cleanup_error:
+                    failure_stage_cleanup = "staging_cleanup_failed"
                     error_details.append(f"failure receipt staging cleanup warning: {str(cleanup_error)[:300]}")
             retained_paths = [path for path in (staging_path, str(failure_stage)) if path and Path(path).is_dir()]
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_disposition": staging_disposition, "staging_directory": retained_paths[0] if retained_paths else None, "staging_directories": retained_paths, "orphaned_artifacts": orphaned_artifacts, "artifact_hashes": {document_path: staged_document_hash} if staged_document_hash else {}})
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_disposition": staging_disposition, "staging_directory": retained_paths[0] if retained_paths else None, "staging_directories": retained_paths, "failure_stage_cleanup": failure_stage_cleanup, "orphaned_artifacts": orphaned_artifacts, "artifact_hashes": {document_path: staged_document_hash} if staged_document_hash else {}})

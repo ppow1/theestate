@@ -83,8 +83,8 @@ does not use `exists()` then rename, `stat()` then rename, `os.replace()`, or
 
 The document is published first and the success receipt second. Completion is
 reported only after both publications succeed. If document publication fails,
-the competing destination remains unchanged and staged evidence is retained or
-reconciled. If the document publishes but receipt publication fails, the
+the competing destination remains unchanged and staged evidence is retained for
+reconciliation. If the document publishes but receipt publication fails, the
 document is preserved as explicitly reported orphaned evidence with its path
 and the SHA-256 computed from its complete staged bytes before publication; the
 governed path is never reread as the authoritative transaction hash. It is
@@ -94,12 +94,16 @@ shared top-level `failed` status, while using a detailed
 Engineering completion remains blocked.
 
 Failure receipts are staged and published once when the destination remains
-available. If a failure receipt cannot be durably published, the staging
-directory is retained with bounded evidence and no recursive retry occurs. A
-staging disposition is recorded only after the handler knows whether the
-directory was retained, removed after durable failure evidence, or could not
-be cleaned (`staging_cleanup_failed`); a retained path must still exist when
-reported. Requests blocked before staging have no staging disposition. Failure receipts contain bounded errors, failed result and
+available. The original transaction staging directory is never removed before
+durable failure evidence exists. The failure receipt records
+`retained_for_reconciliation` and its exact path; a retained path must still
+exist when returned. If failure-receipt staging or publication fails, the
+original and any failure-stage evidence remain available, no recursive retry
+occurs, and the result is `failed_without_durable_receipt`. After a failure
+receipt publishes, its temporary failure-stage directory may be removed; if
+that cleanup fails, the durable receipt remains valid and the result reports a
+bounded cleanup warning plus the retained failure-stage path. Requests blocked
+before staging have no staging disposition. Failure receipts contain bounded errors, failed result and
 validation states, timeout/cancellation state, an empty completed-artifact
 list, and any orphaned-artifact path/hash. Cleanup warnings and
 staging-retention details are surfaced without masking the primary persistence

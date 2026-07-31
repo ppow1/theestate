@@ -262,7 +262,7 @@ def test_timeout_failure_receipt_is_truthful_and_prompt_is_not_stored(tmp_path):
     assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
 
 
-def test_receipt_write_failure_removes_new_artifact(tmp_path, monkeypatch):
+def test_receipt_write_failure_preserves_orphan_and_original_staging(tmp_path, monkeypatch):
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
     original = adapter._write_receipt
     calls = {"count": 0}
@@ -276,7 +276,12 @@ def test_receipt_write_failure_removes_new_artifact(tmp_path, monkeypatch):
     assert result.status == "failed"
     assert result.metadata["transaction_state"] == "failed_with_orphaned_document"
     assert (tmp_path / "docs/operations/examples/qwen-test.md").exists()
-    assert result.metadata["staging_disposition"] == "removed_after_failure_receipt"
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
+    assert Path(result.metadata["staging_directory"]).is_dir()
+    receipt = tmp_path / result.metadata["provider_receipt"]
+    receipt_payload = json.loads(receipt.read_text())
+    assert receipt_payload["staging_disposition"] == "retained_for_reconciliation"
+    assert Path(receipt_payload["staging_path"]).is_dir()
 
 
 def test_orphan_hash_uses_staged_bytes_not_replaced_governed_path(tmp_path, monkeypatch):
@@ -300,6 +305,8 @@ def test_orphan_hash_uses_staged_bytes_not_replaced_governed_path(tmp_path, monk
     assert document.read_bytes() == b"replacement bytes"
     assert result.metadata["orphaned_artifacts"][0]["sha256"] == hashlib.sha256(b"Generated local Qwen text.").hexdigest()
     assert result.metadata["orphaned_artifacts"][0]["sha256"] != hashlib.sha256(b"replacement bytes").hexdigest()
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
+    assert Path(result.metadata["staging_directory"]).is_dir()
 
 
 def test_existing_document_blocks_before_provider_and_preserves_bytes(tmp_path):
@@ -382,7 +389,8 @@ def test_document_partial_write_is_cleaned_and_failure_receipt_is_truthful(tmp_p
     assert payload["artifacts"] == []
     assert "write failed" in " ".join(result.errors)
     assert "private prompt" not in receipt.read_text()
-    assert result.metadata["staging_disposition"] == "removed_after_failure_receipt"
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
+    assert Path(result.metadata["staging_directory"]).is_dir()
 
 
 def test_success_receipt_partial_write_is_cleaned_then_replaced_by_failure_receipt(tmp_path, monkeypatch):
@@ -499,7 +507,8 @@ def test_document_publication_collision_preserves_destination_and_staged_source(
     result = adapter.submit(_request(tmp_path))
     assert result.status == "failed"
     assert document.read_bytes() == b"competing document"
-    assert result.metadata["staging_disposition"] == "removed_after_failure_receipt"
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
+    assert Path(result.metadata["staging_directory"]).is_dir()
 
 
 def test_safe_publication_unavailable_fails_closed_and_retains_staging(tmp_path, monkeypatch):
@@ -511,6 +520,7 @@ def test_safe_publication_unavailable_fails_closed_and_retains_staging(tmp_path,
     assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
     assert Path(result.metadata["staging_directory"]).is_dir()
+    assert result.metadata["failure_stage_cleanup"] == "retained_for_reconciliation"
 
 
 def test_staged_partial_document_has_no_governed_partial_output(tmp_path, monkeypatch):
@@ -550,6 +560,7 @@ def test_partial_failure_receipt_is_retained_without_recursive_retry(tmp_path, m
     assert result.metadata["provider_receipt"] is None
     assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
     assert Path(result.metadata["staging_directory"]).is_dir()
+    assert result.metadata["failure_stage_cleanup"] == "retained_for_reconciliation"
 
 
 def test_staging_cleanup_failure_is_reported_without_masking_primary_failure(tmp_path, monkeypatch):
@@ -558,6 +569,7 @@ def test_staging_cleanup_failure_is_reported_without_masking_primary_failure(tmp
     result = adapter.submit(_request(tmp_path))
     assert result.status == "failed"
     assert result.metadata["transaction_state"] == "failed"
-    assert result.metadata["staging_disposition"] == "staging_cleanup_failed"
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
+    assert result.metadata["failure_stage_cleanup"] == "staging_cleanup_failed"
     assert Path(result.metadata["staging_directory"]).is_dir()
     assert any("staging cleanup warning" in error for error in result.errors)
