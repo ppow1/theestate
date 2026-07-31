@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.commission-execution-authority.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["prompt_source", "prompt_source_type", "prompt_source_digest", "prompt_source_record", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "grace_objective_id", "grace_action_id"],
+  "properties": {
+    "prompt_source": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"},
+    "prompt_source_type": {"const": "estate.grace.action.v1"},
+    "prompt_source_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "allowed_read_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"}},
+    "allowed_write_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"}},
+    "expected_outputs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"}},
+    "grace_objective_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]+$"},
+    "grace_action_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]+$"},
+    "prompt_source_record": {"type": "string", "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"}
+  }
+}

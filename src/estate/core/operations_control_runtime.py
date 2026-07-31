@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 from estate.core.operational_events import OperationalEvent
 from estate.core.operational_status import record_operational_event
 from estate.core.operations_manager import OperationsDecision
+from estate.core.authority_schema_runtime import canonical_record_digest, require_valid
 from estate.core.paths import ESTATE_ROOT
 from estate.core.traffic_controller import OperationsReview, RecommendedAction, redact_summary
 
@@ -19,6 +21,41 @@ STATUS_DIR = CONTROL_ROOT / "status"
 def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _write_create_once(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    if path.exists():
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing != payload:
+            raise ValueError(f"conflicting Operations decision replay at {path}")
+        return
+    try:
+        descriptor = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+    except FileExistsError:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing != payload:
+            raise ValueError(f"conflicting Operations decision replay at {path}")
+        return
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            descriptor = -1
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+        try:
+            directory = os.open(str(path.parent), os.O_RDONLY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+        except OSError:
+            pass
+    except Exception:
+        if descriptor != -1:
+            os.close(descriptor)
+        raise
 
 
 def _load_json(path: Path) -> Any:
@@ -53,7 +90,11 @@ class OperationsControlRuntime:
     def record_decision(self, decision: OperationsDecision) -> dict[str, str]:
         decision.validate()
         path = self.root / DECISIONS_DIR / f"{decision.created_at[:10]}_{decision.decision_id}.json"
-        _write_json(path, decision.to_dict())
+        payload = decision.to_dict()
+        if decision.technical_execution:
+            payload["record_digest"] = canonical_record_digest(payload)
+        require_valid(payload, "estate.operations-control.decision.v1", self.root)
+        _write_create_once(path, payload)
         self._emit_decision_event(decision, path)
         self._write_summary(decision=decision)
         return {"decision": str(path), "summary_json": str(self.root / STATUS_DIR / "summary.json"), "summary_md": str(self.root / STATUS_DIR / "summary.md")}

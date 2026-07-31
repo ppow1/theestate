@@ -7,17 +7,22 @@ result reconciliation; it never invokes a provider itself.
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from estate.core.execution_dispatch import DispatchRequest, enqueue_dispatch_request
+from estate.core.execution_dispatch import DispatchRequest, enqueue_dispatch_request, load_dispatch_queue
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterResult, utc_now
 from estate.core.execution_provider_adapter_runtime import write_adapter_result
 from estate.core.execution_result_reconciliation_runtime import reconcile_result
+from estate.core.authority_schema_runtime import canonical_record_digest, require_valid
 from estate.core.engineering_capability_enablement import CapabilityEnablementLifecycle, CapabilityEvidence
 from estate.core.grace_operations_runtime import GraceOperationsRuntime
+from estate.core.operations_control_runtime import OperationsControlRuntime
+from estate.core.operations_manager import OperationsDecision
 from estate.core.ptm_readiness_integration import PtmReadinessGateError, PtmProductionReadinessResolver, revalidate_readiness, resolve_and_bind
 from estate.core.paths import ESTATE_ROOT
 
@@ -67,6 +72,83 @@ def _write_immutable(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
         return existing
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return payload
+
+
+def _durable_write(path: Path, payload: dict[str, Any]) -> None:
+    """Create a new authority record with complete, durable persistence."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    try:
+        descriptor = os.open(str(path), flags)
+    except FileExistsError:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing != payload:
+            raise ValueError(f"conflicting authority replay at {path}")
+        return
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            descriptor = -1
+            handle.write(encoded); handle.flush(); os.fsync(handle.fileno())
+        try:
+            directory = os.open(str(path.parent), os.O_RDONLY)
+            try: os.fsync(directory)
+            finally: os.close(directory)
+        except OSError:
+            pass
+    except Exception:
+        if descriptor != -1:
+            os.close(descriptor)
+        raise
+
+
+def _record_by_id(root: Path, directory: Path, record_id: str) -> tuple[Path, dict[str, Any]] | None:
+    target = root / directory
+    for path in target.glob("*.json") if target.exists() else []:
+        try:
+            record = _load(path)
+        except (OSError, ValueError):
+            continue
+        if record.get("action_id") == record_id or record.get("objective_id") == record_id:
+            return path, record
+    return None
+
+
+def _canonical_execution_authority(root: Path, objective_id: str, action_id: str, metadata: dict[str, Any] | None) -> dict[str, Any]:
+    objective_record = _record_by_id(root, Path("runtime/operations/grace/objectives"), objective_id)
+    action_record = _record_by_id(root, Path("runtime/operations/grace/actions"), action_id)
+    if not action_record:
+        return {}
+    action_data = action_record[1]
+    objective_authority = ((objective_record[1].get("metadata") or {}).get("execution_authority") if objective_record else None)
+    action_authority = (action_data.get("metadata") or {}).get("execution_authority")
+    if not isinstance(action_authority, dict):
+        action_authority = action_data.get("execution_metadata") if isinstance(action_data.get("execution_metadata"), dict) else None
+    if not isinstance(action_authority, dict):
+        action_authority = objective_authority if isinstance(objective_authority, dict) else None
+    if not isinstance(action_authority, dict):
+        return {}
+    if isinstance(objective_authority, dict) and objective_authority != action_authority:
+        raise ValueError("Grace objective and action execution authority conflict")
+    if isinstance(metadata, dict) and metadata and metadata != action_authority:
+        raise ValueError("caller execution metadata is not the canonical Grace authority")
+    source_path = action_record[0]
+    prompt_source = str(source_path.relative_to(root)).replace("\\", "/")
+    read_paths = list(action_authority.get("allowed_read_paths") or [])
+    write_paths = list(action_authority.get("allowed_write_paths") or [])
+    outputs = list(action_authority.get("expected_outputs") or write_paths)
+    authority = {
+        "prompt_source": prompt_source,
+        "prompt_source_type": "estate.grace.action.v1",
+        "allowed_read_paths": read_paths,
+        "allowed_write_paths": write_paths,
+        "expected_outputs": outputs,
+        "grace_objective_id": objective_id,
+        "grace_action_id": action_id,
+        "prompt_source_record": prompt_source,
+    }
+    authority["prompt_source_digest"] = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    return authority
 
 
 @dataclass
@@ -148,7 +230,7 @@ class GraceHelenEngineeringComposition:
             self._state(request["grace_objective_id"], "blocked_pending_capability", helen_determination_id=det["determination_id"], blocker="capability suspended")
         return det
 
-    def commission_engineering(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str | None = None, ptm_task_or_package_id: str | None = None, enabling_project_id: str | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
+    def commission_engineering(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str | None = None, ptm_task_or_package_id: str | None = None, enabling_project_id: str | None = None, execution_metadata: dict[str, Any] | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
         det = _load(self._path(DETERMINATIONS, helen_determination_id))
         if det["grace_objective_id"] != grace_objective_id:
             raise ValueError("Helen determination does not belong to Grace objective")
@@ -170,12 +252,22 @@ class GraceHelenEngineeringComposition:
             self._state(grace_objective_id, "awaiting_ptm_readiness", blocker=str(exc))
             raise PermissionError(str(exc)) from exc
         key = idempotency_key or f"{grace_objective_id}:{helen_determination_id}:commission"
+        authority = _canonical_execution_authority(self.root, grace_objective_id, grace_action_id, execution_metadata)
+        action_record = _record_by_id(self.root, Path("runtime/operations/grace/actions"), grace_action_id)
+        canonical_decision_id = ((action_record[1].get("metadata") or {}).get("operations_decision_id") if action_record else None)
+        if canonical_decision_id and operations_decision_id and canonical_decision_id != operations_decision_id:
+            raise ValueError("caller operations decision does not match canonical Grace decision")
+        operations_decision_id = canonical_decision_id or operations_decision_id
         directory = self.root / COMMISSIONS
         for p in directory.glob("*.json") if directory.exists() else []:
             existing = _load(p)
             if existing.get("idempotency_key") == key:
+                if (existing.get("execution_authority") or {}) != authority:
+                    raise ValueError("conflicting execution authority replay")
                 return existing
         commission = {"commission_id": f"engcom-{uuid4().hex[:12]}", "grace_objective_id": grace_objective_id, "grace_action_id": grace_action_id, "operations_decision_id": operations_decision_id, "helen_determination_id": helen_determination_id, "required_capability": det["capability_class"], "bounded_objective": bounded_objective, "acceptance_criteria": acceptance_criteria, "status": "proposed", "created_at": utc_now(), "idempotency_key": key, "requesting_office": "Grace", "technical_owner": "Engineering", "readiness_resolution_id": binding.readiness_resolution_id, "readiness_projection_path": binding.readiness_projection_path, "readiness_projection_digest": binding.readiness_projection_digest, "readiness_state": binding.readiness_state, "source_high_watermark": binding.source_high_watermark, "freshness_policy_id": binding.freshness_policy_id, "freshness_policy_version": binding.freshness_policy_version, "freshness_policy_digest": binding.freshness_policy_digest, "waiver_registry_id": binding.waiver_registry_id, "waiver_registry_version": binding.waiver_registry_version, "waiver_registry_digest": binding.waiver_registry_digest, "evaluated_at": binding.evaluated_at, "expires_at": binding.expires_at, "dependency_evidence_references": list(binding.dependency_evidence_references), "waiver_references": [dict(item) for item in binding.waiver_references], "ptm_readiness": binding.to_dict()}
+        if authority:
+            commission["execution_authority"] = authority
         _write(self._path(COMMISSIONS, commission["commission_id"]), commission)
         self._state(grace_objective_id, "awaiting_engineering_acceptance", engineering_commission_id=commission["commission_id"])
         return commission
@@ -186,7 +278,7 @@ class GraceHelenEngineeringComposition:
         if rec["status"] != "proposed": raise ValueError("commission cannot be accepted from current state")
         rec["status"] = "accepted"; rec["accepted_at"] = utc_now(); _write_replace(p, rec); self._state(rec["grace_objective_id"], "engineering_in_progress", engineering_commission_id=commission_id); return rec
 
-    def governed_commission_and_dispatch(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str, ptm_task_or_package_id: str, enabling_project_id: str | None, provider_id: str, provider_type: str, adapter_reference: str, idempotency_key: str | None = None) -> dict[str, Any]:
+    def governed_commission_and_dispatch(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str, ptm_task_or_package_id: str, enabling_project_id: str | None, provider_id: str, provider_type: str, adapter_reference: str, execution_metadata: dict[str, Any] | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
         """Bounded public entry point through commission and Dispatch gates.
 
         Provider execution remains downstream of the canonical Dispatch queue;
@@ -202,6 +294,7 @@ class GraceHelenEngineeringComposition:
             ptm_source_high_watermark=ptm_source_high_watermark,
             ptm_task_or_package_id=ptm_task_or_package_id,
             enabling_project_id=enabling_project_id,
+            execution_metadata=execution_metadata,
             idempotency_key=idempotency_key,
         )
         accepted = self.accept_commission(commission["commission_id"])
@@ -231,16 +324,111 @@ class GraceHelenEngineeringComposition:
                 _write_immutable(self._path(DISPATCH_REJECTIONS, rejection["rejection_id"]), rejection)
             self._state(commission["grace_objective_id"], "dispatch_rejected_ptm_stale", engineering_commission_id=commission_id, blocker=reason, dispatch_rejection_id=(existing or rejection)["rejection_id"])
             raise PermissionError(str(exc)) from exc
+        authority = commission.get("execution_authority") or {}
+        if provider_id in {"qwen.local.text", "codex.execution.cli"}:
+            required = ("prompt_source", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "prompt_source_digest")
+            if not authority or any(not authority.get(key) for key in required):
+                raise PermissionError("technical provider execution authority is incomplete")
+            decision_dir = self.root / "runtime/operations/control/decisions"
+            decision_found = False
+            for decision_path in decision_dir.glob("*.json") if decision_dir.exists() else []:
+                try:
+                    if _load(decision_path).get("decision_id") == commission.get("operations_decision_id"):
+                        decision_found = True; break
+                except (OSError, ValueError):
+                    continue
+            if not decision_found:
+                raise PermissionError("canonical Operations decision is required for technical provider execution")
         key = idempotency_key or f"{commission_id}:{provider_id}:authorization"
-        directory = self.root / AUTHORIZATIONS
-        for p in directory.glob("*.json") if directory.exists() else []:
-            existing = _load(p)
-            if existing.get("idempotency_key") == key: return existing, _load(Path(existing["dispatch_record_path"]))
-        auth = {"authorization_id": f"engauth-{uuid4().hex[:12]}", "engineering_commission_id": commission_id, "engineering_work_item_id": f"engwork-{commission_id}", "selected_capability_profile": det["worker_profile_id"], "provider_selection_id": f"engsel-{uuid4().hex[:12]}", "provider_id": provider_id, "adapter_reference": adapter_reference, "created_at": utc_now(), "idempotency_key": key}
-        request = DispatchRequest(work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=det["worker_profile_id"], classification="Estate Internal", priority="Normal", state="Ready", allowed_providers=[provider_id], provider_metadata={"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_type": provider_type, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed"})
-        item = enqueue_dispatch_request(request, self.root)
-        auth["dispatch_id"] = item.dispatch_id; auth["dispatch_record_path"] = str(self.root / "runtime/execution_dispatch/queue.json"); auth["ptm_readiness"] = binding.to_dict(); auth["ptm_revalidated_at"] = request.provider_metadata["ptm_revalidated_at"]; auth["ptm_revalidation_result"] = "passed"
-        _write(self._path(AUTHORIZATIONS, auth["authorization_id"]), auth)
+        technical_provider = provider_id in {"qwen.local.text", "codex.execution.cli"}
+        stable_token = hashlib.sha256(key.encode("utf-8")).hexdigest()
+        authorization_id = f"engauth-{stable_token[:12]}"
+        dispatch_id = f"dispatch-{stable_token[12:24]}"
+        auth_path = self._path(AUTHORIZATIONS, authorization_id)
+        existing_auth = _load(auth_path) if auth_path.exists() else None
+        if existing_auth and existing_auth.get("idempotency_key") != key:
+            raise ValueError("conflicting authorization replay")
+        auth = existing_auth or {"authorization_id": authorization_id, "engineering_commission_id": commission_id, "engineering_work_item_id": f"engwork-{commission_id}", "selected_capability_profile": det["worker_profile_id"], "provider_selection_id": f"engsel-{stable_token[:12]}", "provider_id": provider_id, "adapter_reference": adapter_reference, "operations_decision_id": commission.get("operations_decision_id"), "created_at": utc_now(), "idempotency_key": key}
+        if existing_auth and existing_auth.get("dispatch_id"):
+            existing_item = next((candidate for candidate in load_dispatch_queue(self.root) if candidate.dispatch_id == existing_auth["dispatch_id"]), None)
+            if existing_item is not None:
+                if existing_item.provider != provider_id or existing_item.provider_metadata.get("engineering_commission_id") != commission_id:
+                    raise ValueError("conflicting Dispatch replay")
+                return existing_auth, existing_item.to_dict()
+        if existing_auth and not existing_auth.get("dispatch_id"):
+            raise ValueError("incomplete existing authorization cannot be reused")
+        authority = commission.get("execution_authority") or {}
+        decision_id = f"opdec-{stable_token[:24]}"
+        decision_reference = f"operations-control/{decision_id}"
+        decision_path = self.root / "runtime/operations/control/decisions"
+        existing_decision = next((candidate for candidate in decision_path.glob("*.json") if candidate.exists() and _load(candidate).get("decision_id") == decision_id), None) if decision_path.exists() else None
+        if technical_provider and existing_decision is None:
+            execution_decision = OperationsDecision(
+                decision_id=decision_id,
+                created_at=utc_now(),
+                decided_by="Engineering",
+                decision_type="authorize_dispatch",
+                target_type="dispatch",
+                target_id=dispatch_id,
+                classification="Estate Internal",
+                reason=f"Authorize bounded technical Dispatch {dispatch_id} from accepted Engineering commission {commission_id}.",
+                priority="normal",
+                requires_boundary_review=False,
+                requires_steward_attention=False,
+                summary_safe=True,
+                metadata={"parent_operations_decision_id": commission["operations_decision_id"]},
+                decision_state="authorized_for_dispatch",
+                technical_execution=True,
+                grace_objective_id=commission["grace_objective_id"],
+                grace_action_id=commission["grace_action_id"],
+                helen_determination_id=det["determination_id"],
+                ptm_readiness=binding.to_dict(),
+                engineering_commission_id=commission_id,
+                engineering_authorization_id=authorization_id,
+                dispatch_id=dispatch_id,
+                selected_provider_id=provider_id,
+                selected_adapter_reference=adapter_reference,
+                authorization_reference=f"runtime/grace_helen_engineering/engineering_authorizations/{authorization_id}.json",
+                decision_reference=decision_reference,
+                prompt_source=authority.get("prompt_source"),
+                prompt_source_digest=authority.get("prompt_source_digest"),
+                allowed_read_paths=list(authority.get("allowed_read_paths") or []),
+                allowed_write_paths=list(authority.get("allowed_write_paths") or []),
+                expected_outputs=list(authority.get("expected_outputs") or []),
+                authorized_at=utc_now(),
+                expires_at=binding.expires_at,
+                idempotency_key=key,
+                parent_operations_decision_id=commission["operations_decision_id"],
+            )
+            OperationsControlRuntime(self.root).record_decision(execution_decision)
+        elif technical_provider:
+            execution_decision = OperationsDecision.from_dict(_load(existing_decision))
+            if not execution_decision.technical_execution or execution_decision.engineering_commission_id != commission_id or execution_decision.dispatch_id != dispatch_id:
+                raise ValueError("conflicting Operations decision replay")
+        technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": decision_reference if technical_provider else f"operations-control/{commission['operations_decision_id']}"}
+        if authority:
+            technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
+        if existing_auth:
+            for field_name, expected in (("engineering_commission_id", commission_id), ("provider_id", provider_id), ("adapter_reference", adapter_reference), ("operations_decision_id", commission["operations_decision_id"]), ("execution_authority", authority)):
+                if auth.get(field_name) != expected:
+                    raise ValueError("conflicting authorization replay")
+        request = DispatchRequest(dispatch_id=dispatch_id, work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=det["worker_profile_id"], classification="Estate Internal", priority="Normal", state="Ready", prompt_source=authority.get("prompt_source"), allowed_read_paths=list(authority.get("allowed_read_paths") or []), allowed_write_paths=list(authority.get("allowed_write_paths") or []), expected_outputs=list(authority.get("expected_outputs") or []), allowed_providers=[provider_id], provider_metadata=technical_metadata)
+        auth.update({"dispatch_id": request.dispatch_id, "dispatch_record_path": "runtime/execution_dispatch/queue.json", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": request.provider_metadata["ptm_revalidated_at"], "ptm_revalidation_result": "passed", "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "helen_determination_id": det["determination_id"], "provider_type": provider_type, "execution_authority": authority, "authorization_reference": technical_metadata["authorization_reference"], "decision_reference": technical_metadata["decision_reference"]})
+        if technical_provider:
+            auth.update({"schema_version": "estate.engineering.authorization.v1", "engineering_authorization_id": auth["authorization_id"], "prompt_source": authority.get("prompt_source"), "prompt_source_type": authority.get("prompt_source_type"), "prompt_source_digest": authority.get("prompt_source_digest"), "allowed_read_paths": list(authority.get("allowed_read_paths") or []), "allowed_write_paths": list(authority.get("allowed_write_paths") or []), "expected_outputs": list(authority.get("expected_outputs") or []), "authorization_state": "authorized_for_dispatch", "authorized_at": request.provider_metadata["ptm_revalidated_at"], "expires_at": binding.expires_at, "institutional_acceptance_state": "not_granted", "idempotency_key": key, "operations_decision_id": commission["operations_decision_id"]})
+        auth["record_digest"] = hashlib.sha256(json.dumps({key: value for key, value in auth.items() if key != "record_digest"}, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        if technical_provider:
+            require_valid(auth, "estate.engineering.authorization.v1", self.root)
+        technical_metadata["authorization_record_digest"] = auth["record_digest"]
+        if not existing_auth:
+            _durable_write(auth_path, auth)
+        try:
+            item = enqueue_dispatch_request(request, self.root)
+        except ValueError as exc:
+            existing_item = next((candidate for candidate in load_dispatch_queue(self.root) if candidate.dispatch_id == request.dispatch_id), None)
+            if existing_item is None or existing_item.to_dict() != request.to_dict():
+                raise ValueError("conflicting Dispatch replay") from exc
+            item = existing_item
         commission["status"] = "authorized_for_dispatch"; _write_replace(self._path(COMMISSIONS, commission_id), commission); self._state(commission["grace_objective_id"], "awaiting_dispatch", engineering_commission_id=commission_id, dispatch_id=item.dispatch_id)
         return auth, item.to_dict()
 

@@ -154,6 +154,7 @@ class DispatchRequest:
     model: str | None = None
     allowed_read_paths: list[str] = field(default_factory=list)
     allowed_write_paths: list[str] = field(default_factory=list)
+    expected_outputs: list[str] = field(default_factory=list)
     allowed_providers: list[str] = field(default_factory=list)
     forbidden_providers: list[str] = field(default_factory=list)
     dependencies: list[str] = field(default_factory=list)
@@ -193,6 +194,7 @@ def dispatch_request_from_dict(data: dict[str, Any]) -> DispatchRequest:
         "forbidden_providers",
         "dependencies",
         "validation_commands",
+        "expected_outputs",
     ):
         values[key] = _coerce_list(values.get(key))
     metadata = values.get("provider_metadata")

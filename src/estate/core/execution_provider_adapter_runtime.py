@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +36,37 @@ def _write_json(path: Path, payload: dict[str, Any]) -> Path:
 
 
 def write_adapter_request(request: ExecutionProviderAdapterRequest, root: str | Path | None = None) -> Path:
-    return _write_json(_root(root) / REQUESTS_DIR / f"{request.adapter_request_id}.json", request.to_dict())
+    path = _root(root) / REQUESTS_DIR / f"{request.adapter_request_id}.json"
+    payload = request.to_dict()
+    if path.exists():
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing != payload:
+            raise ValueError(f"conflicting adapter request replay at {path}")
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    try:
+        descriptor = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+    except FileExistsError:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing != payload:
+            raise ValueError(f"conflicting adapter request replay at {path}")
+        return path
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            descriptor = -1
+            handle.write(encoded); handle.flush(); os.fsync(handle.fileno())
+        try:
+            directory = os.open(str(path.parent), os.O_RDONLY)
+            try: os.fsync(directory)
+            finally: os.close(directory)
+        except OSError:
+            pass
+    except Exception:
+        if descriptor != -1:
+            os.close(descriptor)
+        raise
+    return path
 
 
 def load_adapter_request(path: str | Path) -> ExecutionProviderAdapterRequest:
