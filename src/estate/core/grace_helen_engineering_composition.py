@@ -488,8 +488,8 @@ class GraceHelenEngineeringComposition:
         technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_inquiry_reference": det.get("capability_request_id"), "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": decision_reference if technical_provider else f"operations-control/{commission['operations_decision_id']}"}
         if authority:
             technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
-        if technical_provider and authority.get("provider_extension"):
-            technical_metadata["provider_extension"] = dict(authority["provider_extension"])
+        if technical_provider:
+            technical_metadata["provider_extension"] = dict(authority.get("provider_extension") or {})
         if existing_auth:
             for field_name, expected in (("engineering_commission_id", commission_id), ("provider_id", provider_id), ("adapter_reference", adapter_reference), ("operations_decision_id", commission["operations_decision_id"]), ("execution_authority", authority)):
                 if auth.get(field_name) != expected:
