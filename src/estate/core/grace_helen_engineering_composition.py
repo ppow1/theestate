@@ -152,6 +152,7 @@ def _provider_extension(root: Path, determination: dict[str, Any], authority: di
         raise PermissionError("Qwen execution requires exactly one bounded artifact and one provider receipt output")
     determination_path = f"runtime/grace_helen_engineering/helen_determinations/{determination['determination_id']}.json"
     health_evidence = [determination_path] + [str(path).replace("\\", "/") for path in list(determination.get("provider_health_evidence") or [])]
+    health_digests = [hashlib.sha256((root / path).read_bytes()).hexdigest() for path in health_evidence]
     return {
         "schema_version": "estate.qwen-local-text.execution-extension.v1",
         "provider_id": provider_id,
@@ -164,6 +165,7 @@ def _provider_extension(root: Path, determination: dict[str, Any], authority: di
         "provider_receipt_path": receipt_paths[0],
         "artifact_path": artifact_paths[0],
         "provider_health_evidence": health_evidence,
+        "provider_health_evidence_digests": health_digests,
     }
 
 
@@ -469,7 +471,7 @@ class GraceHelenEngineeringComposition:
             execution_decision = OperationsDecision.from_dict(_load(existing_decision))
             if not execution_decision.technical_execution or execution_decision.engineering_commission_id != commission_id or execution_decision.dispatch_id != dispatch_id:
                 raise ValueError("conflicting Operations decision replay")
-        technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": decision_reference if technical_provider else f"operations-control/{commission['operations_decision_id']}"}
+        technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_inquiry_reference": det.get("capability_request_id"), "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": decision_reference if technical_provider else f"operations-control/{commission['operations_decision_id']}"}
         if authority:
             technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
         if technical_provider and authority.get("provider_extension"):

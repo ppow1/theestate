@@ -197,6 +197,18 @@ def _validate_provider_extension(root: Path, item: DispatchQueueItem, metadata: 
             _canonical_repo_path(root, path, "provider_health_evidence", require_file=True)
         except (ValueError, OSError) as exc:
             errors.append(str(exc))
+    health_paths = list(extension.get("provider_health_evidence") or [])
+    health_digests = list(extension.get("provider_health_evidence_digests") or [])
+    if len(health_paths) != len(health_digests):
+        errors.append("Qwen provider-health evidence paths and digests must align")
+    for path, expected_digest in zip(health_paths, health_digests):
+        try:
+            _, evidence_file = _canonical_repo_path(root, path, "provider_health_evidence", require_file=True)
+            actual_digest = hashlib.sha256(evidence_file.read_bytes()).hexdigest()
+            if actual_digest != expected_digest:
+                errors.append(f"provider-health evidence digest mismatch: {path}")
+        except (ValueError, OSError) as exc:
+            errors.append(str(exc))
     config_path = root / "config/providers/qwen_local_text.json"
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
