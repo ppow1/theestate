@@ -10,9 +10,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime, timezone
+import json
+from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Any
 from uuid import uuid4
+from jsonschema import Draft202012Validator, FormatChecker
 
 from estate.core.orchestrator_intake import ALLOWED_CLASSIFICATIONS
 
@@ -82,6 +85,8 @@ class ExecutionProviderAdapterRequest:
     work_package_id: str | None = None
     work_package_path: str | None = None
     prompt_source: str | None = None
+    prompt_source_type: str | None = None
+    prompt_source_digest: str | None = None
     classification: str = "Estate Internal"
     read_scope_paths: list[str] = field(default_factory=list)
     write_scope_paths: list[str] = field(default_factory=list)
@@ -90,6 +95,14 @@ class ExecutionProviderAdapterRequest:
     validation_required: bool = True
     boundary_review_reference: str | None = None
     decision_reference: str | None = None
+    authorization_reference: str | None = None
+    grace_objective_id: str | None = None
+    grace_action_id: str | None = None
+    helen_determination_id: str | None = None
+    engineering_commission_id: str | None = None
+    engineering_authorization_id: str | None = None
+    adapter_reference: str | None = None
+    ptm_readiness: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=utc_now)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -126,6 +139,8 @@ class ExecutionProviderAdapterRequest:
             work_package_id=data.get("work_package_id"),
             work_package_path=data.get("work_package_path"),
             prompt_source=prompt_source or data.get("work_package_path"),
+            prompt_source_type=(data.get("metadata") or {}).get("prompt_source_type"),
+            prompt_source_digest=(data.get("metadata") or {}).get("prompt_source_digest"),
             classification=data.get("classification"),
             read_scope_paths=data.get("allowed_paths") or [],
             write_scope_paths=(data.get("metadata") or {}).get("write_scope_paths") or [],
@@ -134,6 +149,14 @@ class ExecutionProviderAdapterRequest:
             validation_required=bool(data.get("validation_required", True)),
             boundary_review_reference=data.get("boundary_review_reference"),
             decision_reference=data.get("decision_reference"),
+            authorization_reference=(data.get("metadata") or {}).get("authorization_reference"),
+            grace_objective_id=(data.get("metadata") or {}).get("grace_objective_id"),
+            grace_action_id=(data.get("metadata") or {}).get("grace_action_id"),
+            helen_determination_id=(data.get("metadata") or {}).get("helen_determination_id"),
+            engineering_commission_id=(data.get("metadata") or {}).get("engineering_commission_id"),
+            engineering_authorization_id=(data.get("metadata") or {}).get("engineering_authorization_id"),
+            adapter_reference=(data.get("metadata") or {}).get("adapter_reference"),
+            ptm_readiness=(data.get("metadata") or {}).get("ptm_readiness") or {},
             metadata={**(data.get("metadata") or {}), **(metadata or {})},
         )
 
@@ -157,16 +180,36 @@ class ExecutionProviderAdapterRequest:
             else:
                 warnings.append("prompt_source is not set")
         if (self.metadata or {}).get("technical_execution") is True:
+            for metadata_key, field_name in (("provider_id", "provider_id"), ("adapter_reference", "adapter_reference"), ("prompt_source_digest", "prompt_source_digest"), ("prompt_source_type", "prompt_source_type"), ("grace_objective_id", "grace_objective_id"), ("grace_action_id", "grace_action_id"), ("helen_determination_id", "helen_determination_id"), ("engineering_commission_id", "engineering_commission_id"), ("engineering_authorization_id", "engineering_authorization_id"), ("authorization_reference", "authorization_reference")):
+                if metadata_key in self.metadata:
+                    expected = getattr(self, field_name)
+                    if self.metadata[metadata_key] != expected:
+                        errors.append(f"metadata {metadata_key} conflicts with canonical adapter field")
             if not self.read_scope_paths:
                 errors.append("allowed_read_paths are required for technical execution")
             if not self.write_scope_paths:
                 errors.append("allowed_write_paths are required for technical execution")
             if not self.expected_outputs:
                 errors.append("expected_outputs are required for technical execution")
-            if self.expected_outputs != self.write_scope_paths:
-                errors.append("expected_outputs must match allowed_write_paths for technical execution")
+            def within(output: str, scope: str) -> bool:
+                output_parts = tuple(str(output).replace("\\", "/").strip("/").split("/"))
+                scope_parts = tuple(str(scope).replace("\\", "/").strip("/").split("/"))
+                return output_parts == scope_parts or output_parts[:len(scope_parts)] == scope_parts
+            if not all(any(within(output, scope) for scope in self.write_scope_paths) for output in self.expected_outputs):
+                errors.append("expected_outputs must remain within allowed_write_paths for technical execution")
             if not self.decision_reference:
                 errors.append("decision_reference is required for technical execution")
+            for field_name in ("prompt_source_type", "prompt_source_digest", "authorization_reference", "grace_objective_id", "grace_action_id", "helen_determination_id", "engineering_commission_id", "engineering_authorization_id"):
+                if not getattr(self, field_name):
+                    errors.append(f"{field_name} is required for technical execution")
+            if not self.ptm_readiness:
+                errors.append("ptm_readiness is required for technical execution")
+            schema_path = Path(__file__).resolve().parents[3] / "schemas/execution_provider_adapter_request_v1.schema.json"
+            try:
+                schema = json.loads(schema_path.read_text(encoding="utf-8"))
+                errors.extend(error.message for error in Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(asdict(self)))
+            except (OSError, ValueError) as exc:
+                errors.append(f"technical adapter request schema unavailable: {exc}")
         status = "accepted" if not errors else "blocked"
         return AdapterValidationStatus(status=status, errors=errors, warnings=warnings)
 
