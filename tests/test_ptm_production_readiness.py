@@ -151,7 +151,9 @@ def test_cli_read_and_validate(tmp_path, capsys):
 def test_cli_resolve(tmp_path, capsys):
     event = append_input(tmp_path)
     assert cli(["resolve", "--root", str(tmp_path), "--objective-id", "obj-1", "--enabling-project-id", "prj-1", "--task-id", "tsk-1", "--source-high-watermark", event["event_id"], "--observed-at", NOW]) == 0
-    assert '"readiness_state": "ready"' in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert '"readiness_state": "unknown"' in output
+    assert "freshness policy unavailable" in output
 
 
 def test_canonical_json_is_stable():
