@@ -12,32 +12,54 @@
     "capabilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/capability"}}
   },
   "$defs": {
+    "safe_reference": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9_.:/-]+$"},
     "capability": {
       "type": "object", "additionalProperties": false,
-      "required": ["capability_id", "version", "maturity_level", "current_availability", "dispatchability", "provider_bindings", "classification_ceiling", "accepted_inputs", "accepted_outputs", "limitations", "authorization_requirements", "evidence_sources"],
+      "required": ["capability_id", "version", "maturity_level", "current_availability", "dispatchability", "provider_bindings", "classification_ceiling", "authority", "accepted_inputs", "accepted_outputs", "limitations", "evidence"],
       "properties": {
         "capability_id": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,127}$"},
         "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
         "maturity_level": {"type": "integer", "minimum": 0, "maximum": 5},
         "current_availability": {"enum": ["available", "unavailable", "unknown", "expired", "degraded"]},
         "dispatchability": {"enum": ["dispatchable", "not_dispatchable", "not_applicable"]},
-        "provider_bindings": {"type": "array", "items": {"$ref": "#/$defs/binding"}},
-        "classification_ceiling": {"type": "string", "minLength": 1},
-        "accepted_inputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-        "accepted_outputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "provider_bindings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/binding"}},
+        "classification_ceiling": {"type": "string", "enum": ["public", "internal", "restricted", "protected"]},
+        "authority": {"$ref": "#/$defs/authority"},
+        "accepted_inputs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "accepted_outputs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "limitations": {"type": "array", "items": {"type": "string"}},
-        "authorization_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
-        "evidence_sources": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/evidence"}},
         "implementation_worker_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["authorization_requirements", "prohibited_actions"],
+      "properties": {
+        "authorization_requirements": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "prohibited_actions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
       }
     },
     "binding": {
       "type": "object", "additionalProperties": false,
-      "required": ["provider_id", "adapter_reference"],
+      "required": ["binding_kind", "provider_id", "adapter_reference"],
       "properties": {
-        "provider_id": {"type": "string", "minLength": 1},
-        "adapter_reference": {"type": "string", "minLength": 1},
+        "binding_kind": {"enum": ["provider", "resident_tool", "human_worker", "service", "connector"]},
+        "provider_id": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,127}$"},
+        "adapter_reference": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/@-]{0,255}$"},
         "runtime_identity": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_kind", "source_reference", "state", "observed_at"],
+      "properties": {
+        "evidence_kind": {"enum": ["qualification", "availability", "capacity", "authorization", "health", "operational_acceptance", "source_provenance"]},
+        "source_reference": {"$ref": "#/$defs/safe_reference"},
+        "state": {"enum": ["pass", "fail", "unknown", "expired"]},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     }
   }

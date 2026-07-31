@@ -48,6 +48,7 @@ qualified worker, or a human engineer.
 |---|---|
 | Definition sufficient? | Level 1 only: identity, owner, taxonomy, I/O, classification, boundaries; no dispatch. |
 | Catalog entry sufficient? | Level 2 declaration only; not qualification, health, authority, or execution. |
+| Provider configuration sufficient? | Only when a registered adapter/service already exists and the change adds no new execution semantics; still requires scope, evidence, registration, tests, and the target maturity gate. |
 | Adapter required? | Any executable provider-backed path or runtime side effect. |
 | Resident wrapper sufficient? | Read-only advisory/research/source/classification workflows with owner authorization and receipt. |
 | PTM required? | Dependency-changing project or Engineering execution; not mere description. |
@@ -70,6 +71,13 @@ re-evaluation. The lifecycle remains:
 capability inquiry -> assessment -> gap if any -> specification -> enabling
 project -> registration -> re-evaluation -> Grace resumption
 
+At each phase Grace owns the objective/request and resumption decision, Helen
+owns capability and worker assessment, Engineering owns technical
+interpretation and implementation evidence, the resident owner owns domain
+scope and acceptance criteria, and the Steward/Chief Architect retains
+reserved authority and institutional decisions. A worker may implement only
+the package's recorded scope.
+
 Use fresh IDs and create-once paths for each acceptance. Never call a provider
 directly, widen a scope to pass a test, infer authority from a filename, reuse
 failed evidence, or call operational success institutional acceptance.
@@ -80,4 +88,3 @@ Return to the Steward or Chief Architect for unresolved ownership,
 classification, credentials, network boundary, protected data, institutional
 acceptance, new authority model, registry replacement, missing bootstrap, or a
 required live service outside the package.
-

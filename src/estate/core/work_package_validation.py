@@ -17,17 +17,17 @@ RUNTIME_DIR = Path("runtime/validation/work_packages")
 CAPTURE_DIR = RUNTIME_DIR / "captures"
 
 ONBOARDING_REQUIRED_SECTIONS = {
-    "owner": ("Owner:", "owner", "resident/department owner"),
-    "capability_id": ("Capability ID", "capability_id", "capability identity"),
-    "target_maturity": ("maturity", "target maturity", "maturity_level"),
-    "provider_disposition": ("Provider", "adapter", "resident wrapper", "tool"),
-    "authority_boundaries": ("Authority", "prohibited", "classification"),
-    "scopes": ("Allowed reads", "Allowed writes", "Expected outputs", "not_applicable"),
-    "evidence": ("Evidence", "health", "qualification", "freshness"),
-    "test_plan": ("Unit tests", "Integration tests", "Negative tests"),
-    "live_acceptance": ("Live governed acceptance", "acceptance", "exemption"),
-    "rollback": ("Rollback", "deprecation", "removal"),
-    "steward_stop": ("Stop conditions", "Steward-stop", "safe stop"),
+    "owner": ("owner:", "resident/department owner:"),
+    "capability_id": ("capability id/version:", "capability_id:"),
+    "target_maturity": ("requested maturity:", "target maturity:"),
+    "provider_disposition": ("disposition:",),
+    "authority_boundaries": ("allowed authority:", "prohibited authority:", "classification ceiling:"),
+    "scopes": ("allowed reads:", "allowed writes:", "expected outputs:"),
+    "evidence": ("health source", "qualification evidence:", "freshness/expiry:"),
+    "test_plan": ("unit tests:", "integration tests:", "negative tests:"),
+    "live_acceptance": ("live governed acceptance:", "acceptance scenario:"),
+    "rollback": ("rollback authority", "deprecation/removal:"),
+    "steward_stop": ("steward-stop conditions", "safe stop", "stop conditions"),
 }
 
 
@@ -44,10 +44,16 @@ def validate_capability_onboarding_package(path: str | Path) -> dict[str, Any]:
     if not package_path.is_file():
         errors.append({"type": "missing_package", "path": str(package_path)})
         return {"validation_status": "failed", "package_path": str(package_path), "missing_sections": [], "errors": errors}
-    text = package_path.read_text(encoding="utf-8").lower()
-    missing = [name for name, markers in ONBOARDING_REQUIRED_SECTIONS.items() if not any(marker.lower() in text for marker in markers)]
+    text = package_path.read_text(encoding="utf-8")
+    lowered = text.lower()
+    missing = [name for name, markers in ONBOARDING_REQUIRED_SECTIONS.items() if not any(marker.lower() in lowered for marker in markers)]
     if missing:
         errors.append({"type": "missing_required_sections", "sections": missing})
+    is_template = package_path.name == "ESTATE_CAPABILITY_ONBOARDING_IMPLEMENTATION_TEMPLATE.md"
+    if not is_template:
+        placeholders = sorted(set(re.findall(r"<[^>\n]+>", text)))
+        if placeholders:
+            errors.append({"type": "unresolved_placeholders", "values": placeholders[:20], "count": len(placeholders)})
     return {"validation_status": "passed" if not errors else "failed", "package_path": str(package_path), "missing_sections": missing, "errors": errors}
 
 
