@@ -2779,6 +2779,26 @@ def cmd_ptm_pilot_projection(args):
     print(output, end="")
 
 
+def cmd_ptm_readiness(args):
+    forwarded = [args.action, "--root", args.root or "."]
+    if args.format:
+        forwarded.extend(["--format", args.format])
+    if args.json:
+        forwarded.append("--json")
+    if args.action == "resolve":
+        for name in ("objective_id", "enabling_project_id", "task_id", "source_high_watermark", "observed_at"):
+            value = getattr(args, name)
+            if value is not None:
+                forwarded.extend([f"--{name.replace('_', '-')}", value])
+    elif args.action == "read":
+        if args.resolution_id is not None:
+            forwarded.extend(["--resolution-id", args.resolution_id])
+    else:
+        if args.record is not None:
+            forwarded.extend(["--record", args.record])
+    return ptm_readiness_cli(forwarded)
+
+
 def main(argv=None):
     if argv is None:
         import sys as _sys
@@ -2802,6 +2822,7 @@ def main(argv=None):
     p.add_argument("action", choices=("resolve", "read", "validate"))
     p.add_argument("--root")
     p.add_argument("--json", action="store_true")
+    p.add_argument("--format", choices=("json", "report"), default="json")
     p.add_argument("--objective-id")
     p.add_argument("--enabling-project-id")
     p.add_argument("--task-id")
@@ -2809,7 +2830,7 @@ def main(argv=None):
     p.add_argument("--observed-at")
     p.add_argument("--resolution-id")
     p.add_argument("--record")
-    p.set_defaults(func=lambda args: ptm_readiness_cli([x for x in [args.action, "--root", args.root or ".", "--objective-id", args.objective_id, "--enabling-project-id", args.enabling_project_id, "--task-id", args.task_id, "--source-high-watermark", args.source_high_watermark, "--observed-at", args.observed_at, "--resolution-id", args.resolution_id, "--record", args.record] if x is not None]))
+    p.set_defaults(func=cmd_ptm_readiness)
 
 
 
@@ -4291,8 +4312,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if not hasattr(args, "func"):
         parser.print_help()
-        return
-    args.func(args)
+        return 0
+    result = args.func(args)
+    return result if isinstance(result, int) else 0
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -75,6 +75,36 @@ def _require_id(value: Any, field: str) -> str:
     return value
 
 
+def _safe_relative_path(root: Path, relative: str, field: str) -> Path:
+    if not isinstance(relative, str) or not relative or Path(relative).is_absolute() or any(part == ".." for part in Path(relative).parts):
+        raise PtmReadinessError(f"{field} must be repository-relative without traversal")
+    candidate = (root / relative).resolve()
+    root = root.resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise PtmReadinessError(f"{field} escapes repository") from exc
+    current = root
+    for part in Path(relative).parts:
+        current = current / part
+        if current.is_symlink():
+            raise PtmReadinessError(f"{field} crosses a symlink or reparse point")
+    return candidate
+
+
+def _fsync_parent(path: Path) -> None:
+    if os.name == "nt":
+        return
+    try:
+        fd = os.open(str(path.parent), os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 def _write_create_once(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     encoded = (json.dumps(payload, ensure_ascii=True, sort_keys=True, indent=2) + "\n").encode("utf-8")
@@ -95,18 +125,14 @@ def _write_create_once(path: Path, payload: dict[str, Any]) -> None:
         os.fsync(stream.fileno())
         stream.close()
         created = False
-    except BaseException:
+        _fsync_parent(path)
+    except BaseException as exc:
         try:
             stream.close()
         except BaseException:
             pass
         if created:
-            try:
-                path.unlink()
-            except FileNotFoundError:
-                pass
-            except OSError:
-                pass
+            raise PtmReadinessError(f"partial PTM record retained at {path.as_posix()}") from exc
         raise
 
 
@@ -118,7 +144,7 @@ def _event_hash(event: dict[str, Any]) -> str:
 
 def _event_path(root: Path, event: dict[str, Any]) -> Path:
     stream = re.sub(r"[^A-Za-z0-9_.-]", "_", event["stream_id"])
-    return root / EVENTS_ROOT / stream / f"{event['sequence_number']:020d}_{event['event_id']}.json"
+    return _safe_relative_path(root, (EVENTS_ROOT / stream / f"{event['sequence_number']:020d}_{event['event_id']}.json").as_posix(), "event path")
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -139,6 +165,10 @@ def _validate_event(event: dict[str, Any]) -> None:
     if event["hash_algorithm"] != "sha256" or event["event_hash"] != _event_hash(event):
         raise PtmReadinessError(f"PTM event hash invalid: {event.get('event_id')}")
     _require_id(event["event_id"], "event_id")
+    if not isinstance(event["sequence_number"], int) or event["sequence_number"] < 1:
+        raise PtmReadinessError("PTM sequence_number is invalid")
+    if not isinstance(event["stream_id"], str) or not re.fullmatch(r"[A-Za-z0-9_.:-]+", event["stream_id"]):
+        raise PtmReadinessError("PTM stream_id is invalid")
     if not isinstance(event["authority_refs"], list) or not isinstance(event["source_refs"], list):
         raise PtmReadinessError("PTM event references must be arrays")
     if not isinstance(event["payload"], dict):
@@ -183,8 +213,13 @@ def _load_events(root: Path) -> list[dict[str, Any]]:
     seen_ids: set[str] = set()
     seen_keys: set[tuple[str, str]] = set()
     for path in sorted(directory.rglob("*.json")):
+        if path.is_symlink():
+            raise PtmReadinessError(f"symlinked PTM event rejected: {path.as_posix()}")
         event = _load_json(path)
         _validate_event(event)
+        expected_path = _event_path(root, event)
+        if path.resolve() != expected_path.resolve():
+            raise PtmReadinessError(f"foreign PTM event path rejected: {path.as_posix()}")
         if event["event_id"] in seen_ids or (event["stream_id"], event["idempotency_key"]) in seen_keys:
             raise PtmReadinessError("duplicate PTM event identity or idempotency key")
         seen_ids.add(event["event_id"])
@@ -203,6 +238,9 @@ def _load_events(root: Path) -> list[dict[str, Any]]:
 def _source_check(root: Path, refs: Iterable[dict[str, Any]]) -> list[str]:
     errors: list[str] = []
     for ref in refs:
+        if not isinstance(ref, dict):
+            errors.append("source reference is not an object")
+            continue
         path_value = ref.get("source_path")
         expected = ref.get("source_sha256")
         if not isinstance(path_value, str) or not isinstance(expected, str):
@@ -213,6 +251,11 @@ def _source_check(root: Path, refs: Iterable[dict[str, Any]]) -> list[str]:
             path.relative_to(root.resolve())
         except ValueError:
             errors.append(f"source escapes repository: {path_value}")
+            continue
+        try:
+            path = _safe_relative_path(root, path_value, "source path")
+        except PtmReadinessError as exc:
+            errors.append(str(exc))
             continue
         if not path.exists() or file_sha256(path) != expected:
             errors.append(f"source digest drift: {path_value}")
@@ -236,7 +279,7 @@ def _dependency_cycle(items: list[dict[str, Any]]) -> bool:
     return any(visit(node) for node in graph)
 
 
-def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str | None, task_id: str) -> list[str]:
+def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str | None, task_id: str, root: Path) -> list[str]:
     waiver = item.get("waiver")
     if not isinstance(waiver, dict):
         return ["waiver record missing"]
@@ -251,7 +294,7 @@ def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str |
     scope = waiver.get("scope") or {}
     if scope.get("objective_id") != objective_id or scope.get("task_id") != task_id or (package_id is not None and scope.get("package_id") != package_id):
         errors.append("waiver scope does not match objective or task")
-    errors.extend(_source_check(Path(item.get("_root", ".")), [waiver.get("source_ref")] if isinstance(waiver.get("source_ref"), dict) else []))
+    errors.extend(_source_check(root, [waiver.get("source_ref")] if isinstance(waiver.get("source_ref"), dict) else []))
     return errors
 
 
@@ -260,6 +303,8 @@ def _existing_resolution(root: Path, replay_key: str) -> dict[str, Any] | None:
     if not directory.exists():
         return None
     for path in directory.glob("*.json"):
+        if path.is_symlink():
+            raise PtmReadinessError(f"symlinked readiness record rejected: {path.as_posix()}")
         record = _load_json(path)
         if record.get("replay_idempotency_key") == replay_key:
             validate_readiness_record(record, root=root)
@@ -268,22 +313,26 @@ def _existing_resolution(root: Path, replay_key: str) -> dict[str, Any] | None:
 
 
 def validate_readiness_record(record: dict[str, Any], *, root: Path | None = None) -> dict[str, Any]:
-    required = ("resolution_id", "schema_version", "objective_id", "task_id", "dependency_results", "gate_checks", "readiness_state", "source_references", "source_digests", "source_high_watermark", "evaluator_identity", "evaluated_at", "expires_at", "waiver_references", "conflicts", "warnings", "replay_idempotency_key", "failure_reason", "ledger_event_reference", "projection_path", "projection_digest")
+    required = ("resolution_id", "schema_version", "objective_id", "task_id", "dependency_results", "gate_checks", "readiness_state", "source_references", "source_digests", "source_high_watermark", "evaluator_identity", "freshness_policy_id", "freshness_policy_digest", "evaluated_at", "expires_at", "waiver_references", "conflicts", "warnings", "replay_idempotency_key", "failure_reason", "ledger_event_reference", "projection_path", "projection_digest")
     missing = [key for key in required if key not in record]
     if missing:
         raise PtmReadinessError("readiness record missing: " + ", ".join(missing))
     if record["schema_version"] != SCHEMA_VERSION or record["readiness_state"] not in READINESS_STATES:
         raise PtmReadinessError("readiness schema or state invalid")
+    if not isinstance(record["dependency_results"], list) or not isinstance(record["gate_checks"], list) or not isinstance(record["source_references"], list):
+        raise PtmReadinessError("readiness collections are invalid")
     if any(item.get("state") not in DEPENDENCY_STATES for item in record["dependency_results"]):
         raise PtmReadinessError("dependency state invalid")
     if any(item.get("state") not in GATE_STATES for item in record["gate_checks"]):
         raise PtmReadinessError("gate state invalid")
     _parse_time(record["evaluated_at"]); _parse_time(record["expires_at"])
+    if record["freshness_policy_digest"] is not None and (not isinstance(record["freshness_policy_digest"], str) or not re.fullmatch(r"[a-f0-9]{64}", record["freshness_policy_digest"])):
+        raise PtmReadinessError("freshness policy digest invalid")
     unsigned = dict(record); unsigned["projection_digest"] = None
     if record["projection_digest"] != digest(unsigned):
         raise PtmReadinessError("readiness projection digest invalid")
     if root is not None and record.get("projection_path"):
-        expected = (root / record["projection_path"]).resolve()
+        expected = _safe_relative_path(Path(root).resolve(), record["projection_path"], "projection_path")
         if not expected.exists():
             raise PtmReadinessError("readiness projection path does not exist")
     return record
@@ -304,16 +353,19 @@ class ReadinessResolution:
 class PtmProductionReadinessResolver:
     """The PTM-owned resolver; consumers may read its result but not recalculate it."""
 
-    def __init__(self, root: Path, *, freshness_seconds: int | None = None, evaluator_identity: str = "ptm.production-readiness-resolver@1.0.0") -> None:
+    def __init__(self, root: Path, *, freshness_seconds: int | None = None, freshness_policy_id: str | None = None, freshness_policy_digest: str | None = None, evaluator_identity: str = "ptm.production-readiness-resolver@1.0.0") -> None:
         self.root = Path(root).resolve()
         self.freshness_seconds = freshness_seconds
+        self.freshness_policy_id = freshness_policy_id
+        self.freshness_policy_digest = freshness_policy_digest
         self.evaluator_identity = evaluator_identity
 
     def resolve_engineering_readiness(self, *, objective_id: str, enabling_project_id: str | None, task_or_package_id: str, source_high_watermark: str, observed_at: str, repository_root: Path | None = None) -> ReadinessResolution:
         objective_id = _require_id(objective_id, "objective_id")
         task_id = _require_id(task_or_package_id, "task_or_package_id")
         _parse_time(observed_at)
-        replay_key = digest({"objective_id": objective_id, "enabling_project_id": enabling_project_id, "task_id": task_id, "source_high_watermark": source_high_watermark, "observed_at": observed_at, "policy": self.freshness_seconds, "schema": SCHEMA_VERSION})
+        policy_valid = self.freshness_seconds is not None and bool(self.freshness_policy_id) and bool(self.freshness_policy_digest)
+        replay_key = digest({"objective_id": objective_id, "enabling_project_id": enabling_project_id, "task_id": task_id, "source_high_watermark": source_high_watermark, "observed_at": observed_at, "policy": {"seconds": self.freshness_seconds, "id": self.freshness_policy_id, "digest": self.freshness_policy_digest}, "schema": SCHEMA_VERSION})
         prior = _existing_resolution(self.root, replay_key)
         if prior is not None:
             return ReadinessResolution(prior)
@@ -347,7 +399,7 @@ class PtmProductionReadinessResolver:
                         if dep.get("task_id") and dep.get("task_id") != task_id: conflicts.append(f"dependency task mismatch: {dep.get('dependency_id')}")
                         if payload.get("package_id") is not None and dep.get("package_id") and dep.get("package_id") != payload.get("package_id"): conflicts.append(f"dependency package mismatch: {dep.get('dependency_id')}")
                         if dep.get("state") == "waived":
-                            dep["_root"] = str(self.root); errors = _waiver_errors(dep, objective_id=objective_id, package_id=payload.get("package_id"), task_id=task_id)
+                            errors = _waiver_errors(dep, objective_id=objective_id, package_id=payload.get("package_id"), task_id=task_id, root=self.root)
                             conflicts.extend(errors)
                     for gate in gates:
                         if gate.get("state") not in GATE_STATES: conflicts.append(f"invalid gate state: {gate.get('name')}")
@@ -369,7 +421,7 @@ class PtmProductionReadinessResolver:
                     freshness_expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
                     expiry = min([_parse_time(x) for x in all_expiries] + [freshness_expiry])
                     if _parse_time(observed_at) >= expiry: conflicts.append("readiness evidence is expired")
-                    if self.freshness_seconds is None:
+                    if not policy_valid:
                         warnings.append("freshness policy unavailable")
                         failure = "freshness policy unavailable"
                         readiness = "unknown"
@@ -393,6 +445,7 @@ class PtmProductionReadinessResolver:
             "readiness_state": readiness, "source_references": list(payload.get("source_references") or []),
             "source_digests": {str(x.get("source_path")): x.get("source_sha256") for x in payload.get("source_references") or []},
             "source_high_watermark": source_high_watermark, "evaluator_identity": self.evaluator_identity,
+            "freshness_policy_id": self.freshness_policy_id, "freshness_policy_digest": self.freshness_policy_digest,
             "evaluated_at": observed_at, "expires_at": _iso(expiry), "waiver_references": [x.get("waiver") for x in payload.get("dependencies") or [] if x.get("waiver")],
             "conflicts": sorted(set(conflicts)), "warnings": sorted(set(warnings)), "replay_idempotency_key": replay_key,
             "failure_reason": failure, "ledger_event_reference": None, "projection_path": None, "projection_digest": None,
@@ -400,6 +453,7 @@ class PtmProductionReadinessResolver:
         event = append_ptm_event(self.root, event_type="schedule.readiness_changed", aggregate_type="task", aggregate_id=task_id, stream_id=f"readiness:{task_id}", actor_ref=self.evaluator_identity, authority_refs=["PTM/orchestrator"], source_refs=record["source_references"], payload_schema=SCHEMA_VERSION, payload={"resolution_id": record["resolution_id"], "objective_id": objective_id, "task_id": task_id, "readiness_state": readiness, "replay_idempotency_key": replay_key}, idempotency_key=f"readiness:{replay_key}", occurred_at=observed_at)
         record["ledger_event_reference"] = event["event_id"]
         record["projection_path"] = (READINESS_ROOT / f"{record['resolution_id']}.json").as_posix()
+        _safe_relative_path(self.root, record["projection_path"], "projection path")
         unsigned = dict(record); unsigned["projection_digest"] = None
         record["projection_digest"] = digest(unsigned)
         validate_readiness_record(record)
@@ -408,7 +462,8 @@ class PtmProductionReadinessResolver:
 
 
 def read_readiness(root: Path, resolution_id: str) -> dict[str, Any]:
-    path = Path(root).resolve() / READINESS_ROOT / f"{_require_id(resolution_id, 'resolution_id')}.json"
+    _require_id(resolution_id, "resolution_id")
+    path = _safe_relative_path(Path(root).resolve(), (READINESS_ROOT / f"{resolution_id}.json").as_posix(), "resolution path")
     record = _load_json(path)
     return validate_readiness_record(record, root=Path(root).resolve())
 
@@ -419,6 +474,7 @@ def cli(argv: list[str] | None = None) -> int:
     parser.add_argument("action", choices=("resolve", "read", "validate"))
     parser.add_argument("--root", default=".")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--format", choices=("json", "report"), default="json")
     parser.add_argument("--objective-id")
     parser.add_argument("--enabling-project-id")
     parser.add_argument("--task-id")
@@ -428,16 +484,32 @@ def cli(argv: list[str] | None = None) -> int:
     parser.add_argument("--record")
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()
-    if args.action == "resolve":
-        required = (args.objective_id, args.task_id, args.source_high_watermark, args.observed_at)
-        if any(x is None for x in required):
-            parser.error("resolve requires --objective-id, --task-id, --source-high-watermark, and --observed-at")
-        value = PtmProductionReadinessResolver(root).resolve_engineering_readiness(objective_id=args.objective_id, enabling_project_id=args.enabling_project_id, task_or_package_id=args.task_id, source_high_watermark=args.source_high_watermark, observed_at=args.observed_at)
-    elif args.action == "read":
-        if not args.resolution_id: parser.error("read requires --resolution-id")
-        value = read_readiness(root, args.resolution_id)
+    try:
+        if args.action == "resolve":
+            required = (args.objective_id, args.task_id, args.source_high_watermark, args.observed_at)
+            if any(x is None for x in required):
+                parser.error("resolve requires --objective-id, --task-id, --source-high-watermark, and --observed-at")
+            value = PtmProductionReadinessResolver(root).resolve_engineering_readiness(objective_id=args.objective_id, enabling_project_id=args.enabling_project_id, task_or_package_id=args.task_id, source_high_watermark=args.source_high_watermark, observed_at=args.observed_at)
+        elif args.action == "read":
+            if not args.resolution_id: parser.error("read requires --resolution-id")
+            value = read_readiness(root, args.resolution_id)
+        else:
+            if not args.record: parser.error("validate requires --record")
+            candidate = Path(args.record).resolve()
+            try:
+                relative = candidate.relative_to(root).as_posix()
+            except ValueError as exc:
+                raise PtmReadinessError("record path escapes repository") from exc
+            record_path = _safe_relative_path(root, relative, "record path")
+            value = validate_readiness_record(_load_json(record_path), root=root)
+    except PtmReadinessError as exc:
+        print(f"PTM readiness validation failed: {exc}", file=__import__("sys").stderr)
+        return 2
+    rendered = value.to_dict() if isinstance(value, ReadinessResolution) else value
+    if args.format == "report" and not args.json:
+        print(f"PTM readiness: {rendered.get('readiness_state')} | task={rendered.get('task_id')} | resolution={rendered.get('resolution_id')}")
+        if rendered.get("failure_reason"): print(f"Failure: {rendered['failure_reason']}")
+        for warning in rendered.get("warnings", []): print(f"Warning: {warning}")
     else:
-        if not args.record: parser.error("validate requires --record")
-        value = validate_readiness_record(_load_json(Path(args.record)), root=root)
-    print(json.dumps(value.to_dict() if isinstance(value, ReadinessResolution) else value, indent=2, sort_keys=True))
+        print(json.dumps(rendered, indent=2, sort_keys=True))
     return 0

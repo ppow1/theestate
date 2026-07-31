@@ -24,6 +24,8 @@ runtime/ptm/readiness/<resolution_id>.json
 
 No prior event or resolution is overwritten. The resolver uses an idempotency key derived from the canonical inputs, policy, schema, and source high-watermark. Repeating the same request returns the existing equivalent resolution; changed source state requires a new resolution.
 
+Ledger and projection paths are repository-relative, remain inside the PTM namespace, and reject traversal, symlink/reparse-point crossings, and foreign event paths. Complete writes are flushed, fsynced, closed, and parent-directory-synced where the platform supports directory fsync. A persistence failure retains the partial PTM record and fails closed rather than deleting by pathname.
+
 ## Decision rules
 
 Dependency states are `unsatisfied`, `satisfied`, `waived`, and `unknown`. Gate states are `pass`, `fail`, `waived`, and `unknown`. Readiness states are `not_ready`, `ready`, `blocked`, `waived`, and `unknown`.
@@ -31,6 +33,8 @@ Dependency states are `unsatisfied`, `satisfied`, `waived`, and `unknown`. Gate 
 Unknown, stale, expired, contradictory, cyclic, mismatched, or digest-drifted evidence fails closed. A waiver is only accepted when its authority, scope, reason, timestamps, source reference, and source digest are valid. The resolver validates waivers but never creates them.
 
 The record preserves source references and digests, evaluator identity, high-watermark, expiry, conflicts, warnings, failure reason, ledger event reference, and projection digest. Readiness is evidence for later consumers; it is not Dispatch authorization, Engineering completion, merge authority, or institutional acceptance.
+
+Freshness policy identity and digest are part of the replay key and resolution. No repository freshness policy is currently configured, so the default production resolver returns `unknown` with `freshness policy unavailable`. A test or future canonical runtime may inject an explicit policy; injected policy is not production authority.
 
 ## CLI
 
@@ -43,6 +47,8 @@ PYTHONPATH=src python -m estate.cli.main ptm-readiness validate --record runtime
 ```
 
 There is no always-ready option and no CLI operation that manually grants readiness.
+
+The current bounded implementation generates contract-shaped event ULIDs locally because the general PTM ID service is not yet present. This is recorded as an architectural compatibility item; it must be replaced or formally adopted by the canonical PTM ID authority before broad production use.
 
 ## Boundary
 

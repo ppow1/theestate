@@ -13,6 +13,7 @@ from estate.core.ptm_production_readiness import (
     read_readiness,
     validate_readiness_record,
 )
+from estate.core.ptm_production_readiness import _ulid
 
 
 NOW = "2026-07-31T12:00:00Z"
@@ -31,7 +32,7 @@ def append_input(root: Path, *, dependencies=None, gates=None, objective="obj-1"
 
 
 def resolve(root, event, **kwargs):
-    return PtmProductionReadinessResolver(root, freshness_seconds=3600).resolve_engineering_readiness(objective_id="obj-1", enabling_project_id="prj-1", task_or_package_id="tsk-1", source_high_watermark=event["event_id"], observed_at=NOW, **kwargs)
+    return PtmProductionReadinessResolver(root, freshness_seconds=3600, freshness_policy_id="test-policy-v1", freshness_policy_digest="a" * 64).resolve_engineering_readiness(objective_id="obj-1", enabling_project_id="prj-1", task_or_package_id="tsk-1", source_high_watermark=event["event_id"], observed_at=NOW, **kwargs)
 
 
 def test_satisfied_dependency_is_ready(tmp_path):
@@ -40,6 +41,8 @@ def test_satisfied_dependency_is_ready(tmp_path):
     assert result.readiness_state == "ready"
     assert (tmp_path / result.record["projection_path"]).exists()
     assert result.record["ledger_event_reference"].startswith("evt_")
+    assert result.record["freshness_policy_id"] == "test-policy-v1"
+    assert result.record["freshness_policy_digest"] == "a" * 64
 
 
 @pytest.mark.parametrize(("state", "expected"), [("unsatisfied", "not_ready"), ("unknown", "unknown")])
@@ -125,6 +128,23 @@ def test_malformed_record_and_digest_validation_fail_closed(tmp_path):
         PtmProductionReadinessResolver(tmp_path).resolve_engineering_readiness(objective_id="obj-1", enabling_project_id=None, task_or_package_id="tsk-1", source_high_watermark="x", observed_at=NOW)
 
 
+def test_foreign_event_path_and_duplicate_head_fail_closed(tmp_path):
+    event = append_input(tmp_path)
+    original = next((tmp_path / "runtime/ptm/ledger/events").rglob("*.json"))
+    foreign = original.parent.parent / "foreign" / original.name
+    foreign.parent.mkdir(parents=True)
+    original.rename(foreign)
+    with pytest.raises(PtmReadinessError, match="foreign PTM event path"):
+        resolve(tmp_path, event)
+
+
+def test_path_traversal_and_cli_validation_errors_fail_closed(tmp_path, capsys):
+    with pytest.raises(PtmReadinessError):
+        read_readiness(tmp_path, "../outside")
+    assert cli(["read", "--root", str(tmp_path), "--resolution-id", "../outside"]) == 2
+    assert "validation failed" in capsys.readouterr().err
+
+
 def test_provider_or_helen_or_planning_presence_does_not_grant_authority(tmp_path):
     (tmp_path / "runtime/provider_catalog.json").parent.mkdir(parents=True)
     (tmp_path / "runtime/provider_catalog.json").write_text('{"qwen.local.text":{"status":"operationally_validated"}}', encoding="utf-8")
@@ -158,3 +178,9 @@ def test_cli_resolve(tmp_path, capsys):
 
 def test_canonical_json_is_stable():
     assert canonical_json({"b": 1, "a": [2, 3]}) == '{"a":[2,3],"b":1}'
+
+
+def test_bounded_event_ulid_shape_is_contract_compatible():
+    value = _ulid()
+    assert len(value) == 26
+    assert set(value) <= set("0123456789ABCDEFGHJKMNPQRSTVWXYZ")
