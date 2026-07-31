@@ -261,7 +261,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                     pass
                 raise
             stream = None
-        except Exception:
+        except Exception as exc:
             if stream is not None and not close_attempted:
                 try:
                     stream.close()
@@ -273,12 +273,12 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 except OSError:
                     pass
             token = _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
-            self._remove_if_owned(token)
+            self._append_cleanup_warning(exc, self._remove_if_owned(token))
             raise
         return _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
 
     @staticmethod
-    def _new_quarantine_path(path: Path) -> Path:
+    def _new_quarantine_directory(path: Path) -> Path:
         return path.parent / f".{path.name}.qwen-cleanup-{secrets.token_hex(16)}"
 
     def _before_quarantine_move(self, token: _ExclusiveWriteToken) -> None:
@@ -286,6 +286,23 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
 
     def _after_quarantine_move(self, token: _ExclusiveWriteToken, quarantine: Path) -> None:
         return None
+
+    def _before_quarantine_delete(self, token: _ExclusiveWriteToken, quarantine: Path) -> None:
+        return None
+
+    @staticmethod
+    def _append_cleanup_warning(exc: Exception, warning: str | None) -> None:
+        if not warning:
+            return
+        bounded = f"cleanup warning: {warning[:300]}"
+        if exc.args:
+            exc.args = (f"{exc.args[0]}; {bounded}", *exc.args[1:])
+        else:
+            exc.args = (bounded,)
+        try:
+            exc.add_note(bounded)
+        except AttributeError:
+            pass
 
     def _remove_if_owned(self, token: _ExclusiveWriteToken) -> str | None:
         try:
@@ -301,35 +318,60 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         except OSError:
             return "owned cleanup could not prepare quarantine move"
         try:
-            quarantine = self._new_quarantine_path(token.path)
-            if quarantine.exists():
-                return "owned cleanup skipped because quarantine path already exists"
-            # On Windows os.rename is a same-directory, no-overwrite move. On
-            # POSIX the generated name is collision-checked first; a move
-            # failure is still treated as cleanup failure rather than as
-            # permission to delete by the governed pathname.
+            quarantine_dir = self._new_quarantine_directory(token.path)
+            # mkdir is the authority for ownership.  No prior exists() check
+            # is used, and a colliding directory is never reused or replaced.
+            quarantine_dir.mkdir(mode=0o700)
+            quarantine = quarantine_dir / "owned-output"
             current = token.path.stat()
             if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
+                quarantine_dir.rmdir()
                 return "owned cleanup skipped because governed path identity changed"
+            # The destination is inside a newly created private directory, so
+            # no competing destination entry can exist before this move.
             os.rename(token.path, quarantine)
         except FileNotFoundError:
-            return "owned cleanup skipped because governed path disappeared or quarantine collided"
+            return "owned cleanup skipped because governed path disappeared or quarantine directory collided"
+        except FileExistsError:
+            return "owned cleanup skipped because quarantine directory already exists"
         except OSError:
             return "owned cleanup could not move the file to quarantine"
         try:
             self._after_quarantine_move(token, quarantine)
         except OSError:
             return "owned cleanup could not verify quarantine move"
+        descriptor = None
         try:
-            moved = quarantine.stat()
-        except OSError:
-            return "owned cleanup could not verify quarantined file identity"
-        if (moved.st_dev, moved.st_ino) != (token.st_dev, token.st_ino):
-            return "owned cleanup skipped because quarantined file identity changed"
-        try:
+            descriptor = os.open(quarantine, os.O_RDONLY)
+            moved = os.fstat(descriptor)
+            if (moved.st_dev, moved.st_ino) != (token.st_dev, token.st_ino):
+                return "owned cleanup skipped because quarantined file identity changed"
+            # Windows may reject replacement or unlink while this handle is
+            # open. Close it before the deterministic final-stage hook and
+            # recheck the entry immediately before deletion.
+            os.close(descriptor)
+            descriptor = None
+            self._before_quarantine_delete(token, quarantine)
+            current = quarantine.stat()
+            if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
+                return "owned cleanup skipped because quarantine path identity changed"
+            # The private directory is owned by this invocation, so the
+            # verified entry is not exposed through the governed pathname.
             quarantine.unlink()
+        except FileNotFoundError:
+            return "owned cleanup could not verify quarantined file identity"
         except OSError:
             return "owned cleanup could not remove verified quarantine file"
+        finally:
+            if descriptor is not None:
+                try:
+                    os.close(descriptor)
+                except OSError:
+                    pass
+        try:
+            quarantine_dir.rmdir()
+        except OSError:
+            return "owned cleanup removed the file but could not remove its private quarantine directory"
         return None
 
     def _target_collision_errors(self, request: ExecutionProviderAdapterRequest) -> tuple[list[str], Path | None, Path | None]:

@@ -481,17 +481,17 @@ def test_quarantine_cleanup_preserves_replacement_after_move(tmp_path, monkeypat
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH)
     token = adapter._exclusive_write_text(tmp_path / "owned.txt", "owned")
     quarantine_paths = []
-    original_name = adapter._new_quarantine_path
+    original_name = adapter._new_quarantine_directory
 
     def capture_name(path):
-        quarantine = original_name(path)
-        quarantine_paths.append(quarantine)
-        return quarantine
+        quarantine_dir = original_name(path)
+        quarantine_paths.append(quarantine_dir)
+        return quarantine_dir
 
     def replace_after_move(_token, quarantine):
         _token.path.write_bytes(b"replacement")
 
-    monkeypatch.setattr(adapter, "_new_quarantine_path", capture_name)
+    monkeypatch.setattr(adapter, "_new_quarantine_directory", capture_name)
     monkeypatch.setattr(adapter, "_after_quarantine_move", replace_after_move)
     assert adapter._remove_if_owned(token) is None
     assert token.path.read_bytes() == b"replacement"
@@ -502,12 +502,13 @@ def test_quarantine_name_collision_fails_without_overwrite(tmp_path, monkeypatch
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH)
     token = adapter._exclusive_write_text(tmp_path / "owned.txt", "owned")
     quarantine = tmp_path / ".owned.txt.qwen-cleanup-fixed"
-    quarantine.write_bytes(b"competing quarantine")
-    monkeypatch.setattr(adapter, "_new_quarantine_path", lambda _path: quarantine)
+    quarantine.mkdir()
+    (quarantine / "competing").write_bytes(b"competing quarantine")
+    monkeypatch.setattr(adapter, "_new_quarantine_directory", lambda _path: quarantine)
     warning = adapter._remove_if_owned(token)
-    assert "quarantine path already exists" in warning
+    assert "quarantine directory already exists" in warning
     assert token.path.read_text() == "owned"
-    assert quarantine.read_bytes() == b"competing quarantine"
+    assert (quarantine / "competing").read_bytes() == b"competing quarantine"
 
 
 def test_quarantine_identity_mismatch_is_not_deleted(tmp_path, monkeypatch):
@@ -522,7 +523,8 @@ def test_quarantine_identity_mismatch_is_not_deleted(tmp_path, monkeypatch):
     warning = adapter._remove_if_owned(token)
     assert "quarantined file identity changed" in warning
     assert not token.path.exists()
-    assert list(tmp_path.glob(".owned.txt.qwen-cleanup-*"))[0].read_bytes() == b"mismatched quarantine"
+    quarantine_dir = list(tmp_path.glob(".owned.txt.qwen-cleanup-*"))[0]
+    assert (quarantine_dir / "owned-output").read_bytes() == b"mismatched quarantine"
 
 
 def test_normal_quarantine_cleanup_removes_owned_file_without_residue(tmp_path):
@@ -531,3 +533,51 @@ def test_normal_quarantine_cleanup_removes_owned_file_without_residue(tmp_path):
     assert adapter._remove_if_owned(token) is None
     assert not token.path.exists()
     assert not list(tmp_path.glob(".owned.txt.qwen-cleanup-*"))
+
+
+def test_final_quarantine_deletion_replacement_is_preserved(tmp_path, monkeypatch):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH)
+    token = adapter._exclusive_write_text(tmp_path / "owned.txt", "owned")
+
+    def replace_before_delete(_token, quarantine):
+        quarantine.unlink()
+        quarantine.write_bytes(b"replacement quarantine")
+
+    monkeypatch.setattr(adapter, "_before_quarantine_delete", replace_before_delete)
+    warning = adapter._remove_if_owned(token)
+    assert "quarantine path identity changed" in warning
+    quarantine_dir = list(tmp_path.glob(".owned.txt.qwen-cleanup-*"))[0]
+    assert (quarantine_dir / "owned-output").read_bytes() == b"replacement quarantine"
+
+
+@pytest.mark.parametrize(
+    "phase, failing_call, health",
+    [("write", 1, True), ("zero_after_partial", 1, True), ("write", 2, True), ("write", 1, False)],
+)
+def test_cleanup_warning_propagates_for_document_and_receipt_failures(tmp_path, monkeypatch, phase, failing_call, health):
+    _inject_partial_fdopen(monkeypatch, failing_call=failing_call, phase=phase)
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=health))
+    monkeypatch.setattr(adapter, "_remove_if_owned", lambda _token: "injected cleanup warning")
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert any("cleanup warning: injected cleanup warning" in error for error in result.errors)
+
+
+@pytest.mark.parametrize("phase", ["flush", "close"])
+def test_cleanup_warning_propagates_for_flush_and_close_failures(tmp_path, monkeypatch, phase):
+    _inject_partial_fdopen(monkeypatch, failing_call=1, phase=phase)
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH)
+    monkeypatch.setattr(adapter, "_remove_if_owned", lambda _token: "injected cleanup warning")
+    with pytest.raises(OSError, match="cleanup warning: injected cleanup warning"):
+        adapter._exclusive_write_text(tmp_path / "owned.txt", "content")
+
+
+def test_cleanup_warning_propagates_for_fsync_failure(tmp_path, monkeypatch):
+    def fail_fsync(_descriptor):
+        raise OSError("injected fsync failure")
+
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH)
+    monkeypatch.setattr(qwen_adapter_module.os, "fsync", fail_fsync)
+    monkeypatch.setattr(adapter, "_remove_if_owned", lambda _token: "injected cleanup warning")
+    with pytest.raises(OSError, match="cleanup warning: injected cleanup warning"):
+        adapter._exclusive_write_text(tmp_path / "owned.txt", "content")
