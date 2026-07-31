@@ -9,6 +9,7 @@ Draft 2020-12 contracts at creation and at the final adapter-handoff boundary.
 ## Review and correction
 
 - Starting HEAD: `df72c9311cec97ee6a2bb5fd9ac777649a62a02a`.
+- Correction commit: `68890218 Add closed authority record schemas`.
 - The blocker was that the handoff checked authority-record existence,
   correlation, and digests without validating the complete record shapes.
 - Engineering authorization schema: `schemas/engineering/engineering_authorization_v1.schema.json`, ID `estate.engineering.authorization.v1`.
@@ -58,6 +59,7 @@ technical Dispatch records remain blocked and are not migrated.
 - All 16 stashes remain preserved.
 - `A:\theestate` remains untouched.
 - PR #502 remains open, draft, unmerged, and targets `main`.
+- Final pushed HEAD for this correction: `68890218`.
 
 ## Final handoff
 
