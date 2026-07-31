@@ -9,11 +9,12 @@ from estate.core.ptm_production_readiness import (
     PtmReadinessError,
     append_ptm_event,
     canonical_json,
+    digest,
     cli,
     read_readiness,
     validate_readiness_record,
 )
-from estate.core.ptm_production_readiness import _ulid
+from estate.core.ptm_ids import new_ulid
 
 
 NOW = "2026-07-31T12:00:00Z"
@@ -32,7 +33,9 @@ def append_input(root: Path, *, dependencies=None, gates=None, objective="obj-1"
 
 
 def resolve(root, event, **kwargs):
-    return PtmProductionReadinessResolver(root, freshness_seconds=3600, freshness_policy_id="test-policy-v1", freshness_policy_digest="a" * 64).resolve_engineering_readiness(objective_id="obj-1", enabling_project_id="prj-1", task_or_package_id="tsk-1", source_high_watermark=event["event_id"], observed_at=NOW, **kwargs)
+    registry = {"registry_id": "test-registry", "registry_version": "1", "authorities": [{"authority_id": "steward", "authority_class": "Steward", "permitted_waiver_types": ["dependency", "gate"], "scope_policy": "exact_objective_package_task", "maximum_duration_seconds": 86400, "effective_at": "2026-07-01T00:00:00Z", "expires_at": None, "revoked": False}]}
+    registry["registry_digest"] = digest(registry)
+    return PtmProductionReadinessResolver(root, freshness_seconds=3600, freshness_policy_id="test-policy-v1", freshness_policy_digest="a" * 64, waiver_registry=registry).resolve_engineering_readiness(objective_id="obj-1", enabling_project_id="prj-1", task_or_package_id="tsk-1", source_high_watermark=event["event_id"], observed_at=NOW, **kwargs)
 
 
 def test_satisfied_dependency_is_ready(tmp_path):
@@ -59,7 +62,8 @@ def test_missing_dependency_record_is_unknown(tmp_path):
 
 def test_valid_waiver_is_preserved(tmp_path):
     ref = source_ref(tmp_path, "waiver.json")
-    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "waiver": {"waiver_id": "w-1", "granting_authority": "chief-architect", "scope": {"objective_id": "obj-1", "package_id": "pkg-1", "task_id": "tsk-1"}, "reason": "approved exception", "granted_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "source_ref": ref, "source_digest": ref["source_sha256"]}}
+    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "waiver": {"waiver_id": "w-1", "granting_authority": "steward", "scope": {"objective_id": "obj-1", "package_id": "pkg-1", "task_id": "tsk-1"}, "reason": "approved exception", "granted_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "source_ref": ref, "source_digest": ref["source_sha256"], "authority_registry_id": "test-registry", "authority_registry_version": "1"}}
+    dependency["waiver"]["authority_registry_digest"] = digest({"registry_id": "test-registry", "registry_version": "1", "authorities": [{"authority_id": "steward", "authority_class": "Steward", "permitted_waiver_types": ["dependency", "gate"], "scope_policy": "exact_objective_package_task", "maximum_duration_seconds": 86400, "effective_at": "2026-07-01T00:00:00Z", "expires_at": None, "revoked": False}]})
     event = append_input(tmp_path, dependencies=[dependency], package_id="pkg-1")
     result = resolve(tmp_path, event)
     assert result.readiness_state == "ready"
@@ -67,7 +71,7 @@ def test_valid_waiver_is_preserved(tmp_path):
 
 
 def test_invalid_and_expired_waivers_block(tmp_path):
-    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "waiver": {"waiver_id": "w-1", "granting_authority": "", "scope": {"objective_id": "wrong", "task_id": "tsk-1"}, "reason": "x", "granted_at": NOW, "expires_at": "2026-07-01T00:00:00Z", "source_ref": {}, "source_digest": "bad"}}
+    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "expires_at": "2026-07-01T00:00:00Z", "waiver": {"waiver_id": "w-1", "granting_authority": "", "scope": {"objective_id": "wrong", "task_id": "tsk-1"}, "reason": "x", "granted_at": NOW, "expires_at": "2026-07-01T00:00:00Z", "source_ref": {}, "source_digest": "bad"}}
     event = append_input(tmp_path, dependencies=[dependency])
     result = resolve(tmp_path, event)
     assert result.readiness_state == "blocked"
@@ -76,7 +80,7 @@ def test_invalid_and_expired_waivers_block(tmp_path):
 
 def test_waiver_source_digest_mismatch_blocks(tmp_path):
     ref = source_ref(tmp_path, "waiver-mismatch.json")
-    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "waiver": {"waiver_id": "w-1", "granting_authority": "chief-architect", "scope": {"objective_id": "obj-1", "task_id": "tsk-1"}, "reason": "x", "granted_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "source_ref": ref, "source_digest": "b" * 64}}
+    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "waiver": {"waiver_id": "w-1", "granting_authority": "steward", "scope": {"objective_id": "obj-1", "task_id": "tsk-1"}, "reason": "x", "granted_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "source_ref": ref, "source_digest": "b" * 64, "authority_registry_id": "test-registry", "authority_registry_version": "1", "authority_registry_digest": "0" * 64}}
     event = append_input(tmp_path, dependencies=[dependency])
     assert resolve(tmp_path, event).readiness_state == "blocked"
 
@@ -180,7 +184,7 @@ def test_cli_resolve(tmp_path, capsys):
     assert cli(["resolve", "--root", str(tmp_path), "--objective-id", "obj-1", "--enabling-project-id", "prj-1", "--task-id", "tsk-1", "--source-high-watermark", event["event_id"], "--observed-at", NOW]) == 0
     output = capsys.readouterr().out
     assert '"readiness_state": "unknown"' in output
-    assert "freshness policy unavailable" in output
+    assert "freshness policy missing or malformed" in output
 
 
 def test_canonical_json_is_stable():
@@ -188,6 +192,6 @@ def test_canonical_json_is_stable():
 
 
 def test_bounded_event_ulid_shape_is_contract_compatible():
-    value = _ulid()
+    value = new_ulid()
     assert len(value) == 26
     assert set(value) <= set("0123456789ABCDEFGHJKMNPQRSTVWXYZ")

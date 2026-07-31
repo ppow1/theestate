@@ -10,12 +10,12 @@ import hashlib
 import json
 import os
 import re
-import uuid
-import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+from .ptm_ids import is_valid_ptm_id, new_ptm_id
 
 SCHEMA_VERSION = "estate.ptm.readiness-resolution.v1"
 EVENT_SCHEMA = "estate.ptm.event.v1"
@@ -25,7 +25,6 @@ DEPENDENCY_STATES = {"unsatisfied", "satisfied", "waived", "unknown"}
 READINESS_STATES = {"not_ready", "ready", "blocked", "waived", "unknown"}
 GATE_STATES = {"pass", "fail", "waived", "unknown"}
 ID_RE = re.compile(r"^[A-Za-z0-9_.:/-]+$")
-_ULID_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
 
 class PtmReadinessError(ValueError):
@@ -38,15 +37,6 @@ def canonical_json(value: Any) -> str:
 
 def digest(value: Any) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
-
-
-def _ulid() -> str:
-    value = (int(datetime.now(timezone.utc).timestamp() * 1000) << 80) | secrets.randbits(80)
-    chars = []
-    for _ in range(26):
-        chars.append(_ULID_ALPHABET[value & 31])
-        value >>= 5
-    return "".join(reversed(chars))
 
 
 def file_sha256(path: Path) -> str:
@@ -164,7 +154,8 @@ def _validate_event(event: dict[str, Any]) -> None:
             raise PtmReadinessError(f"PTM event missing {key}")
     if event["hash_algorithm"] != "sha256" or event["event_hash"] != _event_hash(event):
         raise PtmReadinessError(f"PTM event hash invalid: {event.get('event_id')}")
-    _require_id(event["event_id"], "event_id")
+    if not is_valid_ptm_id(event["event_id"], "evt"):
+        raise PtmReadinessError("PTM event_id is not a canonical event ID")
     if not isinstance(event["sequence_number"], int) or event["sequence_number"] < 1:
         raise PtmReadinessError("PTM sequence_number is invalid")
     if not isinstance(event["stream_id"], str) or not re.fullmatch(r"[A-Za-z0-9_.:-]+", event["stream_id"]):
@@ -177,32 +168,64 @@ def _validate_event(event: dict[str, Any]) -> None:
     _parse_time(event["recorded_at"])
 
 
-def append_ptm_event(root: Path, *, event_type: str, aggregate_type: str, aggregate_id: str, stream_id: str, actor_ref: str, authority_refs: list[str], source_refs: list[dict[str, Any]], payload_schema: str, payload: dict[str, Any], idempotency_key: str, occurred_at: str, correlation_id: str | None = None, causation_id: str | None = None) -> dict[str, Any]:
+def append_ptm_event(root: Path, *, event_type: str, aggregate_type: str, aggregate_id: str, stream_id: str, actor_ref: str, authority_refs: list[str], source_refs: list[dict[str, Any]], payload_schema: str, payload: dict[str, Any], idempotency_key: str, occurred_at: str, correlation_id: str | None = None, causation_id: str | None = None, event_id: str | None = None) -> dict[str, Any]:
     """Append one immutable event using the CORE-PTM-002A envelope."""
     root = Path(root).resolve()
-    existing = _load_events(root)
-    for event in existing:
-        if event["idempotency_key"] == idempotency_key:
-            if event["payload"] == payload and event["event_type"] == event_type:
-                return event
-            raise PtmReadinessError("conflicting PTM idempotency key")
-    stream_events = [e for e in existing if e["stream_id"] == stream_id]
-    sequence = max((int(e["sequence_number"]) for e in stream_events), default=0) + 1
-    previous = max(stream_events, key=lambda e: int(e["sequence_number"]))["event_hash"] if stream_events else None
-    now = _iso(datetime.now(timezone.utc))
-    event = {
-        "event_id": f"evt_{_ulid()}", "event_type": event_type, "event_version": 1,
-        "aggregate_type": aggregate_type, "aggregate_id": aggregate_id, "stream_id": stream_id,
-        "sequence_number": sequence, "occurred_at": occurred_at, "recorded_at": now,
-        "actor_ref": actor_ref, "authority_refs": list(authority_refs), "source_refs": list(source_refs),
-        "causation_id": causation_id, "correlation_id": correlation_id, "command_id": None,
-        "idempotency_key": idempotency_key, "payload_schema": payload_schema, "payload": payload,
-        "previous_event_hash": previous, "hash_algorithm": "sha256",
-    }
-    event["event_hash"] = _event_hash(event)
-    _validate_event(event)
-    _write_create_once(_event_path(root, event), event)
-    return event
+    stream_dir = re.sub(r"[^A-Za-z0-9_.-]", "_", stream_id)
+    lock_root = _safe_relative_path(root, (EVENTS_ROOT / f".locks/{stream_dir}").as_posix(), "event lock path")
+    lock_root.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.mkdir(lock_root)
+    except FileExistsError as exc:
+        raise PtmReadinessError("PTM stream is concurrently being appended or has a stale lock") from exc
+    try:
+        existing = _load_events(root)
+        for event in existing:
+            if event["idempotency_key"] == idempotency_key:
+                if event["payload"] == payload and event["event_type"] == event_type:
+                    return event
+                raise PtmReadinessError("conflicting PTM idempotency key")
+        stream_events = [e for e in existing if e["stream_id"] == stream_id]
+        sequence = max((int(e["sequence_number"]) for e in stream_events), default=0) + 1
+        previous = max(stream_events, key=lambda e: int(e["sequence_number"]))["event_hash"] if stream_events else None
+        now = _iso(datetime.now(timezone.utc))
+        event = {
+            "event_id": event_id or new_ptm_id("evt"), "event_type": event_type, "event_version": 1,
+            "aggregate_type": aggregate_type, "aggregate_id": aggregate_id, "stream_id": stream_id,
+            "sequence_number": sequence, "occurred_at": occurred_at, "recorded_at": now,
+            "actor_ref": actor_ref, "authority_refs": list(authority_refs), "source_refs": list(source_refs),
+            "causation_id": causation_id, "correlation_id": correlation_id, "command_id": None,
+            "idempotency_key": idempotency_key, "payload_schema": payload_schema, "payload": payload,
+            "previous_event_hash": previous, "hash_algorithm": "sha256",
+        }
+        event["event_hash"] = _event_hash(event)
+        _validate_event(event)
+        _write_create_once(_event_path(root, event), event)
+        return event
+    finally:
+        try:
+            os.rmdir(lock_root)
+        except FileNotFoundError:
+            pass
+        except OSError as exc:
+            raise PtmReadinessError("PTM stream lock cleanup failed") from exc
+
+
+def _exclusive_directory_lock(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.mkdir(path)
+    except FileExistsError as exc:
+        raise PtmReadinessError("PTM resolution is concurrently being evaluated") from exc
+
+
+def _release_directory_lock(path: Path) -> None:
+    try:
+        os.rmdir(path)
+    except FileNotFoundError:
+        pass
+    except OSError as exc:
+        raise PtmReadinessError("PTM resolution lock cleanup failed") from exc
 
 
 def _load_events(root: Path) -> list[dict[str, Any]]:
@@ -279,11 +302,11 @@ def _dependency_cycle(items: list[dict[str, Any]]) -> bool:
     return any(visit(node) for node in graph)
 
 
-def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str | None, task_id: str, root: Path) -> list[str]:
+def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str | None, task_id: str, root: Path, registry: dict[str, Any] | None, observed_at: str, policy: dict[str, Any] | None) -> list[str]:
     waiver = item.get("waiver")
     if not isinstance(waiver, dict):
         return ["waiver record missing"]
-    required = ("waiver_id", "granting_authority", "scope", "reason", "granted_at", "expires_at", "source_ref", "source_digest")
+    required = ("waiver_id", "granting_authority", "scope", "reason", "granted_at", "expires_at", "source_ref", "source_digest", "authority_registry_id", "authority_registry_version", "authority_registry_digest")
     errors = [f"waiver missing {key}" for key in required if not waiver.get(key)]
     try:
         if waiver.get("expires_at") and _parse_time(waiver["expires_at"]) <= _parse_time(item["observed_at"]):
@@ -300,6 +323,16 @@ def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str |
     if isinstance(source_ref, dict) and waiver.get("source_digest") != source_ref.get("source_sha256"):
         errors.append("waiver source digest does not match source reference")
     errors.extend(_source_check(root, [source_ref] if isinstance(source_ref, dict) else []))
+    if registry is None:
+        errors.append("waiver authority registry unavailable")
+    else:
+        from .ptm_waiver_authority import validate_waiver_authority
+        errors.extend(validate_waiver_authority(registry, waiver, objective_id=objective_id, package_id=package_id, task_id=task_id, observed_at=observed_at))
+    if policy is not None:
+        from .ptm_policy import evaluate_evidence
+        waiver_evidence = dict(item)
+        waiver_evidence.update(waiver)
+        errors.extend(evaluate_evidence(policy, waiver_evidence, evidence_class="waiver", observed_at=observed_at))
     return errors
 
 
@@ -318,7 +351,7 @@ def _existing_resolution(root: Path, replay_key: str) -> dict[str, Any] | None:
 
 
 def validate_readiness_record(record: dict[str, Any], *, root: Path | None = None) -> dict[str, Any]:
-    required = ("resolution_id", "schema_version", "objective_id", "task_id", "dependency_results", "gate_checks", "readiness_state", "source_references", "source_digests", "source_high_watermark", "evaluator_identity", "freshness_policy_id", "freshness_policy_digest", "evaluated_at", "expires_at", "waiver_references", "conflicts", "warnings", "replay_idempotency_key", "failure_reason", "ledger_event_reference", "projection_path", "projection_digest")
+    required = ("resolution_id", "schema_version", "objective_id", "task_id", "dependency_results", "gate_checks", "readiness_state", "source_references", "source_digests", "source_high_watermark", "evaluator_identity", "freshness_policy_id", "freshness_policy_version", "freshness_policy_digest", "waiver_authority_registry_id", "waiver_authority_registry_version", "waiver_authority_registry_digest", "evaluated_at", "expires_at", "waiver_references", "conflicts", "warnings", "replay_idempotency_key", "failure_reason", "ledger_event_reference", "projection_path", "projection_digest")
     missing = [key for key in required if key not in record]
     if missing:
         raise PtmReadinessError("readiness record missing: " + ", ".join(missing))
@@ -358,19 +391,59 @@ class ReadinessResolution:
 class PtmProductionReadinessResolver:
     """The PTM-owned resolver; consumers may read its result but not recalculate it."""
 
-    def __init__(self, root: Path, *, freshness_seconds: int | None = None, freshness_policy_id: str | None = None, freshness_policy_digest: str | None = None, evaluator_identity: str = "ptm.production-readiness-resolver@1.0.0") -> None:
+    def __init__(self, root: Path, *, freshness_policy: dict[str, Any] | None = None, freshness_seconds: int | None = None, freshness_policy_id: str | None = None, freshness_policy_digest: str | None = None, waiver_registry: dict[str, Any] | None = None, evaluator_identity: str = "ptm.production-readiness-resolver@1.0.0") -> None:
         self.root = Path(root).resolve()
+        self.freshness_policy = freshness_policy
         self.freshness_seconds = freshness_seconds
         self.freshness_policy_id = freshness_policy_id
         self.freshness_policy_digest = freshness_policy_digest
+        self.waiver_registry = waiver_registry
         self.evaluator_identity = evaluator_identity
 
     def resolve_engineering_readiness(self, *, objective_id: str, enabling_project_id: str | None, task_or_package_id: str, source_high_watermark: str, observed_at: str, repository_root: Path | None = None) -> ReadinessResolution:
+        objective = _require_id(objective_id, "objective_id")
+        task = _require_id(task_or_package_id, "task_or_package_id")
+        lock_name = re.sub(r"[^A-Za-z0-9_.-]", "_", f"{objective}_{task}")
+        lock_path = _safe_relative_path(self.root, (READINESS_ROOT / f".locks/{lock_name}").as_posix(), "readiness lock path")
+        _exclusive_directory_lock(lock_path)
+        try:
+            return self._resolve_engineering_readiness_locked(
+                objective_id=objective_id,
+                enabling_project_id=enabling_project_id,
+                task_or_package_id=task_or_package_id,
+                source_high_watermark=source_high_watermark,
+                observed_at=observed_at,
+                repository_root=repository_root,
+            )
+        finally:
+            _release_directory_lock(lock_path)
+
+    def _resolve_engineering_readiness_locked(self, *, objective_id: str, enabling_project_id: str | None, task_or_package_id: str, source_high_watermark: str, observed_at: str, repository_root: Path | None = None) -> ReadinessResolution:
         objective_id = _require_id(objective_id, "objective_id")
         task_id = _require_id(task_or_package_id, "task_or_package_id")
         _parse_time(observed_at)
-        policy_valid = self.freshness_seconds is not None and bool(self.freshness_policy_id) and bool(self.freshness_policy_digest)
-        replay_key = digest({"objective_id": objective_id, "enabling_project_id": enabling_project_id, "task_id": task_id, "source_high_watermark": source_high_watermark, "observed_at": observed_at, "policy": {"seconds": self.freshness_seconds, "id": self.freshness_policy_id, "digest": self.freshness_policy_digest}, "schema": SCHEMA_VERSION})
+        policy = self.freshness_policy
+        policy_error = None
+        if policy is None and self.freshness_seconds is None:
+            try:
+                from .ptm_policy import load_freshness_policy
+                policy = load_freshness_policy(self.root, observed_at=observed_at)
+            except PtmReadinessError as exc:
+                policy_error = str(exc)
+        elif policy is None:
+            policy = {"policy_id": self.freshness_policy_id, "policy_version": "test", "policy_digest": self.freshness_policy_digest, "readiness_resolution_maximum_age_seconds": self.freshness_seconds, "allowed_clock_skew_seconds": 120, "evidence_classes": {"accepted_dependency_completion": {"maximum_age_seconds": None, "requires_explicit_expiry": False}, "readiness_gate": {"maximum_age_seconds": self.freshness_seconds, "requires_explicit_expiry": False}, "waiver": {"maximum_age_seconds": 86400, "requires_explicit_expiry": True}}}
+        policy_valid = policy is not None and policy_error is None
+        registry = self.waiver_registry
+        registry_error = None
+        if registry is None:
+            try:
+                from .ptm_waiver_authority import load_waiver_registry
+                registry = load_waiver_registry(self.root, observed_at=observed_at)
+            except PtmReadinessError as exc:
+                registry_error = str(exc)
+        policy_identity = {"id": policy.get("policy_id") if policy else None, "version": policy.get("policy_version") if policy else None, "digest": policy.get("policy_digest") if policy else None}
+        registry_identity = {"id": registry.get("registry_id") if registry else None, "version": registry.get("registry_version") if registry else None, "digest": registry.get("registry_digest") if registry else None}
+        replay_key = digest({"objective_id": objective_id, "enabling_project_id": enabling_project_id, "task_id": task_id, "source_high_watermark": source_high_watermark, "observed_at": observed_at, "policy": policy_identity, "registry": registry_identity, "schema": SCHEMA_VERSION})
         prior = _existing_resolution(self.root, replay_key)
         if prior is not None:
             return ReadinessResolution(prior)
@@ -404,17 +477,18 @@ class PtmProductionReadinessResolver:
                         if dep.get("task_id") and dep.get("task_id") != task_id: conflicts.append(f"dependency task mismatch: {dep.get('dependency_id')}")
                         if payload.get("package_id") is not None and dep.get("package_id") and dep.get("package_id") != payload.get("package_id"): conflicts.append(f"dependency package mismatch: {dep.get('dependency_id')}")
                         if dep.get("state") == "waived":
-                            errors = _waiver_errors(dep, objective_id=objective_id, package_id=payload.get("package_id"), task_id=task_id, root=self.root)
+                            errors = _waiver_errors(dep, objective_id=objective_id, package_id=payload.get("package_id"), task_id=task_id, root=self.root, registry=registry, observed_at=observed_at, policy=policy)
                             conflicts.extend(errors)
                     for gate in gates:
                         if gate.get("state") not in GATE_STATES: conflicts.append(f"invalid gate state: {gate.get('name')}")
-                    for evidence in dependencies + gates:
-                        if evidence.get("observed_at"):
-                            try:
-                                if self.freshness_seconds is not None and _parse_time(observed_at) - _parse_time(evidence["observed_at"]) > timedelta(seconds=self.freshness_seconds):
-                                    conflicts.append(f"stale evidence: {evidence.get('dependency_id') or evidence.get('name')}")
-                            except PtmReadinessError:
-                                conflicts.append("invalid evidence timestamp")
+                    if policy is not None:
+                        from .ptm_policy import evaluate_evidence
+                        for evidence in dependencies:
+                            evidence_class = evidence.get("evidence_class") or ("waiver" if evidence.get("state") == "waived" else "accepted_dependency_completion")
+                            if evidence.get("state") != "waived":
+                                conflicts.extend(evaluate_evidence(policy, evidence, evidence_class=evidence_class, observed_at=observed_at))
+                        for evidence in gates:
+                            conflicts.extend(evaluate_evidence(policy, evidence, evidence_class=evidence.get("evidence_class", "readiness_gate"), observed_at=observed_at))
                     conflicts.extend(str(x) for x in payload.get("conflicts") or [])
                     if _dependency_cycle(dependencies):
                         conflicts.append("dependency cycle detected")
@@ -423,12 +497,13 @@ class PtmProductionReadinessResolver:
                     warnings.extend(source_errors)
                     conflicts.extend(source_errors)
                     all_expiries = [x.get("expires_at") for x in dependencies + gates if x.get("expires_at")]
-                    freshness_expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
+                    freshness_age = policy.get("readiness_resolution_maximum_age_seconds") if policy else 0
+                    freshness_expiry = _parse_time(observed_at) + timedelta(seconds=freshness_age)
                     expiry = min([_parse_time(x) for x in all_expiries] + [freshness_expiry])
                     if _parse_time(observed_at) >= expiry: conflicts.append("readiness evidence is expired")
                     if not policy_valid:
-                        warnings.append("freshness policy unavailable")
-                        failure = "freshness policy unavailable"
+                        warnings.append(policy_error or "freshness policy unavailable")
+                        failure = policy_error or "freshness policy unavailable"
                         readiness = "unknown"
                     elif conflicts or len({x.get("dependency_id") for x in dependencies}) != len(dependencies): readiness = "blocked"
                     elif any(x.get("state") == "unknown" for x in dependencies): readiness = "unknown"
@@ -438,19 +513,20 @@ class PtmProductionReadinessResolver:
                     else: readiness = "unknown"
                     if conflicts and failure is None: failure = "; ".join(conflicts[:3])
         if not source_events:
-            expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
+            expiry = _parse_time(observed_at) + timedelta(seconds=policy.get("readiness_resolution_maximum_age_seconds", 0) if policy else 0)
         else:
-            policy_expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
+            policy_expiry = _parse_time(observed_at) + timedelta(seconds=policy.get("readiness_resolution_maximum_age_seconds", 0) if policy else 0)
             expiry = min([_parse_time(x["expires_at"]) for x in (list(payload.get("dependencies") or []) + list(payload.get("gate_checks") or [])) if x.get("expires_at")] + [policy_expiry])
         record: dict[str, Any] = {
-            "resolution_id": f"res_{uuid.uuid4().hex}", "schema_version": SCHEMA_VERSION,
+            "resolution_id": new_ptm_id("res"), "schema_version": SCHEMA_VERSION,
             "objective_id": objective_id, "campaign_id": payload.get("campaign_id"), "package_id": payload.get("package_id"),
             "task_id": task_id, "enabling_project_id": enabling_project_id,
             "dependency_results": list(payload.get("dependencies") or []), "gate_checks": list(payload.get("gate_checks") or []),
             "readiness_state": readiness, "source_references": list(payload.get("source_references") or []),
             "source_digests": {str(x.get("source_path")): x.get("source_sha256") for x in payload.get("source_references") or []},
             "source_high_watermark": source_high_watermark, "evaluator_identity": self.evaluator_identity,
-            "freshness_policy_id": self.freshness_policy_id, "freshness_policy_digest": self.freshness_policy_digest,
+            "freshness_policy_id": policy.get("policy_id") if policy else None, "freshness_policy_version": policy.get("policy_version") if policy else None, "freshness_policy_digest": policy.get("policy_digest") if policy else None,
+            "waiver_authority_registry_id": registry.get("registry_id") if registry else None, "waiver_authority_registry_version": registry.get("registry_version") if registry else None, "waiver_authority_registry_digest": registry.get("registry_digest") if registry else None,
             "evaluated_at": observed_at, "expires_at": _iso(expiry), "waiver_references": [x.get("waiver") for x in payload.get("dependencies") or [] if x.get("waiver")],
             "conflicts": sorted(set(conflicts)), "warnings": sorted(set(warnings)), "replay_idempotency_key": replay_key,
             "failure_reason": failure, "ledger_event_reference": None, "projection_path": None, "projection_digest": None,

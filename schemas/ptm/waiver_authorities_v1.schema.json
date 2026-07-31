@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.ptm.waiver-authorities.v1",
+  "type": "object",
+  "required": ["registry_id", "schema_version", "registry_version", "effective_at", "authorities", "registry_digest"],
+  "properties": {
+    "registry_id": {"type": "string", "minLength": 1}, "schema_version": {"const": "estate.ptm.waiver-authorities.v1"}, "registry_version": {"type": "string", "minLength": 1}, "effective_at": {"type": "string", "format": "date-time"},
+    "authorities": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["authority_id", "authority_class", "permitted_waiver_types", "scope_policy", "maximum_duration_seconds", "delegation_source", "effective_at", "expires_at", "revoked", "source_authority_reference"], "properties": {"authority_id": {"type": "string", "minLength": 1}, "authority_class": {"type": "string", "minLength": 1}, "permitted_waiver_types": {"type": "array", "minItems": 1, "items": {"enum": ["dependency", "gate"]}}, "scope_policy": {"const": "exact_objective_package_task"}, "maximum_duration_seconds": {"const": 86400}, "delegation_source": {"type": ["string", "null"]}, "effective_at": {"type": "string", "format": "date-time"}, "expires_at": {"type": ["string", "null"], "format": "date-time"}, "revoked": {"type": "boolean"}, "source_authority_reference": {"type": "string", "minLength": 1}}, "additionalProperties": false}},
+    "registry_digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+  },
+  "additionalProperties": false
+}

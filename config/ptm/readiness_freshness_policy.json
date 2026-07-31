@@ -1,0 +1,25 @@
+{
+  "policy_id": "ptm-readiness-freshness-v1",
+  "schema_version": "estate.ptm.readiness-freshness-policy.v1",
+  "policy_version": "1.0.0",
+  "effective_at": "2026-07-30T00:00:00Z",
+  "evidence_classes": {
+    "accepted_dependency_completion": {"maximum_age_seconds": null, "requires_explicit_expiry": false},
+    "capability_or_availability": {"maximum_age_seconds": 900, "requires_explicit_expiry": false},
+    "capacity": {"maximum_age_seconds": 900, "requires_explicit_expiry": false},
+    "provider_health": {"maximum_age_seconds": 300, "requires_explicit_expiry": false},
+    "current_authorization": {"maximum_age_seconds": 900, "requires_explicit_expiry": false},
+    "readiness_gate": {"maximum_age_seconds": 300, "requires_explicit_expiry": false},
+    "waiver": {"maximum_age_seconds": 86400, "requires_explicit_expiry": true}
+  },
+  "readiness_resolution_maximum_age_seconds": 300,
+  "allowed_clock_skew_seconds": 120,
+  "missing_timestamp_behavior": "fail_closed",
+  "future_timestamp_behavior": "fail_closed",
+  "unsupported_evidence_class_behavior": "fail_closed",
+  "waiver_treatment": "explicit_expiry_required_max_24_hours",
+  "authority_reference": "steward-decision:ptm-readiness-freshness-v1",
+  "digest_algorithm": "sha256",
+  "digest_excludes": ["policy_digest"],
+  "policy_digest": null
+}

@@ -24,7 +24,7 @@ runtime/ptm/readiness/<resolution_id>.json
 
 No prior event or resolution is overwritten. The resolver uses an idempotency key derived from the canonical inputs, policy, schema, and source high-watermark. Repeating the same request returns the existing equivalent resolution; changed source state requires a new resolution.
 
-Ledger and projection paths are repository-relative, remain inside the PTM namespace, and reject traversal, symlink/reparse-point crossings, and foreign event paths. Complete writes are flushed, fsynced, closed, and parent-directory-synced where the platform supports directory fsync. A persistence failure retains the partial PTM record and fails closed rather than deleting by pathname.
+Ledger and projection paths are repository-relative, remain inside the PTM namespace, and reject traversal, symlink/reparse-point crossings, and foreign event paths. Complete writes are flushed, fsynced, closed, and parent-directory-synced where the platform supports directory fsync. Per-stream and per-resolution exclusive directory locks serialize sequence and replay decisions; lock contention fails closed. A persistence failure retains the partial PTM record and fails closed rather than deleting by pathname.
 
 ## Decision rules
 
@@ -34,7 +34,9 @@ Unknown, stale, expired, contradictory, cyclic, mismatched, or digest-drifted ev
 
 The record preserves source references and digests, evaluator identity, high-watermark, expiry, conflicts, warnings, failure reason, ledger event reference, and projection digest. Readiness is evidence for later consumers; it is not Dispatch authorization, Engineering completion, merge authority, or institutional acceptance.
 
-Freshness policy identity and digest are part of the replay key and resolution. No repository freshness policy is currently configured, so the default production resolver returns `unknown` with `freshness policy unavailable`. A test or future canonical runtime may inject an explicit policy; injected policy is not production authority.
+Freshness policy identity and digest are part of the replay key and resolution. The canonical policy is `config/ptm/readiness_freshness_policy.json`, validated by `schemas/ptm/readiness_freshness_policy_v1.schema.json`; it specifies the 15-minute capability/capacity/authorization windows, five-minute provider-health/readiness windows, two-minute future skew, and fail-closed missing/unsupported timestamp behavior. The policy digest is computed from the immutable policy bytes with `policy_digest` excluded. Missing, malformed, future-effective, or digest-drifted policy produces `unknown` and never falls back to a hidden Python duration.
+
+Waiver authority is loaded from `config/ptm/waiver_authorities.json`, validated by `schemas/ptm/waiver_authorities_v1.schema.json`, and its computed registry digest is recorded in every resolution. Only registered, finite, exact-scope authorities may validate a waiver; PTM does not create waivers. Registry identity and digest are replay inputs, so authority changes require a new resolution.
 
 ## CLI
 
@@ -48,7 +50,7 @@ PYTHONPATH=src python -m estate.cli.main ptm-readiness validate --record runtime
 
 There is no always-ready option and no CLI operation that manually grants readiness.
 
-The current bounded implementation generates contract-shaped event ULIDs locally because the general PTM ID service is not yet present. This is recorded as an architectural compatibility item; it must be replaced or formally adopted by the canonical PTM ID authority before broad production use.
+The shared `estate.core.ptm_ids` module is the bounded PTM identifier authority. It generates Crockford-compatible 26-character ULIDs using UTC millisecond timestamps, cryptographically strong randomness, and thread-safe monotonic same-process state that survives clock rollback. IDs provide uniqueness and approximate time sorting only; stream sequence and predecessor hash remain authoritative. Create-once event publication remains the cross-process collision protection.
 
 ## Boundary
 
