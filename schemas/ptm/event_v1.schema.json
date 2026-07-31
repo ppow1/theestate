@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.ptm.event.v1",
+  "type": "object",
+  "required": ["event_id", "event_type", "event_version", "aggregate_type", "aggregate_id", "stream_id", "sequence_number", "occurred_at", "recorded_at", "actor_ref", "authority_refs", "source_refs", "idempotency_key", "payload_schema", "payload", "previous_event_hash", "event_hash", "hash_algorithm"],
+  "properties": {
+    "event_id": {"type": "string", "pattern": "^evt_[0-9A-HJKMNP-TV-Z]{26}$"},
+    "event_type": {"type": "string", "pattern": "^[a-z0-9_.]+$"},
+    "event_version": {"const": 1},
+    "aggregate_type": {"type": "string"},
+    "aggregate_id": {"type": "string"},
+    "stream_id": {"type": "string"},
+    "sequence_number": {"type": "integer", "minimum": 1},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "actor_ref": {"type": "string"},
+    "authority_refs": {"type": "array", "items": {"type": "string"}},
+    "source_refs": {"type": "array"},
+    "causation_id": {"type": ["string", "null"]},
+    "correlation_id": {"type": ["string", "null"]},
+    "command_id": {"type": ["string", "null"]},
+    "idempotency_key": {"type": "string"},
+    "payload_schema": {"type": "string"},
+    "payload": {"type": "object"},
+    "previous_event_hash": {"type": ["string", "null"]},
+    "event_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "hash_algorithm": {"const": "sha256"}
+  },
+  "additionalProperties": false
+}

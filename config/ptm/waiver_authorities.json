@@ -1,0 +1,33 @@
+{
+  "registry_id": "ptm-waiver-authorities-v1",
+  "schema_version": "estate.ptm.waiver-authorities.v1",
+  "registry_version": "1.0.0",
+  "effective_at": "2026-07-30T00:00:00Z",
+  "authorities": [
+    {
+      "authority_id": "steward",
+      "authority_class": "Steward",
+      "permitted_waiver_types": ["dependency", "gate"],
+      "scope_policy": "exact_objective_package_task",
+      "maximum_duration_seconds": 86400,
+      "delegation_source": null,
+      "effective_at": "2026-07-30T00:00:00Z",
+      "expires_at": null,
+      "revoked": false,
+      "source_authority_reference": "steward-decision:ptm-waiver-authorities-v1"
+    },
+    {
+      "authority_id": "chief-architect-delegation",
+      "authority_class": "Chief Architect delegation",
+      "permitted_waiver_types": ["dependency", "gate"],
+      "scope_policy": "exact_objective_package_task",
+      "maximum_duration_seconds": 86400,
+      "delegation_source": "not-recorded",
+      "effective_at": "2026-07-30T00:00:00Z",
+      "expires_at": null,
+      "revoked": true,
+      "source_authority_reference": "steward-decision:ptm-waiver-authorities-v1"
+    }
+  ],
+  "registry_digest": null
+}

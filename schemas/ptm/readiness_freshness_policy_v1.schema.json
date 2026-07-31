@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.ptm.readiness-freshness-policy.v1",
+  "type": "object",
+  "required": ["policy_id", "schema_version", "policy_version", "effective_at", "evidence_classes", "readiness_resolution_maximum_age_seconds", "allowed_clock_skew_seconds", "missing_timestamp_behavior", "future_timestamp_behavior", "unsupported_evidence_class_behavior", "waiver_treatment", "authority_reference", "digest_algorithm", "digest_excludes", "policy_digest"],
+  "properties": {
+    "policy_id": {"type": "string", "minLength": 1}, "schema_version": {"const": "estate.ptm.readiness-freshness-policy.v1"}, "policy_version": {"type": "string", "minLength": 1}, "effective_at": {"type": "string", "format": "date-time"},
+    "evidence_classes": {"type": "object", "required": ["accepted_dependency_completion", "capability_or_availability", "capacity", "provider_health", "current_authorization", "readiness_gate", "waiver"], "properties": {"accepted_dependency_completion": {"$ref": "#/$defs/evidenceRule"}, "capability_or_availability": {"$ref": "#/$defs/evidenceRule"}, "capacity": {"$ref": "#/$defs/evidenceRule"}, "provider_health": {"$ref": "#/$defs/evidenceRule"}, "current_authorization": {"$ref": "#/$defs/evidenceRule"}, "readiness_gate": {"$ref": "#/$defs/evidenceRule"}, "waiver": {"$ref": "#/$defs/evidenceRule"}}, "additionalProperties": false},
+    "readiness_resolution_maximum_age_seconds": {"type": "integer", "minimum": 1}, "allowed_clock_skew_seconds": {"type": "integer", "minimum": 0},
+    "missing_timestamp_behavior": {"const": "fail_closed"}, "future_timestamp_behavior": {"const": "fail_closed"}, "unsupported_evidence_class_behavior": {"const": "fail_closed"}, "waiver_treatment": {"type": "string", "minLength": 1}, "authority_reference": {"type": "string", "minLength": 1}, "digest_algorithm": {"const": "sha256"}, "digest_excludes": {"const": ["policy_digest"]}, "policy_digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+  },
+  "$defs": {"evidenceRule": {"type": "object", "required": ["maximum_age_seconds", "requires_explicit_expiry"], "properties": {"maximum_age_seconds": {"type": ["integer", "null"], "minimum": 0}, "requires_explicit_expiry": {"type": "boolean"}}, "additionalProperties": false}},
+  "additionalProperties": false
+}

@@ -2,6 +2,7 @@ import argparse
 import json
 from pathlib import Path
 from estate.core.ptm_pilot_projection import build_repository_pilot, normalized_json as normalized_ptm_json, reviewer_report as ptm_reviewer_report
+from estate.core.ptm_production_readiness import cli as ptm_readiness_cli
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
@@ -2778,6 +2779,26 @@ def cmd_ptm_pilot_projection(args):
     print(output, end="")
 
 
+def cmd_ptm_readiness(args):
+    forwarded = [args.action, "--root", args.root or "."]
+    if args.format:
+        forwarded.extend(["--format", args.format])
+    if args.json:
+        forwarded.append("--json")
+    if args.action == "resolve":
+        for name in ("objective_id", "enabling_project_id", "task_id", "source_high_watermark", "observed_at"):
+            value = getattr(args, name)
+            if value is not None:
+                forwarded.extend([f"--{name.replace('_', '-')}", value])
+    elif args.action == "read":
+        if args.resolution_id is not None:
+            forwarded.extend(["--resolution-id", args.resolution_id])
+    else:
+        if args.record is not None:
+            forwarded.extend(["--record", args.record])
+    return ptm_readiness_cli(forwarded)
+
+
 def main(argv=None):
     if argv is None:
         import sys as _sys
@@ -2796,6 +2817,20 @@ def main(argv=None):
     p.add_argument("--root", help="Estate repository root (defaults to the current directory)")
     p.add_argument("--format", choices=("json", "report"), default="report")
     p.set_defaults(func=cmd_ptm_pilot_projection)
+
+    p = sub.add_parser("ptm-readiness", help="Resolve, read, or validate canonical PTM readiness")
+    p.add_argument("action", choices=("resolve", "read", "validate"))
+    p.add_argument("--root")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--format", choices=("json", "report"), default="json")
+    p.add_argument("--objective-id")
+    p.add_argument("--enabling-project-id")
+    p.add_argument("--task-id")
+    p.add_argument("--source-high-watermark")
+    p.add_argument("--observed-at")
+    p.add_argument("--resolution-id")
+    p.add_argument("--record")
+    p.set_defaults(func=cmd_ptm_readiness)
 
 
 
@@ -4277,8 +4312,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if not hasattr(args, "func"):
         parser.print_help()
-        return
-    args.func(args)
+        return 0
+    result = args.func(args)
+    return result if isinstance(result, int) else 0
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
