@@ -28,5 +28,10 @@
     "ptm_revalidation_result": {"const": "passed"},
     "execution_authority": {"$ref": "estate.engineering.commission-execution-authority.v1"},
     "provider_extension": {"$ref": "estate.qwen-local-text.execution-extension.v1"}
+    ,"adapter_result_reference": {"type": "string", "minLength": 1}
+    ,"adapter_result_content_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    ,"provider_execution_state": {"enum": ["accepted", "dry_run_completed", "blocked", "failed", "completed"]}
+    ,"validation_state": {"enum": ["prepared", "passed", "failed", "not_run"]}
+    ,"result_artifacts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
   }
 }
