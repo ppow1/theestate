@@ -86,18 +86,24 @@ reported only after both publications succeed. If document publication fails,
 the competing destination remains unchanged and staged evidence is retained or
 reconciled. If the document publishes but receipt publication fails, the
 document is preserved as explicitly reported orphaned evidence with its path
-and SHA-256; it is never rolled back by pathname deletion or rename. The result
-uses a failed-with-orphaned-document transaction state and Engineering
-completion remains blocked.
+and the SHA-256 computed from its complete staged bytes before publication; the
+governed path is never reread as the authoritative transaction hash. It is
+never rolled back by pathname deletion or rename. The adapter returns the
+shared top-level `failed` status, while using a detailed
+`failed_with_orphaned_document` transaction state in metadata and evidence;
+Engineering completion remains blocked.
 
 Failure receipts are staged and published once when the destination remains
 available. If a failure receipt cannot be durably published, the staging
-directory is retained with bounded evidence and no recursive retry occurs.
-Failure receipts contain bounded errors, failed result and validation states,
-timeout/cancellation state, an empty completed-artifact list, and any
-orphaned-artifact path/hash. Cleanup warnings and staging-retention details are
-surfaced without masking the primary persistence failure. Institutional
-acceptance remains separate and is not granted.
+directory is retained with bounded evidence and no recursive retry occurs. A
+staging disposition is recorded only after the handler knows whether the
+directory was retained, removed after durable failure evidence, or could not
+be cleaned (`staging_cleanup_failed`); a retained path must still exist when
+reported. Failure receipts contain bounded errors, failed result and
+validation states, timeout/cancellation state, an empty completed-artifact
+list, and any orphaned-artifact path/hash. Cleanup warnings and
+staging-retention details are surfaced without masking the primary persistence
+failure. Institutional acceptance remains separate and is not granted.
 
 Provider execution and Engineering completion are evidence-producing states.
 Neither grants institutional acceptance; acceptance remains a separate

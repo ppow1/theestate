@@ -47,6 +47,15 @@ class _ExclusiveWriteToken:
     st_ino: int
 
 
+class QwenPersistenceError(OSError):
+    def __init__(self, phase: str, path: Path, partial_file_may_exist: bool, primary: Exception) -> None:
+        self.phase = phase
+        self.staged_path = path
+        self.partial_file_may_exist = partial_file_may_exist
+        self.primary = primary
+        super().__init__(f"{phase} failed for staged output: {primary}")
+
+
 def _root(root: str | Path | None) -> Path:
     return Path(root) if root is not None else ESTATE_ROOT
 
@@ -209,8 +218,11 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                        artifacts: list[str], errors: list[str], endpoint_local: bool,
                        receipt_target: Path | None = None,
                        artifact_sources: dict[str, Path] | None = None,
+                       artifact_hashes: dict[str, str] | None = None,
                        orphaned_artifacts: list[dict[str, str]] | None = None,
-                       transaction_state: str | None = None) -> str:
+                       transaction_state: str | None = None,
+                       staging_disposition: str | None = None,
+                       staging_path: str | None = None) -> str:
         receipt_ref = str(request.metadata["provider_receipt_path"]).replace("\\", "/")
         sources = artifact_sources or {}
         payload = {
@@ -224,12 +236,14 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "source_commit": request.metadata.get("source_commit"), "sandbox": request.metadata.get("sandbox"),
             "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest() if prompt else None,
             "declared_artifact_paths": list(request.expected_outputs),
-            "artifacts": [{"path": path, "sha256": hashlib.sha256(sources.get(path, self.root / path).read_bytes()).hexdigest()} for path in artifacts],
+            "artifacts": [{"path": path, "sha256": (artifact_hashes or {}).get(path) or hashlib.sha256(sources.get(path, self.root / path).read_bytes()).hexdigest()} for path in artifacts],
             "orphaned_artifacts": list(orphaned_artifacts or []),
             "started_at": started, "completed_at": utc_now(), "timeout_state": timeout_state,
             "cancellation_state": cancellation_state, "provider_result_state": result_state,
             "validation_result": validation_result, "endpoint_local": endpoint_local,
             "transaction_state": transaction_state or result_state,
+            "staging_disposition": staging_disposition,
+            "staging_path": staging_path,
             "error_details": [str(error)[:500] for error in errors],
         }
         self._exclusive_write_text(receipt_target or (self.root / receipt_ref), json.dumps(payload, indent=2, sort_keys=True) + "\n")
@@ -242,11 +256,13 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         identity = os.fstat(descriptor)
         stream = None
         close_attempted = False
+        phase = "open"
         try:
             stream = os.fdopen(descriptor, "wb", buffering=0, closefd=True)
             descriptor = None
             payload = content.encode("utf-8")
             offset = 0
+            phase = "write"
             while offset < len(payload):
                 remaining = payload[offset:]
                 written = stream.write(remaining)
@@ -255,10 +271,13 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 if written > len(remaining):
                     raise OSError("exclusive write reported more bytes than supplied")
                 offset += written
+            phase = "flush"
             stream.flush()
+            phase = "fsync"
             os.fsync(stream.fileno())
             stream_descriptor = stream.fileno()
             close_attempted = True
+            phase = "close"
             try:
                 stream.close()
             except Exception:
@@ -282,8 +301,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                     os.close(descriptor)
                 except OSError:
                     pass
-            exc.args = (f"{exc}; staged evidence retained at {target}", *exc.args[1:])
-            raise
+            raise QwenPersistenceError(phase, target, target.exists(), exc) from exc
         return _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
 
     def _new_staging_directory(self, request: ExecutionProviderAdapterRequest) -> Path:
@@ -356,7 +374,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         config = self._config(); target_errors, document_target, _ = self._target_collision_errors(request)
         if target_errors:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(metadata["provider_receipt_path"]).replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; published_document = False
+        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(metadata["provider_receipt_path"]).replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
         try:
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
@@ -380,12 +398,17 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
             try:
                 self._exclusive_write_text(staged_document, encoded.decode("utf-8"))
+            except QwenPersistenceError:
+                raise
             except Exception as exc:
                 raise OSError(f"document persistence failed: {str(exc)[:400]}") from exc
+            staged_document_hash = hashlib.sha256(staged_document.read_bytes()).hexdigest()
             self._publish_no_replace(staged_document, document_target)
             published_document = True
             try:
-                self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True, receipt_target=staging_dir / "success-receipt", artifact_sources={document_path: document_target}, transaction_state="completed")
+                self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True, receipt_target=staging_dir / "success-receipt", artifact_hashes={document_path: staged_document_hash}, transaction_state="completed")
+            except QwenPersistenceError:
+                raise
             except Exception as exc:
                 raise OSError(f"success receipt staging failed: {str(exc)[:400]}") from exc
             self._publish_no_replace(staging_dir / "success-receipt", receipt_target)
@@ -396,19 +419,39 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             error_details = [str(exc)[:500]]
             orphaned_artifacts: list[dict[str, str]] = []
             transaction_state = "failed"
-            if published_document:
-                document_hash = hashlib.sha256(document_target.read_bytes()).hexdigest()
-                orphaned_artifacts = [{"path": document_path, "sha256": document_hash}]
+            if published_document and staged_document_hash:
+                orphaned_artifacts = [{"path": document_path, "sha256": staged_document_hash}]
                 transaction_state = "failed_with_orphaned_document"
-            failure_receipt = staging_dir / "failure-receipt"
+            safe_primitive_unavailable = isinstance(exc, NotImplementedError) or "no-replace publication primitive" in str(exc)
+            staging_disposition = "retained_for_reconciliation"
+            staging_path = str(staging_dir)
+            cleanup_warning = None
+            if not safe_primitive_unavailable:
+                try:
+                    self._remove_staging_directory(staging_dir)
+                    staging_disposition = "removed_after_failure_receipt"
+                    staging_path = None
+                except Exception as cleanup_error:
+                    staging_disposition = "staging_cleanup_failed"
+                    cleanup_warning = str(cleanup_error)[:300]
+                    error_details.append(f"staging cleanup warning: {cleanup_warning}")
+            failure_stage = self._new_staging_directory(request)
+            failure_receipt = failure_stage / "failure-receipt"
             failure_receipt_ref = None
             try:
-                self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True, receipt_target=failure_receipt, orphaned_artifacts=orphaned_artifacts, transaction_state=transaction_state)
+                self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True, receipt_target=failure_receipt, orphaned_artifacts=orphaned_artifacts, transaction_state=transaction_state, staging_disposition=staging_disposition, staging_path=staging_path)
                 self._publish_no_replace(failure_receipt, receipt_target)
                 failure_receipt_ref = receipt_ref
             except Exception as receipt_error:
-                transaction_state = "failed_without_durable_receipt" if not published_document else transaction_state
+                transaction_state = "failed_without_durable_receipt"
                 error_details.append(f"failure receipt persistence failed: {str(receipt_error)[:400]}")
+                if Path(failure_stage).is_dir():
+                    staging_disposition = "retained_for_reconciliation"
+                    staging_path = str(failure_stage)
             else:
-                self._remove_staging_directory(staging_dir)
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status=transaction_state, started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_directory": str(staging_dir), "orphaned_artifacts": orphaned_artifacts})
+                try:
+                    self._remove_staging_directory(failure_stage)
+                except Exception as cleanup_error:
+                    error_details.append(f"failure receipt staging cleanup warning: {str(cleanup_error)[:300]}")
+            retained_paths = [path for path in (staging_path, str(failure_stage)) if path and Path(path).is_dir()]
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_disposition": staging_disposition, "staging_directory": retained_paths[0] if retained_paths else None, "staging_directories": retained_paths, "orphaned_artifacts": orphaned_artifacts, "artifact_hashes": {document_path: staged_document_hash} if staged_document_hash else {}})

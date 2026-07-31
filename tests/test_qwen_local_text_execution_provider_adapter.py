@@ -264,11 +264,42 @@ def test_timeout_failure_receipt_is_truthful_and_prompt_is_not_stored(tmp_path):
 
 def test_receipt_write_failure_removes_new_artifact(tmp_path, monkeypatch):
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
-    monkeypatch.setattr(adapter, "_write_receipt", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("receipt write failed")))
+    original = adapter._write_receipt
+    calls = {"count": 0}
+    def fail_once(*args, **kwargs):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise OSError("receipt write failed")
+        return original(*args, **kwargs)
+    monkeypatch.setattr(adapter, "_write_receipt", fail_once)
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_with_orphaned_document"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_with_orphaned_document"
     assert (tmp_path / "docs/operations/examples/qwen-test.md").exists()
-    assert Path(result.metadata["staging_directory"]).is_dir()
+    assert result.metadata["staging_disposition"] == "removed_after_failure_receipt"
+
+
+def test_orphan_hash_uses_staged_bytes_not_replaced_governed_path(tmp_path, monkeypatch):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    original = adapter._write_receipt
+    replaced = {"done": False}
+    document = tmp_path / "docs/operations/examples/qwen-test.md"
+
+    def fail_after_replacement(*args, **kwargs):
+        if not replaced["done"]:
+            replaced["done"] = True
+            document.unlink()
+            document.write_bytes(b"replacement bytes")
+            raise OSError("receipt staging failure after replacement")
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(adapter, "_write_receipt", fail_after_replacement)
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_with_orphaned_document"
+    assert document.read_bytes() == b"replacement bytes"
+    assert result.metadata["orphaned_artifacts"][0]["sha256"] == hashlib.sha256(b"Generated local Qwen text.").hexdigest()
+    assert result.metadata["orphaned_artifacts"][0]["sha256"] != hashlib.sha256(b"replacement bytes").hexdigest()
 
 
 def test_existing_document_blocks_before_provider_and_preserves_bytes(tmp_path):
@@ -332,7 +363,8 @@ def test_receipt_publication_collision_preserves_competitor_and_reports_orphan(t
 
     monkeypatch.setattr(adapter, "_publish_no_replace", race)
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_with_orphaned_document"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_without_durable_receipt"
     assert receipt.read_bytes() == b"competing receipt"
     assert (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     assert result.metadata["orphaned_artifacts"][0]["path"] == "docs/operations/examples/qwen-test.md"
@@ -348,15 +380,17 @@ def test_document_partial_write_is_cleaned_and_failure_receipt_is_truthful(tmp_p
     payload = json.loads(receipt.read_text())
     assert payload["provider_result_state"] == "failed"
     assert payload["artifacts"] == []
-    assert "document persistence" in " ".join(result.errors)
+    assert "write failed" in " ".join(result.errors)
     assert "private prompt" not in receipt.read_text()
+    assert result.metadata["staging_disposition"] == "removed_after_failure_receipt"
 
 
 def test_success_receipt_partial_write_is_cleaned_then_replaced_by_failure_receipt(tmp_path, monkeypatch):
     _inject_partial_fdopen(monkeypatch, failing_call=2, phase="write")
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_with_orphaned_document"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_with_orphaned_document"
     assert (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     payload = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
     assert payload["provider_result_state"] == "failed"
@@ -368,9 +402,12 @@ def test_failure_receipt_partial_write_leaves_no_receipt_and_does_not_retry(tmp_
     calls = _inject_partial_fdopen(monkeypatch, failing_call=1, phase="write")
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_without_durable_receipt"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_without_durable_receipt"
     assert result.metadata["provider_receipt"] is None
     assert result.metadata["receipt_reference"] is None
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
+    assert Path(result.metadata["staging_directory"]).is_dir()
     assert calls["count"] == 1
     assert not list((tmp_path / "runtime/engineering_adapter_receipts").glob("*.json"))
     assert any("failure receipt persistence failed" in error for error in result.errors)
@@ -441,7 +478,8 @@ def test_zero_progress_success_receipt_removes_owned_document_and_writes_one_fai
     _inject_partial_fdopen(monkeypatch, failing_call=2, phase="zero_after_partial")
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_with_orphaned_document"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_with_orphaned_document"
     assert (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     assert json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())["provider_result_state"] == "failed"
 
@@ -461,15 +499,17 @@ def test_document_publication_collision_preserves_destination_and_staged_source(
     result = adapter.submit(_request(tmp_path))
     assert result.status == "failed"
     assert document.read_bytes() == b"competing document"
-    assert result.metadata["staging_directory"]
+    assert result.metadata["staging_disposition"] == "removed_after_failure_receipt"
 
 
 def test_safe_publication_unavailable_fails_closed_and_retains_staging(tmp_path, monkeypatch):
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
     monkeypatch.setattr(adapter, "_publish_no_replace", lambda *_args: (_ for _ in ()).throw(NotImplementedError("no safe primitive")))
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_without_durable_receipt"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_without_durable_receipt"
     assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
     assert Path(result.metadata["staging_directory"]).is_dir()
 
 
@@ -494,7 +534,8 @@ def test_published_document_is_orphaned_when_receipt_publication_fails(tmp_path,
 
     monkeypatch.setattr(adapter, "_publish_no_replace", fail_receipt)
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_with_orphaned_document"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_with_orphaned_document"
     assert result.metadata["orphaned_artifacts"]
     assert (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     assert result.metadata["provider_receipt"]
@@ -504,6 +545,19 @@ def test_partial_failure_receipt_is_retained_without_recursive_retry(tmp_path, m
     _inject_partial_fdopen(monkeypatch, failing_call=1, phase="write")
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
     result = adapter.submit(_request(tmp_path))
-    assert result.status == "failed_without_durable_receipt"
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed_without_durable_receipt"
     assert result.metadata["provider_receipt"] is None
+    assert result.metadata["staging_disposition"] == "retained_for_reconciliation"
     assert Path(result.metadata["staging_directory"]).is_dir()
+
+
+def test_staging_cleanup_failure_is_reported_without_masking_primary_failure(tmp_path, monkeypatch):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
+    monkeypatch.setattr(adapter, "_remove_staging_directory", lambda _path: (_ for _ in ()).throw(OSError("staging cleanup unavailable")))
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert result.metadata["transaction_state"] == "failed"
+    assert result.metadata["staging_disposition"] == "staging_cleanup_failed"
+    assert Path(result.metadata["staging_directory"]).is_dir()
+    assert any("staging cleanup warning" in error for error in result.errors)
