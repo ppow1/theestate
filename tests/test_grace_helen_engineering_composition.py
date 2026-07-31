@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import hashlib
+import shutil
+from pathlib import Path
+
 import pytest
 
 from estate.core.execution_dispatch import DispatchRequest, enqueue_dispatch_request, load_dispatch_queue
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterResult, utc_now
 from estate.core.grace_helen_engineering_composition import GraceHelenEngineeringComposition
 from estate.core.grace_operations_runtime import GraceObjective, GraceOperationsRuntime
+from estate.core.ptm_production_readiness import append_ptm_event
 
 
 def _objective(root):
@@ -19,8 +24,26 @@ def _available(comp, objective):
     return comp.determine_capability(req["capability_request_id"], disposition="qualified_and_available", worker_profile_id="worker-profile-cad", qualification_evidence=["qualification/cad.json"], availability_evidence=["availability/cad.json"])
 
 
+def _ptm_ready(root, objective):
+    source = root / "ptm-evidence.json"
+    source.write_text('{"accepted":true}\n', encoding="utf-8")
+    source_ref = {"source_path": source.name, "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(), "adapter_name": "test", "adapter_version": "1"}
+    for name in ("readiness_freshness_policy.json", "waiver_authorities.json"):
+        target = root / "config/ptm" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(Path(__file__).resolve().parents[1] / "config/ptm" / name, target)
+    for name in ("readiness_freshness_policy_v1.schema.json", "waiver_authorities_v1.schema.json", "readiness_resolution_v1.schema.json", "event_v1.schema.json"):
+        target = root / "schemas/ptm" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(Path(__file__).resolve().parents[1] / "schemas/ptm" / name, target)
+    observed = utc_now()
+    event = append_ptm_event(root, event_type="task.readiness_inputs", aggregate_type="task", aggregate_id=f"task-{objective.objective_id}", stream_id=f"task:task-{objective.objective_id}", actor_ref="fixture-ptm", authority_refs=["PTM"], source_refs=[source_ref], payload_schema="estate.ptm.readiness-input.v1", payload={"objective_id": objective.objective_id, "task_id": f"task-{objective.objective_id}", "enabling_project_id": "project-test", "dependencies": [{"dependency_id": "dep-test", "state": "satisfied", "observed_at": observed}], "gate_checks": [{"name": "dependency_gate", "state": "pass", "observed_at": observed}], "source_references": [source_ref]}, idempotency_key=f"fixture:{objective.objective_id}", occurred_at=observed)
+    return event
+
+
 def _commission(comp, objective, determination):
-    commission = comp.commission_engineering(objective.objective_id, determination["determination_id"], grace_action_id="grace-act-test", operations_decision_id="ops-dec-test", bounded_objective=objective.summary, acceptance_criteria=["one validated drawing"])
+    event = _ptm_ready(comp.root, objective)
+    commission = comp.commission_engineering(objective.objective_id, determination["determination_id"], grace_action_id="grace-act-test", operations_decision_id="ops-dec-test", bounded_objective=objective.summary, acceptance_criteria=["one validated drawing"], ptm_source_high_watermark=event["event_id"], ptm_task_or_package_id=f"task-{objective.objective_id}", enabling_project_id="project-test")
     return comp.accept_commission(commission["commission_id"])
 
 

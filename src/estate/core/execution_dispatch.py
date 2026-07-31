@@ -212,7 +212,7 @@ def load_dispatch_request(path: str | Path) -> DispatchRequest:
     return dispatch_request_from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
 
-def _validate_request(request: DispatchRequest) -> None:
+def _validate_request(request: DispatchRequest, root: Path | None = None) -> None:
     errors: list[str] = []
     if not str(request.dispatch_id or "").strip():
         errors.append("dispatch_id is required")
@@ -240,6 +240,15 @@ def _validate_request(request: DispatchRequest) -> None:
                 errors.append(f"technical execution requires {key}")
         if metadata.get("capability_disposition") != "qualified_and_available":
             errors.append("technical execution requires qualified_and_available capability determination")
+        binding = metadata.get("ptm_readiness")
+        if not isinstance(binding, dict):
+            errors.append("technical execution requires PTM readiness evidence")
+        elif root is not None:
+            try:
+                from estate.core.ptm_readiness_integration import PtmReadinessGateError, revalidate_readiness
+                revalidate_readiness(root, binding, commission_id=str(metadata.get("engineering_commission_id") or ""))
+            except (PtmReadinessGateError, ValueError, OSError) as exc:
+                errors.append(f"PTM readiness revalidation failed: {exc}")
     if errors:
         raise ValueError("; ".join(errors))
 
@@ -376,7 +385,7 @@ def enqueue_dispatch_request(request: DispatchRequest | dict[str, Any], root: st
     req.state = _clean_state(req.state)
     req.created_at = req.created_at or now
     req.updated_at = req.updated_at or req.created_at
-    _validate_request(req)
+    _validate_request(req, base)
     items = load_dispatch_queue(base)
     if any(item.dispatch_id == req.dispatch_id for item in items):
         raise ValueError(f"dispatch item already exists: {req.dispatch_id}")
