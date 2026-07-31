@@ -50,13 +50,28 @@ authorization mechanism for Qwen execution.
 
 ## Receipt and artifact evidence
 
-Successful execution writes only the declared artifact and a receipt under
-`runtime/engineering_adapter_receipts/`. The receipt records provider and
-adapter identity, configured and actual model identity, request and Dispatch
-references, Grace/Helen references, source commit, boundary, prompt digest,
-artifact SHA-256 values, timestamps, timeout and cancellation state, local
-endpoint determination, and validation result. It never records the complete
-prompt or secrets.
+Every live request must declare both the document path and
+`provider_receipt_path` in request metadata. Both paths must appear in
+`expected_outputs` and `write_scope_paths`. The adapter never invents or
+silently appends a receipt destination, and the shared
+`runtime/engineering_adapter_receipts/` directory is never a valid broad
+write scope.
+
+Successful execution writes only the explicitly authorized document and
+receipt paths. The receipt records provider and adapter identity, configured
+and actual model identity, request and Dispatch references, Grace/Helen
+references, source commit, boundary, prompt digest, artifact SHA-256 values,
+timestamps, timeout and cancellation state, local endpoint determination, and
+validation result. It never records the complete prompt or secrets.
+
+If pre-invocation receipt authority is absent or invalid, the request is
+blocked without provider invocation or repository mutation. If a live request
+with valid receipt authority fails, the adapter writes a truthful failure
+receipt to that exact declared path with bounded error details, failed result
+and validation states, timeout/cancellation state, and an empty artifact list.
+If document writing succeeds but receipt writing fails, the adapter returns
+failure and removes the newly created document when it did not pre-exist; it
+does not claim successful completion.
 
 Provider execution and Engineering completion are evidence-producing states.
 Neither grants institutional acceptance; acceptance remains a separate

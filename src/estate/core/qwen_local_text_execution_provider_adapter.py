@@ -31,6 +31,7 @@ ADAPTER_ID = "qwen-local-ollama-text-adapter"
 ADAPTER_VERSION = "1.0.0"
 SUPPORTED_CAPABILITIES = {"documentation_draft", "text_generation", "bounded_repository_read"}
 RECEIPT_DIR = Path("runtime/engineering_adapter_receipts")
+RECEIPT_ROOT = "runtime/engineering_adapter_receipts/"
 
 
 def _root(root: str | Path | None) -> Path:
@@ -142,16 +143,33 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         elif (observed > now or expires <= now or expires <= observed
               or (now - observed).total_seconds() > int(config["evidence_freshness_seconds"])):
             errors.append("qualification or health evidence is stale")
+        receipt_path = str(metadata.get("provider_receipt_path") or "").replace("\\", "/")
+        if not receipt_path:
+            errors.append("provider_receipt_path is required for live execution")
+        elif (not receipt_path.startswith(RECEIPT_ROOT)
+              or "/" in receipt_path[len(RECEIPT_ROOT):]
+              or not receipt_path.endswith(".json")
+              or receipt_path == RECEIPT_ROOT + ".json"):
+            errors.append("provider_receipt_path must be one exact JSON file below runtime/engineering_adapter_receipts/")
         if not request.expected_outputs or not request.write_scope_paths:
             errors.append("exact expected output and write scope are required")
         if set(request.expected_outputs) != set(request.write_scope_paths):
             errors.append("Qwen adapter requires write scopes to equal exact expected outputs")
+        if receipt_path and (receipt_path not in request.expected_outputs or receipt_path not in request.write_scope_paths):
+            errors.append("provider_receipt_path must be included in expected outputs and authorized write scopes")
+        document_outputs = [str(path).replace("\\", "/") for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")]
+        if len(document_outputs) != 1:
+            errors.append("Qwen requests require exactly one declared documentation artifact plus one receipt")
         for path in request.expected_outputs:
             normalized = str(path).replace("\\", "/")
             if not normalized or normalized.startswith("/") or ":" in normalized[:3] or ".." in normalized.split("/"):
                 errors.append(f"invalid expected output path: {path}")
-            if not normalized.startswith("docs/"):
+            if normalized.startswith("runtime/") and normalized != receipt_path:
+                errors.append(f"runtime output is not the declared provider receipt: {path}")
+            if not normalized.startswith("docs/") and normalized != receipt_path:
                 errors.append(f"Qwen output is outside the permitted documentation boundary: {path}")
+        if document_outputs and not document_outputs[0].startswith("docs/"):
+            errors.append("the Qwen document artifact must be under docs/")
         return errors
 
     def validate_request(self, request: ExecutionProviderAdapterRequest) -> AdapterValidationStatus:
@@ -172,26 +190,49 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         validation = self.validate_request(request); now = utc_now()
         return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="dry_run_completed" if validation.ok else "blocked", started_at=now, finished_at=utc_now(), summary="Qwen local adapter request validated without provider invocation.", validation_status="passed" if validation.ok else "failed", errors=validation.errors, warnings=validation.warnings, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
 
+    def _write_receipt(self, request: ExecutionProviderAdapterRequest, config: dict[str, Any], *, started: str,
+                       result_state: str, validation_result: str, timeout_state: str,
+                       cancellation_state: str, actual_model: str | None, prompt: str,
+                       artifacts: list[str], errors: list[str], endpoint_local: bool) -> str:
+        receipt_ref = str(request.metadata["provider_receipt_path"]).replace("\\", "/")
+        payload = {
+            "schema_version": "estate.provider-receipt.v1", "provider_id": PROVIDER_ID,
+            "adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
+            "endpoint_type": config["endpoint_type"], "authorized_model_identity": config["model_identity"],
+            "actual_model_identity": actual_model, "request_id": request.adapter_request_id,
+            "dispatch_id": request.dispatch_id, "grace_objective_id": request.metadata.get("grace_objective_id"),
+            "capability_inquiry_reference": request.metadata.get("capability_inquiry_reference"),
+            "helen_assessment_reference": request.metadata.get("helen_assessment_reference"),
+            "source_commit": request.metadata.get("source_commit"), "sandbox": request.metadata.get("sandbox"),
+            "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest() if prompt else None,
+            "declared_artifact_paths": list(request.expected_outputs),
+            "artifacts": [{"path": path, "sha256": hashlib.sha256((self.root / path).read_bytes()).hexdigest()} for path in artifacts],
+            "started_at": started, "completed_at": utc_now(), "timeout_state": timeout_state,
+            "cancellation_state": cancellation_state, "provider_result_state": result_state,
+            "validation_result": validation_result, "endpoint_local": endpoint_local,
+            "error_details": [str(error)[:500] for error in errors],
+        }
+        target = self.root / receipt_ref
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return receipt_ref
+
     def submit(self, request: ExecutionProviderAdapterRequest) -> ExecutionProviderAdapterResult:
         started = utc_now(); validation = self.validate_request(request)
         if not validation.ok:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked before provider invocation.", validation_status="failed", errors=validation.errors, warnings=validation.warnings, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        config = self._config(); endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata
+        config = self._config(); endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); document_preexisted = (self.root / document_path).exists()
         try:
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
             if health_status >= 400 or config["model_identity"] not in names:
                 raise ValueError("configured Qwen model is not present in the healthy local service")
-            prompt = str(metadata.get("prompt_text") or "")
             if not prompt:
                 raise ValueError("bounded prompt_text is required")
             if len(prompt.encode("utf-8")) > int(config["context_limit"]) * 4:
                 raise ValueError("Qwen prompt exceeds the configured context bound")
-            if metadata.get("cancel_requested") is True:
-                raise ValueError("cancellation requested before Qwen generation")
             status, response = self.http_call("POST", endpoint + "/api/generate", {"model": config["model_identity"], "prompt": prompt, "stream": False, "options": {"num_ctx": config.get("context_limit"), "num_predict": config["output_limits"]["max_output_tokens"]}}, int(config["timeout_seconds"]))
-            text = response.get("response") if isinstance(response, dict) else None
-            actual_model = response.get("model") if isinstance(response, dict) else None
+            text = response.get("response") if isinstance(response, dict) else None; actual_model = response.get("model") if isinstance(response, dict) else None
             if status >= 400 or not isinstance(text, str) or not text.strip():
                 raise ValueError("Qwen returned a malformed or incomplete response")
             if actual_model != config["model_identity"]:
@@ -202,12 +243,22 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             encoded = text.strip().encode("utf-8")
             if len(encoded) > int(config["output_limits"]["max_artifact_bytes"]):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
-            for output in request.expected_outputs:
-                target = (self.root / output).resolve(); target.relative_to(self.root.resolve()); target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(encoded)
-            artifacts = [str(path).replace("\\", "/") for path in request.expected_outputs]
-            receipt_path = self.root / RECEIPT_DIR / f"qwen-{request.adapter_request_id}.json"; receipt_path.parent.mkdir(parents=True, exist_ok=True)
-            receipt = {"schema_version": "estate.provider-receipt.v1", "provider_id": PROVIDER_ID, "adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "endpoint_type": config["endpoint_type"], "authorized_model_identity": config["model_identity"], "actual_model_identity": actual_model or config["model_identity"], "request_id": request.adapter_request_id, "dispatch_id": request.dispatch_id, "grace_objective_id": metadata.get("grace_objective_id"), "capability_inquiry_reference": metadata.get("capability_inquiry_reference"), "helen_assessment_reference": metadata.get("helen_assessment_reference"), "source_commit": metadata.get("source_commit"), "sandbox": metadata.get("sandbox"), "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(), "artifacts": [{"path": path, "sha256": hashlib.sha256((self.root / path).read_bytes()).hexdigest()} for path in artifacts], "started_at": started, "completed_at": utc_now(), "timeout_state": "completed_within_limit", "cancellation_state": "not_requested", "provider_result_state": "completed", "validation_result": "passed", "endpoint_local": True, "error_details": []}
-            receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"); receipt_ref = str(receipt_path.relative_to(self.root)).replace("\\", "/"); artifacts.append(receipt_ref)
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=artifacts, validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model or config["model_identity"], "live_provider_called": True, "endpoint_local": True})
+            target = (self.root / document_path).resolve(); target.relative_to(self.root.resolve()); target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(encoded)
+            try:
+                receipt_ref = self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True)
+            except Exception:
+                if not document_preexisted and target.exists():
+                    target.unlink()
+                raise
+            artifacts = [document_path, receipt_ref]
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=artifacts, validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})
         except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError) as exc:
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", validation_status="failed", errors=[str(exc)], metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": True, "endpoint_local": True})
+            timeout_state = "timed_out" if isinstance(exc, (TimeoutError, socket.timeout)) or "timed out" in str(exc).lower() else "completed_within_limit"
+            error_details = [str(exc)[:500]]
+            receipt_ref = None
+            try:
+                receipt_ref = self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True)
+            except Exception:
+                receipt_ref = None
+            artifacts = [receipt_ref] if receipt_ref else []
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=artifacts, validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})

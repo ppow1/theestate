@@ -11,7 +11,7 @@ from estate.core.qwen_local_text_execution_provider_adapter import QwenLocalText
 CONFIG_PATH = Path("config/providers/qwen_local_text.json")
 
 
-def _request(tmp_path: Path, output_path: str = "docs/operations/examples/qwen-test.md", **metadata):
+def _request(tmp_path: Path, output_path: str = "docs/operations/examples/qwen-test.md", receipt_path: str = "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json", **metadata):
     now = datetime.now(timezone.utc).replace(microsecond=0)
     values = {
         "requested_capability": "documentation_draft",
@@ -28,6 +28,7 @@ def _request(tmp_path: Path, output_path: str = "docs/operations/examples/qwen-t
         "shell_authority": False,
         "automatic_merge_authority": False,
         "institutional_acceptance_authority": False,
+        "provider_receipt_path": receipt_path,
     }
     values.update(metadata)
     return ExecutionProviderAdapterRequest.create(
@@ -36,16 +37,16 @@ def _request(tmp_path: Path, output_path: str = "docs/operations/examples/qwen-t
         provider_id="qwen.local.text",
         provider_type="execution",
         prompt_source="test prompt",
-        write_scope_paths=[output_path],
-        expected_outputs=[output_path],
+        write_scope_paths=[output_path, receipt_path] if receipt_path else [output_path],
+        expected_outputs=[output_path, receipt_path] if receipt_path else [output_path],
         metadata=values,
     )
 
 
-def _transport(response_text="Generated local Qwen text.", model="qwen3:8b", health=True):
+def _transport(response_text="Generated local Qwen text.", model="qwen3:8b", health=True, health_model="qwen3:8b"):
     def call(method, url, payload, timeout):
         if method == "GET":
-            return (200, {"models": [{"name": model}]}) if health else (503, {})
+            return (200, {"models": [{"name": health_model}]}) if health else (503, {})
         return (200, {"model": model, "response": response_text})
     return call
 
@@ -69,6 +70,9 @@ def test_valid_documentation_request_uses_mock_local_service(tmp_path):
     assert payload["actual_model_identity"] == "qwen3:8b"
     assert payload["endpoint_local"] is True
     assert payload["artifacts"][0]["sha256"]
+    assert result.metadata["provider_receipt"] == "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json"
+    assert payload["provider_result_state"] == "completed"
+    assert payload["declared_artifact_paths"] == result.artifacts
 
 
 def test_unsupported_capability_is_rejected_before_provider_call(tmp_path):
@@ -102,7 +106,11 @@ def test_missing_configuration_fails_closed_without_provider_call(tmp_path):
 
 def test_health_failure_and_stale_evidence_fail_closed(tmp_path):
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
-    assert adapter.submit(_request(tmp_path)).status == "failed"
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    failure = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    assert failure["provider_result_state"] == "failed" and failure["validation_result"] == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     old = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat().replace("+00:00", "Z")
     assert adapter.submit(_request(tmp_path, evidence_expires_at=old)).status == "blocked"
 
@@ -112,8 +120,11 @@ def test_remote_endpoint_and_model_mismatch_fail_closed(tmp_path):
     config["endpoint_address"] = "https://example.invalid"
     path = tmp_path / "qwen.json"; path.write_text(json.dumps(config))
     assert QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=path).submit(_request(tmp_path)).status == "blocked"
-    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(model="qwen2.5-coder:7b"))
-    assert adapter.submit(_request(tmp_path)).status == "failed"
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(model="qwen2.5-coder:7b", health_model="qwen3:8b"))
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    failure = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    assert failure["actual_model_identity"] == "qwen2.5-coder:7b"
 
 
 def test_cancellation_timeout_authority_and_shell_boundaries(tmp_path):
@@ -126,7 +137,9 @@ def test_cancellation_timeout_authority_and_shell_boundaries(tmp_path):
 def test_malformed_response_and_exact_output_enforcement(tmp_path):
     def malformed(method, url, payload, timeout):
         return (200, {"model": "qwen3:8b"})
-    assert QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=malformed).submit(_request(tmp_path)).status == "failed"
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=malformed).submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert result.metadata["provider_receipt"]
     adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
     result = adapter.submit(_request(tmp_path, output_path="runtime/other.md"))
     assert result.status == "blocked"
@@ -153,3 +166,53 @@ def test_dry_run_does_not_call_service_or_grant_authority(tmp_path):
     result = adapter.dry_run(_request(tmp_path))
     assert result.status == "dry_run_completed" and calls == []
     assert result.metadata["live_provider_called"] is False
+
+
+def test_missing_receipt_path_blocks_before_provider_call(tmp_path):
+    calls = []
+    request = _request(tmp_path); request.metadata.pop("provider_receipt_path")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args))
+    result = adapter.submit(request)
+    assert result.status == "blocked" and calls == []
+    assert not list(tmp_path.rglob("*"))
+
+
+def test_receipt_scope_and_expected_output_authority_fail_closed(tmp_path):
+    for receipt_path, mutate in [
+        ("runtime/other/qwen.json", None),
+        ("runtime/engineering_adapter_receipts", None),
+        ("runtime/engineering_adapter_receipts/qwen-other.json", "expected"),
+        ("runtime/engineering_adapter_receipts/qwen-other.json", "scope"),
+    ]:
+        request = _request(tmp_path, receipt_path=receipt_path)
+        if mutate == "expected":
+            request.expected_outputs = [request.expected_outputs[0], "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json"]
+        if mutate == "scope":
+            request.write_scope_paths = [request.write_scope_paths[0], "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json"]
+        calls = []
+        result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args)).submit(request)
+        assert result.status == "blocked" and calls == []
+    assert not list(tmp_path.rglob("*"))
+
+
+def test_timeout_failure_receipt_is_truthful_and_prompt_is_not_stored(tmp_path):
+    def timeout(method, url, payload, limit):
+        if method == "GET":
+            return (200, {"models": [{"name": "qwen3:8b"}]})
+        raise TimeoutError("bounded test timeout")
+    request = _request(tmp_path, prompt_text="private prompt that must never be stored")
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=timeout).submit(request)
+    assert result.status == "failed"
+    receipt = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    assert receipt["timeout_state"] == "timed_out"
+    assert "private prompt" not in json.dumps(receipt)
+    assert receipt["artifacts"] == []
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+
+
+def test_receipt_write_failure_removes_new_artifact(tmp_path, monkeypatch):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    monkeypatch.setattr(adapter, "_write_receipt", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("receipt write failed")))
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
