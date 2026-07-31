@@ -69,7 +69,10 @@ def bridge_request_from_adapter_request(request: ExecutionProviderAdapterRequest
         cwd=_metadata(request, "cwd", "."),
         sandbox=sandbox,
         allowed_read_paths=list(request.read_scope_paths),
-        allowed_write_paths=list(request.write_scope_paths),
+        # Provider receipts are adapter-owned outputs.  They remain in the
+        # governed request/write scope, but the Codex child process never
+        # receives permission to write the receipt namespace.
+        allowed_write_paths=[path for path in request.write_scope_paths if not str(path).replace("\\", "/").startswith("runtime/engineering_adapter_receipts/")],
         approval_policy=str(_metadata(request, "approval_policy", APPROVAL_POLICY)),
         json_mode=bool(_metadata(request, "json_mode", True)),
         session_persistence_required=bool(_metadata(request, "session_persistence_required", False)),

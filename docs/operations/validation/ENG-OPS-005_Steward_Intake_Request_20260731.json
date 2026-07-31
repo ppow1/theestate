@@ -1,0 +1,37 @@
+{
+  "required_capability": "documentation_draft",
+  "allowed_read_paths": [
+    "config/providers/catalog.json"
+  ],
+  "allowed_write_paths": [
+    "docs/operations/validation/ENG-OPS-005_Steward_Intake_20260731.md",
+    "runtime/engineering_adapter_receipts/eng-ops-005-steward-intake-20260731.json"
+  ],
+  "expected_outputs": [
+    "docs/operations/validation/ENG-OPS-005_Steward_Intake_20260731.md"
+  ],
+  "provider_id": "codex.execution.cli",
+  "provider_type": "execution",
+  "adapter_reference": "codex-cli-execution-adapter@1.0.0",
+  "ptm_task_or_package_id": "task-eng-ops-005-steward-intake-20260731",
+  "enabling_project_id": "eng-ops-005",
+  "constraints": [
+    "bounded documentation only",
+    "no shell",
+    "no source changes",
+    "no merge",
+    "no institutional acceptance"
+  ],
+  "validation_criteria": [
+    "declared Markdown artifact exists",
+    "Codex provider receipt exists"
+  ],
+  "helen": {
+    "worker_profile_id": "default",
+    "qualification_evidence": ["config/providers/catalog.json"],
+    "availability_evidence": ["config/providers/catalog.json"],
+    "capacity_evidence": ["config/providers/catalog.json"],
+    "authorization_evidence": ["config/providers/catalog.json"],
+    "provider_health_evidence": ["config/providers/catalog.json"]
+  }
+}

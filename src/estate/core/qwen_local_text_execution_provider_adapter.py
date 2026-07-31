@@ -420,7 +420,23 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         if target_errors:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
         endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; extension = request.provider_extension or {}; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(extension.get("provider_receipt_path") or metadata.get("provider_receipt_path") or "").replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
+        injection = metadata.get("test_failure_injection")
+        if injection and os.environ.get("ESTATE_ENABLE_PROVIDER_FAILURE_INJECTION") != "1":
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Provider failure injection is disabled outside explicit validation mode.", validation_status="failed", errors=["provider failure injection requires explicit validation enablement"], metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
         try:
+            if injection:
+                if not isinstance(injection, dict) or injection.get("engineering_commission_id") != request.engineering_commission_id or injection.get("dispatch_id") != request.dispatch_id:
+                    raise PermissionError("provider failure injection is not bound to this commission")
+                mode = injection.get("mode")
+                if mode == "transport":
+                    raise URLError("injected provider transport failure")
+                if mode == "timeout":
+                    raise TimeoutError("injected provider timeout")
+                if mode == "malformed_response":
+                    raise ValueError("injected malformed provider response")
+                if mode == "declared_failure":
+                    raise ValueError("injected declared provider failure")
+                raise ValueError("unknown provider failure injection mode")
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
             if health_status >= 400 or config["model_identity"] not in names:

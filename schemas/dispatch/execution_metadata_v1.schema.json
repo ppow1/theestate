@@ -34,6 +34,7 @@
     ,"provider_execution_state": {"enum": ["accepted", "dry_run_completed", "blocked", "failed", "completed"]}
     ,"validation_state": {"enum": ["prepared", "passed", "failed", "not_run"]}
     ,"result_artifacts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+    ,"test_failure_injection": {"type": "object", "additionalProperties": false, "required": ["mode", "engineering_commission_id", "dispatch_id"], "properties": {"mode": {"enum": ["transport", "timeout", "malformed_response", "declared_failure"]}, "engineering_commission_id": {"type": "string", "minLength": 1}, "dispatch_id": {"type": "string", "minLength": 1}}}
   },
   "allOf": [
     {"if": {"properties": {"provider_id": {"const": "qwen.local.text"}}, "required": ["provider_id"]}, "then": {"required": ["provider_extension"], "properties": {"provider_extension": {"$ref": "estate.qwen-local-text.execution-extension.v1"}}}}

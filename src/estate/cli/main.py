@@ -1,7 +1,9 @@
 import argparse
 import json
+import hashlib
 from pathlib import Path
 from estate.core.ptm_pilot_projection import build_repository_pilot, normalized_json as normalized_ptm_json, reviewer_report as ptm_reviewer_report
+from estate.core.operational_events import utc_now_iso
 from estate.core.ptm_production_readiness import cli as ptm_readiness_cli
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
@@ -260,6 +262,17 @@ def cmd_grace_operations(args):
         print(json.dumps(payload, indent=2, sort_keys=True) if args.json else payload.get("message", json.dumps(payload, indent=2, sort_keys=True)))
         return
     if args.grace_action == "conduct":
+        technical_spec = None
+        if getattr(args, "technical_request_file", None):
+            technical_spec = json.loads(Path(args.technical_request_file).read_text(encoding="utf-8"))
+            required = ("required_capability", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "provider_id", "provider_type", "adapter_reference", "ptm_task_or_package_id", "helen")
+            missing = [key for key in required if not technical_spec.get(key)]
+            if missing:
+                raise SystemExit("technical request is missing required governed fields: " + ", ".join(missing))
+            for key in ("allowed_read_paths", "allowed_write_paths", "expected_outputs"):
+                values = technical_spec[key]
+                if not isinstance(values, list) or not values or any(not isinstance(value, str) or not value.strip() or value in {".", "*", "**"} or value.startswith(("/", "\\")) or ":" in value.split("/")[0] or ".." in Path(value).parts for value in values):
+                    raise SystemExit(f"technical request {key} must contain only explicit repository-relative paths")
         objective = GraceObjective.create(
             requested_by=args.requested_by,
             title=args.title,
@@ -273,9 +286,40 @@ def cmd_grace_operations(args):
             owner=args.owner,
             checkpoint=args.checkpoint,
             evidence=args.evidence or [],
-            metadata={"summary_safe": args.summary_safe, "requires_engineering": bool(getattr(args, "request_engineering_commission", False))},
+            metadata={"summary_safe": args.summary_safe, "requires_engineering": bool(getattr(args, "request_engineering_commission", False) or technical_spec), **({"execution_authority": {"allowed_read_paths": list(technical_spec["allowed_read_paths"]), "allowed_write_paths": list(technical_spec["allowed_write_paths"]), "expected_outputs": list(technical_spec["expected_outputs"])} } if technical_spec else {})},
         )
         action, paths = runtime.conduct_objective(objective, request_dispatch=args.request_dispatch)
+        if technical_spec:
+            action_path = Path(paths["action"])
+            action_payload = json.loads(action_path.read_text(encoding="utf-8"))
+            authority = dict((action_payload.get("metadata") or {}).get("execution_authority") or {})
+            action_rel = action_path.relative_to(runtime.root).as_posix()
+            authority["allowed_read_paths"] = sorted(set(authority["allowed_read_paths"] + [action_rel]))
+            action_payload.setdefault("metadata", {})["execution_authority"] = authority
+            action_path.write_text(json.dumps(action_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            objective_candidates = list((action_path.parents[1] / "objectives").glob(f"*_{objective.objective_id}.json"))
+            objective_path = objective_candidates[0] if objective_candidates else None
+            if objective_path is not None and objective_path.exists():
+                objective_payload = json.loads(objective_path.read_text(encoding="utf-8"))
+                objective_payload.setdefault("metadata", {})["execution_authority"] = authority
+                objective_path.write_text(json.dumps(objective_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            from estate.core.grace_helen_engineering_composition import GraceHelenEngineeringComposition
+            if not technical_spec.get("ptm_source_high_watermark"):
+                from estate.core.ptm_production_readiness import append_ptm_event
+                task_id = technical_spec["ptm_task_or_package_id"]
+                evidence_path = runtime.root / "runtime" / f"steward-intake-{objective.objective_id}-ptm.json"
+                evidence_path.parent.mkdir(parents=True, exist_ok=True)
+                evidence_path.write_text(json.dumps({"objective_id": objective.objective_id, "task_id": task_id}, sort_keys=True) + "\n", encoding="utf-8")
+                observed = utc_now_iso()
+                source_ref = {"source_path": evidence_path.relative_to(runtime.root).as_posix(), "source_sha256": hashlib.sha256(evidence_path.read_bytes()).hexdigest(), "adapter_name": "steward-intake", "adapter_version": "1"}
+                event = append_ptm_event(runtime.root, event_type="task.readiness_inputs", aggregate_type="task", aggregate_id=task_id, stream_id=f"task:{task_id}", actor_ref="Steward", authority_refs=["PTM"], source_refs=[source_ref], payload_schema="estate.ptm.readiness-input.v1", payload={"objective_id": objective.objective_id, "task_id": task_id, "enabling_project_id": technical_spec.get("enabling_project_id"), "dependencies": [{"dependency_id": objective.objective_id, "state": "satisfied", "observed_at": observed}], "gate_checks": [{"name": "steward_technical_intake", "state": "pass", "observed_at": observed}], "source_references": [source_ref]}, idempotency_key=f"steward-intake:{objective.objective_id}", occurred_at=observed)
+                technical_spec["ptm_source_high_watermark"] = event["event_id"]
+            comp = GraceHelenEngineeringComposition()
+            capability = comp.request_capability(objective.objective_id, technical_spec["required_capability"], constraints=list(technical_spec.get("constraints") or []), idempotency_key=f"{objective.objective_id}:technical-intake")
+            helen = technical_spec["helen"]
+            determination = comp.determine_capability(capability["capability_request_id"], disposition="qualified_and_available", worker_profile_id=helen.get("worker_profile_id", "default"), qualification_evidence=list(helen.get("qualification_evidence") or ["steward-technical-intake"]), availability_evidence=list(helen.get("availability_evidence") or ["steward-technical-intake"]), capacity_evidence=list(helen.get("capacity_evidence") or ["steward-technical-intake"]), authorization_evidence=list(helen.get("authorization_evidence") or ["steward-technical-intake"]), provider_health_evidence=list(helen.get("provider_health_evidence") or ["steward-technical-intake"]), idempotency_key=f"{capability['capability_request_id']}:qualified")
+            lifecycle = comp.governed_commission_and_dispatch(objective.objective_id, determination["determination_id"], grace_action_id=action.action_id, operations_decision_id=json.loads(Path(runtime.root / "runtime/operations/grace/actions" / f"{action.created_at[:10]}_{action.action_id}.json").read_text(encoding="utf-8"))["metadata"]["operations_decision_id"], bounded_objective=objective.summary, acceptance_criteria=list(technical_spec.get("validation_criteria") or [{"kind": "artifact_exists"}, {"kind": "provider_receipt"}]), ptm_source_high_watermark=technical_spec["ptm_source_high_watermark"], ptm_task_or_package_id=technical_spec["ptm_task_or_package_id"], enabling_project_id=technical_spec.get("enabling_project_id"), provider_id=technical_spec["provider_id"], provider_type=technical_spec["provider_type"], adapter_reference=technical_spec["adapter_reference"], idempotency_key=f"{objective.objective_id}:{determination['determination_id']}:technical")
+            paths.update({"capability_request_id": capability["capability_request_id"], "helen_determination_id": determination["determination_id"], "engineering_commission_id": lifecycle["commission"]["commission_id"], "engineering_authorization_id": lifecycle["authorization"]["authorization_id"], "dispatch_id": lifecycle["dispatch"]["dispatch_id"]})
         if getattr(args, "request_engineering_commission", False):
             from estate.core.grace_helen_engineering_composition import GraceHelenEngineeringComposition
             if not args.required_capability:
@@ -2897,7 +2941,7 @@ def main(argv=None):
     sp.add_argument("--work-package-id"); sp.add_argument("--classification", default="Estate Internal"); sp.add_argument("--priority", default="normal")
     sp.add_argument("--authority", choices=["delegated", "requires_steward", "unauthorized"], default="delegated")
     sp.add_argument("--dependency", action="append"); sp.add_argument("--blocker", action="append"); sp.add_argument("--owner"); sp.add_argument("--checkpoint")
-    sp.add_argument("--evidence", action="append"); sp.add_argument("--request-dispatch", action="store_true"); sp.add_argument("--request-engineering-commission", action="store_true", help="Create a Helen capability-verification request for technical work; does not Dispatch directly."); sp.add_argument("--required-capability"); sp.add_argument("--capability-constraint", action="append"); sp.add_argument("--summary-safe", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
+    sp.add_argument("--evidence", action="append"); sp.add_argument("--request-dispatch", action="store_true"); sp.add_argument("--request-engineering-commission", action="store_true", help="Create a Helen capability-verification request for technical work; does not Dispatch directly."); sp.add_argument("--technical-request-file", help="Canonical JSON request containing complete bounded technical intake authority."); sp.add_argument("--required-capability"); sp.add_argument("--capability-constraint", action="append"); sp.add_argument("--summary-safe", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
     sp = go.add_parser("close"); sp.add_argument("objective_id"); sp.add_argument("--reviewed-by", required=True); sp.add_argument("--result", required=True); sp.add_argument("--accepted", action="store_true"); sp.add_argument("--json", action="store_true"); sp.set_defaults(func=cmd_grace_operations)
     p=sub.add_parser("grace-momentum"); q=p.add_subparsers(dest="momentum_action",required=True)
     for n in ("pause","resume","stop","revoke","inspect","history"):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -53,6 +54,25 @@ def _transport(response_text="Generated local Qwen text.", model="qwen3:8b", hea
             return (200, {"models": [{"name": health_model}]}) if health else (503, {})
         return (200, {"model": model, "response": response_text})
     return call
+
+
+def test_explicit_commission_bound_failure_injection_is_disabled_by_default_and_truthful(tmp_path, monkeypatch):
+    calls = {"count": 0}
+    (tmp_path / "config/providers").mkdir(parents=True)
+    shutil.copyfile(CONFIG_PATH, tmp_path / "config/providers/qwen_local_text.json")
+    request = _request(tmp_path, output_path="docs/failure-injection.md", receipt_path="runtime/engineering_adapter_receipts/failure-injection.json", engineering_commission_id="engcom-injection", test_failure_injection={"mode": "transport", "engineering_commission_id": "engcom-injection"})
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path)
+    adapter.http_call = lambda *args: calls.__setitem__("count", calls["count"] + 1) or _transport()(*args)
+    blocked = adapter.submit(request)
+    assert blocked.status == "blocked"
+    assert calls["count"] == 0
+    monkeypatch.setenv("ESTATE_ENABLE_PROVIDER_FAILURE_INJECTION", "1")
+    result = adapter.submit(request)
+    assert result.status == "failed"
+    assert result.metadata["live_provider_called"] is True
+    assert result.metadata["transaction_state"] == "failed"
+    assert result.metadata["provider_receipt"]
+    assert not (tmp_path / "docs/failure-injection.md").exists()
 
 
 def _inject_partial_fdopen(monkeypatch, failing_call: int, phase: str = "write"):
