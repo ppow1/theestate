@@ -126,12 +126,8 @@ def _canonical_path_list(root: Path, values: list[str], field: str) -> tuple[lis
 
 
 def _validate_authority_schema(root: Path, authority: dict[str, Any]) -> list[str]:
-    schema_path = root / "schemas/engineering/commission_execution_authority_v1.schema.json"
-    if not schema_path.exists():
-        schema_path = Path(__file__).resolve().parents[3] / "schemas/engineering/commission_execution_authority_v1.schema.json"
     try:
-        schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        return [error.message for error in Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(authority)]
+        return validation_errors(authority, "estate.engineering.commission-execution-authority.v1", root)
     except (OSError, ValueError) as exc:
         return [f"commission authority schema unavailable: {exc}"]
 
@@ -146,8 +142,8 @@ def _validate_dispatch_metadata_schema(root: Path, metadata: dict[str, Any]) -> 
         if not engineering_dir.exists():
             engineering_dir = Path(__file__).resolve().parents[3] / "schemas/engineering"
         resources = []
-        for name in ("commission_ptm_evidence_v1.schema.json", "commission_execution_authority_v1.schema.json"):
-            nested = json.loads((engineering_dir / name).read_text(encoding="utf-8"))
+        for name, directory in (("commission_ptm_evidence_v1.schema.json", engineering_dir), ("commission_execution_authority_v1.schema.json", engineering_dir), ("qwen_local_text_execution_extension_v1.schema.json", schema_path.parent.parent / "providers")):
+            nested = json.loads((directory / name).read_text(encoding="utf-8"))
             resources.append((nested["$id"], Resource.from_contents(nested)))
         registry = Registry().with_resources(resources)
         validator = Draft202012Validator(schema, registry=registry, format_checker=FormatChecker())
@@ -159,6 +155,73 @@ def _validate_dispatch_metadata_schema(root: Path, metadata: dict[str, Any]) -> 
 def _path_within(path: str, scope: str) -> bool:
     child = PurePosixPath(path); parent = PurePosixPath(scope)
     return child == parent or parent in child.parents
+
+
+def _validate_provider_extension(root: Path, item: DispatchQueueItem, metadata: dict[str, Any]) -> list[str]:
+    if item.provider != "qwen.local.text":
+        return []
+    errors: list[str] = []
+    extension = metadata.get("provider_extension")
+    if not isinstance(extension, dict):
+        return ["Qwen provider extension is required"]
+    try:
+        errors.extend(validation_errors(extension, "estate.qwen-local-text.execution-extension.v1", root))
+    except (OSError, ValueError) as exc:
+        errors.append(f"Qwen provider extension schema unavailable: {exc}")
+    if extension.get("provider_id") != item.provider or extension.get("adapter_id") not in str(metadata.get("adapter_reference") or "") or extension.get("adapter_version") not in str(metadata.get("adapter_reference") or ""):
+        errors.append("Qwen provider extension identity does not match Dispatch adapter")
+    try:
+        observed = datetime.fromisoformat(str(extension.get("evidence_observed_at")).replace("Z", "+00:00"))
+        expires = datetime.fromisoformat(str(extension.get("evidence_expires_at")).replace("Z", "+00:00"))
+        now = datetime.now(timezone.utc)
+        if observed > now or expires <= now or expires <= observed:
+            errors.append("Qwen capability or provider-health evidence is stale")
+    except (TypeError, ValueError):
+        errors.append("Qwen capability or provider-health evidence timestamps are invalid")
+    determination_id = metadata.get("helen_determination_id")
+    determination_path = root / "runtime/grace_helen_engineering/helen_determinations" / f"{determination_id}.json"
+    try:
+        determination = json.loads(determination_path.read_text(encoding="utf-8"))
+        if determination.get("capability_class") != extension.get("requested_capability") or determination.get("evidence_observed_at") != extension.get("evidence_observed_at") or determination.get("evidence_expires_at") != extension.get("evidence_expires_at"):
+            errors.append("Qwen extension does not match canonical Helen evidence")
+    except (OSError, ValueError):
+        errors.append("canonical Helen determination is not available")
+    outputs = {str(path).replace("\\", "/") for path in item.expected_outputs}
+    writes = {str(path).replace("\\", "/") for path in item.allowed_write_paths}
+    if extension.get("provider_receipt_path") not in outputs or extension.get("provider_receipt_path") not in writes:
+        errors.append("Qwen provider receipt path is outside exact governed outputs")
+    if extension.get("artifact_path") not in outputs or extension.get("artifact_path") not in writes:
+        errors.append("Qwen artifact path is outside exact governed outputs")
+    for path in extension.get("provider_health_evidence") or []:
+        try:
+            _canonical_repo_path(root, path, "provider_health_evidence", require_file=True)
+        except (ValueError, OSError) as exc:
+            errors.append(str(exc))
+    health_paths = list(extension.get("provider_health_evidence") or [])
+    health_digests = list(extension.get("provider_health_evidence_digests") or [])
+    if len(health_paths) != len(health_digests):
+        errors.append("Qwen provider-health evidence paths and digests must align")
+    for path, expected_digest in zip(health_paths, health_digests):
+        try:
+            _, evidence_file = _canonical_repo_path(root, path, "provider_health_evidence", require_file=True)
+            actual_digest = hashlib.sha256(evidence_file.read_bytes()).hexdigest()
+            if actual_digest != expected_digest:
+                errors.append(f"provider-health evidence digest mismatch: {path}")
+        except (ValueError, OSError) as exc:
+            errors.append(str(exc))
+    config_path = root / "config/providers/qwen_local_text.json"
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        if config.get("provider_id") != item.provider:
+            fallback = Path(__file__).resolve().parents[3] / "config/providers/qwen_local_text.json"
+            config = json.loads(fallback.read_text(encoding="utf-8"))
+        if config.get("model_identity") != extension.get("authorized_model_identity") or config.get("provider_id") != item.provider or config.get("adapter_id") != extension.get("adapter_id") or config.get("adapter_version") != extension.get("adapter_version"):
+            errors.append("Qwen provider configuration does not match authorized extension")
+        if config.get("endpoint_address") != "http://127.0.0.1:11434" or config.get("network_policy") != "loopback_only":
+            errors.append("Qwen endpoint policy is not the canonical loopback configuration")
+    except (OSError, ValueError) as exc:
+        errors.append(f"Qwen provider configuration unavailable: {exc}")
+    return errors
 
 
 def _validate_item(item: DispatchQueueItem, root: Path | None = None) -> HandoffStatus:
@@ -203,6 +266,7 @@ def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list
     metadata = item.provider_metadata or {}
     if item.provider in {"qwen.local.text", "codex.execution.cli"}:
         errors.extend(_validate_dispatch_metadata_schema(root, metadata))
+    errors.extend(_validate_provider_extension(root, item, metadata))
     commission_id = str(metadata.get("engineering_commission_id") or "")
     if not commission_id:
         return ["technical execution requires engineering_commission_id"]
@@ -237,6 +301,8 @@ def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list
             errors.append("allowed_write_paths do not match commission authority")
         if output_paths != list(authority.get("expected_outputs") or []):
             errors.append("expected_outputs do not match commission authority")
+        if item.provider == "qwen.local.text" and metadata.get("provider_extension") != authority.get("provider_extension"):
+            errors.append("provider extension does not match commission authority")
     elif item.provider in {"qwen.local.text", "codex.execution.cli"}:
         errors.append("technical provider commission lacks execution authority")
     if metadata.get("grace_objective_id") != commission.get("grace_objective_id"):
@@ -269,7 +335,7 @@ def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list
             expected_digest = hashlib.sha256(json.dumps({key: value for key, value in auth.items() if key != "record_digest"}, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
             if auth.get("record_digest") != metadata.get("authorization_record_digest") or auth.get("record_digest") != expected_digest:
                 errors.append("authorization record digest does not match")
-            if auth.get("engineering_commission_id") != commission_id or auth.get("dispatch_id") != item.dispatch_id or auth.get("provider_id") != item.provider or auth.get("provider_type") != metadata.get("provider_type") or auth.get("adapter_reference") != metadata.get("adapter_reference") or auth.get("grace_objective_id") != commission.get("grace_objective_id") or auth.get("grace_action_id") != commission.get("grace_action_id") or auth.get("helen_determination_id") != commission.get("helen_determination_id") or auth.get("execution_authority") != authority or auth.get("prompt_source") != item.prompt_source or auth.get("prompt_source_digest") != metadata.get("prompt_source_digest") or auth.get("allowed_read_paths") != item.allowed_read_paths or auth.get("allowed_write_paths") != item.allowed_write_paths or auth.get("expected_outputs") != item.expected_outputs or auth.get("ptm_readiness") != metadata.get("ptm_readiness") or auth.get("decision_reference") != metadata.get("decision_reference"):
+            if auth.get("engineering_commission_id") != commission_id or auth.get("dispatch_id") != item.dispatch_id or auth.get("provider_id") != item.provider or auth.get("provider_type") != metadata.get("provider_type") or auth.get("adapter_reference") != metadata.get("adapter_reference") or auth.get("grace_objective_id") != commission.get("grace_objective_id") or auth.get("grace_action_id") != commission.get("grace_action_id") or auth.get("helen_determination_id") != commission.get("helen_determination_id") or auth.get("execution_authority") != authority or auth.get("provider_extension") != metadata.get("provider_extension") or auth.get("prompt_source") != item.prompt_source or auth.get("prompt_source_digest") != metadata.get("prompt_source_digest") or auth.get("allowed_read_paths") != item.allowed_read_paths or auth.get("allowed_write_paths") != item.allowed_write_paths or auth.get("expected_outputs") != item.expected_outputs or auth.get("ptm_readiness") != metadata.get("ptm_readiness") or auth.get("decision_reference") != metadata.get("decision_reference"):
                 errors.append("authorization record does not match Dispatch, commission, or provider")
             try:
                 if datetime.fromisoformat(str(auth["expires_at"]).replace("Z", "+00:00")) <= datetime.now(timezone.utc):
@@ -309,12 +375,15 @@ def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list
                 "helen_determination_id": commission.get("helen_determination_id"),
                 "engineering_authorization_id": metadata.get("engineering_authorization_id"),
                 "prompt_source_digest": metadata.get("prompt_source_digest"),
+                "provider_extension": metadata.get("provider_extension"),
             }
             for key, expected in expected_decision.items():
                 if decision.get(key) != expected:
                     errors.append(f"Operations decision {key} does not match governed Dispatch")
             if decision.get("authorization_reference") != metadata.get("authorization_reference"):
                 errors.append("Operations decision authorization reference does not match Dispatch")
+            if decision.get("provider_extension") != metadata.get("provider_extension"):
+                errors.append("Operations decision provider extension does not match Dispatch")
             if decision.get("ptm_readiness") != metadata.get("ptm_readiness"):
                 errors.append("Operations decision PTM evidence does not match Dispatch")
             for field_name, expected in (("prompt_source", item.prompt_source), ("allowed_read_paths", item.allowed_read_paths), ("allowed_write_paths", item.allowed_write_paths), ("expected_outputs", item.expected_outputs)):
@@ -364,6 +433,7 @@ def build_adapter_request(item: DispatchQueueItem) -> ExecutionProviderAdapterRe
         "allowed_paths": item.allowed_read_paths,
         "forbidden_paths": [],
         "expected_outputs": item.expected_outputs or item.allowed_write_paths,
+        "provider_extension": dict(metadata.get("provider_extension") or {}),
         "validation_required": True,
         "boundary_review_reference": metadata.get("boundary_review_reference"),
         "decision_reference": _auth_ref(item),

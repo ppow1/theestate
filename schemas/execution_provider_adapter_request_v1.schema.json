@@ -3,7 +3,7 @@
   "$id": "estate.execution-provider-adapter.request.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["adapter_request_id", "dispatch_id", "provider_id", "provider_type", "adapter_reference", "prompt_source", "prompt_source_type", "prompt_source_digest", "read_scope_paths", "write_scope_paths", "expected_outputs", "decision_reference", "authorization_reference", "grace_objective_id", "grace_action_id", "helen_determination_id", "engineering_commission_id", "engineering_authorization_id", "ptm_readiness"],
+  "required": ["adapter_request_id", "dispatch_id", "provider_id", "provider_type", "adapter_reference", "prompt_source", "prompt_source_type", "prompt_source_digest", "read_scope_paths", "write_scope_paths", "expected_outputs", "decision_reference", "authorization_reference", "grace_objective_id", "grace_action_id", "helen_determination_id", "engineering_commission_id", "engineering_authorization_id", "ptm_readiness", "provider_extension"],
   "properties": {
     "adapter_request_id": {"type": "string", "minLength": 1},
     "dispatch_id": {"type": "string", "minLength": 1},
@@ -32,6 +32,7 @@
     "engineering_commission_id": {"type": "string", "minLength": 1},
     "engineering_authorization_id": {"type": "string", "minLength": 1},
     "ptm_readiness": {"type": "object", "minProperties": 1},
-    "metadata": {"type": "object"}
+    "metadata": {"type": "object"},
+    "provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "object", "maxProperties": 0}]}
   }
 }

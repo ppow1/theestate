@@ -31,6 +31,7 @@ from estate.core.execution_provider_adapter import (
     utc_now,
 )
 from estate.core.paths import ESTATE_ROOT
+from estate.core.authority_schema_runtime import require_valid
 
 PROVIDER_ID = "qwen.local.text"
 ADAPTER_ID = "qwen-local-ollama-text-adapter"
@@ -145,7 +146,8 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
     def _metadata_errors(self, request: ExecutionProviderAdapterRequest, config: dict[str, Any]) -> list[str]:
         errors: list[str] = []
         metadata = request.metadata
-        capability = str(metadata.get("requested_capability") or "")
+        extension = request.provider_extension or {}
+        capability = str(extension.get("requested_capability") or metadata.get("requested_capability") or "")
         if capability not in SUPPORTED_CAPABILITIES or capability not in config["supported_capabilities"]:
             errors.append("requested capability is unsupported by qwen.local.text")
         if metadata.get("sandbox", "workspace-write") not in {"read-only", "workspace-write"}:
@@ -155,17 +157,17 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 errors.append(f"{key} is prohibited")
         if metadata.get("cancel_requested") is True:
             errors.append("cancellation requested before Qwen invocation")
-        if metadata.get("authorized_model_identity") and metadata["authorized_model_identity"] != config["model_identity"]:
+        if extension.get("authorized_model_identity") and extension["authorized_model_identity"] != config["model_identity"]:
             errors.append("configured model differs from the authorized model")
-        if not metadata.get("authorization_reference"):
+        if not (request.authorization_reference or metadata.get("authorization_reference")):
             errors.append("authorization evidence is required")
-        observed = _parse_time(metadata.get("evidence_observed_at")); expires = _parse_time(metadata.get("evidence_expires_at")); now = datetime.now(timezone.utc)
+        observed = _parse_time(extension.get("evidence_observed_at") or metadata.get("evidence_observed_at")); expires = _parse_time(extension.get("evidence_expires_at") or metadata.get("evidence_expires_at")); now = datetime.now(timezone.utc)
         if observed is None or expires is None:
             errors.append("fresh qualification and health evidence timestamps are required")
         elif (observed > now or expires <= now or expires <= observed
               or (now - observed).total_seconds() > int(config["evidence_freshness_seconds"])):
             errors.append("qualification or health evidence is stale")
-        receipt_path = str(metadata.get("provider_receipt_path") or "").replace("\\", "/")
+        receipt_path = str(extension.get("provider_receipt_path") or metadata.get("provider_receipt_path") or "").replace("\\", "/")
         if not receipt_path:
             errors.append("provider_receipt_path is required for live execution")
         elif (not receipt_path.startswith(RECEIPT_ROOT)
@@ -223,8 +225,39 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                        transaction_state: str | None = None,
                        staging_disposition: str | None = None,
                        staging_path: str | None = None) -> str:
-        receipt_ref = str(request.metadata["provider_receipt_path"]).replace("\\", "/")
+        receipt_ref = str((request.provider_extension or {}).get("provider_receipt_path") or request.metadata.get("provider_receipt_path") or "").replace("\\", "/")
         sources = artifact_sources or {}
+        extension = request.provider_extension or {}
+        ptm = request.ptm_readiness or {}
+        correlation = {
+            "provider_id": request.provider_id,
+            "provider_type": request.provider_type,
+            "adapter_reference": request.adapter_reference or f"{ADAPTER_ID}@{ADAPTER_VERSION}",
+            "adapter_id": ADAPTER_ID,
+            "adapter_version": ADAPTER_VERSION,
+            "request_id": request.adapter_request_id,
+            "dispatch_id": request.dispatch_id,
+            "grace_objective_id": request.grace_objective_id or request.metadata.get("grace_objective_id"),
+            "grace_action_id": request.grace_action_id or request.metadata.get("grace_action_id"),
+            "capability_inquiry_reference": request.metadata.get("capability_inquiry_reference"),
+            "helen_assessment_reference": request.metadata.get("helen_assessment_reference") or request.helen_determination_id or request.metadata.get("helen_determination_id"),
+            "ptm_readiness_resolution_id": ptm.get("readiness_resolution_id"),
+            "ptm_readiness_projection_digest": ptm.get("readiness_projection_digest"),
+            "engineering_commission_id": request.engineering_commission_id or request.metadata.get("engineering_commission_id"),
+            "engineering_authorization_id": request.engineering_authorization_id or request.metadata.get("engineering_authorization_id"),
+            "authorization_reference": request.authorization_reference or request.metadata.get("authorization_reference"),
+            "authorization_record_digest": request.metadata.get("authorization_record_digest"),
+            "operations_decision_reference": request.metadata.get("decision_reference") or request.decision_reference,
+            "operations_decision_id": request.metadata.get("operations_decision_id"),
+            "prompt_source": request.prompt_source,
+            "prompt_source_type": request.prompt_source_type,
+            "prompt_source_digest": request.prompt_source_digest or request.metadata.get("prompt_source_digest"),
+            "allowed_read_paths": list(request.read_scope_paths),
+            "allowed_write_paths": list(request.write_scope_paths),
+            "expected_outputs": list(request.expected_outputs),
+            "artifact_path": extension.get("artifact_path"),
+            "provider_receipt_path": receipt_ref,
+        }
         payload = {
             "schema_version": "estate.provider-receipt.v1", "provider_id": PROVIDER_ID,
             "adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
@@ -232,7 +265,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "actual_model_identity": actual_model, "request_id": request.adapter_request_id,
             "dispatch_id": request.dispatch_id, "grace_objective_id": request.metadata.get("grace_objective_id"),
             "capability_inquiry_reference": request.metadata.get("capability_inquiry_reference"),
-            "helen_assessment_reference": request.metadata.get("helen_assessment_reference"),
+            "helen_assessment_reference": request.metadata.get("helen_assessment_reference") or request.helen_determination_id or request.metadata.get("helen_determination_id"),
             "source_commit": request.metadata.get("source_commit"), "sandbox": request.metadata.get("sandbox"),
             "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest() if prompt else None,
             "declared_artifact_paths": list(request.expected_outputs),
@@ -245,9 +278,21 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "staging_disposition": staging_disposition,
             "staging_path": staging_path,
             "error_details": [str(error)[:500] for error in errors],
+            "governed_correlation": correlation,
         }
+        if request.metadata.get("technical_execution") is True:
+            require_valid(payload, "estate.provider-receipt.v1", self.root)
         self._exclusive_write_text(receipt_target or (self.root / receipt_ref), json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return receipt_ref
+
+    @staticmethod
+    def _artifact_content_errors(text: str, model_identity: str) -> list[str]:
+        lowered = text.lower()
+        required = ("documentation_draft", "text_generation", "bounded_repository_read", "no shell", "no repository implementation", "no arbitrary writes", "no merge authority", "no institutional acceptance", model_identity.lower())
+        errors = [f"artifact is missing required governed statement: {term}" for term in required if term not in lowered]
+        prohibited = ("based on the provided json", "provided json structure", "generated by: grace", "owner: operations", "let me know if further adjustments are needed")
+        errors.extend(f"artifact contains uncontrolled or misleading residue: {term}" for term in prohibited if term in lowered)
+        return errors
 
     def _exclusive_write_text(self, target: Path, content: str) -> _ExclusiveWriteToken:
         target = target.resolve(strict=False)
@@ -343,7 +388,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
 
     def _target_collision_errors(self, request: ExecutionProviderAdapterRequest) -> tuple[list[str], Path | None, Path | None]:
         document_path = next((str(path).replace("\\", "/") for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")), None)
-        receipt_ref = str(request.metadata.get("provider_receipt_path") or "").replace("\\", "/")
+        receipt_ref = str((request.provider_extension or {}).get("provider_receipt_path") or request.metadata.get("provider_receipt_path") or "").replace("\\", "/")
         if not document_path or not receipt_ref:
             return [], None, None
         root = self.root.resolve()
@@ -374,7 +419,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         config = self._config(); target_errors, document_target, _ = self._target_collision_errors(request)
         if target_errors:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(metadata["provider_receipt_path"]).replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
+        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; extension = request.provider_extension or {}; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(extension.get("provider_receipt_path") or metadata.get("provider_receipt_path") or "").replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
         try:
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
@@ -396,6 +441,10 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             encoded = text.strip().encode("utf-8")
             if len(encoded) > int(config["output_limits"]["max_artifact_bytes"]):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
+            if request.metadata.get("technical_execution") is True:
+                content_errors = self._artifact_content_errors(text, config["model_identity"])
+                if content_errors:
+                    raise ValueError("Qwen artifact failed the governed content contract: " + "; ".join(content_errors))
             try:
                 self._exclusive_write_text(staged_document, encoded.decode("utf-8"))
             except QwenPersistenceError:

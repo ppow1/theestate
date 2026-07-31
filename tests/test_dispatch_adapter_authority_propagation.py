@@ -58,6 +58,40 @@ def test_governed_authority_reaches_fake_adapter_once(tmp_path):
     assert len(calls) == 1
 
 
+def test_qwen_provider_extension_is_canonical_and_reaches_adapter_request(tmp_path):
+    result = _governed(tmp_path)
+    extension = result["commission"]["execution_authority"]["provider_extension"]
+    assert extension["requested_capability"] == "documentation_draft"
+    assert extension["authorized_model_identity"] == "qwen3:8b"
+    assert extension["provider_receipt_path"] in result["dispatch"]["expected_outputs"]
+    assert extension == result["authorization"]["provider_extension"]
+    checked = validate_handoff(result["dispatch"]["dispatch_id"], tmp_path)
+    assert checked["status"] == "handoff_validated"
+    assert checked["adapter_request"]["provider_extension"] == extension
+
+
+def test_qwen_provider_extension_tampering_blocks_before_request_publication(tmp_path):
+    result = _governed(tmp_path)
+    queue_path = tmp_path / "runtime/execution_dispatch/queue.json"
+    payload = json.loads(queue_path.read_text(encoding="utf-8"))
+    payload["items"][0]["provider_metadata"]["provider_extension"]["provider_receipt_path"] = "runtime/engineering_adapter_receipts/other.json"
+    queue_path.write_text(json.dumps(payload), encoding="utf-8")
+    checked = validate_handoff(result["dispatch"]["dispatch_id"], tmp_path)
+    assert checked["status"] == "blocked"
+    assert any("provider" in error.lower() or "extension" in error.lower() for error in checked["errors"])
+    assert not (tmp_path / "runtime/execution_adapters/requests").exists()
+
+
+def test_qwen_provider_extension_stale_helen_evidence_blocks_final_handoff(tmp_path):
+    result = _governed(tmp_path)
+    determination_id = result["dispatch"]["provider_metadata"]["helen_determination_id"]
+    path = tmp_path / "runtime/grace_helen_engineering/helen_determinations" / f"{determination_id}.json"
+    record = json.loads(path.read_text(encoding="utf-8")); record["evidence_expires_at"] = "2000-01-01T00:00:00Z"; path.write_text(json.dumps(record), encoding="utf-8")
+    checked = validate_handoff(result["dispatch"]["dispatch_id"], tmp_path)
+    assert checked["status"] == "blocked"
+    assert any("Helen" in error or "stale" in error for error in checked["errors"])
+
+
 def test_technical_handoff_fails_closed_for_missing_or_broad_scope(tmp_path):
     result = _governed(tmp_path)
     dispatch_id = result["dispatch"]["dispatch_id"]

@@ -18,6 +18,8 @@ SCHEMA_FILES = (
     "dispatch/execution_metadata_v1.schema.json",
     "execution_provider_adapter_request_v1.schema.json",
     "operations_control/operations_decision_v1.schema.json",
+    "providers/qwen_local_text_execution_extension_v1.schema.json",
+    "providers/provider_receipt_v1.schema.json",
 )
 
 

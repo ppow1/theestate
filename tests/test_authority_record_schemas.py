@@ -120,3 +120,10 @@ def test_arbitrary_operations_reference_and_missing_schema_fail_closed(tmp_path)
     checked = prepare_handoff(result["dispatch"]["dispatch_id"], tmp_path, write=True)
     assert checked["status"] == "blocked"
     assert not (tmp_path / "runtime/execution_adapters/requests").exists()
+
+
+def test_dispatch_result_evidence_remains_valid_after_reconciliation_projection(tmp_path):
+    result, _, _ = _records(tmp_path)
+    metadata = dict(result["dispatch"]["provider_metadata"])
+    metadata.update({"adapter_result_reference": "runtime/execution_adapters/results/adapter.json", "adapter_result_content_hash": "a" * 64, "provider_execution_state": "completed", "validation_state": "passed", "result_artifacts": ["docs/output.md"]})
+    require_valid(metadata, "estate.dispatch.execution-metadata.v1", tmp_path)

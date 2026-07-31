@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.qwen-local-text.execution-extension.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "provider_id", "adapter_id", "adapter_version", "requested_capability", "evidence_observed_at", "evidence_expires_at", "authorized_model_identity", "provider_receipt_path", "artifact_path", "provider_health_evidence", "provider_health_evidence_digests"],
+  "properties": {
+    "schema_version": {"const": "estate.qwen-local-text.execution-extension.v1"},
+    "provider_id": {"const": "qwen.local.text"},
+    "adapter_id": {"const": "qwen-local-ollama-text-adapter"},
+    "adapter_version": {"const": "1.0.0"},
+    "requested_capability": {"enum": ["documentation_draft", "text_generation", "bounded_repository_read"]},
+    "evidence_observed_at": {"type": "string", "format": "date-time"},
+    "evidence_expires_at": {"type": "string", "format": "date-time"},
+    "authorized_model_identity": {"type": "string", "pattern": "^qwen[^\\s]*$"},
+    "provider_receipt_path": {"type": "string", "pattern": "^runtime/engineering_adapter_receipts/[A-Za-z0-9_.-]+[.]json$"},
+    "artifact_path": {"type": "string", "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"},
+    "provider_health_evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"}},
+    "provider_health_evidence_digests": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+  }
+}
