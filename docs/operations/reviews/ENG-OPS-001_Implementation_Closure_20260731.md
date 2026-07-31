@@ -1,7 +1,9 @@
 # ENG-OPS-001 Implementation Closure
 
 Starting main: `c3d5f3990e86123d5623462c03e5c39be3d50aec`  
-Campaign branch: `engineering/complete-governed-engineering-first-live-task`
+Campaign branch: `engineering/complete-governed-engineering-first-live-task`  
+Final pushed HEAD: `c9ef01c5`  
+Commits: `00db8ff2`, `272151b7`, `c9ef01c5`
 
 ## Scope and production path
 
@@ -79,7 +81,5 @@ records.
 The first live task succeeded; complete lifecycle evidence is in
 [Qwen_First_Live_Task_6561985c223d405c8c9b1d41562af5fb_20260731.md](../validation/Qwen_First_Live_Task_6561985c223d405c8c9b1d41562af5fb_20260731.md).
 
-The final commit and draft PR are recorded after this report is committed.
 The next Steward action is blocking review of the campaign PR; merge remains
 outside this work package execution.
-
