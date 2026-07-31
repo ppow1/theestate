@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.qwen-local-text-provider.v1",
+  "type": "object",
+  "required": [
+    "provider_id",
+    "adapter_id",
+    "adapter_version",
+    "endpoint_type",
+    "endpoint_address",
+    "model_identity",
+    "context_limit",
+    "timeout_seconds",
+    "supported_capabilities",
+    "health_check",
+    "output_limits",
+    "network_policy",
+    "evidence_freshness_seconds"
+  ],
+  "properties": {
+    "provider_id": {"const": "qwen.local.text"},
+    "adapter_id": {"const": "qwen-local-ollama-text-adapter"},
+    "adapter_version": {"const": "1.0.0"},
+    "endpoint_type": {"const": "ollama-http"},
+    "endpoint_address": {"type": "string", "format": "uri", "pattern": "^http://(127\\.0\\.0\\.1|localhost|\\[::1\\])(:[0-9]{1,5})?/?$"},
+    "model_identity": {"type": "string", "minLength": 1, "pattern": "^qwen[^\\s]*$"},
+    "context_limit": {"type": "integer", "minimum": 1},
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 3600},
+    "supported_capabilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["documentation_draft", "text_generation", "bounded_repository_read"]}},
+    "health_check": {"type": "object", "required": ["method", "path", "requires_model_present"], "properties": {"method": {"const": "GET"}, "path": {"const": "/api/tags"}, "requires_model_present": {"const": true}}, "additionalProperties": false},
+    "output_limits": {"type": "object", "required": ["max_output_tokens", "max_artifact_bytes"], "properties": {"max_output_tokens": {"type": "integer", "minimum": 1}, "max_artifact_bytes": {"type": "integer", "minimum": 1}}, "additionalProperties": false},
+    "network_policy": {"const": "loopback_only"},
+    "evidence_freshness_seconds": {"type": "integer", "minimum": 1, "maximum": 86400}
+  },
+  "additionalProperties": false
+}

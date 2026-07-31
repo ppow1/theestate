@@ -90,6 +90,7 @@ def run_dry_run_adapter(request: ExecutionProviderAdapterRequest, root: str | Pa
 def load_registered_adapter(request: ExecutionProviderAdapterRequest, *, root: str | Path | None = None, bridge_runner: Any = None):
     """Resolve only adapters registered in the canonical provider catalog seam."""
     from estate.core.codex_bridge_execution_provider_adapter import CodexCliExecutionProviderAdapter
+    from estate.core.qwen_local_text_execution_provider_adapter import QwenLocalTextExecutionProviderAdapter
     from estate.core.provider_catalog import load_provider_catalog
 
     catalog = load_provider_catalog(_root(root) / "config" / "providers" / "catalog.json")
@@ -98,4 +99,6 @@ def load_registered_adapter(request: ExecutionProviderAdapterRequest, *, root: s
         raise ValueError(f"provider '{request.provider_id}' is not registered for execution: {provider.status}")
     if request.provider_id == "codex.execution.cli":
         return CodexCliExecutionProviderAdapter(root=_root(root), bridge_runner=bridge_runner)
+    if request.provider_id == "qwen.local.text":
+        return QwenLocalTextExecutionProviderAdapter(root=_root(root))
     raise ValueError(f"no concrete adapter registered for provider '{request.provider_id}'")
