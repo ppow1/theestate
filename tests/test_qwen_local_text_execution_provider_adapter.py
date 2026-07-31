@@ -371,11 +371,32 @@ def test_failure_receipt_partial_write_leaves_no_receipt_and_does_not_retry(tmp_
     assert any("failure receipt persistence failed" in error for error in result.errors)
 
 
+def test_short_failure_receipt_writes_complete_failed_evidence(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=1, phase="short")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    payload = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    assert payload["provider_result_state"] == "failed"
+    assert payload["validation_result"] == "failed"
+
+
 @pytest.mark.parametrize("phase", ["flush", "close"])
 def test_flush_and_close_failures_remove_owned_target_and_preserve_primary_error(tmp_path, monkeypatch, phase):
     _inject_partial_fdopen(monkeypatch, failing_call=1, phase=phase)
     target = tmp_path / "owned.json"
     with pytest.raises(OSError, match=f"injected {phase} failure"):
+        QwenLocalTextExecutionProviderAdapter._exclusive_write_text(target, "content")
+    assert not target.exists()
+
+
+def test_fsync_failure_removes_owned_target_and_preserves_primary_error(tmp_path, monkeypatch):
+    def fail_fsync(_descriptor):
+        raise OSError("injected fsync failure")
+
+    monkeypatch.setattr(qwen_adapter_module.os, "fsync", fail_fsync)
+    target = tmp_path / "owned.json"
+    with pytest.raises(OSError, match="injected fsync failure"):
         QwenLocalTextExecutionProviderAdapter._exclusive_write_text(target, "content")
     assert not target.exists()
 
