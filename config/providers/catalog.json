@@ -61,6 +61,30 @@
       "supports_offline": true
     },
     {
+      "capability_id": "text_generation",
+      "category": "documentation",
+      "description": "Bounded natural-language generation from an authorized local text model.",
+      "display_name": "Text Generation",
+      "input_artifacts": ["bounded_prompt"],
+      "metadata": {"local_only": true, "no_shell": true},
+      "output_artifacts": ["text_artifact", "provider_receipt"],
+      "requires_approval": true,
+      "requires_validation": true,
+      "supports_offline": false
+    },
+    {
+      "capability_id": "bounded_repository_read",
+      "category": "execution",
+      "description": "Read only the explicitly authorized repository paths for a bounded local text request.",
+      "display_name": "Bounded Repository Read",
+      "input_artifacts": ["authorized_read_scope"],
+      "metadata": {"read_only": true, "no_shell": true},
+      "output_artifacts": ["provider_receipt"],
+      "requires_approval": true,
+      "requires_validation": true,
+      "supports_offline": false
+    },
+    {
       "capability_id": "repository_implementation",
       "category": "execution",
       "description": "Repository Implementation capability.",
@@ -279,6 +303,27 @@
       "requires_network": false,
       "status": "designed",
       "supports_offline": true
+    },
+    {
+      "capabilities": [
+        "documentation_draft",
+        "text_generation",
+        "bounded_repository_read"
+      ],
+      "classification_ceiling": "Local Only",
+      "cost_model": "local",
+      "display_name": "Qwen Local Text",
+      "implementation_kind": "local_llm",
+      "provider_id": "qwen.local.text",
+      "provider_type": "execution",
+      "requires_boundary_review": true,
+      "requires_network": false,
+      "routing_notes": "Loopback-only configured Qwen-family text generation through the existing local inference service; no shell or repository implementation authority.",
+      "status": "implemented",
+      "supports_artifacts": true,
+      "supports_events": true,
+      "supports_validation": true,
+      "supports_offline": false
     },
     {
       "capabilities": [

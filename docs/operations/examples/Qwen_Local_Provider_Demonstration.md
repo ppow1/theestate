@@ -1,0 +1,13 @@
+# Provider Execution, Engineering Completion, and Institutional Acceptance  
+
+## Provider Execution  
+Provider execution refers to the process by which a provider delivers a bounded scope of work within defined technical and operational constraints. This phase produces **bounded work**—a finite set of deliverables that align with agreed-upon requirements—and **technical evidence** such as documentation, test results, or system outputs that demonstrate compliance with specifications. The provider’s role is to ensure their contributions are scoped, tested, and validated within their designated responsibilities, without extending beyond their contractual obligations.  
+
+## Engineering Completion  
+Engineering completion involves the validation of the artifact (the product of provider execution) to confirm it meets technical and functional requirements. This phase requires rigorous testing, analysis, and verification by engineering teams to ensure the artifact is stable, secure, and operational within the intended environment. Engineering also records completion through formal documentation, such as test reports, acceptance criteria checklists, or version control logs. These records serve as proof that the artifact has been validated and is ready for further review or deployment. However, this validation does not equate to institutional acceptance.  
+
+## Institutional Acceptance  
+Institutional acceptance is a distinct decision made by an authorized authority, separate from the provider and engineering teams. This decision involves evaluating the artifact’s alignment with organizational policies, strategic goals, and risk tolerances. It may require additional stakeholder input, governance reviews, or compliance checks. The provider and engineering teams cannot grant this acceptance; it must be formally authorized by the institution’s designated decision-makers. This step ensures that the artifact meets not only technical standards but also organizational and regulatory expectations.  
+
+---  
+This document outlines the distinct phases and responsibilities within the lifecycle of a provider-driven project. Provider execution and engineering completion establish technical validity, while institutional acceptance represents a separate governance milestone. No stage in this process grants institutional acceptance, which remains a sovereign decision by the organization’s authorized authority.

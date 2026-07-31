@@ -1,0 +1,155 @@
+from __future__ import annotations
+
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+from estate.core.execution_provider_adapter import ExecutionProviderAdapterRequest
+from estate.core.execution_provider_adapter_runtime import load_registered_adapter
+from estate.core.qwen_local_text_execution_provider_adapter import QwenLocalTextExecutionProviderAdapter
+
+CONFIG_PATH = Path("config/providers/qwen_local_text.json")
+
+
+def _request(tmp_path: Path, output_path: str = "docs/operations/examples/qwen-test.md", **metadata):
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    values = {
+        "requested_capability": "documentation_draft",
+        "authorization_reference": "steward/qwen-test-authorization",
+        "evidence_observed_at": now.isoformat().replace("+00:00", "Z"),
+        "evidence_expires_at": (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
+        "authorized_model_identity": "qwen3:8b",
+        "prompt_text": "Explain the governed boundary in one sentence.",
+        "grace_objective_id": "grace-qwen-test",
+        "capability_inquiry_reference": "capinq-qwen-test",
+        "helen_assessment_reference": "capassess-qwen-test",
+        "source_commit": "a" * 40,
+        "sandbox": "workspace-write",
+        "shell_authority": False,
+        "automatic_merge_authority": False,
+        "institutional_acceptance_authority": False,
+    }
+    values.update(metadata)
+    return ExecutionProviderAdapterRequest.create(
+        adapter_request_id="adapter-qwen-test",
+        dispatch_id="dispatch-qwen-test",
+        provider_id="qwen.local.text",
+        provider_type="execution",
+        prompt_source="test prompt",
+        write_scope_paths=[output_path],
+        expected_outputs=[output_path],
+        metadata=values,
+    )
+
+
+def _transport(response_text="Generated local Qwen text.", model="qwen3:8b", health=True):
+    def call(method, url, payload, timeout):
+        if method == "GET":
+            return (200, {"models": [{"name": model}]}) if health else (503, {})
+        return (200, {"model": model, "response": response_text})
+    return call
+
+
+def test_provider_catalog_registration_and_adapter_identity(tmp_path):
+    adapter = load_registered_adapter(_request(tmp_path), root=Path.cwd())
+    assert isinstance(adapter, QwenLocalTextExecutionProviderAdapter)
+    assert adapter.provider_id == "qwen.local.text"
+    assert adapter.adapter_id == "qwen-local-ollama-text-adapter"
+
+
+def test_valid_documentation_request_uses_mock_local_service(tmp_path):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "completed"
+    assert result.metadata["live_provider_called"] is True
+    assert (tmp_path / "docs/operations/examples/qwen-test.md").read_text() == "Generated local Qwen text."
+    receipt = tmp_path / result.metadata["provider_receipt"]
+    payload = json.loads(receipt.read_text())
+    assert payload["provider_id"] == "qwen.local.text"
+    assert payload["actual_model_identity"] == "qwen3:8b"
+    assert payload["endpoint_local"] is True
+    assert payload["artifacts"][0]["sha256"]
+
+
+def test_unsupported_capability_is_rejected_before_provider_call(tmp_path):
+    calls = []
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args))
+    result = adapter.submit(_request(tmp_path, requested_capability="repository_implementation"))
+    assert result.status == "blocked" and calls == []
+
+
+def test_missing_model_and_endpoint_configuration_fail_closed(tmp_path):
+    config = json.loads((tmp_path / "config/providers/qwen_local_text.json").read_text()) if (tmp_path / "config/providers/qwen_local_text.json").exists() else json.loads(Path("config/providers/qwen_local_text.json").read_text())
+    config["model_identity"] = ""
+    path = tmp_path / "qwen.json"; path.write_text(json.dumps(config))
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=path)
+    assert adapter.submit(_request(tmp_path)).status == "blocked"
+    config["model_identity"] = "qwen3:8b"; config["endpoint_address"] = "http://example.invalid:11434"; path.write_text(json.dumps(config))
+    assert adapter.submit(_request(tmp_path)).status == "blocked"
+
+
+def test_missing_configuration_fails_closed_without_provider_call(tmp_path):
+    calls = []
+    adapter = QwenLocalTextExecutionProviderAdapter(
+        root=tmp_path,
+        config_path=tmp_path / "missing-qwen.json",
+        http_call=lambda *args: calls.append(args),
+    )
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "blocked"
+    assert calls == []
+
+
+def test_health_failure_and_stale_evidence_fail_closed(tmp_path):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
+    assert adapter.submit(_request(tmp_path)).status == "failed"
+    old = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat().replace("+00:00", "Z")
+    assert adapter.submit(_request(tmp_path, evidence_expires_at=old)).status == "blocked"
+
+
+def test_remote_endpoint_and_model_mismatch_fail_closed(tmp_path):
+    config = json.loads(Path("config/providers/qwen_local_text.json").read_text())
+    config["endpoint_address"] = "https://example.invalid"
+    path = tmp_path / "qwen.json"; path.write_text(json.dumps(config))
+    assert QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=path).submit(_request(tmp_path)).status == "blocked"
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(model="qwen2.5-coder:7b"))
+    assert adapter.submit(_request(tmp_path)).status == "failed"
+
+
+def test_cancellation_timeout_authority_and_shell_boundaries(tmp_path):
+    calls = []
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args))
+    result = adapter.submit(_request(tmp_path, cancel_requested=True, shell_authority=True, automatic_merge_authority=True, institutional_acceptance_authority=True))
+    assert result.status == "blocked" and calls == []
+
+
+def test_malformed_response_and_exact_output_enforcement(tmp_path):
+    def malformed(method, url, payload, timeout):
+        return (200, {"model": "qwen3:8b"})
+    assert QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=malformed).submit(_request(tmp_path)).status == "failed"
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path, output_path="runtime/other.md"))
+    assert result.status == "blocked"
+
+
+def test_unbounded_output_is_rejected_before_artifact_write(tmp_path):
+    config = json.loads(Path("config/providers/qwen_local_text.json").read_text())
+    config["output_limits"]["max_artifact_bytes"] = 8
+    path = tmp_path / "qwen.json"
+    path.write_text(json.dumps(config))
+    adapter = QwenLocalTextExecutionProviderAdapter(
+        root=tmp_path,
+        config_path=path,
+        http_call=_transport(response_text="this output is too large"),
+    )
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+
+
+def test_dry_run_does_not_call_service_or_grant_authority(tmp_path):
+    calls = []
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args))
+    result = adapter.dry_run(_request(tmp_path))
+    assert result.status == "dry_run_completed" and calls == []
+    assert result.metadata["live_provider_called"] is False
