@@ -4,8 +4,11 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pytest
+
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterRequest
 from estate.core.execution_provider_adapter_runtime import load_registered_adapter
+import estate.core.qwen_local_text_execution_provider_adapter as qwen_adapter_module
 from estate.core.qwen_local_text_execution_provider_adapter import QwenLocalTextExecutionProviderAdapter
 
 CONFIG_PATH = Path("config/providers/qwen_local_text.json")
@@ -49,6 +52,44 @@ def _transport(response_text="Generated local Qwen text.", model="qwen3:8b", hea
             return (200, {"models": [{"name": health_model}]}) if health else (503, {})
         return (200, {"model": model, "response": response_text})
     return call
+
+
+def _inject_partial_fdopen(monkeypatch, failing_call: int, phase: str = "write"):
+    original_fdopen = qwen_adapter_module.os.fdopen
+    calls = {"count": 0}
+
+    def fdopen(fd, *args, **kwargs):
+        calls["count"] += 1
+        stream = original_fdopen(fd, *args, **kwargs)
+        if calls["count"] != failing_call:
+            return stream
+
+        class FailingStream:
+            def write(self, data):
+                if phase == "write":
+                    stream.write(data[:max(1, len(data) // 2)])
+                    raise OSError("injected write failure")
+                return stream.write(data)
+
+            def flush(self):
+                if phase == "flush":
+                    stream.flush()
+                    raise OSError("injected flush failure")
+                return stream.flush()
+
+            def fileno(self):
+                return stream.fileno()
+
+            def close(self):
+                if phase == "close":
+                    stream.close()
+                    raise OSError("injected close failure")
+                return stream.close()
+
+        return FailingStream()
+
+    monkeypatch.setattr(qwen_adapter_module.os, "fdopen", fdopen)
+    return calls
 
 
 def test_provider_catalog_registration_and_adapter_identity(tmp_path):
@@ -280,3 +321,50 @@ def test_late_receipt_collision_preserves_competitor_and_removes_new_document(tm
     assert (tmp_path / "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json").read_bytes() == b"competing receipt"
     assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
     assert any("failure receipt persistence failed" in error for error in result.errors)
+
+
+def test_document_partial_write_is_cleaned_and_failure_receipt_is_truthful(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=1, phase="write")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path, prompt_text="private prompt must remain redacted"))
+    assert result.status == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+    receipt = tmp_path / result.metadata["provider_receipt"]
+    payload = json.loads(receipt.read_text())
+    assert payload["provider_result_state"] == "failed"
+    assert payload["artifacts"] == []
+    assert "document persistence" in " ".join(result.errors)
+    assert "private prompt" not in receipt.read_text()
+
+
+def test_success_receipt_partial_write_is_cleaned_then_replaced_by_failure_receipt(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=2, phase="write")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+    payload = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    assert payload["provider_result_state"] == "failed"
+    assert payload["validation_result"] == "failed"
+    assert payload["artifacts"] == []
+
+
+def test_failure_receipt_partial_write_leaves_no_receipt_and_does_not_retry(tmp_path, monkeypatch):
+    calls = _inject_partial_fdopen(monkeypatch, failing_call=1, phase="write")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(health=False))
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert result.metadata["provider_receipt"] is None
+    assert result.metadata["receipt_reference"] is None
+    assert calls["count"] == 1
+    assert not list((tmp_path / "runtime/engineering_adapter_receipts").glob("*.json"))
+    assert any("failure receipt persistence failed" in error for error in result.errors)
+
+
+@pytest.mark.parametrize("phase", ["flush", "close"])
+def test_flush_and_close_failures_remove_owned_target_and_preserve_primary_error(tmp_path, monkeypatch, phase):
+    _inject_partial_fdopen(monkeypatch, failing_call=1, phase=phase)
+    target = tmp_path / "owned.json"
+    with pytest.raises(OSError, match=f"injected {phase} failure"):
+        QwenLocalTextExecutionProviderAdapter._exclusive_write_text(target, "content")
+    assert not target.exists()

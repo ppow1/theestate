@@ -76,12 +76,22 @@ If document writing succeeds but receipt writing fails, the adapter returns
 failure and removes the newly created document when it did not pre-exist; it
 does not claim successful completion.
 
-Both files use exclusive creation. A late collision therefore fails closed;
-the competing file is never overwritten. Cleanup removes only the document
-created by the current invocation. A collision before provider execution
-produces no receipt because no valid live execution began. A collision after
-live execution may produce a bounded failure receipt only when its exact
-declared receipt target remains available.
+Both files use exclusive creation, but exclusive creation alone does not imply
+complete persistence. The helper owns a newly created file until its encoding,
+write, flush, fsync, and close all succeed. If any of those operations fails,
+it compares the target identity with the file it created and removes only that
+file. Pre-existing or competing files are never removed. Cleanup errors do not
+mask the original persistence error.
+
+If document persistence fails, no partial document remains and a truthful
+failure receipt may be written when its fresh declared target is available. If
+success receipt persistence fails, the newly created document is removed and
+the adapter makes one bounded attempt to write a truthful failure receipt; it
+does not report completion. If failure-receipt persistence itself fails, the
+partial receipt is removed, no recursive retry occurs, and the result reports
+that durable evidence could not be persisted. A late collision therefore fails
+closed; the competing file is never overwritten. A collision before provider
+execution produces no receipt because no valid live execution began.
 
 Provider execution and Engineering completion are evidence-producing states.
 Neither grants institutional acceptance; acceptance remains a separate

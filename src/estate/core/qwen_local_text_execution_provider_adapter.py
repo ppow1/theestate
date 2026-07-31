@@ -220,12 +220,44 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
     def _exclusive_write_text(target: Path, content: str) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        identity = os.fstat(descriptor)
+        stream = None
+        close_attempted = False
         try:
-            with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
-                stream.write(content)
-        except Exception:
+            stream = os.fdopen(descriptor, "wb", buffering=0, closefd=True)
+            descriptor = None
+            stream.write(content.encode("utf-8"))
+            stream.flush()
+            os.fsync(stream.fileno())
+            stream_descriptor = stream.fileno()
+            close_attempted = True
             try:
-                os.close(descriptor)
+                stream.close()
+            except Exception:
+                # A close failure may leave the descriptor open on Windows.  A
+                # second low-level close is attempted only after close was
+                # already attempted, and its error cannot mask the original.
+                try:
+                    os.close(stream_descriptor)
+                except OSError:
+                    pass
+                raise
+            stream = None
+        except Exception:
+            if stream is not None and not close_attempted:
+                try:
+                    stream.close()
+                except OSError:
+                    pass
+            elif descriptor is not None:
+                try:
+                    os.close(descriptor)
+                except OSError:
+                    pass
+            try:
+                current = target.stat()
+                if (current.st_dev, current.st_ino) == (identity.st_dev, identity.st_ino):
+                    target.unlink()
             except OSError:
                 pass
             raise
@@ -285,13 +317,18 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             encoded = text.strip().encode("utf-8")
             if len(encoded) > int(config["output_limits"]["max_artifact_bytes"]):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
-            target = document_target or (self.root / document_path).resolve(); target.relative_to(self.root.resolve()); self._exclusive_write_text(target, encoded.decode("utf-8")); document_created = True
+            target = document_target or (self.root / document_path).resolve(); target.relative_to(self.root.resolve())
+            try:
+                self._exclusive_write_text(target, encoded.decode("utf-8"))
+            except Exception as exc:
+                raise OSError(f"document persistence failed: {str(exc)[:400]}") from exc
+            document_created = True
             try:
                 receipt_ref = self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True)
-            except Exception:
+            except Exception as exc:
                 if document_created and target.exists():
                     target.unlink()
-                raise
+                raise OSError(f"success receipt persistence failed: {str(exc)[:400]}") from exc
             artifacts = [document_path, receipt_ref]
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=artifacts, validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})
         except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError) as exc:
