@@ -51,6 +51,23 @@ def test_request_validation_accepts_read_only_allowed_request():
     assert result.errors == []
 
 
+def test_request_validation_accepts_only_canonical_grace_action_prompt_namespace():
+    root = make_root("grace_action_prompt")
+    write(root, "runtime/operations/grace/actions/grace-act-test.json")
+    req = request(root, prompt_source="runtime/operations/grace/actions/grace-act-test.json", allowed_read_paths=["runtime/operations/grace/actions"])
+    result = validate_bridge_request(req, root)
+    assert result.accepted is True
+
+
+def test_request_validation_rejects_other_runtime_prompt_sources():
+    root = make_root("denied_runtime_prompt")
+    write(root, "runtime/other/prompt.json")
+    req = request(root, prompt_source="runtime/other/prompt.json", allowed_read_paths=["runtime/other"])
+    result = validate_bridge_request(req, root)
+    assert result.accepted is False
+    assert "prompt source is inside a denied local runtime or secret path" in result.errors
+
+
 def test_request_validation_rejects_missing_classification():
     root = make_root("missing_classification")
     req = request(root, classification="")

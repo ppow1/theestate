@@ -33,6 +33,7 @@ ALLOWED_PROVIDER_PROFILES = {
     "codex-cli-ollama": {"default", "local-ollama"},
 }
 FORBIDDEN_PATH_SEGMENTS = {".git", ".codex", "runtime"}
+CODEX_PROMPT_SOURCE_PREFIX = Path("runtime/operations/grace/actions")
 FORBIDDEN_FILE_NAMES = {".env", "auth.json"}
 MOJIBAKE_MARKERS = ("ΓÇÖ", "ΓÇ£", "ΓÇ¥", "ΓÇô", "ΓÇö", "├⌐", "├»", "├▒")
 EVENT_TYPES = {
@@ -210,6 +211,15 @@ def _path_has_forbidden_segment(path: Path, root: Path) -> bool:
         rel_parts = {part.lower() for part in path.relative_to(root).parts}
         return bool(rel_parts & FORBIDDEN_PATH_SEGMENTS) or path.name.lower() in FORBIDDEN_FILE_NAMES
     return False
+
+
+def _is_authorized_codex_prompt_source(path: Path, root: Path) -> bool:
+    """Allow only immutable Grace action records as Codex prompt sources."""
+    try:
+        relative = path.relative_to(root)
+    except ValueError:
+        return False
+    return relative.as_posix().startswith(CODEX_PROMPT_SOURCE_PREFIX.as_posix() + "/") and path.suffix.lower() == ".json"
 
 
 def _path_is_too_broad(path: Path, root: Path) -> bool:
@@ -435,7 +445,7 @@ def validate_bridge_request(request: CodexBridgeRequest, root: str | Path | None
     prompt_path = _resolve(request.prompt_source, base)
     if not prompt_path.exists():
         errors.append("prompt source does not exist")
-    elif _path_has_forbidden_segment(prompt_path, base):
+    elif _path_has_forbidden_segment(prompt_path, base) and not _is_authorized_codex_prompt_source(prompt_path, base):
         errors.append("prompt source is inside a denied local runtime or secret path")
 
     read_paths = [_resolve(path, base) for path in request.allowed_read_paths]

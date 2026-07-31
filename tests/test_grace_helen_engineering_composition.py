@@ -132,3 +132,5 @@ def test_completed_governed_replay_returns_existing_records_without_reexecution(
     assert replay["commission"]["commission_id"] == commission["commission_id"]
     assert replay["authorization"]["authorization_id"] == auth["authorization_id"]
     assert replay["dispatch"]["dispatch_id"] == dispatch["dispatch_id"]
+    with pytest.raises(ValueError, match="conflicting provider replay"):
+        comp.governed_commission_and_dispatch(objective.objective_id, determination["determination_id"], grace_action_id="grace-act-test", operations_decision_id="ops-dec-test", bounded_objective=objective.summary, acceptance_criteria=["one validated drawing"], ptm_source_high_watermark=commission["source_high_watermark"], ptm_task_or_package_id=f"task-{objective.objective_id}", enabling_project_id="project-test", provider_id="other-provider", provider_type="fixture", adapter_reference="other.adapter", idempotency_key=f"{objective.objective_id}:{determination['determination_id']}:commission")

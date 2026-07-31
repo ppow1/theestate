@@ -73,3 +73,15 @@ def test_codex_technical_decision_does_not_require_qwen_extension():
         selected_provider_id="codex.execution.cli", provider_extension=None,
     )
     decision.validate()
+
+
+def test_steward_technical_intake_fails_closed_when_bounded_fields_are_missing(tmp_path):
+    request = tmp_path / "request.json"
+    request.write_text(json.dumps({"required_capability": "documentation_draft"}), encoding="utf-8")
+    result = subprocess.run([
+        sys.executable, "-m", "estate.cli.main", "grace-operations", "conduct",
+        "--title", "missing technical intake", "--summary", "missing fields",
+        "--technical-request-file", str(request), "--json",
+    ], cwd=tmp_path, env={"PYTHONPATH": str(Path.cwd() / "src"), "ESTATE_ROOT": str(tmp_path)}, text=True, capture_output=True)
+    assert result.returncode != 0
+    assert "missing required governed fields" in result.stderr

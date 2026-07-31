@@ -290,7 +290,7 @@ class GraceHelenEngineeringComposition:
             self._state(request["grace_objective_id"], "blocked_pending_capability", helen_determination_id=det["determination_id"], blocker="capability suspended")
         return det
 
-    def commission_engineering(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str | None = None, ptm_task_or_package_id: str | None = None, enabling_project_id: str | None = None, execution_metadata: dict[str, Any] | None = None, provider_id: str | None = None, adapter_reference: str | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
+    def commission_engineering(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str | None = None, ptm_task_or_package_id: str | None = None, enabling_project_id: str | None = None, execution_metadata: dict[str, Any] | None = None, provider_id: str | None = None, provider_type: str | None = None, adapter_reference: str | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
         det = _load(self._path(DETERMINATIONS, helen_determination_id))
         if det["grace_objective_id"] != grace_objective_id:
             raise ValueError("Helen determination does not belong to Grace objective")
@@ -312,7 +312,10 @@ class GraceHelenEngineeringComposition:
             self._state(grace_objective_id, "awaiting_ptm_readiness", blocker=str(exc))
             raise PermissionError(str(exc)) from exc
         key = idempotency_key or f"{grace_objective_id}:{helen_determination_id}:commission"
-        authority = _canonical_execution_authority(self.root, grace_objective_id, grace_action_id, execution_metadata)
+        authority_input = execution_metadata
+        if isinstance(execution_metadata, dict) and "test_failure_injection" in execution_metadata:
+            authority_input = {key: value for key, value in execution_metadata.items() if key in {"prompt_source", "prompt_source_type", "prompt_source_digest", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "prompt_source_record"}}
+        authority = _canonical_execution_authority(self.root, grace_objective_id, grace_action_id, authority_input or None)
         if provider_id and provider_id == "qwen.local.text":
             extension = _provider_extension(self.root, det, authority, provider_id=provider_id, adapter_reference=adapter_reference or "")
             authority = {**authority, "provider_extension": extension}
@@ -327,8 +330,15 @@ class GraceHelenEngineeringComposition:
             if existing.get("idempotency_key") == key:
                 if (existing.get("execution_authority") or {}) != authority:
                     raise ValueError("conflicting execution authority replay")
+                if any(existing.get(field) is not None and existing.get(field) != expected for field, expected in (("provider_id", provider_id), ("provider_type", provider_type), ("adapter_reference", adapter_reference))):
+                    raise ValueError("conflicting provider replay")
                 return existing
-        commission = {"commission_id": f"engcom-{uuid4().hex[:12]}", "grace_objective_id": grace_objective_id, "grace_action_id": grace_action_id, "operations_decision_id": operations_decision_id, "helen_determination_id": helen_determination_id, "required_capability": det["capability_class"], "bounded_objective": bounded_objective, "acceptance_criteria": acceptance_criteria, "status": "proposed", "created_at": utc_now(), "idempotency_key": key, "requesting_office": "Grace", "technical_owner": "Engineering", "readiness_resolution_id": binding.readiness_resolution_id, "readiness_projection_path": binding.readiness_projection_path, "readiness_projection_digest": binding.readiness_projection_digest, "readiness_state": binding.readiness_state, "source_high_watermark": binding.source_high_watermark, "freshness_policy_id": binding.freshness_policy_id, "freshness_policy_version": binding.freshness_policy_version, "freshness_policy_digest": binding.freshness_policy_digest, "waiver_registry_id": binding.waiver_registry_id, "waiver_registry_version": binding.waiver_registry_version, "waiver_registry_digest": binding.waiver_registry_digest, "evaluated_at": binding.evaluated_at, "expires_at": binding.expires_at, "dependency_evidence_references": list(binding.dependency_evidence_references), "waiver_references": [dict(item) for item in binding.waiver_references], "ptm_readiness": binding.to_dict()}
+        commission = {"commission_id": f"engcom-{uuid4().hex[:12]}", "grace_objective_id": grace_objective_id, "grace_action_id": grace_action_id, "operations_decision_id": operations_decision_id, "helen_determination_id": helen_determination_id, "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "required_capability": det["capability_class"], "bounded_objective": bounded_objective, "acceptance_criteria": acceptance_criteria, "status": "proposed", "created_at": utc_now(), "idempotency_key": key, "requesting_office": "Grace", "technical_owner": "Engineering", "readiness_resolution_id": binding.readiness_resolution_id, "readiness_projection_path": binding.readiness_projection_path, "readiness_projection_digest": binding.readiness_projection_digest, "readiness_state": binding.readiness_state, "source_high_watermark": binding.source_high_watermark, "freshness_policy_id": binding.freshness_policy_id, "freshness_policy_version": binding.freshness_policy_version, "freshness_policy_digest": binding.freshness_policy_digest, "waiver_registry_id": binding.waiver_registry_id, "waiver_registry_version": binding.waiver_registry_version, "waiver_registry_digest": binding.waiver_registry_digest, "evaluated_at": binding.evaluated_at, "expires_at": binding.expires_at, "dependency_evidence_references": list(binding.dependency_evidence_references), "waiver_references": [dict(item) for item in binding.waiver_references], "ptm_readiness": binding.to_dict()}
+        injection = (execution_metadata or {}).get("test_failure_injection") if isinstance(execution_metadata, dict) else None
+        if injection is not None:
+            if not isinstance(injection, dict) or injection.get("mode") not in {"transport", "timeout", "malformed_response", "declared_failure"}:
+                raise ValueError("unsupported provider failure injection mode")
+            commission["test_failure_injection"] = {"mode": injection["mode"]}
         if authority:
             commission["execution_authority"] = authority
         _write(self._path(COMMISSIONS, commission["commission_id"]), commission)
@@ -359,6 +369,7 @@ class GraceHelenEngineeringComposition:
             enabling_project_id=enabling_project_id,
             execution_metadata=execution_metadata,
             provider_id=provider_id,
+            provider_type=provider_type,
             adapter_reference=adapter_reference,
             idempotency_key=idempotency_key,
         )
@@ -490,11 +501,13 @@ class GraceHelenEngineeringComposition:
             technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
         if technical_provider:
             technical_metadata["provider_extension"] = dict(authority.get("provider_extension") or {})
+            if commission.get("test_failure_injection"):
+                technical_metadata["test_failure_injection"] = {**commission["test_failure_injection"], "engineering_commission_id": commission_id, "dispatch_id": dispatch_id}
         if existing_auth:
             for field_name, expected in (("engineering_commission_id", commission_id), ("provider_id", provider_id), ("adapter_reference", adapter_reference), ("operations_decision_id", commission["operations_decision_id"]), ("execution_authority", authority)):
                 if auth.get(field_name) != expected:
                     raise ValueError("conflicting authorization replay")
-        request = DispatchRequest(dispatch_id=dispatch_id, work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=det["worker_profile_id"], classification="Estate Internal", priority="Normal", state="Ready", prompt_source=authority.get("prompt_source"), allowed_read_paths=list(authority.get("allowed_read_paths") or []), allowed_write_paths=list(authority.get("allowed_write_paths") or []), expected_outputs=list(authority.get("expected_outputs") or []), allowed_providers=[provider_id], provider_metadata=technical_metadata)
+        request = DispatchRequest(dispatch_id=dispatch_id, work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=("default" if provider_id == "codex.execution.cli" else det["worker_profile_id"]), classification="Estate Internal", priority="Normal", state="Ready", sandbox=("workspace-write" if provider_id == "codex.execution.cli" else "read-only"), prompt_source=authority.get("prompt_source"), allowed_read_paths=list(authority.get("allowed_read_paths") or []), allowed_write_paths=list(authority.get("allowed_write_paths") or []), expected_outputs=list(authority.get("expected_outputs") or []), allowed_providers=[provider_id], provider_metadata=technical_metadata)
         auth.update({"dispatch_id": request.dispatch_id, "dispatch_record_path": "runtime/execution_dispatch/queue.json", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": request.provider_metadata["ptm_revalidated_at"], "ptm_revalidation_result": "passed", "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "helen_determination_id": det["determination_id"], "provider_type": provider_type, "execution_authority": authority, "authorization_reference": technical_metadata["authorization_reference"], "decision_reference": technical_metadata["decision_reference"]})
         if technical_provider:
             auth.update({"schema_version": "estate.engineering.authorization.v1", "engineering_authorization_id": auth["authorization_id"], "prompt_source": authority.get("prompt_source"), "prompt_source_type": authority.get("prompt_source_type"), "prompt_source_digest": authority.get("prompt_source_digest"), "allowed_read_paths": list(authority.get("allowed_read_paths") or []), "allowed_write_paths": list(authority.get("allowed_write_paths") or []), "expected_outputs": list(authority.get("expected_outputs") or []), "provider_extension": dict(authority.get("provider_extension") or {}), "authorization_state": "authorized_for_dispatch", "authorized_at": request.provider_metadata["ptm_revalidated_at"], "expires_at": binding.expires_at, "institutional_acceptance_state": "not_granted", "idempotency_key": key, "operations_decision_id": commission["operations_decision_id"]})
@@ -511,6 +524,7 @@ class GraceHelenEngineeringComposition:
             if existing_item is None or existing_item.to_dict() != request.to_dict():
                 raise ValueError("conflicting Dispatch replay") from exc
             item = existing_item
+        commission.update({"provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference})
         commission["status"] = "authorized_for_dispatch"; _write_replace(self._path(COMMISSIONS, commission_id), commission); self._state(commission["grace_objective_id"], "awaiting_dispatch", engineering_commission_id=commission_id, dispatch_id=item.dispatch_id)
         return auth, item.to_dict()
 
