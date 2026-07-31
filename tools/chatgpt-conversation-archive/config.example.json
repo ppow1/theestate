@@ -31,7 +31,7 @@
   "inventoryPollingIntervalMs": 1200,
   "inventoryFallbackDelayMs": 5000,
   "inventoryBottomDwellMs": 10000,
-  "inventoryRequiredStablePasses": 810,
+  "inventoryRequiredStablePasses": 10,
   "inventoryMaxDurationMs": 2700000,
   "inventoryMaxPasses": 5000,
   "staleRunHeartbeatThresholdMs": 300000,

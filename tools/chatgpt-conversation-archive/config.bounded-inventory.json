@@ -8,7 +8,7 @@
   "inventoryPollingIntervalMs": 200,
   "inventoryFallbackDelayMs": 500,
   "inventoryBottomDwellMs": 500,
-  "inventoryRequiredStablePasses": 6,
+  "inventoryRequiredStablePasses": 10,
   "inventoryMaxPasses": 30,
   "inventoryMaxDurationMs": 30000
 }

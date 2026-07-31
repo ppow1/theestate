@@ -4,7 +4,9 @@
   "private": true,
   "description": "Estate-wide local ChatGPT conversation archive and incremental synchronizer",
   "type": "module",
-  "bin": { "chatgpt-archive": "dist/cli.js" },
+  "bin": {
+    "chatgpt-archive": "dist/cli.js"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
@@ -12,6 +14,15 @@
     "playwright:test": "playwright test",
     "validate": "npm run build && node dist/cli.js validate --config config.example.json"
   },
-  "dependencies": { "commander": "^14.0.0", "playwright": "^1.55.0" },
-  "devDependencies": { "@types/node": "^24.0.0", "typescript": "^5.9.0", "vitest": "^3.2.0", "@playwright/test": "^1.55.0" }
+  "dependencies": {
+    "commander": "^14.0.0",
+    "pdf-parse": "^2.4.5",
+    "playwright": "^1.55.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
 }
