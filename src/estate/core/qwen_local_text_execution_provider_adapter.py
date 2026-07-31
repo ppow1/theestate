@@ -11,6 +11,7 @@ import json
 import ipaddress
 import os
 import socket
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -33,6 +34,13 @@ ADAPTER_VERSION = "1.0.0"
 SUPPORTED_CAPABILITIES = {"documentation_draft", "text_generation", "bounded_repository_read"}
 RECEIPT_DIR = Path("runtime/engineering_adapter_receipts")
 RECEIPT_ROOT = "runtime/engineering_adapter_receipts/"
+
+
+@dataclass(frozen=True)
+class _ExclusiveWriteToken:
+    path: Path
+    st_dev: int
+    st_ino: int
 
 
 def _root(root: str | Path | None) -> Path:
@@ -217,7 +225,8 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         return receipt_ref
 
     @staticmethod
-    def _exclusive_write_text(target: Path, content: str) -> None:
+    def _exclusive_write_text(target: Path, content: str) -> _ExclusiveWriteToken:
+        target = target.resolve(strict=False)
         target.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         identity = os.fstat(descriptor)
@@ -226,7 +235,16 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         try:
             stream = os.fdopen(descriptor, "wb", buffering=0, closefd=True)
             descriptor = None
-            stream.write(content.encode("utf-8"))
+            payload = content.encode("utf-8")
+            offset = 0
+            while offset < len(payload):
+                remaining = payload[offset:]
+                written = stream.write(remaining)
+                if written is None or not isinstance(written, int) or written <= 0:
+                    raise OSError("exclusive write made no progress")
+                if written > len(remaining):
+                    raise OSError("exclusive write reported more bytes than supplied")
+                offset += written
             stream.flush()
             os.fsync(stream.fileno())
             stream_descriptor = stream.fileno()
@@ -261,6 +279,25 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             except OSError:
                 pass
             raise
+        return _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
+
+    @staticmethod
+    def _remove_if_owned(token: _ExclusiveWriteToken) -> bool:
+        try:
+            current = token.path.stat()
+        except FileNotFoundError:
+            return True
+        except OSError:
+            return False
+        if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
+            return False
+        try:
+            token.path.unlink()
+        except FileNotFoundError:
+            return True
+        except OSError:
+            return False
+        return True
 
     def _target_collision_errors(self, request: ExecutionProviderAdapterRequest) -> tuple[list[str], Path | None, Path | None]:
         document_path = next((str(path).replace("\\", "/") for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")), None)
@@ -295,7 +332,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         config = self._config(); target_errors, document_target, _ = self._target_collision_errors(request)
         if target_errors:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); document_created = False
+        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); document_token = None
         try:
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
@@ -319,16 +356,16 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
             target = document_target or (self.root / document_path).resolve(); target.relative_to(self.root.resolve())
             try:
-                self._exclusive_write_text(target, encoded.decode("utf-8"))
+                document_token = self._exclusive_write_text(target, encoded.decode("utf-8"))
             except Exception as exc:
                 raise OSError(f"document persistence failed: {str(exc)[:400]}") from exc
-            document_created = True
             try:
                 receipt_ref = self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True)
             except Exception as exc:
-                if document_created and target.exists():
-                    target.unlink()
-                raise OSError(f"success receipt persistence failed: {str(exc)[:400]}") from exc
+                rollback_warning = ""
+                if document_token is not None and not self._remove_if_owned(document_token):
+                    rollback_warning = "; document rollback skipped because file identity changed or cleanup failed"
+                raise OSError(f"success receipt persistence failed: {str(exc)[:400]}{rollback_warning}") from exc
             artifacts = [document_path, receipt_ref]
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=artifacts, validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})
         except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError) as exc:

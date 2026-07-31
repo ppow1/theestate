@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -65,10 +66,19 @@ def _inject_partial_fdopen(monkeypatch, failing_call: int, phase: str = "write")
             return stream
 
         class FailingStream:
+            write_calls = 0
+
             def write(self, data):
+                self.write_calls += 1
                 if phase == "write":
                     stream.write(data[:max(1, len(data) // 2)])
                     raise OSError("injected write failure")
+                if phase == "short":
+                    return stream.write(data[:max(1, len(data) // 2)])
+                if phase == "zero_after_partial":
+                    if self.write_calls == 1:
+                        return stream.write(data[:max(1, len(data) // 2)])
+                    return 0
                 return stream.write(data)
 
             def flush(self):
@@ -368,3 +378,63 @@ def test_flush_and_close_failures_remove_owned_target_and_preserve_primary_error
     with pytest.raises(OSError, match=f"injected {phase} failure"):
         QwenLocalTextExecutionProviderAdapter._exclusive_write_text(target, "content")
     assert not target.exists()
+
+
+def test_short_document_writes_complete_and_hash_matches_receipt(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=1, phase="short")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "completed"
+    document = tmp_path / "docs/operations/examples/qwen-test.md"
+    receipt = tmp_path / result.metadata["provider_receipt"]
+    payload = json.loads(receipt.read_text())
+    assert document.read_text() == "Generated local Qwen text."
+    assert payload["artifacts"][0]["sha256"] == hashlib.sha256(document.read_bytes()).hexdigest()
+
+
+def test_zero_progress_document_write_fails_closed_and_writes_failure_receipt(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=1, phase="zero_after_partial")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+    assert json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())["artifacts"] == []
+
+
+def test_short_success_receipt_writes_complete_and_completion_is_reported_after_commit(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=2, phase="short")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "completed"
+    assert json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())["provider_result_state"] == "completed"
+
+
+def test_zero_progress_success_receipt_removes_owned_document_and_writes_one_failure_receipt(tmp_path, monkeypatch):
+    _inject_partial_fdopen(monkeypatch, failing_call=2, phase="zero_after_partial")
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+    assert json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())["provider_result_state"] == "failed"
+
+
+def test_receipt_failure_does_not_remove_replacement_document(tmp_path, monkeypatch):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    original = adapter._write_receipt
+    replaced = {"done": False}
+
+    def fail_after_replacement(request, config, **kwargs):
+        if not replaced["done"]:
+            replaced["done"] = True
+            document = tmp_path / "docs/operations/examples/qwen-test.md"
+            document.unlink()
+            document.write_bytes(b"replacement document")
+            raise OSError("injected success receipt failure")
+        return original(request, config, **kwargs)
+
+    monkeypatch.setattr(adapter, "_write_receipt", fail_after_replacement)
+    result = adapter.submit(_request(tmp_path))
+    document = tmp_path / "docs/operations/examples/qwen-test.md"
+    assert result.status == "failed"
+    assert document.read_bytes() == b"replacement document"
+    assert any("identity changed" in error for error in result.errors)

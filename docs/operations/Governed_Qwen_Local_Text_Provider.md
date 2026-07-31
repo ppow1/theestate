@@ -77,11 +77,14 @@ failure and removes the newly created document when it did not pre-exist; it
 does not claim successful completion.
 
 Both files use exclusive creation, but exclusive creation alone does not imply
-complete persistence. The helper owns a newly created file until its encoding,
-write, flush, fsync, and close all succeed. If any of those operations fails,
-it compares the target identity with the file it created and removes only that
-file. Pre-existing or competing files are never removed. Cleanup errors do not
-mask the original persistence error.
+complete persistence. The helper encodes once and loops until every byte has
+been written. A `None`, zero, negative, oversized, or otherwise invalid write
+result fails closed; zero progress is never retried indefinitely. The helper
+then flushes, fsyncs, and closes before returning success. It owns a newly
+created file until all of those operations succeed, records the creation-time
+file identity, and removes only that identity on persistence failure.
+Pre-existing or competing files are never removed. Cleanup errors do not mask
+the original persistence error.
 
 If document persistence fails, no partial document remains and a truthful
 failure receipt may be written when its fresh declared target is available. If
@@ -89,7 +92,10 @@ success receipt persistence fails, the newly created document is removed and
 the adapter makes one bounded attempt to write a truthful failure receipt; it
 does not report completion. If failure-receipt persistence itself fails, the
 partial receipt is removed, no recursive retry occurs, and the result reports
-that durable evidence could not be persisted. A late collision therefore fails
+that durable evidence could not be persisted. Document rollback compares the
+current path identity with the ownership token; if a replacement has appeared,
+rollback is skipped and a bounded warning is surfaced. The adapter never uses
+pathname-only deletion for governed rollback. A late collision therefore fails
 closed; the competing file is never overwritten. A collision before provider
 execution produces no receipt because no valid live execution began.
 
