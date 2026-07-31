@@ -18,8 +18,11 @@ from estate.core.execution_dispatch import DispatchRequest, enqueue_dispatch_req
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterResult, utc_now
 from estate.core.execution_provider_adapter_runtime import write_adapter_result
 from estate.core.execution_result_reconciliation_runtime import reconcile_result
+from estate.core.authority_schema_runtime import canonical_record_digest, require_valid
 from estate.core.engineering_capability_enablement import CapabilityEnablementLifecycle, CapabilityEvidence
 from estate.core.grace_operations_runtime import GraceOperationsRuntime
+from estate.core.operations_control_runtime import OperationsControlRuntime
+from estate.core.operations_manager import OperationsDecision
 from estate.core.ptm_readiness_integration import PtmReadinessGateError, PtmProductionReadinessResolver, revalidate_readiness, resolve_and_bind
 from estate.core.paths import ESTATE_ROOT
 
@@ -76,7 +79,13 @@ def _durable_write(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     encoded = (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
-    descriptor = os.open(str(path), flags)
+    try:
+        descriptor = os.open(str(path), flags)
+    except FileExistsError:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing != payload:
+            raise ValueError(f"conflicting authority replay at {path}")
+        return
     try:
         with os.fdopen(descriptor, "wb") as handle:
             descriptor = -1
@@ -331,6 +340,7 @@ class GraceHelenEngineeringComposition:
             if not decision_found:
                 raise PermissionError("canonical Operations decision is required for technical provider execution")
         key = idempotency_key or f"{commission_id}:{provider_id}:authorization"
+        technical_provider = provider_id in {"qwen.local.text", "codex.execution.cli"}
         stable_token = hashlib.sha256(key.encode("utf-8")).hexdigest()
         authorization_id = f"engauth-{stable_token[:12]}"
         dispatch_id = f"dispatch-{stable_token[12:24]}"
@@ -348,7 +358,54 @@ class GraceHelenEngineeringComposition:
         if existing_auth and not existing_auth.get("dispatch_id"):
             raise ValueError("incomplete existing authorization cannot be reused")
         authority = commission.get("execution_authority") or {}
-        technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": f"operations-control/{commission['operations_decision_id']}"}
+        decision_id = f"opdec-{stable_token[:24]}"
+        decision_reference = f"operations-control/{decision_id}"
+        decision_path = self.root / "runtime/operations/control/decisions"
+        existing_decision = next((candidate for candidate in decision_path.glob("*.json") if candidate.exists() and _load(candidate).get("decision_id") == decision_id), None) if decision_path.exists() else None
+        if technical_provider and existing_decision is None:
+            execution_decision = OperationsDecision(
+                decision_id=decision_id,
+                created_at=utc_now(),
+                decided_by="Engineering",
+                decision_type="authorize_dispatch",
+                target_type="dispatch",
+                target_id=dispatch_id,
+                classification="Estate Internal",
+                reason=f"Authorize bounded technical Dispatch {dispatch_id} from accepted Engineering commission {commission_id}.",
+                priority="normal",
+                requires_boundary_review=False,
+                requires_steward_attention=False,
+                summary_safe=True,
+                metadata={"parent_operations_decision_id": commission["operations_decision_id"]},
+                decision_state="authorized_for_dispatch",
+                technical_execution=True,
+                grace_objective_id=commission["grace_objective_id"],
+                grace_action_id=commission["grace_action_id"],
+                helen_determination_id=det["determination_id"],
+                ptm_readiness=binding.to_dict(),
+                engineering_commission_id=commission_id,
+                engineering_authorization_id=authorization_id,
+                dispatch_id=dispatch_id,
+                selected_provider_id=provider_id,
+                selected_adapter_reference=adapter_reference,
+                authorization_reference=f"runtime/grace_helen_engineering/engineering_authorizations/{authorization_id}.json",
+                decision_reference=decision_reference,
+                prompt_source=authority.get("prompt_source"),
+                prompt_source_digest=authority.get("prompt_source_digest"),
+                allowed_read_paths=list(authority.get("allowed_read_paths") or []),
+                allowed_write_paths=list(authority.get("allowed_write_paths") or []),
+                expected_outputs=list(authority.get("expected_outputs") or []),
+                authorized_at=utc_now(),
+                expires_at=binding.expires_at,
+                idempotency_key=key,
+                parent_operations_decision_id=commission["operations_decision_id"],
+            )
+            OperationsControlRuntime(self.root).record_decision(execution_decision)
+        elif technical_provider:
+            execution_decision = OperationsDecision.from_dict(_load(existing_decision))
+            if not execution_decision.technical_execution or execution_decision.engineering_commission_id != commission_id or execution_decision.dispatch_id != dispatch_id:
+                raise ValueError("conflicting Operations decision replay")
+        technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": decision_reference if technical_provider else f"operations-control/{commission['operations_decision_id']}"}
         if authority:
             technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
         if existing_auth:
@@ -357,7 +414,11 @@ class GraceHelenEngineeringComposition:
                     raise ValueError("conflicting authorization replay")
         request = DispatchRequest(dispatch_id=dispatch_id, work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=det["worker_profile_id"], classification="Estate Internal", priority="Normal", state="Ready", prompt_source=authority.get("prompt_source"), allowed_read_paths=list(authority.get("allowed_read_paths") or []), allowed_write_paths=list(authority.get("allowed_write_paths") or []), expected_outputs=list(authority.get("expected_outputs") or []), allowed_providers=[provider_id], provider_metadata=technical_metadata)
         auth.update({"dispatch_id": request.dispatch_id, "dispatch_record_path": "runtime/execution_dispatch/queue.json", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": request.provider_metadata["ptm_revalidated_at"], "ptm_revalidation_result": "passed", "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "helen_determination_id": det["determination_id"], "provider_type": provider_type, "execution_authority": authority, "authorization_reference": technical_metadata["authorization_reference"], "decision_reference": technical_metadata["decision_reference"]})
+        if technical_provider:
+            auth.update({"schema_version": "estate.engineering.authorization.v1", "engineering_authorization_id": auth["authorization_id"], "prompt_source": authority.get("prompt_source"), "prompt_source_type": authority.get("prompt_source_type"), "prompt_source_digest": authority.get("prompt_source_digest"), "allowed_read_paths": list(authority.get("allowed_read_paths") or []), "allowed_write_paths": list(authority.get("allowed_write_paths") or []), "expected_outputs": list(authority.get("expected_outputs") or []), "authorization_state": "authorized_for_dispatch", "authorized_at": request.provider_metadata["ptm_revalidated_at"], "expires_at": binding.expires_at, "institutional_acceptance_state": "not_granted", "idempotency_key": key, "operations_decision_id": commission["operations_decision_id"]})
         auth["record_digest"] = hashlib.sha256(json.dumps({key: value for key, value in auth.items() if key != "record_digest"}, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        if technical_provider:
+            require_valid(auth, "estate.engineering.authorization.v1", self.root)
         technical_metadata["authorization_record_digest"] = auth["record_digest"]
         if not existing_auth:
             _durable_write(auth_path, auth)

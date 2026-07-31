@@ -13,6 +13,7 @@ import os
 import posixpath
 import stat
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from pathlib import PurePosixPath, PureWindowsPath
 from typing import Any
@@ -34,6 +35,7 @@ from estate.core.execution_dispatch import (
 from estate.core.execution_provider_adapter import ExecutionProviderAdapterRequest
 from estate.core.execution_provider_adapter_runtime import run_dry_run_adapter, write_adapter_request
 from estate.core.ptm_readiness_integration import PtmReadinessGateError, revalidate_readiness
+from estate.core.authority_schema_runtime import canonical_record_digest, validation_errors
 
 HANDOFF_ELIGIBLE_STATES = {"Ready"}
 HANDOFF_STATES = {
@@ -196,8 +198,11 @@ def _validate_item(item: DispatchQueueItem, root: Path | None = None) -> Handoff
 def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list[str]:
     """Validate technical Dispatch metadata against its durable commission/auth."""
     errors: list[str] = []
+    if item.provider not in {"qwen.local.text", "codex.execution.cli"}:
+        return errors
     metadata = item.provider_metadata or {}
-    errors.extend(_validate_dispatch_metadata_schema(root, metadata))
+    if item.provider in {"qwen.local.text", "codex.execution.cli"}:
+        errors.extend(_validate_dispatch_metadata_schema(root, metadata))
     commission_id = str(metadata.get("engineering_commission_id") or "")
     if not commission_id:
         return ["technical execution requires engineering_commission_id"]
@@ -247,8 +252,8 @@ def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list
     expected_auth_ref = f"runtime/grace_helen_engineering/engineering_authorizations/{metadata.get('engineering_authorization_id')}.json"
     if metadata.get("authorization_reference") != expected_auth_ref:
         errors.append("authorization_reference is not the canonical Engineering authorization path")
-    if metadata.get("decision_reference") != f"operations-control/{commission.get('operations_decision_id')}":
-        errors.append("decision_reference does not match the canonical Operations decision")
+    if not isinstance(metadata.get("decision_reference"), str) or not metadata["decision_reference"].startswith("operations-control/"):
+        errors.append("decision_reference does not identify the canonical Operations decision")
     if not auth_ref or auth_ref != expected_auth_ref:
         errors.append("recognized authorization reference is required")
     else:
@@ -257,19 +262,70 @@ def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list
         except (OSError, ValueError):
             errors.append("authorization record is not available")
         else:
+            try:
+                errors.extend(validation_errors(auth, "estate.engineering.authorization.v1", root))
+            except (OSError, ValueError) as exc:
+                errors.append(f"Engineering authorization schema unavailable: {exc}")
             expected_digest = hashlib.sha256(json.dumps({key: value for key, value in auth.items() if key != "record_digest"}, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
             if auth.get("record_digest") != metadata.get("authorization_record_digest") or auth.get("record_digest") != expected_digest:
                 errors.append("authorization record digest does not match")
-            if auth.get("engineering_commission_id") != commission_id or auth.get("dispatch_id") != item.dispatch_id or auth.get("provider_id") != item.provider or auth.get("provider_type") != metadata.get("provider_type") or auth.get("adapter_reference") != metadata.get("adapter_reference") or auth.get("grace_objective_id") != commission.get("grace_objective_id") or auth.get("grace_action_id") != commission.get("grace_action_id") or auth.get("helen_determination_id") != commission.get("helen_determination_id") or auth.get("execution_authority") != authority:
+            if auth.get("engineering_commission_id") != commission_id or auth.get("dispatch_id") != item.dispatch_id or auth.get("provider_id") != item.provider or auth.get("provider_type") != metadata.get("provider_type") or auth.get("adapter_reference") != metadata.get("adapter_reference") or auth.get("grace_objective_id") != commission.get("grace_objective_id") or auth.get("grace_action_id") != commission.get("grace_action_id") or auth.get("helen_determination_id") != commission.get("helen_determination_id") or auth.get("execution_authority") != authority or auth.get("prompt_source") != item.prompt_source or auth.get("prompt_source_digest") != metadata.get("prompt_source_digest") or auth.get("allowed_read_paths") != item.allowed_read_paths or auth.get("allowed_write_paths") != item.allowed_write_paths or auth.get("expected_outputs") != item.expected_outputs or auth.get("ptm_readiness") != metadata.get("ptm_readiness") or auth.get("decision_reference") != metadata.get("decision_reference"):
                 errors.append("authorization record does not match Dispatch, commission, or provider")
-    decision_dir = root / "runtime/operations/control/decisions"
-    decision_paths = [path for path in decision_dir.glob("*.json") if path.is_file()] if decision_dir.exists() else []
-    decisions = []
-    for path in decision_paths:
-        try: decisions.append(json.loads(path.read_text(encoding="utf-8")))
-        except (OSError, ValueError): pass
-    if not any(record.get("decision_id") == commission.get("operations_decision_id") for record in decisions):
-        errors.append("canonical Operations decision record is not available")
+            try:
+                if datetime.fromisoformat(str(auth["expires_at"]).replace("Z", "+00:00")) <= datetime.now(timezone.utc):
+                    errors.append("Engineering authorization is expired")
+            except (KeyError, ValueError, TypeError):
+                pass
+    decision_ref = metadata.get("decision_reference")
+    decision_id = decision_ref.removeprefix("operations-control/") if isinstance(decision_ref, str) and decision_ref.startswith("operations-control/") else ""
+    decision_path = root / "runtime/operations/control/decisions" / f"{decision_id}.json"
+    if not decision_id:
+        errors.append("canonical Operations decision reference is required")
+    else:
+        candidates = [path for path in (root / "runtime/operations/control/decisions").glob(f"*_{decision_id}.json") if path.is_file()] if (root / "runtime/operations/control/decisions").exists() else []
+        if candidates:
+            decision_path = candidates[0]
+        try:
+            decision = json.loads(decision_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            errors.append("canonical Operations decision record is not available")
+        else:
+            try:
+                errors.extend(validation_errors(decision, "estate.operations-control.decision.v1", root))
+            except (OSError, ValueError) as exc:
+                errors.append(f"Operations decision schema unavailable: {exc}")
+            if decision.get("record_digest") != canonical_record_digest(decision):
+                errors.append("Operations decision digest does not match")
+            expected_decision = {
+                "decision_id": decision_id,
+                "decision_reference": decision_ref,
+                "parent_operations_decision_id": commission.get("operations_decision_id"),
+                "engineering_commission_id": commission_id,
+                "dispatch_id": item.dispatch_id,
+                "selected_provider_id": item.provider,
+                "selected_adapter_reference": metadata.get("adapter_reference"),
+                "grace_objective_id": commission.get("grace_objective_id"),
+                "grace_action_id": commission.get("grace_action_id"),
+                "helen_determination_id": commission.get("helen_determination_id"),
+                "engineering_authorization_id": metadata.get("engineering_authorization_id"),
+                "prompt_source_digest": metadata.get("prompt_source_digest"),
+            }
+            for key, expected in expected_decision.items():
+                if decision.get(key) != expected:
+                    errors.append(f"Operations decision {key} does not match governed Dispatch")
+            if decision.get("authorization_reference") != metadata.get("authorization_reference"):
+                errors.append("Operations decision authorization reference does not match Dispatch")
+            if decision.get("ptm_readiness") != metadata.get("ptm_readiness"):
+                errors.append("Operations decision PTM evidence does not match Dispatch")
+            for field_name, expected in (("prompt_source", item.prompt_source), ("allowed_read_paths", item.allowed_read_paths), ("allowed_write_paths", item.allowed_write_paths), ("expected_outputs", item.expected_outputs)):
+                if decision.get(field_name) != expected:
+                    errors.append(f"Operations decision {field_name} does not match Dispatch")
+            for field_name in ("authorized_at", "expires_at"):
+                try:
+                    if field_name == "expires_at" and datetime.fromisoformat(str(decision[field_name]).replace("Z", "+00:00")) <= datetime.now(timezone.utc):
+                        errors.append("Operations decision is expired")
+                except (KeyError, ValueError, TypeError):
+                    pass
     try:
         revalidate_readiness(root, metadata.get("ptm_readiness") or {}, commission_id=commission_id)
     except (PtmReadinessGateError, ValueError, OSError) as exc:
