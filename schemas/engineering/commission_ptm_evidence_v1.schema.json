@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.commission-ptm-evidence.v1",
+  "type": "object",
+  "required": ["readiness_resolution_id", "readiness_projection_path", "readiness_projection_digest", "readiness_state", "source_high_watermark", "freshness_policy_id", "freshness_policy_version", "freshness_policy_digest", "waiver_registry_id", "waiver_registry_version", "waiver_registry_digest", "evaluated_at", "expires_at", "dependency_evidence_references", "waiver_references"],
+  "properties": {
+    "readiness_resolution_id": {"type": "string", "minLength": 1},
+    "readiness_projection_path": {"type": "string", "pattern": "^runtime/ptm/readiness/[A-Za-z0-9_.-]+[.]json$"},
+    "readiness_projection_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "readiness_state": {"enum": ["ready", "waived"]},
+    "objective_id": {"type": "string", "minLength": 1},
+    "enabling_project_id": {"type": ["string", "null"]},
+    "task_or_package_id": {"type": "string", "minLength": 1},
+    "source_high_watermark": {"type": "string", "minLength": 1},
+    "freshness_policy_id": {"type": ["string", "null"]},
+    "freshness_policy_version": {"type": ["string", "null"]},
+    "freshness_policy_digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "waiver_registry_id": {"type": ["string", "null"]},
+    "waiver_registry_version": {"type": ["string", "null"]},
+    "waiver_registry_digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "evaluated_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "dependency_evidence_references": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "waiver_references": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

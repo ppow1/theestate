@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.dispatch.readiness-rejection.v1",
+  "type": "object",
+  "required": ["rejection_id", "engineering_commission_id", "readiness_resolution_id", "rejection_state", "reason", "rejected_at", "idempotency_key", "institutional_acceptance_state"],
+  "properties": {
+    "rejection_id": {"type": "string", "minLength": 1},
+    "engineering_commission_id": {"type": "string", "minLength": 1},
+    "readiness_resolution_id": {"type": ["string", "null"]},
+    "rejection_state": {"const": "blocked"},
+    "reason": {"type": "string", "minLength": 1},
+    "rejected_at": {"type": "string", "format": "date-time"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "institutional_acceptance_state": {"const": "not_granted"}
+  },
+  "additionalProperties": false
+}

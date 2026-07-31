@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering.completion-evidence-chain.v1",
+  "type": "object",
+  "required": ["commission_id", "dispatch_id", "ptm_readiness_resolution_id", "ptm_readiness_projection_digest", "provider_execution_receipt", "artifact_references", "validation_evidence", "reconciliation_outcome"],
+  "properties": {
+    "commission_id": {"type": "string", "minLength": 1},
+    "dispatch_id": {"type": "string", "minLength": 1},
+    "ptm_readiness_resolution_id": {"type": "string", "minLength": 1},
+    "ptm_readiness_projection_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "provider_execution_receipt": {"type": "string", "minLength": 1},
+    "artifact_references": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "validation_evidence": {"type": "string", "minLength": 1},
+    "reconciliation_outcome": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

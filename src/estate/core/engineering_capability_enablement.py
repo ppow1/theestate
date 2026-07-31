@@ -95,6 +95,9 @@ class CapabilityEnablementLifecycle:
     def __init__(self, root: str | Path | None = None,
                  canonical_dependency_resolver: CanonicalDependencyResolver | None = None) -> None:
         self.root = _root(root)
+        if canonical_dependency_resolver is None:
+            from estate.core.ptm_readiness_integration import PtmCapabilityDependencyResolver
+            canonical_dependency_resolver = PtmCapabilityDependencyResolver(self.root)
         self.canonical_dependency_resolver = canonical_dependency_resolver
 
     def _record(self, kind: str, prefix: str, payload: dict[str, Any]) -> dict[str, Any]:
