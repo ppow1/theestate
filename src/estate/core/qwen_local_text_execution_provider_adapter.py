@@ -10,8 +10,11 @@ import hashlib
 import json
 import ipaddress
 import os
-import secrets
+import shutil
 import socket
+import sys
+import tempfile
+import ctypes
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -203,8 +206,13 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
     def _write_receipt(self, request: ExecutionProviderAdapterRequest, config: dict[str, Any], *, started: str,
                        result_state: str, validation_result: str, timeout_state: str,
                        cancellation_state: str, actual_model: str | None, prompt: str,
-                       artifacts: list[str], errors: list[str], endpoint_local: bool) -> str:
+                       artifacts: list[str], errors: list[str], endpoint_local: bool,
+                       receipt_target: Path | None = None,
+                       artifact_sources: dict[str, Path] | None = None,
+                       orphaned_artifacts: list[dict[str, str]] | None = None,
+                       transaction_state: str | None = None) -> str:
         receipt_ref = str(request.metadata["provider_receipt_path"]).replace("\\", "/")
+        sources = artifact_sources or {}
         payload = {
             "schema_version": "estate.provider-receipt.v1", "provider_id": PROVIDER_ID,
             "adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
@@ -216,13 +224,15 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "source_commit": request.metadata.get("source_commit"), "sandbox": request.metadata.get("sandbox"),
             "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest() if prompt else None,
             "declared_artifact_paths": list(request.expected_outputs),
-            "artifacts": [{"path": path, "sha256": hashlib.sha256((self.root / path).read_bytes()).hexdigest()} for path in artifacts],
+            "artifacts": [{"path": path, "sha256": hashlib.sha256(sources.get(path, self.root / path).read_bytes()).hexdigest()} for path in artifacts],
+            "orphaned_artifacts": list(orphaned_artifacts or []),
             "started_at": started, "completed_at": utc_now(), "timeout_state": timeout_state,
             "cancellation_state": cancellation_state, "provider_result_state": result_state,
             "validation_result": validation_result, "endpoint_local": endpoint_local,
+            "transaction_state": transaction_state or result_state,
             "error_details": [str(error)[:500] for error in errors],
         }
-        self._exclusive_write_text(self.root / receipt_ref, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        self._exclusive_write_text(receipt_target or (self.root / receipt_ref), json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return receipt_ref
 
     def _exclusive_write_text(self, target: Path, content: str) -> _ExclusiveWriteToken:
@@ -272,107 +282,46 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                     os.close(descriptor)
                 except OSError:
                     pass
-            token = _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
-            self._append_cleanup_warning(exc, self._remove_if_owned(token))
+            exc.args = (f"{exc}; staged evidence retained at {target}", *exc.args[1:])
             raise
         return _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
 
-    @staticmethod
-    def _new_quarantine_directory(path: Path) -> Path:
-        return path.parent / f".{path.name}.qwen-cleanup-{secrets.token_hex(16)}"
-
-    def _before_quarantine_move(self, token: _ExclusiveWriteToken) -> None:
-        return None
-
-    def _after_quarantine_move(self, token: _ExclusiveWriteToken, quarantine: Path) -> None:
-        return None
-
-    def _before_quarantine_delete(self, token: _ExclusiveWriteToken, quarantine: Path) -> None:
-        return None
+    def _new_staging_directory(self, request: ExecutionProviderAdapterRequest) -> Path:
+        parent = self.root / "runtime" / "engineering_adapter_staging"
+        parent.mkdir(parents=True, exist_ok=True)
+        return Path(tempfile.mkdtemp(prefix=f"qwen-{request.adapter_request_id}-", dir=parent))
 
     @staticmethod
-    def _append_cleanup_warning(exc: Exception, warning: str | None) -> None:
-        if not warning:
+    def _publish_no_replace(source: Path, destination: Path) -> None:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if os.name == "nt":
+            move_file = ctypes.windll.kernel32.MoveFileExW
+            move_file.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32]
+            move_file.restype = ctypes.c_int
+            if not move_file(str(source), str(destination), 0x00000008):
+                raise ctypes.WinError()
             return
-        bounded = f"cleanup warning: {warning[:300]}"
-        if exc.args:
-            exc.args = (f"{exc.args[0]}; {bounded}", *exc.args[1:])
-        else:
-            exc.args = (bounded,)
-        try:
-            exc.add_note(bounded)
-        except AttributeError:
-            pass
+        if sys.platform.startswith("linux"):
+            libc = ctypes.CDLL(None, use_errno=True)
+            renameat2 = getattr(libc, "renameat2", None)
+            if renameat2 is None:
+                raise NotImplementedError("Linux renameat2 no-replace publication is unavailable")
+            renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+            renameat2.restype = ctypes.c_int
+            result = renameat2(-100, os.fsencode(source), -100, os.fsencode(destination), 1)
+            if result != 0:
+                error = ctypes.get_errno()
+                raise OSError(error, os.strerror(error))
+            return
+        raise NotImplementedError("no portable no-replace publication primitive is available")
 
-    def _remove_if_owned(self, token: _ExclusiveWriteToken) -> str | None:
+    @staticmethod
+    def _remove_staging_directory(staging_dir: Path) -> None:
+        shutil.rmtree(staging_dir)
         try:
-            current = token.path.stat()
-        except FileNotFoundError:
-            return None
+            staging_dir.parent.rmdir()
         except OSError:
-            return "owned cleanup could not stat the governed path"
-        if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
-            return "owned cleanup skipped because governed path identity changed"
-        try:
-            self._before_quarantine_move(token)
-        except OSError:
-            return "owned cleanup could not prepare quarantine move"
-        try:
-            quarantine_dir = self._new_quarantine_directory(token.path)
-            # mkdir is the authority for ownership.  No prior exists() check
-            # is used, and a colliding directory is never reused or replaced.
-            quarantine_dir.mkdir(mode=0o700)
-            quarantine = quarantine_dir / "owned-output"
-            current = token.path.stat()
-            if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
-                quarantine_dir.rmdir()
-                return "owned cleanup skipped because governed path identity changed"
-            # The destination is inside a newly created private directory, so
-            # no competing destination entry can exist before this move.
-            os.rename(token.path, quarantine)
-        except FileNotFoundError:
-            return "owned cleanup skipped because governed path disappeared or quarantine directory collided"
-        except FileExistsError:
-            return "owned cleanup skipped because quarantine directory already exists"
-        except OSError:
-            return "owned cleanup could not move the file to quarantine"
-        try:
-            self._after_quarantine_move(token, quarantine)
-        except OSError:
-            return "owned cleanup could not verify quarantine move"
-        descriptor = None
-        try:
-            descriptor = os.open(quarantine, os.O_RDONLY)
-            moved = os.fstat(descriptor)
-            if (moved.st_dev, moved.st_ino) != (token.st_dev, token.st_ino):
-                return "owned cleanup skipped because quarantined file identity changed"
-            # Windows may reject replacement or unlink while this handle is
-            # open. Close it before the deterministic final-stage hook and
-            # recheck the entry immediately before deletion.
-            os.close(descriptor)
-            descriptor = None
-            self._before_quarantine_delete(token, quarantine)
-            current = quarantine.stat()
-            if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
-                return "owned cleanup skipped because quarantine path identity changed"
-            # The private directory is owned by this invocation, so the
-            # verified entry is not exposed through the governed pathname.
-            quarantine.unlink()
-        except FileNotFoundError:
-            return "owned cleanup could not verify quarantined file identity"
-        except OSError:
-            return "owned cleanup could not remove verified quarantine file"
-        finally:
-            if descriptor is not None:
-                try:
-                    os.close(descriptor)
-                except OSError:
-                    pass
-        try:
-            quarantine_dir.rmdir()
-        except OSError:
-            return "owned cleanup removed the file but could not remove its private quarantine directory"
-        return None
+            pass
 
     def _target_collision_errors(self, request: ExecutionProviderAdapterRequest) -> tuple[list[str], Path | None, Path | None]:
         document_path = next((str(path).replace("\\", "/") for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")), None)
@@ -407,7 +356,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         config = self._config(); target_errors, document_target, _ = self._target_collision_errors(request)
         if target_errors:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); document_token = None
+        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(metadata["provider_receipt_path"]).replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; published_document = False
         try:
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
@@ -429,30 +378,37 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             encoded = text.strip().encode("utf-8")
             if len(encoded) > int(config["output_limits"]["max_artifact_bytes"]):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
-            target = document_target or (self.root / document_path).resolve(); target.relative_to(self.root.resolve())
             try:
-                document_token = self._exclusive_write_text(target, encoded.decode("utf-8"))
+                self._exclusive_write_text(staged_document, encoded.decode("utf-8"))
             except Exception as exc:
                 raise OSError(f"document persistence failed: {str(exc)[:400]}") from exc
+            self._publish_no_replace(staged_document, document_target)
+            published_document = True
             try:
-                receipt_ref = self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True)
+                self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True, receipt_target=staging_dir / "success-receipt", artifact_sources={document_path: document_target}, transaction_state="completed")
             except Exception as exc:
-                rollback_warning = ""
-                if document_token is not None:
-                    cleanup_warning = self._remove_if_owned(document_token)
-                    if cleanup_warning:
-                        rollback_warning = f"; {cleanup_warning}"
-                raise OSError(f"success receipt persistence failed: {str(exc)[:400]}{rollback_warning}") from exc
-            artifacts = [document_path, receipt_ref]
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=artifacts, validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})
-        except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError) as exc:
+                raise OSError(f"success receipt staging failed: {str(exc)[:400]}") from exc
+            self._publish_no_replace(staging_dir / "success-receipt", receipt_target)
+            self._remove_staging_directory(staging_dir)
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=[document_path, receipt_ref], validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": "completed"})
+        except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError, NotImplementedError) as exc:
             timeout_state = "timed_out" if isinstance(exc, (TimeoutError, socket.timeout)) or "timed out" in str(exc).lower() else "completed_within_limit"
             error_details = [str(exc)[:500]]
-            receipt_ref = None
+            orphaned_artifacts: list[dict[str, str]] = []
+            transaction_state = "failed"
+            if published_document:
+                document_hash = hashlib.sha256(document_target.read_bytes()).hexdigest()
+                orphaned_artifacts = [{"path": document_path, "sha256": document_hash}]
+                transaction_state = "failed_with_orphaned_document"
+            failure_receipt = staging_dir / "failure-receipt"
+            failure_receipt_ref = None
             try:
-                receipt_ref = self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True)
+                self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True, receipt_target=failure_receipt, orphaned_artifacts=orphaned_artifacts, transaction_state=transaction_state)
+                self._publish_no_replace(failure_receipt, receipt_target)
+                failure_receipt_ref = receipt_ref
             except Exception as receipt_error:
-                receipt_ref = None
+                transaction_state = "failed_without_durable_receipt" if not published_document else transaction_state
                 error_details.append(f"failure receipt persistence failed: {str(receipt_error)[:400]}")
-            artifacts = [receipt_ref] if receipt_ref else []
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=artifacts, validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})
+            else:
+                self._remove_staging_directory(staging_dir)
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status=transaction_state, started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_directory": str(staging_dir), "orphaned_artifacts": orphaned_artifacts})

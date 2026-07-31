@@ -68,47 +68,36 @@ timestamps, timeout and cancellation state, local endpoint determination, and
 validation result. It never records the complete prompt or secrets.
 
 If pre-invocation receipt authority is absent or invalid, the request is
-blocked without provider invocation or repository mutation. If a live request
-with valid receipt authority fails, the adapter writes a truthful failure
-receipt to that exact declared path with bounded error details, failed result
-and validation states, timeout/cancellation state, and an empty artifact list.
-If document writing succeeds but receipt writing fails, the adapter returns
-failure and removes the newly created document when it did not pre-exist; it
-does not claim successful completion.
+blocked without provider invocation or repository mutation. Every live
+document and receipt is first written completely inside an invocation-owned
+private staging directory. The writer loops until every encoded byte is
+written, rejects `None`, zero, negative, oversized, and invalid progress, then
+flushes, fsyncs, and closes.
 
-Both files use exclusive creation, but exclusive creation alone does not imply
-complete persistence. The helper encodes once and loops until every byte has
-been written. A `None`, zero, negative, oversized, or otherwise invalid write
-result fails closed; zero progress is never retried indefinitely. The helper
-then flushes, fsyncs, and closes before returning success. It owns a newly
-created file until all of those operations succeed and records the
-creation-time file identity. A stat followed by pathname unlink is not
-considered race-safe. Cleanup atomically creates an invocation-owned private
-same-parent quarantine directory with exclusive mkdir semantics, then moves
-the governed file into its fixed internal name. The destination cannot be
-occupied before the move, and `os.rename()` is not treated as a portable
-no-overwrite primitive on its own. The private container is the ownership and
-no-overwrite boundary. Cleanup verifies the moved object's identity, closes
-the verification handle, rechecks immediately before final deletion, and
-deletes only the verified private entry. Pre-existing or competing files are
-never removed. Cleanup errors do not mask the original persistence error.
+Publication uses a governed no-replace abstraction: Windows uses native
+`MoveFileExW` without `MOVEFILE_REPLACE_EXISTING`; Linux uses
+`renameat2(..., RENAME_NOREPLACE)`. Platforms without a genuine no-overwrite
+primitive fail closed and retain the staging directory. The implementation
+does not use `exists()` then rename, `stat()` then rename, `os.replace()`, or
+`stat()` then unlink as a safety primitive.
 
-If document persistence fails, no partial document remains and a truthful
-failure receipt may be written when its fresh declared target is available. If
-success receipt persistence fails, the newly created document is removed and
-the adapter makes one bounded attempt to write a truthful failure receipt; it
-does not report completion. If failure-receipt persistence itself fails, the
-partial receipt is removed, no recursive retry occurs, and the result reports
-that durable evidence could not be persisted. Document rollback compares the
-current path identity with the ownership token; if a replacement has appeared,
-rollback is skipped and a bounded warning is surfaced. Private-container
-collisions fail closed without overwriting the competing container. A
-post-move identity mismatch preserves the quarantined evidence. Cleanup
-warnings are appended in bounded form to the primary persistence error and
-there is no recursive receipt-writing loop. The adapter never deletes the
-governed pathname after a separate identity check. A late collision therefore
-fails closed; the competing file is never overwritten. A collision before
-provider execution produces no receipt because no valid live execution began.
+The document is published first and the success receipt second. Completion is
+reported only after both publications succeed. If document publication fails,
+the competing destination remains unchanged and staged evidence is retained or
+reconciled. If the document publishes but receipt publication fails, the
+document is preserved as explicitly reported orphaned evidence with its path
+and SHA-256; it is never rolled back by pathname deletion or rename. The result
+uses a failed-with-orphaned-document transaction state and Engineering
+completion remains blocked.
+
+Failure receipts are staged and published once when the destination remains
+available. If a failure receipt cannot be durably published, the staging
+directory is retained with bounded evidence and no recursive retry occurs.
+Failure receipts contain bounded errors, failed result and validation states,
+timeout/cancellation state, an empty completed-artifact list, and any
+orphaned-artifact path/hash. Cleanup warnings and staging-retention details are
+surfaced without masking the primary persistence failure. Institutional
+acceptance remains separate and is not granted.
 
 Provider execution and Engineering completion are evidence-producing states.
 Neither grants institutional acceptance; acceptance remains a separate
