@@ -474,7 +474,7 @@ class GraceHelenEngineeringComposition:
                 allowed_read_paths=list(authority.get("allowed_read_paths") or []),
                 allowed_write_paths=list(authority.get("allowed_write_paths") or []),
                 expected_outputs=list(authority.get("expected_outputs") or []),
-                provider_extension=authority.get("provider_extension"),
+                provider_extension=dict(authority.get("provider_extension") or {}),
                 authorized_at=utc_now(),
                 expires_at=binding.expires_at,
                 idempotency_key=key,
