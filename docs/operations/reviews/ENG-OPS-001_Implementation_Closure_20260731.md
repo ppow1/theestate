@@ -2,8 +2,8 @@
 
 Starting main: `c3d5f3990e86123d5623462c03e5c39be3d50aec`  
 Campaign branch: `engineering/complete-governed-engineering-first-live-task`  
-Final pushed HEAD: `c9ef01c5`  
-Commits: `00db8ff2`, `272151b7`, `c9ef01c5`
+Final pushed HEAD before this report-only finalization: `6c642be1`  
+Commits: `00db8ff2`, `272151b7`, `c9ef01c5`, `6c642be1`
 
 ## Scope and production path
 
