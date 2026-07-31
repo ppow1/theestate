@@ -294,7 +294,12 @@ def _waiver_errors(item: dict[str, Any], *, objective_id: str, package_id: str |
     scope = waiver.get("scope") or {}
     if scope.get("objective_id") != objective_id or scope.get("task_id") != task_id or (package_id is not None and scope.get("package_id") != package_id):
         errors.append("waiver scope does not match objective or task")
-    errors.extend(_source_check(root, [waiver.get("source_ref")] if isinstance(waiver.get("source_ref"), dict) else []))
+    source_ref = waiver.get("source_ref")
+    if not isinstance(waiver.get("source_digest"), str) or not re.fullmatch(r"[a-f0-9]{64}", waiver.get("source_digest", "")):
+        errors.append("waiver source digest invalid")
+    if isinstance(source_ref, dict) and waiver.get("source_digest") != source_ref.get("source_sha256"):
+        errors.append("waiver source digest does not match source reference")
+    errors.extend(_source_check(root, [source_ref] if isinstance(source_ref, dict) else []))
     return errors
 
 

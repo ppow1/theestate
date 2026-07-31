@@ -74,6 +74,13 @@ def test_invalid_and_expired_waivers_block(tmp_path):
     assert result.record["conflicts"]
 
 
+def test_waiver_source_digest_mismatch_blocks(tmp_path):
+    ref = source_ref(tmp_path, "waiver-mismatch.json")
+    dependency = {"dependency_id": "dep-1", "state": "waived", "observed_at": NOW, "waiver": {"waiver_id": "w-1", "granting_authority": "chief-architect", "scope": {"objective_id": "obj-1", "task_id": "tsk-1"}, "reason": "x", "granted_at": NOW, "expires_at": "2026-08-01T00:00:00Z", "source_ref": ref, "source_digest": "b" * 64}}
+    event = append_input(tmp_path, dependencies=[dependency])
+    assert resolve(tmp_path, event).readiness_state == "blocked"
+
+
 def test_missing_gate_and_contradictory_evidence_block(tmp_path):
     event = append_input(tmp_path, dependencies=[{"dependency_id": "dep-1", "state": "satisfied"}, {"dependency_id": "dep-1", "state": "unsatisfied"}], gates=[], conflicts=["contradictory source records"])
     result = resolve(tmp_path, event)
