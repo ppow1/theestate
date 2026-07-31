@@ -119,3 +119,16 @@ def test_completion_requires_artifact_and_provider_receipt(tmp_path):
     no_receipt = ExecutionProviderAdapterResult(adapter_request_id="no-receipt", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), artifacts=["artifact.dwg"], validation_status="passed")
     with pytest.raises(ValueError, match="receipt"):
         comp.reconcile_validate_complete(auth["authorization_id"], no_receipt, validation_passed=True)
+
+
+def test_completed_governed_replay_returns_existing_records_without_reexecution(tmp_path):
+    objective = _objective(tmp_path); comp = GraceHelenEngineeringComposition(tmp_path)
+    determination = _available(comp, objective); commission = _commission(comp, objective, determination)
+    auth, dispatch = comp.authorize_dispatch(commission["commission_id"], provider_id="fixture-cad-provider", provider_type="fixture", adapter_reference="tests.fixture")
+    result = ExecutionProviderAdapterResult(adapter_request_id="replay-fixture", dispatch_id=auth["dispatch_id"], provider_id="fixture-cad-provider", status="completed", started_at=utc_now(), artifacts=["replay.dwg"], validation_status="passed", metadata={"live_provider_called": False, "provider_receipt": "receipt://fixture/replay"})
+    completion = comp.reconcile_validate_complete(auth["authorization_id"], result, validation_passed=True)
+    comp.receive_completion(completion["completion_id"], objective.objective_id)
+    replay = comp.governed_commission_and_dispatch(objective.objective_id, determination["determination_id"], grace_action_id="grace-act-test", operations_decision_id="ops-dec-test", bounded_objective=objective.summary, acceptance_criteria=["one validated drawing"], ptm_source_high_watermark=commission["source_high_watermark"], ptm_task_or_package_id=f"task-{objective.objective_id}", enabling_project_id="project-test", provider_id="fixture-cad-provider", provider_type="fixture", adapter_reference="tests.fixture", idempotency_key=f"{objective.objective_id}:{determination['determination_id']}:commission")
+    assert replay["commission"]["commission_id"] == commission["commission_id"]
+    assert replay["authorization"]["authorization_id"] == auth["authorization_id"]
+    assert replay["dispatch"]["dispatch_id"] == dispatch["dispatch_id"]

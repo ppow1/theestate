@@ -362,6 +362,20 @@ class GraceHelenEngineeringComposition:
             adapter_reference=adapter_reference,
             idempotency_key=idempotency_key,
         )
+        if commission.get("status") == "completed":
+            existing_auth = next((
+                _load(path) for path in (self.root / AUTHORIZATIONS).glob("*.json")
+                if _load(path).get("engineering_commission_id") == commission["commission_id"]
+            ), None)
+            if existing_auth is None or not existing_auth.get("dispatch_id"):
+                raise ValueError("completed commission replay is missing its durable authorization")
+            existing_dispatch = next((
+                item.to_dict() for item in load_dispatch_queue(self.root)
+                if item.dispatch_id == existing_auth["dispatch_id"]
+            ), None)
+            if existing_dispatch is None:
+                raise ValueError("completed commission replay is missing its durable Dispatch item")
+            return {"commission": commission, "authorization": existing_auth, "dispatch": existing_dispatch, "provider_execution": "already_completed", "institutional_acceptance_state": "not_granted"}
         accepted = self.accept_commission(commission["commission_id"])
         authorization, dispatch = self.authorize_dispatch(
             accepted["commission_id"],
@@ -460,7 +474,7 @@ class GraceHelenEngineeringComposition:
                 allowed_read_paths=list(authority.get("allowed_read_paths") or []),
                 allowed_write_paths=list(authority.get("allowed_write_paths") or []),
                 expected_outputs=list(authority.get("expected_outputs") or []),
-                provider_extension=authority.get("provider_extension"),
+                provider_extension=dict(authority.get("provider_extension") or {}),
                 authorized_at=utc_now(),
                 expires_at=binding.expires_at,
                 idempotency_key=key,
@@ -474,8 +488,8 @@ class GraceHelenEngineeringComposition:
         technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_inquiry_reference": det.get("capability_request_id"), "capability_disposition": det["disposition"], "provider_id": provider_id, "provider_type": provider_type, "adapter_reference": adapter_reference, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": decision_reference if technical_provider else f"operations-control/{commission['operations_decision_id']}"}
         if authority:
             technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
-        if technical_provider and authority.get("provider_extension"):
-            technical_metadata["provider_extension"] = dict(authority["provider_extension"])
+        if technical_provider:
+            technical_metadata["provider_extension"] = dict(authority.get("provider_extension") or {})
         if existing_auth:
             for field_name, expected in (("engineering_commission_id", commission_id), ("provider_id", provider_id), ("adapter_reference", adapter_reference), ("operations_decision_id", commission["operations_decision_id"]), ("execution_authority", authority)):
                 if auth.get(field_name) != expected:

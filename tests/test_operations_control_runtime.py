@@ -64,3 +64,12 @@ def test_cli_operations_decisions_list_succeeds_with_no_decisions(tmp_path):
     result = subprocess.run([sys.executable, "-m", "estate.cli.main", "operations-decisions-list"], cwd=tmp_path, env={"PYTHONPATH": str(Path.cwd() / "src"), "ESTATE_ROOT": str(tmp_path)}, text=True, capture_output=True)
     assert result.returncode == 0, result.stderr + result.stdout
     assert "No operations decisions" in result.stdout
+
+
+def test_codex_technical_decision_does_not_require_qwen_extension():
+    decision = OperationsDecision.create(
+        decided_by="Engineering", decision_type="authorize_dispatch", target_type="dispatch",
+        reason="Bounded Codex review", technical_execution=True,
+        selected_provider_id="codex.execution.cli", provider_extension=None,
+    )
+    decision.validate()

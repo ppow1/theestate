@@ -3,7 +3,7 @@
   "$id": "estate.engineering.commission-execution-authority.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["prompt_source", "prompt_source_type", "prompt_source_digest", "prompt_source_record", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "grace_objective_id", "grace_action_id", "provider_extension"],
+  "required": ["prompt_source", "prompt_source_type", "prompt_source_digest", "prompt_source_record", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "grace_objective_id", "grace_action_id"],
   "properties": {
     "prompt_source": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"},
     "prompt_source_type": {"const": "estate.grace.action.v1"},
@@ -14,6 +14,6 @@
     "grace_objective_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]+$"},
     "grace_action_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]+$"},
     "prompt_source_record": {"type": "string", "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+$"}
-    ,"provider_extension": {"$ref": "estate.qwen-local-text.execution-extension.v1"}
+    ,"provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "object", "additionalProperties": false}, {"type": "null"}]}
   }
 }

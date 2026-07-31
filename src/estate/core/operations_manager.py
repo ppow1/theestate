@@ -90,7 +90,7 @@ class OperationsDecision:
         if self.schema_version != "estate.operations-control.decision.v1": raise ValueError("unsupported Operations decision schema")
         if self.institutional_acceptance_state != "not_granted": raise ValueError("institutional acceptance must remain not_granted")
         if self.decision_state not in {"recorded", "authorized_for_dispatch", "expired", "rejected", "cancelled"}: raise ValueError("unknown decision state")
-        if self.technical_execution and not isinstance(self.provider_extension, dict): raise ValueError("technical execution requires provider extension")
+        if self.technical_execution and self.selected_provider_id == "qwen.local.text" and not isinstance(self.provider_extension, dict): raise ValueError("Qwen technical execution requires provider extension")
 
     def to_dict(self) -> dict[str, Any]:
         self.validate(); return asdict(self)
