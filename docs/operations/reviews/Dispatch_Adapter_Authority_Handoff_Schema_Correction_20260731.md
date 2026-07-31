@@ -59,7 +59,7 @@ technical Dispatch records remain blocked and are not migrated.
 - All 16 stashes remain preserved.
 - `A:\theestate` remains untouched.
 - PR #502 remains open, draft, unmerged, and targets `main`.
-- Final pushed HEAD for this correction: `68890218`.
+- Final pushed HEAD for this correction: `e8b4a65b`.
 
 ## Final handoff
 
