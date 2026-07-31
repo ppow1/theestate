@@ -99,7 +99,7 @@ directory is retained with bounded evidence and no recursive retry occurs. A
 staging disposition is recorded only after the handler knows whether the
 directory was retained, removed after durable failure evidence, or could not
 be cleaned (`staging_cleanup_failed`); a retained path must still exist when
-reported. Failure receipts contain bounded errors, failed result and
+reported. Requests blocked before staging have no staging disposition. Failure receipts contain bounded errors, failed result and
 validation states, timeout/cancellation state, an empty completed-artifact
 list, and any orphaned-artifact path/hash. Cleanup warnings and
 staging-retention details are surfaced without masking the primary persistence
