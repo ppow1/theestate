@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.ptm.readiness-resolution.v1",
+  "type": "object",
+  "required": ["resolution_id", "schema_version", "objective_id", "task_id", "dependency_results", "gate_checks", "readiness_state", "source_references", "source_digests", "source_high_watermark", "evaluator_identity", "evaluated_at", "expires_at", "waiver_references", "conflicts", "warnings", "replay_idempotency_key", "failure_reason", "ledger_event_reference", "projection_path", "projection_digest"],
+  "properties": {
+    "resolution_id": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "estate.ptm.readiness-resolution.v1"},
+    "objective_id": {"type": "string", "minLength": 1},
+    "campaign_id": {"type": ["string", "null"]},
+    "package_id": {"type": ["string", "null"]},
+    "task_id": {"type": "string", "minLength": 1},
+    "enabling_project_id": {"type": ["string", "null"]},
+    "dependency_results": {"type": "array", "items": {"type": "object", "required": ["dependency_id", "state"], "properties": {"dependency_id": {"type": "string"}, "state": {"enum": ["unsatisfied", "satisfied", "waived", "unknown"]}}}},
+    "gate_checks": {"type": "array", "items": {"type": "object", "required": ["name", "state"], "properties": {"name": {"type": "string"}, "state": {"enum": ["pass", "fail", "waived", "unknown"]}}}},
+    "readiness_state": {"enum": ["not_ready", "ready", "blocked", "waived", "unknown"]},
+    "source_references": {"type": "array"},
+    "source_digests": {"type": "object"},
+    "source_high_watermark": {"type": "string"},
+    "evaluator_identity": {"type": "string"},
+    "evaluated_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "waiver_references": {"type": "array"},
+    "conflicts": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "replay_idempotency_key": {"type": "string"},
+    "failure_reason": {"type": ["string", "null"]},
+    "ledger_event_reference": {"type": ["string", "null"]},
+    "projection_path": {"type": ["string", "null"]},
+    "projection_digest": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

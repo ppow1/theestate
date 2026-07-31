@@ -2,6 +2,7 @@ import argparse
 import json
 from pathlib import Path
 from estate.core.ptm_pilot_projection import build_repository_pilot, normalized_json as normalized_ptm_json, reviewer_report as ptm_reviewer_report
+from estate.core.ptm_production_readiness import cli as ptm_readiness_cli
 from estate.core.ledger import create_change
 from estate.core.residents import register_resident
 from estate.core.registry import load_registry
@@ -2796,6 +2797,19 @@ def main(argv=None):
     p.add_argument("--root", help="Estate repository root (defaults to the current directory)")
     p.add_argument("--format", choices=("json", "report"), default="report")
     p.set_defaults(func=cmd_ptm_pilot_projection)
+
+    p = sub.add_parser("ptm-readiness", help="Resolve, read, or validate canonical PTM readiness")
+    p.add_argument("action", choices=("resolve", "read", "validate"))
+    p.add_argument("--root")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--objective-id")
+    p.add_argument("--enabling-project-id")
+    p.add_argument("--task-id")
+    p.add_argument("--source-high-watermark")
+    p.add_argument("--observed-at")
+    p.add_argument("--resolution-id")
+    p.add_argument("--record")
+    p.set_defaults(func=lambda args: ptm_readiness_cli([x for x in [args.action, "--root", args.root or ".", "--objective-id", args.objective_id, "--enabling-project-id", args.enabling_project_id, "--task-id", args.task_id, "--source-high-watermark", args.source_high_watermark, "--observed-at", args.observed_at, "--resolution-id", args.resolution_id, "--record", args.record] if x is not None]))
 
 
 
