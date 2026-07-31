@@ -26,3 +26,7 @@ Each `latest.json` and immutable revision is a `Conversation` object with `schem
 Allowed `completenessStatus` values are `complete`, `incomplete`, `timed-out`, `container-not-found`, `unstable`, and `extraction-failed`. `complete` is valid only after convergence; reaching the safety ceiling, reaching the top once, or extracting a non-empty DOM snapshot is insufficient. `exportMetadata.complete` must be false for every other status.
 
 Messages use `data-message-id` when exposed. Otherwise the exporter uses role plus normalized content identity for safe incremental deduplication. Virtualized records are accumulated during upward traversal and emitted in chronological order.
+
+## Three-artifact conversation directory
+
+Each fully validated conversation is stored under `conversations/<conversation-id>/` with `conversation.json` (canonical model), `conversation.mhtml` (rendered archival page), `conversation.pdf` (canonical-model print), `validation.json` (hashes, fingerprints, counts, and cross-check verdict), and `manifest.json`. Validation statuses are `complete-validated`, `complete-with-warnings`, `incomplete`, `artifact-failed`, and `validation-failed`. Canonical-model PDF generation is intentional for virtualized pages so the beginning and end cannot disappear with the viewport.

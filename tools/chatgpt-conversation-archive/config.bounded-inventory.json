@@ -1,0 +1,14 @@
+{
+  "archiveRoot": "A:/AI/Archives/ChatGPT",
+  "profilePath": "A:/AI/Tools/ChatGPTConversationArchive/profile",
+  "diagnosticsPath": "A:/AI/Tools/ChatGPTConversationArchive/diagnostics",
+  "headless": false,
+  "nonInteractive": true,
+  "conversationLimit": 5,
+  "inventoryPollingIntervalMs": 200,
+  "inventoryFallbackDelayMs": 500,
+  "inventoryBottomDwellMs": 500,
+  "inventoryRequiredStablePasses": 6,
+  "inventoryMaxPasses": 30,
+  "inventoryMaxDurationMs": 30000
+}

@@ -7,6 +7,9 @@ import { atomicWrite, cleanId, hashConversation, loadIndex, saveIndex, renderMar
 import { backoffDelayMs, BackoffCancelledError, ThrottleError, waitForBackoff, withinRetryWindow } from './throttle.js';
 import { isBrowserContextLoss } from './failures.js';
 import { ProgressReporter, updateRuntimeMetrics } from './progress.js';
+import { recoverStaleRun, writeTerminalRunState } from './lifecycle.js';
+import { reconcileInventory } from './reconciliation.js';
+import { writeConversationArtifacts } from './artifacts.js';
 
 const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -30,9 +33,11 @@ type Operation<T> = () => Promise<T>;
 export async function runSync(config: ArchiveConfig, mode: 'full' | 'sync' | 'resume' = 'sync') {
   fs.mkdirSync(config.archiveRoot, { recursive: true });
   try { atomicWrite(path.join(config.archiveRoot, 'archive-manifest.json'), JSON.stringify({ schemaVersion: '1.0', kind: 'Estate-wide ChatGPT conversation archive', updatedAt: new Date().toISOString(), exporterVersion: '1.1.0', classification: 'Local Only' }, null, 2)); } catch (error) { console.warn(`ARCHIVE_MANIFEST_WRITE_DEFERRED: ${String(error)}`); }
+  const recovered = recoverStaleRun(config.archiveRoot, config);
   const runId = `${new Date().toISOString().replace(/[:.]/g, '-')}-${crypto.randomUUID().slice(0, 8)}`;
   const startedAt = new Date().toISOString();
-  const report: SyncReport = { runId, startedAt, endedAt: undefined, durationMs: undefined, status: 'running', counts: { new: 0, updated: 0, renamed: 0, unchanged: 0, unavailable: 0, failed: 0, deferred: 0, resumed: mode === 'resume' ? 1 : 0, discovered: 0, processed: 0 }, ids: { new: [], updated: [], renamed: [], unchanged: [], unavailable: [], failed: [] }, errors: [], accounting: { trueExportFailures: 0, browserContextFailures: 0, cascadingDeferredItems: 0 }, metrics: { totalRequests: 0, totalActions: 0, conversationsOpened: 0, throttlingEvents: 0, http429Responses: 0, uiThrottleDetections: 0, retryCount: 0, recoveredThrottleEpisodes: 0, exhaustedThrottleEpisodes: 0, totalBackoffMs: 0 } };
+  const report: SyncReport = { runId, startedAt, endedAt: undefined, durationMs: undefined, status: 'running', counts: { new: 0, updated: 0, renamed: 0, unchanged: 0, unavailable: 0, failed: 0, deferred: 0, resumed: mode === 'resume' ? 1 : 0, discovered: 0, processed: 0 }, ids: { new: [], updated: [], renamed: [], unchanged: [], unavailable: [], failed: [] }, errors: [], accounting: { trueExportFailures: 0, browserContextFailures: 0, cascadingDeferredItems: 0, artifactGenerationFailures: 0, validationFailures: 0 }, metrics: { totalRequests: 0, totalActions: 0, conversationsOpened: 0, throttlingEvents: 0, http429Responses: 0, uiThrottleDetections: 0, retryCount: 0, recoveredThrottleEpisodes: 0, exhaustedThrottleEpisodes: 0, totalBackoffMs: 0 } };
+  if (recovered) report.reconciliation = { recoveredRun: recovered };
   const progress = new ProgressReporter(config.archiveRoot, config, runId, mode, startedAt);
   progress.start();
   const index = loadIndex(config.archiveRoot);
@@ -82,11 +87,14 @@ export async function runSync(config: ArchiveConfig, mode: 'full' | 'sync' | 're
   };
   try {
     browser = await ChatGPTBrowser.open(config, false);
-    const discovered = await runWithThrottleRetry(() => browser!.inventory());
+    const inventoryResult = await runWithThrottleRetry(() => browser!.inventoryDetailed((snapshot) => progress.update({ inventory: snapshot })));
+    const discovered = inventoryResult.conversations;
+    report.inventory = inventoryResult.metadata;
+    report.reconciliation = { ...(report.reconciliation || {}), ...reconcileInventory(config.archiveRoot, discovered) };
     report.counts.discovered = discovered.length;
     progress.update({ discovered: discovered.length, counts: report.counts, metrics: report.metrics, accounting: report.accounting });
     const seen = new Set(discovered.map(item => item.id));
-    for (const old of Object.values(index)) if (!seen.has(old.id)) { old.currentStatus = 'unavailable'; old.lastSynchronizedAt = new Date().toISOString(); report.counts.unavailable++; report.ids.unavailable.push(old.id); }
+    if (inventoryResult.metadata.completenessStatus === 'complete') for (const old of Object.values(index)) if (!seen.has(old.id)) { old.lastSynchronizedAt = new Date().toISOString(); report.counts.unavailable++; report.ids.unavailable.push(old.id); }
     let stopAfterContextLoss = false;
     for (let itemIndex = 0; itemIndex < discovered.length; itemIndex++) {
       const item = discovered[itemIndex];
@@ -96,7 +104,7 @@ export async function runSync(config: ArchiveConfig, mode: 'full' | 'sync' | 're
         let conversation: Conversation | undefined;
         if (mode === 'full' || !old || old.currentStatus === 'unavailable' || old.currentStatus === 'incomplete' || old.title !== item.title) {
           for (let attempt = 0; attempt <= config.retryLimit; attempt++) {
-            try { conversation = await runWithThrottleRetry(() => browser!.conversation(item, (s, pass, stable) => progress.update({ hydration: { item: itemIndex + 1, total: discovered.length, pass, messages: s.count, previousMessages: 0, stable, requiredStable: config.conversationHydrationStablePasses, scrollTop: Math.round(s.scrollTop), scrollHeight: s.scrollHeight, elapsedMs: 0, topReached: s.topReached, virtualizationDetected: s.virtualizationDetected } }), () => cancelled)); break; }
+            try { let previousMessages = 0; const hydrationStarted = Date.now(); conversation = await runWithThrottleRetry(() => browser!.conversation(item, (s, pass, stable) => { progress.update({ hydration: { item: itemIndex + 1, total: discovered.length, pass, messages: s.count, previousMessages, initialMessages: s.count, cumulativeMessages: Math.max(s.count, previousMessages), stable, requiredStable: config.conversationHydrationStablePasses, scrollTop: Math.round(s.scrollTop), scrollHeight: s.scrollHeight, elapsedMs: Date.now() - hydrationStarted, topReached: s.topReached, virtualizationDetected: s.virtualizationDetected } }); previousMessages = s.count; }, () => cancelled)); break; }
             catch (error) { if (error instanceof ThrottleError || attempt === config.retryLimit) throw error; await sleep(500 * (attempt + 1)); }
           }
         }
@@ -111,6 +119,7 @@ export async function runSync(config: ArchiveConfig, mode: 'full' | 'sync' | 're
         if (!changed && !renamed) { report.counts.unchanged++; report.ids.unchanged.push(item.id); }
         else {
           const revisionId = changed ? writeRevision(config.archiveRoot, conversation, hash, old?.lastSuccessfulRevisionId) : old?.lastSuccessfulRevisionId;
+          if (config.validateArtifacts && (changed || !fs.existsSync(path.join(config.archiveRoot, 'conversations', cleanId(item.id), 'manifest.json')))) { try { await writeConversationArtifacts(config.archiveRoot, conversation, config, changed ? 'newly-generated' : 'missing-artifacts'); } catch (artifactError) { report.accounting!.artifactGenerationFailures = (report.accounting!.artifactGenerationFailures || 0) + 1; report.errors.push({ id: item.id, category: 'artifact-generation', message: String(artifactError) }); } }
           index[item.id] = { id: item.id, title: item.title, sourceUrl: item.sourceUrl, firstArchivedAt: old?.firstArchivedAt || new Date().toISOString(), lastDiscoveredAt: new Date().toISOString(), lastSuccessfulExportAt: changed ? new Date().toISOString() : old?.lastSuccessfulExportAt, lastSynchronizedAt: new Date().toISOString(), contentHash: hash, revisionCount: (old?.revisionCount || 0) + (changed ? 1 : 0), currentStatus: 'available', lastSuccessfulRevisionId: revisionId || old?.lastSuccessfulRevisionId };
           const bucket = changed ? (old ? 'updated' : 'new') : 'renamed'; report.counts[bucket]++; report.ids[bucket].push(item.id);
         }
@@ -138,14 +147,14 @@ export async function runSync(config: ArchiveConfig, mode: 'full' | 'sync' | 're
       syncMetrics(); progress.update({ processed: report.counts.processed, counts: report.counts, metrics: report.metrics, accounting: report.accounting });
       if (stopAfterContextLoss) break;
     }
-    if (cancelled) report.status = 'cancelled'; else if (report.status === 'running') report.status = 'completed';
+    if (cancelled) report.status = 'cancelled'; else if (report.status === 'running') report.status = inventoryResult.metadata.completenessStatus === 'complete' ? 'completed' : 'inventory-incomplete';
   } catch (error) {
     if (error instanceof ThrottleError) { report.status = 'throttled'; report.errors.push({ category: 'rate-limit', message: error.message }); }
     else if (error instanceof BackoffCancelledError || cancelled || String(error).includes('ARCHIVE_CANCELLED_DURING_HYDRATION')) { report.status = 'cancelled'; report.errors.push({ category: 'cancelled', message: String(error) }); }
     else if (isBrowserContextLoss(error)) { report.status = 'browser-context-lost'; report.accounting!.browserContextFailures++; report.errors.push({ category: 'browser-context', message: String(error) }); }
     else { report.status = 'failed'; report.counts.failed++; report.accounting!.trueExportFailures++; report.errors.push({ category: 'browser', message: String(error) }); }
   } finally {
-    syncMetrics(); report.endedAt = new Date().toISOString(); report.durationMs = Date.parse(report.endedAt) - Date.parse(report.startedAt); if (!report.status || report.status === 'running') report.status = cancelled ? 'cancelled' : 'completed'; if (cancelled) atomicWrite(path.join(config.archiveRoot, 'state', 'run-state.json'), JSON.stringify({ runId, lastCompletedConversationId, mode, updatedAt: new Date().toISOString(), status: 'cancelled' }, null, 2)); writeReport(config.archiveRoot, report); updateRuntimeMetrics(config.archiveRoot, config, report); progress.finish(report.status, report); process.removeListener('SIGINT', onInterrupt); if (browser) await browser.close().catch(() => undefined);
+    syncMetrics(); report.endedAt = new Date().toISOString(); report.durationMs = Date.parse(report.endedAt) - Date.parse(report.startedAt); if (!report.status || report.status === 'running') report.status = cancelled ? 'cancelled' : 'completed'; writeTerminalRunState(config.archiveRoot, { runId, lastCompletedConversationId, mode, status: report.status }); writeReport(config.archiveRoot, report); updateRuntimeMetrics(config.archiveRoot, config, report); progress.finish(report.status, report); process.removeListener('SIGINT', onInterrupt); if (browser) await browser.close().catch(() => undefined);
   }
   return report;
 }

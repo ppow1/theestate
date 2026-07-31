@@ -23,3 +23,5 @@ The JSON configuration is merged with safe defaults. Timing values are milliseco
 The defaults are deliberately conservative. Do not reduce them casually: faster settings can increase temporary ChatGPT restrictions. Reports include total requests/actions, conversations opened, throttle events, retries, and total backoff time.
 
 Hydration defaults favor correctness over speed. A ceiling before convergence yields an incomplete export and the index entry is not eligible for successful skip behavior.
+
+Inventory and recovery settings include `inventoryPollingIntervalMs` (1200), `inventoryFallbackDelayMs` (5000), `inventoryBottomDwellMs` (10000), `inventoryRequiredStablePasses` (810), `inventoryMaxDurationMs` (2700000), `inventoryMaxPasses` (5000), `staleRunHeartbeatThresholdMs` (300000), `pdfGenerationTimeoutMs` (120000), `mhtmlGenerationTimeoutMs` (120000), and `validateArtifacts` (true). Safety ceilings never imply completeness. Use a separate low-ceiling configuration only for bounded validation.

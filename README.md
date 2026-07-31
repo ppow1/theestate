@@ -77,3 +77,7 @@ The repaired full command is:
 ```
 
 Do not run the full command until a genuinely long conversation has passed bounded live validation.
+
+Each completed conversation also receives `conversation.json`, `conversation.mhtml`, `conversation.pdf`, `validation.json`, and `manifest.json` under `conversations/<id>/`. PDF is generated from the complete canonical accumulated model, not a virtualized viewport.
+
+Inventory completion requires the configured stable bottom passes (default 810), delayed-load dwell, and an upward/back-down probe. A partial scan is reported as incomplete and reconciled with the historical ID union. Stale running checkpoints are recorded under `state/recovered-runs/` and the interrupted conversation is requeued. Use `generate-artifacts --conversation-id <id>` for bounded artifact repair; do not use `full` or `resume` for bounded validation.

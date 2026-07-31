@@ -28,5 +28,15 @@
   "conversationHydrationMaxPasses": 1200,
   "conversationTopPositionTolerancePx": 8,
   "messageCountStabilityRequirement": 4,
+  "inventoryPollingIntervalMs": 1200,
+  "inventoryFallbackDelayMs": 5000,
+  "inventoryBottomDwellMs": 10000,
+  "inventoryRequiredStablePasses": 810,
+  "inventoryMaxDurationMs": 2700000,
+  "inventoryMaxPasses": 5000,
+  "staleRunHeartbeatThresholdMs": 300000,
+  "pdfGenerationTimeoutMs": 120000,
+  "mhtmlGenerationTimeoutMs": 120000,
+  "validateArtifacts": true,
   "runtimeSeat": "local"
 }

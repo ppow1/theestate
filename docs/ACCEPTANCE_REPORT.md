@@ -107,3 +107,13 @@ The extractor uses layered URL, accessible-role, durable-attribute, and visible-
 ## Final status
 
 The implementation is built, tested, installed, and ready for manual profile initialization. Operational live validation is pending only the external authenticated-browser step above; this report deliberately does not claim that portion complete.
+
+## Follow-up recovery and artifact validation — 2026-07-31
+
+Starting branch HEAD was `b90b0bb8ead5daa5eab4b9b7c85bfe68ad38db48`. The stale run `2026-07-30T23-15-56-316Z-f36a32f2` was recovered without starting an archive. Its heartbeat age was 1,288,215 ms; item 57 (`6a24faab-6ce4-832a-87d2-a22c7f11d827`, `Upload Throughput Analysis`) was recorded as interrupted and requeued. The 48 existing `conversations/<id>/latest.json` exports were preserved.
+
+A bounded inventory probe deliberately used six required stable passes and a 30-pass ceiling. It continued beyond the old four-pass rule and observed sidebar discovery counts 28, 56, 84, 112, 140, 168, 196, and 224 by pass 30, with mutation count 37 and changing scroll heights. It correctly returned `incomplete` at the safety ceiling rather than claiming inventory completion. The sidebar selector was `nav[data-archive-sidebar-scroll-container="true"]`; conversation content is separately selected and excluded.
+
+Bounded artifacts were generated and inspected for short conversation `6a629d0c-1380-83ea-a88a-8223c40cd8fd` (4 messages) and long conversation `6a62a0da-0368-83ea-a254-03b881c84343` (45 canonical accumulated messages). Each has `conversation.json`, `conversation.mhtml`, `conversation.pdf`, `validation.json`, and `manifest.json`, with `complete-validated` verdicts and SHA-256 hashes. PDF generation is explicitly canonical-model based to preserve virtualized beginning/end content.
+
+The enhanced automated suite reports 6 test files and 28 tests passed. A stale marker from the test harness may rewrite `status/current-run.json` during launcher tests; the durable `state/recovered-runs/2026-07-30T23-15-56-316Z-f36a32f2.json` is authoritative for the requested stopped run.
