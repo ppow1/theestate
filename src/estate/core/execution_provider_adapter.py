@@ -152,7 +152,21 @@ class ExecutionProviderAdapterRequest:
                 if _paths_overlap(write_path, blocked_path):
                     errors.append(f"write path '{write_path}' conflicts with blocked path '{blocked_path}'")
         if not self.prompt_source:
-            warnings.append("prompt_source is not set")
+            if (self.metadata or {}).get("technical_execution") is True:
+                errors.append("prompt_source is required for technical execution")
+            else:
+                warnings.append("prompt_source is not set")
+        if (self.metadata or {}).get("technical_execution") is True:
+            if not self.read_scope_paths:
+                errors.append("allowed_read_paths are required for technical execution")
+            if not self.write_scope_paths:
+                errors.append("allowed_write_paths are required for technical execution")
+            if not self.expected_outputs:
+                errors.append("expected_outputs are required for technical execution")
+            if self.expected_outputs != self.write_scope_paths:
+                errors.append("expected_outputs must match allowed_write_paths for technical execution")
+            if not self.decision_reference:
+                errors.append("decision_reference is required for technical execution")
         status = "accepted" if not errors else "blocked"
         return AdapterValidationStatus(status=status, errors=errors, warnings=warnings)
 

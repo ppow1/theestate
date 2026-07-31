@@ -8,6 +8,7 @@ provider.
 from __future__ import annotations
 
 import json
+import posixpath
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
@@ -73,7 +74,7 @@ def _provider_type(item: DispatchQueueItem) -> str:
     return str(metadata.get("provider_type") or item.provider or "")
 
 
-def _validate_item(item: DispatchQueueItem) -> HandoffStatus:
+def _validate_item(item: DispatchQueueItem, root: Path | None = None) -> HandoffStatus:
     errors: list[str] = []
     if item.state not in HANDOFF_ELIGIBLE_STATES:
         errors.append(f"dispatch state must be one of {sorted(HANDOFF_ELIGIBLE_STATES)}")
@@ -87,6 +88,16 @@ def _validate_item(item: DispatchQueueItem) -> HandoffStatus:
         errors.append("allowed_read_paths are required")
     if item.sandbox == "workspace-write" and not item.allowed_write_paths:
         errors.append("workspace-write handoff requires allowed_write_paths")
+    technical = (item.provider_metadata or {}).get("technical_execution") is True
+    if technical:
+        if not item.allowed_write_paths:
+            errors.append("technical execution requires allowed_write_paths")
+        if not item.expected_outputs:
+            errors.append("technical execution requires expected_outputs")
+        elif item.expected_outputs != item.allowed_write_paths:
+            errors.append("expected_outputs must exactly match authorized write scope")
+        if root is not None:
+            errors.extend(_validate_governed_correlations(item, root))
     if not _auth_ref(item):
         errors.append("authorization or decision reference is required")
     if item.provider and item.provider in item.forbidden_providers:
@@ -97,12 +108,68 @@ def _validate_item(item: DispatchQueueItem) -> HandoffStatus:
     return HandoffStatus(status=status, dispatch_id=item.dispatch_id, errors=errors)
 
 
+def _validate_governed_correlations(item: DispatchQueueItem, root: Path) -> list[str]:
+    """Validate technical Dispatch metadata against its durable commission/auth."""
+    errors: list[str] = []
+    metadata = item.provider_metadata or {}
+    commission_id = str(metadata.get("engineering_commission_id") or "")
+    if not commission_id:
+        return ["technical execution requires engineering_commission_id"]
+    commission_path = root / "runtime/grace_helen_engineering/engineering_commissions" / f"{commission_id}.json"
+    try:
+        commission = json.loads(commission_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ["engineering commission authority record is not available"]
+    authority = commission.get("execution_authority") or {}
+    if authority:
+        if item.prompt_source != authority.get("prompt_source"):
+            errors.append("prompt_source does not match commission authority")
+        if list(item.allowed_read_paths) != list(authority.get("allowed_read_paths") or []):
+            errors.append("allowed_read_paths do not match commission authority")
+        if list(item.allowed_write_paths) != list(authority.get("allowed_write_paths") or []):
+            errors.append("allowed_write_paths do not match commission authority")
+        if list(item.expected_outputs) != list(authority.get("expected_outputs") or []):
+            errors.append("expected_outputs do not match commission authority")
+        if metadata.get("prompt_source_digest") != authority.get("prompt_source_digest"):
+            errors.append("prompt-source digest does not match commission authority")
+    elif item.provider in {"qwen.local.text", "codex.execution.cli"}:
+        errors.append("technical provider commission lacks execution authority")
+    if metadata.get("grace_objective_id") != commission.get("grace_objective_id"):
+        errors.append("Grace objective does not match commission")
+    if metadata.get("grace_action_id") != commission.get("grace_action_id"):
+        errors.append("Grace action does not match commission")
+    if metadata.get("helen_determination_id") != commission.get("helen_determination_id"):
+        errors.append("Helen assessment does not match commission")
+    ptm = metadata.get("ptm_readiness") or {}
+    if ptm.get("readiness_resolution_id") != commission.get("readiness_resolution_id") or ptm.get("readiness_projection_digest") != commission.get("readiness_projection_digest"):
+        errors.append("PTM readiness reference does not match commission")
+    auth_ref = _auth_ref(item)
+    if not auth_ref:
+        errors.append("authorization or decision reference is required")
+    elif auth_ref.startswith("runtime/"):
+        try:
+            auth = json.loads((root / auth_ref).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            errors.append("authorization record is not available")
+        else:
+            if auth.get("engineering_commission_id") != commission_id or auth.get("dispatch_id") != item.dispatch_id or auth.get("provider_id") != item.provider:
+                errors.append("authorization record does not match Dispatch, commission, or provider")
+    for field_name, paths in (("allowed_read_paths", item.allowed_read_paths), ("allowed_write_paths", item.allowed_write_paths), ("expected_outputs", item.expected_outputs)):
+        for raw in paths:
+            normalized = str(raw).replace("\\", "/")
+            if not normalized or normalized.startswith("/") or posixpath.isabs(normalized) or normalized == "." or normalized.startswith("../") or "/../" in f"/{normalized}":
+                errors.append(f"{field_name} contains an unsafe repository path")
+            if normalized in {"*", "**"}:
+                errors.append(f"{field_name} cannot broaden repository scope")
+    return errors
+
+
 def inspect_handoff(dispatch_id: str, root: str | Path | None = None) -> dict[str, Any]:
     try:
         item = inspect_dispatch_item(dispatch_id, root)
     except KeyError as exc:
         return HandoffStatus(status="not_ready", dispatch_id=dispatch_id, errors=[str(exc)]).to_dict()
-    status = _validate_item(item)
+    status = _validate_item(item, _root(root))
     payload = status.to_dict()
     payload["dispatch"] = item.to_dict()
     payload["handoff_reference"] = item.handoff_reference
@@ -127,7 +194,7 @@ def build_adapter_request(item: DispatchQueueItem) -> ExecutionProviderAdapterRe
         "classification": item.classification,
         "allowed_paths": item.allowed_read_paths,
         "forbidden_paths": [],
-        "expected_outputs": item.allowed_write_paths,
+        "expected_outputs": item.expected_outputs or item.allowed_write_paths,
         "validation_required": True,
         "boundary_review_reference": metadata.get("boundary_review_reference"),
         "decision_reference": _auth_ref(item),
@@ -182,7 +249,7 @@ def prepare_handoff(dispatch_id: str, root: str | Path | None = None, *, write: 
             _emit_event(base, item, "dispatch_handoff_validated", f"Provider-neutral Engineering commission handoff validated for {dispatch_id}.")
             generate_current_dispatch_snapshot(base, write=True)
         return {"status": "handoff_validated", "dispatch_id": dispatch_id, "errors": [], "warnings": [], "adapter_request": None, "validation": {"status": "accepted", "provider_selection_owner": "Engineering"}, "artifacts": {"request_path": _rel(handoff_path, base)}, "dispatch": item.to_dict(), "handoff_reference": _rel(handoff_path, base), "live_provider_called": False}
-    gate = _validate_item(item)
+    gate = _validate_item(item, base)
     if gate.errors:
         _emit_event(base, item, "dispatch_handoff_blocked", "; ".join(gate.errors))
         return gate.to_dict()
@@ -218,3 +285,17 @@ def dry_run_handoff(dispatch_id: str, root: str | Path | None = None) -> dict[st
     payload = dict(prepared)
     payload.update({"status": "dry_run_completed" if result.get("status") == "dry_run_completed" else result.get("status"), "dry_run_result": result, "live_provider_called": bool((result.get("metadata") or {}).get("live_provider_called", False))})
     return payload
+
+
+def run_handoff_adapter(dispatch_id: str, root: str | Path | None = None, *, adapter: Any) -> dict[str, Any]:
+    """Run one already-validated handoff through an injected adapter seam.
+
+    Production callers resolve the registered adapter separately; tests inject a
+    bounded fake so this function cannot accidentally invoke a live provider.
+    """
+    prepared = prepare_handoff(dispatch_id, root, write=True)
+    if prepared.get("errors"):
+        return prepared
+    request = ExecutionProviderAdapterRequest.from_dict(prepared["adapter_request"])
+    result = adapter.submit(request)
+    return {"status": result.status, "dispatch_id": dispatch_id, "adapter_request": request.to_dict(), "result": result.to_dict(), "live_provider_called": bool(result.metadata.get("live_provider_called", False))}

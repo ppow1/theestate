@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.dispatch.execution-metadata.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["technical_execution", "grace_objective_id", "grace_action_id", "helen_determination_id", "engineering_commission_id", "engineering_authorization_id", "ptm_readiness", "authorization_reference", "decision_reference", "execution_authority"],
+  "properties": {
+    "technical_execution": {"const": true},
+    "grace_objective_id": {"type": "string", "minLength": 1},
+    "grace_action_id": {"type": "string", "minLength": 1},
+    "helen_determination_id": {"type": "string", "minLength": 1},
+    "engineering_commission_id": {"type": "string", "minLength": 1},
+    "engineering_authorization_id": {"type": "string", "minLength": 1},
+    "authorization_reference": {"type": "string", "minLength": 1},
+    "decision_reference": {"type": "string", "minLength": 1},
+    "ptm_readiness": {"type": "object", "minProperties": 1},
+    "execution_authority": {"$ref": "../engineering/commission_execution_authority_v1.schema.json"}
+  }
+}

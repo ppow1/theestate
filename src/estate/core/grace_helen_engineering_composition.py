@@ -7,6 +7,8 @@ result reconciliation; it never invokes a provider itself.
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
@@ -67,6 +69,82 @@ def _write_immutable(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
         return existing
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return payload
+
+
+def _durable_write(path: Path, payload: dict[str, Any]) -> None:
+    """Create a new authority record with complete, durable persistence."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    descriptor = os.open(str(path), flags)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            descriptor = -1
+            handle.write(encoded); handle.flush(); os.fsync(handle.fileno())
+        try:
+            directory = os.open(str(path.parent), os.O_RDONLY)
+            try: os.fsync(directory)
+            finally: os.close(directory)
+        except OSError:
+            pass
+    except Exception:
+        if descriptor != -1:
+            os.close(descriptor)
+        raise
+
+
+def _record_by_id(root: Path, directory: Path, record_id: str) -> tuple[Path, dict[str, Any]] | None:
+    target = root / directory
+    for path in target.glob("*.json") if target.exists() else []:
+        try:
+            record = _load(path)
+        except (OSError, ValueError):
+            continue
+        if record.get("action_id") == record_id or record.get("objective_id") == record_id:
+            return path, record
+    return None
+
+
+def _canonical_execution_authority(root: Path, objective_id: str, action_id: str, metadata: dict[str, Any] | None) -> dict[str, Any]:
+    objective_record = _record_by_id(root, Path("runtime/operations/grace/objectives"), objective_id)
+    action_record = _record_by_id(root, Path("runtime/operations/grace/actions"), action_id)
+    sources = [action_record, objective_record]
+    supplied = dict(metadata or {})
+    for record in sources:
+        if record:
+            record_data = record[1]
+            record_metadata = record_data.get("metadata") or {}
+            direct = {key: record_data[key] for key in ("prompt_source", "prompt_source_digest", "prompt_source_type", "allowed_read_paths", "allowed_write_paths", "expected_outputs") if key in record_data}
+            supplied = {**direct, **record_metadata, **record_metadata.get("execution_authority", {}), **record_data.get("execution_metadata", {}), **supplied}
+            handoff = record[1].get("dispatch_handoff_request") or {}
+            supplied = {**(handoff.get("execution_authority", {}) if isinstance(handoff, dict) else {}), **supplied}
+    prompt_source = supplied.get("prompt_source")
+    source_path = action_record[0] if action_record else (objective_record[0] if objective_record else None)
+    if not prompt_source and source_path:
+        prompt_source = str(source_path.relative_to(root)).replace("\\", "/")
+    if not prompt_source:
+        return {}
+    read_paths = list(supplied.get("allowed_read_paths") or [])
+    write_paths = list(supplied.get("allowed_write_paths") or [])
+    outputs = list(supplied.get("expected_outputs") or write_paths)
+    authority = {
+        "prompt_source": str(prompt_source).replace("\\", "/"),
+        "prompt_source_type": supplied.get("prompt_source_type") or "estate.grace.action.v1",
+        "allowed_read_paths": read_paths,
+        "allowed_write_paths": write_paths,
+        "expected_outputs": outputs,
+        "grace_objective_id": objective_id,
+        "grace_action_id": action_id,
+    }
+    prompt_path = root / authority["prompt_source"]
+    if prompt_path.is_file():
+        authority["prompt_source_digest"] = hashlib.sha256(prompt_path.read_bytes()).hexdigest()
+    elif source_path:
+        authority["prompt_source_digest"] = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        authority["prompt_source_record"] = authority["prompt_source"]
+    elif supplied.get("prompt_source_digest"):
+        authority["prompt_source_digest"] = supplied["prompt_source_digest"]
+    return authority
 
 
 @dataclass
@@ -148,7 +226,7 @@ class GraceHelenEngineeringComposition:
             self._state(request["grace_objective_id"], "blocked_pending_capability", helen_determination_id=det["determination_id"], blocker="capability suspended")
         return det
 
-    def commission_engineering(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str | None = None, ptm_task_or_package_id: str | None = None, enabling_project_id: str | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
+    def commission_engineering(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str | None = None, ptm_task_or_package_id: str | None = None, enabling_project_id: str | None = None, execution_metadata: dict[str, Any] | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
         det = _load(self._path(DETERMINATIONS, helen_determination_id))
         if det["grace_objective_id"] != grace_objective_id:
             raise ValueError("Helen determination does not belong to Grace objective")
@@ -170,12 +248,17 @@ class GraceHelenEngineeringComposition:
             self._state(grace_objective_id, "awaiting_ptm_readiness", blocker=str(exc))
             raise PermissionError(str(exc)) from exc
         key = idempotency_key or f"{grace_objective_id}:{helen_determination_id}:commission"
+        authority = _canonical_execution_authority(self.root, grace_objective_id, grace_action_id, execution_metadata)
         directory = self.root / COMMISSIONS
         for p in directory.glob("*.json") if directory.exists() else []:
             existing = _load(p)
             if existing.get("idempotency_key") == key:
+                if (existing.get("execution_authority") or {}) != authority:
+                    raise ValueError("conflicting execution authority replay")
                 return existing
         commission = {"commission_id": f"engcom-{uuid4().hex[:12]}", "grace_objective_id": grace_objective_id, "grace_action_id": grace_action_id, "operations_decision_id": operations_decision_id, "helen_determination_id": helen_determination_id, "required_capability": det["capability_class"], "bounded_objective": bounded_objective, "acceptance_criteria": acceptance_criteria, "status": "proposed", "created_at": utc_now(), "idempotency_key": key, "requesting_office": "Grace", "technical_owner": "Engineering", "readiness_resolution_id": binding.readiness_resolution_id, "readiness_projection_path": binding.readiness_projection_path, "readiness_projection_digest": binding.readiness_projection_digest, "readiness_state": binding.readiness_state, "source_high_watermark": binding.source_high_watermark, "freshness_policy_id": binding.freshness_policy_id, "freshness_policy_version": binding.freshness_policy_version, "freshness_policy_digest": binding.freshness_policy_digest, "waiver_registry_id": binding.waiver_registry_id, "waiver_registry_version": binding.waiver_registry_version, "waiver_registry_digest": binding.waiver_registry_digest, "evaluated_at": binding.evaluated_at, "expires_at": binding.expires_at, "dependency_evidence_references": list(binding.dependency_evidence_references), "waiver_references": [dict(item) for item in binding.waiver_references], "ptm_readiness": binding.to_dict()}
+        if authority:
+            commission["execution_authority"] = authority
         _write(self._path(COMMISSIONS, commission["commission_id"]), commission)
         self._state(grace_objective_id, "awaiting_engineering_acceptance", engineering_commission_id=commission["commission_id"])
         return commission
@@ -186,7 +269,7 @@ class GraceHelenEngineeringComposition:
         if rec["status"] != "proposed": raise ValueError("commission cannot be accepted from current state")
         rec["status"] = "accepted"; rec["accepted_at"] = utc_now(); _write_replace(p, rec); self._state(rec["grace_objective_id"], "engineering_in_progress", engineering_commission_id=commission_id); return rec
 
-    def governed_commission_and_dispatch(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str, ptm_task_or_package_id: str, enabling_project_id: str | None, provider_id: str, provider_type: str, adapter_reference: str, idempotency_key: str | None = None) -> dict[str, Any]:
+    def governed_commission_and_dispatch(self, grace_objective_id: str, helen_determination_id: str, *, grace_action_id: str, operations_decision_id: str, bounded_objective: str, acceptance_criteria: list[str], ptm_source_high_watermark: str, ptm_task_or_package_id: str, enabling_project_id: str | None, provider_id: str, provider_type: str, adapter_reference: str, execution_metadata: dict[str, Any] | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
         """Bounded public entry point through commission and Dispatch gates.
 
         Provider execution remains downstream of the canonical Dispatch queue;
@@ -202,6 +285,7 @@ class GraceHelenEngineeringComposition:
             ptm_source_high_watermark=ptm_source_high_watermark,
             ptm_task_or_package_id=ptm_task_or_package_id,
             enabling_project_id=enabling_project_id,
+            execution_metadata=execution_metadata,
             idempotency_key=idempotency_key,
         )
         accepted = self.accept_commission(commission["commission_id"])
@@ -231,16 +315,25 @@ class GraceHelenEngineeringComposition:
                 _write_immutable(self._path(DISPATCH_REJECTIONS, rejection["rejection_id"]), rejection)
             self._state(commission["grace_objective_id"], "dispatch_rejected_ptm_stale", engineering_commission_id=commission_id, blocker=reason, dispatch_rejection_id=(existing or rejection)["rejection_id"])
             raise PermissionError(str(exc)) from exc
+        authority = commission.get("execution_authority") or {}
+        if provider_id in {"qwen.local.text", "codex.execution.cli"}:
+            required = ("prompt_source", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "prompt_source_digest")
+            if not authority or any(not authority.get(key) for key in required):
+                raise PermissionError("technical provider execution authority is incomplete")
         key = idempotency_key or f"{commission_id}:{provider_id}:authorization"
         directory = self.root / AUTHORIZATIONS
         for p in directory.glob("*.json") if directory.exists() else []:
             existing = _load(p)
             if existing.get("idempotency_key") == key: return existing, _load(Path(existing["dispatch_record_path"]))
-        auth = {"authorization_id": f"engauth-{uuid4().hex[:12]}", "engineering_commission_id": commission_id, "engineering_work_item_id": f"engwork-{commission_id}", "selected_capability_profile": det["worker_profile_id"], "provider_selection_id": f"engsel-{uuid4().hex[:12]}", "provider_id": provider_id, "adapter_reference": adapter_reference, "created_at": utc_now(), "idempotency_key": key}
-        request = DispatchRequest(work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=det["worker_profile_id"], classification="Estate Internal", priority="Normal", state="Ready", allowed_providers=[provider_id], provider_metadata={"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_type": provider_type, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed"})
+        auth = {"authorization_id": f"engauth-{uuid4().hex[:12]}", "engineering_commission_id": commission_id, "engineering_work_item_id": f"engwork-{commission_id}", "selected_capability_profile": det["worker_profile_id"], "provider_selection_id": f"engsel-{uuid4().hex[:12]}", "provider_id": provider_id, "adapter_reference": adapter_reference, "operations_decision_id": commission.get("operations_decision_id"), "created_at": utc_now(), "idempotency_key": key}
+        authority = commission.get("execution_authority") or {}
+        technical_metadata = {"technical_execution": True, "grace_objective_id": commission["grace_objective_id"], "grace_action_id": commission["grace_action_id"], "operations_decision_id": commission["operations_decision_id"], "engineering_commission_id": commission_id, "engineering_authorization_id": auth["authorization_id"], "helen_determination_id": det["determination_id"], "capability_disposition": det["disposition"], "provider_type": provider_type, "validation_required": True, "institutional_acceptance_state": "not_granted", "ptm_readiness": binding.to_dict(), "ptm_revalidated_at": utc_now(), "ptm_revalidation_result": "passed", "authorization_reference": f"runtime/grace_helen_engineering/engineering_authorizations/{auth['authorization_id']}.json", "decision_reference": f"operations-control/{commission['operations_decision_id']}"}
+        if authority:
+            technical_metadata.update({"prompt_source_digest": authority.get("prompt_source_digest"), "prompt_source_type": authority.get("prompt_source_type"), "execution_authority": authority})
+        request = DispatchRequest(work_package_id=commission["grace_objective_id"], title=commission["bounded_objective"], requested_by="Engineering", assigned_worker=det["worker_profile_id"], provider=provider_id, profile_label=det["worker_profile_id"], classification="Estate Internal", priority="Normal", state="Ready", prompt_source=authority.get("prompt_source"), allowed_read_paths=list(authority.get("allowed_read_paths") or []), allowed_write_paths=list(authority.get("allowed_write_paths") or []), expected_outputs=list(authority.get("expected_outputs") or []), allowed_providers=[provider_id], provider_metadata=technical_metadata)
         item = enqueue_dispatch_request(request, self.root)
         auth["dispatch_id"] = item.dispatch_id; auth["dispatch_record_path"] = str(self.root / "runtime/execution_dispatch/queue.json"); auth["ptm_readiness"] = binding.to_dict(); auth["ptm_revalidated_at"] = request.provider_metadata["ptm_revalidated_at"]; auth["ptm_revalidation_result"] = "passed"
-        _write(self._path(AUTHORIZATIONS, auth["authorization_id"]), auth)
+        _durable_write(self._path(AUTHORIZATIONS, auth["authorization_id"]), auth)
         commission["status"] = "authorized_for_dispatch"; _write_replace(self._path(COMMISSIONS, commission_id), commission); self._state(commission["grace_objective_id"], "awaiting_dispatch", engineering_commission_id=commission_id, dispatch_id=item.dispatch_id)
         return auth, item.to_dict()
 
