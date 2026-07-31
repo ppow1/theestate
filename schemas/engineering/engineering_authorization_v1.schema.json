@@ -3,7 +3,7 @@
   "$id": "estate.engineering.authorization.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "engineering_authorization_id", "authorization_id", "engineering_commission_id", "dispatch_id", "provider_id", "provider_type", "adapter_reference", "grace_objective_id", "grace_action_id", "helen_determination_id", "operations_decision_id", "decision_reference", "authorization_reference", "ptm_readiness", "prompt_source", "prompt_source_type", "prompt_source_digest", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "execution_authority", "provider_extension", "authorization_state", "authorized_at", "expires_at", "institutional_acceptance_state", "idempotency_key", "record_digest"],
+  "required": ["schema_version", "engineering_authorization_id", "authorization_id", "engineering_commission_id", "dispatch_id", "provider_id", "provider_type", "adapter_reference", "grace_objective_id", "grace_action_id", "helen_determination_id", "operations_decision_id", "decision_reference", "authorization_reference", "ptm_readiness", "prompt_source", "prompt_source_type", "prompt_source_digest", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "execution_authority", "authorization_state", "authorized_at", "expires_at", "institutional_acceptance_state", "idempotency_key", "record_digest"],
   "properties": {
     "schema_version": {"const": "estate.engineering.authorization.v1"},
     "engineering_authorization_id": {"type": "string", "pattern": "^engauth-[A-Za-z0-9_-]+$"},
@@ -40,6 +40,9 @@
     "dispatch_record_path": {"type": "string", "pattern": "^runtime/execution_dispatch/[A-Za-z0-9_./-]+$"},
     "ptm_revalidated_at": {"type": "string", "format": "date-time"},
     "ptm_revalidation_result": {"const": "passed"}
-    ,"provider_extension": {"$ref": "estate.qwen-local-text.execution-extension.v1"}
-  }
+    ,"provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "object", "additionalProperties": false}, {"type": "null"}]}
+  },
+  "allOf": [
+    {"if": {"properties": {"provider_id": {"const": "qwen.local.text"}}, "required": ["provider_id"]}, "then": {"required": ["provider_extension"], "properties": {"provider_extension": {"$ref": "estate.qwen-local-text.execution-extension.v1"}}}}
+  ]
 }
