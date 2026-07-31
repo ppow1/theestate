@@ -81,10 +81,14 @@ complete persistence. The helper encodes once and loops until every byte has
 been written. A `None`, zero, negative, oversized, or otherwise invalid write
 result fails closed; zero progress is never retried indefinitely. The helper
 then flushes, fsyncs, and closes before returning success. It owns a newly
-created file until all of those operations succeed, records the creation-time
-file identity, and removes only that identity on persistence failure.
-Pre-existing or competing files are never removed. Cleanup errors do not mask
-the original persistence error.
+created file until all of those operations succeed and records the
+creation-time file identity. A stat followed by pathname unlink is not
+considered race-safe. Cleanup first moves the owned object from its governed
+path to a fresh, unpredictable, same-directory quarantine name using the
+platform's atomic no-overwrite rename behavior. It verifies the moved object's
+identity, then deletes only the verified quarantine file. Pre-existing or
+competing files are never removed. Cleanup errors do not mask the original
+persistence error.
 
 If document persistence fails, no partial document remains and a truthful
 failure receipt may be written when its fresh declared target is available. If
@@ -94,10 +98,12 @@ does not report completion. If failure-receipt persistence itself fails, the
 partial receipt is removed, no recursive retry occurs, and the result reports
 that durable evidence could not be persisted. Document rollback compares the
 current path identity with the ownership token; if a replacement has appeared,
-rollback is skipped and a bounded warning is surfaced. The adapter never uses
-pathname-only deletion for governed rollback. A late collision therefore fails
-closed; the competing file is never overwritten. A collision before provider
-execution produces no receipt because no valid live execution began.
+rollback is skipped and a bounded warning is surfaced. Quarantine-name
+collisions fail closed without overwriting the competing quarantine file. The
+adapter never uses pathname-only deletion for governed rollback. A late
+collision therefore fails closed; the competing file is never overwritten. A
+collision before provider execution produces no receipt because no valid live
+execution began.
 
 Provider execution and Engineering completion are evidence-producing states.
 Neither grants institutional acceptance; acceptance remains a separate

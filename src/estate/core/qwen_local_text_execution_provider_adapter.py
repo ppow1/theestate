@@ -10,6 +10,7 @@ import hashlib
 import json
 import ipaddress
 import os
+import secrets
 import socket
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -224,8 +225,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         self._exclusive_write_text(self.root / receipt_ref, json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return receipt_ref
 
-    @staticmethod
-    def _exclusive_write_text(target: Path, content: str) -> _ExclusiveWriteToken:
+    def _exclusive_write_text(self, target: Path, content: str) -> _ExclusiveWriteToken:
         target = target.resolve(strict=False)
         target.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -272,32 +272,65 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                     os.close(descriptor)
                 except OSError:
                     pass
-            try:
-                current = target.stat()
-                if (current.st_dev, current.st_ino) == (identity.st_dev, identity.st_ino):
-                    target.unlink()
-            except OSError:
-                pass
+            token = _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
+            self._remove_if_owned(token)
             raise
         return _ExclusiveWriteToken(path=target, st_dev=identity.st_dev, st_ino=identity.st_ino)
 
     @staticmethod
-    def _remove_if_owned(token: _ExclusiveWriteToken) -> bool:
+    def _new_quarantine_path(path: Path) -> Path:
+        return path.parent / f".{path.name}.qwen-cleanup-{secrets.token_hex(16)}"
+
+    def _before_quarantine_move(self, token: _ExclusiveWriteToken) -> None:
+        return None
+
+    def _after_quarantine_move(self, token: _ExclusiveWriteToken, quarantine: Path) -> None:
+        return None
+
+    def _remove_if_owned(self, token: _ExclusiveWriteToken) -> str | None:
         try:
             current = token.path.stat()
         except FileNotFoundError:
-            return True
+            return None
         except OSError:
-            return False
+            return "owned cleanup could not stat the governed path"
         if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
-            return False
+            return "owned cleanup skipped because governed path identity changed"
         try:
-            token.path.unlink()
-        except FileNotFoundError:
-            return True
+            self._before_quarantine_move(token)
         except OSError:
-            return False
-        return True
+            return "owned cleanup could not prepare quarantine move"
+        try:
+            quarantine = self._new_quarantine_path(token.path)
+            if quarantine.exists():
+                return "owned cleanup skipped because quarantine path already exists"
+            # On Windows os.rename is a same-directory, no-overwrite move. On
+            # POSIX the generated name is collision-checked first; a move
+            # failure is still treated as cleanup failure rather than as
+            # permission to delete by the governed pathname.
+            current = token.path.stat()
+            if (current.st_dev, current.st_ino) != (token.st_dev, token.st_ino):
+                return "owned cleanup skipped because governed path identity changed"
+            os.rename(token.path, quarantine)
+        except FileNotFoundError:
+            return "owned cleanup skipped because governed path disappeared or quarantine collided"
+        except OSError:
+            return "owned cleanup could not move the file to quarantine"
+        try:
+            self._after_quarantine_move(token, quarantine)
+        except OSError:
+            return "owned cleanup could not verify quarantine move"
+        try:
+            moved = quarantine.stat()
+        except OSError:
+            return "owned cleanup could not verify quarantined file identity"
+        if (moved.st_dev, moved.st_ino) != (token.st_dev, token.st_ino):
+            return "owned cleanup skipped because quarantined file identity changed"
+        try:
+            quarantine.unlink()
+        except OSError:
+            return "owned cleanup could not remove verified quarantine file"
+        return None
 
     def _target_collision_errors(self, request: ExecutionProviderAdapterRequest) -> tuple[list[str], Path | None, Path | None]:
         document_path = next((str(path).replace("\\", "/") for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")), None)
@@ -363,8 +396,10 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 receipt_ref = self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True)
             except Exception as exc:
                 rollback_warning = ""
-                if document_token is not None and not self._remove_if_owned(document_token):
-                    rollback_warning = "; document rollback skipped because file identity changed or cleanup failed"
+                if document_token is not None:
+                    cleanup_warning = self._remove_if_owned(document_token)
+                    if cleanup_warning:
+                        rollback_warning = f"; {cleanup_warning}"
                 raise OSError(f"success receipt persistence failed: {str(exc)[:400]}{rollback_warning}") from exc
             artifacts = [document_path, receipt_ref]
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=artifacts, validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})
