@@ -304,7 +304,7 @@ class ReadinessResolution:
 class PtmProductionReadinessResolver:
     """The PTM-owned resolver; consumers may read its result but not recalculate it."""
 
-    def __init__(self, root: Path, *, freshness_seconds: int = 3600, evaluator_identity: str = "ptm.production-readiness-resolver@1.0.0") -> None:
+    def __init__(self, root: Path, *, freshness_seconds: int | None = None, evaluator_identity: str = "ptm.production-readiness-resolver@1.0.0") -> None:
         self.root = Path(root).resolve()
         self.freshness_seconds = freshness_seconds
         self.evaluator_identity = evaluator_identity
@@ -354,7 +354,7 @@ class PtmProductionReadinessResolver:
                     for evidence in dependencies + gates:
                         if evidence.get("observed_at"):
                             try:
-                                if _parse_time(observed_at) - _parse_time(evidence["observed_at"]) > timedelta(seconds=self.freshness_seconds):
+                                if self.freshness_seconds is not None and _parse_time(observed_at) - _parse_time(evidence["observed_at"]) > timedelta(seconds=self.freshness_seconds):
                                     conflicts.append(f"stale evidence: {evidence.get('dependency_id') or evidence.get('name')}")
                             except PtmReadinessError:
                                 conflicts.append("invalid evidence timestamp")
@@ -366,10 +366,14 @@ class PtmProductionReadinessResolver:
                     warnings.extend(source_errors)
                     conflicts.extend(source_errors)
                     all_expiries = [x.get("expires_at") for x in dependencies + gates if x.get("expires_at")]
-                    freshness_expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds)
+                    freshness_expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
                     expiry = min([_parse_time(x) for x in all_expiries] + [freshness_expiry])
                     if _parse_time(observed_at) >= expiry: conflicts.append("readiness evidence is expired")
-                    if conflicts or len({x.get("dependency_id") for x in dependencies}) != len(dependencies): readiness = "blocked"
+                    if self.freshness_seconds is None:
+                        warnings.append("freshness policy unavailable")
+                        failure = "freshness policy unavailable"
+                        readiness = "unknown"
+                    elif conflicts or len({x.get("dependency_id") for x in dependencies}) != len(dependencies): readiness = "blocked"
                     elif any(x.get("state") == "unknown" for x in dependencies): readiness = "unknown"
                     elif any(x.get("state") == "unsatisfied" for x in dependencies): readiness = "not_ready"
                     elif any(x.get("state") == "fail" for x in gates): readiness = "blocked"
@@ -377,9 +381,10 @@ class PtmProductionReadinessResolver:
                     else: readiness = "unknown"
                     if conflicts and failure is None: failure = "; ".join(conflicts[:3])
         if not source_events:
-            expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds)
+            expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
         else:
-            expiry = min([_parse_time(x["expires_at"]) for x in (list(payload.get("dependencies") or []) + list(payload.get("gate_checks") or [])) if x.get("expires_at")] + [_parse_time(observed_at) + timedelta(seconds=self.freshness_seconds)])
+            policy_expiry = _parse_time(observed_at) + timedelta(seconds=self.freshness_seconds) if self.freshness_seconds is not None else _parse_time(observed_at)
+            expiry = min([_parse_time(x["expires_at"]) for x in (list(payload.get("dependencies") or []) + list(payload.get("gate_checks") or [])) if x.get("expires_at")] + [policy_expiry])
         record: dict[str, Any] = {
             "resolution_id": f"res_{uuid.uuid4().hex}", "schema_version": SCHEMA_VERSION,
             "objective_id": objective_id, "campaign_id": payload.get("campaign_id"), "package_id": payload.get("package_id"),
