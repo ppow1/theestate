@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import ipaddress
+import os
 import socket
 from datetime import datetime, timezone
 from pathlib import Path
@@ -212,16 +213,57 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "validation_result": validation_result, "endpoint_local": endpoint_local,
             "error_details": [str(error)[:500] for error in errors],
         }
-        target = self.root / receipt_ref
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        self._exclusive_write_text(self.root / receipt_ref, json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return receipt_ref
+
+    @staticmethod
+    def _exclusive_write_text(target: Path, content: str) -> None:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
+                stream.write(content)
+        except Exception:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+            raise
+
+    def _target_collision_errors(self, request: ExecutionProviderAdapterRequest) -> tuple[list[str], Path | None, Path | None]:
+        document_path = next((str(path).replace("\\", "/") for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")), None)
+        receipt_ref = str(request.metadata.get("provider_receipt_path") or "").replace("\\", "/")
+        if not document_path or not receipt_ref:
+            return [], None, None
+        root = self.root.resolve()
+        document_target = (self.root / document_path).resolve(strict=False)
+        receipt_target = (self.root / receipt_ref).resolve(strict=False)
+        errors: list[str] = []
+        try:
+            document_target.relative_to(root); receipt_target.relative_to(root)
+        except ValueError:
+            return ["declared output resolves outside the repository root"], document_target, receipt_target
+        if document_target == receipt_target or document_target in receipt_target.parents or receipt_target in document_target.parents:
+            errors.append("document and provider receipt targets must be distinct non-shadowing files")
+        for label, target in (("documentation artifact", document_target), ("provider receipt", receipt_target)):
+            if target.exists():
+                errors.append(f"{label} target already exists; governed outputs are create-once")
+            for parent in target.parents:
+                if parent == root:
+                    break
+                if parent.exists() and not parent.is_dir():
+                    errors.append(f"{label} parent path is shadowed by an existing file")
+                    break
+        return errors, document_target, receipt_target
 
     def submit(self, request: ExecutionProviderAdapterRequest) -> ExecutionProviderAdapterResult:
         started = utc_now(); validation = self.validate_request(request)
         if not validation.ok:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked before provider invocation.", validation_status="failed", errors=validation.errors, warnings=validation.warnings, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        config = self._config(); endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); document_preexisted = (self.root / document_path).exists()
+        config = self._config(); target_errors, document_target, _ = self._target_collision_errors(request)
+        if target_errors:
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
+        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); document_created = False
         try:
             health_status, health = self.http_call("GET", endpoint + config["health_check"]["path"], None, int(config["timeout_seconds"]))
             names = {str(item.get("name") or item.get("model")) for item in health.get("models", [])} if isinstance(health, dict) else set()
@@ -243,11 +285,11 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             encoded = text.strip().encode("utf-8")
             if len(encoded) > int(config["output_limits"]["max_artifact_bytes"]):
                 raise ValueError("Qwen output exceeds the configured artifact limit")
-            target = (self.root / document_path).resolve(); target.relative_to(self.root.resolve()); target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(encoded)
+            target = document_target or (self.root / document_path).resolve(); target.relative_to(self.root.resolve()); self._exclusive_write_text(target, encoded.decode("utf-8")); document_created = True
             try:
                 receipt_ref = self._write_receipt(request, config, started=started, result_state="completed", validation_result="passed", timeout_state="completed_within_limit", cancellation_state="not_requested", actual_model=actual_model, prompt=prompt, artifacts=[document_path], errors=[], endpoint_local=True)
             except Exception:
-                if not document_preexisted and target.exists():
+                if document_created and target.exists():
                     target.unlink()
                 raise
             artifacts = [document_path, receipt_ref]
@@ -258,7 +300,8 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             receipt_ref = None
             try:
                 receipt_ref = self._write_receipt(request, config, started=started, result_state="failed", validation_result="failed", timeout_state=timeout_state, cancellation_state="requested" if metadata.get("cancel_requested") else "not_requested", actual_model=actual_model, prompt=prompt, artifacts=[], errors=error_details, endpoint_local=True)
-            except Exception:
+            except Exception as receipt_error:
                 receipt_ref = None
+                error_details.append(f"failure receipt persistence failed: {str(receipt_error)[:400]}")
             artifacts = [receipt_ref] if receipt_ref else []
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=artifacts, validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True})

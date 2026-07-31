@@ -216,3 +216,67 @@ def test_receipt_write_failure_removes_new_artifact(tmp_path, monkeypatch):
     result = adapter.submit(_request(tmp_path))
     assert result.status == "failed"
     assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+
+
+def test_existing_document_blocks_before_provider_and_preserves_bytes(tmp_path):
+    document = tmp_path / "docs/operations/examples/qwen-test.md"
+    document.parent.mkdir(parents=True); document.write_bytes(b"prior document")
+    calls = []
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args)).submit(_request(tmp_path))
+    assert result.status == "blocked" and result.metadata["live_provider_called"] is False and calls == []
+    assert document.read_bytes() == b"prior document"
+    assert not (tmp_path / "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json").exists()
+
+
+def test_existing_receipt_blocks_before_provider_and_preserves_bytes(tmp_path):
+    receipt = tmp_path / "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json"
+    receipt.parent.mkdir(parents=True); receipt.write_bytes(b"prior receipt")
+    calls = []
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: calls.append(args)).submit(_request(tmp_path))
+    assert result.status == "blocked" and result.metadata["live_provider_called"] is False and calls == []
+    assert receipt.read_bytes() == b"prior receipt"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+
+
+def test_existing_directories_and_same_target_block_without_mutation(tmp_path):
+    document = tmp_path / "docs/operations/examples/qwen-test.md"; document.mkdir(parents=True)
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: (_ for _ in ()).throw(AssertionError("provider called"))).submit(_request(tmp_path))
+    assert result.status == "blocked"
+    receipt = tmp_path / "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json"; receipt.mkdir(parents=True)
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: (_ for _ in ()).throw(AssertionError("provider called"))).submit(_request(tmp_path))
+    assert result.status == "blocked"
+    same = _request(tmp_path, output_path="runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json")
+    result = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=lambda *args: (_ for _ in ()).throw(AssertionError("provider called"))).submit(same)
+    assert result.status == "blocked"
+
+
+def test_late_document_collision_uses_exclusive_create(tmp_path):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    original = adapter._target_collision_errors
+    def race(request):
+        errors, document, receipt = original(request)
+        document.parent.mkdir(parents=True, exist_ok=True); document.write_bytes(b"competing document")
+        return errors, document, receipt
+    adapter._target_collision_errors = race
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert (tmp_path / "docs/operations/examples/qwen-test.md").read_bytes() == b"competing document"
+    assert result.metadata["provider_receipt"]
+
+
+def test_late_receipt_collision_preserves_competitor_and_removes_new_document(tmp_path, monkeypatch):
+    adapter = QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport())
+    original = adapter._write_receipt
+    raced = {"done": False}
+    def race(request, config, **kwargs):
+        if not raced["done"]:
+            raced["done"] = True
+            receipt = tmp_path / request.metadata["provider_receipt_path"]
+            receipt.parent.mkdir(parents=True, exist_ok=True); receipt.write_bytes(b"competing receipt")
+        return original(request, config, **kwargs)
+    monkeypatch.setattr(adapter, "_write_receipt", race)
+    result = adapter.submit(_request(tmp_path))
+    assert result.status == "failed"
+    assert (tmp_path / "runtime/engineering_adapter_receipts/qwen-adapter-qwen-test.json").read_bytes() == b"competing receipt"
+    assert not (tmp_path / "docs/operations/examples/qwen-test.md").exists()
+    assert any("failure receipt persistence failed" in error for error in result.errors)

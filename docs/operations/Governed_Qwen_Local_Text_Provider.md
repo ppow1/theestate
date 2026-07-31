@@ -55,7 +55,10 @@ Every live request must declare both the document path and
 `expected_outputs` and `write_scope_paths`. The adapter never invents or
 silently appends a receipt destination, and the shared
 `runtime/engineering_adapter_receipts/` directory is never a valid broad
-write scope.
+write scope. Governed document and receipt outputs are create-once for a
+commission: callers must provide fresh commission-specific paths, and
+pre-existing files or directories block before the health check or generation
+request. Historical artifacts and receipts are never rewritten.
 
 Successful execution writes only the explicitly authorized document and
 receipt paths. The receipt records provider and adapter identity, configured
@@ -72,6 +75,13 @@ and validation states, timeout/cancellation state, and an empty artifact list.
 If document writing succeeds but receipt writing fails, the adapter returns
 failure and removes the newly created document when it did not pre-exist; it
 does not claim successful completion.
+
+Both files use exclusive creation. A late collision therefore fails closed;
+the competing file is never overwritten. Cleanup removes only the document
+created by the current invocation. A collision before provider execution
+produces no receipt because no valid live execution began. A collision after
+live execution may produce a bounded failure receipt only when its exact
+declared receipt target remains available.
 
 Provider execution and Engineering completion are evidence-producing states.
 Neither grants institutional acceptance; acceptance remains a separate
