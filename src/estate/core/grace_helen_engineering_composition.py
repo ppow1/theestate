@@ -362,6 +362,20 @@ class GraceHelenEngineeringComposition:
             adapter_reference=adapter_reference,
             idempotency_key=idempotency_key,
         )
+        if commission.get("status") == "completed":
+            existing_auth = next((
+                _load(path) for path in (self.root / AUTHORIZATIONS).glob("*.json")
+                if _load(path).get("engineering_commission_id") == commission["commission_id"]
+            ), None)
+            if existing_auth is None or not existing_auth.get("dispatch_id"):
+                raise ValueError("completed commission replay is missing its durable authorization")
+            existing_dispatch = next((
+                item.to_dict() for item in load_dispatch_queue(self.root)
+                if item.dispatch_id == existing_auth["dispatch_id"]
+            ), None)
+            if existing_dispatch is None:
+                raise ValueError("completed commission replay is missing its durable Dispatch item")
+            return {"commission": commission, "authorization": existing_auth, "dispatch": existing_dispatch, "provider_execution": "already_completed", "institutional_acceptance_state": "not_granted"}
         accepted = self.accept_commission(commission["commission_id"])
         authorization, dispatch = self.authorize_dispatch(
             accepted["commission_id"],
