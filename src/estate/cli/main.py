@@ -67,7 +67,7 @@ from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, 
 from estate.core.validation_observations import append_observation, load_observations, update_observation_status, render_markdown_log
 from estate.core.validation_metrics_dashboard import generate_validation_metrics_dashboard, format_validation_metrics_summary
 from estate.core.validation_handoff_artifact_workflow import generate_validation_handoff_artifact_workflow, format_validation_handoff_summary
-from estate.core.work_package_validation import validate_work_package, format_validation_markdown
+from estate.core.work_package_validation import validate_work_package, format_validation_markdown, validate_capability_onboarding_package
 from estate.core.production_readiness_validation import generate_production_readiness_report, format_production_readiness_markdown
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
@@ -2307,6 +2307,13 @@ def cmd_validate_work_package(args):
         raise SystemExit(1)
 
 
+def cmd_validate_capability_onboarding(args):
+    payload = validate_capability_onboarding_package(args.path)
+    print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else payload)
+    if payload.get("validation_status") != "passed":
+        raise SystemExit(1)
+
+
 def cmd_codex_bridge(args):
     import json
     request = load_bridge_request(args.request)
@@ -3227,6 +3234,11 @@ def main(argv=None):
     p.add_argument("--id", required=True, help="Work package id, such as WP-0058")
     p.add_argument("--json", action="store_true", help="Print validation report JSON")
     p.set_defaults(func=cmd_validate_work_package)
+
+    p = sub.add_parser("validate-capability-onboarding", help="Lint an Estate capability onboarding package using the work-package validator")
+    p.add_argument("--path", required=True, help="Path to the capability onboarding package")
+    p.add_argument("--json", action="store_true", help="Print lint result JSON")
+    p.set_defaults(func=cmd_validate_capability_onboarding)
 
     p = sub.add_parser("codex-bridge", help="Run a bounded local Codex Bridge request")
     p.add_argument("--request", required=True, help="Path to Codex Bridge request JSON")
