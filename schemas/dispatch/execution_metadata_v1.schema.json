@@ -3,7 +3,7 @@
   "$id": "estate.dispatch.execution-metadata.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["technical_execution", "capability_disposition", "validation_required", "institutional_acceptance_state", "grace_objective_id", "grace_action_id", "helen_determination_id", "operations_decision_id", "engineering_commission_id", "engineering_authorization_id", "provider_id", "provider_type", "adapter_reference", "ptm_readiness", "ptm_revalidated_at", "ptm_revalidation_result", "authorization_reference", "decision_reference", "authorization_record_digest", "execution_authority"],
+  "required": ["technical_execution", "capability_disposition", "validation_required", "institutional_acceptance_state", "grace_objective_id", "grace_action_id", "helen_determination_id", "operations_decision_id", "engineering_commission_id", "engineering_authorization_id", "provider_id", "provider_type", "adapter_reference", "ptm_readiness", "ptm_revalidated_at", "ptm_revalidation_result", "authorization_reference", "decision_reference", "authorization_record_digest", "execution_authority", "provider_extension"],
   "properties": {
     "technical_execution": {"const": true},
     "capability_disposition": {"const": "qualified_and_available"},
@@ -26,6 +26,7 @@
     "ptm_readiness": {"$ref": "estate.engineering.commission-ptm-evidence.v1"},
     "ptm_revalidated_at": {"type": "string", "format": "date-time"},
     "ptm_revalidation_result": {"const": "passed"},
-    "execution_authority": {"$ref": "estate.engineering.commission-execution-authority.v1"}
+    "execution_authority": {"$ref": "estate.engineering.commission-execution-authority.v1"},
+    "provider_extension": {"$ref": "estate.qwen-local-text.execution-extension.v1"}
   }
 }

@@ -18,6 +18,7 @@ from uuid import uuid4
 from jsonschema import Draft202012Validator, FormatChecker
 
 from estate.core.orchestrator_intake import ALLOWED_CLASSIFICATIONS
+from estate.core.authority_schema_runtime import load_registry
 
 ADAPTER_RESULT_STATUSES = {"accepted", "dry_run_completed", "blocked", "failed", "completed"}
 
@@ -103,6 +104,7 @@ class ExecutionProviderAdapterRequest:
     engineering_authorization_id: str | None = None
     adapter_reference: str | None = None
     ptm_readiness: dict[str, Any] = field(default_factory=dict)
+    provider_extension: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=utc_now)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -157,6 +159,7 @@ class ExecutionProviderAdapterRequest:
             engineering_authorization_id=(data.get("metadata") or {}).get("engineering_authorization_id"),
             adapter_reference=(data.get("metadata") or {}).get("adapter_reference"),
             ptm_readiness=(data.get("metadata") or {}).get("ptm_readiness") or {},
+            provider_extension=(data.get("metadata") or {}).get("provider_extension") or data.get("provider_extension") or {},
             metadata={**(data.get("metadata") or {}), **(metadata or {})},
         )
 
@@ -204,10 +207,13 @@ class ExecutionProviderAdapterRequest:
                     errors.append(f"{field_name} is required for technical execution")
             if not self.ptm_readiness:
                 errors.append("ptm_readiness is required for technical execution")
+            if self.provider_id == "qwen.local.text" and not self.provider_extension:
+                errors.append("provider_extension is required for Qwen technical execution")
             schema_path = Path(__file__).resolve().parents[3] / "schemas/execution_provider_adapter_request_v1.schema.json"
             try:
-                schema = json.loads(schema_path.read_text(encoding="utf-8"))
-                errors.extend(error.message for error in Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(asdict(self)))
+                registry, schemas = load_registry(schema_path.parents[1])
+                schema = schemas["estate.execution-provider-adapter.request.v1"]
+                errors.extend(error.message for error in Draft202012Validator(schema, registry=registry, format_checker=FormatChecker()).iter_errors(asdict(self)))
             except (OSError, ValueError) as exc:
                 errors.append(f"technical adapter request schema unavailable: {exc}")
         status = "accepted" if not errors else "blocked"

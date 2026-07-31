@@ -47,9 +47,10 @@
     "expires_at": {"type": ["string", "null"], "format": "date-time"},
     "idempotency_key": {"type": ["string", "null"]},
     "record_digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
-    "parent_operations_decision_id": {"type": ["string", "null"]}
+    "parent_operations_decision_id": {"type": ["string", "null"]},
+    "provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "null"}]}
   },
   "allOf": [
-    {"if": {"properties": {"technical_execution": {"const": true}}, "required": ["technical_execution"]}, "then": {"required": ["grace_objective_id", "grace_action_id", "helen_determination_id", "ptm_readiness", "engineering_commission_id", "engineering_authorization_id", "dispatch_id", "selected_provider_id", "selected_adapter_reference", "authorization_reference", "decision_reference", "prompt_source", "prompt_source_digest", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "authorized_at", "expires_at", "idempotency_key", "record_digest", "parent_operations_decision_id"], "properties": {"decision_type": {"const": "authorize_dispatch"}, "decision_state": {"const": "authorized_for_dispatch"}, "technical_execution": {"const": true}, "metadata": {"type": "object", "additionalProperties": false, "required": ["parent_operations_decision_id"], "properties": {"parent_operations_decision_id": {"type": "string", "minLength": 1}}}}}}
+    {"if": {"properties": {"technical_execution": {"const": true}}, "required": ["technical_execution"]}, "then": {"required": ["grace_objective_id", "grace_action_id", "helen_determination_id", "ptm_readiness", "engineering_commission_id", "engineering_authorization_id", "dispatch_id", "selected_provider_id", "selected_adapter_reference", "authorization_reference", "decision_reference", "prompt_source", "prompt_source_digest", "allowed_read_paths", "allowed_write_paths", "expected_outputs", "authorized_at", "expires_at", "idempotency_key", "record_digest", "parent_operations_decision_id", "provider_extension"], "properties": {"decision_type": {"const": "authorize_dispatch"}, "decision_state": {"const": "authorized_for_dispatch"}, "technical_execution": {"const": true}, "metadata": {"type": "object", "additionalProperties": false, "required": ["parent_operations_decision_id"], "properties": {"parent_operations_decision_id": {"type": "string", "minLength": 1}}}}}}
   ]
 }
