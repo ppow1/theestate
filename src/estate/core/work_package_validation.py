@@ -16,6 +16,40 @@ REPORTS_DIR = Path("operations/validation/reports")
 RUNTIME_DIR = Path("runtime/validation/work_packages")
 CAPTURE_DIR = RUNTIME_DIR / "captures"
 
+ONBOARDING_REQUIRED_SECTIONS = {
+    "owner": ("Owner:", "owner", "resident/department owner"),
+    "capability_id": ("Capability ID", "capability_id", "capability identity"),
+    "target_maturity": ("maturity", "target maturity", "maturity_level"),
+    "provider_disposition": ("Provider", "adapter", "resident wrapper", "tool"),
+    "authority_boundaries": ("Authority", "prohibited", "classification"),
+    "scopes": ("Allowed reads", "Allowed writes", "Expected outputs", "not_applicable"),
+    "evidence": ("Evidence", "health", "qualification", "freshness"),
+    "test_plan": ("Unit tests", "Integration tests", "Negative tests"),
+    "live_acceptance": ("Live governed acceptance", "acceptance", "exemption"),
+    "rollback": ("Rollback", "deprecation", "removal"),
+    "steward_stop": ("Stop conditions", "Steward-stop", "safe stop"),
+}
+
+
+def validate_capability_onboarding_package(path: str | Path) -> dict[str, Any]:
+    """Validate the canonical onboarding package shape using this validator.
+
+    This is intentionally a structural pre-dispatch lint, not a second
+    onboarding lifecycle. It catches absent authority sections before a normal
+    work-package recipe is admitted; semantic, schema, and cross-record checks
+    remain the responsibility of the package's normal validation recipe.
+    """
+    package_path = Path(path)
+    errors: list[dict[str, Any]] = []
+    if not package_path.is_file():
+        errors.append({"type": "missing_package", "path": str(package_path)})
+        return {"validation_status": "failed", "package_path": str(package_path), "missing_sections": [], "errors": errors}
+    text = package_path.read_text(encoding="utf-8").lower()
+    missing = [name for name, markers in ONBOARDING_REQUIRED_SECTIONS.items() if not any(marker.lower() in text for marker in markers)]
+    if missing:
+        errors.append({"type": "missing_required_sections", "sections": missing})
+    return {"validation_status": "passed" if not errors else "failed", "package_path": str(package_path), "missing_sections": missing, "errors": errors}
+
 
 def _root(root: str | Path | None = None) -> Path:
     if root is not None:
