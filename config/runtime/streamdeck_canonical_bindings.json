@@ -1,0 +1,16 @@
+{
+  "schema_version": "estate.streamdeck-canonical-bindings.v1",
+  "profile": "Estate Operations v0.4",
+  "external_root": "A:\\AI\\Tools\\EstateStreamDeckMVP",
+  "bindings": {
+    "08-Start-Resident-Gateway.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py start --slot blue --service gateway",
+    "10-Start-OpenWebUI.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py start --slot blue --service webui",
+    "12-Start-Estate-Surfaces.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py start --slot blue",
+    "13-Estate-Runtime-Status.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py status",
+    "16-Restart-Estate-Surfaces.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py restart",
+    "17-Service-Health.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py status"
+  },
+  "legacy_controller": "A:\\AI\\Tools\\EstateStreamDeckMVP\\Estate-Service-Control.ps1",
+  "legacy_controller_active": false,
+  "operator_deck_slots_are_deployment_control": false
+}
