@@ -1,0 +1,632 @@
+{
+  "conflicts": [
+    {
+      "entity_id": "CAP-000001",
+      "reason": "registry status is stronger than current operational-evidence field; help uses fail-closed status"
+    },
+    {
+      "entity_id": "CAP-000002",
+      "reason": "registry status is stronger than current operational-evidence field; help uses fail-closed status"
+    },
+    {
+      "entity_id": "CAP-000003",
+      "reason": "registry status is stronger than current operational-evidence field; help uses fail-closed status"
+    },
+    {
+      "entity_id": "CAP-000004",
+      "reason": "registry status is stronger than current operational-evidence field; help uses fail-closed status"
+    },
+    {
+      "entity_id": "CAP-000005",
+      "reason": "registry status is stronger than current operational-evidence field; help uses fail-closed status"
+    }
+  ],
+  "entities": [
+    {
+      "accepted_scope": "Help, discovery, bounded operational coordination, and governed handoffs.",
+      "availability": "temporarily_unavailable",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, help.",
+        "Grace, what can we do?",
+        "Grace, prepare a proposal before execution."
+      ],
+      "description": "Sequences approved operational movement, dependencies, checkpoints, and governed Dispatch handoffs without provider execution or authority expansion.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "plain-language answer",
+        "bounded proposal or governed handoff"
+      ],
+      "id": "grace",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "canonical Grace/Gateway/WebUI path is not currently semantically ready"
+      ],
+      "maturity": "active resident",
+      "name": "Grace",
+      "owner": "Operations",
+      "prohibited_or_unsupported_scope": [
+        "provider execution without governed dispatch",
+        "institutional acceptance",
+        "unbounded movement"
+      ],
+      "qualified_providers_or_workers": [
+        "Grace"
+      ],
+      "required_authority": [
+        "explicit request for any governed action",
+        "existing Operations/Steward decisions"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "data/registry/residents.json",
+          "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
+        },
+        {
+          "exists": true,
+          "reference": "config/runtime/canonical_webui_gateway.json",
+          "sha256": "984d7343d89af8370e0fb1d30ee507a7c34d5d11ca9808ac9673b8d33e2ed065"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Readiness and workforce assessment; bounded recommendations.",
+      "availability": "operational_now",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Helen, do we have a governed transcription capability?",
+        "What is unavailable and what project enables it?"
+      ],
+      "description": "Capability, qualification, availability, capacity, and gap assessment.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "qualification and readiness assessment",
+        "bounded gap and enabling project"
+      ],
+      "id": "helen",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [],
+      "maturity": "ready",
+      "name": "Helen",
+      "owner": "Human Resources",
+      "prohibited_or_unsupported_scope": [
+        "granting constitutional authority",
+        "claiming provider execution",
+        "inventing qualification"
+      ],
+      "qualified_providers_or_workers": [
+        "Helen"
+      ],
+      "required_authority": [
+        "Helen assessment authority under existing governance"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "runtime/residents/helen/readiness.json",
+          "sha256": "6dc8c3ea64a8e01fab2fffc1bf71088a3e9877db837b3d93f2c2a66cbde6df52"
+        },
+        {
+          "exists": true,
+          "reference": "data/registry/residents.json",
+          "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Explicitly scoped repository/design/review work through canonical authorization and Dispatch.",
+      "availability": "authorization_required",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, ask Engineering to draft...",
+        "Grace, ask Engineering to review these exact files..."
+      ],
+      "description": "Technical design, bounded implementation, review, and validation coordination.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": "Capability-specific enabling project",
+      "expected_outputs": [
+        "bounded design or implementation artifact",
+        "receipt and validation evidence"
+      ],
+      "id": "engineering",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "each request needs current authority, scope, worker, provider, and readiness"
+      ],
+      "maturity": "registered",
+      "name": "Engineering",
+      "owner": "Engineering",
+      "prohibited_or_unsupported_scope": [
+        "implicit write scope",
+        "provider selection without readiness",
+        "merge or acceptance without authority"
+      ],
+      "qualified_providers_or_workers": [
+        "Engineering workers assessed by Helen"
+      ],
+      "required_authority": [
+        "owner authorization",
+        "PTM/readiness",
+        "Operations and Dispatch as applicable"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/providers/catalog.json",
+          "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
+        },
+        {
+          "exists": true,
+          "reference": "data/registry/residents.json",
+          "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Only capabilities declared by the provider catalog and current authorization.",
+      "availability": "authorization_required",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, ask Engineering to draft...",
+        "Helen, is Qwen text available now?"
+      ],
+      "description": "Loopback Qwen-family text generation and bounded repository reads.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "provider receipt",
+        "validated artifact when separately authorized"
+      ],
+      "id": "qwen.local.text",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "fresh loopback reachability is present, but governed authorization and validation remain required"
+      ],
+      "maturity": "implemented",
+      "name": "qwen.local.text",
+      "owner": "Engineering",
+      "prohibited_or_unsupported_scope": [
+        "unbounded shell or repository access",
+        "assuming installed/catalog status means ready"
+      ],
+      "qualified_providers_or_workers": [
+        "qwen.local.text"
+      ],
+      "required_authority": [
+        "explicit governed authorization",
+        "fresh provider health/capacity"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/providers/catalog.json",
+          "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
+        },
+        {
+          "exists": true,
+          "reference": "config/providers/qwen_local_text.json",
+          "sha256": "17f523cb04d428d9b7d25a34b6ad7ee5fa2ccf1d0efb93d47d9f0032d2cad7e1"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Only capabilities declared by the provider catalog and current authorization.",
+      "availability": "temporarily_unavailable",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, ask Engineering to review these exact files..."
+      ],
+      "description": "Bounded Codex CLI execution with declared workspace and outputs.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": "Provider health/readiness enablement",
+      "expected_outputs": [
+        "provider receipt",
+        "validated artifact when separately authorized"
+      ],
+      "id": "codex.execution.cli",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "provider health is stale/offline; provider catalog does not grant execution authority"
+      ],
+      "maturity": "implemented",
+      "name": "codex.execution.cli",
+      "owner": "Engineering",
+      "prohibited_or_unsupported_scope": [
+        "unbounded shell or repository access",
+        "assuming installed/catalog status means ready"
+      ],
+      "qualified_providers_or_workers": [
+        "codex.execution.cli"
+      ],
+      "required_authority": [
+        "explicit governed authorization",
+        "fresh provider health/capacity"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/providers/catalog.json",
+          "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
+        },
+        {
+          "exists": true,
+          "reference": "runtime/provider_health/providers/codex_cli_openai.json",
+          "sha256": "2475327de11ab76a5b8d3aae522e363f9f054b9609d24805daab115d05647410"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Only capabilities declared by the provider catalog and current authorization.",
+      "availability": "registered_unavailable",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, prepare a ComfyUI image proposal."
+      ],
+      "description": "Local image workflow preparation and governed submission.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": "Provider health/readiness enablement",
+      "expected_outputs": [
+        "provider receipt",
+        "validated artifact when separately authorized"
+      ],
+      "id": "comfyui.local.image",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "fresh health/capacity and separate live submission authorization are required"
+      ],
+      "maturity": "implemented",
+      "name": "ComfyUI",
+      "owner": "Engineering",
+      "prohibited_or_unsupported_scope": [
+        "unbounded shell or repository access",
+        "assuming installed/catalog status means ready"
+      ],
+      "qualified_providers_or_workers": [
+        "comfyui.local.image"
+      ],
+      "required_authority": [
+        "explicit governed authorization",
+        "fresh provider health/capacity"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/providers/catalog.json",
+          "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
+        },
+        {
+          "exists": true,
+          "reference": "runtime/ai_services/implementations/comfyui/service.manifest.json",
+          "sha256": "ddc5c23dbc196d06418849016e8539beb2d4b42bcc8a7b453fa5736051a346a6"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Observation only until formal provider routing, health, qualification, and authority are current.",
+      "availability": "registered_unavailable",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Helen, is Qwen Coder available now?"
+      ],
+      "description": "Observed Qwen coder model record; no current formal routing or fresh dispatch evidence is claimed.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": "Qwen Coder provider onboarding",
+      "expected_outputs": [
+        "future bounded text artifact and provider receipt"
+      ],
+      "id": "qwen-coder",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "observed model record is historical and formal routing policy is pending"
+      ],
+      "maturity": "observed",
+      "name": "Qwen Coder",
+      "owner": "Engineering",
+      "prohibited_or_unsupported_scope": [
+        "treating model presence or historical use as operational dispatchability"
+      ],
+      "qualified_providers_or_workers": [],
+      "required_authority": [
+        "future provider onboarding and explicit governed authorization"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "data/registry/providers.json",
+          "sha256": "0fa5ce443b21a7234840d5903fa27a6848d79f71babcd9336e4aa93aa7e0d57a"
+        },
+        {
+          "exists": true,
+          "reference": "data/registry/capabilities.json",
+          "sha256": "17894e0eaa0b17bdad4c9739975cb6abf637bf8b872ce4456e52f095ebbf8428"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "No current governed transcription execution is proven.",
+      "availability": "planned",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Can we transcribe audio?",
+        "Helen, do we have a governed transcription capability?"
+      ],
+      "description": "Planned local speech-to-text capability for speech transcription workflows.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": "Whisper capability onboarding",
+      "expected_outputs": [
+        "future transcript artifact with provenance"
+      ],
+      "id": "CAP-000006",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "registry says Pending Install; no current operational provider evidence"
+      ],
+      "maturity": "Designed",
+      "name": "Whisper",
+      "owner": "Administration",
+      "prohibited_or_unsupported_scope": [
+        "claiming transcription is operational from installation/catalog evidence"
+      ],
+      "qualified_providers_or_workers": [],
+      "required_authority": [
+        "future governed onboarding and execution authorization"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "data/registry/capabilities.json",
+          "sha256": "17894e0eaa0b17bdad4c9739975cb6abf637bf8b872ce4456e52f095ebbf8428"
+        },
+        {
+          "exists": true,
+          "reference": "data/registry/providers.json",
+          "sha256": "0fa5ce443b21a7234840d5903fa27a6848d79f71babcd9336e4aa93aa7e0d57a"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Declared bounded Skill scope only.",
+      "availability": "authorization_required",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Check Git",
+        "Repo Health",
+        "Is Git clean?",
+        "Grace, use the Check Git Skill and report only."
+      ],
+      "description": "Inspect repository and worktree health without changing repository state.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "declared Skill artifact and receipt"
+      ],
+      "id": "repository-health",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "explicit execution authority is still required"
+      ],
+      "maturity": 4,
+      "name": "Repository Health",
+      "owner": "Estate Engineering",
+      "prohibited_or_unsupported_scope": [
+        "discovery silently executing",
+        "repository mutation or acceptance through help"
+      ],
+      "qualified_providers_or_workers": [
+        "Engineering"
+      ],
+      "required_authority": [
+        "owner-authorized-read-only-inspection"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/skills/estate_skill_registry.json",
+          "sha256": "3efca58be115c3826172ebd04a48205566d6e97c19664a473cf765a76ef80490"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Discovery, explanation, readiness assessment, and explicitly governed Skill invocation.",
+      "availability": "operational_now",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "What Skills are available?",
+        "How do I ask for this outcome?"
+      ],
+      "description": "Canonical versioned governed procedure registry and read-only discovery.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "current Skill list and proposal guidance"
+      ],
+      "id": "estate-skills",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [],
+      "maturity": "operational implementation",
+      "name": "Estate Skills framework",
+      "owner": "Estate Architecture",
+      "prohibited_or_unsupported_scope": [
+        "creating authority by registration",
+        "help-triggered execution"
+      ],
+      "qualified_providers_or_workers": [],
+      "required_authority": [
+        "Skill-specific authority and canonical lifecycle"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/skills/estate_skill_registry.json",
+          "sha256": "3efca58be115c3826172ebd04a48205566d6e97c19664a473cf765a76ef80490"
+        },
+        {
+          "exists": true,
+          "reference": "schemas/skills/skill_manifest_v1.schema.json",
+          "sha256": "15d5fb479b38b7b27808ead909d144fbb516a794b378befc49639562151399da"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Capability registration and governed readiness assessment.",
+      "availability": "authorization_required",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "What project enables this capability?"
+      ],
+      "description": "Existing capability/provider registration and Grace/Helen/Engineering readiness path.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": "Capability-specific onboarding",
+      "expected_outputs": [
+        "registration, assessment, gap, and evidence"
+      ],
+      "id": "capability-onboarding",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "capability-specific evidence may be stale or missing"
+      ],
+      "maturity": "registered",
+      "name": "Capability onboarding framework",
+      "owner": "Engineering",
+      "prohibited_or_unsupported_scope": [
+        "registration alone proving operation",
+        "bypassing Helen/PTM/authorization"
+      ],
+      "qualified_providers_or_workers": [],
+      "required_authority": [
+        "owner and Engineering authorization"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "src/estate/core/engineering_capability_enablement.py",
+          "sha256": "9d3305dfca1e654fb73be8b37d95d3cc3c9f0ffd4991bae9138718900db35185"
+        },
+        {
+          "exists": true,
+          "reference": "config/providers/catalog.json",
+          "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
+        }
+      ]
+    },
+    {
+      "accepted_scope": "Authenticated WebUI conversation using the canonical shared state and Grace/Gateway route.",
+      "availability": "temporarily_unavailable",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, help.",
+        "Grace, what Skills are available?"
+      ],
+      "description": "Canonical authenticated Open WebUI path through Grace runtime and the Resident Gateway.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "authenticated conversation response and bounded evidence"
+      ],
+      "id": "openwebui-estate-path",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "canonical three-service semantic readiness is not currently proven"
+      ],
+      "maturity": "validated operational path",
+      "name": "Open WebUI / Grace / Resident Gateway",
+      "owner": "Operations",
+      "prohibited_or_unsupported_scope": [
+        "unauthenticated readiness being treated as authenticated acceptance",
+        "database reset or alternate state"
+      ],
+      "qualified_providers_or_workers": [],
+      "required_authority": [
+        "existing approved administrator session for use; governed request authority for actions"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "reference": "config/runtime/canonical_webui_gateway.json",
+          "sha256": "984d7343d89af8370e0fb1d30ee507a7c34d5d11ca9808ac9673b8d33e2ed065"
+        },
+        {
+          "exists": true,
+          "reference": "runtime/ai_services/implementations/open_webui/service.manifest.json",
+          "sha256": "c2c6c6ca2a611232d10d97ec6c8998401def0c29f9ab12ddf63cab47fe54455a"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-01T20:01:11Z",
+  "generation_policy": {
+    "historical_success_is_not_current_availability": true,
+    "installed_or_registered_is_not_operational": true,
+    "live_probes": true,
+    "read_only": true
+  },
+  "institutional_acceptance": "not_granted",
+  "schema_version": "estate.current-capabilities.v1",
+  "source_references": [
+    {
+      "exists": true,
+      "reference": "data/registry/capabilities.json",
+      "sha256": "17894e0eaa0b17bdad4c9739975cb6abf637bf8b872ce4456e52f095ebbf8428"
+    },
+    {
+      "exists": true,
+      "reference": "data/registry/providers.json",
+      "sha256": "0fa5ce443b21a7234840d5903fa27a6848d79f71babcd9336e4aa93aa7e0d57a"
+    },
+    {
+      "exists": true,
+      "reference": "data/registry/residents.json",
+      "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
+    },
+    {
+      "exists": true,
+      "reference": "config/providers/catalog.json",
+      "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
+    },
+    {
+      "exists": true,
+      "reference": "config/skills/estate_skill_registry.json",
+      "sha256": "3efca58be115c3826172ebd04a48205566d6e97c19664a473cf765a76ef80490"
+    },
+    {
+      "exists": true,
+      "reference": "runtime/residents/helen/readiness.json",
+      "sha256": "6dc8c3ea64a8e01fab2fffc1bf71088a3e9877db837b3d93f2c2a66cbde6df52"
+    },
+    {
+      "exists": true,
+      "reference": "runtime/providers/health/status/latest.json",
+      "sha256": "f103845f37bf25c50e27d1919bdd3731a3c402b6cbf5d2e3c62d0cbe7a9e52a5"
+    },
+    {
+      "exists": true,
+      "reference": "runtime/provider_health/providers/codex_cli_openai.json",
+      "sha256": "2475327de11ab76a5b8d3aae522e363f9f054b9609d24805daab115d05647410"
+    },
+    {
+      "exists": true,
+      "reference": "runtime/ai_services/implementations/comfyui/service.manifest.json",
+      "sha256": "ddc5c23dbc196d06418849016e8539beb2d4b42bcc8a7b453fa5736051a346a6"
+    },
+    {
+      "exists": true,
+      "reference": "config/runtime/canonical_webui_gateway.json",
+      "sha256": "984d7343d89af8370e0fb1d30ee507a7c34d5d11ca9808ac9673b8d33e2ed065"
+    }
+  ]
+}
