@@ -118,5 +118,25 @@
     "rollback_preserves_persistent_data": true,
     "steward_promotion_authorization_required": true
   },
+  "phase_5a_result": {
+    "authorized": true,
+    "performed": true,
+    "removed_paths": [
+      "A:\\theestate-main",
+      "A:\\theestate-wp4229",
+      "A:\\theestate-wp4230",
+      "A:\\theestate-wp4231",
+      "A:\\theestate-wp4231-maincheck",
+      "A:\\theestate-wp4232-final",
+      "A:\\theestate-wp4232-u1"
+    ],
+    "skipped_paths": [],
+    "git_worktree_prune_dry_run": "no stale registrations",
+    "gross_removed_file_bytes": 717316610,
+    "protected_worktrees": ["A:\\theestate", "A:\\EstateRuntime\\bootstrap\\estate-main", "A:\\theestate-wp4232", "A:\\theestate-wp4233"],
+    "stashes_remaining": 16,
+    "estate_healthy_after": true,
+    "active_slot_after": "blue"
+  },
   "phase_5_blocked_until": ["Steward approves named paths and dispositions","unique work preservation is completed","nested repositories and evidence retention are resolved"]
 }
