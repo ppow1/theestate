@@ -111,18 +111,22 @@ plugin's detached cmd.exe /c call dispatch:
 6. Canonical stop again closed both ports and reported stopped.
 7. Canonical full-core start returned state=running, processes=true,
    gateway=true, and webui=true.
-8. A bounded authenticated Open WebUI request returned HTTP 200 and a
-   truthful Grace response identifying the canonical Estate Gateway path.
-9. A final stop/start repeat after the prior test process ended again produced
-   stopped-then-running state, with both ports listening only under the
-   canonical process records.
+8. The authenticated Open WebUI request was not executed by Codex: this
+   session has no safe browser automation surface for the established
+   authenticated session, and no credential, cookie, or token was extracted.
+   The required authenticated UI-to-Grace proof therefore remains open.
+9. The runtime stop/start repeat was verified independently, with both ports
+   listening only under the canonical process records.
 
-The browser-open action was issued by the operator target after readiness; no
-manual provider or manually started Open WebUI process was used.
+The browser-open action was issued by the operator target after readiness in
+the earlier operator-equivalent run; no manual provider or manually started
+Open WebUI process was used. In the current authenticated-path attempt, the
+Estate was started through the canonical core control path and is intentionally
+left running for the Steward handoff below.
 
 ## Validation
 
-- tests/test_canonical_webui_gateway_runtime.py: 7 passed.
+- tests/test_canonical_webui_gateway_runtime.py: 9 passed.
 - Added regression coverage for stale process records and wrong command
   identity.
 - Python compilation passed.
@@ -139,3 +143,35 @@ preserved. A:\theestate was not modified by this repair.
 PR #509 remains draft and unmerged. The exact next Steward action is to review
 the pushed correction and the operator-equivalent evidence, then decide
 whether PR #509 may be marked ready. Do not merge without explicit approval.
+
+## 2026-08-01 authenticated-path handoff
+
+The current attempt began from stopped state and started the Estate through the
+canonical core control path. Active slot blue is semantically ready for both
+Gateway and Open WebUI. The actual Open WebUI listener is the expected
+`open-webui.exe serve` process, and its live environment matches
+`A:\AI\OpenWebUI\EstateCanonicalData` and the canonical `webui.db`. The
+canonical database has one approved administrator and the expected
+`estate/grace-grounded-test`, `grace_runtime_bridge`, and
+`grace_runtime_grounding` objects. These checks are bounded and contain no
+credentials or session material.
+
+The browser must remain authenticated through the Steward's existing session.
+Codex cannot safely drive that session from this environment, and direct
+unauthenticated probes are not an acceptable substitute. The Estate is left
+running. In the already authenticated normal WebUI, select
+`estate/grace-grounded-test` and submit exactly:
+
+> Grace, report your identity and confirm that this request reached you through the canonical Open WebUI and Resident Gateway path. Do not execute a provider task.
+
+After submission, Codex must collect only bounded non-secret evidence: UTC
+timestamps, approved non-secret user ID, conversation/request correlation,
+selected model, tool/filter identities, Gateway/Grace correlation, HTTP/result
+status, and a short visible-response summary. The collection must correlate the
+authenticated WebUI request with the canonical WebUI chat/message rows and
+Gateway/Grace logs; it must not read cookies, tokens, passwords, API keys, or
+full secret-bearing payloads. The same bounded request must then be repeated
+after the Steward closes the browser and uses canonical stop/start once more.
+
+Until those two authenticated UI requests are durably correlated, this report
+does not grant acceptance and PR #509 is not merge-ready.
