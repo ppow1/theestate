@@ -43,6 +43,14 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def _open_browser_url(url: str) -> None:
+    """Open a URL through the normal Windows shell without cmd empty-argv parsing."""
+    if hasattr(os, "startfile"):
+        os.startfile(url)  # type: ignore[attr-defined]
+        return
+    subprocess.Popen(["python", "-m", "webbrowser", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -447,7 +455,7 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
                 _append_event(config, "start.semantic_ready", slot=slot_id, active_ports=active_ports, services=list(services), pids=[p.pid for p in processes.values()], data_dir=manifest["state_identity"]["data_dir"], database=manifest["state_identity"]["database"])
                 if open_browser:
                     # Browser launch is deliberately after semantic readiness.
-                    subprocess.Popen(["cmd.exe", "/d", "/s", "/c", "start", "", f"http://{config['open_webui']['host']}:{slot.webui_port}/"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    _open_browser_url(f"http://{config['open_webui']['host']}:{slot.webui_port}/")
                     _append_event(config, "browser.open_requested", slot=slot_id, url=f"http://{config['open_webui']['host']}:{slot.webui_port}/")
                 return manifest
             if any(p.poll() is not None for p in processes.values()):
@@ -460,6 +468,23 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
             if process.poll() is None:
                 process.terminate()
         raise
+
+
+def open_browser(config: dict[str, Any]) -> dict[str, Any]:
+    """Open the canonical WebUI without re-starting an already healthy slot."""
+    current = status(config)
+    runtime = current.get("runtime", {})
+    active_slot = current.get("active", {}).get("active_slot", "blue")
+    if runtime.get("healthy") is not True or runtime.get("slot_id") != active_slot:
+        return start_slot(config, active_slot, active_ports=True, open_browser=True)
+
+    webui = runtime.get("webui", {})
+    if webui.get("ready") is not True:
+        raise RuntimeControlError("canonical WebUI is not semantically ready")
+    url = f"http://{config['open_webui']['host']}:{config['open_webui']['active_port']}/"
+    _open_browser_url(url)
+    _append_event(config, "browser.open_requested", slot=active_slot, url=url, reused_healthy_runtime=True)
+    return {"state": "browser-opened", "active_slot": active_slot, "url": url, "runtime": current}
 
 
 def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:

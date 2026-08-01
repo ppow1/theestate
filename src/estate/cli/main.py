@@ -161,6 +161,7 @@ from estate.cli.helen_workforce import run as run_helen_workforce_cli
 from estate.cli.institutional_learning import run as run_institutional_learning_cli
 from estate.core.personal_journals import PersonalJournalStore
 from estate.core.research_office import ResearchOfficeRuntime, format_summary as format_research_summary
+from estate.core.steward_help import answer as steward_help_answer, build_snapshot as build_steward_help_snapshot, render_cheat_sheet as render_steward_cheat_sheet, write_surfaces as write_steward_help_surfaces
 
 def _repo_path(rel):
     return (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd()) / rel
@@ -1215,6 +1216,18 @@ def cmd_capabilities(args):
         print(json.dumps(capabilities, indent=2, sort_keys=True))
     else:
         print_table(capabilities, ["id", "name", "category", "status", "location"])
+
+def cmd_steward_help(args):
+    root = Path(args.root) if getattr(args, "root", None) else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
+    action = getattr(args, "steward_help_action", "ask")
+    if action == "ask":
+        payload = steward_help_answer(build_steward_help_snapshot(root), args.request or "help", resident=args.resident)
+    else:
+        written = write_steward_help_surfaces(root)
+        payload = written["snapshot"] if action == "snapshot" else {"cheat_sheet_path": written["cheat_sheet_path"], "generated_at": written["snapshot"]["generated_at"], "freshness_state": written["snapshot"]["freshness_state"]}
+        if action == "cheat-sheet" and not getattr(args, "json", False):
+            print(render_steward_cheat_sheet(written["snapshot"])); return
+    print(json.dumps(payload, indent=2, sort_keys=True, default=str) if getattr(args, "json", False) or action != "cheat-sheet" else payload)
 
 def cmd_providers(args):
     print_table(list_providers(), ["id", "name", "service", "status", "location"])
@@ -3000,6 +3013,15 @@ def main(argv=None):
     p = sub.add_parser("capabilities")
     p.add_argument("--json", action="store_true", help="Print registered capabilities JSON")
     p.set_defaults(func=cmd_capabilities)
+
+    for command_name in ("steward-help", "help"):
+        p = sub.add_parser(command_name, help="Read-only current Steward help and capability discovery")
+        p.add_argument("steward_help_action", nargs="?", choices=["ask", "snapshot", "cheat-sheet"], default="ask")
+        p.add_argument("request", nargs="?", help="Plain-language question; used with ask")
+        p.add_argument("--resident", default="Grace", choices=["Grace", "Helen"])
+        p.add_argument("--root")
+        p.add_argument("--json", action="store_true")
+        p.set_defaults(func=cmd_steward_help)
 
     p = sub.add_parser("providers")
     p.set_defaults(func=cmd_providers)

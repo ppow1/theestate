@@ -98,6 +98,18 @@ def test_start_slot_fails_closed_when_grace_is_unavailable_even_if_other_surface
         runtime.start_slot(value, "blue", wait_seconds=0.01, sleeper=lambda _: None)
 
 
+def test_open_browser_reuses_healthy_runtime_without_starting(monkeypatch, tmp_path):
+    value = config(tmp_path)
+    launched = []
+    monkeypatch.setattr(runtime, "status", lambda _: {"active": {"active_slot": "blue"}, "runtime": {"healthy": True, "slot_id": "blue", "webui": {"ready": True}}})
+    monkeypatch.setattr(runtime, "_open_browser_url", lambda url: launched.append(url))
+    monkeypatch.setattr(runtime, "start_slot", lambda *args, **kwargs: pytest.fail("healthy runtime must not restart"))
+    result = runtime.open_browser(value)
+    assert result["state"] == "browser-opened"
+    assert result["active_slot"] == "blue"
+    assert launched == ["http://127.0.0.1:8080/"]
+
+
 def test_webui_semantic_readiness_requires_admin_and_bridge(monkeypatch, tmp_path):
     value = config(tmp_path)
     monkeypatch.setattr(runtime, "_http_status", lambda url: 200)

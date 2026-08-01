@@ -7,12 +7,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
-from estate.core.canonical_webui_gateway_runtime import load_config, promote, restart, rollback, start_slot, status, stop_slot
+from estate.core.canonical_webui_gateway_runtime import load_config, open_browser, promote, restart, rollback, start_slot, status, stop_slot
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=["start", "stop", "restart", "promote", "rollback", "status"])
+    parser.add_argument("action", choices=["start", "stop", "restart", "promote", "rollback", "status", "open-browser"])
     parser.add_argument("--slot", choices=["blue", "green"], default="blue")
     parser.add_argument("--service", choices=["grace_runtime", "gateway", "webui"], action="append")
     parser.add_argument("--open-browser", action="store_true", help="open WebUI only after semantic readiness")
@@ -35,6 +35,8 @@ def main() -> int:
         result = promote(config, args.slot)
     elif args.action == "rollback":
         result = rollback(config)
+    elif args.action == "open-browser":
+        result = open_browser(config)
     else:
         result = status(config)
     print(json.dumps(result, indent=2, sort_keys=True, default=str))

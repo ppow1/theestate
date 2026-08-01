@@ -1,17 +1,19 @@
 # Steward Cheat Sheet — Current Capabilities
 
-Generated: 2026-08-01T20:01:11Z
+Generated: 2026-08-01T22:28:08Z
 
 This is a read-only current-state view. Help never executes a Skill or grants authority.
 
 ## What is operational now
 
+- **Grace** (`grace`): Sequences approved operational movement, dependencies, checkpoints, and governed Dispatch handoffs without provider execution or authority expansion.
 - **Helen** (`helen`): Capability, qualification, availability, capacity, and gap assessment.
 - **Estate Skills framework** (`estate-skills`): Canonical versioned governed procedure registry and read-only discovery.
+- **Open WebUI / Grace / Resident Gateway** (`openwebui-estate-path`): Canonical authenticated Open WebUI path through Grace runtime and the Resident Gateway.
 
 ## What requires authorization
 
-- **Engineering** (`engineering`): Technical design, bounded implementation, review, and validation coordination. Block: each request needs current authority, scope, worker, provider, and readiness.
+- **Engineering** (`engineering`): Bounded repository implementation, review, documentation, test execution, technical intake, validation, reconciliation, and truthful failure evidence. Block: each request needs current authority, scope, worker, provider, and readiness.
 - **qwen.local.text** (`qwen.local.text`): Loopback Qwen-family text generation and bounded repository reads. Block: fresh loopback reachability is present, but governed authorization and validation remain required.
 - **Repository Health** (`repository-health`): Inspect repository and worktree health without changing repository state. Block: explicit execution authority is still required.
 - **Capability onboarding framework** (`capability-onboarding`): Existing capability/provider registration and Grace/Helen/Engineering readiness path. Block: capability-specific evidence may be stale or missing.
@@ -23,17 +25,15 @@ This is a read-only current-state view. Help never executes a Skill or grants au
 
 ## What is temporarily unavailable
 
-- **Grace** (`grace`): Sequences approved operational movement, dependencies, checkpoints, and governed Dispatch handoffs without provider execution or authority expansion. Block: canonical Grace/Gateway/WebUI path is not currently semantically ready.
 - **codex.execution.cli** (`codex.execution.cli`): Bounded Codex CLI execution with declared workspace and outputs. Block: provider health is stale/offline; provider catalog does not grant execution authority.
-- **Open WebUI / Grace / Resident Gateway** (`openwebui-estate-path`): Canonical authenticated Open WebUI path through Grace runtime and the Resident Gateway. Block: canonical three-service semantic readiness is not currently proven.
 
 ## Capability gaps
 
-- None proven in the current snapshot.
+- **Whisper** (`CAP-000006`): Planned local speech-to-text capability for speech transcription workflows. Block: registry says Pending Install; no current operational provider evidence.
 
 ## What is planned
 
-- **Whisper** (`CAP-000006`): Planned local speech-to-text capability for speech transcription workflows. Block: registry says Pending Install; no current operational provider evidence.
+- None proven in the current snapshot.
 
 ## Common things the Steward can say
 
