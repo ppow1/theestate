@@ -1,0 +1,3 @@
+# Estate Skill Worked Examples
+
+These are designs only and are not live-enabled: **Sync GitHub** (owner-authorized fetch/commit/push checkpoints); **Clean Git** (preservation, Steward checkpoint, then bounded cleanup); **Add a Tool** (existing onboarding and capability registry); **Promote Runtime** (candidate validation, explicit promotion, semantic validation, rollback); **Transcribe and File** (Whisper provenance and resident filing); **Generate Image** (ComfyUI workflow and artifact receipt); **Verify Sources** (Historian source review); **Check Citation** (legal source/citation verification). Each requires its own authority, scope, provider, evidence, and rollback review.
