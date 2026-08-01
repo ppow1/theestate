@@ -24,13 +24,33 @@ def config(tmp_path: Path) -> dict:
     }
 
 
-def test_inherited_state_override_fails_closed(tmp_path, monkeypatch):
+def test_mismatched_inherited_state_override_fails_closed(tmp_path, monkeypatch):
     path = tmp_path / "config.json"
     value = config(tmp_path)
     path.write_text(json.dumps(value), encoding="utf-8")
     monkeypatch.setenv("DATABASE_URL", "sqlite:///wrong.db")
     with pytest.raises(runtime.RuntimeControlError, match="DATABASE_URL"):
         runtime.load_config(path)
+
+
+def test_canonical_inherited_state_is_accepted(tmp_path, monkeypatch):
+    path = tmp_path / "config.json"
+    value = config(tmp_path)
+    path.write_text(json.dumps(value), encoding="utf-8")
+    monkeypatch.setenv("DATA_DIR", str((tmp_path / "data").resolve()))
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///" + str((tmp_path / "data" / "webui.db").resolve().as_posix()))
+    monkeypatch.setenv("PYTHONPATH", str((Path(__file__).parents[1] / "src").resolve()))
+    assert runtime.load_config(path)["source_root"] == value["source_root"]
+
+
+def test_process_command_contains_explicit_canonical_state(tmp_path):
+    value = config(tmp_path)
+    value["open_webui"]["secret_key_file"] = str(tmp_path / "secret")
+    (tmp_path / "secret").write_text("test-secret", encoding="utf-8")
+    _, _, environment = runtime._process_command(value, runtime.SLOTS["blue"])
+    assert environment["DATA_DIR"] == str((tmp_path / "data").resolve())
+    assert environment["DATABASE_URL"] == "sqlite:///" + str((tmp_path / "data" / "webui.db").resolve().as_posix())
+    assert environment["PYTHONPATH"] == str((Path(__file__).parents[1] / "src").resolve())
 
 
 def test_gateway_semantic_readiness_requires_grace(monkeypatch, tmp_path):

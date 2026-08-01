@@ -8,17 +8,26 @@ no model was changed, and no institutional acceptance was granted.
 
 ## Verified failure cause
 
-The operator profile in use was the installed Estate Operations v0.5 Plugin
-profile, not the exported v0.4 legacy profile used by the earlier Codex
-acceptance. Its com.estate.statusbridge plugin mapped WebUI start to:
+The cold-boot investigation corrected the earlier diagnosis. The active
+installed profile is the Estate Operations v0.5 Plugin, and its loaded
+`com.estate.statusbridge` action table maps WebUI single-press, double-press,
+and long-press to the canonical files:
 
-A:\AI\Tools\EstateStreamDeckMVP\Core\Start-OpenWebUI.cmd
+- `A:\theestate-wp4233\scripts\canonical_webui_gateway_webui_open.cmd`
+- `A:\theestate-wp4233\scripts\canonical_webui_gateway_webui_stop.cmd`
 
-That path used the legacy Estate-Service-Lib.ps1, had no WebUI
-double-press/open mapping, and reported health from generic HTTP/service
-probes. The earlier Codex run therefore proved the canonical controller and a
-legacy script invocation, but did not prove the active installed Stream Deck
-plugin path.
+The failure was at the `.cmd` boundary. `canonical_webui_gateway.cmd`
+explicitly created empty `DATA_DIR` and `DATABASE_URL` variables before
+invoking the Python controller. `load_config()` treated the mere presence of
+those variables as an unsafe inherited override and exited before starting
+either service. The detached Stream Deck `cmd.exe /c call` path therefore
+looked like a successful launch to the operator while no WebUI was opened.
+
+The earlier Codex acceptance reported success because it exercised the Python
+controller/direct command path and/or observed a process already started by a
+previous test. It did not execute the active plugin's detached `.cmd` boundary
+from a stopped state, leaving this wrapper-only environment defect and the
+browser-open behavior unproven.
 
 The preserved live process evidence also showed stale status assumptions:
 
@@ -41,6 +50,9 @@ A:\AI\Backups\Estate-Ops-001-PR509-Operator-Failure\20260731-220823
   WebUI stop, Estate core start/stop/restart, and environment clearing.
 - Canonical start now passes explicit DATA_DIR, DATABASE_URL, and
   PYTHONPATH to the actual child process.
+- Canonical startup allows only inherited values that exactly match the
+  canonical configuration and waits up to 120 seconds for cold-start semantic
+  readiness, covering the initial Open WebUI embedding initialization.
 - Stop discovers canonical service owners on the configured ports, terminates
   their trees, waits for both ports to close, and records truthful stopped
   state.
@@ -53,6 +65,29 @@ A:\AI\Backups\Estate-Ops-001-PR509-Operator-Failure\20260731-220823
   canonical controller status rather than generic port reachability.
 - streamdeck_canonical_bindings.json now records the installed plugin
   mappings as well as the legacy compatibility bindings.
+- Operator-boundary start, browser-open, and stop events are appended to
+  `Core/state/canonical-runtime/logs/operator-actions.jsonl`.
+
+## 2026-08-01 cold-boot follow-up
+
+The first post-restart double-press reached the operator wrapper but timed out
+while Open WebUI performed its cold-start initialization. A subsequent
+invocation through the same detached `cmd.exe /d /s /c call` path reached
+semantic readiness, opened Edge at `http://127.0.0.1:8080/`, and recorded the
+canonical data/database paths. The controller timeout is now 120 seconds so
+this initialization is not reported as a silent operator failure.
+
+The full operator control sequence then passed: WebUI stop, full-core start,
+core restart, core stop with both ports closed, and a final full-core start
+with `healthy=true`, `processes_match=true`, and both semantic readiness checks
+true. The selected database still contains one approved admin and the Grace
+model/tool/function objects; no Create Admin Account action occurred.
+
+The authenticated Open WebUI-to-Grace request remains an explicit acceptance
+boundary. Direct unauthenticated API probes correctly returned HTTP 401, and
+no new account or credential was created. Therefore this follow-up does not
+grant operator acceptance or mark PR #509 ready; a Steward-authenticated UI
+request must still be observed in the existing session.
 
 ## Operator-equivalent acceptance
 

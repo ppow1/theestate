@@ -59,9 +59,17 @@ def load_config(path: Path) -> dict[str, Any]:
         raise RuntimeControlError(f"canonical source root mismatch: {source_root}")
     if not source_root.joinpath("src", "estate").is_dir():
         raise RuntimeControlError("canonical source root is not an Estate checkout")
-    for key in ("DATA_DIR", "DATABASE_URL", "PYTHONPATH", "ESTATE_ROOT"):
-        if key in os.environ:
-            raise RuntimeControlError(f"unexpected inherited override: {key}")
+    expected_environment = {
+        "DATA_DIR": str(Path(config["open_webui"]["data_dir"]).resolve()),
+        "DATABASE_URL": "sqlite:///" + str(Path(config["open_webui"]["database"]).as_posix()),
+        "PYTHONPATH": str(source_root / "src"),
+    }
+    for key, expected in expected_environment.items():
+        inherited = os.environ.get(key)
+        if inherited is not None and inherited != expected:
+            raise RuntimeControlError(f"inherited override does not match canonical {key}")
+    if os.environ.get("ESTATE_ROOT") not in (None, str(source_root)):
+        raise RuntimeControlError("inherited override does not match canonical ESTATE_ROOT")
     return config
 
 
@@ -100,6 +108,15 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
         handle.flush()
         os.fsync(handle.fileno())
     temporary.replace(path)
+
+
+def _append_event(config: dict[str, Any], event: str, **fields: Any) -> None:
+    """Record operator-boundary events without recording secrets."""
+    root, _, _ = _state_paths(config)
+    path = root / "logs" / "operator-actions.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"event": event, "at": utc_now(), **fields}, sort_keys=True) + "\n")
 
 
 def _http_json(url: str, timeout: float = 3.0) -> tuple[int, dict[str, Any] | None]:
@@ -319,7 +336,7 @@ def _validate_process_identity(processes: list[subprocess.Popen[str]], slot: Slo
         raise RuntimeControlError("Open WebUI process identity does not match the canonical command")
 
 
-def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...] = ("gateway", "webui"), active_ports: bool = False, wait_seconds: float = 45.0, sleeper: Callable[[float], None] = time.sleep, open_browser: bool = False) -> dict[str, Any]:
+def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...] = ("gateway", "webui"), active_ports: bool = False, wait_seconds: float = 120.0, sleeper: Callable[[float], None] = time.sleep, open_browser: bool = False) -> dict[str, Any]:
     if slot_id not in SLOTS:
         raise RuntimeControlError(f"unknown slot: {slot_id}")
     configured = SLOTS[slot_id]
@@ -347,9 +364,11 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
                 _write_json(manifests / f"{slot_id}.json", manifest)
                 _write_json(root / f"{slot_id}-processes.json", {"slot_id": slot_id, "pids": [p.pid for p in processes], "started_at": utc_now()})
                 _runtime_status(config, slot, "running" if active_ports else "candidate-running", pids=[p.pid for p in processes], validation=validation)
+                _append_event(config, "start.semantic_ready", slot=slot_id, active_ports=active_ports, services=list(services), pids=[p.pid for p in processes], data_dir=manifest["state_identity"]["data_dir"], database=manifest["state_identity"]["database"])
                 if open_browser:
                     # Browser launch is deliberately after semantic readiness.
                     subprocess.Popen(["cmd.exe", "/d", "/s", "/c", "start", "", f"http://{config['open_webui']['host']}:{slot.webui_port}/"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    _append_event(config, "browser.open_requested", slot=slot_id, url=f"http://{config['open_webui']['host']}:{slot.webui_port}/")
                 return manifest
             if any(p.poll() is not None for p in processes):
                 break
@@ -395,6 +414,7 @@ def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
     closed = not _port_open(slot.gateway_port) and not _port_open(slot.webui_port)
     result = {"slot_id": slot_id, "terminated_pids": terminated, "ports_closed": closed}
     _runtime_status(config, slot, "stopped" if closed else "degraded", **result)
+    _append_event(config, "stop.completed", **result)
     if not closed:
         raise RuntimeControlError(json.dumps(result, sort_keys=True))
     return result
