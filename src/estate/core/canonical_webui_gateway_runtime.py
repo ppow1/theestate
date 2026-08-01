@@ -277,6 +277,7 @@ def _process_command(config: dict[str, Any], slot: Slot) -> tuple[list[str], lis
     root = Path(config["source_root"])
     env = {key: value for key, value in os.environ.items() if key not in {"DATA_DIR", "DATABASE_URL", "PYTHONPATH", "ESTATE_ROOT"}}
     env["PYTHONPATH"] = str(root / "src")
+    env["ESTATE_ROOT"] = str(root)
     env["DATA_DIR"] = str(Path(config["open_webui"]["data_dir"]))
     env["DATABASE_URL"] = "sqlite:///" + str(Path(config["open_webui"]["database"]).as_posix())
     secret_path = Path(config["open_webui"]["secret_key_file"])
@@ -285,7 +286,7 @@ def _process_command(config: dict[str, Any], slot: Slot) -> tuple[list[str], lis
     env["WEBUI_SECRET_KEY"] = secret_path.read_text(encoding="utf-8").strip()
     grace_config = config["grace_runtime"]
     grace = [grace_config["python"], grace_config["script"], "--root", grace_config["root"], "--host", grace_config["host"], "--port", str(slot.grace_port), "--mode", grace_config["mode"]]
-    gateway = [config["gateway"]["python"], "-m", config["gateway"]["module"], "resident-gateway", "start", "--host", config["gateway"]["host"], "--port", str(slot.gateway_port)]
+    gateway = [config["gateway"]["python"], "-m", config["gateway"]["module"], "resident-gateway", "start", "--host", config["gateway"]["host"], "--port", str(slot.gateway_port), "--root", str(root)]
     webui = [config["open_webui"]["executable"], "serve", "--host", config["open_webui"]["host"], "--port", str(slot.webui_port)]
     return grace, gateway, webui, env
 
@@ -324,19 +325,42 @@ def _process_snapshot(pid: int) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
-def _identity_matches(snapshot: dict[str, Any] | None, slot: Slot, service: str) -> bool:
+def _identity_matches(snapshot: dict[str, Any] | None, slot: Slot, service: str, source_root: Path | None = None) -> bool:
     if not snapshot:
         return False
     command = str(snapshot.get("CommandLine") or "").lower()
     executable = str(snapshot.get("ExecutablePath") or "").lower()
     port = str({"grace_runtime": slot.grace_port, "gateway": slot.gateway_port, "webui": slot.webui_port}[service])
     if service == "grace_runtime":
-        return "run_grace_momentum_runtime.py" in command and port in command and "python" in executable
+        return "run_grace_momentum_runtime.py" in command and port in command and "python" in executable and (source_root is None or f"--root {str(source_root).lower()}" in command)
     if port not in command:
         return False
     if service == "gateway":
-        return "resident-gateway" in command and "python" in executable
+        return "resident-gateway" in command and "python" in executable and (source_root is None or f"--root {str(source_root).lower()}" in command)
     return "open-webui.exe" in command and "a:\\ai\\openwebui" in executable + command
+
+
+def _environment_matches(pid: int, config: dict[str, Any], service: str) -> bool:
+    """Verify the actual live environment, failing closed if it cannot be read."""
+    try:
+        import psutil
+    except ImportError:
+        return False
+    try:
+        environment = psutil.Process(pid).environ()
+    except (OSError, psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        return False
+    root = Path(config["source_root"]).resolve()
+    expected = {
+        "ESTATE_ROOT": str(root),
+        "PYTHONPATH": str(root / "src"),
+    }
+    if service in {"grace_runtime", "webui"}:
+        expected.update({
+            "DATA_DIR": str(Path(config["open_webui"]["data_dir"]).resolve()),
+            "DATABASE_URL": "sqlite:///" + str(Path(config["open_webui"]["database"]).resolve().as_posix()),
+        })
+    return all(environment.get(key) == value for key, value in expected.items())
 
 
 def _port_owner_pids(port: int) -> list[int]:
@@ -368,9 +392,9 @@ def _runtime_status(config: dict[str, Any], slot: Slot, state: str, **extra: Any
     return payload
 
 
-def _validate_process_identity(processes: dict[str, subprocess.Popen[str]], slot: Slot, services: tuple[str, ...]) -> None:
+def _validate_process_identity(config: dict[str, Any], processes: dict[str, subprocess.Popen[str]], slot: Slot, services: tuple[str, ...]) -> None:
     for service in services:
-        if not _identity_matches(_process_snapshot(processes[service].pid), slot, service):
+        if not _identity_matches(_process_snapshot(processes[service].pid), slot, service, Path(config["source_root"]).resolve()) or not _environment_matches(processes[service].pid, config, service):
             raise RuntimeControlError(f"{service} process identity does not match the canonical command")
 
 
@@ -415,7 +439,7 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
             validation = {"grace_runtime": grace_runtime_readiness(config, slot), "gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
             required_ready = _required_services_ready(validation, services)
             if required_ready:
-                _validate_process_identity(processes, slot, services)
+                _validate_process_identity(config, processes, slot, services)
                 manifest = _manifest(config, slot, "validated" if set(services) == {"grace_runtime", "gateway", "webui"} else f"{services[0]}-ready", validation)
                 _write_json(manifests / f"{slot_id}.json", manifest)
                 _write_json(root / f"{slot_id}-processes.json", {"slot_id": slot_id, "services": {name: process.pid for name, process in processes.items()}, "pids": [p.pid for p in processes.values()], "started_at": utc_now()})
@@ -551,7 +575,11 @@ def status(config: dict[str, Any]) -> dict[str, Any]:
         live = {
             "slot_id": slot.slot_id,
             "pids": pids,
-            "processes_match": len(snapshots) == 3 and _identity_matches(snapshots[0], slot, "grace_runtime") and _identity_matches(snapshots[1], slot, "gateway") and _identity_matches(snapshots[2], slot, "webui"),
+            "processes_match": len(snapshots) == 3
+            and _identity_matches(snapshots[0], slot, "grace_runtime", Path(config["source_root"]).resolve())
+            and _identity_matches(snapshots[1], slot, "gateway", Path(config["source_root"]).resolve())
+            and _identity_matches(snapshots[2], slot, "webui", Path(config["source_root"]).resolve())
+            and all(_environment_matches(pid, config, service) for pid, service in zip(pids, ("grace_runtime", "gateway", "webui"))),
             "grace_runtime": grace_runtime_readiness(config, slot),
             "gateway": gateway_readiness(config, slot),
             "webui": webui_readiness(config, slot),

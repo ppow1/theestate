@@ -253,3 +253,44 @@ canonical service lifecycle. It does not prove a request reached Grace, so the
 authenticated acceptance failed and PR #509 remains not merge-ready. No
 credentials, cookies, tokens, API keys, or full secret-bearing payloads were
 read or recorded. The Estate remains running for repair and re-test.
+
+## 2026-08-01 final adversarial merge-readiness audit
+
+The final audit began from reviewed head `6d2e425d5a6cc9e73f1a3bcccb984173adb8b1c2`.
+It rechecked the complete three-service implementation, controller lifecycle,
+slot manifests, promotion and rollback records, canonical Stream Deck binding
+artifact, runbooks, incident reports, state inventory, and live acceptance
+evidence. The required public surfaces are Grace Momentum `127.0.0.1:8766`,
+Resident Gateway `127.0.0.1:11435`, and Open WebUI `127.0.0.1:8080`; candidate
+surfaces are `8767`, `11436`, and `8081`. The source root is
+`A:\theestate-wp4233` and the one persistent WebUI state is
+`A:\AI\OpenWebUI\EstateCanonicalData\webui.db`.
+
+During adversarial review, a live process set from before the final identity
+hardening was semantically responsive but lacked the canonical Gateway
+`--root` argument and explicit `ESTATE_ROOT`/database environment. The
+reviewed status path correctly rejected that set (`processes_match=false`,
+`healthy=false`) instead of accepting it. The correction makes controller
+startup and status require canonical command identity and live environment
+identity for Grace, Gateway, and WebUI; an old `A:\theestate` process,
+stale PID, inherited process, unrelated port owner, wrong database, or first-run
+WebUI therefore fails closed. The Gateway CLI now accepts and propagates the
+canonical root used by the managed child.
+
+The final focused validation passed 32 tests, including the Grace-unavailable
+fail-closed regression, stale/foreign process identity rejection, and live
+environment checks. Existing authenticated acceptance evidence remains bounded:
+the approved administrator session, persisted conversation, selected
+`estate/grace-grounded-test`, `grace_runtime_grounding`,
+`grace_runtime_bridge`, `AUTHORITATIVE_RESULT` from `grace-momentum-runtime`,
+Resident Gateway correlation, and a second successful turn after restart were
+all recorded without credentials, cookies, tokens, or secret keys. The active
+Stream Deck binding artifact invokes only the canonical controller and marks
+the legacy controller inactive. Blue/green records preserve the same canonical
+database identity; final institutional acceptance remains `not_granted`.
+
+The final source-tree audit found no changed model or Open WebUI upgrade;
+Open WebUI remains version `0.10.2`. `A:\theestate` was not modified by this
+repair. PR #509 remains unmerged; after the hardening commit is pushed, this
+report and the PR description are the merge-readiness record, not institutional
+acceptance.

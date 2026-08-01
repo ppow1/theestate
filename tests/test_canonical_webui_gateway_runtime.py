@@ -156,3 +156,24 @@ def test_process_identity_rejects_gateway_from_wrong_command_root(tmp_path):
     }
     assert runtime._identity_matches(snapshot, slot, "gateway") is True
     assert runtime._identity_matches({**snapshot, "CommandLine": "python unrelated-service --port 11435"}, slot, "gateway") is False
+
+
+def test_process_identity_rejects_gateway_from_old_estate_root(tmp_path):
+    slot = runtime.SLOTS["blue"]
+    snapshot = {
+        "CommandLine": r"C:\Python314\python.exe -m estate.cli.main resident-gateway start --host 127.0.0.1 --port 11435 --root A:\theestate",
+        "ExecutablePath": r"C:\Python314\python.exe",
+    }
+    assert runtime._identity_matches(snapshot, slot, "gateway", Path(r"A:\theestate-wp4233")) is False
+
+
+def test_process_environment_is_required_for_live_identity(tmp_path, monkeypatch):
+    value = config(tmp_path)
+    monkeypatch.setitem(value["open_webui"], "data_dir", str((tmp_path / "data").resolve()))
+    monkeypatch.setitem(value["open_webui"], "database", str((tmp_path / "data" / "webui.db").resolve()))
+    class FakePsutil:
+        class Process:
+            def __init__(self, pid): self.pid = pid
+            def environ(self): return {"ESTATE_ROOT": str(Path(value["source_root"]).resolve()), "PYTHONPATH": str(Path(value["source_root"]).resolve() / "src"), "DATA_DIR": str((tmp_path / "data").resolve()), "DATABASE_URL": "sqlite:///" + str((tmp_path / "data" / "webui.db").resolve().as_posix())}
+    monkeypatch.setitem(__import__("sys").modules, "psutil", FakePsutil)
+    assert runtime._environment_matches(123, value, "webui") is True
