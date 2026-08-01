@@ -10,7 +10,8 @@ roles:
 
 `A:\theestate-common` (backed by one Git common repository)
 
-with exactly two deliberate deployment worktrees:
+with one primary Common working tree and exactly two deliberate candidate
+worktrees; Live is an immutable release root, not a Git worktree:
 
 | Slot | Proposed path | Branch policy | Runtime ports | Persistent state |
 |---|---|---|---|---|
@@ -54,8 +55,10 @@ recovery material is proposed at `A:\theestate-backup`; it is not created here.
    evidence before considering any removal.
 3. For stashes, retain the 16 entries in the common repository. A later
    explicitly named stash decision is required before export or drop.
-4. For nested `.git` directories and `A:\theestate\.wp4232-worktree`, stop
-   and resolve repository ownership before any retirement.
+4. For nested `.git` directories under the dirty common repository, stop and
+   resolve repository ownership before any retirement. The independent
+   `A:\theestate\.wp4232-worktree` clone has been resolved as a separate
+   remote-synchronized WP-4232 clone and is classified archive-evidence.
 
 ## Proposed dispositions
 
@@ -119,7 +122,6 @@ tokens, secret keys, canonical databases, models, and unrelated user data.
 ### Unresolved-Steward-decision
 
 - `A:\temp`, because it is not demonstrably Estate-only;
-- `A:\theestate\.wp4232-worktree`, because it contains nested Git content;
 - any nested repositories discovered under the dirty common repository;
 - any launcher/configuration still referencing `A:\theestate` until a
   transactionally safe canonical replacement is reviewed.

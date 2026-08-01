@@ -265,3 +265,43 @@ relationship recorded; no credentials, databases, private data, or required
 runtime state inside; replacement stable path proven; and explicit approval of
 the named path and disposition. Ingrid's future data-classification work is
 not part of this package.
+
+## Blocking migration-safety addendum
+
+The exact recommended Git model is a normal primary source worktree at
+`A:\theestate-common` with one common `.git` directory and linked candidate
+worktrees `A:\theestate-blue` and `A:\theestate-green`. A bare repository is
+rejected because Common must contain inspectable source files. The existing
+`A:\theestate` repository cannot be repurposed in place while dirty: it has
+566 refs, 16 stashes, enabled reflogs, registered worktrees, local branch and
+remote configuration, nested repositories, and dirty/untracked content.
+
+The future migration must preserve all refs and objects, separately capture
+dirty/untracked content, retain the old reflogs and `.git` as recovery until
+acceptance, and recreate worktree registrations rather than copying stale
+admin records. A Git bundle alone is insufficient.
+
+Live is not a Git worktree. The exact recommended model is an immutable
+versioned release directory under `A:\theestate-live` with an atomic
+`active-release.json` binding release ID, source commit, configuration/state
+identity, and authorization. Blue and Green remain candidate-only and never
+take Live ports. The current `A:\theestate-wp4233` public-port runtime is
+transitional and must not be copied into either final candidate.
+
+The source/runtime boundary review identified generated and operational state
+under `runtime/production`, `runtime/resident_interactions`,
+`runtime/resident_conversations`, `runtime/residents`, `runtime/mailboxes`,
+`runtime/operations`, `runtime/execution_*`, `runtime/engineering_*`,
+`runtime/codex_bridge`, `runtime/validation`, and related runtime trees. These
+must be externalized to standard or sensitive data/evidence boundaries in a
+later governed operation. Source-authored registries, schemas, policies, and
+visual manifests remain Common content. The existing canonical WebUI database
+and secret key remain external and are not relocated here.
+
+The complete blocking-review report defines promotion, rollback, backup,
+checkpoint, data-boundary, path-reference, WP-4232 preservation, and final
+destructive-authorization requirements. It also confirms that full-tree scans
+or archival duplication of very large evidence corpora are not prerequisites
+for beginning a safe migration; targeted metadata, hash manifests, and
+bounded evidence selection are sufficient until a separately approved archive
+operation.

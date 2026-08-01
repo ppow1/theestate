@@ -82,5 +82,41 @@
   "active_references": [{"path":"A:\\theestate-wp4233","references":["transitional Grace 8766","transitional Gateway 11435","transitional WebUI 8080","canonical Stream Deck bindings"]},{"path":"A:\\theestate","references":["legacy operator helper","legacy launcher/configuration"]}],
   "reclaimable_space_estimate": {"clean_merged_linked_worktrees_bytes":717316610,"clean_merged_linked_worktrees_mib":684.1,"broader_old_worktree_total_excluding_unique_wp4232_and_current_wp4233_bytes":988623722,"broader_old_worktree_total_mib":942.9,"caveat":"gross directory totals; shared Git objects and evidence retention reduce actual reclaim"},
   "architecture_notes": {"blue_green_are_candidate_only":true,"live_owns_public_ports":true,"data_outside_code_releases":true,"code_rollback_does_not_roll_back_data":true,"ingrid_classification_policy_deferred":true},
+  "blocking_review": {
+    "reviewed_head": "a6e6650b51c416ad2ef3404b2d732da4f7b6dcea",
+    "verdict": "proposal safe to present after documentation corrections; no destructive authorization",
+    "git_common_model": "normal primary working tree at A:\\theestate-common with linked worktrees A:\\theestate-blue and A:\\theestate-green",
+    "live_model": "immutable versioned release directories under A:\\theestate-live selected by atomic active-release.json; not a Git worktree",
+    "bundle_alone_insufficient": ["dirty tracked changes", "untracked evidence", "reflogs", "worktree registrations", "local configuration and hooks"],
+    "wp4232": {"unique_commits":113,"bundle_required":true,"dirty_untracked_preservation_separate":true,"credentials_databases_generated_bulk_excluded":true},
+    "independent_wp4232_clone": {"path":"A:\\theestate\\.wp4232-worktree","head":"b064dac95856156a5fd9c1fe35b9959e58abfb10","upstream":"origin/wp-4232-dual-surface-acceptance","untracked":".pytest-wp4232/","registered_worktree":false},
+    "current_runtime_is_transitional": true,
+    "current_runtime_source": "A:\\theestate-wp4233",
+    "public_ports_reserved_for_final_live": [8766,11435,8080],
+    "migration_checkpoints": ["A-current-live", "B-preservation", "C-common-metadata", "D-blue-green-candidates", "E-live-release", "F-live-activation-rollback", "G-low-risk-worktree-retirement"],
+    "first_separately_authorizable_destructive_phase": "Phase 5A: one individually approved clean merged linked worktree after fresh identity/state/evidence check",
+    "full_tree_scan_required_to_begin": false,
+    "full_archive_duplication_required_to_begin": false,
+    "scheduled_task_reference": "A:\\EstateRuntime\\host\\estate-main\\state\\run_operations_runtime_host.ps1"
+  },
+  "git_migration_invariants": {
+    "existing_common": "A:\\theestate\\.git",
+    "ref_count": 566,
+    "stash_count": 16,
+    "reflogs_enabled": true,
+    "worktree_registrations_recreate_not_copy": true,
+    "remote_configuration_preserve": true,
+    "hooks_and_attributes_compare": true,
+    "dirty_and_untracked_preservation_separate_from_bundle": true,
+    "old_common_retained_until_acceptance": true
+  },
+  "live_release_model": {
+    "root": "A:\\theestate-live",
+    "mechanism": "immutable versioned release directories plus atomic active-release.json",
+    "git_worktree": false,
+    "public_ports": [8766, 11435, 8080],
+    "rollback_preserves_persistent_data": true,
+    "steward_promotion_authorization_required": true
+  },
   "phase_5_blocked_until": ["Steward approves named paths and dispositions","unique work preservation is completed","nested repositories and evidence retention are resolved"]
 }
