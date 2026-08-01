@@ -1,4 +1,4 @@
-"""Canonical, semantic, fail-closed WebUI/Gateway runtime controller.
+"""Canonical, semantic, fail-closed WebUI/Gateway/Grace runtime controller.
 
 The controller owns the two application processes, while Open WebUI state stays
 in one explicit shared database. Blue/green slots are code/process slots; they
@@ -28,13 +28,14 @@ class RuntimeControlError(RuntimeError):
 @dataclass(frozen=True)
 class Slot:
     slot_id: str
+    grace_port: int
     gateway_port: int
     webui_port: int
 
 
 SLOTS = {
-    "blue": Slot("blue", 11435, 8080),
-    "green": Slot("green", 11436, 8081),
+    "blue": Slot("blue", 8766, 11435, 8080),
+    "green": Slot("green", 8767, 11436, 8081),
 }
 
 
@@ -59,6 +60,11 @@ def load_config(path: Path) -> dict[str, Any]:
         raise RuntimeControlError(f"canonical source root mismatch: {source_root}")
     if not source_root.joinpath("src", "estate").is_dir():
         raise RuntimeControlError("canonical source root is not an Estate checkout")
+    grace = config.get("grace_runtime")
+    if not isinstance(grace, dict) or grace.get("active_port") != 8766 or grace.get("candidate_port") != 8767:
+        raise RuntimeControlError("canonical Grace runtime ports are missing or incorrect")
+    if Path(grace.get("root", "")).resolve() != source_root:
+        raise RuntimeControlError("canonical Grace runtime root mismatch")
     expected_environment = {
         "DATA_DIR": str(Path(config["open_webui"]["data_dir"]).resolve()),
         "DATABASE_URL": "sqlite:///" + str(Path(config["open_webui"]["database"]).as_posix()),
@@ -128,6 +134,17 @@ def _http_json(url: str, timeout: float = 3.0) -> tuple[int, dict[str, Any] | No
         return 0, None
 
 
+def _grace_http_json(config: dict[str, Any], port: int, path: str, timeout: float = 3.0) -> tuple[int, dict[str, Any] | None]:
+    grace = config["grace_runtime"]
+    claims = {"iss": grace["authentication_issuer"], "sub": "canonical-runtime-controller", "office": "Runtime", "authority_source": "canonical-runtime-controller", "active": True}
+    request = urllib.request.Request(f"http://{grace['host']}:{port}{path}", headers={"Accept": "application/json", "X-Estate-Claims": json.dumps(claims)})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return response.status, json.loads(response.read().decode("utf-8"))
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError, OSError):
+        return 0, None
+
+
 def _http_status(url: str, timeout: float = 3.0) -> int:
     try:
         request = urllib.request.Request(url, method="GET")
@@ -142,6 +159,22 @@ def _port_open(port: int, host: str = "127.0.0.1") -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
         probe.settimeout(0.2)
         return probe.connect_ex((host, port)) == 0
+
+
+def grace_runtime_readiness(config: dict[str, Any], slot: Slot) -> dict[str, Any]:
+    grace = config["grace_runtime"]
+    health_status, health = _grace_http_json(config, slot.grace_port, grace["health_path"])
+    readiness_status, readiness = _grace_http_json(config, slot.grace_port, grace["readiness_path"])
+    ready = bool(
+        health_status == 200 and readiness_status == 200
+        and health and health.get("service") == "grace-momentum" and health.get("healthy") is True
+        and readiness and readiness.get("service") == "grace-momentum" and readiness.get("ready") is True
+        and readiness.get("mode") == grace["mode"]
+        and readiness.get("persistence_healthy") is True
+        and readiness.get("replay_healthy") is True
+        and readiness.get("idempotency_healthy") is True
+    )
+    return {"ready": ready, "health_http_status": health_status, "readiness_http_status": readiness_status, "health": health, "readiness": readiness}
 
 
 def _grace_entry(payload: dict[str, Any]) -> dict[str, Any] | None:
@@ -224,8 +257,11 @@ def _manifest(config: dict[str, Any], slot: Slot, status: str, validation: dict[
         "slot_id": slot.slot_id,
         "source_root": str(root),
         "source_commit": source_commit(root),
+        "grace_port": slot.grace_port,
         "gateway_port": slot.gateway_port,
         "webui_port": slot.webui_port,
+        "grace_executable": config["grace_runtime"]["python"],
+        "grace_runtime_root": config["grace_runtime"]["root"],
         "gateway_executable": config["gateway"]["python"],
         "webui_executable": config["open_webui"]["executable"],
         "webui_version": config["open_webui"]["version"],
@@ -237,7 +273,7 @@ def _manifest(config: dict[str, Any], slot: Slot, status: str, validation: dict[
     }
 
 
-def _process_command(config: dict[str, Any], slot: Slot) -> tuple[list[str], list[str], dict[str, str]]:
+def _process_command(config: dict[str, Any], slot: Slot) -> tuple[list[str], list[str], list[str], dict[str, str]]:
     root = Path(config["source_root"])
     env = {key: value for key, value in os.environ.items() if key not in {"DATA_DIR", "DATABASE_URL", "PYTHONPATH", "ESTATE_ROOT"}}
     env["PYTHONPATH"] = str(root / "src")
@@ -247,9 +283,11 @@ def _process_command(config: dict[str, Any], slot: Slot) -> tuple[list[str], lis
     if not secret_path.is_file():
         raise RuntimeControlError("canonical Open WebUI secret key is missing")
     env["WEBUI_SECRET_KEY"] = secret_path.read_text(encoding="utf-8").strip()
+    grace_config = config["grace_runtime"]
+    grace = [grace_config["python"], grace_config["script"], "--root", grace_config["root"], "--host", grace_config["host"], "--port", str(slot.grace_port), "--mode", grace_config["mode"]]
     gateway = [config["gateway"]["python"], "-m", config["gateway"]["module"], "resident-gateway", "start", "--host", config["gateway"]["host"], "--port", str(slot.gateway_port)]
     webui = [config["open_webui"]["executable"], "serve", "--host", config["open_webui"]["host"], "--port", str(slot.webui_port)]
-    return gateway, webui, env
+    return grace, gateway, webui, env
 
 
 def _launch(command: list[str], cwd: Path, env: dict[str, str], log_path: Path) -> subprocess.Popen[str]:
@@ -291,7 +329,9 @@ def _identity_matches(snapshot: dict[str, Any] | None, slot: Slot, service: str)
         return False
     command = str(snapshot.get("CommandLine") or "").lower()
     executable = str(snapshot.get("ExecutablePath") or "").lower()
-    port = str(slot.gateway_port if service == "gateway" else slot.webui_port)
+    port = str({"grace_runtime": slot.grace_port, "gateway": slot.gateway_port, "webui": slot.webui_port}[service])
+    if service == "grace_runtime":
+        return "run_grace_momentum_runtime.py" in command and port in command and "python" in executable
     if port not in command:
         return False
     if service == "gateway":
@@ -321,62 +361,78 @@ def _runtime_status(config: dict[str, Any], slot: Slot, state: str, **extra: Any
         "checked_at": utc_now(),
         "data_dir": str(Path(config["open_webui"]["data_dir"]).resolve()),
         "database": str(Path(config["open_webui"]["database"]).resolve()),
+        "ports": {"grace_runtime": slot.grace_port, "gateway": slot.gateway_port, "webui": slot.webui_port},
         **extra,
     }
     _write_json(_state_paths(config)[0] / "runtime-status.json", payload)
     return payload
 
 
-def _validate_process_identity(processes: list[subprocess.Popen[str]], slot: Slot, services: tuple[str, ...]) -> None:
-    lines = [_process_command_line(process.pid).lower() for process in processes]
-    combined = "\n".join(lines)
-    if "gateway" in services and ("resident-gateway" not in combined or str(slot.gateway_port) not in combined):
-        raise RuntimeControlError("Gateway process identity does not match the canonical command")
-    if "webui" in services and ("open-webui.exe" not in combined or str(slot.webui_port) not in combined):
-        raise RuntimeControlError("Open WebUI process identity does not match the canonical command")
+def _validate_process_identity(processes: dict[str, subprocess.Popen[str]], slot: Slot, services: tuple[str, ...]) -> None:
+    for service in services:
+        if not _identity_matches(_process_snapshot(processes[service].pid), slot, service):
+            raise RuntimeControlError(f"{service} process identity does not match the canonical command")
 
 
-def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...] = ("gateway", "webui"), active_ports: bool = False, wait_seconds: float = 120.0, sleeper: Callable[[float], None] = time.sleep, open_browser: bool = False) -> dict[str, Any]:
+def _required_services_ready(validation: dict[str, Any], services: tuple[str, ...]) -> bool:
+    return bool(services) and all(validation.get(service, {}).get("ready") is True for service in services)
+
+
+def _slot_ports(config: dict[str, Any], slot_id: str) -> Slot:
+    slot = _slot_ports(config, slot_id)
+    _, active_path, _ = _state_paths(config)
+    if active_path.exists():
+        try:
+            active = json.loads(active_path.read_text(encoding="utf-8"))
+            if active.get("active_slot") == slot_id:
+                return Slot(slot_id, config["grace_runtime"]["active_port"], config["gateway"]["active_port"], config["open_webui"]["active_port"])
+        except (OSError, TypeError, ValueError, json.JSONDecodeError):
+            pass
+    return slot
+
+
+def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...] = ("grace_runtime", "gateway", "webui"), active_ports: bool = False, wait_seconds: float = 120.0, sleeper: Callable[[float], None] = time.sleep, open_browser: bool = False) -> dict[str, Any]:
     if slot_id not in SLOTS:
         raise RuntimeControlError(f"unknown slot: {slot_id}")
     configured = SLOTS[slot_id]
-    slot = Slot(slot_id, config["gateway"]["active_port"], config["open_webui"]["active_port"]) if active_ports else configured
-    if _port_open(slot.gateway_port) or _port_open(slot.webui_port):
+    slot = Slot(slot_id, config["grace_runtime"]["active_port"], config["gateway"]["active_port"], config["open_webui"]["active_port"]) if active_ports else configured
+    if any(_port_open(port) for port in (slot.grace_port, slot.gateway_port, slot.webui_port)):
         raise RuntimeControlError(f"candidate ports already owned for {slot_id}")
     root, _, manifests = _state_paths(config)
-    if set(services) - {"gateway", "webui"} or not services:
-        raise RuntimeControlError("services must contain gateway and/or webui")
-    gateway_command, webui_command, env = _process_command(config, slot)
-    processes = []
+    if set(services) - {"grace_runtime", "gateway", "webui"} or not services:
+        raise RuntimeControlError("services must contain grace_runtime, gateway, and/or webui")
+    grace_command, gateway_command, webui_command, env = _process_command(config, slot)
+    commands = {"grace_runtime": (grace_command, Path(config["grace_runtime"]["working_directory"])), "gateway": (gateway_command, Path(config["source_root"])), "webui": (webui_command, Path(config["open_webui"]["working_directory"]))}
+    processes: dict[str, subprocess.Popen[str]] = {}
     try:
-        if "gateway" in services:
-            processes.append(_launch(gateway_command, Path(config["source_root"]), env, root / "logs" / f"{slot_id}-gateway.log"))
-        if "webui" in services:
-            processes.append(_launch(webui_command, Path(config["open_webui"]["working_directory"]), env, root / "logs" / f"{slot_id}-webui.log"))
+        for service in ("grace_runtime", "gateway", "webui"):
+            if service in services:
+                command, cwd = commands[service]
+                processes[service] = _launch(command, cwd, env, root / "logs" / f"{slot_id}-{service}.log")
         deadline = time.monotonic() + wait_seconds
         validation: dict[str, Any] = {}
         while time.monotonic() < deadline:
-            validation = {"gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
-            required_ready = all(validation[service]["ready"] for service in services)
+            validation = {"grace_runtime": grace_runtime_readiness(config, slot), "gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
+            required_ready = _required_services_ready(validation, services)
             if required_ready:
                 _validate_process_identity(processes, slot, services)
-                manifest = _manifest(config, slot, "validated" if set(services) == {"gateway", "webui"} else f"{services[0]}-ready", validation)
+                manifest = _manifest(config, slot, "validated" if set(services) == {"grace_runtime", "gateway", "webui"} else f"{services[0]}-ready", validation)
                 _write_json(manifests / f"{slot_id}.json", manifest)
-                _write_json(root / f"{slot_id}-processes.json", {"slot_id": slot_id, "pids": [p.pid for p in processes], "started_at": utc_now()})
-                _runtime_status(config, slot, "running" if active_ports else "candidate-running", pids=[p.pid for p in processes], validation=validation)
-                _append_event(config, "start.semantic_ready", slot=slot_id, active_ports=active_ports, services=list(services), pids=[p.pid for p in processes], data_dir=manifest["state_identity"]["data_dir"], database=manifest["state_identity"]["database"])
+                _write_json(root / f"{slot_id}-processes.json", {"slot_id": slot_id, "services": {name: process.pid for name, process in processes.items()}, "pids": [p.pid for p in processes.values()], "started_at": utc_now()})
+                _runtime_status(config, slot, "running" if active_ports else "candidate-running", pids=[p.pid for p in processes.values()], services=list(services), validation=validation)
+                _append_event(config, "start.semantic_ready", slot=slot_id, active_ports=active_ports, services=list(services), pids=[p.pid for p in processes.values()], data_dir=manifest["state_identity"]["data_dir"], database=manifest["state_identity"]["database"])
                 if open_browser:
                     # Browser launch is deliberately after semantic readiness.
                     subprocess.Popen(["cmd.exe", "/d", "/s", "/c", "start", "", f"http://{config['open_webui']['host']}:{slot.webui_port}/"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     _append_event(config, "browser.open_requested", slot=slot_id, url=f"http://{config['open_webui']['host']}:{slot.webui_port}/")
                 return manifest
-            if any(p.poll() is not None for p in processes):
+            if any(p.poll() is not None for p in processes.values()):
                 break
             sleeper(0.5)
-        validation = {"gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
+        validation = {"grace_runtime": grace_runtime_readiness(config, slot), "gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
         raise RuntimeControlError(json.dumps({"slot": slot_id, "validation": validation}, sort_keys=True))
     except Exception:
-        for process in processes:
+        for process in processes.values():
             if process.poll() is None:
                 process.terminate()
         raise
@@ -394,12 +450,12 @@ def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
     # Include the live owners of the canonical ports. This closes the gap
     # where a stale PID record made stop appear successful while an older
     # Estate process continued serving the port.
-    pids = sorted(set(pids) | set(_port_owner_pids(slot.gateway_port)) | set(_port_owner_pids(slot.webui_port)))
+    pids = sorted(set(pids) | set(_port_owner_pids(slot.grace_port)) | set(_port_owner_pids(slot.gateway_port)) | set(_port_owner_pids(slot.webui_port)))
     terminated = []
     for raw_pid in pids:
         snapshot = _process_snapshot(int(raw_pid))
         command = str((snapshot or {}).get("CommandLine") or "").lower()
-        if not ("resident-gateway" in command or "open-webui.exe" in command):
+        if not ("run_grace_momentum_runtime.py" in command or "resident-gateway" in command or "open-webui.exe" in command):
             continue
         try:
             process = subprocess.Popen(["taskkill", "/PID", str(int(raw_pid)), "/T", "/F"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -409,9 +465,9 @@ def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
             continue
     process_path.unlink(missing_ok=True)
     deadline = time.monotonic() + 10
-    while time.monotonic() < deadline and (_port_open(slot.gateway_port) or _port_open(slot.webui_port)):
+    while time.monotonic() < deadline and any(_port_open(port) for port in (slot.grace_port, slot.gateway_port, slot.webui_port)):
         time.sleep(0.25)
-    closed = not _port_open(slot.gateway_port) and not _port_open(slot.webui_port)
+    closed = not any(_port_open(port) for port in (slot.grace_port, slot.gateway_port, slot.webui_port))
     result = {"slot_id": slot_id, "terminated_pids": terminated, "ports_closed": closed}
     _runtime_status(config, slot, "stopped" if closed else "degraded", **result)
     _append_event(config, "stop.completed", **result)
@@ -429,8 +485,8 @@ def promote(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
     if manifest.get("validation_status") != "validated":
         raise RuntimeControlError("only a validated slot may be promoted")
     slot = SLOTS[slot_id]
-    validation = {"gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
-    if not validation["gateway"]["ready"] or not validation["webui"]["ready"]:
+    validation = {"grace_runtime": grace_runtime_readiness(config, slot), "gateway": gateway_readiness(config, slot), "webui": webui_readiness(config, slot)}
+    if not _required_services_ready(validation, ("grace_runtime", "gateway", "webui")):
         raise RuntimeControlError("post-candidate semantic validation failed")
     previous = None
     if active_path.exists():
@@ -443,7 +499,7 @@ def promote(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
         stop_slot(config, previous)
     promoted_manifest = start_slot(config, slot_id, active_ports=True)
     validation = promoted_manifest["validation"]
-    if not validation["gateway"]["ready"] or not validation["webui"]["ready"]:
+    if not _required_services_ready(validation, ("grace_runtime", "gateway", "webui")):
         raise RuntimeControlError("post-promotion semantic validation failed")
     manifest_path = _state_paths(config)[2] / f"{slot_id}.json"
     manifest = promoted_manifest
@@ -469,7 +525,7 @@ def rollback(config: dict[str, Any]) -> dict[str, Any]:
         raise RuntimeControlError("rollback slot is not validated")
     stop_slot(config, current.get("active_slot"))
     promoted_manifest = start_slot(config, previous, active_ports=True)
-    if not promoted_manifest["validation"]["gateway"]["ready"] or not promoted_manifest["validation"]["webui"]["ready"]:
+    if not _required_services_ready(promoted_manifest["validation"], ("grace_runtime", "gateway", "webui")):
         raise RuntimeControlError("rollback semantic validation failed")
     record = {"schema_version": "estate.runtime-promotion.v1", "active_slot": previous, "previous_slot": current.get("active_slot"), "manifest_sha256": sha256_file(manifest_path), "source_commit": manifest["source_commit"], "state_identity": manifest["state_identity"], "rollback_of": current.get("promoted_at"), "promoted_at": utc_now(), "institutional_acceptance_state": "not_granted"}
     _write_json(active_path, record)
@@ -495,11 +551,12 @@ def status(config: dict[str, Any]) -> dict[str, Any]:
         live = {
             "slot_id": slot.slot_id,
             "pids": pids,
-            "processes_match": len(snapshots) == 2 and _identity_matches(snapshots[0], slot, "gateway") and _identity_matches(snapshots[1], slot, "webui"),
+            "processes_match": len(snapshots) == 3 and _identity_matches(snapshots[0], slot, "grace_runtime") and _identity_matches(snapshots[1], slot, "gateway") and _identity_matches(snapshots[2], slot, "webui"),
+            "grace_runtime": grace_runtime_readiness(config, slot),
             "gateway": gateway_readiness(config, slot),
             "webui": webui_readiness(config, slot),
         }
-        live["healthy"] = bool(live["processes_match"] and live["gateway"]["ready"] and live["webui"]["ready"])
+        live["healthy"] = bool(live["processes_match"] and _required_services_ready(live, ("grace_runtime", "gateway", "webui")))
         live["state"] = "running" if live["healthy"] else "degraded"
     runtime_status_path = root / "runtime-status.json"
     recorded_status = json.loads(runtime_status_path.read_text(encoding="utf-8")) if runtime_status_path.exists() else None
@@ -511,7 +568,7 @@ def restart(config: dict[str, Any]) -> dict[str, Any]:
     slot_id = active.get("active_slot", "blue")
     stop_slot(config, slot_id)
     manifest = start_slot(config, slot_id, active_ports=True)
-    if not manifest["validation"]["gateway"]["ready"] or not manifest["validation"]["webui"]["ready"]:
+    if not _required_services_ready(manifest["validation"], ("grace_runtime", "gateway", "webui")):
         raise RuntimeControlError("restart semantic validation failed")
     _, active_path, manifests = _state_paths(config)
     refreshed = dict(active)

@@ -18,6 +18,7 @@ def config(tmp_path: Path) -> dict:
         "schema_version": "estate.canonical-webui-gateway.v1",
         "source_root": str(source),
         "gateway": {"host": "127.0.0.1", "active_port": 11435, "candidate_port": 11436, "health_path": "/v1/models", "expected_model": "estate/grace", "python": "python", "module": "estate.cli.main"},
+        "grace_runtime": {"host": "127.0.0.1", "active_port": 8766, "candidate_port": 8767, "python": "python", "script": "scripts/run_grace_momentum_runtime.py", "working_directory": str(source), "root": str(source), "mode": "governed_local_test", "health_path": "/v1/health", "readiness_path": "/v1/readiness", "authentication_issuer": "estate-control"},
         "open_webui": {"host": "127.0.0.1", "active_port": 8080, "candidate_port": 8081, "executable": "open-webui.exe", "working_directory": str(tmp_path), "data_dir": str(database.parent), "database": str(database), "version": "0.10.2", "health_path": "/", "expected_model": "estate/grace-grounded-test", "expected_base_model": "estate/grace"},
         "state_root": str(tmp_path / "state"),
         "bridge_deployment_version": "estate-openwebui-grace-bridge.v1",
@@ -47,7 +48,7 @@ def test_process_command_contains_explicit_canonical_state(tmp_path):
     value = config(tmp_path)
     value["open_webui"]["secret_key_file"] = str(tmp_path / "secret")
     (tmp_path / "secret").write_text("test-secret", encoding="utf-8")
-    _, _, environment = runtime._process_command(value, runtime.SLOTS["blue"])
+    _, _, _, environment = runtime._process_command(value, runtime.SLOTS["blue"])
     assert environment["DATA_DIR"] == str((tmp_path / "data").resolve())
     assert environment["DATABASE_URL"] == "sqlite:///" + str((tmp_path / "data" / "webui.db").resolve().as_posix())
     assert environment["PYTHONPATH"] == str((Path(__file__).parents[1] / "src").resolve())
@@ -60,6 +61,41 @@ def test_gateway_semantic_readiness_requires_grace(monkeypatch, tmp_path):
     assert result["ready"] is True
     monkeypatch.setattr(runtime, "_http_json", lambda url: (200, {"data": []}))
     assert runtime.gateway_readiness(value, runtime.SLOTS["blue"])["ready"] is False
+
+
+def test_required_startup_fails_closed_when_grace_runtime_unavailable(monkeypatch, tmp_path):
+    value = config(tmp_path)
+    monkeypatch.setattr(runtime, "grace_runtime_readiness", lambda *args: {"ready": False})
+    validation = {"grace_runtime": runtime.grace_runtime_readiness(value, runtime.SLOTS["blue"]), "gateway": {"ready": True}, "webui": {"ready": True}}
+    assert runtime._required_services_ready(validation, ("grace_runtime", "gateway", "webui")) is False
+
+
+def test_start_slot_fails_closed_when_grace_is_unavailable_even_if_other_surfaces_are_ready(monkeypatch, tmp_path):
+    value = config(tmp_path)
+    secret = tmp_path / "secret"
+    secret.write_text("test-secret", encoding="utf-8")
+    value["open_webui"]["secret_key_file"] = str(secret)
+
+    class FakeProcess:
+        _next_pid = 1000
+
+        def __init__(self):
+            self.pid = FakeProcess._next_pid
+            FakeProcess._next_pid += 1
+
+        def poll(self):
+            return None
+
+        def terminate(self):
+            return None
+
+    monkeypatch.setattr(runtime, "_port_open", lambda port: False)
+    monkeypatch.setattr(runtime, "_launch", lambda *args, **kwargs: FakeProcess())
+    monkeypatch.setattr(runtime, "grace_runtime_readiness", lambda *args: {"ready": False})
+    monkeypatch.setattr(runtime, "gateway_readiness", lambda *args: {"ready": True})
+    monkeypatch.setattr(runtime, "webui_readiness", lambda *args: {"ready": True})
+    with pytest.raises(runtime.RuntimeControlError):
+        runtime.start_slot(value, "blue", wait_seconds=0.01, sleeper=lambda _: None)
 
 
 def test_webui_semantic_readiness_requires_admin_and_bridge(monkeypatch, tmp_path):
@@ -88,8 +124,9 @@ def test_promotion_and_rollback_preserve_shared_state(tmp_path, monkeypatch):
     runtime._write_json(active_path, {"schema_version": "estate.runtime-promotion.v1", "active_slot": "blue"})
     monkeypatch.setattr(runtime, "gateway_readiness", lambda *args: {"ready": True})
     monkeypatch.setattr(runtime, "webui_readiness", lambda *args: {"ready": True})
+    monkeypatch.setattr(runtime, "grace_runtime_readiness", lambda *args: {"ready": True})
     monkeypatch.setattr(runtime, "stop_slot", lambda *args: {"terminated_pids": []})
-    monkeypatch.setattr(runtime, "start_slot", lambda *args, **kwargs: {"source_commit": "a" * 40, "state_identity": manifest["state_identity"], "validation": {"gateway": {"ready": True}, "webui": {"ready": True}}})
+    monkeypatch.setattr(runtime, "start_slot", lambda *args, **kwargs: {"source_commit": "a" * 40, "state_identity": manifest["state_identity"], "validation": {"grace_runtime": {"ready": True}, "gateway": {"ready": True}, "webui": {"ready": True}}})
     promoted = runtime.promote(value, "green")
     assert promoted["active_slot"] == "green"
     rolled_back = runtime.rollback(value)

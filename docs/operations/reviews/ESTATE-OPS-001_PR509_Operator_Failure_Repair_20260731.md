@@ -126,7 +126,8 @@ left running for the Steward handoff below.
 
 ## Validation
 
-- tests/test_canonical_webui_gateway_runtime.py: 9 passed.
+- tests/test_canonical_webui_gateway_runtime.py and tests/test_wp4233_bridge.py:
+  15 passed, including startup fail-closed coverage when Grace is unavailable.
 - Added regression coverage for stale process records and wrong command
   identity.
 - Python compilation passed.
@@ -175,6 +176,54 @@ after the Steward closes the browser and uses canonical stop/start once more.
 
 Until those two authenticated UI requests are durably correlated, this report
 does not grant acceptance and PR #509 is not merge-ready.
+
+## 2026-08-01 independent Grace runtime correction and acceptance
+
+The prior correlation identified a real architectural omission: the canonical
+PR #509 controller managed only Resident Gateway and Open WebUI, while the
+accepted WP-4233 bridge contract independently requires the Grace Momentum
+runtime on loopback port 8766. The Resident Gateway on 11435 is not that
+runtime and was not substituted for it.
+
+The correction adds the existing `scripts/run_grace_momentum_runtime.py`
+entry point as a first-class managed service. Blue uses Grace 8766, Gateway
+11435, and Open WebUI 8080; green uses 8767, 11436, and 8081. The controller
+now authenticates its readiness probes, requires Grace health/readiness plus
+persistence/replay/idempotency readiness, records all three process identities,
+and fails closed when Grace is unavailable even if Gateway and WebUI are ready.
+Stop, restart, status, promotion, rollback, manifests, and Stream Deck-equivalent
+canonical start controls include all three services.
+
+The complete authenticated operator sequence then passed twice. The first
+post-correction request persisted conversation
+`10120a3c-25c3-4dcd-ac17-5445a4ec5b2b` under the approved administrator with
+`estate/grace-grounded-test`, `done=1`, and an
+`AUTHORITATIVE_RESULT` from `grace-momentum-runtime`. Grace reported healthy
+and ready in `governed_local_test` mode with its existing admitted state and
+healthy persistence/replay/idempotency. The same conversation received a
+second `done=1` authoritative result after canonical restart at
+`2026-08-01T17:00:38Z`.
+
+Open WebUI's configured local backend remained `http://127.0.0.1:11435/v1`,
+and the live Gateway catalog returned `estate/grace` with the expected
+`grace_runtime_bridge` and `grace_runtime_grounding` metadata. The persisted
+Open WebUI custom model remained `estate/grace-grounded-test`, base
+`estate/grace`, created and updated at `2026-08-01T00:54:00Z`; no model record
+was altered during comparison.
+
+After the browser was closed, canonical stop terminated all three managed
+processes and closed 8766, 11435, and 8080. A final canonical start after that
+complete stop returned validated readiness for all three surfaces. The
+approved administrator and canonical database persisted; no account reset,
+credential access, model download, or provider task was performed.
+
+This is operational evidence only. PR #509 remains unmerged and is not being
+marked ready or granted institutional acceptance.
+
+The actual green candidate also validated on Grace 8767, Gateway 11436, and
+Open WebUI 8081. Promotion to green and rollback to blue both completed with
+three-service semantic validation; the final active record is blue with
+`institutional_acceptance_state=not_granted`.
 
 ## 2026-08-01 authenticated-path correlation result
 
