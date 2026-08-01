@@ -175,3 +175,32 @@ after the Steward closes the browser and uses canonical stop/start once more.
 
 Until those two authenticated UI requests are durably correlated, this report
 does not grant acceptance and PR #509 is not merge-ready.
+
+## 2026-08-01 authenticated-path correlation result
+
+The Steward submitted the exact bounded message in the already authenticated
+Open WebUI session. Read-only correlation found:
+
+- WebUI persisted conversation `f6cf0efa-d134-4a31-b332-a6a86af6068c` under
+  the approved administrator identity reference
+  `1f0449c8-3564-4a9f-a344-a8de330302fe`.
+- The selected model was `estate/grace-grounded-test`; the persisted model
+  record remains associated with `estate/grace`,
+  `grace_runtime_bridge`, and `grace_runtime_grounding`.
+- The WebUI request completed with HTTP 200 and the assistant message was
+  durably stored with `done=1`.
+- The bounded bridge result was not a Grace success. Its source was
+  `grace-momentum-runtime`, with `RUNTIME_UNAVAILABLE` and
+  `control service unavailable` at 16:33:27.666238Z and 16:33:29.705095Z.
+- The canonical Resident Gateway listener was present on 127.0.0.1:11435,
+  but the bridge tool's configured default runtime endpoint is
+  `http://127.0.0.1:8766`; no listener was present on 8766. The WebUI log
+  confirms the tool module loaded and the authenticated chat endpoint returned
+  200, but no corresponding successful Gateway/Grace result exists.
+
+This proves the authenticated WebUI path and identifies the remaining repair:
+the authoritative bridge/runtime boundary is miswired or not included in the
+canonical service lifecycle. It does not prove a request reached Grace, so the
+authenticated acceptance failed and PR #509 remains not merge-ready. No
+credentials, cookies, tokens, API keys, or full secret-bearing payloads were
+read or recorded. The Estate remains running for repair and re-test.
