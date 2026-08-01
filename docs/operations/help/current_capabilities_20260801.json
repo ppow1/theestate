@@ -24,7 +24,7 @@
   "entities": [
     {
       "accepted_scope": "Help, discovery, bounded operational coordination, and governed handoffs.",
-      "availability": "temporarily_unavailable",
+      "availability": "operational_now",
       "classification_ceiling": "Estate Internal",
       "common_phrases": [
         "Grace, help.",
@@ -41,9 +41,7 @@
       "id": "grace",
       "institutional_acceptance": "not_granted",
       "invocation_mode": "proposal_or_authorization_required",
-      "likely_block_or_failure_reasons": [
-        "canonical Grace/Gateway/WebUI path is not currently semantically ready"
-      ],
+      "likely_block_or_failure_reasons": [],
       "maturity": "active resident",
       "name": "Grace",
       "owner": "Operations",
@@ -123,19 +121,21 @@
       ]
     },
     {
-      "accepted_scope": "Explicitly scoped repository/design/review work through canonical authorization and Dispatch.",
+      "accepted_scope": "Codex repository implementation/review/documentation/tests and Qwen documentation/text generation or repository reads, only through explicit governed scope and canonical Dispatch.",
       "availability": "authorization_required",
       "classification_ceiling": "Estate Internal",
       "common_phrases": [
         "Grace, ask Engineering to draft...",
         "Grace, ask Engineering to review these exact files..."
       ],
-      "description": "Technical design, bounded implementation, review, and validation coordination.",
+      "description": "Bounded repository implementation, review, documentation, test execution, technical intake, validation, reconciliation, and truthful failure evidence.",
       "dispatchability": "not_dispatchable",
       "enabling_project": "Capability-specific enabling project",
       "expected_outputs": [
         "bounded design or implementation artifact",
-        "receipt and validation evidence"
+        "documentation or test result",
+        "validation/reconciliation receipt",
+        "truthful failure evidence"
       ],
       "id": "engineering",
       "institutional_acceptance": "not_granted",
@@ -147,9 +147,12 @@
       "name": "Engineering",
       "owner": "Engineering",
       "prohibited_or_unsupported_scope": [
-        "implicit write scope",
-        "provider selection without readiness",
-        "merge or acceptance without authority"
+        "unrestricted shell or repository access",
+        "direct provider bypass",
+        "merge authority",
+        "model mutation",
+        "institutional acceptance",
+        "implicit write scope"
       ],
       "qualified_providers_or_workers": [
         "Engineering workers assessed by Helen"
@@ -546,7 +549,7 @@
     },
     {
       "accepted_scope": "Authenticated WebUI conversation using the canonical shared state and Grace/Gateway route.",
-      "availability": "temporarily_unavailable",
+      "availability": "operational_now",
       "classification_ceiling": "Estate Internal",
       "common_phrases": [
         "Grace, help.",
@@ -561,9 +564,7 @@
       "id": "openwebui-estate-path",
       "institutional_acceptance": "not_granted",
       "invocation_mode": "proposal_or_authorization_required",
-      "likely_block_or_failure_reasons": [
-        "canonical three-service semantic readiness is not currently proven"
-      ],
+      "likely_block_or_failure_reasons": [],
       "maturity": "validated operational path",
       "name": "Open WebUI / Grace / Resident Gateway",
       "owner": "Operations",
@@ -630,7 +631,7 @@
     }
   ],
   "freshness_state": "conflicted_and_stale",
-  "generated_at": "2026-08-01T20:07:59Z",
+  "generated_at": "2026-08-01T22:28:08Z",
   "generation_policy": {
     "cache": "not cached; regenerate on every live response; generated artifacts bind source digests",
     "historical_success_is_not_current_availability": true,

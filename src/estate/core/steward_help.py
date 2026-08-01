@@ -110,7 +110,7 @@ def build_snapshot(root: str | Path, *, include_live_probes: bool = True) -> dic
     readiness = _read(root, "runtime/residents/helen/readiness.json", {})
     helen_ready = readiness.get("overall_status") in {"ready", "ready_with_limitations"}
     entities.append(_entity("helen", "Helen", "Capability, qualification, availability, capacity, and gap assessment.", owner="Human Resources", maturity=readiness.get("overall_status", "unknown"), availability="operational_now" if helen_ready else "temporarily_unavailable", dispatchable=False, scope="Readiness and workforce assessment; bounded recommendations.", prohibited=["granting constitutional authority", "claiming provider execution", "inventing qualification"], authority=["Helen assessment authority under existing governance"], phrases=["Helen, do we have a governed transcription capability?","What is unavailable and what project enables it?"], outputs=["qualification and readiness assessment", "bounded gap and enabling project"], reasons=[] if helen_ready else ["Helen readiness evidence is missing or not ready"], project=None, sources=[_source(root,"runtime/residents/helen/readiness.json"),_source(root,"data/registry/residents.json")], qualified=["Helen"]))
-    entities.append(_entity("engineering", "Engineering", "Technical design, bounded implementation, review, and validation coordination.", owner="Engineering", maturity="registered", availability="authorization_required", dispatchable=False, scope="Explicitly scoped repository/design/review work through canonical authorization and Dispatch.", prohibited=["implicit write scope", "provider selection without readiness", "merge or acceptance without authority"], authority=["owner authorization", "PTM/readiness", "Operations and Dispatch as applicable"], phrases=["Grace, ask Engineering to draft...","Grace, ask Engineering to review these exact files..."], outputs=["bounded design or implementation artifact", "receipt and validation evidence"], reasons=["each request needs current authority, scope, worker, provider, and readiness"], project="Capability-specific enabling project", sources=[_source(root,"config/providers/catalog.json"),_source(root,"data/registry/residents.json")], qualified=["Engineering workers assessed by Helen"]))
+    entities.append(_entity("engineering", "Engineering", "Bounded repository implementation, review, documentation, test execution, technical intake, validation, reconciliation, and truthful failure evidence.", owner="Engineering", maturity="registered", availability="authorization_required", dispatchable=False, scope="Codex repository implementation/review/documentation/tests and Qwen documentation/text generation or repository reads, only through explicit governed scope and canonical Dispatch.", prohibited=["unrestricted shell or repository access", "direct provider bypass", "merge authority", "model mutation", "institutional acceptance", "implicit write scope"], authority=["owner authorization", "PTM/readiness", "Operations and Dispatch as applicable"], phrases=["Grace, ask Engineering to draft...","Grace, ask Engineering to review these exact files..."], outputs=["bounded design or implementation artifact", "documentation or test result", "validation/reconciliation receipt", "truthful failure evidence"], reasons=["each request needs current authority, scope, worker, provider, and readiness"], project="Capability-specific enabling project", sources=[_source(root,"config/providers/catalog.json"),_source(root,"data/registry/residents.json")], qualified=["Engineering workers assessed by Helen"]))
     for provider_id, display, desc, phrases in [("qwen.local.text","qwen.local.text","Loopback Qwen-family text generation and bounded repository reads.",["Grace, ask Engineering to draft...","Helen, is Qwen text available now?"]), ("codex.execution.cli","codex.execution.cli","Bounded Codex CLI execution with declared workspace and outputs.",["Grace, ask Engineering to review these exact files..."]), ("comfyui.local.image","ComfyUI","Local image workflow preparation and governed submission.",["Grace, prepare a ComfyUI image proposal."])]:
         pstate = _provider_state(root, provider_id, catalog) if include_live_probes else {"availability":"registered_unavailable","dispatchable":False,"reason":"live probe not requested","evidence_stale":True}
         cp = _catalog_provider(catalog, provider_id)
@@ -168,17 +168,115 @@ def _outcome_matches(snapshot: dict[str, Any], outcome: str) -> list[dict[str, A
     if names: return [e for e in snapshot["entities"] if e["name"] in names or e["id"] in names]
     return _match(snapshot, outcome)
 
+
+def _summarize_entries(name: str, matches: list[dict[str, Any]]) -> str:
+    """Render a bounded, useful plain-language capability summary."""
+    lines = [f"{name} currently has {len(matches)} bounded capability or responsibility entries:"]
+    for entry in matches:
+        state = entry["availability"].replace("_", " ")
+        dispatch = "dispatchable" if entry.get("dispatchable") else "not dispatchable from help"
+        detail = entry.get("description", "")
+        authority = ", ".join(entry.get("required_authority", [])[:3]) or "current governed authorization"
+        blockers = "; ".join(entry.get("likely_block_or_failure_reasons", [])[:2])
+        line = f"- {entry['name']}: {state}; {dispatch}. {detail} Authority: {authority}."
+        if blockers:
+            line += f" Limitation/blocker: {blockers}."
+        if entry.get("enabling_project"):
+            line += f" Enabling work: {entry['enabling_project']}."
+        lines.append(line)
+    prohibited = []
+    for entry in matches:
+        for item in entry.get("prohibited_or_unsupported_scope", []):
+            if item not in prohibited:
+                prohibited.append(item)
+    if prohibited:
+        lines.append("Prohibited or unsupported boundaries: " + "; ".join(prohibited[:8]) + ".")
+    lines.append("No execution was requested or performed. Help does not grant authority, bypass providers, merge, mutate models, or grant institutional acceptance.")
+    return "\n".join(lines)
+
+
+def _engineering_help(snapshot: dict[str, Any], matches: list[dict[str, Any]]) -> str:
+    """Translate Engineering evidence into Steward-facing outcomes."""
+    by_name = {entry["name"]: entry for entry in matches}
+    lines = ["Engineering can currently help with:", "", "- Repository implementation", "- Repository code review", "- Documentation generation", "- Work package authoring", "- Test execution", "- Validation and reconciliation", "- Governed Codex engineering tasks", "- Governed Qwen documentation and text tasks", "- Repository proposals without execution", "", "Requires authorization:"]
+    lines += ["- Each request needs explicit scope, an authorized worker/provider, readiness evidence, and the appropriate Steward/Engineering or Dispatch authorization."]
+    for name, label in (("codex.execution.cli", "Codex engineering tasks"), ("qwen.local.text", "Qwen documentation and text tasks")):
+        entry = by_name.get(name)
+        if entry and entry["availability"] == "authorization_required":
+            state = entry["availability"].replace("_", " ")
+            reason = entry.get("likely_block_or_failure_reasons", ["current authorization and readiness are required"])[0]
+            lines.append(f"- {label}: {state}; {reason}.")
+    unavailable = [entry for entry in matches if entry["availability"] in {"registered_unavailable", "temporarily_unavailable", "capability_gap"}]
+    display_names = {"qwen.local.text": "Qwen provider", "codex.execution.cli": "Codex provider"}
+    lines += ["", "Not currently available:"]
+    if unavailable:
+        for entry in unavailable:
+            reason = _operator_reason(entry)
+            lines.append(f"- {display_names.get(entry['name'], entry['name'])}: {entry['availability'].replace('_', ' ')}; {reason}.")
+    else:
+        lines.append("- None beyond requests that still require authorization.")
+    lines += ["", "Engineering cannot:", "- provide unrestricted shell or repository access", "- perform a direct provider bypass or bypass Dispatch", "- merge or grant merge authority", "- mutate or download models", "- grant institutional acceptance", "", f"Institutional Acceptance: {snapshot['institutional_acceptance'].replace('_', ' ').title()}"]
+    return "\n".join(lines)
+
+
+def _skills_help(snapshot: dict[str, Any]) -> str:
+    current = [e for e in snapshot["entities"] if e["id"] == "repository-health"]
+    planned = [e for e in snapshot["entities"] if e["id"] not in {"repository-health", "estate-skills", "prohibited-implicit-execution"} and e.get("enabling_project") and "Skill" in e.get("name", "")]
+    lines = ["Current Skills", ""]
+    if current:
+        for entry in current:
+            lines += [f"- {entry['name']}", "  - Checks repository health", "  - Reports branches", "  - Reports worktrees", "  - Reports stashes", "  - Read-only"]
+    else:
+        lines.append("- None currently listed.")
+    lines += ["", "Planned Skills", ""]
+    lines.append("- None currently recorded." if not planned else "\n".join(f"- {e['name']} — {e['enabling_project']}" for e in planned))
+    return "\n".join(lines)
+
+
+def _commands_help() -> str:
+    return "\n".join(["Steward commands", "", "- Grace, help", "- Grace, current capabilities", "- Grace, what can Engineering do?", "- Grace, what Skills are available?", "- Grace, use the Check Git Skill", "- Grace, prepare an Engineering proposal", "- Grace, propose but do not execute", "- Grace, why can't this execute?", "- Grace, what is blocking this request?", "- Helen, what capabilities do we currently possess?", "- Helen, do we have a governed transcription capability?", "- Grace, can we transcribe audio?"])
+
+
+def _yes_no_answer(snapshot: dict[str, Any], entry: dict[str, Any]) -> str:
+    state = entry["availability"]
+    lead = {"operational_now": "Yes.", "authorization_required": "Yes, with authorization.", "registered_unavailable": "No.", "temporarily_unavailable": "Unknown.", "capability_gap": "No.", "planned": "Not yet.", "prohibited": "No."}.get(state, "Unknown.")
+    status = state.replace("_", " ").title()
+    reason = _operator_reason(entry)
+    project = f" Enabling work: {entry['enabling_project']}." if entry.get("enabling_project") else ""
+    subject = "a governed transcription capability" if entry["name"] == "Whisper" else entry["description"].rstrip(".")
+    operational = "Yes" if state == "operational_now" else "No"
+    dispatchable = "Yes" if entry.get("dispatchable") else "No"
+    return f"{lead}\n\nThe Estate does not currently have {subject}.\n\nStatus: {status}\nOperational: {operational}\nDispatchable: {dispatchable}\n{reason}.{project}\nNo execution occurred. Institutional Acceptance: {snapshot['institutional_acceptance'].replace('_', ' ').title()}."
+
+
+def _operator_reason(entry: dict[str, Any]) -> str:
+    """Convert evidence wording into bounded Steward-facing language."""
+    reason = entry.get("likely_block_or_failure_reasons", ["current evidence is insufficient"])[0]
+    if entry.get("name") == "Whisper":
+        return "The governed transcription provider has not yet been onboarded or proven operational"
+    if entry.get("name") == "Qwen Coder":
+        return "No current governed routing or readiness evidence proves this model is available"
+    if entry.get("name") in {"qwen.local.text", "codex.execution.cli"}:
+        return "Fresh provider health and authorization evidence is required"
+    if "live probe not requested" in reason:
+        return "Fresh provider health and authorization evidence is required"
+    if "registry says Pending Install" in reason:
+        return "The capability is registered, but its governed provider is not operational"
+    return reason
+
 def answer(snapshot: dict[str, Any], request: str, *, resident: str = "Grace") -> dict[str, Any]:
     def result(**payload: Any) -> dict[str, Any]:
         return {"generated_at":snapshot["generated_at"],"freshness_state":snapshot["freshness_state"],"source_references":snapshot["source_references"],"conflicts":snapshot["conflicts"],**payload}
     original=request; q=request.casefold().strip(); discovery_only=True
+    q = re.sub(r"^(grace|helen)\s*,\s*", "", q)
     if not q: q="help"
     if "what skills" in q:
         skills = [e for e in snapshot["entities"] if e["id"] in {"repository-health", "estate-skills"}]
-        names = ", ".join(f"{e['name']} ({e['availability'].replace('_',' ')})" for e in skills)
-        return result(resident=resident,request=original,intent="skill_discovery",plain_language=f"The current Skill surface lists: {names}. Discovery is read-only; no Skill was executed. Ask ‘Grace, use the Check Git Skill and report only’ only when you want a separate explicit request.",matches=skills,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
-    if any(x in q for x in ("help", "what can we do", "show my commands", "current capabilities")):
-        text="I can explain current capabilities, Skills, owners, limits, authority, and blockers. I will not execute from a help request. Ask: ‘Grace, what Skills are available?’, ‘Helen, do we have a governed transcription capability?’, or ‘Grace, use the Check Git Skill and report only.’"
+        return result(resident=resident,request=original,intent="skill_discovery",plain_language=_skills_help(snapshot),matches=skills,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
+    if "show my commands" in q or q in {"commands", "show commands"}:
+        return result(resident=resident,request=original,intent="command_help",plain_language=_commands_help(),matches=[],executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
+    if any(x in q for x in ("help", "what can we do", "current capabilities")):
+        text="I can show what you can ask the Estate to do, what requires authorization, what is unavailable, and what is blocking a request. You can ask Engineering for a repository change, review, documentation, tests, or a proposal; ask Helen about capability readiness; or use the read-only Repository Health Skill. Help answers questions only and does not execute anything."
         return result(resident=resident,request=original,intent="help_or_discovery",plain_language=text,matches=snapshot["entities"],executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
     if "how do i ask" in q or "how do we ask" in q:
         outcome=q.split("how do i ask",1)[-1].strip(" :?") or "the outcome"
@@ -187,12 +285,15 @@ def answer(snapshot: dict[str, Any], request: str, *, resident: str = "Grace") -
         who="Helen" if "helen" in q else "Engineering" if "engineering" in q else q.split("what can ",1)[-1].strip(" ?")
         matches=[e for e in snapshot["entities"] if e["owner"].casefold() == who.casefold() or e["name"].casefold() == who.casefold()]
         if not matches: return result(resident=resident,request=original,intent="scoped_discovery",plain_language=f"I cannot prove a current capability record for {who}; Helen can return a bounded gap and enabling project.",matches=[],executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
-        return result(resident=resident,request=original,intent="scoped_discovery",plain_language=f"{who} has {len(matches)} recorded capability or responsibility entries. Current availability and authorization are shown per entry; no execution was requested.",matches=matches,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
+        plain = _engineering_help(snapshot, matches) if who.casefold() == "engineering" else _summarize_entries(who, matches)
+        return result(resident=resident,request=original,intent="scoped_discovery",plain_language=plain,matches=matches,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
     if q.startswith("can we ") or "do we have" in q or "is this capability" in q:
         outcome=q[7:].strip(" ?") if q.startswith("can we ") else q.replace("do we have", "").replace("is this capability", "").strip(" ?"); matches=_outcome_matches(snapshot,outcome)
         if len(matches) != 1:
             return result(resident=resident,request=original,intent="outcome_discovery",plain_language="I need a more specific outcome before I can identify one record; I will not guess or execute.",matches=matches,executed=False,ambiguous=len(matches)>1,institutional_acceptance=snapshot["institutional_acceptance"])
-        e=matches[0]; return result(resident=resident,request=original,intent="outcome_discovery",plain_language=f"{e['name']} is {e['availability'].replace('_',' ')}. {e['description']} {e['likely_block_or_failure_reasons'][0] if e['likely_block_or_failure_reasons'] else 'A separate governed request is still required.'}",matches=matches,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
+        e=matches[0]
+        project = f" Enabling work: {e['enabling_project']}." if e.get("enabling_project") else ""
+        return result(resident=resident,request=original,intent="outcome_discovery",plain_language=_yes_no_answer(snapshot, e),matches=matches,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
     matches=_match(snapshot,q)
     return result(resident=resident,request=original,intent="discovery",plain_language="I found no unambiguous help record for that phrase. Ask for ‘current capabilities’, a named resident, a formal Skill, or ‘how do I ask for <outcome>’. I did not execute anything.",matches=matches,executed=False,institutional_acceptance=snapshot["institutional_acceptance"])
 
