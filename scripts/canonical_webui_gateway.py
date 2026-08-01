@@ -15,11 +15,18 @@ def main() -> int:
     parser.add_argument("action", choices=["start", "stop", "restart", "promote", "rollback", "status"])
     parser.add_argument("--slot", choices=["blue", "green"], default="blue")
     parser.add_argument("--service", choices=["gateway", "webui"], action="append")
+    parser.add_argument("--open-browser", action="store_true", help="open WebUI only after semantic readiness")
     parser.add_argument("--config", type=Path, default=Path(__file__).parents[1] / "config" / "runtime" / "canonical_webui_gateway.json")
     args = parser.parse_args()
     config = load_config(args.config)
     if args.action == "start":
-        result = start_slot(config, args.slot, services=tuple(args.service or ("gateway", "webui")))
+        result = start_slot(
+            config,
+            args.slot,
+            services=tuple(args.service or ("gateway", "webui")),
+            active_ports=args.slot == "blue",
+            open_browser=args.open_browser,
+        )
     elif args.action == "stop":
         result = stop_slot(config, args.slot)
     elif args.action == "restart":

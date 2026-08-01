@@ -75,3 +75,27 @@ def test_promotion_and_rollback_preserve_shared_state(tmp_path, monkeypatch):
     rolled_back = runtime.rollback(value)
     assert rolled_back["active_slot"] == "blue"
     assert rolled_back["state_identity"]["database"] == manifest["state_identity"]["database"]
+
+
+def test_status_rejects_stale_process_record_even_when_ports_are_semantically_ready(tmp_path, monkeypatch):
+    value = config(tmp_path)
+    root, active_path, _ = runtime._state_paths(value)
+    runtime._write_json(active_path, {"schema_version": "estate.runtime-promotion.v1", "active_slot": "blue"})
+    runtime._write_json(root / "blue-processes.json", {"slot_id": "blue", "pids": [101, 202], "started_at": runtime.utc_now()})
+    monkeypatch.setattr(runtime, "_process_snapshot", lambda pid: None)
+    monkeypatch.setattr(runtime, "gateway_readiness", lambda *args: {"ready": True})
+    monkeypatch.setattr(runtime, "webui_readiness", lambda *args: {"ready": True})
+    result = runtime.status(value)
+    assert result["runtime"]["processes_match"] is False
+    assert result["runtime"]["healthy"] is False
+    assert result["runtime"]["state"] == "degraded"
+
+
+def test_process_identity_rejects_gateway_from_wrong_command_root(tmp_path):
+    slot = runtime.SLOTS["blue"]
+    snapshot = {
+        "CommandLine": r"C:\Python314\python.exe -m estate.cli.main resident-gateway start --host 127.0.0.1 --port 11435",
+        "ExecutablePath": r"C:\Python314\python.exe",
+    }
+    assert runtime._identity_matches(snapshot, slot, "gateway") is True
+    assert runtime._identity_matches({**snapshot, "CommandLine": "python unrelated-service --port 11435"}, slot, "gateway") is False

@@ -1,6 +1,6 @@
 {
   "schema_version": "estate.streamdeck-canonical-bindings.v1",
-  "profile": "Estate Operations v0.4",
+  "profile": "Estate Operations v0.5 Plugin",
   "external_root": "A:\\AI\\Tools\\EstateStreamDeckMVP",
   "bindings": {
     "08-Start-Resident-Gateway.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py start --slot blue --service gateway",
@@ -8,7 +8,13 @@
     "12-Start-Estate-Surfaces.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py start --slot blue",
     "13-Estate-Runtime-Status.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py status",
     "16-Restart-Estate-Surfaces.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py restart",
-    "17-Service-Health.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py status"
+    "17-Service-Health.cmd": "C:\\Python314\\python.exe A:\\theestate-wp4233\\scripts\\canonical_webui_gateway.py status",
+    "plugin.com.estate.statusbridge.open_webui.start.single": "A:\\theestate-wp4233\\scripts\\canonical_webui_gateway_webui_open.cmd",
+    "plugin.com.estate.statusbridge.open_webui.start.double": "A:\\theestate-wp4233\\scripts\\canonical_webui_gateway_webui_open.cmd",
+    "plugin.com.estate.statusbridge.open_webui.start.long": "A:\\theestate-wp4233\\scripts\\canonical_webui_gateway_webui_stop.cmd",
+    "plugin.com.estate.statusbridge.surfaces.start": "A:\\theestate-wp4233\\scripts\\canonical_webui_gateway_core_start.cmd",
+    "plugin.com.estate.statusbridge.surfaces.stop": "A:\\theestate-wp4233\\scripts\\canonical_webui_gateway_core_stop.cmd",
+    "plugin.com.estate.statusbridge.surfaces.restart": "A:\\theestate-wp4233\\scripts\\canonical_webui_gateway_core_restart.cmd"
   },
   "legacy_controller": "A:\\AI\\Tools\\EstateStreamDeckMVP\\Estate-Service-Control.ps1",
   "legacy_controller_active": false,

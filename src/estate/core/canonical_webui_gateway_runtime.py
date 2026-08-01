@@ -251,6 +251,65 @@ def _process_command_line(pid: int) -> str:
     return result.stdout.strip()
 
 
+def _process_snapshot(pid: int) -> dict[str, Any] | None:
+    """Return the live Windows identity for a PID, or None when it is gone."""
+    script = (
+        f"$p=Get-CimInstance Win32_Process -Filter 'ProcessId = {int(pid)}' "
+        "-ErrorAction SilentlyContinue; "
+        "if ($null -ne $p) { $p | Select-Object ProcessId,ParentProcessId,CommandLine,ExecutablePath,CreationDate | "
+        "ConvertTo-Json -Compress }"
+    )
+    result = subprocess.run(["powershell.exe", "-NoProfile", "-Command", script], capture_output=True, text=True, timeout=10)
+    if not result.stdout.strip():
+        return None
+    try:
+        value = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _identity_matches(snapshot: dict[str, Any] | None, slot: Slot, service: str) -> bool:
+    if not snapshot:
+        return False
+    command = str(snapshot.get("CommandLine") or "").lower()
+    executable = str(snapshot.get("ExecutablePath") or "").lower()
+    port = str(slot.gateway_port if service == "gateway" else slot.webui_port)
+    if port not in command:
+        return False
+    if service == "gateway":
+        return "resident-gateway" in command and "python" in executable
+    return "open-webui.exe" in command and "a:\\ai\\openwebui" in executable + command
+
+
+def _port_owner_pids(port: int) -> list[int]:
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-Command", f"Get-NetTCPConnection -LocalPort {int(port)} -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess"],
+        capture_output=True, text=True, timeout=10,
+    )
+    owners: list[int] = []
+    for line in result.stdout.splitlines():
+        try:
+            owners.append(int(line.strip()))
+        except ValueError:
+            continue
+    return owners
+
+
+def _runtime_status(config: dict[str, Any], slot: Slot, state: str, **extra: Any) -> dict[str, Any]:
+    payload = {
+        "schema_version": "estate.canonical-runtime-status.v1",
+        "state": state,
+        "active_slot": slot.slot_id,
+        "checked_at": utc_now(),
+        "data_dir": str(Path(config["open_webui"]["data_dir"]).resolve()),
+        "database": str(Path(config["open_webui"]["database"]).resolve()),
+        **extra,
+    }
+    _write_json(_state_paths(config)[0] / "runtime-status.json", payload)
+    return payload
+
+
 def _validate_process_identity(processes: list[subprocess.Popen[str]], slot: Slot, services: tuple[str, ...]) -> None:
     lines = [_process_command_line(process.pid).lower() for process in processes]
     combined = "\n".join(lines)
@@ -260,7 +319,7 @@ def _validate_process_identity(processes: list[subprocess.Popen[str]], slot: Slo
         raise RuntimeControlError("Open WebUI process identity does not match the canonical command")
 
 
-def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...] = ("gateway", "webui"), active_ports: bool = False, wait_seconds: float = 45.0, sleeper: Callable[[float], None] = time.sleep) -> dict[str, Any]:
+def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...] = ("gateway", "webui"), active_ports: bool = False, wait_seconds: float = 45.0, sleeper: Callable[[float], None] = time.sleep, open_browser: bool = False) -> dict[str, Any]:
     if slot_id not in SLOTS:
         raise RuntimeControlError(f"unknown slot: {slot_id}")
     configured = SLOTS[slot_id]
@@ -287,6 +346,10 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
                 manifest = _manifest(config, slot, "validated" if set(services) == {"gateway", "webui"} else f"{services[0]}-ready", validation)
                 _write_json(manifests / f"{slot_id}.json", manifest)
                 _write_json(root / f"{slot_id}-processes.json", {"slot_id": slot_id, "pids": [p.pid for p in processes], "started_at": utc_now()})
+                _runtime_status(config, slot, "running" if active_ports else "candidate-running", pids=[p.pid for p in processes], validation=validation)
+                if open_browser:
+                    # Browser launch is deliberately after semantic readiness.
+                    subprocess.Popen(["cmd.exe", "/d", "/s", "/c", "start", "", f"http://{config['open_webui']['host']}:{slot.webui_port}/"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 return manifest
             if any(p.poll() is not None for p in processes):
                 break
@@ -301,13 +364,24 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
 
 
 def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
+    if slot_id not in SLOTS:
+        raise RuntimeControlError(f"unknown slot: {slot_id}")
+    slot = SLOTS[slot_id]
     root, _, _ = _state_paths(config)
     process_path = root / f"{slot_id}-processes.json"
     pids = []
     if process_path.exists():
         pids = json.loads(process_path.read_text(encoding="utf-8")).get("pids", [])
+    # Include the live owners of the canonical ports. This closes the gap
+    # where a stale PID record made stop appear successful while an older
+    # Estate process continued serving the port.
+    pids = sorted(set(pids) | set(_port_owner_pids(slot.gateway_port)) | set(_port_owner_pids(slot.webui_port)))
     terminated = []
     for raw_pid in pids:
+        snapshot = _process_snapshot(int(raw_pid))
+        command = str((snapshot or {}).get("CommandLine") or "").lower()
+        if not ("resident-gateway" in command or "open-webui.exe" in command):
+            continue
         try:
             process = subprocess.Popen(["taskkill", "/PID", str(int(raw_pid)), "/T", "/F"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             process.wait(timeout=10)
@@ -315,7 +389,15 @@ def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
         except (ValueError, OSError, subprocess.TimeoutExpired):
             continue
     process_path.unlink(missing_ok=True)
-    return {"slot_id": slot_id, "terminated_pids": terminated}
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline and (_port_open(slot.gateway_port) or _port_open(slot.webui_port)):
+        time.sleep(0.25)
+    closed = not _port_open(slot.gateway_port) and not _port_open(slot.webui_port)
+    result = {"slot_id": slot_id, "terminated_pids": terminated, "ports_closed": closed}
+    _runtime_status(config, slot, "stopped" if closed else "degraded", **result)
+    if not closed:
+        raise RuntimeControlError(json.dumps(result, sort_keys=True))
+    return result
 
 
 def promote(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
@@ -378,7 +460,30 @@ def rollback(config: dict[str, Any]) -> dict[str, Any]:
 def status(config: dict[str, Any]) -> dict[str, Any]:
     root, active_path, manifests = _state_paths(config)
     active = json.loads(active_path.read_text(encoding="utf-8")) if active_path.exists() else None
-    return {"active": active, "manifests": {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in manifests.glob("*.json")}, "source_commit": source_commit(Path(config["source_root"])), "state_identity": canonical_state_identity(config)}
+    manifest_map = {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in manifests.glob("*.json")}
+    live = None
+    if active and active.get("active_slot") in SLOTS:
+        slot = SLOTS[active["active_slot"]]
+        process_record = root / f"{slot.slot_id}-processes.json"
+        pids = []
+        if process_record.exists():
+            try:
+                pids = [int(pid) for pid in json.loads(process_record.read_text(encoding="utf-8")).get("pids", [])]
+            except (ValueError, TypeError, json.JSONDecodeError):
+                pids = []
+        snapshots = [_process_snapshot(pid) for pid in pids]
+        live = {
+            "slot_id": slot.slot_id,
+            "pids": pids,
+            "processes_match": len(snapshots) == 2 and _identity_matches(snapshots[0], slot, "gateway") and _identity_matches(snapshots[1], slot, "webui"),
+            "gateway": gateway_readiness(config, slot),
+            "webui": webui_readiness(config, slot),
+        }
+        live["healthy"] = bool(live["processes_match"] and live["gateway"]["ready"] and live["webui"]["ready"])
+        live["state"] = "running" if live["healthy"] else "degraded"
+    runtime_status_path = root / "runtime-status.json"
+    recorded_status = json.loads(runtime_status_path.read_text(encoding="utf-8")) if runtime_status_path.exists() else None
+    return {"active": active, "runtime": live, "recorded_status": recorded_status, "manifests": manifest_map, "source_commit": source_commit(Path(config["source_root"])), "state_identity": canonical_state_identity(config)}
 
 
 def restart(config: dict[str, Any]) -> dict[str, Any]:
