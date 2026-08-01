@@ -2,32 +2,45 @@
 
 Status: proposal only; no Phase 5 action authorized or performed.
 
-## Required canonical topology
+## Required canonical topology — Steward-corrected
 
-The post-PR-509 design should converge on one Git common repository:
+The previous proposal is superseded. The post-PR-509 design must converge on
+the following separate code, candidate, Live, data, sensitive-data, and backup
+roles:
 
-`A:\theestate\.git`
+`A:\theestate-common` (backed by one Git common repository)
 
 with exactly two deliberate deployment worktrees:
 
 | Slot | Proposed path | Branch policy | Runtime ports | Persistent state |
 |---|---|---|---|---|
-| blue | `A:\theestate-wp4233` | `main` or approved release commit; clean and pinned | Grace 8766, Gateway 11435, WebUI 8080 | shared canonical DB |
-| green | `A:\theestate-wp4233-green` | candidate release worktree; clean and pinned | Grace 8767, Gateway 11436, WebUI 8081 | same shared canonical DB |
+| Common | `A:\theestate-common` | source only; no Live runtime | none | no operational state |
+| blue | `A:\theestate-blue` | clean candidate release | candidate/test ports only; proposed 8767/11436/8081 | external shared state |
+| green | `A:\theestate-green` | clean peer candidate release | distinct candidate/test ports reserved later | external shared state |
+| Live | `A:\theestate-live` | explicit promoted release; never developed directly | Grace 8766, Gateway 11435, WebUI 8080 | external shared state |
 
-`A:\theestate-wp4233-green` is a proposal, not an existing path and was not
+All four stable code paths are proposals, not existing paths, and none was
 created in this phase. The controller, manifests, Stream Deck bindings, and
-rollback records remain authoritative; blue/green must not become a second
-independent service system.
+rollback records must be updated in a later governed implementation so
+Blue/Green are candidate-only and Live owns public ports. Blue and Green must
+not become a competing Live system.
 
 Shared state remains:
 
 `A:\AI\OpenWebUI\EstateCanonicalData\webui.db`
 
 No per-slot Open WebUI database, account store, model record, Tool record, or
-Filter record may be created. The authoritative controller remains
-`A:\theestate-wp4233\scripts\canonical_webui_gateway.py` and manages Grace,
-Gateway, and WebUI together.
+Filter record may be created. Until the later path migration, the authoritative
+controller remains `A:\theestate-wp4233\scripts\canonical_webui_gateway.py`.
+The final controller must manage candidate validation and explicit Live
+promotion without developing in Live.
+
+Standard persistent data is reserved at `A:\theestate-data`; the current shared
+Open WebUI state remains at `A:\AI\OpenWebUI\EstateCanonicalData`. Sensitive
+data is reserved at `A:\theestate-sensitive-data` with only the placeholder
+levels `restricted`, `highly-restricted`, `classification-pending`, and
+`quarantine`. Ingrid later refines classification and access policy. Offline
+recovery material is proposed at `A:\theestate-backup`; it is not created here.
 
 ## Proposed preservation methods
 
@@ -59,6 +72,9 @@ approves the named path:
 - `A:\theestate-wp4231-maincheck` (detached checkpoint);
 - `A:\theestate-wp4232-final` (merged PR #492);
 - `A:\theestate-wp4232-u1` (merged PR #491).
+- `A:\theestate-wp4233` only after Common, Blue, Green, and Live are stable,
+  all references are updated, and the current Live release no longer depends
+  on the transitional path.
 
 Retirement must use `git worktree remove` only after identity checks, followed
 by a separately approved prune. No path above was removed.
@@ -67,6 +83,9 @@ by a separately approved prune. No path above was removed.
 
 - `A:\theestate-wp4232`: 113 commits are not reachable from remotes. Preserve
   commit history and unique tracked work before any retirement.
+- `A:\theestate`: preserve the dirty feature branch, tracked/untracked work,
+  common Git object store, and all 16 stashes before migrating to
+  `A:\theestate-common`.
 
 ### Archive-evidence
 
@@ -81,15 +100,17 @@ by a separately approved prune. No path above was removed.
 - `A:\AI\Tools\EstateStreamDeckBuild-PR509-2214`;
 - `A:\AI\Tools\EstateStreamDeckBuild-PR509-2222`;
 - historical Estate Chat Walker copies v0.2–v0.4.
+- `A:\theestate\\.wp4232-worktree`: independent WP-4232 clone synchronized
+  to its remote branch, with untracked `.pytest-wp4232` evidence.
 
 The archive must be read-only, hashed, and must exclude credentials, cookies,
 tokens, secret keys, canonical databases, models, and unrelated user data.
 
-### Retain-active
+### Retain-active (transitional only)
 
 - `A:\theestate` as the shared Git common repository and dirty work/stash
   authority;
-- `A:\theestate-wp4233` as canonical blue;
+- the running `A:\theestate-wp4233` source until stable named paths are proven;
 - `A:\AI\Tools\EstateStreamDeckMVP`;
 - `A:\AI\Tools\EstateStreamDeckPlugin`;
 - `A:\AI\Tools\EngineeringWorkerRuntime`;
@@ -102,6 +123,41 @@ tokens, secret keys, canonical databases, models, and unrelated user data.
 - any nested repositories discovered under the dirty common repository;
 - any launcher/configuration still referencing `A:\theestate` until a
   transactionally safe canonical replacement is reviewed.
+
+## Common migration proposal
+
+Do not rename or repurpose the dirty `A:\theestate` in place. After explicit
+approval, create a clean Git-connected `A:\theestate-common` from retained
+remote/main history, verify that only source-controlled code and non-secret
+configuration are present, and preserve the old common repository separately.
+Then create clean candidate worktrees `A:\theestate-blue` and
+`A:\theestate-green` from Common. Create/select `A:\theestate-live` only from
+a complete validated candidate release. No runtime data, database, resident
+memory, credentials, private documents, or generated output is copied into
+Common, Blue, Green, or Live.
+
+## Promotion, rollback, backup, and retirement
+
+Blue or Green is built and semantically validated on candidate ports. A
+promotion creates/selects a complete Live release on 8766/11435/8080 and
+records the prior Live release. A failed promotion restores the prior Live
+release, leaves persistent data unchanged, and re-runs all three readiness
+checks. A code rollback never silently rolls back data; data migrations are a
+separate governed operation.
+
+The proposed backup contains read-only release manifests, source/tree identity,
+controller and launcher manifests, prior Live rollback metadata, and separately
+governed persistent-state recovery material. `A:\theestate-backup` is not
+created here.
+
+No work-package path is retired until active processes, launchers, services,
+scheduled tasks, manifests, status records, and documentation no longer refer
+to it; unique commits/evidence are preserved; the replacement path is proven;
+and the Steward approves the exact disposition. Gross measurable later
+reclaim from the seven clean merged linked worktrees is 717,316,610 bytes
+(about 684.1 MiB), excluding shared Git objects. The broader old-worktree
+total excluding WP-4232 unique work and current WP-4233 is 988,623,722 bytes
+(about 942.9 MiB). Evidence is not counted as reclaimable.
 
 ## Stale reference plan
 

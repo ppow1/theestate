@@ -142,3 +142,126 @@ The current deployment is one canonical source root plus runtime slots, not yet
 two deliberate Git deployment worktrees. The proposed topology and retirement
 plan therefore remain proposals requiring Steward review. No deletion or
 worktree retirement is authorized by this report.
+
+## Steward-corrected topology and final decision table
+
+The earlier proposal that treated `A:\theestate-wp4233` as permanent
+canonical-blue is superseded. It is a transitional source/runtime root only.
+The final architecture is:
+
+| Final role | Stable path | State boundary | Decision |
+|---|---|---|---|
+| Common | `A:\theestate-common` | Git-connected source, schemas, policies, docs, tests, templates, migrations, non-secret config only | create later; no Live runtime |
+| Blue | `A:\theestate-blue` | non-Live candidate/test ports only | create later from Common |
+| Green | `A:\theestate-green` | peer non-Live candidate/test ports only | create later from Common |
+| Live | `A:\theestate-live` | promoted operational release; Grace 8766, Gateway 11435, WebUI 8080 | create/select later from validated release |
+| Standard data | `A:\theestate-data` | persistent operational data outside code worktrees | reserve later; no migration now |
+| Sensitive data | `A:\theestate-sensitive-data` | external sensitive data; placeholder levels restricted, highly-restricted, classification-pending, quarantine | reserve later; no classification standard now |
+| Backup | `A:\theestate-backup` | offline/read-only last-known-good recovery material | define later; do not create now |
+| Current WebUI state | `A:\AI\OpenWebUI\EstateCanonicalData` | existing shared canonical state; no per-slot copies | retain in place |
+
+The current active process remains rooted at `A:\theestate-wp4233`; this is
+allowed only as a transitional condition. Its final disposition is
+`safe-delete-after-review` after stable named paths are created, tested,
+referenced, and promoted. No work-package-numbered path is part of the final
+permanent topology.
+
+`A:\theestate` is not safe to designate as the final Common path in place. It
+is dirty, contains 3,570 untracked files, 126 nested `.git` directories, and
+16 stashes. The safest proposed migration is to create a clean
+`A:\theestate-common` from the retained remote/main source, verify that it
+contains only code and non-secret configuration, then create Blue and Green
+from that Common. Preserve the existing common repository, dirty branch,
+stashes, and unique work separately before any retirement decision.
+
+The separate `A:\theestate\.wp4232-worktree` is not a registered worktree. It
+is an independent clone on branch `wp-4232-dual-surface-acceptance`, at
+`b064dac95856156a5fd9c1fe35b9959e58abfb10`, synchronized to
+`origin/wp-4232-dual-surface-acceptance`, with only untracked `.pytest-wp4232`
+content. It is duplicate WP-4232 source plus test evidence and is classified
+`archive-evidence`; it is not the owner of the 113 commits found in the linked
+`A:\theestate-wp4232` worktree.
+
+The 113 commits in `A:\theestate-wp4232` are classified
+`archive-unique-work`. They are the local WP-4232 dual-surface acceptance
+history after the common repository's retained remote refs diverged. The
+proposed preservation method is a reviewed commit manifest plus a named
+archive branch or Git bundle, excluding generated files, databases,
+credentials, private data, and ignored output. No preservation artifact was
+created in this phase.
+
+## Corrected migration and promotion map
+
+1. **Current state:** Live services remain on the PR-509 transitional source
+   `A:\theestate-wp4233`; persistent WebUI state remains at
+   `A:\AI\OpenWebUI\EstateCanonicalData`; old worktrees and tools remain
+   untouched.
+2. **Common creation:** after Steward approval, create a clean Git-connected
+   `A:\theestate-common` from retained source history. Copy no runtime output,
+   operational data, resident memory, database, credentials, private
+   documents, models, or generated artifacts.
+3. **Blue creation:** create `A:\theestate-blue` as a clean candidate worktree
+   from Common. It uses only candidate/test ports; the initial proposed
+   candidate triplet is Grace 8767, Gateway 11436, and WebUI 8081.
+4. **Green creation:** create `A:\theestate-green` as a peer candidate worktree
+   from Common. It must use a distinct candidate triplet reserved by the
+   controller; a concrete second triplet is a later implementation decision,
+   not an authorization to create or run it now.
+5. **Validation:** build, integration, semantic readiness, operator, and
+   authenticated-path checks run in Blue or Green only. Neither candidate
+   claims the Live/public ports.
+6. **Promotion:** package a complete validated release from Blue or Green,
+   select/create `A:\theestate-live` at that release, start all three services
+   on 8766/11435/8080, verify readiness, and record source commit, release
+   manifest, state identity, and prior Live release. Nothing is developed
+   directly in Live.
+7. **Backup:** before promotion, proposed `A:\theestate-backup` contents are
+   read-only release manifests, source commit/tree identity, controller and
+   launcher manifests, prior Live rollback metadata, and separately governed
+   persistent-state recovery material. It is not an active worktree and is not
+   created here.
+8. **Standard data:** future operational data belongs under
+   `A:\theestate-data`, but the existing canonical Open WebUI state is not
+   relocated by this package.
+9. **Sensitive data:** reserve, without implementing policy, the four levels
+   under `A:\theestate-sensitive-data`: `restricted`, `highly-restricted`,
+   `classification-pending`, and `quarantine`. Ingrid later refines the
+   classification model and access policy.
+
+## Rollback and path-reference sequence
+
+Promotion rollback stops admission of the new Live release, preserves the
+prior Live release, restores/selects that prior release, leaves persistent data
+unchanged, restarts the complete three-service surface, and re-runs semantic
+readiness and authenticated correlation. Code rollback never silently rolls
+back data. Any data migration requires separate governance, backup, forward
+and backward compatibility, and an explicit rollback plan.
+
+Before retiring any work-package path, inventory and update source roots,
+working directories, Stream Deck actions, services, scheduled tasks, manifests,
+status/PID records, scripts, tests, and documentation in a controlled sequence:
+Common first, then Blue/Green candidate references, then explicit Live
+promotion references. Prove no active process or launcher refers to the old
+path before retirement. No launcher was modified in this phase.
+
+## Work-package path retirement criteria and measurable space
+
+`A:\theestate-wp4229`, `wp4230`, `wp4231`, `wp4231-maincheck`,
+`wp4232-final`, and `wp4232-u1` are clean merged worktrees with retained remote
+branches. Their measured directory totals sum to 717,316,610 bytes (about
+684.1 MiB) as a gross upper bound for later worktree removal; shared Git object
+storage means actual reclaimed disk will be lower.
+
+The measured totals for all listed old linked worktrees except the unique
+WP-4232 worktree and current WP-4233 total 988,623,722 bytes (about 942.9
+MiB), before evidence/archive retention. Evidence trees are not counted as
+reclaimable. These are planning measurements only.
+
+Every work-package-numbered path must meet all of these conditions before a
+Steward-approved disposition is executed: no active process/cwd/reference;
+no registered worktree dependency; clean or preserved dirty/untracked state;
+all unique commits and evidence hashed and recoverable; remote branch/PR
+relationship recorded; no credentials, databases, private data, or required
+runtime state inside; replacement stable path proven; and explicit approval of
+the named path and disposition. Ingrid's future data-classification work is
+not part of this package.
