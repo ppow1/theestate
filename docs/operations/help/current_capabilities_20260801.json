@@ -62,11 +62,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/residents.json",
           "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/runtime/canonical_webui_gateway.json",
           "sha256": "984d7343d89af8370e0fb1d30ee507a7c34d5d11ca9808ac9673b8d33e2ed065"
         }
@@ -108,11 +110,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "runtime/residents/helen/readiness.json",
           "sha256": "6dc8c3ea64a8e01fab2fffc1bf71088a3e9877db837b3d93f2c2a66cbde6df52"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/residents.json",
           "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
         }
@@ -158,11 +162,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/providers/catalog.json",
           "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/residents.json",
           "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
         }
@@ -206,11 +212,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/providers/catalog.json",
           "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/providers/qwen_local_text.json",
           "sha256": "17f523cb04d428d9b7d25a34b6ad7ee5fa2ccf1d0efb93d47d9f0032d2cad7e1"
         }
@@ -253,11 +261,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/providers/catalog.json",
           "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
         },
         {
           "exists": true,
+          "freshness_state": "evidence_stale_or_requires_live_probe",
           "reference": "runtime/provider_health/providers/codex_cli_openai.json",
           "sha256": "2475327de11ab76a5b8d3aae522e363f9f054b9609d24805daab115d05647410"
         }
@@ -300,11 +310,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/providers/catalog.json",
           "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "runtime/ai_services/implementations/comfyui/service.manifest.json",
           "sha256": "ddc5c23dbc196d06418849016e8539beb2d4b42bcc8a7b453fa5736051a346a6"
         }
@@ -342,11 +354,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/providers.json",
           "sha256": "0fa5ce443b21a7234840d5903fa27a6848d79f71babcd9336e4aa93aa7e0d57a"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/capabilities.json",
           "sha256": "17894e0eaa0b17bdad4c9739975cb6abf637bf8b872ce4456e52f095ebbf8428"
         }
@@ -354,7 +368,7 @@
     },
     {
       "accepted_scope": "No current governed transcription execution is proven.",
-      "availability": "planned",
+      "availability": "capability_gap",
       "classification_ceiling": "Estate Internal",
       "common_phrases": [
         "Can we transcribe audio?",
@@ -385,11 +399,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/capabilities.json",
           "sha256": "17894e0eaa0b17bdad4c9739975cb6abf637bf8b872ce4456e52f095ebbf8428"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "data/registry/providers.json",
           "sha256": "0fa5ce443b21a7234840d5903fa27a6848d79f71babcd9336e4aa93aa7e0d57a"
         }
@@ -433,6 +449,7 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/skills/estate_skill_registry.json",
           "sha256": "3efca58be115c3826172ebd04a48205566d6e97c19664a473cf765a76ef80490"
         }
@@ -470,11 +487,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/skills/estate_skill_registry.json",
           "sha256": "3efca58be115c3826172ebd04a48205566d6e97c19664a473cf765a76ef80490"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "schemas/skills/skill_manifest_v1.schema.json",
           "sha256": "15d5fb479b38b7b27808ead909d144fbb516a794b378befc49639562151399da"
         }
@@ -513,11 +532,13 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "src/estate/core/engineering_capability_enablement.py",
           "sha256": "9d3305dfca1e654fb73be8b37d95d3cc3c9f0ffd4991bae9138718900db35185"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/providers/catalog.json",
           "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
         }
@@ -557,19 +578,61 @@
       "sources": [
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "config/runtime/canonical_webui_gateway.json",
           "sha256": "984d7343d89af8370e0fb1d30ee507a7c34d5d11ca9808ac9673b8d33e2ed065"
         },
         {
           "exists": true,
+          "freshness_state": "current_at_generation",
           "reference": "runtime/ai_services/implementations/open_webui/service.manifest.json",
           "sha256": "c2c6c6ca2a611232d10d97ec6c8998401def0c29f9ab12ddf63cab47fe54455a"
         }
       ]
+    },
+    {
+      "accepted_scope": "No execution; ask separately for a bounded proposal or governed action.",
+      "availability": "prohibited",
+      "classification_ceiling": "Estate Internal",
+      "common_phrases": [
+        "Grace, prepare a proposal before execution."
+      ],
+      "description": "Help and discovery cannot execute a Skill, provider, work package, repository mutation, merge, deletion, purchase, external message, or acceptance action.",
+      "dispatchability": "not_dispatchable",
+      "enabling_project": null,
+      "expected_outputs": [
+        "plain-language boundary explanation"
+      ],
+      "id": "prohibited-implicit-execution",
+      "institutional_acceptance": "not_granted",
+      "invocation_mode": "proposal_or_authorization_required",
+      "likely_block_or_failure_reasons": [
+        "help request is discovery-only"
+      ],
+      "maturity": "governance boundary",
+      "name": "Implicit execution from help",
+      "owner": "Office of the Steward",
+      "prohibited_or_unsupported_scope": [
+        "silent execution from a question about capability"
+      ],
+      "qualified_providers_or_workers": [],
+      "required_authority": [
+        "a separate explicit governed request is required"
+      ],
+      "sources": [
+        {
+          "exists": true,
+          "freshness_state": "current_at_generation",
+          "reference": "docs/architecture/Estate_Steward_Help_and_Capability_Discovery.md",
+          "sha256": "16abb51d3eb0e69b0a1684e0413f4fccc942e3742cc51ffd8f0c26b203d8ea2a"
+        }
+      ]
     }
   ],
-  "generated_at": "2026-08-01T20:01:11Z",
+  "freshness_state": "conflicted_and_stale",
+  "generated_at": "2026-08-01T20:07:59Z",
   "generation_policy": {
+    "cache": "not cached; regenerate on every live response; generated artifacts bind source digests",
     "historical_success_is_not_current_availability": true,
     "installed_or_registered_is_not_operational": true,
     "live_probes": true,
@@ -580,51 +643,61 @@
   "source_references": [
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "data/registry/capabilities.json",
       "sha256": "17894e0eaa0b17bdad4c9739975cb6abf637bf8b872ce4456e52f095ebbf8428"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "data/registry/providers.json",
       "sha256": "0fa5ce443b21a7234840d5903fa27a6848d79f71babcd9336e4aa93aa7e0d57a"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "data/registry/residents.json",
       "sha256": "41f68cefe49232133229955a4b8728859f2af481c95d33d7a93c2fb1b22333fe"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "config/providers/catalog.json",
       "sha256": "045ceed06484e92b7218a01948624e7d08a356a421c264f4e7900fdc0b4b0c79"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "config/skills/estate_skill_registry.json",
       "sha256": "3efca58be115c3826172ebd04a48205566d6e97c19664a473cf765a76ef80490"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "runtime/residents/helen/readiness.json",
       "sha256": "6dc8c3ea64a8e01fab2fffc1bf71088a3e9877db837b3d93f2c2a66cbde6df52"
     },
     {
       "exists": true,
+      "freshness_state": "evidence_stale_or_requires_live_probe",
       "reference": "runtime/providers/health/status/latest.json",
       "sha256": "f103845f37bf25c50e27d1919bdd3731a3c402b6cbf5d2e3c62d0cbe7a9e52a5"
     },
     {
       "exists": true,
+      "freshness_state": "evidence_stale_or_requires_live_probe",
       "reference": "runtime/provider_health/providers/codex_cli_openai.json",
       "sha256": "2475327de11ab76a5b8d3aae522e363f9f054b9609d24805daab115d05647410"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "runtime/ai_services/implementations/comfyui/service.manifest.json",
       "sha256": "ddc5c23dbc196d06418849016e8539beb2d4b42bcc8a7b453fa5736051a346a6"
     },
     {
       "exists": true,
+      "freshness_state": "current_at_generation",
       "reference": "config/runtime/canonical_webui_gateway.json",
       "sha256": "984d7343d89af8370e0fb1d30ee507a7c34d5d11ca9808ac9673b8d33e2ed065"
     }

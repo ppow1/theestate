@@ -27,13 +27,21 @@ def test_plain_language_help_never_executes():
 def test_status_distinctions_and_bounded_outcome():
     snapshot = build_snapshot(ROOT, include_live_probes=False)
     by_name = {e["name"]: e for e in snapshot["entities"]}
-    assert by_name["Whisper"]["availability"] == "planned"
+    assert by_name["Whisper"]["availability"] == "capability_gap"
     assert by_name["Qwen Coder"]["availability"] == "registered_unavailable"
     result = answer(snapshot, "Can we transcribe audio?")
     assert result["matches"][0]["name"] == "Whisper"
-    assert "planned" in result["plain_language"]
+    assert "capability gap" in result["plain_language"]
     helen = answer(snapshot, "Helen, do we have a governed transcription capability?", resident="Helen")
     assert helen["matches"][0]["name"] == "Whisper" and helen["executed"] is False
+
+def test_live_response_binds_freshness_and_sources():
+    snapshot = build_snapshot(ROOT, include_live_probes=False)
+    response = answer(snapshot, "Grace, what can Engineering do right now?")
+    assert response["generated_at"] == snapshot["generated_at"]
+    assert response["freshness_state"] == snapshot["freshness_state"]
+    assert response["source_references"] == snapshot["source_references"]
+    assert response["executed"] is False
 
 def test_ambiguous_request_fails_closed_and_cheat_sheet_is_readable():
     snapshot = build_snapshot(ROOT, include_live_probes=False)
@@ -44,3 +52,12 @@ def test_ambiguous_request_fails_closed_and_cheat_sheet_is_readable():
     assert "What is operational now" in sheet
     assert "Known limits" in sheet
     assert "not_granted" in sheet
+
+def test_resident_conversation_routes_help_without_generation(tmp_path, monkeypatch):
+    from estate.core import resident_interaction
+    snapshot = build_snapshot(ROOT, include_live_probes=False)
+    monkeypatch.setattr(resident_interaction, "build_steward_help_snapshot", lambda _root: snapshot)
+    result = resident_interaction.process_chat("grace", "Grace, what Skills are available?", root=tmp_path, session_id="help-acceptance")
+    assert result["turn"]["help_surface"]["executed"] is False
+    assert result["turn"]["help_surface"]["freshness_state"] == snapshot["freshness_state"]
+    assert result["turn"]["llm"]["mode"] == "steward_help_snapshot"

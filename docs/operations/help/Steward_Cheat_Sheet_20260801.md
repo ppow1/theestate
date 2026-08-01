@@ -1,6 +1,6 @@
 # Steward Cheat Sheet — Current Capabilities
 
-Generated: 2026-08-01T20:01:11Z
+Generated: 2026-08-01T20:07:59Z
 
 This is a read-only current-state view. Help never executes a Skill or grants authority.
 
@@ -29,11 +29,11 @@ This is a read-only current-state view. Help never executes a Skill or grants au
 
 ## Capability gaps
 
-- None proven in the current snapshot.
+- **Whisper** (`CAP-000006`): Planned local speech-to-text capability for speech transcription workflows. Block: registry says Pending Install; no current operational provider evidence.
 
 ## What is planned
 
-- **Whisper** (`CAP-000006`): Planned local speech-to-text capability for speech transcription workflows. Block: registry says Pending Install; no current operational provider evidence.
+- None proven in the current snapshot.
 
 ## Common things the Steward can say
 
