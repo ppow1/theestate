@@ -1,0 +1,18 @@
+{
+  "schema_version": "estate.skill.registry.v1",
+  "registry_id": "canonical-estate-skills",
+  "authority": "read_only_canonical_registry; registration_creates_no_authority",
+  "skills": [
+    {
+      "skill_id": "repository-health", "version": "1.0.0", "name": "Repository Health", "aliases": ["Check Git", "Repo Health", "Is Git clean?"],
+      "owner": "Estate Engineering", "maintainer": "Engineering", "purpose": "Inspect repository and worktree health without changing repository state.", "outcomes": ["bounded Git health report", "preservation and synchronization risks"],
+      "trigger_classes": ["interactive", "diagnostic"], "required_capabilities": [{"id":"read_repository_state","minimum_maturity":3}], "allowed_providers_tools": ["local-git-readonly"], "bootstrap_dependencies": [{"id":"git","available":true}], "classification":"internal-operational",
+      "authority": {"required": ["owner-authorized-read-only-inspection"], "implicit": false, "reserved_decisions": ["cleanup", "synchronization", "preservation", "deletion"]},
+      "scope": {"reads": ["repository metadata", "registered worktrees", "bounded configured reference roots"], "writes": [], "outputs": ["runtime/operations/skills/repository_health/*.report.json", "runtime/operations/skills/repository_health/*.receipt.json"], "external_sinks": []},
+      "stages": [{"id":"inspect","action":"read Git metadata and bounded references"},{"id":"report","action":"write one report and one receipt"}],
+      "preconditions": ["explicit execution request", "approved repository root", "read-only inspection authority"], "stop_and_escalation": {"stop_conditions":["root is not approved", "Git read fails", "scope would widen"], "escalation":["request Steward decision for preservation or cleanup"], "timeout":"30 seconds per Git command", "partial_result":"return blocked or partial receipt without guessing"},
+      "idempotency": {"identity":"invocation_id", "replay":"same artifacts are replayed; conflicting artifacts are rejected", "conflict":"stop and escalate"}, "contracts": {"artifact":"repository_health.report.v1", "receipt":"estate.skill.receipt.v1", "validation":"report hash and schema validation", "reconciliation":"bounded artifact presence and status reconciliation", "terminal_result":"completed|blocked|failed|partial"}, "rollback":"remove only the declared report and receipt under a separately authorized bounded path; never alter repository state.",
+      "maturity": 4, "availability":"available", "institutional_acceptance":"not_granted", "examples": ["Check Git", "Repo Health", "Is Git clean?"]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# Grace and Helen Skill Integration
+
+Grace discovers by formal name, alias, owner, or intended outcome; explains what a Skill does and does not do; preserves exact request provenance; suggests without execution; requests missing authority; and reports unavailable, blocked, failed, completed, and partial outcomes. Helen assesses identity/version, owner authorization, capability maturity, qualified worker, provider/tool health and freshness, bootstrap dependencies, dispatchability, gaps, and enabling projects. These are adapters over the canonical Estate surfaces, not new authority, PTM, Dispatch, provider, or resident systems.
