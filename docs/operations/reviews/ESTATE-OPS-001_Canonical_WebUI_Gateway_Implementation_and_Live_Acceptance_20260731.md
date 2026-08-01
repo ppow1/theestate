@@ -3,7 +3,9 @@
 ## Implementation
 
 - Source root: `A:\theestate-wp4233`
-- Source commit at acceptance: `22a276268fc25c4568954da84f6a4215c1b95c31`
+- Source commit at initial acceptance: `22a276268fc25c4568954da84f6a4215c1b95c31`
+- Final pushed source commit and post-commit runtime restart: recorded in the
+  final active-slot manifest and PR head.
 - Gateway: `C:\Python314\python.exe`, public `127.0.0.1:11435`, candidate
   `127.0.0.1:11436`
 - Open WebUI: `A:\AI\OpenWebUI\.venv\Scripts\open-webui.exe`, version
@@ -27,6 +29,9 @@
    metadata. This proves the Open WebUI -> canonical Gateway bridge path.
 7. The shared administrator, model, Tool, Filter, database quick check, source
    commit, and state identity remained valid after restart.
+
+The final post-commit restart reconciled the active manifest and promotion
+record to the pushed implementation commit before handoff.
 
 ## Failure behavior
 
