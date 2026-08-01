@@ -1,0 +1,19 @@
+{
+  "service_id": "resident_gateway",
+  "display_name": "Estate Resident Gateway",
+  "service_type": "resident_gateway",
+  "local_only": true,
+  "host_policy": {"bind": "127.0.0.1", "allow_public_bind": false},
+  "default_endpoint": "http://127.0.0.1:11435",
+  "candidate_endpoint": "http://127.0.0.1:11436",
+  "ports": [11435, 11436],
+  "paths": {"source_root": "A:\\theestate-wp4233", "source_commit": "recorded by canonical slot manifest"},
+  "operations": {
+    "status": {"api_template": "GET http://127.0.0.1:{slot_port}/v1/models"},
+    "start": {"command_template": "scripts/canonical_webui_gateway.py start --slot {slot} --service gateway"},
+    "promote": {"command_template": "scripts/canonical_webui_gateway.py promote --slot {slot}"},
+    "rollback": {"command_template": "scripts/canonical_webui_gateway.py rollback"}
+  },
+  "readiness": {"requires_model": "estate/grace", "requires_grace_privileged_actions_disabled": true},
+  "approval": {"start": {"required": true}, "stop": {"required": true}, "promote": {"required": true}, "rollback": {"required": true}}
+}

@@ -1139,7 +1139,7 @@ def cmd_resident_chat(args):
 def cmd_resident_gateway(args):
     if args.gateway_action == "start":
         try:
-            serve_resident_gateway(host=args.host, port=args.port)
+            serve_resident_gateway(host=args.host, port=args.port, root=args.root)
         except OSError as exc:
             print(json.dumps({"ok": False, "error": "port_unavailable", "detail": str(exc)}, indent=2, sort_keys=True))
             raise SystemExit(1)
@@ -3845,6 +3845,7 @@ def main(argv=None):
     q = rg.add_parser("start", help="Start local resident gateway")
     q.add_argument("--host", default="127.0.0.1")
     q.add_argument("--port", type=int, default=11435)
+    q.add_argument("--root")
     q.set_defaults(func=cmd_resident_gateway)
     q = rg.add_parser("status", help="Show local resident gateway status")
     q.add_argument("--host", default="127.0.0.1")

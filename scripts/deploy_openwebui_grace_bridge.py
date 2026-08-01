@@ -82,10 +82,39 @@ async def install_grounding_filter(source: str | Path) -> dict:
 async def associate_grace_model(model_id: str = GRACE_MODEL_ID) -> dict:
     """Bind the persisted bridge and filter to the selected Grace custom model."""
     from open_webui.models.models import ModelForm, ModelMeta, Models
+    from open_webui.models.users import Users
 
     model = await Models.get_model_by_id(model_id)
     if model is None:
-        raise RuntimeError(f"Open WebUI model not found: {model_id}")
+        user = await Users.get_first_user()
+        if user is None:
+            raise RuntimeError("Open WebUI has no administrator user")
+        metadata = merge_grace_bridge_metadata({
+            "description": "Estate Grace through the canonical Resident Gateway",
+            "toolIds": [GRACE_TOOL_ID],
+            "filterIds": [GRACE_FILTER_ID],
+        })
+        result = await Models.insert_new_model(
+            ModelForm(
+                id=model_id,
+                base_model_id="estate/grace",
+                name="Grace (Estate Resident Gateway)",
+                params={},
+                meta=ModelMeta(**metadata),
+                is_active=True,
+            ),
+            user.id,
+        )
+        if result is None:
+            raise RuntimeError(f"Open WebUI model creation failed: {model_id}")
+        return {
+            "action": "created_and_associated",
+            "model_id": model_id,
+            "base_model_id": "estate/grace",
+            "tool_ids": metadata["toolIds"],
+            "filter_ids": metadata["filterIds"],
+            "updated": True,
+        }
     if model.base_model_id not in {"estate/grace", model_id}:
         raise RuntimeError(
             f"Open WebUI model {model_id} is not backed by estate/grace: "

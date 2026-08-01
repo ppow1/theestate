@@ -1,0 +1,43 @@
+{
+  "schema_version": "estate.canonical-webui-gateway.v1",
+  "source_root": "A:\\theestate-wp4233",
+  "gateway": {
+    "host": "127.0.0.1",
+    "active_port": 11435,
+    "candidate_port": 11436,
+    "python": "C:\\Python314\\python.exe",
+    "module": "estate.cli.main",
+    "health_path": "/v1/models",
+    "expected_model": "estate/grace"
+  },
+  "grace_runtime": {
+    "host": "127.0.0.1",
+    "active_port": 8766,
+    "candidate_port": 8767,
+    "python": "C:\\Python314\\python.exe",
+    "script": "scripts\\run_grace_momentum_runtime.py",
+    "working_directory": "A:\\theestate-wp4233",
+    "root": "A:\\theestate-wp4233",
+    "mode": "governed_local_test",
+    "health_path": "/v1/health",
+    "readiness_path": "/v1/readiness",
+    "authentication_issuer": "estate-control"
+  },
+  "open_webui": {
+    "host": "127.0.0.1",
+    "active_port": 8080,
+    "candidate_port": 8081,
+    "executable": "A:\\AI\\OpenWebUI\\.venv\\Scripts\\open-webui.exe",
+    "working_directory": "A:\\AI\\OpenWebUI",
+    "secret_key_file": "A:\\AI\\OpenWebUI\\.webui_secret_key",
+    "data_dir": "A:\\AI\\OpenWebUI\\EstateCanonicalData",
+    "database": "A:\\AI\\OpenWebUI\\EstateCanonicalData\\webui.db",
+    "version": "0.10.2",
+    "health_path": "/",
+    "expected_model": "estate/grace-grounded-test",
+    "expected_base_model": "estate/grace"
+  },
+  "state_root": "A:\\AI\\Tools\\EstateStreamDeckMVP\\Core\\state\\canonical-runtime",
+  "shared_state_policy": "one-canonical-database-shared-across-code-slots",
+  "bridge_deployment_version": "estate-openwebui-grace-bridge.v1"
+}
