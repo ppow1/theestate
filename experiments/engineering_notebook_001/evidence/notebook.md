@@ -1,12 +1,13 @@
 # Engineering Notebook: poc-001
 
 - Status: **completed**
+- Revision: `5`
+- State digest: `1fb6701e21a53ed864963dcaebac9fc2cb1840c4def12fc963dc041565e7d056`
 - Schema: `estate.engineering-notebook.state.v1`
 - Objective: `ESTATE-NOTEBOOK-001-POC`
 - Work package: `ESTATE-NOTEBOOK-001`
 - Assigned worker: `worker-a`
-- Last verified: `2026-08-02T11:14:47Z`
-- Source commit/state: `fixture-commit`
+- Last verified: `2026-08-02T11:47:43Z`
 
 ## Current job
 
@@ -32,6 +33,8 @@ Prohibited:
 
 ## Evidence
 
+- Freshness: **current**
+- Provenance classes: `worker_proposed`, `harness_observed`, `validator_produced`, `operator_authorized`, `repository_derived`
 - Schema state: pass
 - Compilation state: pass
 - Fixture integrity: pass
@@ -40,7 +43,7 @@ Prohibited:
 
 ## Continuity
 
-Completed html; carry only verified output and next stage.
+Completed html; carry verified final output.
 
 Omitted from this packet:
 - full prior transcript

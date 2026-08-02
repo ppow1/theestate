@@ -1,10 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "estate.engineering-notebook.update-proposal.v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema_version", "proposal_id", "notebook_id", "worker", "proposed_at", "changes", "provenance", "reason"],
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "proposal_id", "notebook_id", "worker", "proposed_at", "idempotency_key", "prior_state_digest", "changes", "provenance", "reason"],
   "properties": {
-    "schema_version": {"const": "estate.engineering-notebook.update-proposal.v1"}, "proposal_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}, "notebook_id": {"type": "string", "minLength": 1}, "worker": {"type": "string", "minLength": 1}, "proposed_at": {"type": "string", "format": "date-time"}, "reason": {"type": "string", "minLength": 1}, "changes": {"type": "object", "minProperties": 1, "additionalProperties": false, "properties": {"task": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/task"}, "evidence": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/evidence"}, "continuity": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/continuity"}, "status": {"enum": ["current", "stale", "conflicted", "incomplete", "blocked", "completed", "archived"]}, "last_verified_at": {"type": "string", "format": "date-time"}, "freshness": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/freshness"}}}, "provenance": {"type": "array", "items": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/provenance"}}
+    "schema_version": {"const": "estate.engineering-notebook.update-proposal.v1"},
+    "proposal_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}, "notebook_id": {"type": "string", "minLength": 1}, "worker": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}, "proposed_at": {"type": "string", "format": "date-time"}, "idempotency_key": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}, "prior_state_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "reason": {"type": "string", "minLength": 1},
+    "changes": {"type": "object", "additionalProperties": false, "minProperties": 1, "properties": {"task": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/task"}, "evidence": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/evidence"}, "continuity": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/continuity"}, "status": {"enum": ["current", "stale", "conflicted", "incomplete", "blocked", "completed", "archived"]}}},
+    "provenance": {"type": "array", "minItems": 1, "items": {"$ref": "engineering_notebook_state_v1.schema.json#/$defs/provenance"}}
   }
 }

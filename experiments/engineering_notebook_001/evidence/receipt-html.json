@@ -4,7 +4,7 @@
   "proposal_id": "stage-html",
   "notebook_id": "poc-001",
   "status": "accepted",
-  "accepted_at": "2026-08-02T11:14:47Z",
+  "accepted_at": "2026-08-02T11:47:43Z",
   "accepted_fields": [
     "continuity",
     "evidence",
@@ -15,7 +15,7 @@
     "task": {
       "original_objective": "Complete parser, schema, and HTML stages from verified notebook state.",
       "current_stage": "html",
-      "stage_status": "active",
+      "stage_status": "complete",
       "completed_stages": [
         "parser",
         "schema",
@@ -60,9 +60,9 @@
         "passed": 0,
         "failed": 0
       },
-      "schema_state": "unknown",
-      "compilation_state": "unknown",
-      "fixture_integrity": "unknown",
+      "schema_state": "pass",
+      "compilation_state": "pass",
+      "fixture_integrity": "pass",
       "sources": [],
       "receipts": [
         "experiments/engineering_notebook_001/evidence/receipt-parser.json",
@@ -72,8 +72,8 @@
     },
     "continuity": {
       "previous_session": "worker-3",
-      "handoff_reason": "fresh-session stage handoff",
-      "compaction_summary": "Completed html; carry only verified output and next stage.",
+      "handoff_reason": "fresh process session handoff",
+      "compaction_summary": "Completed html; carry verified final output.",
       "safe_facts": [
         "Notebook is subordinate to authoritative repository and runtime records."
       ],
@@ -86,8 +86,14 @@
         "workspace/workspace/dashboard.html"
       ],
       "expires_at": null
-    }
+    },
+    "artifacts_exist": true,
+    "required_validators_passed": true
   },
-  "state_digest": "9c0ab9af0b1bb47f8da6a3d9bd90a2bc0d7ce832690c36cc84bbe4c2625a8200",
-  "institutional_acceptance": "not_granted"
+  "state_digest": "ef387a1199f286b3f57514cf7888d345c43ab37a1dced730db6ca1cea4d394fa",
+  "institutional_acceptance": "not_granted",
+  "revision": 4,
+  "idempotency_key": "idem-stage-html",
+  "prior_state_digest": "5e5df17eb16485725db0d44371c384be2edbb53ea9117a1be57e52766a67aafa",
+  "resulting_state_digest": "ef387a1199f286b3f57514cf7888d345c43ab37a1dced730db6ca1cea4d394fa"
 }

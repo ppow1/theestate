@@ -8,11 +8,12 @@
 5. Execute only bounded tools.
 6. Run validation and record actual results.
 7. Accept or reject a worker update proposal.
-8. Write a verified state and receipt.
+8. Atomically write a revisioned verified state and append a receipt.
 9. Compact context into safe facts and explicit omissions.
 10. Create a handoff record and terminate the session.
 11. Build a fresh packet and require acknowledgment before resume.
-12. Mark completed only after final validation; archive with evidence.
+12. Mark completed only after final validation; archive with evidence and a
+    recoverable digest chain.
 
 The runtime functions in `estate.core.engineering_notebook` implement this
 minimum contract. No new orchestration loop is introduced.
@@ -21,5 +22,7 @@ minimum contract. No new orchestration loop is introduced.
 
 Stale/conflicted state, missing authority, unsafe references, unsupported claims,
 scope changes, failed required validation, retry exhaustion, secret-like text,
-or an acknowledgment mismatch stop tool execution. A blocked notebook may be
-updated only with observed blocker evidence or an authorized resolution.
+replay/out-of-order updates, partial-write failure, or an acknowledgment
+mismatch stop tool execution. A blocked notebook may be updated only with
+observed blocker evidence or an authoritative resolution. Worker proposals
+cannot refresh freshness, alter authority, or grant institutional acceptance.

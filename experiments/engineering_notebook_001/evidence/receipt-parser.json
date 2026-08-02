@@ -4,7 +4,7 @@
   "proposal_id": "stage-parser",
   "notebook_id": "poc-001",
   "status": "accepted",
-  "accepted_at": "2026-08-02T11:14:47Z",
+  "accepted_at": "2026-08-02T11:47:43Z",
   "accepted_fields": [
     "continuity",
     "evidence",
@@ -14,7 +14,7 @@
   "observed_facts": {
     "task": {
       "original_objective": "Complete parser, schema, and HTML stages from verified notebook state.",
-      "current_stage": "parser",
+      "current_stage": "schema",
       "stage_status": "active",
       "completed_stages": [
         "parser"
@@ -59,8 +59,8 @@
     },
     "continuity": {
       "previous_session": "worker-1",
-      "handoff_reason": "fresh-session stage handoff",
-      "compaction_summary": "Completed parser; carry only verified output and next stage.",
+      "handoff_reason": "fresh process session handoff",
+      "compaction_summary": "Completed parser; carry only verified packet and current stage.",
       "safe_facts": [
         "Notebook is subordinate to authoritative repository and runtime records."
       ],
@@ -73,8 +73,14 @@
         "workspace/workspace/parsed.json"
       ],
       "expires_at": null
-    }
+    },
+    "artifacts_exist": true,
+    "required_validators_passed": true
   },
-  "state_digest": "508708a2b5b4d0fd9055b615d277f35ef02cd4589128edb362b6d6615490c28c",
-  "institutional_acceptance": "not_granted"
+  "state_digest": "57b0caac2a38aae8f7287ed346c24eb9d2f80da5c864ff04a6e46497b53c785b",
+  "institutional_acceptance": "not_granted",
+  "revision": 1,
+  "idempotency_key": "idem-stage-parser",
+  "prior_state_digest": "712cd570203932bb73bdfdcbf4baa4f4c59ea0cbe8071a995be5d41c6ec15bc5",
+  "resulting_state_digest": "57b0caac2a38aae8f7287ed346c24eb9d2f80da5c864ff04a6e46497b53c785b"
 }
