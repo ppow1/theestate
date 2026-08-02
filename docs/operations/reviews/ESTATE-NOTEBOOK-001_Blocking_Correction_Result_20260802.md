@@ -2,10 +2,10 @@
 
 Date: 2026-08-02
 Repository: `ppow1/theestate`
-PR: `#515` (kept draft)
+PR: `#515` (GitHub now reports merged before this correction phase; no merge was performed here)
 Base: `origin/main` at `e4e4828855bb468dfe3276730eb1dbe22bb89460`
 Starting correction head: `e77abcd7f06d4ec037ff1fd3eee871670b6a06e9`
-Final correction head: recorded after commit and push
+Correction commit: `034f4110375098ed13daf507e961a8e8807c6509`
 
 ## Scope and disposition
 
@@ -76,10 +76,13 @@ use until its owner decides how to preserve or retire those unrelated changes.
    **HARNESS-LEVEL FRESH-SESSION CONTINUITY**.
 4. Actual local-model notebook acceptance: **NOT YET TESTED**.
 5. Resident-integrated Estate continuity: **NOT YET TESTED**.
-6. PR #515: **NOT READY** until the requested independent rereview is complete;
-   the PR remains draft.
+6. PR #515: **NOT READY** for acceptance. GitHub reports it as already merged
+   before this correction phase, so it cannot be returned to draft or made ready
+   for the requested independent rereview through the PR lifecycle.
 
-No unresolved implementation blocker remains from the independent review. Model
-acceptance, resident integration, and institutional acceptance are separate gates;
-the first two remain untested and institutional acceptance remains
+No unresolved implementation blocker remains from the independent review. The
+PR lifecycle state is an external process blocker: the correction commit is on
+the existing branch but is not part of the recorded merge commit. Model
+acceptance, resident integration, and institutional acceptance are separate
+gates; the first two remain untested and institutional acceptance remains
 `not_granted`.
