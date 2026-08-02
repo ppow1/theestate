@@ -5,6 +5,11 @@ Repository: `ppow1/theestate`
 Reviewed corrected commit: `568050325be51185f5169b55ed74a7e6a762fc7a`
 Independent worktree: `A:\review-notebook-protected-fields-final-20260802`
 
+PR #515 merged before the original correction. The first correction remained
+blocked by the protected-field defect. This reconstructed PR carries the
+explicit protected-field enforcement and its independent rereview; no
+local-model testing has run.
+
 ## Decision
 
 **PASS FOR ISOLATED LOCAL-MODEL TRIAL, WITH CONDITIONS.**
