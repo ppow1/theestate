@@ -4,7 +4,7 @@
   "proposal_id": "proof-close",
   "notebook_id": "poc-001",
   "status": "accepted",
-  "accepted_at": "2026-08-02T04:49:37Z",
+  "accepted_at": "2026-08-02T11:14:47Z",
   "accepted_fields": [
     "evidence",
     "status",
@@ -72,6 +72,6 @@
     },
     "status": "completed"
   },
-  "state_digest": "6c8bdd4b73a9f0b48d61609c8e09572e43efb1ab53dc019ee411fe2b98d70cb0",
+  "state_digest": "a98a6a42c484b774716bda76a2e2ec9c0d060fe98819de6607faee18b1f3cf9c",
   "institutional_acceptance": "not_granted"
 }

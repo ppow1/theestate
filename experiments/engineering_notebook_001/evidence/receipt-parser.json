@@ -4,7 +4,7 @@
   "proposal_id": "stage-parser",
   "notebook_id": "poc-001",
   "status": "accepted",
-  "accepted_at": "2026-08-02T04:49:37Z",
+  "accepted_at": "2026-08-02T11:14:47Z",
   "accepted_fields": [
     "continuity",
     "evidence",
@@ -75,6 +75,6 @@
       "expires_at": null
     }
   },
-  "state_digest": "65c6421ac56c9db6544461817b1fc34b8f8654fcb2f6853a57c7ff10f7f586bd",
+  "state_digest": "508708a2b5b4d0fd9055b615d277f35ef02cd4589128edb362b6d6615490c28c",
   "institutional_acceptance": "not_granted"
 }

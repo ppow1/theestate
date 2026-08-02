@@ -1,12 +1,12 @@
 {
   "schema_version": "estate.engineering-notebook.handoff.v1",
-  "handoff_id": "handoff-poc-001-20260802044937",
+  "handoff_id": "handoff-poc-001-20260802111447",
   "notebook_id": "poc-001",
-  "created_at": "2026-08-02T04:49:37Z",
+  "created_at": "2026-08-02T11:14:47Z",
   "previous_worker": "worker-a",
   "next_worker": "worker-final",
   "reason": "fresh-session stage handoff",
-  "packet_digest": "0d517bd1fe2440428c9548a98f2da5b7c783776f81bcbc089791dd8707ca8e74",
+  "packet_digest": "85bc4a49e4fb1598a3e89954d06099e74eb2e57f5c9c918cacd1d61334d7d439",
   "resume_required": true,
   "institutional_acceptance": "not_granted"
 }
