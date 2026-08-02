@@ -18,7 +18,10 @@ The source-based checks that did run passed:
 
 A temporary `git clone --no-local` reached the expected WP-4232 HEAD, but its
 checkout was interrupted by the bounded command timeout before a clean working
-tree could be verified. It is not claimed as a successful restoration test.
+tree could be verified. An independent targeted fetch-and-checkout attempt
+also resolved `9ed81a20249498327d2f3b1c0ccd5ebd831062e2` before the bounded
+timeout, without completing checkout verification. These are ref-resolution
+smoke results only and are not claimed as successful restoration tests.
 The temporary path is outside the Estate worktrees and contains no service or
 runtime state; it must be handled separately before the next task.
 

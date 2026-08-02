@@ -40,14 +40,15 @@ git merge-base --is-ancestor 9ed81a20249498327d2f3b1c0ccd5ebd831062e2 origin/mai
 success
 ```
 
-The earlier ESTATE-OPS-002 report recorded 113 against its then-observed
-remote-ref set. That result is not reproducible against the fetched current
-repository or even against its cited retained baseline
-`2417654679c6db1221b18e7a44384e0a13751364`: WP-4232 HEAD is an ancestor of
-that baseline as well. The corrected preservation count is therefore 0;
-WP-4232 history is already reachable from the retained remote history. The
-local branch and its remote branch remain protected until a separate
-retirement decision.
+The earlier ESTATE-OPS-002 report recorded 113, but rechecking its cited
+retained baseline `2417654679c6db1221b18e7a44384e0a13751364` shows that
+WP-4232 HEAD is already an ancestor of that baseline. Thus 113 was not a
+valid historical WP-4232-only count against that baseline and is consistent
+with a reversed or differently scoped query. PR #490 merged the WP-4232
+branch into main at `93532a72bbe56246a1b14751cc46590362485ad6` on 2026-07-27
+08:09 -0400. The corrected present-tense preservation count is 0; WP-4232
+history is reachable from retained remote history. The local branch and its
+remote branch remain protected until a separate retirement decision.
 
 ## Classification
 
@@ -57,7 +58,7 @@ retirement decision.
 | `origin/wp-4232-dual-surface-acceptance` | reachable protected branch | remote branch remains available |
 | tracked working changes | none observed | clean status |
 | 21 ignored files | generated/reproducible material; protected pending decision | caches, bytecode, and one generated fixture; not treated as disposable |
-| shared reflog-only/unreachable objects | unresolved and therefore protected | shared common object store contains many unclassified unreachable objects |
+| shared reflog-only/unreachable objects | unresolved and therefore protected | 862 objects reported unreachable with reflogs excluded: 105 commits, 455 trees, 302 blobs; 15 of 16 stash commits are in this set |
 | local Git/worktree configuration | separate preservation requirement | not represented by a Git bundle or repository tree |
 | active path references | not fully proven absent | broad external scan timed out; targeted tracked scan found none |
 

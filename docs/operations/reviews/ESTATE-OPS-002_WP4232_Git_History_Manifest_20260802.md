@@ -14,10 +14,16 @@ Current retained baseline: `origin/main` at `e4e4828855bb468dfe3276730eb1dbe22bb
 | prior ESTATE-OPS-002 reported count | 113 |
 | corrected current count | 0 |
 
-The previous 113-commit result is preserved as a historical finding, not
-repeated as a current fact. The cited 2026-08-01 baseline already contains
-WP-4232 HEAD, so the earlier count cannot be reproduced from the current
-object graph. No history rewrite was performed by this task.
+The previous 113-commit result is preserved as a historical report, not
+repeated as a current fact. Rechecking the cited 2026-08-01 baseline shows
+that WP-4232 HEAD is already an ancestor of that baseline too, so 113 was not
+a valid WP-4232-only count against that baseline. It is consistent with a
+reversed or differently scoped reachability query, not with 113 commits that
+were historically unique to WP-4232. The later merge of PR #490
+(`93532a72bbe56246a1b14751cc46590362485ad6`, 2026-07-27 08:09 -0400) is the
+point at which the WP-4232 branch became reachable from `origin/main`; the
+branch tip itself predates that merge. No history rewrite was performed by
+this task.
 
 ## Protected refs and tree identity
 
@@ -44,4 +50,9 @@ authorize implementation and no approved retention root was identified.
 5. Compare commit, tree, ref, and object manifests.
 6. Preserve non-Git files separately; a bundle is not sufficient.
 
-No step above was executed by this documentation-only package.
+No step above was executed by this documentation-only package. The common
+object database also contains 862 objects reported unreachable when reflogs
+are excluded (105 commits, 455 trees, 302 blobs). These are shared-repository
+objects, not a WP-4232-only count; they include reflog-only stash history and
+WP-era/abandoned work. They remain protected until bounded classification or
+separate preservation authorization.
