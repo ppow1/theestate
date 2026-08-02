@@ -1,0 +1,35 @@
+{
+  "sessions": 3,
+  "results": [
+    {
+      "stage": "parser",
+      "output": "workspace/workspace/parsed.json",
+      "validation": "pass"
+    },
+    {
+      "stage": "schema",
+      "output": "workspace/workspace/validated.json",
+      "validation": "pass"
+    },
+    {
+      "stage": "html",
+      "output": "workspace/workspace/dashboard.html",
+      "validation": "pass"
+    }
+  ],
+  "stale_detection": {
+    "state": "conflicted",
+    "conflicts": [
+      "experiments/engineering_notebook_001/input/corpus.md"
+    ],
+    "age_seconds": 0
+  },
+  "full_transcript_required": false,
+  "notebook_packet_bytes": 657,
+  "fixture_hash_before": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158",
+  "fixture_hash_after": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158",
+  "fixture_unchanged": true,
+  "receipts": 4,
+  "handoffs": 1,
+  "institutional_acceptance": "not_granted"
+}

@@ -1,0 +1,179 @@
+{
+  "schema_version": "estate.engineering-notebook.state.v1",
+  "notebook_id": "poc-001",
+  "notebook_type": "engineering_working_state",
+  "owner": "Engineering",
+  "assigned_worker": "worker-a",
+  "objective_id": "ESTATE-NOTEBOOK-001-POC",
+  "work_package_ref": "ESTATE-NOTEBOOK-001",
+  "created_at": "2026-08-02T04:49:37Z",
+  "last_verified_at": "2026-08-02T04:49:37Z",
+  "source_commit": "fixture-commit",
+  "status": "completed",
+  "task": {
+    "original_objective": "Complete parser, schema, and HTML stages from verified notebook state.",
+    "current_stage": "html",
+    "stage_status": "complete",
+    "completed_stages": [
+      "parser",
+      "schema",
+      "html"
+    ],
+    "remaining_stages": [],
+    "next_action": "Close the proof.",
+    "current_blocker": "none",
+    "blocking_severity": "none",
+    "repair_count": 0,
+    "retry_limit": 3,
+    "stop_condition": "Stop on scope, authority, safety, or unresolved validation conflict."
+  },
+  "authority": {
+    "references": [
+      "ESTATE-NOTEBOOK-001"
+    ],
+    "required": [
+      "explicit assigned objective"
+    ],
+    "merge": false,
+    "network": false,
+    "model_mutation": false,
+    "destructive": false,
+    "institutional_acceptance": "not_granted"
+  },
+  "constraints": {
+    "permitted_repository": [
+      "experiments/engineering_notebook_001"
+    ],
+    "permitted_read_paths": [
+      "experiments/engineering_notebook_001/input"
+    ],
+    "permitted_write_paths": [
+      "experiments/engineering_notebook_001/workspace"
+    ],
+    "permitted_commands": [
+      "approved validation commands"
+    ],
+    "prohibited_actions": [
+      "secret storage",
+      "scope widening",
+      "repository mutation outside permitted writes",
+      "self-authorizing",
+      "merging",
+      "deletion"
+    ]
+  },
+  "architecture": {
+    "protected_components": [],
+    "runtime_boundaries": [],
+    "do_not_redesign": [],
+    "required_interfaces": [],
+    "governing_documents": [],
+    "accepted_decisions": [],
+    "unresolved_decisions": []
+  },
+  "evidence": {
+    "files": [
+      "workspace/workspace/parsed.json",
+      "workspace/workspace/validated.json",
+      "workspace/workspace/dashboard.html"
+    ],
+    "commands": [
+      "python poc_runner.py"
+    ],
+    "last_results": [
+      {
+        "stage": "parser",
+        "output": "workspace/workspace/parsed.json",
+        "validation": "pass"
+      },
+      {
+        "stage": "schema",
+        "output": "workspace/workspace/validated.json",
+        "validation": "pass"
+      },
+      {
+        "stage": "html",
+        "output": "workspace/workspace/dashboard.html",
+        "validation": "pass"
+      }
+    ],
+    "unresolved_failures": [],
+    "test_counts": {
+      "passed": 0,
+      "failed": 0
+    },
+    "schema_state": "pass",
+    "compilation_state": "pass",
+    "fixture_integrity": "pass",
+    "sources": [],
+    "receipts": [
+      "experiments/engineering_notebook_001/evidence/receipt-parser.json",
+      "experiments/engineering_notebook_001/evidence/receipt-schema.json",
+      "experiments/engineering_notebook_001/evidence/receipt-html.json"
+    ]
+  },
+  "continuity": {
+    "previous_session": "worker-3",
+    "handoff_reason": "fresh-session stage handoff",
+    "compaction_summary": "Completed html; carry only verified output and next stage.",
+    "safe_facts": [
+      "Notebook is subordinate to authoritative repository and runtime records."
+    ],
+    "omitted_information": [
+      "full prior transcript",
+      "model chain-of-thought",
+      "unrelated repository content"
+    ],
+    "next_stage_files": [
+      "workspace/workspace/dashboard.html"
+    ],
+    "expires_at": null
+  },
+  "freshness": {
+    "state": "current",
+    "checked_at": "2026-08-02T04:49:37Z",
+    "source_digests": {
+      "experiments/engineering_notebook_001/input/corpus.md": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158"
+    },
+    "max_age_seconds": 3600,
+    "conflicts": []
+  },
+  "provenance": [
+    {
+      "source": "ESTATE-NOTEBOOK-001",
+      "category": "operator_authorized",
+      "digest": null,
+      "observed_at": "2026-08-02T04:49:37Z",
+      "claim": "Bounded objective and initial scope were authorized."
+    },
+    {
+      "source": "poc_runner.py",
+      "category": "validator_produced",
+      "digest": null,
+      "observed_at": "2026-08-02T04:49:37Z",
+      "claim": "Validator passed the parser stage."
+    },
+    {
+      "source": "poc_runner.py",
+      "category": "validator_produced",
+      "digest": null,
+      "observed_at": "2026-08-02T04:49:37Z",
+      "claim": "Validator passed the schema stage."
+    },
+    {
+      "source": "poc_runner.py",
+      "category": "validator_produced",
+      "digest": null,
+      "observed_at": "2026-08-02T04:49:37Z",
+      "claim": "Validator passed the html stage."
+    },
+    {
+      "source": "poc_runner.py",
+      "category": "validator_produced",
+      "digest": null,
+      "observed_at": "2026-08-02T04:49:37Z",
+      "claim": "All three proof stages passed."
+    }
+  ],
+  "institutional_acceptance": "not_granted"
+}

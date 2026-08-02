@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering-notebook.verification-receipt.v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "receipt_id", "proposal_id", "notebook_id", "status", "accepted_at", "accepted_fields", "rejected_fields", "observed_facts", "state_digest", "institutional_acceptance"],
+  "properties": {"schema_version": {"const": "estate.engineering-notebook.verification-receipt.v1"}, "receipt_id": {"type": "string"}, "proposal_id": {"type": "string"}, "notebook_id": {"type": "string"}, "status": {"enum": ["accepted", "rejected", "conflicted"]}, "accepted_at": {"type": "string", "format": "date-time"}, "accepted_fields": {"type": "array", "items": {"type": "string"}}, "rejected_fields": {"type": "array", "items": {"type": "string"}}, "observed_facts": {"type": "object"}, "state_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "institutional_acceptance": {"const": "not_granted"}}
+}
