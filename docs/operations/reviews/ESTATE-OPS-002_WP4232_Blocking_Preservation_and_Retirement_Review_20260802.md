@@ -281,3 +281,14 @@ Final retirement decision: **B. NOT READY**.
 
 WP-4232 must remain present and registered. No retirement command is authorized
 by this report.
+
+## Validation record
+
+- `git diff --check`: pass.
+- Review worktree cleanliness: pass after commit.
+- Worktree registration: WP-4232 remains registered; no registration was changed.
+- Stash identity check: all 16 identities/messages match the read-only baseline.
+- Non-Git inventory: 0 tracked/staged/ordinary-untracked, 21 ignored; manifest paths match.
+- Tracked JSON parse: two pre-existing malformed fixture files remain outside this PR: `collaboration/workstreams/WP-4219/fixtures/malformed_queue_input.json` and `collaboration/workstreams/WP-4227/fixtures/malformed_inputs.json`. No PR JSON was introduced or changed.
+- Exact repository reference search: no tracked WP-4232 path hit; scheduled-task inventory had no hit; broad external scan remains incomplete.
+- Secret/redaction scan of the PR Markdown: no credential or secret payload found; expected words such as “secret key” occur only in exclusion/safety prose.
