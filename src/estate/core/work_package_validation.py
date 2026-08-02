@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from estate.core.background_process import run_background_command
+
 from estate.core.paths import ESTATE_ROOT
 
 REPORTS_DIR = Path("operations/validation/reports")
@@ -2875,14 +2877,22 @@ def _run_command(root: Path, validation_id: str, index: int, spec: dict[str, Any
     env = os.environ.copy()
     src_path = str(root / "src")
     env["PYTHONPATH"] = src_path + os.pathsep + env.get("PYTHONPATH", "") if env.get("PYTHONPATH") else src_path
+    timed_out = False
     try:
-        proc = subprocess.run(command, cwd=root, shell=True, text=True, capture_output=True, env=env, check=False)
+        timeout = spec.get("timeout_seconds")
+        proc = run_background_command(command, cwd=root, env=env, timeout=float(timeout) if timeout is not None else None)
         exit_code, stdout, stderr = proc.returncode, proc.stdout, proc.stderr
+    except subprocess.TimeoutExpired as exc:
+        timed_out = True
+        exit_code = -1
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        stderr = (stderr + "\n" if stderr else "") + f"command timed out after {spec.get('timeout_seconds')} seconds"
     except OSError as exc:
         exit_code, stdout, stderr = 127, "", str(exc)
     completed = datetime.now(timezone.utc)
     classification = str(spec.get("classification") or ("required" if spec.get("required", True) else "observational"))
-    status = "passed" if exit_code == 0 else ("failed" if classification == "required" else "finding")
+    status = "timed_out" if timed_out else ("passed" if exit_code == 0 else ("failed" if classification == "required" else "finding"))
     stdout_path = _write_capture(root, validation_id, index, "stdout", stdout)
     stderr_path = _write_capture(root, validation_id, index, "stderr", stderr)
     result = {
@@ -2894,6 +2904,7 @@ def _run_command(root: Path, validation_id: str, index: int, spec: dict[str, Any
         "duration_seconds": round((completed - started).total_seconds(), 3),
         "exit_code": exit_code,
         "status": status,
+        "timed_out": timed_out,
     }
     if stdout_path: result["stdout_path"] = stdout_path
     else: result["stdout_excerpt"] = ""

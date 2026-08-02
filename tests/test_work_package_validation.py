@@ -60,6 +60,28 @@ def test_required_vs_observational_command_handling_and_failed_capture(tmp_path,
     assert "stderr_path" in payload["command_results"][0]
 
 
+def test_background_validation_timeout_is_captured(tmp_path, monkeypatch):
+    init_git(tmp_path)
+    from estate.core import work_package_validation as mod
+    monkeypatch.setitem(mod.VALIDATION_RECIPES, "WP-1235", {
+        "recipe_id": "timeout-recipe",
+        "continue_on_failure": True,
+        "commands": [{
+            "command": f'{sys.executable} -c "import time; print(\'before-timeout\'); time.sleep(1)"',
+            "required": True,
+            "timeout_seconds": 0.05,
+        }],
+    })
+
+    payload = validate_work_package("WP-1235", tmp_path)
+
+    result = payload["command_results"][0]
+    assert result["timed_out"] is True
+    assert result["status"] == "timed_out"
+    assert result["exit_code"] == -1
+    assert "timed out" in (tmp_path / result["stderr_path"]).read_text()
+
+
 def test_markdown_json_required_fields_and_self_check_recipe(tmp_path):
     assert get_validation_recipe("WP-0079") is not None
     init_git(tmp_path)

@@ -109,6 +109,34 @@ def test_windows_install_executes_and_verifies_scheduled_task(tmp_path, monkeypa
     assert installed["scheduled_task_name"] == test_task_name
     assert installed["scheduled_task_verified"] is True
     assert installed["scheduled_task_exists"] is True
+    assert "-WindowStyle Hidden" in calls[0][7]
+
+
+def test_windows_host_start_uses_no_window_process_creation(tmp_path, monkeypatch):
+    import estate.core.operations_runtime_host as mod
+
+    captured = {}
+
+    class FakeProc:
+        pid = 4321
+
+    def fake_popen(command, **kwargs):
+        captured.update(command=command, kwargs=kwargs)
+        return FakeProc()
+
+    monkeypatch.setattr(mod.os, "name", "nt")
+    monkeypatch.setattr(mod.subprocess, "Popen", fake_popen)
+    monkeypatch.setattr(mod.subprocess, "CREATE_NO_WINDOW", 0x08000000, raising=False)
+    monkeypatch.setattr(mod.subprocess, "STARTUPINFO", lambda: type("StartupInfo", (), {"dwFlags": 0, "wShowWindow": None})())
+    monkeypatch.setattr(mod.subprocess, "STARTF_USESHOWWINDOW", 1)
+    monkeypatch.setattr(mod.subprocess, "SW_HIDE", 0)
+
+    payload = OperationsRuntimeHost(tmp_path / "repo", tmp_path / "state").start()
+
+    assert payload["pid"] == 4321
+    assert captured["kwargs"]["creationflags"] == 0x08000000
+    assert captured["kwargs"]["startupinfo"].wShowWindow == 0
+    assert captured["kwargs"]["start_new_session"] is False
 
 
 def test_cli_host_install_accepts_isolated_task_name(tmp_path, monkeypatch, capsys):

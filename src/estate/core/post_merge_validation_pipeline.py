@@ -19,6 +19,7 @@ from estate.core.paths import ESTATE_ROOT
 from estate.core.audit_workspace_runtime import config_from_target
 from estate.core.audit_workspace_service import AuditWorkspaceService
 from estate.core.production_readiness_validation import calculate_production_readiness, validate_receipt
+from estate.core.background_process import hidden_windows_process_kwargs
 
 DEFAULT_STATES = {"pending","claimed","running_validation","ring2_required","running_ring2","completed","blocked","failed"}
 DEFAULT_VERDICTS = {"ring2_required","accepted","accepted_with_notes","needs_repair","blocked","validation_failed","no_recipe"}
@@ -178,7 +179,7 @@ class PostMergeValidationPipeline:
     def _standard_validator(self, wp: str, workspace: Path) -> dict[str, Any]:
         cmd = ["python", "-m", "estate.cli.main", "validate-work-package", "--id", wp, "--json"]
         env = os.environ.copy(); env["PYTHONPATH"] = str(self.root / "src")
-        r = subprocess.run(cmd, cwd=workspace, text=True, capture_output=True, check=False, env=env)
+        r = subprocess.run(cmd, cwd=workspace, text=True, capture_output=True, check=False, env=env, **hidden_windows_process_kwargs())
         try:
             payload = json.loads(r.stdout)
         except json.JSONDecodeError:
