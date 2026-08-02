@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.engineering-notebook.handoff.v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "handoff_id", "notebook_id", "created_at", "previous_worker", "next_worker", "reason", "packet_digest", "resume_required", "institutional_acceptance"],
+  "properties": {"schema_version": {"const": "estate.engineering-notebook.handoff.v1"}, "handoff_id": {"type": "string"}, "notebook_id": {"type": "string"}, "created_at": {"type": "string", "format": "date-time"}, "previous_worker": {"type": "string"}, "next_worker": {"type": "string"}, "reason": {"type": "string"}, "packet_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "resume_required": {"const": true}, "institutional_acceptance": {"const": "not_granted"}}
+}
