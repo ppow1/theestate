@@ -6,10 +6,30 @@
   "assigned_worker": "worker-a",
   "objective_id": "ESTATE-NOTEBOOK-001-POC",
   "work_package_ref": "ESTATE-NOTEBOOK-001",
-  "created_at": "2026-08-02T11:14:47Z",
-  "last_verified_at": "2026-08-02T11:14:47Z",
-  "source_commit": "fixture-commit",
+  "created_at": "2026-08-02T20:34:35Z",
+  "last_verified_at": "2026-08-02T20:34:36Z",
+  "source_commit": "fixture-commit-001",
   "status": "completed",
+  "revision": 5,
+  "last_update_id": "proof-close",
+  "last_receipt_id": "receipt-proof-close",
+  "last_idempotency_key": "idem-proof-close",
+  "prior_state_digest": "1a225954bb279c0d1ab391feaff81bd3fb267774a4bece876c931abe3fe10112",
+  "state_digest": "c0de6fe40b927a393bb37d6900652208abeb635dc85bca321a8638f67531507d",
+  "applied_update_ids": [
+    "stage-parser",
+    "stage-schema",
+    "refresh-authoritative",
+    "stage-html",
+    "proof-close"
+  ],
+  "applied_idempotency_keys": [
+    "idem-stage-parser",
+    "idem-stage-schema",
+    "idem-refresh",
+    "idem-stage-html",
+    "idem-proof-close"
+  ],
   "task": {
     "original_objective": "Complete parser, schema, and HTML stages from verified notebook state.",
     "current_stage": "html",
@@ -114,8 +134,8 @@
   },
   "continuity": {
     "previous_session": "worker-3",
-    "handoff_reason": "fresh-session stage handoff",
-    "compaction_summary": "Completed html; carry only verified output and next stage.",
+    "handoff_reason": "fresh process session handoff",
+    "compaction_summary": "Completed html; carry verified final output.",
     "safe_facts": [
       "Notebook is subordinate to authoritative repository and runtime records."
     ],
@@ -131,7 +151,7 @@
   },
   "freshness": {
     "state": "current",
-    "checked_at": "2026-08-02T11:14:47Z",
+    "checked_at": "2026-08-02T20:34:36Z",
     "source_digests": {
       "experiments/engineering_notebook_001/input/corpus.md": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158"
     },
@@ -143,36 +163,43 @@
       "source": "ESTATE-NOTEBOOK-001",
       "category": "operator_authorized",
       "digest": null,
-      "observed_at": "2026-08-02T11:14:47Z",
+      "observed_at": "2026-08-02T20:34:35Z",
       "claim": "Bounded objective and initial scope were authorized."
     },
     {
       "source": "poc_runner.py",
       "category": "validator_produced",
       "digest": null,
-      "observed_at": "2026-08-02T11:14:47Z",
-      "claim": "Validator passed the parser stage."
+      "observed_at": "2026-08-02T20:34:35Z",
+      "claim": "Independent process validated the parser stage."
     },
     {
       "source": "poc_runner.py",
       "category": "validator_produced",
       "digest": null,
-      "observed_at": "2026-08-02T11:14:47Z",
-      "claim": "Validator passed the schema stage."
+      "observed_at": "2026-08-02T20:34:35Z",
+      "claim": "Independent process validated the schema stage."
+    },
+    {
+      "source": "authoritative-refresh",
+      "category": "repository_derived",
+      "digest": "e7c17b22c212736febc22d3dc82fba16078dd03679987113d7c0023eb50bb28d",
+      "observed_at": "2026-08-02T20:34:36Z",
+      "claim": "authoritative freshness refresh"
     },
     {
       "source": "poc_runner.py",
       "category": "validator_produced",
       "digest": null,
-      "observed_at": "2026-08-02T11:14:47Z",
-      "claim": "Validator passed the html stage."
+      "observed_at": "2026-08-02T20:34:36Z",
+      "claim": "Independent process validated the html stage."
     },
     {
       "source": "poc_runner.py",
       "category": "validator_produced",
       "digest": null,
-      "observed_at": "2026-08-02T11:14:47Z",
-      "claim": "All three proof stages passed."
+      "observed_at": "2026-08-02T20:34:36Z",
+      "claim": "All three independent process stages passed."
     }
   ],
   "institutional_acceptance": "not_granted"

@@ -1,0 +1,272 @@
+{
+  "packet_core": {
+    "schema_version": "estate.engineering-notebook.state.v1",
+    "notebook_id": "poc-001",
+    "revision": 3,
+    "state_digest": "5ee2372cde0c49b4c0d75773c17f97b40c7d4b095e8a6df0502f24b1edc995f1",
+    "snapshot_verified_at": "2026-08-02T20:34:36Z",
+    "objective": "Complete parser, schema, and HTML stages from verified notebook state.",
+    "current_stage": "html",
+    "assigned_worker": "worker-a",
+    "authority_digest": "031f12d7f9fa2f7b790ea052a14867f77658074b297a51db0d420e20b73c6d3d",
+    "evidence_digest": "2f339fc5a1685bd837585969043d87195197221c536c7f3abbfb7f5b17e62b32",
+    "permitted_repository": [
+      "experiments/engineering_notebook_001"
+    ],
+    "permitted_write_paths": [
+      "experiments/engineering_notebook_001/workspace"
+    ],
+    "current_blocker": "none",
+    "required_validation": [
+      "python poc_runner.py"
+    ],
+    "prohibited_actions": [
+      "secret storage",
+      "scope widening",
+      "repository mutation outside permitted writes",
+      "self-authorizing",
+      "merging",
+      "deletion"
+    ],
+    "stage_files": [
+      "workspace/workspace/validated.json"
+    ],
+    "current_failures": []
+  },
+  "state": {
+    "schema_version": "estate.engineering-notebook.state.v1",
+    "notebook_id": "poc-001",
+    "notebook_type": "engineering_working_state",
+    "owner": "Engineering",
+    "assigned_worker": "worker-a",
+    "objective_id": "ESTATE-NOTEBOOK-001-POC",
+    "work_package_ref": "ESTATE-NOTEBOOK-001",
+    "created_at": "2026-08-02T20:34:35Z",
+    "last_verified_at": "2026-08-02T20:34:36Z",
+    "source_commit": "fixture-commit-001",
+    "status": "current",
+    "revision": 3,
+    "last_update_id": "refresh-authoritative",
+    "last_receipt_id": "receipt-refresh-authoritative",
+    "last_idempotency_key": "idem-refresh",
+    "prior_state_digest": "bd114f326ef9f4d57288ac3db9e8be55346ef61e78f300336dbb6631b7de8f5f",
+    "state_digest": "5ee2372cde0c49b4c0d75773c17f97b40c7d4b095e8a6df0502f24b1edc995f1",
+    "applied_update_ids": [
+      "stage-parser",
+      "stage-schema",
+      "refresh-authoritative"
+    ],
+    "applied_idempotency_keys": [
+      "idem-stage-parser",
+      "idem-stage-schema",
+      "idem-refresh"
+    ],
+    "task": {
+      "original_objective": "Complete parser, schema, and HTML stages from verified notebook state.",
+      "current_stage": "html",
+      "stage_status": "active",
+      "completed_stages": [
+        "parser",
+        "schema"
+      ],
+      "remaining_stages": [
+        "html"
+      ],
+      "next_action": "Complete the next stage.",
+      "current_blocker": "none",
+      "blocking_severity": "none",
+      "repair_count": 0,
+      "retry_limit": 3,
+      "stop_condition": "Stop on scope, authority, safety, or unresolved validation conflict."
+    },
+    "authority": {
+      "references": [
+        "ESTATE-NOTEBOOK-001"
+      ],
+      "required": [
+        "explicit assigned objective"
+      ],
+      "merge": false,
+      "network": false,
+      "model_mutation": false,
+      "destructive": false,
+      "institutional_acceptance": "not_granted"
+    },
+    "constraints": {
+      "permitted_repository": [
+        "experiments/engineering_notebook_001"
+      ],
+      "permitted_read_paths": [
+        "experiments/engineering_notebook_001/input"
+      ],
+      "permitted_write_paths": [
+        "experiments/engineering_notebook_001/workspace"
+      ],
+      "permitted_commands": [
+        "approved validation commands"
+      ],
+      "prohibited_actions": [
+        "secret storage",
+        "scope widening",
+        "repository mutation outside permitted writes",
+        "self-authorizing",
+        "merging",
+        "deletion"
+      ]
+    },
+    "architecture": {
+      "protected_components": [],
+      "runtime_boundaries": [],
+      "do_not_redesign": [],
+      "required_interfaces": [],
+      "governing_documents": [],
+      "accepted_decisions": [],
+      "unresolved_decisions": []
+    },
+    "evidence": {
+      "files": [
+        "workspace/workspace/parsed.json",
+        "workspace/workspace/validated.json"
+      ],
+      "commands": [
+        "python poc_runner.py"
+      ],
+      "last_results": [
+        {
+          "stage": "parser",
+          "output": "workspace/workspace/parsed.json",
+          "validation": "pass"
+        },
+        {
+          "stage": "schema",
+          "output": "workspace/workspace/validated.json",
+          "validation": "pass"
+        }
+      ],
+      "unresolved_failures": [],
+      "test_counts": {
+        "passed": 0,
+        "failed": 0
+      },
+      "schema_state": "unknown",
+      "compilation_state": "unknown",
+      "fixture_integrity": "unknown",
+      "sources": [],
+      "receipts": [
+        "experiments/engineering_notebook_001/evidence/receipt-parser.json",
+        "experiments/engineering_notebook_001/evidence/receipt-schema.json"
+      ]
+    },
+    "continuity": {
+      "previous_session": "worker-2",
+      "handoff_reason": "fresh process session handoff",
+      "compaction_summary": "Completed schema; carry only verified packet and current stage.",
+      "safe_facts": [
+        "Notebook is subordinate to authoritative repository and runtime records."
+      ],
+      "omitted_information": [
+        "full prior transcript",
+        "model chain-of-thought",
+        "unrelated repository content"
+      ],
+      "next_stage_files": [
+        "workspace/workspace/validated.json"
+      ],
+      "expires_at": null
+    },
+    "freshness": {
+      "state": "current",
+      "checked_at": "2026-08-02T20:34:36Z",
+      "source_digests": {
+        "experiments/engineering_notebook_001/input/corpus.md": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158"
+      },
+      "max_age_seconds": 3600,
+      "conflicts": []
+    },
+    "provenance": [
+      {
+        "source": "ESTATE-NOTEBOOK-001",
+        "category": "operator_authorized",
+        "digest": null,
+        "observed_at": "2026-08-02T20:34:35Z",
+        "claim": "Bounded objective and initial scope were authorized."
+      },
+      {
+        "source": "poc_runner.py",
+        "category": "validator_produced",
+        "digest": null,
+        "observed_at": "2026-08-02T20:34:35Z",
+        "claim": "Independent process validated the parser stage."
+      },
+      {
+        "source": "poc_runner.py",
+        "category": "validator_produced",
+        "digest": null,
+        "observed_at": "2026-08-02T20:34:35Z",
+        "claim": "Independent process validated the schema stage."
+      },
+      {
+        "source": "authoritative-refresh",
+        "category": "repository_derived",
+        "digest": "e7c17b22c212736febc22d3dc82fba16078dd03679987113d7c0023eb50bb28d",
+        "observed_at": "2026-08-02T20:34:36Z",
+        "claim": "authoritative freshness refresh"
+      }
+    ],
+    "institutional_acceptance": "not_granted"
+  },
+  "stage": "html",
+  "worker_id": "worker-3",
+  "source_digests": {
+    "experiments/engineering_notebook_001/input/corpus.md": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158"
+  },
+  "source_commit": "fixture-commit-001",
+  "stage_files": [
+    "workspace/workspace/validated.json"
+  ],
+  "authority_digest": "031f12d7f9fa2f7b790ea052a14867f77658074b297a51db0d420e20b73c6d3d",
+  "evidence_digest": "2f339fc5a1685bd837585969043d87195197221c536c7f3abbfb7f5b17e62b32",
+  "assigned_worker": "worker-a",
+  "output": "A:\\theestate-notebook-protected-fields-pr\\experiments\\engineering_notebook_001\\workspace\\workspace\\dashboard.html",
+  "ack": {
+    "notebook_id": "poc-001",
+    "objective": "Complete parser, schema, and HTML stages from verified notebook state.",
+    "stage": "html",
+    "permitted_repository": [
+      "experiments/engineering_notebook_001"
+    ],
+    "permitted_write_paths": [
+      "experiments/engineering_notebook_001/workspace"
+    ],
+    "blocker": "none",
+    "required_validation": [
+      "python poc_runner.py"
+    ],
+    "prohibited_actions": [
+      "secret storage",
+      "scope widening",
+      "repository mutation outside permitted writes",
+      "self-authorizing",
+      "merging",
+      "deletion"
+    ],
+    "stage_files": [
+      "workspace/workspace/validated.json"
+    ]
+  },
+  "handoff": {
+    "schema_version": "estate.engineering-notebook.handoff.v1",
+    "handoff_id": "handoff-poc-001-3",
+    "notebook_id": "poc-001",
+    "created_at": "2026-08-02T20:34:36Z",
+    "previous_worker": "worker-a",
+    "next_worker": "worker-3",
+    "session_id": "session-3",
+    "revision": 3,
+    "state_digest": "5ee2372cde0c49b4c0d75773c17f97b40c7d4b095e8a6df0502f24b1edc995f1",
+    "reason": "authoritative refresh verified; resume HTML",
+    "packet_digest": "d51a5dbe06ac7f90bd38f382903b7b2b74f007e709993e13ad61d9f1952538bc",
+    "resume_required": true,
+    "institutional_acceptance": "not_granted"
+  }
+}

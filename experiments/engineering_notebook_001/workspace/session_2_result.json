@@ -1,0 +1,39 @@
+{
+  "session_id": "pid-24632",
+  "worker_id": "worker-2",
+  "acknowledgment": {
+    "notebook_id": "poc-001",
+    "objective": "Complete parser, schema, and HTML stages from verified notebook state.",
+    "stage": "schema",
+    "permitted_repository": [
+      "experiments/engineering_notebook_001"
+    ],
+    "permitted_write_paths": [
+      "experiments/engineering_notebook_001/workspace"
+    ],
+    "blocker": "none",
+    "required_validation": [
+      "python poc_runner.py"
+    ],
+    "prohibited_actions": [
+      "secret storage",
+      "scope widening",
+      "repository mutation outside permitted writes",
+      "self-authorizing",
+      "merging",
+      "deletion"
+    ],
+    "stage_files": [
+      "workspace/workspace/parsed.json"
+    ]
+  },
+  "actions": [
+    "completed schema"
+  ],
+  "validation": {
+    "stage": "schema",
+    "output": "workspace/workspace/validated.json",
+    "validation": "pass"
+  },
+  "fixture_hash": "f543574b8f12cf81c6f47ba3f0e9a9349523888272df32cacc0a1c8741445158"
+}

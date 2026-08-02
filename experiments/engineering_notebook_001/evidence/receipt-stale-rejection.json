@@ -1,0 +1,25 @@
+{
+  "schema_version": "estate.engineering-notebook.verification-receipt.v1",
+  "receipt_id": "rejection-poc-001-2-e22a2eb1a4a2",
+  "proposal_id": "acknowledgment",
+  "notebook_id": "poc-001",
+  "status": "rejected",
+  "accepted_at": "2026-08-02T20:34:36Z",
+  "accepted_fields": [],
+  "rejected_fields": [
+    "freshness"
+  ],
+  "observed_facts": {
+    "reason": "execution requires current authoritative state",
+    "authoritative_conflicts": [
+      "experiments/engineering_notebook_001/input/corpus.md"
+    ]
+  },
+  "state_digest": "bd114f326ef9f4d57288ac3db9e8be55346ef61e78f300336dbb6631b7de8f5f",
+  "institutional_acceptance": "not_granted",
+  "revision": 2,
+  "idempotency_key": "rejection",
+  "prior_state_digest": "bd114f326ef9f4d57288ac3db9e8be55346ef61e78f300336dbb6631b7de8f5f",
+  "resulting_state_digest": "bd114f326ef9f4d57288ac3db9e8be55346ef61e78f300336dbb6631b7de8f5f",
+  "provenance": []
+}
