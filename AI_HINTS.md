@@ -9,6 +9,16 @@ Alfred is Chief of Staff. Alfred coordinates the Estate; Alfred is not the whole
 
 ## Fast Recovery
 
+### Working on Estate Comms8 or the ChatGPT MCP provider?
+
+Read completely:
+
+`docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md`
+
+This is the canonical engineering reference for the Estate Comms8 ChatGPT MCP provider, including the working architecture, authentication boundaries, notification compatibility repair, seven-tool acceptance criteria, correct ChatGPT app configuration, and remaining restartability and supervision debt.
+
+Read it before modifying Estate Comms8, the Blue candidate service, ChatGPT Custom Apps, MCP authentication, the seven-tool contract, provider integration, repair work, or functional acceptance packages. Do not repeat investigations or redesign architecture already resolved there. If it conflicts with older work packages or conversation history, treat this reference as authoritative until a newer revision explicitly supersedes it.
+
 ### Forgot how Estate communications work?
 
 Read completely:
