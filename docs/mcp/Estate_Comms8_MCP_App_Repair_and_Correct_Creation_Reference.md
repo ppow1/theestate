@@ -1,8 +1,8 @@
 # Estate Comms8 MCP App Repair and Correct Creation Reference
 
-Version: 1.1  
+Version: 1.2  
 Status: Operational repair record and future implementation reference  
-Date: 2026-08-04; addendum 2026-08-05–06  
+Date: 2026-08-04; addenda 2026-08-05–06  
 Owner: Office of the Steward / Estate Engineering  
 Scope: Estate Comms8 ChatGPT MCP App creation, authentication, compatibility repair, end-to-end validation, and remaining persistence work
 
@@ -541,9 +541,9 @@ Only after candidate acceptance:
 
 ## 19. Remaining technical debt
 
-### Missing candidate source/package
+### Candidate source/package recovery status
 
-The live candidate observed as PID `3524` could not be reproduced from the files found on disk. This is the most serious remaining issue.
+The original repair could not locate the live candidate package. The August 5–6 persistence addendum later recovered its actual launch context from the surviving Python 3.14 process. The package was found at `A:\theestate-ops003\staging\estate_comms8`, and a fresh candidate process successfully imported and listened on a temporary validation port when launched with the documented working directory and Python path. This particular missing-package blocker is resolved; governed promotion of that staging source remains separate work.
 
 ### Temporary compatibility proxy
 
@@ -561,9 +561,9 @@ The working connection depended on:
 
 PIDs are observations, not durable identities. These processes were not yet a governed restartable service group.
 
-### No reboot recovery
+### Reboot recovery not yet exercised
 
-A Windows restart or permanent failure of any required process can break the app.
+Persistent at-logon scheduled tasks now exist for the candidate server, notification proxy, and reverse tunnel. All three were started through those tasks and passed live acceptance. An actual Windows reboot/logon recovery test has not yet been recorded, so pre-login availability and reboot recovery must not be claimed.
 
 ### Canonical controller extension required
 
@@ -623,7 +623,7 @@ The Estate Comms8 MCP App is fully created only when:
 - logs and readiness evidence are preserved;
 - the canonical Estate controller owns the complete lifecycle.
 
-At the time of the original repair, the functional ChatGPT connection and tool invocation were demonstrated through the compatibility repair. The August 5–6 addendum below records the later correction and persistence of the Blue reverse tunnel. Full-stack restartability and governed supervision remain incomplete because persistence of the candidate server and notification proxy was not established by that tunnel-only change.
+At the time of the original repair, the functional ChatGPT connection and tool invocation were demonstrated through the compatibility repair. The August 5–6 addenda below record the later correction and persistence of the Blue reverse tunnel, discovery of the surviving candidate package, and persistent scheduled tasks for the candidate server and notification proxy. All three tasks passed live public MCP acceptance. Actual Windows reboot/logon recovery and canonical controller ownership remain unverified.
 
 ## 22. Relationship to Estate topology work
 
@@ -855,16 +855,9 @@ This proved that the newly created App—not merely the older `Estate Comms8_5` 
 - invoke the public Blue MCP endpoint;
 - and return real application data without mutation.
 
-### 24.9 Remaining persistence boundary
+### 24.9 Persistence boundary at the time of the tunnel repair
 
-The August 5–6 change made the corrected **Blue reverse SSH tunnel** persistent. It did not prove or create persistence for:
-
-- the original `estate_comms8.candidate_server` process;
-- the `mcp_notification_proxy.py` process;
-- full recovery before user logon;
-- or canonical Estate controller ownership of the complete Comms8 stack.
-
-Those items remain separate governed implementation work. Future documentation must not describe the entire Comms8 stack as restartable merely because the tunnel scheduled task is running.
+At this stage of the August 5–6 work, only the corrected **Blue reverse SSH tunnel** had been made persistent. Candidate and proxy persistence were completed and validated in the subsequent persistence addendum below. Full recovery before user logon and canonical Estate controller ownership remain separate governed work.
 
 ### 24.10 Required future acceptance checklist
 
@@ -886,3 +879,153 @@ A newly created Estate Comms8 App is accepted only after all of the following ar
 - [ ] The read-only result returns without creating or modifying anything.
 - [ ] Blue tunnel route is `11808 -> 11809`, not `11808 -> 11808`.
 - [ ] Scheduled task `Estate Comms8 Blue Reverse Tunnel` is running.
+
+
+## 25. Addendum — August 5–6, 2026: persistent Blue candidate and notification proxy
+
+### 25.1 Recovery of the actual candidate package
+
+A fresh PowerShell process initially failed to import the candidate:
+
+`ModuleNotFoundError: No module named 'estate_comms8'`
+
+Filesystem searches under the previously assumed runtime and repository locations returned no package. The surviving Python 3.14 candidate process was therefore inspected using the supported running-process debugger attachment.
+
+The live process reported:
+
+| Item | Recovered value |
+|---|---|
+| Working directory | `A:\theestate-ops003` |
+| Package root | `A:\theestate-ops003\staging` |
+| Blue source dependency | `A:\theestate-blue\src` |
+| Package location | `A:\theestate-ops003\staging\estate_comms8` |
+| Candidate entry module | `estate_comms8.candidate_server` |
+| Runtime data root | `A:\theestate-data\candidate-blue-runtime` |
+| Python executable | `C:\Python314\python.exe` |
+
+The required process-scoped Python path is:
+
+`A:\theestate-ops003\staging;A:\theestate-blue\src`
+
+The candidate was then launched independently on temporary port `11810`. It imported successfully, established the listener, and shut down cleanly. This proved a reproducible candidate launch configuration without stopping the live port-`11808` process.
+
+### 25.2 Persistent launcher files
+
+The following Blue-only launchers now exist:
+
+| Component | Launcher |
+|---|---|
+| Candidate server | `A:\theestate-data\candidate-blue-runtime\comms8-package4-ingress\start_comms8_blue_candidate.ps1` |
+| Notification proxy | `A:\theestate-data\candidate-blue-runtime\comms8-package4-ingress\start_comms8_blue_proxy.ps1` |
+| Reverse tunnel | `A:\theestate-data\candidate-blue-runtime\comms8-package4-ingress\start_comms8_blue_tunnel.ps1` |
+
+The candidate launcher:
+
+1. Sets `PYTHONPATH` to the recovered package and Blue source roots.
+2. Changes working directory to `A:\theestate-ops003`.
+3. Runs:
+
+`C:\Python314\python.exe -m estate_comms8.candidate_server --host 127.0.0.1 --port 11808 --root A:\theestate-data\candidate-blue-runtime`
+
+The proxy launcher changes working directory to the ingress directory and runs:
+
+`C:\Python314\python.exe A:\theestate-data\candidate-blue-runtime\comms8-package4-ingress\mcp_notification_proxy.py`
+
+### 25.3 Persistent scheduled tasks
+
+The Blue runtime is now represented by three at-logon scheduled tasks:
+
+| Task | Expected responsibility |
+|---|---|
+| `Estate Comms8 Blue Candidate Server` | Maintain candidate listener `127.0.0.1:11808` |
+| `Estate Comms8 Blue Notification Proxy` | Maintain compatibility proxy listener `127.0.0.1:11809` |
+| `Estate Comms8 Blue Reverse Tunnel` | Maintain VPS `11808` to Windows `11809` reverse forwarding |
+
+The tasks run with the current Windows user's interactive logon token, highest run level, hidden PowerShell launchers, no execution time limit, and automatic restart settings.
+
+These tasks are specific to the Blue implementation. They do not authorize or alter Green, Live, Backup, or unrelated Estate services.
+
+### 25.4 Controlled cutover validation
+
+The existing candidate and proxy were identified by exact command-line identity and stopped. The new scheduled tasks then started the replacements.
+
+The resulting listeners were:
+
+| Listener | Owning component |
+|---|---|
+| `127.0.0.1:11808` | Persistent candidate server |
+| `127.0.0.1:11809` | Persistent notification proxy |
+
+The tunnel command retained the required route:
+
+`-R 127.0.0.1:11808:127.0.0.1:11809 root@64.227.21.54`
+
+This confirms that public ingress terminates at the proxy rather than bypassing it.
+
+### 25.5 Complete public acceptance result
+
+After the persistent tasks took ownership, the public endpoint returned:
+
+| MCP operation | Required result | Observed result |
+|---|---:|---:|
+| `initialize` | HTTP 200 | HTTP 200 |
+| `notifications/initialized` | HTTP 202 | HTTP 202 |
+| `tools/list` | HTTP 200 | HTTP 200 |
+| Tool count | 7 | 7 |
+
+The seven discovered actions were:
+
+1. `estate_comms8_create_reasoning_request`
+2. `estate_comms8_list_requests`
+3. `estate_comms8_read_request`
+4. `estate_comms8_claim_request`
+5. `estate_comms8_acknowledge_request`
+6. `estate_comms8_respond_request`
+7. `estate_comms8_resolve_request`
+
+This proves live persistence-task ownership and complete public MCP behavior for the running Windows session.
+
+### 25.6 Recovery procedure for a future chat
+
+When a new App cannot connect, refresh, or discover actions, perform recovery in this order:
+
+1. Read this document completely.
+2. In workspace Apps administration, verify the App is published and enabled.
+3. In personal ChatGPT **Settings → Plugins**, verify the individual App connection.
+4. On the Windows Blue host, inspect these tasks:
+   - `Estate Comms8 Blue Candidate Server`
+   - `Estate Comms8 Blue Notification Proxy`
+   - `Estate Comms8 Blue Reverse Tunnel`
+5. Verify listeners:
+   - candidate on `127.0.0.1:11808`;
+   - proxy on `127.0.0.1:11809`.
+6. Verify the SSH command forwards VPS `11808` to Windows `11809`.
+7. Start any missing task through Task Scheduler or `Start-ScheduledTask`.
+8. Confirm the candidate process contains the recovered `PYTHONPATH` launch context through its launcher.
+9. Run public acceptance:
+   - `initialize` → `200`;
+   - `notifications/initialized` → `202`;
+   - `tools/list` → `200` with seven tools.
+10. Reconnect under personal settings if required, then refresh actions.
+11. Invoke the bounded read-only `estate_comms8_list_requests` acceptance test.
+
+Do not redirect the tunnel to Windows port `11808`; that bypasses the proxy and recreates the connector-link failure.
+
+### 25.7 Remaining verification boundary
+
+The following statements are now supported:
+
+- Candidate server can be started reproducibly.
+- Notification proxy source is present and startable.
+- Candidate and proxy are owned by persistent at-logon tasks.
+- Reverse tunnel is owned by a persistent at-logon task.
+- All three running tasks pass the public MCP acceptance sequence.
+
+The following statements are not yet supported:
+
+- The stack is available before the Windows user logs on.
+- A real Windows reboot/logon recovery has been executed and recorded.
+- The canonical Estate service controller owns the stack.
+- The staging package has been promoted into a governed permanent package location.
+
+A future reboot test must verify all three tasks, both listeners, the corrected tunnel command, public `200/202/200`, seven-tool discovery, and a read-only ChatGPT invocation before reboot recovery is declared complete.
