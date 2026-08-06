@@ -1,8 +1,8 @@
 # Estate Comms8 MCP App Repair and Correct Creation Reference
 
-Version: 1.0  
+Version: 1.1  
 Status: Operational repair record and future implementation reference  
-Date: 2026-08-04  
+Date: 2026-08-04; addendum 2026-08-05–06  
 Owner: Office of the Steward / Estate Engineering  
 Scope: Estate Comms8 ChatGPT MCP App creation, authentication, compatibility repair, end-to-end validation, and remaining persistence work
 
@@ -623,7 +623,7 @@ The Estate Comms8 MCP App is fully created only when:
 - logs and readiness evidence are preserved;
 - the canonical Estate controller owns the complete lifecycle.
 
-At the time of this repair, the functional ChatGPT connection and tool invocation were demonstrated through the compatibility repair. Restartability, governed supervision, and reboot recovery remained incomplete.
+At the time of the original repair, the functional ChatGPT connection and tool invocation were demonstrated through the compatibility repair. The August 5–6 addendum below records the later correction and persistence of the Blue reverse tunnel. Full-stack restartability and governed supervision remain incomplete because persistence of the candidate server and notification proxy was not established by that tunnel-only change.
 
 ## 22. Relationship to Estate topology work
 
@@ -642,3 +642,247 @@ This reference intentionally records:
 - and observed behavior.
 
 It intentionally does not record any token or Bearer secret value. Token rotation remains a separate operational action after the durable service path is established.
+
+
+## 24. Addendum — August 5–6, 2026: new-app creation, personal connection, action refresh, and persistent Blue tunnel
+
+### 24.1 Why this addendum was required
+
+A later attempt created several new ChatGPT Apps using the same public MCP URL and the same API-key/Bearer configuration. The drafts could be created and published, but their App detail pages displayed:
+
+> No actions are available for this app.
+
+The already-working `Estate Comms8_5` continued to display all seven actions and could invoke them. That comparison proved that the endpoint and API-key/Bearer model were still valid. The problem was not that ChatGPT had removed Bearer-token support, nor was the correct solution to keep using the older app.
+
+Two separate issues had to be understood:
+
+1. ChatGPT separates workspace App administration from the individual user's connector session.
+2. The public Blue ingress was again bypassing the notification compatibility proxy because the reverse tunnel targeted the original candidate port instead of the proxy port.
+
+### 24.2 ChatGPT has two different configuration surfaces
+
+The ChatGPT interface uses separate surfaces for separate purposes:
+
+| Surface | Purpose | What it does not do |
+|---|---|---|
+| Workspace Apps administration | Create the App definition, review risk acknowledgements, publish it, enable it for the workspace, and choose the default policy for newly discovered actions | It does not establish the individual user's authenticated connector session |
+| Personal ChatGPT web settings → Plugins | Connect the enabled App for the current user, collect the API key/Bearer token, show connection information, and expose the connected App's actions | It does not replace workspace publication or workspace enablement |
+
+The word **Plugins** in personal settings refers to the user-facing connection-management surface. It does not mean that a different MCP product or a legacy plugin implementation must be created. The object remains the same workspace App.
+
+Therefore, publishing and enabling an App are necessary but do not by themselves connect it for an individual user.
+
+### 24.3 Correct end-to-end UI procedure for a newly created App
+
+#### A. Create the App in workspace administration
+
+Create a new App with:
+
+| Field | Value |
+|---|---|
+| Connection | Server URL |
+| Server URL | `https://estate-comms8-blue-candidate.ionoge.com/mcp` |
+| Authentication | Access token / API key |
+| Header scheme | Bearer |
+| Credential entered during personal connection | Value of the ChatGPT-facing candidate credential |
+| Effective request header | `Authorization: Bearer <credential>` |
+
+Accept the custom-MCP risk acknowledgement and create the draft.
+
+#### B. Publish and enable it for the workspace
+
+From the workspace Apps administration page:
+
+1. Open the draft.
+2. Select **Publish**.
+3. Review and acknowledge each required risk item.
+4. Complete the trust and parameter-review checkboxes.
+5. Publish the App to the intended workspace.
+6. Select **Enable** when the App detail page presents that control.
+7. For future action policy, select the intended option, such as **Enable all new actions**.
+
+This makes the App available in the workspace. It still does not establish the current user's token-backed connection.
+
+#### C. Connect it from the user's personal web settings
+
+In the ordinary ChatGPT web interface:
+
+1. Open the user's personal **Settings**.
+2. Select **Plugins**.
+3. Open the newly published and enabled Estate Comms8 App.
+4. Select **Connect**.
+5. Enter the ChatGPT-facing candidate token only, without typing the word `Bearer`; ChatGPT applies the configured Bearer header scheme.
+6. Submit the connection.
+
+This is the location of the Connect button when it is absent from the workspace App detail page.
+
+Each user who needs to invoke the App may need an individual connector link in personal settings, even when the workspace App definition and backing service use the same shared application credential. Workspace enablement controls availability; the personal connector link stores the user's authorization association.
+
+#### D. Refresh and verify actions after connection
+
+After the personal connection succeeds:
+
+1. Return to the enabled App's action-management view.
+2. Select **Refresh**.
+3. Confirm that the action list contains exactly seven actions.
+4. Enable the intended action toggles.
+5. Start a new conversation and select or mention the new App.
+6. Perform the read-only acceptance test described below.
+
+If **Refresh** reports that the App must be connected, return to personal **Settings → Plugins** and complete the Connect flow first.
+
+### 24.4 Meaning of “No actions are available”
+
+The message:
+
+> No actions are available for this app.
+
+does not, by itself, prove that the MCP endpoint has no tools. In the observed creation flow, it could mean that the new App had not completed a successful authenticated connector handshake and action refresh.
+
+The correct diagnostic order is:
+
+1. Verify the App is published and workspace-enabled.
+2. Verify the individual user connected it under **Settings → Plugins**.
+3. Verify the credential is the ChatGPT-facing candidate credential.
+4. Test the public MCP handshake.
+5. Confirm `notifications/initialized` returns `202`.
+6. Confirm `tools/list` returns seven tools.
+7. Refresh the App's actions.
+
+### 24.5 Public MCP diagnostic results
+
+The ChatGPT-facing candidate credential was loaded from:
+
+`A:\theestate-data\candidate-blue-runtime\comms8-package4-ingress\candidate-secrets.env`
+
+using the variable:
+
+`ESTATE_COMMS8_CANDIDATE_SECRET`
+
+The following similarly named values are not the token to paste into ChatGPT's Connect box:
+
+- `ESTATE_COMMS8_CANDIDATE_UPSTREAM_AUTH`
+- `ESTATE_COMMS8_BLUE_UPSTREAM_AUTH`
+
+The public handshake initially produced:
+
+| MCP operation | Result |
+|---|---:|
+| `initialize` | HTTP 200 |
+| `notifications/initialized` | HTTP 504 |
+| `tools/list` | HTTP 200, seven tools |
+
+This pattern was decisive. Authentication, public routing, and tool discovery worked, but the initialization notification failed.
+
+### 24.6 Root cause: the reverse tunnel bypassed the notification proxy
+
+Windows process inspection showed:
+
+| Component | Listener |
+|---|---|
+| Original `estate_comms8.candidate_server` | `127.0.0.1:11808` |
+| `mcp_notification_proxy.py` | `127.0.0.1:11809` |
+
+The active reverse tunnel incorrectly used:
+
+`VPS 127.0.0.1:11808 -> Windows 127.0.0.1:11808`
+
+That route bypassed the notification compatibility proxy. It allowed `initialize` and `tools/list` to succeed while `notifications/initialized` failed.
+
+The tunnel was corrected to:
+
+`VPS 127.0.0.1:11808 -> Windows 127.0.0.1:11809`
+
+After correction, the public notification test returned:
+
+`notifications/initialized HTTP 202`
+
+The new `Estate Comms8 Blue3` App then connected, refreshed, displayed all seven actions, and invoked a read-only action successfully.
+
+### 24.7 Persistent Blue-only tunnel change
+
+The corrected tunnel was made persistent on the Windows Blue runtime host using:
+
+- Scheduled task: `Estate Comms8 Blue Reverse Tunnel`
+- Launcher:
+  `A:\theestate-data\candidate-blue-runtime\comms8-package4-ingress\start_comms8_blue_tunnel.ps1`
+- PowerShell executable:
+  `C:\Program Files\PowerShell\7\pwsh.exe`
+- SSH key:
+  `C:\Users\wille\.ssh\id_ed25519`
+- Remote destination:
+  `root@64.227.21.54`
+- Reverse-forward rule:
+  `127.0.0.1:11808:127.0.0.1:11809`
+
+The launcher runs SSH with:
+
+- `BatchMode=yes`
+- `ExitOnForwardFailure=yes`
+- `ServerAliveInterval=30`
+- `ServerAliveCountMax=3`
+- `ConnectTimeout=10`
+
+Validation confirmed:
+
+- the scheduled task state was `Running`;
+- exactly one corrected SSH tunnel process existed;
+- the command line forwarded VPS port `11808` to Windows proxy port `11809`;
+- the public MCP notification returned HTTP `202`;
+- ChatGPT discovered all seven actions;
+- a real read-only tool invocation succeeded.
+
+This scheduled task change is specific to the Blue implementation. It does not alter Green, Live, Backup, or unrelated Estate tunnels.
+
+The task is configured to recreate the Blue tunnel at Windows user logon. It is not a pre-login Windows service.
+
+### 24.8 Acceptance evidence for the newly created App
+
+The following read-only ChatGPT request was used:
+
+`Use Estate Comms8 Blue3 to call estate_comms8_list_requests. Do not create or modify anything.`
+
+The action completed and returned two existing requests:
+
+- `ec8-134b990b0b9644bf` — `queued`
+- `ec8-42fcdf8d6bf14cd2` — `resolved`
+
+This proved that the newly created App—not merely the older `Estate Comms8_5` App—could:
+
+- connect with the configured API-key/Bearer flow;
+- discover the seven actions;
+- expose those actions in ChatGPT;
+- invoke the public Blue MCP endpoint;
+- and return real application data without mutation.
+
+### 24.9 Remaining persistence boundary
+
+The August 5–6 change made the corrected **Blue reverse SSH tunnel** persistent. It did not prove or create persistence for:
+
+- the original `estate_comms8.candidate_server` process;
+- the `mcp_notification_proxy.py` process;
+- full recovery before user logon;
+- or canonical Estate controller ownership of the complete Comms8 stack.
+
+Those items remain separate governed implementation work. Future documentation must not describe the entire Comms8 stack as restartable merely because the tunnel scheduled task is running.
+
+### 24.10 Required future acceptance checklist
+
+A newly created Estate Comms8 App is accepted only after all of the following are true:
+
+- [ ] App definition created with the public candidate URL.
+- [ ] Authentication configured as API key/access token with Bearer scheme.
+- [ ] Required custom-MCP risk acknowledgement completed.
+- [ ] App published to the intended workspace.
+- [ ] App enabled in workspace administration.
+- [ ] Current user connected the App under personal **Settings → Plugins**.
+- [ ] Public `initialize` returns HTTP `200`.
+- [ ] Public `notifications/initialized` returns HTTP `202`.
+- [ ] Public `tools/list` returns exactly seven tools.
+- [ ] App action list refreshed after connection.
+- [ ] Exactly seven expected actions are visible.
+- [ ] Intended action toggles are enabled.
+- [ ] A new conversation can invoke `estate_comms8_list_requests`.
+- [ ] The read-only result returns without creating or modifying anything.
+- [ ] Blue tunnel route is `11808 -> 11809`, not `11808 -> 11808`.
+- [ ] Scheduled task `Estate Comms8 Blue Reverse Tunnel` is running.
