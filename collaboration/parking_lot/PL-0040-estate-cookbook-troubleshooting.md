@@ -105,3 +105,9 @@ Estate-wide checkpoint coverage remains ordinary follow-on work rather than a
 foundation blocker. Automated universal probes, autonomous Grace cookbook
 consultation, and automated remediation remain future work; remediation is not
 authorized by this foundation.
+
+The integrated developer-ingestion slice now creates strict impact packets with
+Git/worktree provenance, preserves non-promoted candidate knowledge, and exports
+a bounded local-AI review delta through the same CLI and reconciliation owner.
+An overnight local-AI reviewer remains future work, as do Estate-wide cookbook
+population and universal probes.

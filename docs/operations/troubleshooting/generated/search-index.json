@@ -6,14 +6,7 @@
       "checkpoint_id": "1.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "resident_gateway",
-      "differences": [
-        {
-          "current": "sha256:49bede64b899ca23021b4ed5e984d1c0a2976c85544ce5d73318daaf721b822f",
-          "dependency": "src/estate/core/resident_gateway.py",
-          "previous": "sha256:b35ffeace481b1c0c94a6c14416948bcf9e6f83c9750825e47ff75af24784116",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -62,7 +55,7 @@
         "src/estate/core/resident_gateway.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "resident_gateway",
       "symptoms": [
         "conversation unanswered"
@@ -87,14 +80,7 @@
       "checkpoint_id": "10.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "model_control",
-      "differences": [
-        {
-          "current": "sha256:c80c7102ecea76cb29ea804e93e37797dc255effe3545ae222b001dec3ca6756",
-          "dependency": "src/estate/model_control/resident_model_assignment.py",
-          "previous": "sha256:a3f1673dd366725e8a10b185e9a9ede02c60fac692a6b765ea6f28a2a8dc79a0",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -147,7 +133,7 @@
         "src/estate/model_control/resident_model_assignment.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "model_control",
       "symptoms": [
         "which model is grace using"
@@ -174,7 +160,7 @@
       "component_id": "living_diagnostics",
       "differences": [
         {
-          "current": "sha256:30fc95c19dd23a795ba02a23695ed346ccc0266bf565a07bad6ce2a10d445b5c",
+          "current": "sha256:c6df4e213cfdfc94886cd997f1ac525a608441852c1832cb7f3f3a390ee832a0",
           "dependency": "src/estate/diagnostics/living.py",
           "previous": "sha256:123e789f664e37a8d42bc0eeaf0b6f98e40e14d465a6f50f01c724a42544cafd",
           "reason": "CONTENT_CHANGED"
@@ -253,14 +239,7 @@
       "checkpoint_id": "12.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "continuous_momentum_engine",
-      "differences": [
-        {
-          "current": "sha256:dc3331c47c310fb0a5aa9ab505e1d268a632bb30b6a03f3c3f4385255f18d550",
-          "dependency": "docs/operations/ESTATE_Grace_Reasoning_Loop_Implementation_and_Operations.md",
-          "previous": "sha256:9821e02454ad442cca8a0da76ab3af3add0e5189140c9352b1519c7744653318",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -309,7 +288,7 @@
         "docs/operations/ESTATE_Grace_Reasoning_Loop_Implementation_and_Operations.md"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "continuous_momentum_engine",
       "symptoms": [
         "process observer effect"
@@ -329,19 +308,92 @@
       "workflow": "detached process-sensitive testing"
     },
     {
+      "activation_restart_boundary": "No runtime restart; reconciliation reads repository files.",
+      "authority": "The canonical Living Diagnostics reconciliation in src/estate/diagnostics/living.py and its accepted implementation baseline.",
+      "checkpoint_id": "13.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "living_diagnostics",
+      "differences": [],
+      "escalation_condition": "A packet is invalid, an implementation change is uncovered, or accepted baseline authority is unavailable.",
+      "expected_input": "A strict Diagnostic Impact Packet describing repository-relative changed artifacts.",
+      "expected_output": "Accepted candidate knowledge, affected checkpoint identities, and fail-closed freshness classifications.",
+      "failure_codes": [
+        "INVALID_DIAGNOSTIC_IMPACT_PACKET",
+        "CHANGE_WITHOUT_DIAGNOSTIC_IMPACT_METADATA"
+      ],
+      "historical_incidents": [
+        "PR-519-PR-521-INTEGRATION"
+      ],
+      "keywords": [
+        "LD-DEVELOPER-INGESTION",
+        "impact packet",
+        "candidate",
+        "local AI delta"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "PR #519 foundation",
+          "merged PR #521 developer ingestion"
+        ],
+        "method": "MIXED"
+      },
+      "known_failures": [
+        "invalid packet cannot cover changed artifact",
+        "candidate knowledge accidentally promoted"
+      ],
+      "likely_causes": [
+        "malformed or stale packet",
+        "unsafe path",
+        "changed file omitted from a valid packet"
+      ],
+      "maturity": "PROVEN",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Create a packet, reconcile against the accepted baseline, then inspect affected checkpoints and preserved candidates.",
+      "prohibited_actions": [
+        "Do not advance the accepted baseline to hide staleness",
+        "Do not treat local-AI output as promotion authority"
+      ],
+      "purpose": "Ingest developer change impact without creating a second reconciliation or checkpoint authority.",
+      "recovery_summary": "Correct the packet or add missing impact metadata, then rerun canonical reconciliation.",
+      "recovery_verification": "The packet is consumed, affected checkpoints are reported, and canonical knowledge remains unchanged.",
+      "source_dependencies": [
+        "src/estate/diagnostics/living.py",
+        "src/estate/diagnostics/impact.py",
+        "tools/estate_diagnostics.py",
+        "schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json"
+      ],
+      "source_document": "docs/operations/troubleshooting/cookbook.json",
+      "status": "VALIDATED",
+      "subsystem": "living_diagnostics",
+      "symptoms": [
+        "diagnostic impact packet rejected",
+        "implementation change lacks diagnostic coverage"
+      ],
+      "title": "Developer Diagnostic Impact Packet ingestion",
+      "validated_against": {
+        "components": {
+          "living_diagnostics": "1.0.0"
+        },
+        "files": {
+          "schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json": "sha256:d9b1499756477d71a7ced65987f8b03786a00ac1b213dd62ed310b2d92a4fb43",
+          "src/estate/diagnostics/impact.py": "sha256:994ecc6f4fc862931af689de671c6835b29ee512b0fc74de255d2c157ffb3075",
+          "src/estate/diagnostics/living.py": "sha256:c6df4e213cfdfc94886cd997f1ac525a608441852c1832cb7f3f3a390ee832a0",
+          "tools/estate_diagnostics.py": "sha256:3c6ca38f02775c881cc53596a2b27c0f13a195186cc3d4331925fa88b48aa146"
+        },
+        "interfaces": {},
+        "repository_commit": "f20a75e"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "developer diagnostic impact ingestion"
+    },
+    {
       "activation_restart_boundary": "The owning component only, after evidence capture.",
       "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
       "checkpoint_id": "2.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "consultation_store",
-      "differences": [
-        {
-          "current": "sha256:3d7a3eeaf5337428faae2a65309327a9023a52689cdf7330980a444f581107e8",
-          "dependency": "src/estate/core/continuous_momentum_engine.py",
-          "previous": "sha256:a585e4371410b33c146e9a112e2dabaec1daee53d87f0798ae3f0fb379ef7f62",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -391,7 +443,7 @@
         "src/estate/core/continuous_momentum_engine.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "consultation_store",
       "symptoms": [
         "queued but never claimed"
@@ -416,14 +468,7 @@
       "checkpoint_id": "3.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "continuous_momentum_engine",
-      "differences": [
-        {
-          "current": "sha256:3d7a3eeaf5337428faae2a65309327a9023a52689cdf7330980a444f581107e8",
-          "dependency": "src/estate/core/continuous_momentum_engine.py",
-          "previous": "sha256:a585e4371410b33c146e9a112e2dabaec1daee53d87f0798ae3f0fb379ef7f62",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -474,7 +519,7 @@
         "src/estate/core/continuous_momentum_engine.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "continuous_momentum_engine",
       "symptoms": [
         "cme owner stale"
@@ -499,14 +544,7 @@
       "checkpoint_id": "4.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "comms8",
-      "differences": [
-        {
-          "current": "sha256:43eadd6e1f110c03a510cefca4882b2d4cbdf9ebb46a9fe5a30f732daf061c26",
-          "dependency": "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md",
-          "previous": "sha256:86ea1b62d2b7ae6d1712a16c8a09e203eca49b9aacd36a15d1f4d074029a023a",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -556,7 +594,7 @@
         "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "comms8",
       "symptoms": [
         "message was not picked up"
@@ -581,14 +619,7 @@
       "checkpoint_id": "5.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "comms8",
-      "differences": [
-        {
-          "current": "sha256:43eadd6e1f110c03a510cefca4882b2d4cbdf9ebb46a9fe5a30f732daf061c26",
-          "dependency": "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md",
-          "previous": "sha256:86ea1b62d2b7ae6d1712a16c8a09e203eca49b9aacd36a15d1f4d074029a023a",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -638,7 +669,7 @@
         "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "comms8",
       "symptoms": [
         "composer missing"
@@ -663,14 +694,7 @@
       "checkpoint_id": "6.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "reason_execute_orchestration",
-      "differences": [
-        {
-          "current": "sha256:9d213c73ed87b4476f545cb18bc86144476fc236a907e81ce24bb0ff0b71e13b",
-          "dependency": "src/estate/core/execution_dispatch.py",
-          "previous": "sha256:389e815f106384d2443148e5c0c95c789cce850f2648cf635566367a45ff49f3",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -723,7 +747,7 @@
         "src/estate/core/execution_dispatch.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "reason_execute_orchestration",
       "symptoms": [
         "recommendation not executed"
@@ -748,14 +772,7 @@
       "checkpoint_id": "7.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "reason_execute_orchestration",
-      "differences": [
-        {
-          "current": "sha256:30b153516ee6e5999cbb9a8c2c23985ae335e6f9dea77905e4d321483b5a0a17",
-          "dependency": "src/estate/core/execution_attempt_runtime.py",
-          "previous": "sha256:35a5d3557eacfeb86e866b51151c416baeb2ab6af356a25d56c1b15163660e5d",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -804,7 +821,7 @@
         "src/estate/core/execution_attempt_runtime.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "reason_execute_orchestration",
       "symptoms": [
         "provider quota exhausted"
@@ -829,14 +846,7 @@
       "checkpoint_id": "8.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "reason_execute_orchestration",
-      "differences": [
-        {
-          "current": "sha256:d2f62f7821bab63edc6ca670d03aa742c7ecff0517e08077348a97d1b12ff81d",
-          "dependency": "src/estate/core/execution_result_reconciliation_runtime.py",
-          "previous": "sha256:b7d77d599f44bb1d4bc19a6241369d345a4a104c51a444484ad03df1aecce9e2",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -893,7 +903,7 @@
         "src/estate/core/execution_result_reconciliation_runtime.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "reason_execute_orchestration",
       "symptoms": [
         "execution evidence missing",
@@ -919,14 +929,7 @@
       "checkpoint_id": "9.1.1",
       "checkpoint_revision": "1.0.0",
       "component_id": "resident_gateway",
-      "differences": [
-        {
-          "current": "sha256:192e06cf7e1083cf02730e16b2dbe543d434bc62dc04be0c1e4bcb20f0b428cc",
-          "dependency": "src/estate/core/grace_momentum_service.py",
-          "previous": "sha256:2f722e75913cc0c163b601a09db3b677458bfda14945bf0d2e2f9fcaba686411",
-          "reason": "CONTENT_CHANGED"
-        }
-      ],
+      "differences": [],
       "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
       "expected_input": "A durable upstream record with correlation identity.",
       "expected_output": "A durable authoritative downstream record or explicit failure state.",
@@ -976,7 +979,7 @@
         "src/estate/core/grace_momentum_service.py"
       ],
       "source_document": "docs/operations/troubleshooting/cookbook.json",
-      "status": "REVALIDATION_REQUIRED",
+      "status": "VALIDATED",
       "subsystem": "resident_gateway",
       "symptoms": [
         "grace did not answer"

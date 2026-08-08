@@ -1,0 +1,109 @@
+{
+  "author_provenance": {
+    "actor": "Codex integration",
+    "kind": "MIXED"
+  },
+  "change_id": "LD-INTEGRATION-519-521",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "8c37a568f969e8d8aa1a1320d000e39e1117fa1d",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "aeb1610740c4ccb474e49e4643b3782b7991c83993fe70c37c59075979f20ef7",
+      "state": "DIRTY",
+      "worktree_git_blob": "27de5f4dde9be94c4eeb22bac0051b0327268fa1"
+    },
+    {
+      "head_git_blob": "80a09067675547179f00bb0e2a674714c1015a4b",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "240b37b181f91524905df72000591cae1081e9b0feeaaba47e8c1a16f75ea3e8",
+      "state": "DIRTY",
+      "worktree_git_blob": "82a4b69fbb2eacdf6d7b5739770fc16209d7c6e6"
+    },
+    {
+      "head_git_blob": "f2d12b0a0618495707182ba70baea56878b268b4",
+      "path": "docs/operations/troubleshooting/cookbook.json",
+      "sha256": "515798e5ff8a48bfa6c735a769e1ddc385a57b63602cf68fc2e1ab4d4f33cdfd",
+      "state": "DIRTY",
+      "worktree_git_blob": "976d73efdc221051389f8f0aa675aa2586151708"
+    },
+    {
+      "head_git_blob": "a1de2b54a0426e5a0eb3a86535616efd768ccb53",
+      "path": "schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json",
+      "sha256": "d9b1499756477d71a7ced65987f8b03786a00ac1b213dd62ed310b2d92a4fb43",
+      "state": "DIRTY",
+      "worktree_git_blob": "eb271240d4254a1d5ab45e9ef957f22c559c2dfb"
+    },
+    {
+      "head_git_blob": "4c7ae841e22acce0651ebb85482a6e82a43f2ce7",
+      "path": "src/estate/diagnostics/living.py",
+      "sha256": "c6df4e213cfdfc94886cd997f1ac525a608441852c1832cb7f3f3a390ee832a0",
+      "state": "DIRTY",
+      "worktree_git_blob": "a5d8b27198377601520c770f51d48b0142d63a1d"
+    },
+    {
+      "head_git_blob": "68b1c9bd18c66d0be172064f4fc95db618f0fef8",
+      "path": "tools/estate_diagnostics.py",
+      "sha256": "3c6ca38f02775c881cc53596a2b27c0f13a195186cc3d4331925fa88b48aa146",
+      "state": "DIRTY",
+      "worktree_git_blob": "f98da9b4674430936f1da46ddafb48cb7dd318da"
+    },
+    {
+      "head_git_blob": "HEAD:AI_SOFTWARE_DEVELOPMENT_HINTS.md",
+      "path": "AI_SOFTWARE_DEVELOPMENT_HINTS.md",
+      "sha256": "085c370d23e66c3cf75e38082d0c429bf39f028f8bfbe4070942a396ba163d57",
+      "state": "DIRTY",
+      "worktree_git_blob": "a93316dc2c8c70c249a489854bce1948cc0c5b72"
+    },
+    {
+      "head_git_blob": "HEAD:src/estate/diagnostics/impact.py",
+      "path": "src/estate/diagnostics/impact.py",
+      "sha256": "994ecc6f4fc862931af689de671c6835b29ee512b0fc74de255d2c157ffb3075",
+      "state": "DIRTY",
+      "worktree_git_blob": "c3d06057a0a21fe963ca4b2d3236ddfbab35164a"
+    },
+    {
+      "head_git_blob": "HEAD:tests/test_estate_diagnostic_impact.py",
+      "path": "tests/test_estate_diagnostic_impact.py",
+      "sha256": "db81ef7eb1e0a0fc986fbe02f65c5fc9746d7fdc4d4b1da1dfec9bca8a999255",
+      "state": "DIRTY",
+      "worktree_git_blob": "eef74f470c7d954a45f881d345da3ef7f96cba18"
+    }
+  ],
+  "changed_components": [
+    "living_diagnostics"
+  ],
+  "changed_files": [
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "docs/operations/troubleshooting/README.md",
+    "docs/operations/troubleshooting/cookbook.json",
+    "schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json",
+    "src/estate/diagnostics/living.py",
+    "tools/estate_diagnostics.py",
+    "AI_SOFTWARE_DEVELOPMENT_HINTS.md",
+    "src/estate/diagnostics/impact.py",
+    "tests/test_estate_diagnostic_impact.py"
+  ],
+  "changed_interfaces": [
+    "estate_diagnostics CLI"
+  ],
+  "changed_schemas": [
+    "diagnostic_impact_packet_v1"
+  ],
+  "confidence": "CANDIDATE",
+  "estate_change_id": "PR-521-INTEGRATION",
+  "implementation_revision": "f20a75e737f2f408b1563d0b7c0373e03355d943",
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "PR #519 foundation and PR #521 developer ingestion reconciled under one engine."
+  ],
+  "recommended_checkpoint_impacts": [
+    "13.1.1",
+    "11.1.1"
+  ],
+  "source_revision": "f20a75e737f2f408b1563d0b7c0373e03355d943",
+  "validation_evidence": [
+    "combined focused suite",
+    "deterministic build validation"
+  ],
+  "work_package_id": "PR-519"
+}

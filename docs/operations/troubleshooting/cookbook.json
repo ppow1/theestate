@@ -886,6 +886,84 @@
       },
       "validated_at": "2026-08-08T00:00:00Z",
       "workflow": "detached process-sensitive testing"
+    },
+    {
+      "activation_restart_boundary": "No runtime restart; reconciliation reads repository files.",
+      "authority": "The canonical Living Diagnostics reconciliation in src/estate/diagnostics/living.py and its accepted implementation baseline.",
+      "checkpoint_id": "13.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "living_diagnostics",
+      "escalation_condition": "A packet is invalid, an implementation change is uncovered, or accepted baseline authority is unavailable.",
+      "expected_input": "A strict Diagnostic Impact Packet describing repository-relative changed artifacts.",
+      "expected_output": "Accepted candidate knowledge, affected checkpoint identities, and fail-closed freshness classifications.",
+      "failure_codes": [
+        "INVALID_DIAGNOSTIC_IMPACT_PACKET",
+        "CHANGE_WITHOUT_DIAGNOSTIC_IMPACT_METADATA"
+      ],
+      "historical_incidents": [
+        "PR-519-PR-521-INTEGRATION"
+      ],
+      "keywords": [
+        "LD-DEVELOPER-INGESTION",
+        "impact packet",
+        "candidate",
+        "local AI delta"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "PR #519 foundation",
+          "merged PR #521 developer ingestion"
+        ],
+        "method": "MIXED"
+      },
+      "known_failures": [
+        "invalid packet cannot cover changed artifact",
+        "candidate knowledge accidentally promoted"
+      ],
+      "likely_causes": [
+        "malformed or stale packet",
+        "unsafe path",
+        "changed file omitted from a valid packet"
+      ],
+      "maturity": "PROVEN",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Create a packet, reconcile against the accepted baseline, then inspect affected checkpoints and preserved candidates.",
+      "prohibited_actions": [
+        "Do not advance the accepted baseline to hide staleness",
+        "Do not treat local-AI output as promotion authority"
+      ],
+      "purpose": "Ingest developer change impact without creating a second reconciliation or checkpoint authority.",
+      "recovery_summary": "Correct the packet or add missing impact metadata, then rerun canonical reconciliation.",
+      "recovery_verification": "The packet is consumed, affected checkpoints are reported, and canonical knowledge remains unchanged.",
+      "source_dependencies": [
+        "src/estate/diagnostics/living.py",
+        "src/estate/diagnostics/impact.py",
+        "tools/estate_diagnostics.py",
+        "schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "living_diagnostics",
+      "symptoms": [
+        "diagnostic impact packet rejected",
+        "implementation change lacks diagnostic coverage"
+      ],
+      "title": "Developer Diagnostic Impact Packet ingestion",
+      "validated_against": {
+        "components": {
+          "living_diagnostics": "1.0.0"
+        },
+        "files": {
+          "schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json": "sha256:d9b1499756477d71a7ced65987f8b03786a00ac1b213dd62ed310b2d92a4fb43",
+          "src/estate/diagnostics/impact.py": "sha256:994ecc6f4fc862931af689de671c6835b29ee512b0fc74de255d2c157ffb3075",
+          "src/estate/diagnostics/living.py": "sha256:c6df4e213cfdfc94886cd997f1ac525a608441852c1832cb7f3f3a390ee832a0",
+          "tools/estate_diagnostics.py": "sha256:3c6ca38f02775c881cc53596a2b27c0f13a195186cc3d4331925fa88b48aa146"
+        },
+        "interfaces": {},
+        "repository_commit": "f20a75e"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "developer diagnostic impact ingestion"
     }
   ],
   "diagrams": {
@@ -896,7 +974,7 @@
     "reason_execute": "flowchart LR\n Reason-->Execute-->Evidence-->Continue-->Synthesis",
     "seven_step": "flowchart LR\n A[Define]-->B[Verify]-->C[Localize]-->D[Causes]-->E[Smallest safe action]-->F[Verify restoration]-->G[Preserve]"
   },
-  "document_revision": "1.0.0",
+  "document_revision": "1.1.0",
   "format_version": "1.0.0",
   "method": [
     "DEFINE THE SYMPTOM",

@@ -76,6 +76,10 @@ Accepted change/work-package completion may emit a packet conforming to
 `schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json` and trigger
 incremental reconciliation. The full daily sweep independently detects packets
 that were omitted and emits `CHANGE_WITHOUT_DIAGNOSTIC_IMPACT_METADATA`.
+That schema is the single authoritative packet contract; no documentation-local
+schema or separate checkpoint registry is authoritative. Developer packets are
+preserved below `operations/diagnostics/candidates/` with
+`canonical_promotion: false` until separately reviewed and revalidated.
 
 ## Commands and machine contract
 
@@ -91,6 +95,9 @@ python tools/estate_diagnostics.py affected-by src/estate/core/continuous_moment
 python tools/estate_diagnostics.py reconcile --accepted-manifest PATH
 python tools/estate_diagnostics.py reconcile --incremental --impact-packet PACKET
 python tools/estate_diagnostics.py accept-baseline --actor OPERATOR --reason REASON --expected-revision SHA
+python tools/estate_diagnostics.py impact create --request REQUEST.json --output PACKET.json
+python tools/estate_diagnostics.py candidates [PHRASE]
+python tools/estate_diagnostics.py local-ai-delta
 ```
 
 ## Accepted baseline lifecycle
