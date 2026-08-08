@@ -8,6 +8,24 @@ const path = require('node:path');
 const {matchesExpectation, loadScenario} = require('../tools/openwebui-operator/scenario.cjs');
 const {safePath, sanitizeNetwork} = require('../tools/openwebui-operator/evidence.cjs');
 const {compareCmeClaim} = require('../tools/openwebui-operator/ground_truth.cjs');
+const {defaultProfilePath, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, authBootstrapOutcome} = require('../tools/openwebui_operator_acceptance.cjs');
+
+test('auth bootstrap and normal acceptance share the same default profile', () => {
+  assert.equal(defaultProfilePath(), path.resolve('runtime/browser/openwebui-operator-profile'));
+  assert.match(AUTH_BOOTSTRAP_COMMAND, /auth-bootstrap/);
+});
+
+test('auth bootstrap privacy disables credential-bearing evidence', () => {
+  assert.deepEqual(AUTH_BOOTSTRAP_PRIVACY, {
+    capture_console: false, capture_network: false, tracing: false, screenshots: false, credentials_persisted: false
+  });
+});
+
+test('auth bootstrap outcomes distinguish success, timeout, and cancellation', () => {
+  assert.equal(authBootstrapOutcome({authenticated: true, readinessResult: {status: 'OPENWEBUI_READY'}}).classification, 'AUTH_BOOTSTRAP_COMPLETE');
+  assert.equal(authBootstrapOutcome({timedOut: true}).classification, 'AUTH_BOOTSTRAP_TIMEOUT');
+  assert.equal(authBootstrapOutcome({cancelled: true}).classification, 'AUTH_BOOTSTRAP_CANCELLED');
+});
 
 test('scenario expectations are semantic and bounded', () => {
   assert.equal(matchesExpectation('CME is IDLE and healthy', {contains_any: ['IDLE']}).passed, true);

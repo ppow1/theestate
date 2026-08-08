@@ -12,6 +12,9 @@ const {compareCmeClaim, readCmeState} = require('./openwebui-operator/ground_tru
 
 const VERSION = '0.1.0';
 const DEFAULT_URL = process.env.ESTATE_OPENWEBUI_URL || 'http://127.0.0.1:8080';
+const DEFAULT_AUTH_BOOTSTRAP_TIMEOUT = 30 * 60;
+const AUTH_BOOTSTRAP_COMMAND = 'node tools/openwebui_operator_acceptance.cjs auth-bootstrap';
+const AUTH_BOOTSTRAP_PRIVACY = Object.freeze({capture_console: false, capture_network: false, tracing: false, screenshots: false, credentials_persisted: false});
 const FAILURE_CLASSES = Object.freeze({
   OPENWEBUI_UNAVAILABLE: 'OPENWEBUI_UNAVAILABLE', LOGIN_REQUIRED: 'LOGIN_REQUIRED',
   RESIDENT_SURFACE_UNAVAILABLE: 'RESIDENT_SURFACE_UNAVAILABLE',
@@ -40,8 +43,13 @@ function gitRevision() {
 
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
+function defaultProfilePath() {
+  return path.join(ROOT, 'runtime', 'browser', 'openwebui-operator-profile');
+}
+
 async function openSession(options, evidence) {
   const browserErrors = [], networkErrors = [];
+  const capture = options.capture !== false;
   let browser, context, managed = true;
   const cdp = options['connect-cdp'] || process.env.ESTATE_OPENWEBUI_CDP;
   if (cdp) {
@@ -50,7 +58,7 @@ async function openSession(options, evidence) {
     context = browser.contexts()[0];
     if (!context) throw Object.assign(new Error('CDP browser has no context'), {classification: FAILURE_CLASSES.OPENWEBUI_UNAVAILABLE});
   } else {
-    const profile = options.profile || path.join(ROOT, 'runtime', 'browser', 'openwebui-operator-profile');
+    const profile = options.profile || defaultProfilePath();
     context = await chromium.launchPersistentContext(profile, {
       headless: options.headless === true || options.headless === 'true',
       timeout: Number(options['launch-timeout'] || 30000),
@@ -59,15 +67,17 @@ async function openSession(options, evidence) {
     browser = context;
   }
   const page = await context.newPage();
-  page.on('pageerror', error => browserErrors.push({timestamp: new Date().toISOString(), type: 'pageerror', message: String(error.message || error)}));
-  page.on('console', message => { if (['error', 'warning'].includes(message.type())) browserErrors.push({timestamp: new Date().toISOString(), type: message.type(), message: message.text()}); });
-  page.on('requestfailed', request => networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: request.method(), url: request.url(), failure: request.failure()?.errorText || 'request_failed'})));
-  page.on('response', response => { if (response.status() >= 400) networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: response.request().method(), url: response.url(), status: response.status(), failure: `HTTP_${response.status()}`})); });
+  if (capture) {
+    page.on('pageerror', error => browserErrors.push({timestamp: new Date().toISOString(), type: 'pageerror', message: String(error.message || error)}));
+    page.on('console', message => { if (['error', 'warning'].includes(message.type())) browserErrors.push({timestamp: new Date().toISOString(), type: message.type(), message: message.text()}); });
+    page.on('requestfailed', request => networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: request.method(), url: request.url(), failure: request.failure()?.errorText || 'request_failed'})));
+    page.on('response', response => { if (response.status() >= 400) networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: response.request().method(), url: response.url(), status: response.status(), failure: `HTTP_${response.status()}`})); });
+  }
   return {browser, context, page, managed, browserErrors, networkErrors, close: async () => { await page.close().catch(() => {}); if (managed) await context.close().catch(() => {}); }};
 }
 
-async function readiness(page, url) {
-  try { await page.goto(url, {waitUntil: 'domcontentloaded', timeout: 15000}); }
+async function readiness(page, url, {navigate = true} = {}) {
+  try { if (navigate) await page.goto(url, {waitUntil: 'domcontentloaded', timeout: 15000}); }
   catch (error) { return {status: FAILURE_CLASSES.OPENWEBUI_UNAVAILABLE, error: error.message, url: page.url()}; }
   // DOMContentLoaded only proves that the Svelte shell arrived. Wait for the
   // rendered semantic surface so a healthy asset deployment is not reported
@@ -82,6 +92,83 @@ async function readiness(page, url) {
   const composer = await firstVisible(page, SELECTORS.composer);
   const grace = /\bgrace\b/i.test(text);
   return {status: composer && grace ? 'OPENWEBUI_READY' : (grace ? 'MODEL_SURFACE_UNAVAILABLE' : 'RESIDENT_SURFACE_UNAVAILABLE'), url: page.url(), grace_visible: grace, composer_usable: Boolean(composer), title: await page.title()};
+}
+
+async function isAuthenticatedSurface(page, result) {
+  if (result.status === FAILURE_CLASSES.LOGIN_REQUIRED) return false;
+  const text = await visibleText(page);
+  if (/sign in to open webui|enter your password|don't have an account/i.test(text)) return false;
+  return Boolean(await firstVisible(page, SELECTORS.composer)) || /new chat|chat history|open webui/i.test(text);
+}
+
+function authBootstrapOutcome({cancelled = false, timedOut = false, readinessResult = null, authenticated = false} = {}) {
+  if (cancelled) return {status: 'CANCELLED', classification: 'AUTH_BOOTSTRAP_CANCELLED', exitCode: 130};
+  if (timedOut) return {status: 'BLOCKED', classification: 'AUTH_BOOTSTRAP_TIMEOUT', exitCode: 2};
+  if (authenticated) return {status: 'PASS', classification: 'AUTH_BOOTSTRAP_COMPLETE', exitCode: 0, final_readiness: readinessResult};
+  return {status: 'BLOCKED', classification: readinessResult?.status || FAILURE_CLASSES.UNKNOWN, exitCode: 2, final_readiness: readinessResult};
+}
+
+async function authBootstrap(options) {
+  const evidence = makeEvidence(runId());
+  const profile = options.profile || defaultProfilePath();
+  const url = options.url || DEFAULT_URL;
+  const timeoutSeconds = Math.max(60, Number(options.timeout || DEFAULT_AUTH_BOOTSTRAP_TIMEOUT));
+  const manifest = {
+    schema_version: 'estate.openwebui.auth-bootstrap.v1',
+    harness_version: VERSION,
+    git_revision: gitRevision(),
+    run_id: evidence.run,
+    command: process.argv.slice(2),
+    profile_path: profile,
+    url: (() => { try { const u = new URL(url); return `${u.origin}${u.pathname}`; } catch { return String(url).split('?')[0]; } })(),
+    started_at: new Date().toISOString(),
+    status: 'RUNNING',
+    privacy: AUTH_BOOTSTRAP_PRIVACY
+  };
+  const session = await openSession({...options, headed: true, headless: false, capture: false}, evidence);
+  let cancelled = false;
+  const onSignal = () => { cancelled = true; };
+  process.once('SIGINT', onSignal);
+  console.log('OPENWEBUI AUTHENTICATION REQUIRED');
+  console.log('Complete login in the opened browser window.');
+  console.log('This window uses the dedicated Estate Playwright operator profile.');
+  console.log('The harness will continue automatically when the authenticated Open WebUI surface is detected.');
+  console.log(`Profile: ${profile}`);
+  try {
+    await session.page.goto(url, {waitUntil: 'domcontentloaded', timeout: 15000});
+    const started = Date.now();
+    let lastReport = 0;
+    let finalReadiness = null;
+    while (!cancelled && Date.now() - started < timeoutSeconds * 1000) {
+      finalReadiness = await readiness(session.page, url, {navigate: false});
+      const authenticated = await isAuthenticatedSurface(session.page, finalReadiness);
+      if (authenticated) {
+        manifest.readiness = finalReadiness;
+        manifest.authenticated_surface = true;
+        Object.assign(manifest, authBootstrapOutcome({readinessResult: finalReadiness, authenticated}));
+        break;
+      }
+      const elapsed = Math.floor((Date.now() - started) / 1000);
+      if (elapsed - lastReport >= 15) {
+        console.log(`Waiting for authenticated Open WebUI surface (${elapsed}s elapsed; Ctrl+C to cancel).`);
+        lastReport = elapsed;
+      }
+      await wait(2000);
+    }
+    if (cancelled) Object.assign(manifest, authBootstrapOutcome({cancelled}));
+    else if (manifest.status === 'RUNNING') Object.assign(manifest, authBootstrapOutcome({timedOut: true, readinessResult: finalReadiness}));
+  } catch (error) {
+    manifest.status = 'BLOCKED';
+    manifest.classification = error.classification || FAILURE_CLASSES.UNKNOWN;
+    manifest.error = error.message;
+  } finally {
+    process.removeListener('SIGINT', onSignal);
+    manifest.completed_at = new Date().toISOString();
+    writeCompletion(evidence, manifest);
+    await session.close();
+  }
+  console.log(JSON.stringify({status: manifest.status, classification: manifest.classification, run_id: evidence.run, evidence_dir: evidence.dir}, null, 2));
+  return manifest.exitCode ?? (manifest.status === 'PASS' ? 0 : 2);
 }
 
 async function discoverResidents(page) {
@@ -212,6 +299,7 @@ async function executeConcurrent(files, options) {
 async function main() {
   const options = args(process.argv.slice(2));
   const command = options._[0] || 'readiness';
+  if (command === 'auth-bootstrap') return authBootstrap(options);
   if (command === 'scenario') return executeScenario(options._[1], options);
   if (command === 'concurrent') return executeConcurrent([options['scenario-a'], options['scenario-b']].filter(Boolean), options);
   if (!['readiness', 'doctor', 'chat'].includes(command)) throw new Error(`Unknown command: ${command}`);
@@ -238,6 +326,7 @@ async function main() {
     if (command === 'doctor') {
       manifest.status = manifest.readiness.status === 'OPENWEBUI_READY' ? 'PASS' : 'BLOCKED';
       manifest.recommended_activation_boundary = manifest.readiness.status === 'LOGIN_REQUIRED' ? 'AUTOMATION_PAUSED_FOR_HUMAN' : 'OPENWEBUI_SERVICE_OR_UI_BOUNDARY';
+      if (manifest.readiness.status === 'LOGIN_REQUIRED') manifest.recommended_command = AUTH_BOOTSTRAP_COMMAND;
     }
   } catch (error) { manifest.status = 'BLOCKED'; manifest.failure_class = error.classification || FAILURE_CLASSES.UNKNOWN; manifest.error = error.message; await session.page.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {}); }
   finally { manifest.completed_at = new Date().toISOString(); manifest.console = session.browserErrors; manifest.network = session.networkErrors; writeJson(path.join(evidence.dir, 'console.json'), session.browserErrors); writeJson(path.join(evidence.dir, 'network.json'), session.networkErrors); writeCompletion(evidence, manifest); await session.close(); }
@@ -247,4 +336,4 @@ async function main() {
 
 if (require.main === module) main().then(code => process.exitCode = code).catch(error => { console.error(error.stack || error); process.exitCode = 1; });
 
-module.exports = {VERSION, FAILURE_CLASSES, args, readiness, discoverResidents, selectResident, assistantTexts, matchesExpectation};
+module.exports = {VERSION, FAILURE_CLASSES, DEFAULT_AUTH_BOOTSTRAP_TIMEOUT, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, args, defaultProfilePath, readiness, isAuthenticatedSurface, authBootstrapOutcome, discoverResidents, selectResident, assistantTexts, matchesExpectation};
