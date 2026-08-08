@@ -13,6 +13,20 @@ from estate.core.resident_voice_commissioning import live_resident_voice_binding
 from estate.core.openwebui_resident_package import resident_package
 
 REPORT_DIR = Path("collaboration/reports/openwebui_campaign_02")
+COMMS8_TOOL_SERVER_ID = "server:mcp:estate-comms8-live"
+COMMS8_TOOL_NAMES = (
+    "estate_comms8_create_reasoning_request",
+    "estate_comms8_list_requests",
+    "estate_comms8_read_request",
+    "estate_comms8_claim_request",
+    "estate_comms8_acknowledge_request",
+    "estate_comms8_respond_request",
+    "estate_comms8_resolve_request",
+)
+
+
+def comms8_tool_ids() -> list[str]:
+    return [f"{COMMS8_TOOL_SERVER_ID}|{name}" for name in COMMS8_TOOL_NAMES]
 PROMPTS = [
     ("start_of_day_greeting", "Greet the Steward at the start of the day in your natural working voice."),
     ("difficult_operational_problem", "A critical handoff is blocked, two people disagree, and the Steward is tired. What do you say?"),
@@ -56,9 +70,13 @@ def resident_model_catalog(root=None) -> dict[str, Any]:
     data = []
     for model_id, rid in ACTIVE_RESIDENT_MODELS.items():
         package = resident_package(model_id, rid, rootp)
+        tool_ids = ["grace_runtime_bridge"] if rid == "grace" else []
+        if rid == "grace":
+            tool_ids.extend(comms8_tool_ids())
         data.append({
             "id": model_id, "object": "model", "created": 0, "owned_by": "estate",
             "name": package["display_name"],
+            "info": {"meta": {"toolIds": tool_ids, "filterIds": ["grace_runtime_grounding"] if rid == "grace" else []}},
             "estate": {
                 **package,
                 "display_name": package["display_name"],

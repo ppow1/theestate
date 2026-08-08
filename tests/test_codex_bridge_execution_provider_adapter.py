@@ -71,6 +71,13 @@ def test_request_to_codex_bridge_translation_preserves_fields(tmp_path):
     assert bridge.approval_policy == "never"
 
 
+def test_generated_prompt_is_governed_and_readable(tmp_path):
+    adapter_request = request(tmp_path, prompt_source="A bounded fixture repair.", read_scope_paths=["Temp/fixture"])
+    bridge = bridge_request_from_adapter_request(adapter_request, root=tmp_path)
+    assert bridge.prompt_source.startswith("docs/prompts/generated-")
+    assert not bridge.prompt_source.startswith("runtime/")
+
+
 def test_authorization_decision_reference_required(tmp_path):
     adapter = CodexBridgeExecutionProviderAdapter(root=tmp_path)
     validation = adapter.validate_request(request(tmp_path, decision_reference=None))

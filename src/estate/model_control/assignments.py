@@ -8,7 +8,7 @@ DEFAULTS={'fallback_text_model':None,'preferred_text_model':None,'preferred_code
 
 def rootp(root=None): return Path(root) if root is not None else Path.cwd()
 def default_assignments():
-    return {'version':'estate-model-assignments-v1','updated_at':now(),'estate_defaults':dict(DEFAULTS),'residents':{'alfred':{'text':'estate_default','vision':None,'fallback_text':'estate_default'},'helen':{'text':'estate_default','vision':None,'fallback_text':'estate_default'}},'workers':{},'authority':{'residents':{'alfred':['text','vision'],'helen':['text']},'workers':{},'requires_steward_approval':True}}
+    return {'version':'estate-model-assignments-v1','updated_at':now(),'estate_defaults':dict(DEFAULTS),'residents':{'alfred':{'text':'estate_default','vision':None,'fallback_text':'estate_default'},'grace':{'text':'estate_default','vision':None,'fallback_text':'estate_default'},'helen':{'text':'estate_default','vision':None,'fallback_text':'estate_default'}},'workers':{},'authority':{'residents':{'alfred':['text','vision'],'grace':['text'],'helen':['text']},'workers':{},'requires_steward_approval':True}}
 
 def load_assignments(root=None):
     p=rootp(root)/ASSIGNMENTS_PATH
@@ -41,6 +41,6 @@ def set_default(capability, model_id, approved_by='steward', root=None):
 
 def assign_actor(actor, capability, model_id, approved_by='steward', actor_type=None, root=None):
     if approved_by!='steward': return {'updated':False,'error':'steward_approval_required'}
-    data=load_assignments(root); bucket=actor_type or ('residents' if actor in data.get('residents',{}) or actor in {'alfred','helen','ingrid'} else 'workers')
+    data=load_assignments(root); bucket=actor_type or ('residents' if actor in data.get('residents',{}) or actor in {'alfred','grace','helen','ingrid'} else 'workers')
     data.setdefault(bucket,{}).setdefault(actor,{})[capability]=model_id
     save_assignments(data, root); append_audit({'actor':approved_by,'operation':'assign','target_actor':actor,'actor_type':bucket,'capability':capability,'model_id':model_id,'authority':'steward_approved','policy_result':'allowed'}, root); return data
