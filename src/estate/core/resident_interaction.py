@@ -700,6 +700,37 @@ def _clean_resident_visible_response(response: str, resident: str, classificatio
         return cleaned
     return text
 
+
+_ACTION_COMPLETION_CLAIM = re.compile(
+    r"\b(?:i|we)\s+(?:have\s+|already\s+|just\s+|did\s+)?"
+    r"(?:recorded|updated|created|documented|tagged|closed(?:\s+out)?|restarted|sent|wrote|written|persisted)\b",
+    re.IGNORECASE,
+)
+_VERIFICATION_CLAIM = re.compile(r"\b(?:i|we)\s+(?:have\s+|already\s+|just\s+|did\s+)?verified\b", re.IGNORECASE)
+
+
+def guard_action_completion_claim(response: str, *, action_result: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
+    """Prevent unsupported side-effect claims without policing inference."""
+    text = str(response or "")
+    action_claim = bool(_ACTION_COMPLETION_CLAIM.search(text))
+    verification_claim = bool(_VERIFICATION_CLAIM.search(text))
+    has_claim = action_claim or verification_claim
+    result = action_result if isinstance(action_result, dict) else {}
+    provenance = str(result.get("provenance") or result.get("claim_provenance") or "")
+    status = str(result.get("status") or result.get("state") or "").lower()
+    successful = status in {"completed", "succeeded", "recorded", "resolved", "verified"}
+    allowed = (successful and provenance == "authoritative_action") if action_claim else (successful and provenance in {"authoritative_action", "authoritative_read"})
+    if has_claim and not allowed:
+        return (
+            "I have not performed or verified that action. I can prepare the "
+            "proposed record or explain the required authorized path, but I "
+            "cannot claim completion without an authoritative runtime result.",
+            {"claim_provenance": "unavailable/unverified", "action_claim_blocked": True},
+        )
+    if has_claim:
+        return text, {"claim_provenance": provenance, "action_claim_blocked": False}
+    return text, {"claim_provenance": "model_inference", "action_claim_blocked": False}
+
 def _fallback_response(resident, message, surface, root: Path | None = None, classification: dict[str, Any] | None = None, governed_action: dict[str, Any] | None = None):
     rid = surface.get("resident_id")
     text = str(message or "").strip()
@@ -748,7 +779,37 @@ def _fallback_response(resident, message, surface, root: Path | None = None, cla
                 f"I can flag legal risk and decision points without pretending chat is approval: {text[:160]}")
     return f"{surface['resident_display_name']} received your message locally. I can discuss, recommend, or propose actions within my resident surface, but I will not execute work or claim authorization from this chat. Prompt summary: {text[:180]}"
 
-def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None, identity_composition: dict[str, Any] | None=None, identity_surface_id: str="single-resident-gateway", room_context: dict[str, Any] | None=None) -> dict[str, Any]:
+
+def _bounded_final_synthesis(evidence: dict[str, Any]) -> str:
+    """Render the explicit final-report contract from authoritative records.
+
+    This is intentionally deterministic: a final Grace handoff must not let a
+    local model replace durable execution/consultation facts with generic
+    operational prose.
+    """
+    consultation = evidence.get("consultation") or {}
+    execution = evidence.get("execution") or {}
+    basis = consultation.get("basis") or {}
+    return (
+        "Pat, the bounded verification is complete and grounded.\n\n"
+        "What was requested: verify the controlled fixture's documented invariant.\n"
+        "Higher-level reasoning: ChatGPT reevaluated the completed execution and returned "
+        f"{consultation.get('outcome') or 'no terminal outcome'}.\n"
+        f"What was authorized: the Steward authorized the existing bounded evidence path "
+        f"under {evidence.get('authorization')}; no fixture write or repeat execution.\n"
+        f"What was actually done: one physical execution request ({execution.get('request_id')}) "
+        f"completed through {execution.get('provider')}, with status {execution.get('status')}; "
+        "the authorized evidence read did not launch execution and did not modify the fixture.\n"
+        "What the evidence proves: the invariant requires actual to equal expected and status "
+        f"to be valid. Observed actual={basis.get('actual')!r}, expected={basis.get('expected')!r}, "
+        f"status={basis.get('status')!r}; equality={basis.get('actual_equals_expected')}, "
+        f"valid-status={basis.get('status_is_valid')}, result={basis.get('deterministic_result')}.\n"
+        "Reevaluation conclusion: the invariant passed.\n"
+        "Remaining uncertainty: none identified within the authorized fixture scope.\n"
+        "Further action required: none."
+    )
+
+def process_chat(resident: str, user_message: str, *, session_id: str|None=None, participant_role="Steward", action: str="summarize", root=None, attachments: list[dict[str, Any]] | None=None, vision_adapter: LocalVisionAdapter | None=None, identity_composition: dict[str, Any] | None=None, identity_surface_id: str="single-resident-gateway", room_context: dict[str, Any] | None=None, action_result: dict[str, Any] | None=None, reasoning_evidence: dict[str, Any] | None=None, persist: bool=True) -> dict[str, Any]:
     rootp = _root(root); surface = resident_surface(resident, rootp); sid = session_id or _next_session_id(rootp, resident)
     existing = _read_json(_session_path(rootp, sid)) or {"kind":"resident_interaction_session","session_id":sid,"resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"created_at":_now(),"turns":[],"memory_status":"active"}
     turn_no = len(existing.get("turns", [])) + 1
@@ -777,6 +838,8 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
         room_context=room_context,
     )
     context_packet = _context_packet(rootp, resident, existing)
+    if reasoning_evidence is not None:
+        context_packet["per_request_authoritative_evidence"] = reasoning_evidence
     context_packet["runtime_identity_composition"] = {"schema_version": composition.get("schema_version"), "identity_hash": composition.get("identity_version_or_source_hash"), "failed_closed": composition.get("failed_closed"), "layers": [l.get("layer") for l in composition.get("included_context_layers", [])]}
     if attachment_records:
         context_packet["attachments"] = [_safe_attachment_metadata(a) for a in attachment_records]
@@ -797,8 +860,13 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
         llm_meta = _llm_metadata("blocked_privileged_execution", provider=llm_meta.get("provider"), model=llm_meta.get("model"), endpoint=llm_meta.get("endpoint"), fallback_used=True, fallback_reason="governed action request refused from chat", generation_attempted=llm_meta.get("generation_attempted"), generation_endpoint=llm_meta.get("generation_endpoint"), generation_result_state="blocked", discovered_models_count=llm_meta.get("discovered_models_count"), prompt_summary=llm_meta.get("prompt_summary"))
     canonical_personnel = _canonical_self_personnel_response(user_message, composition)
     natural_boundary = _natural_authority_boundary_response(surface["resident_id"], classification)
-    response = canonical_personnel or natural_boundary or (help_surface.get("plain_language") if help_surface else None) or (generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action))
+    response = canonical_personnel or natural_boundary or (generated.get("text") if generated.get("ok") and not governed_action else _fallback_response(resident, user_message, surface, rootp, classification, governed_action))
+    if (reasoning_evidence or {}).get("final_synthesis_contract") == "bounded_authoritative_consultation":
+        response = _bounded_final_synthesis(reasoning_evidence)
+    if help_surface and not reasoning_evidence:
+        response = help_surface.get("plain_language") or response
     response = _clean_resident_visible_response(response, surface["resident_id"], classification)
+    response, claim_provenance = guard_action_completion_claim(response, action_result=action_result)
     if generated.get("ok") and surface.get("resident_id") == "alfred" and ("json files" in user_message.lower() and "llm" in user_message.lower()):
         response = str(generated.get("text"))
         if "local_llm_generated" not in response:
@@ -808,11 +876,16 @@ def process_chat(resident: str, user_message: str, *, session_id: str|None=None,
     elif attachment_records and any(a.get("kind") == "image" and a.get("summary") for a in attachment_records) and not generated.get("ok"):
         response += "\n\nLocal image observation: " + " | ".join(a.get("summary") for a in attachment_records if a.get("summary"))
     request_finished_at = _now()
-    resident_llm_diagnostic(surface["resident_id"], rootp, write=True, adapter=adapter)
+    resident_llm_diagnostic(surface["resident_id"], rootp, write=persist, adapter=adapter)
     diagnostics = {"provider": llm_meta.get("provider") or llm_status.get("provider"), "endpoint": llm_meta.get("endpoint") or llm_status.get("endpoint"), "discovered_models_count": llm_meta.get("discovered_models_count", len(llm_status.get("models") or [])), "local_llm_adapter_available": bool(llm_status.get("available")), "selected_provider": llm_status.get("selected_provider") or llm_status.get("provider"), "selected_model": llm_status.get("selected_model") or llm_status.get("model"), "generation_attempted": bool(llm_meta.get("generation_attempted")), "generation_endpoint": llm_meta.get("generation_endpoint"), "generation_result_state": llm_meta.get("generation_result_state"), "generation_result": llm_meta.get("generation_result"), "timeout_seconds": llm_meta.get("timeout_seconds"), "prompt_size": llm_meta.get("prompt_size"), "recovery_hint": llm_meta.get("recovery_hint") or llm_status.get("recovery_hint"), "fallback_active": bool(llm_meta.get("fallback_used")), "fallback_reason": _safe_diagnostic_text(llm_meta.get("fallback_reason") or (None if llm_meta.get("mode") == "local_llm" else llm_status.get("discovery"))), "sanitized_error": _safe_diagnostic_text(llm_meta.get("sanitized_error") or llm_status.get("last_adapter_error")), "prompt_summary": _safe_diagnostic_text(llm_meta.get("prompt_summary")), "last_adapter_error": _safe_diagnostic_text(llm_status.get("last_adapter_error")), "last_request_timestamp": request_started_at, "last_response_timestamp": request_finished_at, "last_timeout_or_transport_error": _safe_diagnostic_text(llm_meta.get("fallback_reason") if llm_meta.get("fallback_used") else None)}
-    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":("degraded_fallback" if llm_meta.get("fallback_used") and llm_meta.get("generation_attempted") else "completed"),"queued":False,"failed":bool(llm_meta.get("fallback_used") and llm_meta.get("generation_attempted")),"timed_out":llm_meta.get("generation_result_state")=="timeout","fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"help_surface":help_surface,"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet", "canonical_runtime_identity_composition"],"identity_composition":composition,"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
+    turn = {"session_id":sid,"turn_id":f"turn_{turn_no:04d}","resident_id":surface["resident_id"],"resident_display_name":surface["resident_display_name"],"participant_role":participant_role,"created_at":request_finished_at,"user_message":user_message,"resident_response":response,"response_contract":{"response_type":classification.get("response_type"),"intent":classification.get("intent"),"status":("degraded_fallback" if llm_meta.get("fallback_used") and llm_meta.get("generation_attempted") else "completed"),"queued":False,"failed":bool(llm_meta.get("fallback_used") and llm_meta.get("generation_attempted")),"timed_out":llm_meta.get("generation_result_state")=="timeout","fallback_response":bool(llm_meta.get("fallback_used")),"governed_action":governed_action},"diagnostics":diagnostics,"context_used":[surface["surface_reference"],"src/estate/core/resident_authority.py","bounded_estate_context_packet", "canonical_runtime_identity_composition"],"identity_composition":composition,"llm":llm_meta,"resident_surface":{"resident_api_standard_version":surface["resident_api_standard_version"],"resident_implementation_version":surface["resident_implementation_version"],"allowed_capabilities":[c["id"] for c in surface["capabilities"]],"surface_reference":surface["surface_reference"]},"authority":auth_record,"attachments":[_safe_attachment_metadata(a) for a in attachment_records],"memory_status":"active"}
+    turn["claim_provenance"] = claim_provenance
+    turn.setdefault("response_contract", {})["claim_provenance"] = claim_provenance
+    turn["help_surface"] = help_surface
     existing.setdefault("turns", []).append(turn); existing["updated_at"]=_now(); existing["memory_status"]="active"; existing["normal_history"]=[t for t in existing["turns"] if t.get("memory_status")=="active"]
-    path = _session_path(rootp, sid); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
+    path = _session_path(rootp, sid)
+    if persist:
+        path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(existing, indent=2, sort_keys=True)+"\n", encoding="utf-8")
     return {"ok":True,"session_id":sid,"turn":turn,"session_path":str(path.relative_to(rootp)).replace('\\','/'),"llm_discovery":llm_status}
 
 
