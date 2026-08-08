@@ -218,7 +218,7 @@
           "living_diagnostics": "NOT_DECLARED"
         },
         "files": {
-          "src/estate/diagnostics/living.py": "sha256:ea6a740a77409053808f7dfbc9acb36e73a7c032376135018fa2ac838c26e722"
+          "src/estate/diagnostics/living.py": "sha256:123e789f664e37a8d42bc0eeaf0b6f98e40e14d465a6f50f01c724a42544cafd"
         },
         "interfaces": {},
         "repository_commit": "00ee3d2"
@@ -912,6 +912,6 @@
       "workflow": "Grace final synthesis"
     }
   ],
-  "generated_at": "2026-08-08T10:40:00Z",
+  "generated_at": "2026-08-08T12:48:39Z",
   "index_version": "1.0.0"
 }

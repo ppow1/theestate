@@ -1,4 +1,10 @@
 {
+  "accepted_baseline": "/workspace/theestate/operations/diagnostics/accepted-implementation-manifest.json",
+  "accepted_revision": "e6d1bb2a4cc3815faf6a24de4f50fa978df98f6f",
+  "affected_checkpoints": [],
+  "baseline_valid": true,
+  "canonical_knowledge_auto_modified": false,
+  "changed_artifacts": [],
   "checkpoint_counts": {
     "PROPOSED": 0,
     "REVALIDATION_REQUIRED": 0,
@@ -6,12 +12,17 @@
     "UNKNOWN": 0,
     "VALIDATED": 12
   },
+  "classifications": [],
   "duration_seconds": 0,
-  "generated_at": "2026-08-08T10:40:00Z",
+  "generated_at": "2026-08-08T12:48:39Z",
+  "impact_packets_consumed": 0,
   "implementation_state": "CURRENT_LOCAL_STATE",
-  "mode": "build",
+  "invalid_impact_packets": [],
+  "mode": "full",
+  "pending_candidate_knowledge": [],
   "pending_reasoning_review": 0,
   "provider_independence": "Stage 1 completed without an AI provider",
   "reasoning_provider_required": false,
+  "reconciliation_outcome": "IMPLEMENTATION_UNCHANGED",
   "report_version": "1.0.0"
 }

@@ -7,11 +7,13 @@ instead of becoming a second orchestrator.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from estate.core.operational_events import OperationalEvent
 from estate.core.operational_status import record_operational_event
@@ -67,6 +69,7 @@ class SchedulerJob:
     runtime_mode: str = "observe-only"
     interval_seconds: int | None = None
     calendar: str | None = None  # HH:MM UTC daily
+    calendar_timezone: str = "UTC"
     events: list[str] = field(default_factory=list)
     debounce_seconds: int = 0
     retry_seconds: int = 300
@@ -87,6 +90,7 @@ DEFAULT_JOBS: dict[str, SchedulerJob] = {
     "ring2_preparation": SchedulerJob("ring2_preparation", "Prepare Ring 2 audit prompts when required", "process-audits-and-ring2", interval_seconds=3600, events=["ring2.required", "audit.blocked"], debounce_seconds=60, depends_on=["audit_processing"]),
     "health_refresh": SchedulerJob("health_refresh", "Refresh Operations Runtime health and Office status", "observe-only", interval_seconds=300, calendar="00:00", events=["office.refresh", "health.refresh"], debounce_seconds=15),
     "repository_monitoring": SchedulerJob("repository_monitoring", "Monitor repository state and operational targets", "discover-merges", interval_seconds=1200, events=["repo.changed", "work_package.completed"], debounce_seconds=45, max_audit_requests=2),
+    "living_diagnostics_full_reconciliation": SchedulerJob("living_diagnostics_full_reconciliation", "Reconcile living diagnostics against the accepted implementation baseline", "living-diagnostics-reconcile", calendar="06:00", calendar_timezone="ESTATE_LOCAL", events=["diagnostic.impact.accepted"], debounce_seconds=30),
 }
 
 
@@ -192,9 +196,13 @@ class OperationsScheduler:
             candidates.append(self.now + timedelta(seconds=job.interval_seconds))
         if job.calendar:
             hour, minute = [int(x) for x in job.calendar.split(":", 1)]
-            cal = self.now.replace(hour=hour, minute=minute, second=0)
-            if cal <= self.now: cal += timedelta(days=1)
-            candidates.append(cal)
+            timezone_name = os.environ.get("ESTATE_TIMEZONE", "UTC") if job.calendar_timezone == "ESTATE_LOCAL" else job.calendar_timezone
+            try: local_zone = ZoneInfo(timezone_name)
+            except ZoneInfoNotFoundError: local_zone = timezone.utc
+            local_now = self.now.astimezone(local_zone)
+            cal = local_now.replace(hour=hour, minute=minute, second=0)
+            if cal <= local_now: cal += timedelta(days=1)
+            candidates.append(cal.astimezone(timezone.utc))
         return min(candidates) if candidates else self.now + timedelta(days=365)
 
     def _append_scheduler_event(self, payload: dict[str, Any]) -> None:
