@@ -12,8 +12,8 @@
   // Prefer the retained conversation target when it advertises the Estate
   // Comms8 identity; the temporary surface can coexist as an empty shell
   // after recovery and has no action manifest.
-  const target=workTargets.at(-1)
-    ||targets.find(x=>x.type==='page'&&x.url.includes('surface=work'))
+  const target=targets.find(x=>x.type==='page'&&x.url.includes('surface=work'))
+    ||workTargets.at(-1)
     ||targets.find(x=>x.type==='page'&&x.title==='Estate Comms8 Live')
     ||targets.find(x=>x.type==='page'&&x.url.startsWith('https://chatgpt.com/'));
   if(!target) throw Error('chatgpt_live_target_unavailable');
@@ -43,7 +43,7 @@
   // manifest after ChatGPT changes the temporary surface URL to /c/<id>.
   // Preserve that valid surface; pages without the full manifest still use
   // the bounded UI recovery path below.
-  if(!target.url.includes('surface=work')&&!target.url.includes('/c/')&&!manifestProbe) {
+  if(!manifestProbe) {
     const bootstrap=await evaluate(`(()=>{
       const app=[...document.querySelectorAll('a')].find(a=>(a.href||'').includes('${livePluginId}'));
       if(app){app.click();return 'app_detail';}

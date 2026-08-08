@@ -123,3 +123,21 @@ capacity, dependency/hold reasoning, deterministic priority, and
 reconciliation are reused conceptually, while consultation SQLite, CME,
 Comms8, execution routing, and existing work-package authorities remain the
 production sources of truth.
+
+## Live acceptance blocker
+
+Live ordinary-language intake created roots `19.00` and `20.00` concurrently.
+The durable reservation proof showed `20.00` ACTIVE with a real worker PID and
+`19.00` HELD_FOR_CAPACITY at observed reasoning capacity one. Root `14.00`
+already proved the full bounded execution/reevaluation path with a real
+ChatGPT/Comms8 response and completed local Codex Bridge execution.
+
+The browser acceptance then failed closed at the product boundary: the
+authenticated `?surface=work` CDP target has no attached Estate Comms8 Live
+app, while the former titled `/c/` target is stale and produces stable prose
+without authoritative Comms8 resolution. Target selection was repaired to
+prefer Work, and the existing UI recovery seam was attempted; it now truthfully
+returns `LIVE_APP_NOT_FOUND`. PL-0016/WP-4215 therefore remains open for the
+Steward's app-attachment action and subsequent rerun of Comms8 correlation,
+worktree/conflict, failure-isolation, and Grace conversational portfolio
+acceptance. No premature lifecycle closure is recorded.

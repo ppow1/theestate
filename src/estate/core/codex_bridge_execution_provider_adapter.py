@@ -68,7 +68,18 @@ def _provider_request(request: ExecutionProviderAdapterRequest, root: str | Path
 
 def bridge_request_from_adapter_request(request: ExecutionProviderAdapterRequest, *, root: str | Path | None = None) -> CodexBridgeRequest:
     """Translate a provider-neutral adapter request into a Codex Bridge request."""
+    original_prompt_source = request.prompt_source
     request = _provider_request(request, root)
+    # Generated neutral prompts are governed artifacts created by this
+    # adapter. They must be readable by the bridge in addition to the caller's
+    # bounded evidence scope; this does not widen the requested source scope.
+    read_scope_paths = list(request.read_scope_paths)
+    original_text = str(original_prompt_source or "")
+    generated_prompt = request.prompt_source != original_prompt_source and str(request.prompt_source).replace("\\", "/").startswith("docs/prompts/generated-")
+    generated_from_natural_text = "/" not in original_text and "\\" not in original_text
+    generated_from_bounded_target = " and " in original_text and original_text.count("/") >= 2
+    if generated_prompt and (generated_from_natural_text or generated_from_bounded_target) and "docs/prompts" not in read_scope_paths:
+        read_scope_paths.append("docs/prompts")
 
     sandbox = str(_metadata(request, "sandbox", SANDBOX_READ_ONLY))
     return CodexBridgeRequest(
@@ -83,7 +94,7 @@ def bridge_request_from_adapter_request(request: ExecutionProviderAdapterRequest
         worker_label=str(_metadata(request, "worker_label", "codex-bridge-adapter")),
         cwd=_metadata(request, "cwd", "."),
         sandbox=sandbox,
-        allowed_read_paths=list(request.read_scope_paths),
+        allowed_read_paths=read_scope_paths,
         allowed_write_paths=list(request.write_scope_paths),
         approval_policy=str(_metadata(request, "approval_policy", APPROVAL_POLICY)),
         json_mode=bool(_metadata(request, "json_mode", True)),

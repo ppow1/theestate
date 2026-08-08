@@ -16,6 +16,7 @@ from estate.core.autonomous_reason_execute_loop import classify_reasoning_respon
 from estate.core.chatgpt_worker_runtime import validate_worker_runtime
 from estate.core.evidence_acquisition import acquisition_count, MAX_ACQUISITIONS
 from estate.core.consultation_escalation import instrument_escalation
+from estate.core.grace_parallel_portfolio import list_activations, mark_activation_active
 
 
 WORKER_ID = "chatgpt"
@@ -279,7 +280,18 @@ class AutonomousChatGPTMailboxWorker:
             self._write_state("IDLE", result="EMPTY_QUEUE")
             return WorkerResult("EMPTY_QUEUE", reason="no_awaiting_reasoning_consultation")
 
-        consultation = candidates[0]
+        reservations = {
+            item.continuation_logical_id: item
+            for item in list_activations(self.store, states={"RESERVED", "LAUNCHING", "ACTIVE"})
+        }
+        reserved_candidates = [item for item in candidates if item.logical_consultation_id in reservations]
+        # A direct legacy worker tick may have no portfolio reservation; keep
+        # the historical fallback, while a reserved live lane is authoritative
+        # and prevents the worker from claiming another root's request.
+        consultation = (reserved_candidates or candidates)[0]
+        activation = reservations.get(consultation.logical_consultation_id)
+        if activation and activation.state == "RESERVED":
+            mark_activation_active(self.store, activation.activation_id, worker_pid=os.getpid())
         if not consultation.ec8_request_id:
             self._write_state("ERROR", reason="consultation_missing_ec8_request_id", logical_consultation_id=consultation.logical_consultation_id)
             return WorkerResult("ERROR", consultation.logical_consultation_id, reason="consultation_missing_ec8_request_id")

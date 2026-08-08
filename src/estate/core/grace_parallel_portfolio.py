@@ -123,7 +123,7 @@ def claim_activation(
             (idempotency_key,),
         ).fetchone()
         if existing:
-            if existing["state"] == "HELD_FOR_CAPACITY" and capacity is not None and int(capacity) >= 1:
+            if existing["state"] in {"RELEASED", "FAILED", "HELD_FOR_CAPACITY"} and capacity is not None and int(capacity) >= 1:
                 used = db.execute(
                     "SELECT COUNT(*) AS n FROM grace_activation_reservations WHERE worker_class = ? AND provider_key = ? AND state IN ('RESERVED','LAUNCHING','ACTIVE')",
                     (worker_class, provider_key),
@@ -132,6 +132,10 @@ def claim_activation(
                     db.execute("UPDATE grace_activation_reservations SET state='RESERVED', reason=NULL, controller_pid=?, updated_at=? WHERE activation_id=?", (controller_pid, now, existing["activation_id"]))
                     db.commit()
                     return {"status": "RESERVED", "activation_id": existing["activation_id"], "reason": None, "controller_pid": controller_pid, "worker_pid": None}
+            if existing["state"] in {"RELEASED", "FAILED"}:
+                db.execute("UPDATE grace_activation_reservations SET state='HELD_FOR_CAPACITY', reason='provider_capacity_exhausted', controller_pid=?, updated_at=? WHERE activation_id=?", (controller_pid, now, existing["activation_id"]))
+                db.commit()
+                return {"status": "HELD_FOR_CAPACITY", "activation_id": existing["activation_id"], "reason": "provider_capacity_exhausted", "controller_pid": controller_pid, "worker_pid": None}
             return {"status": "ALREADY_RESERVED", "activation": dict(existing), "activation_id": existing["activation_id"]}
         if capacity is None or int(capacity) < 1:
             state, reason = "HELD_FOR_CAPACITY", "unknown_or_invalid_capacity"
@@ -232,7 +236,11 @@ def build_portfolio(store: ConsultationStore, *, reasoning_capacity: int | None 
 def reconcile_ready(store: ConsultationStore, *, reasoning_capacity: int | None, provider_key: str = "default", controller_pid: int | None = None) -> dict[str, Any]:
     portfolio = build_portfolio(store, reasoning_capacity=reasoning_capacity, provider_key=provider_key)
     newly = []
-    for item in portfolio["items"]:
+    # Capacity-held work gets first reactivation opportunity when a slot is
+    # released; otherwise a previously active row could reclaim the slot and
+    # starve the durable held lane.
+    ordered_items = sorted(portfolio["items"], key=lambda item: (0 if item["classification"] == "HELD_CAPACITY" else 1, item["root_id"], item["continuation_id"]))
+    for item in ordered_items:
         if item["classification"] not in {"READY", "HELD_CAPACITY"}:
             continue
         result = claim_activation(store, root_logical_id=item["root_id"], continuation_logical_id=item["continuation_id"], worker_class="reasoning", provider_key=provider_key, idempotency_key=f"{item['root_id']}:{item['continuation_id']}:reasoning", capacity=reasoning_capacity, controller_pid=controller_pid if controller_pid is not None else os.getpid())

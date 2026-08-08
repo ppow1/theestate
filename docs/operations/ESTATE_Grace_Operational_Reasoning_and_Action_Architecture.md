@@ -105,3 +105,24 @@ all durable active reservations, not only the current tick. Root-scoped
 reservations and evidence make stale-owner recovery and Steward escalation
 local to one lane. Write-capable execution remains behind the existing
 provider-neutral boundary and repository ownership/worktree checks.
+
+## 2026-08-08 live acceptance checkpoint
+
+The real Gateway created ordinary-language roots `14.00`, `15.00`, `16.00`,
+and later concurrent roots `19.00` and `20.00`. Root `14.00` completed the
+full bounded reason/evidence/execute/reevaluate path: ChatGPT/Comms8 response
+correlation, execution request `exec-ab212f477a75`, physical attempt
+`attempt-590ab025041f`, and reevaluation continuation `14.02` were recorded.
+
+The concurrent live pair proved one observed browser reasoning slot: root
+`20.00` reached ACTIVE with controller PID `40388` and worker PID `35724`,
+while root `19.00` remained durably `HELD_FOR_CAPACITY` with reason
+`provider_capacity_exhausted`. The reservation was released after the active
+root's browser failure, without clearing the held root.
+
+The remaining live gate is external to the Estate code. Current CDP evidence
+shows the authenticated Work surface has no Estate Comms8 Live app attached;
+the supported browser seam returns `LIVE_APP_NOT_FOUND` and
+`composer_ready=false`. The stale titled conversation was corrected out of
+target preference, but attaching the installed app to the Work surface needs
+Steward/UI action. No live completion claim is made beyond the evidence above.

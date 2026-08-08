@@ -21,6 +21,7 @@ from estate.core.consultation_store import ConsultationRecord, ConsultationStore
 from estate.core.consultation_escalation import instrument_escalation
 from estate.core.chatgpt_reasoning_resident import build_durable_context_package
 from estate.core.autonomous_reason_execute_loop import parse_reasoning_envelope
+from estate.core.grace_parallel_portfolio import claim_activation, release_activation
 
 
 LIVE_MCP_URL = "https://estate-comms8-live.ionoge.com/mcp"
@@ -460,12 +461,45 @@ class GraceConsultationLoop:
                 self.store.set_status(consultation.logical_consultation_id, "open")
                 raise RuntimeError(f"comms8_create_failed:{type(exc).__name__}") from exc
 
+        # The existing browser worker is a real physical reasoning resource.
+        # Reserve it through the durable multi-lane projection before waking
+        # the worker, so concurrent ordinary Grace requests produce an
+        # explainable capacity hold instead of racing two browser activations.
+        capacity_value = os.environ.get("ESTATE_REASONING_CAPACITY", "1")
+        try:
+            reasoning_capacity = int(capacity_value)
+        except (TypeError, ValueError):
+            reasoning_capacity = None
+        reservation = claim_activation(
+            self.store,
+            root_logical_id=consultation.root_logical_id,
+            continuation_logical_id=consultation.logical_consultation_id,
+            worker_class="reasoning",
+            provider_key="chatgpt-browser",
+            idempotency_key=f"{consultation.root_logical_id}:{consultation.logical_consultation_id}:reasoning",
+            capacity=reasoning_capacity,
+            controller_pid=os.getpid(),
+        )
+        if reservation.get("status") != "RESERVED":
+            return {
+                "logical_consultation_id": consultation.logical_consultation_id,
+                "root_logical_id": consultation.root_logical_id,
+                "ec8_request_id": consultation.ec8_request_id,
+                "workflow_id": consultation.workflow_id,
+                "status": "HELD_CAPACITY",
+                "reason": reservation.get("reason") or "reasoning capacity is already reserved",
+                "authoritative": True,
+                "message": "This independent Grace lane is waiting for reasoning capacity; unrelated lanes remain eligible.",
+            }
+
         # The worker owns claim/ack/respond/resolve.  Grace only wakes it and
         # verifies the authoritative result; it never supplies the request ID.
         worker_result = self.wake_worker()
         if worker_result.get("status") == "ERROR":
+            release_activation(self.store, reservation["activation_id"], reason="reasoning_worker_failed")
             raise RuntimeError("chatgpt_worker_failed:" + str(worker_result.get("reason") or "unknown"))
         if worker_result.get("status") == "CONTEXT_REQUIRED":
+            release_activation(self.store, reservation["activation_id"], reason="reasoning_context_required")
             self.store.set_status(consultation.logical_consultation_id, "continuation_required")
             raise RuntimeError("context_required")
         resolved = self._await_result(consultation.ec8_request_id or "")
@@ -478,6 +512,7 @@ class GraceConsultationLoop:
             recommendation=stored_response.get("content") if isinstance(stored_response, dict) else None,
         )
         self.store.set_status(consultation.logical_consultation_id, "validating")
+        release_activation(self.store, reservation["activation_id"], reason="reasoning_response_received")
         content = response.get("content") if isinstance(response, dict) else str(response)
         return {
             "logical_consultation_id": consultation.logical_consultation_id,
