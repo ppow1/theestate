@@ -3,7 +3,7 @@
 Status: Active
 Owner: Alfred / Chief of Staff
 Classification: Estate Internal
-Updated: 2026-07-28
+Updated: 2026-08-08
 
 ## Purpose
 
@@ -77,6 +77,7 @@ Each item should include:
 | PL-0028 | Canonical nomenclature and dictation normalization guard: maintain a small Estate glossary for dictation-sensitive terms such as CueMastery and IONOGE, including canonical spelling, pronunciation, lowercase machine identifiers, forbidden variants, and validation hooks so speech-recognition errors do not propagate through resident, work-package, or Character Architecture artifacts | Institutional Documentation / Validation | High | Pat / Steward | 2026-07-09 | Captured | Post-WP-0225 terminology repair | At least three dictation-sensitive Estate terms are identified, or a future work package repeats a forbidden variant after WP-0225 |
 | PL-0029 | Orientation handbook update loop and onboarding coverage repair: create a mechanism to capture onboarding lessons discovered during active chats, update the orientation handbook or handbook addenda, and ensure new ChatGPT/Codex workers actually consume the relevant guidance instead of falsely claiming onboarding after reading only partial search excerpts; include discovered issues from this onboarding session such as standard Codex handoff format, Parking Lot procedure, merge-versus-validation distinction, work-package lane discipline, GitHub state verification before handoffs, canonical nomenclature, and the limitation that search snippets may not cover the full handbook | Institutional Onboarding / Knowledge Transfer | Strategic | Pat / Steward | 2026-07-09 | Captured | Orientation handbook and onboarding manifest revision | Repeated onboarding misses or handbook-glossing incidents show that critical operating knowledge is not reliably reaching new chats/workers, or the next onboarding handbook revision is opened |
 | PL-0030 | Consolidate multiple Estate directory structures and worktree-specific roots created during testing into one canonical Estate directory structure, preserving unmerged work, runtime data, service dependencies, and recoverability through an inventory-first process | Development Workflow / Repository Hygiene | High | Pat / Steward | 2026-07-28 | Captured | Post-Grace/Open WebUI stabilization | Promote when the current integration campaign is stable enough for a complete read-only inventory, or sooner if path ambiguity causes another service, deployment, merge, or validation failure |
+| PL-0041 | Generalized Browser Operator Automation: extract the proven Playwright/Open WebUI browser/session/evidence machinery into a provider-neutral reusable operator core with thin target-specific layers, so ChatGPT, Codex, or local AI can directly exercise approved browser UIs such as the Office of the Steward instead of requiring the Steward to relay prompts, screenshots, and results manually | Developer Experience / Browser Automation / Acceptance Engineering | Strategic | Pat / Steward | 2026-08-08 | Captured | After current Grace/Open WebUI browser acceptance | Current browser acceptance proves operational value and a second materially different UI, preferably the Office of the Steward modernization, is ready to prove the abstraction |
 
 ## Review Guidance
 

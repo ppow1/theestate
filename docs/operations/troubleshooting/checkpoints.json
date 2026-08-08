@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "checkpoints": [
+    {
+      "id": "LD-DEVELOPER-INGESTION",
+      "title": "Developer diagnostic handoff remains consumable",
+      "state": "VALIDATED",
+      "artifact_globs": ["src/estate/diagnostics/**", "tools/estate_diagnostics.py", "docs/operations/troubleshooting/**"],
+      "canonical_knowledge": {
+        "expected_input": "A schema-valid Diagnostic Impact Packet with exact worktree identities",
+        "expected_output": "Accepted candidate metadata that does not mutate this checkpoint",
+        "probe": "python tools/estate_diagnostics.py reconcile --help",
+        "evidence": "tests/test_living_diagnostics_ingestion.py"
+      }
+    }
+  ]
+}
