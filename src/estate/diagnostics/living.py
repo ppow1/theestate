@@ -242,22 +242,36 @@ def _validate_manifest(payload: Any) -> list[str]:
     return errors
 
 
-def validate_impact_packet(payload: Any) -> list[str]:
+def validate_impact_packet(payload: Any, root: Path | None = None) -> list[str]:
     """Validate the safety-critical packet contract without optional packages."""
     if not isinstance(payload, dict): return ["packet must be a JSON object"]
-    allowed = {"packet_version","change_id","work_package_id","estate_change_id","author_provenance","changed_files","changed_components","changed_interfaces","changed_schemas","behavior_before","behavior_after","expected_inputs","expected_outputs","dependencies_read","dependencies_called","resources_written","new_failure_modes","changed_failure_modes","removed_failure_modes","new_or_changed_logs","new_or_changed_status_codes","tests_added_or_changed","validation_evidence","recommended_checkpoint_impacts","preliminary_troubleshooting_notes","prohibited_recovery_actions","activation_restart_impact","source_revision","confidence"}
+    allowed = {"packet_version","change_id","work_package_id","estate_change_id","author_provenance","changed_files","changed_artifacts","changed_components","changed_interfaces","changed_schemas","behavior_before","behavior_after","expected_inputs","expected_outputs","dependencies_read","dependencies_called","resources_written","new_failure_modes","changed_failure_modes","removed_failure_modes","new_or_changed_logs","new_or_changed_status_codes","tests_added_or_changed","validation_evidence","recommended_checkpoint_impacts","preliminary_troubleshooting_notes","prohibited_recovery_actions","activation_restart_impact","source_revision","implementation_revision","confidence"}
     required = {"packet_version","change_id","author_provenance","changed_files","source_revision","confidence"}
     errors = [f"missing required field: {x}" for x in sorted(required - payload.keys())]
     errors += [f"unknown field: {x}" for x in sorted(payload.keys() - allowed)]
     if payload.get("packet_version") != "1.0.0": errors.append("packet_version must be 1.0.0")
     for field in ("change_id", "source_revision"):
         if not isinstance(payload.get(field), str) or not payload.get(field, "").strip(): errors.append(f"{field} must be a non-empty string")
+    if isinstance(payload.get("change_id"), str) and not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,199}", payload["change_id"]): errors.append("change_id contains unsafe characters")
     provenance = payload.get("author_provenance")
     if not isinstance(provenance, dict) or not isinstance(provenance.get("kind"), str): errors.append("author_provenance.kind is required")
     changed = payload.get("changed_files")
     if not isinstance(changed, list) or not changed or any(not isinstance(x, str) or not x or x.startswith("/") or ".." in Path(x).parts or "\\" in x for x in changed): errors.append("changed_files must contain safe repository-relative paths")
+    elif len(changed) != len(set(changed)): errors.append("changed_files must not contain duplicates")
+    elif root:
+        resolved_root = root.resolve()
+        for rel in changed:
+            path = root / rel
+            try: inside = path.resolve().is_relative_to(resolved_root)
+            except OSError: inside = False
+            if not path.is_file() or path.is_symlink() or not inside: errors.append(f"changed file is missing or unsafe: {rel}")
+    if "implementation_revision" in payload and payload.get("implementation_revision") != payload.get("source_revision"): errors.append("implementation_revision must equal source_revision")
+    artifacts = payload.get("changed_artifacts")
+    if artifacts is not None:
+        if not isinstance(artifacts, list) or len(artifacts) != len(changed or []): errors.append("changed_artifacts must describe every changed file")
+        elif [x.get("path") for x in artifacts if isinstance(x, dict)] != changed: errors.append("changed_artifacts paths must exactly match changed_files")
     if payload.get("confidence") not in {"PROVEN","SUPPORTED","CANDIDATE","UNKNOWN"}: errors.append("confidence is invalid")
-    array_fields = allowed - {"packet_version","change_id","work_package_id","estate_change_id","author_provenance","behavior_before","behavior_after","activation_restart_impact","source_revision","confidence"}
+    array_fields = allowed - {"packet_version","change_id","work_package_id","estate_change_id","author_provenance","behavior_before","behavior_after","activation_restart_impact","source_revision","implementation_revision","confidence"}
     for field in array_fields:
         if field in payload and not isinstance(payload[field], list): errors.append(f"{field} must be an array")
     return errors
@@ -301,10 +315,13 @@ def reconcile(root: Path, accepted_manifest: Path | None = None, packets: Iterab
     changed=sorted(p for p in set(previous)|set(now) if previous.get(p,{}).get("content_hash") != now.get(p,{}).get("content_hash"))
     packet_data=[]; invalid_packets=[]
     for packet_path in packets:
-        try: packet = json.loads(packet_path.read_text(encoding="utf-8")); errors = validate_impact_packet(packet)
+        try: packet = json.loads(packet_path.read_text(encoding="utf-8")); errors = validate_impact_packet(packet, root=root)
         except (OSError, ValueError) as exc: packet = {}; errors = [str(exc)]
         if errors: invalid_packets.append({"path":str(packet_path),"errors":errors})
-        else: packet_data.append(packet)
+        else:
+            packet_data.append(packet)
+            from .impact import preserve_candidate
+            preserve_candidate(root, packet)
     covered={p for packet in packet_data for p in packet.get("changed_files",[])}
     result=build(root,manifest=current)
     repo=DiagnosticsRepository(root); affected=repo.affected(changed)
