@@ -80,3 +80,28 @@ CME owns the next reasoning activation; Grace does not launch a provider or
 invent a completion claim. The final Steward response must be grounded in the
 execution request, physical attempt, provider result, and authoritative
 reevaluation.
+
+## Grace multi-lane portfolio
+
+Each consultation root is a semantic work lane; continuations remain beneath
+that root and never inherit a mutable global-current-root pointer. The
+existing consultation SQLite database also contains the
+`grace_activation_reservations` projection. CME remains the single process
+owner, while each reservation records controller PID, and a real worker PID is
+attached only after launch. A controller PID is not evidence that a worker is
+alive.
+
+Reservation claiming is an atomic `BEGIN IMMEDIATE` transaction keyed by
+root, continuation, and deterministic idempotency key. A duplicate selector
+receives the existing reservation, not a second worker or transport request.
+Reasoning capacity is policy input per worker/provider; unknown capacity holds
+work safely rather than failing it. Held capacity resumes under the same
+reservation identity when capacity is released.
+
+Grace receives a bounded portfolio projection with per-item classification and
+authoritative reason: READY, ACTIVE, HELD_CAPACITY, WAITING_STEWARD,
+VERIFYING, COMPLETE, FAILED, or UNKNOWN. Active activation count is read from
+all durable active reservations, not only the current tick. Root-scoped
+reservations and evidence make stale-owner recovery and Steward escalation
+local to one lane. Write-capable execution remains behind the existing
+provider-neutral boundary and repository ownership/worktree checks.

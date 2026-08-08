@@ -95,3 +95,31 @@ surface with no tool cards before Comms8 responded. The worker therefore
 failed closed with `authoritative_comms8_completion_not_proven`; no execution
 request was created. Evidence is preserved under the corresponding detached
 run directory and is not treated as completion.
+
+## Multi-lane operations and recovery
+
+`estate.core.grace_parallel_portfolio` extends the consultation store with
+durable CME activation reservations. The portfolio planner is bounded and
+deterministic, exposing READY, ACTIVE, HELD_CAPACITY, WAITING_STEWARD,
+VERIFYING, COMPLETE, FAILED, and UNKNOWN with a reason for each candidate.
+Two selectors can race safely because the reservation transaction is SQLite
+authoritative; continuation-scoped idempotency prevents duplicate CME ticks.
+
+The lifecycle is `RESERVED -> LAUNCHING -> ACTIVE`; the implementation never
+uses the CME controller PID as a fake worker PID. Capacity exhaustion is
+`HELD_FOR_CAPACITY`/`HELD_CAPACITY`, not failure or global CME busy. Counts are
+portfolio-wide durable counts. One root's stale owner, provider failure,
+evidence budget, or Steward wait must not clear or freeze unrelated roots.
+
+Process-sensitive ownership tests are run only via
+`tools/cme_owner_isolation.py`. Detached run
+`cme-owner-20260808T103745815136Z-491998b28f` completed with exit code 0 and
+26 passing tests; its manifest, stdout, stderr, and completion marker are
+under `runtime/evidence/cme-owner-isolation/`. Live provider/browser
+acceptance remains a separate evidence gate.
+
+This reconciles PL-0016/WP-4215 principles selectively: durable ownership,
+capacity, dependency/hold reasoning, deterministic priority, and
+reconciliation are reused conceptually, while consultation SQLite, CME,
+Comms8, execution routing, and existing work-package authorities remain the
+production sources of truth.
