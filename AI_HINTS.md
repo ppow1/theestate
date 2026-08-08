@@ -9,6 +9,16 @@ Alfred is Chief of Staff. Alfred coordinates the Estate; Alfred is not the whole
 
 ## Fast Recovery
 
+### About to create, modify, repair, integrate, test, deploy, or promote Estate software?
+
+Read completely:
+
+`AI_SOFTWARE_DEVELOPMENT_HINTS.md`
+
+This is the canonical minimum engineering contract for Estate software work. It applies to cloud Codex, ChatGPT, local AI workers, future providers, automation, and human developers. It covers scope discipline, environment identity, Blue/Green/Live/Archive responsibilities, revision and implementation provenance, Diagnostic Impact Packets and first-pass troubleshooting knowledge, local-AI diagnostic review, observer-effect/process-isolated testing, real-boundary acceptance, incoming browser-integrated testing, Git/publication, generated/runtime/secret handling, and minimum completion deliverables.
+
+A work package may impose stricter or additional requirements. It does not silently remove this minimum contract.
+
 ### Working on Estate Comms8 or the ChatGPT MCP provider?
 
 Read completely:
