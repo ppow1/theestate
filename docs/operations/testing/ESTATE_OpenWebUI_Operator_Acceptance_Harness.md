@@ -15,6 +15,18 @@ node tools/openwebui_operator_acceptance.cjs doctor --headed
 node tools/openwebui_operator_acceptance.cjs scenario scenarios/grace_openwebui_basic.yaml --headed
 ```
 
+If readiness reports `LOGIN_REQUIRED`, bootstrap the same persistent profile in
+a visible browser:
+
+```powershell
+node tools/openwebui_operator_acceptance.cjs auth-bootstrap
+```
+
+The command waits for a human to complete login, records no console/network
+credential evidence, and closes after the authenticated semantic surface is
+detected. `--timeout` controls the bounded human wait (default: 30 minutes).
+Ctrl+C cancels cleanly without deleting the profile.
+
 For an already-authenticated visible browser, use a separate Open WebUI page
 through the existing CDP endpoint:
 
