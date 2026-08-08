@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.local-ai-diagnostic-delta.v1",
+  "description": "Bounded review input. Output is proposal-only and cannot mutate baseline, cookbook, remediation authority, or validation state.",
+  "type": "object",
+  "required": ["contract", "accepted_baseline", "current_revision", "changed_artifacts", "accepted_packets", "affected_checkpoints", "canonical_knowledge", "evidence_references", "allowed_outputs", "forbidden_actions"]
+}
