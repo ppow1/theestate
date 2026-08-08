@@ -1,6 +1,6 @@
 # PL-0040 — Estate Cookbook Troubleshooting
 
-Status: Captured
+Status: Incremental foundation implemented; Estate-wide population remains parked
 Priority: High
 Category: Estate Operations / Troubleshooting / Diagnostic Engineering
 Originator: Pat / Steward
@@ -47,3 +47,16 @@ Do not begin a new Estate-wide registry, scheduler, database, department, or pro
 - `docs/operations/ESTATE_Grace_Reasoning_Loop_Implementation_and_Operations.md`
 - `tools/cme_owner_isolation.py`
 - `AI_COMMUNICATION_HINTS.md`
+
+## Implemented foundation (2026-08-08)
+
+Deterministic implementation provenance, accepted-baseline reconciliation, the
+Diagnostic Impact Packet schema, provider-neutral developer packet creation,
+fail-closed ingestion, affected-checkpoint discovery, candidate preservation and
+query, and the bounded local-AI delta contract are implemented. Existing 06:00
+Operations Scheduler integration remains the scheduled reconciliation owner.
+
+Still incremental/future: Estate-wide checkpoint population, an autonomous
+overnight local-AI reviewer, universal deterministic probes, autonomous Grace
+cookbook consultation, and automatic remediation. This update does not close
+PL-0040 or authorize those capabilities.

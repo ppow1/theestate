@@ -1,0 +1,132 @@
+{
+  "affected_checkpoints": [
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "boundaries": [
+    "rerun packet creation after any covered artifact changes",
+    "run deterministic reconciliation before review"
+  ],
+  "changed_artifacts": [
+    {
+      "git_blob": "5da8cbde705458e9bbcf5518a3290e2cec314945",
+      "head_git_blob": "469ab4cca1beb4d8842ac1724e0621db91bcfed6",
+      "path": "AI_SOFTWARE_DEVELOPMENT_HINTS.md",
+      "sha256": "ea28e1b26a2506a1da055eff6da0f8e045e6de2e2661bcdd81f96596253c79c1",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "67ea629b2bd658a7e5a0b82d85cca6b5e9b052c2",
+      "head_git_blob": "804248fedea9f7e2ad6442b653f438ec125a186b",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "ce3cf367ecab4bd8280815c3ffef53f7a4de62104ea6925a2847d448cb39e77e",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "35dd7ed91301a66d64aedaffb0cda0766be36d46",
+      "head_git_blob": "3b8d5ac17ff985cebfbc0e68ae5122127da23d18",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "2f9d3a80a7fa0fcab9c0a702cafeb8198807b8514ea21ad6c96eb1af6643ca79",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "f79220063538d0c423dbc75276f856ac13799344",
+      "head_git_blob": null,
+      "path": "docs/operations/troubleshooting/checkpoints.json",
+      "sha256": "3cf91c0ceb64eb39289e2fb2bd819ae2230a70273701ce1caf973f9b6248fda6",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "016047b1965059b9e65d246f0ff27dafbbb74be8",
+      "head_git_blob": null,
+      "path": "docs/operations/troubleshooting/diagnostic-impact-packet.schema.json",
+      "sha256": "73faeee3244141db1cfc2963b05359d8de2a0d574f5fb0d1f42d0d8d11b7f7bd",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "9b173870e30055b39a41724f74696ec3e422dc2f",
+      "head_git_blob": null,
+      "path": "docs/operations/troubleshooting/local-ai-diagnostic-delta.schema.json",
+      "sha256": "ee8e1ca641642dc4ca8e015e9367c71d714866295f559ba117a1fa2c178db19d",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "a9f8985c529083e9ca5703aefb16e4e566a25497",
+      "head_git_blob": null,
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "d0355eaaeed7fcd7d25291ae6253c98be56017df5a6894a6cd40d2c1e77949f3",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "f31e882054190d3b812a5bc460199984e01a40c4",
+      "head_git_blob": null,
+      "path": "src/estate/diagnostics/__init__.py",
+      "sha256": "e267c745292b41c3b16f93257c5b96f9fcf2b5cc200ec6eac3f1c34a00c40fbd",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "81316a0d4f3a800450f2ef23f9241e119165043c",
+      "head_git_blob": null,
+      "path": "src/estate/diagnostics/impact.py",
+      "sha256": "d8e01463ecb0f06d50e051c14d670e51be047542595166889e357347f5087009",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "407a79f872145690a97c78c1b32e7a096cda38bf",
+      "head_git_blob": null,
+      "path": "tests/test_living_diagnostics_ingestion.py",
+      "sha256": "f2818f12fe3e8cf4a6be938fa5f330ee8f1c341c6126313f66e5395d5f9826cb",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "493fe241bcf403995ab1d276e0ed668cd342b9b1",
+      "head_git_blob": null,
+      "path": "tools/estate_diagnostics.py",
+      "sha256": "e76e05f335b433aa9bf8d1e132de2878c26fada46ec9efdc7cc5df65aef65e29",
+      "worktree_state": "untracked"
+    }
+  ],
+  "component": "Living Diagnostics",
+  "confidence": "HIGH",
+  "dependencies": [
+    "Git CLI",
+    "Python standard library",
+    "canonical troubleshooting checkpoints"
+  ],
+  "evidence": [
+    "tests/test_living_diagnostics_ingestion.py",
+    "docs/operations/troubleshooting/README.md"
+  ],
+  "failure_seams": [
+    "stale packet artifact identity",
+    "unknown checkpoint declaration",
+    "missing source provenance",
+    "unsafe changed-artifact path"
+  ],
+  "implementation_revision": {
+    "git_revision": "42986a595cc034b49f9fa528dccabbddfbfa7cca",
+    "worktree_dirty": true
+  },
+  "intended_behavior": "Provide the provider-neutral developer-to-cookbook Diagnostic Impact Packet ingestion vertical slice without promoting candidate text.",
+  "invariants": [
+    "invalid metadata never covers a change",
+    "candidate knowledge never mutates canonical cookbook knowledge",
+    "repository-relative content and Git identities remain explicit"
+  ],
+  "packet_id": "WP-LD-DEVELOPER-INGESTION-20260808",
+  "probes": [
+    "python -m pytest -q tests/test_living_diagnostics_ingestion.py",
+    "python -m pytest -q tests/test_living_diagnostics*.py"
+  ],
+  "proposed_knowledge": [
+    {
+      "state": "CANDIDATE",
+      "text": "When a software change remains uncovered, inspect rejected packet reasons and regenerate exact artifact provenance before validation."
+    }
+  ],
+  "schema_version": "1.0",
+  "source": {
+    "actor": "OpenAI software worker",
+    "created_at": "2026-08-08T19:51:39+00:00",
+    "kind": "ai"
+  }
+}

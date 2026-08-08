@@ -107,7 +107,10 @@ For a material code change, record at minimum:
 - existing troubleshooting checkpoints affected;
 - proposed new checkpoint/failure knowledge where an existing entry cannot absorb the change.
 
-Use the canonical Diagnostic Impact Packet contract when available. Do not silently change implementation and leave Living Diagnostics to reverse-engineer intent later.
+Use the canonical, provider-neutral Diagnostic Impact Packet command:
+`python tools/estate_diagnostics.py impact create --input <request.json> --output <packet.json>`.
+The schema and concise workflow live in `docs/operations/troubleshooting/README.md`.
+Do not silently change implementation and leave Living Diagnostics to reverse-engineer intent later.
 
 Candidate diagnostic knowledge is not automatically canonical knowledge. Reconciliation, validation, and acceptance decide promotion into the Troubleshooting Cookbook.
 

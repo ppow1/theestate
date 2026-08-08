@@ -1,6 +1,6 @@
 # PL-0040 — Estate Cookbook Troubleshooting
 
-Status: Captured
+Status: Incremental foundation implemented; Estate-wide population remains parked
 Priority: High
 Category: Estate Operations / Troubleshooting / Diagnostic Engineering
 Originator: Pat / Steward
@@ -92,3 +92,16 @@ When promoted, first determine which existing Estate subsystems can absorb cookb
 - The implementation reference explicitly identifies Estate-wide cookbook troubleshooting and diagnostic tooling as deliberate future work.
 - Existing detached process-sensitive test harness: `tools/cme_owner_isolation.py`.
 - Canonical Parking Lot process: `AI_COMMUNICATION_HINTS.md`.
+
+## Implemented foundation (2026-08-08)
+
+The repository now has deterministic implementation provenance and accepted
+baseline reconciliation, the Diagnostic Impact Packet schema and provider-neutral
+developer handoff, fail-closed packet ingestion, affected-checkpoint discovery,
+candidate knowledge preservation/query, and a bounded local-AI delta contract.
+The existing Operations Scheduler remains the owner of scheduled 06:00
+reconciliation.
+
+Estate-wide checkpoint population, autonomous overnight local-AI review,
+universal deterministic probes, autonomous Grace consultation, and automatic
+remediation remain incremental future work. PL-0040 is not closed.
