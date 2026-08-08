@@ -5,8 +5,8 @@ import subprocess
 from pathlib import Path
 
 from estate.diagnostics.living import (
-    DiagnosticsRepository, applicability, build, component_for, excluded,
-    generate_manifest, reconcile, sha256,
+    DiagnosticsRepository, advance_accepted_baseline, applicability, build, component_for, excluded,
+    generate_manifest, reconcile, sha256, validate_impact_packet,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,7 +60,9 @@ def test_build_query_html_mermaid_json_and_determinism(tmp_path):
     assert before=={p.name:p.read_bytes() for p in (root/"docs/operations/troubleshooting/generated").iterdir()}
     repo=DiagnosticsRepository(root); assert repo.search("broken")[0]["checkpoint_id"]=="1.1.1"
     assert repo.checkpoint("1.1.1")["title"]=="Synthetic" and repo.affected(["src/component.py"])
-    assert "mermaid" in (root/"docs/operations/troubleshooting/generated/index.html").read_text()
+    generated_html=(root/"docs/operations/troubleshooting/generated/index.html").read_text()
+    assert "data-diagram-language=\"mermaid\"" in generated_html
+    assert "<svg class=\"process-diagram\"" in generated_html and "<line " in generated_html and "<rect " in generated_html
     assert json.loads((root/"docs/operations/troubleshooting/generated/search-index.json").read_text())["entries"]
     assert first["checkpoint_count"]==second["checkpoint_count"]==1
 
@@ -83,6 +85,46 @@ def test_incremental_packet_candidate_never_auto_validates(tmp_path):
     assert result["mode"]=="incremental" and result["impact_packets_consumed"]==1
     assert result["pending_candidate_knowledge"]==["EC-X"] and result["canonical_knowledge_auto_modified"] is False
     assert result["classifications"]==[] and result["checkpoint_counts"]["REVALIDATION_REQUIRED"]==1
+
+
+def test_missing_and_malformed_baselines_fail_closed(tmp_path):
+    root,_=synthetic(tmp_path)
+    missing=reconcile(root,root/"missing.json")
+    assert missing["reconciliation_outcome"]=="ACCEPTED_BASELINE_MISSING"
+    assert missing["provider_independence"].endswith("without an AI provider")
+    malformed=root/"bad.json"; malformed.write_text("{no")
+    assert reconcile(root,malformed)["reconciliation_outcome"]=="ACCEPTED_BASELINE_INVALID"
+    malformed.write_text(json.dumps({"manifest_version":"1.0.0","artifacts":"wrong"}))
+    assert reconcile(root,malformed)["baseline_valid"] is False
+
+
+def test_baseline_initialization_advancement_and_history(tmp_path, monkeypatch):
+    root,_=synthetic(tmp_path); monkeypatch.setenv("SOURCE_DATE_EPOCH","946684800")
+    first=advance_accepted_baseline(root,actor="test",reason="initial acceptance")
+    assert first["action"]=="INITIALIZED" and first["previous_revision"] is None
+    (root/"src/component.py").write_text("B\n"); git(root,"add", "."); git(root,"commit","-m","B")
+    second=advance_accepted_baseline(root,actor="test",reason="proven change")
+    assert second["action"]=="ADVANCED" and second["previous_revision"]==first["accepted_revision"]
+    history=(root/"operations/diagnostics/accepted-implementation-manifest.history.jsonl").read_text().splitlines()
+    assert len(history)==2 and json.loads(history[-1])["manifest_sha256"].startswith("sha256:")
+
+
+def test_invalid_packet_does_not_cover_undeclared_change(tmp_path):
+    root,_=synthetic(tmp_path); accepted=root/"accepted.json"; accepted.write_text(json.dumps(generate_manifest(root)))
+    (root/"src/component.py").write_text("B\n")
+    packet=root/"packet.json"; packet.write_text(json.dumps({"packet_version":"1.0.0","change_id":"X","author_provenance":{},"changed_files":["src/component.py"],"source_revision":"x","confidence":"CANDIDATE"}))
+    result=reconcile(root,accepted,[packet],"incremental")
+    assert result["impact_packets_consumed"]==0 and result["invalid_impact_packets"]
+    assert set(result["classifications"])=={"INVALID_DIAGNOSTIC_IMPACT_PACKET","CHANGE_WITHOUT_DIAGNOSTIC_IMPACT_METADATA"}
+    assert validate_impact_packet({"packet_version":"1.0.0","change_id":"X","author_provenance":{"kind":"HUMAN"},"changed_files":["../secret"],"source_revision":"x","confidence":"CANDIDATE"})
+
+
+def test_no_change_reconciliation_and_git_provenance(tmp_path):
+    root,_=synthetic(tmp_path); accepted=root/"accepted.json"; manifest=generate_manifest(root); accepted.write_text(json.dumps(manifest))
+    result=reconcile(root,accepted)
+    assert result["reconciliation_outcome"]=="IMPLEMENTATION_UNCHANGED" and result["changed_artifacts"]==[]
+    artifact=next(x for x in manifest["artifacts"] if x["path"]=="src/component.py")
+    assert artifact["last_commit_sha"] not in {"UNKNOWN", ""} and artifact["last_commit_timestamp"]!="UNKNOWN"
 
 
 def test_seeded_search_replays_and_failure_codes():

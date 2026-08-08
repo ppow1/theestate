@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from estate.diagnostics.living import DiagnosticsRepository, GENERATED, SOURCE, build, canonical_json, generate_manifest, reconcile
+from estate.diagnostics.living import DiagnosticsRepository, GENERATED, SOURCE, advance_accepted_baseline, build, canonical_json, generate_manifest, reconcile
 
 
 def validate(root: Path) -> dict:
@@ -38,6 +38,7 @@ def main() -> int:
     w=sub.add_parser("workflow");w.add_argument("name")
     a=sub.add_parser("affected-by");a.add_argument("dependencies",nargs="+")
     r=sub.add_parser("reconcile");r.add_argument("--accepted-manifest",type=Path);r.add_argument("--impact-packet",type=Path,action="append",default=[]);r.add_argument("--incremental",action="store_true")
+    b=sub.add_parser("accept-baseline");b.add_argument("--actor",required=True);b.add_argument("--reason",required=True);b.add_argument("--expected-revision")
     args=parser.parse_args(); root=args.root.resolve(); repo=DiagnosticsRepository(root)
     if args.command=="build": result=build(root)
     elif args.command=="validate": result=validate(root)
@@ -50,9 +51,10 @@ def main() -> int:
     elif args.command=="workflow": result=[x for x in repo.generated("search-index.json")["entries"] if args.name.lower() in x["workflow"].lower()]
     elif args.command=="stale": result=[x for x in repo.generated("search-index.json")["entries"] if x["status"] in {"REVALIDATION_REQUIRED","STALE","UNKNOWN"}]
     elif args.command=="affected-by": result=repo.affected(args.dependencies)
+    elif args.command=="accept-baseline": result=advance_accepted_baseline(root,actor=args.actor,reason=args.reason,expected_revision=args.expected_revision)
     else: result=reconcile(root,args.accepted_manifest,args.impact_packet,"incremental" if args.incremental else "full")
     if json_requested or not isinstance(result,list): print(canonical_json(result),end="")
     else:
         for item in result: print(f"{item['checkpoint_id']} [{item['status']}] {item['title']}")
-    return 0
+    return 2 if isinstance(result,dict) and result.get("reconciliation_outcome") in {"ACCEPTED_BASELINE_MISSING","ACCEPTED_BASELINE_INVALID"} else 0
 if __name__=="__main__": raise SystemExit(main())

@@ -66,9 +66,12 @@ pending review and never preserves false certainty. Knowledge provenance uses
 `DETERMINISTIC`, `LOCAL_AI`, `EXTERNAL_AI`, `HUMAN`, or `MIXED`; provider detail
 is audit metadata, not architecture.
 
-The canonical Operations Scheduler is the scheduling owner. Register the
-read-only command in `operations/operations_scheduler/living_diagnostics_job.json`
-for nominal 06:00 Estate-local execution; this package creates no scheduler.
+The canonical Operations Scheduler is the active scheduling owner. Its
+`living_diagnostics_full_reconciliation` job runs nominally at 06:00 in
+`ESTATE_TIMEZONE` (UTC when unset/invalid), using the existing scheduler lease,
+retry, status, and Office-event path. `OperationsSchedulerRuntime.run_due`
+invokes deterministic reconciliation directly; the JSON registration describes
+that binding and is not a second scheduler.
 Accepted change/work-package completion may emit a packet conforming to
 `schemas/troubleshooting/diagnostic_impact_packet_v1.schema.json` and trigger
 incremental reconciliation. The full daily sweep independently detects packets
@@ -87,7 +90,32 @@ python tools/estate_diagnostics.py checkpoint 3.1.1 --json
 python tools/estate_diagnostics.py affected-by src/estate/core/continuous_momentum_engine.py
 python tools/estate_diagnostics.py reconcile --accepted-manifest PATH
 python tools/estate_diagnostics.py reconcile --incremental --impact-packet PACKET
+python tools/estate_diagnostics.py accept-baseline --actor OPERATOR --reason REASON --expected-revision SHA
 ```
+
+## Accepted baseline lifecycle
+
+Reconciliation defaults to
+`operations/diagnostics/accepted-implementation-manifest.json`. A missing,
+unreadable, or structurally invalid baseline fails closed with a non-zero CLI
+exit and `ACCEPTED_BASELINE_MISSING` or `ACCEPTED_BASELINE_INVALID`; it can never
+mean `IMPLEMENTATION_UNCHANGED`. Initialization and advancement are explicit
+operator acceptance actions through `accept-baseline`. They validate an existing
+baseline before replacement, optionally enforce the expected current revision,
+and append actor, reason, previous/accepted revision, timestamp, and accepted
+manifest hash to the JSONL history. The baseline and its history are excluded
+from governed change comparison to prevent self-referential drift.
+
+Packets are validated before ingestion. Invalid JSON, unsafe paths, missing
+provenance, unknown fields, and contract/type failures are recorded as invalid;
+their file claims do not cover implementation changes, so omitted metadata is
+still classified. Packet content remains candidate knowledge and never edits
+canonical cookbook knowledge automatically.
+
+The static HTML embeds an accessible SVG graphical rendering of the authored
+Mermaid flowchart, including visible nodes and directed edges. Its Mermaid
+source remains available in a disclosure for portability. Rendering is
+deterministic, local, and requires neither a CDN nor a web service.
 
 Future Grace/operations consumption reads `freshness-report.json` and surfaces
 only material exceptions. Probe producers should return CHECKPOINT, RESULT,

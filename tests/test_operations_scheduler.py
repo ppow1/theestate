@@ -45,3 +45,12 @@ def test_retry_and_next_run_state(tmp_path):
     assert failed["retry_count"] == 1
     assert failed["failure_count"] == 1
     assert failed["next_run_at"] == "2026-07-10T12:06:00Z"
+
+
+def test_living_diagnostics_is_active_at_six_estate_local(tmp_path, monkeypatch):
+    monkeypatch.setenv("ESTATE_TIMEZONE", "America/New_York")
+    now = datetime(2026, 7, 10, 12, 0, tzinfo=timezone.utc)
+    scheduler = OperationsScheduler(tmp_path, now=now)
+    state=scheduler.load_state(); job=scheduler.describe_job("living_diagnostics_full_reconciliation",state)
+    assert job["enabled"] is True and job["calendar"]=="06:00" and job["calendar_timezone"]=="ESTATE_LOCAL"
+    assert scheduler._next_time(__import__("estate.core.operations_scheduler",fromlist=["DEFAULT_JOBS"]).DEFAULT_JOBS[job["job_id"]]).isoformat()=="2026-07-11T10:00:00+00:00"

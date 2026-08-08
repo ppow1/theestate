@@ -1,0 +1,1 @@
+{"accepted_at": "2026-08-08T12:47:50Z", "accepted_revision": "e6d1bb2a4cc3815faf6a24de4f50fa978df98f6f", "action": "INITIALIZED", "actor": "steward", "event_version": "1.0.0", "manifest_sha256": "sha256:cf8fbef00f6446e50fd4b2b029d8e520abb8a3be05796a1e1dc212751f684446", "previous_revision": null, "reason": "PR 519 operational hardening acceptance"}
