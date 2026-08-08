@@ -141,3 +141,12 @@ returns `LIVE_APP_NOT_FOUND`. PL-0016/WP-4215 therefore remains open for the
 Steward's app-attachment action and subsequent rerun of Comms8 correlation,
 worktree/conflict, failure-isolation, and Grace conversational portfolio
 acceptance. No premature lifecycle closure is recorded.
+## 2026-08-08 transport and reservation correction
+
+Live acceptance exposed two independent boundaries. First, Comms8 transport
+readiness includes authenticated Streamable HTTP GET/session lifecycle, not
+only initialize and tools/list. Second, CME must launch the durable reserved
+consultation rather than merely selecting an awaiting row; the existing
+browser worker now receives that internal reservation correlation and releases
+it only after authoritative completion. Steward-facing prompts remain ordinary
+language and contain no internal request identifiers.

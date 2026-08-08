@@ -1,0 +1,9 @@
+name: GRACE_PARALLEL_LANE_A_BOUNDED_EXECUTION
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, get a second opinion on this bounded harmless acceptance fixture verification. The fixture is at Temp/cme-execution-fixtures/full-loop-20260807/fixture.json. You may perform only the smallest safe read-only validation of that fixture, never modify production or the canonical checkout, and must report authoritative evidence before recommending any further action. If the evidence is insufficient, say exactly what is missing instead of claiming that validation occurred."
+    expect:
+      not_contains: ["I modified production", "I changed the canonical checkout"]
+timeouts:
+  timeout: 240000

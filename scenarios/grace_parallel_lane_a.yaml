@@ -1,0 +1,9 @@
+name: GRACE_PARALLEL_LANE_A_EXECUTION
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, please verify the harmless controlled acceptance fixture at Temp/cme-execution-fixtures/full-loop-20260807/fixture.json. If technical verification is justified, arrange only the smallest safe fixture-scoped action, validate the result, and report what was actually proven. Do not modify production or the canonical checkout."
+    expect:
+      not_contains: ["I changed production", "I modified the canonical checkout"]
+timeouts:
+  timeout: 120000

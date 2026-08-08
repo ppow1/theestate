@@ -73,14 +73,18 @@ async function openSession(options, evidence) {
     });
     browser = context;
   }
-  const page = await context.newPage();
+  const existing = cdp ? context.pages().find(candidate => {
+    try { return new URL(candidate.url()).origin === new URL(DEFAULT_URL).origin; } catch { return false; }
+  }) : null;
+  const page = existing || await context.newPage();
+  const ownsPage = !existing;
   if (capture) {
     page.on('pageerror', error => browserErrors.push({timestamp: new Date().toISOString(), type: 'pageerror', message: String(error.message || error)}));
     page.on('console', message => { if (['error', 'warning'].includes(message.type())) browserErrors.push({timestamp: new Date().toISOString(), type: message.type(), message: message.text()}); });
     page.on('requestfailed', request => networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: request.method(), url: request.url(), failure: request.failure()?.errorText || 'request_failed'})));
     page.on('response', response => { if (response.status() >= 400) networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: response.request().method(), url: response.url(), status: response.status(), failure: `HTTP_${response.status()}`})); });
   }
-  return {browser, context, page, managed, browserErrors, networkErrors, close: async () => { await page.close().catch(() => {}); if (managed) await context.close().catch(() => {}); }};
+  return {browser, context, page, managed, ownsPage, browserErrors, networkErrors, close: async () => { if (ownsPage) await page.close().catch(() => {}); if (managed) await context.close().catch(() => {}); }};
 }
 
 async function readiness(page, url, {navigate = true} = {}) {
@@ -396,7 +400,7 @@ async function main() {
   const command = options._[0] || 'readiness';
   if (command === 'auth-bootstrap') return authBootstrap(options);
   if (command === 'scenario') return executeScenario(options._[1], options);
-  if (command === 'concurrent') return executeConcurrent([options['scenario-a'], options['scenario-b']].filter(Boolean), options);
+  if (command === 'concurrent') return executeConcurrent([options['scenario-a'], options['scenario-b'], options['scenario-c']].filter(Boolean), options);
   if (!['readiness', 'doctor', 'chat'].includes(command)) throw new Error(`Unknown command: ${command}`);
   const evidence = makeEvidence(runId());
   const session = await openSession(options, evidence);

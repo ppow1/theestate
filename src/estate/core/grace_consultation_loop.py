@@ -437,6 +437,25 @@ class GraceConsultationLoop:
             self.sleep(2.0)
         raise TimeoutError("comms8_response_timeout")
 
+    def _reusable_existing_consultation(self, consultation: ConsultationRecord) -> bool:
+        """Do not reuse a logical row whose authoritative transport is terminal.
+
+        Historical rows can retain ``awaiting_reasoning`` after an expired or
+        resolved Comms8 request.  Reusing such a row suppresses the fresh root
+        that an ordinary Grace conversation is entitled to allocate.  The
+        durable request state is authoritative; the consultation status alone
+        is not sufficient.
+        """
+        if not consultation.ec8_request_id:
+            return True
+        try:
+            state = self.read_request(consultation.ec8_request_id).get("state")
+        except Exception:
+            # Preserve duplicate protection when the authority is temporarily
+            # unreadable; CME can reconcile it once transport is available.
+            return True
+        return state not in {"expired", "resolved"}
+
     def delegate(self, text: str, *, session_id: str | None = None,
                  parent_logical_id: str | None = None,
                  ptm_project_id: str | None = None,
@@ -448,7 +467,9 @@ class GraceConsultationLoop:
             parent = self._latest_candidate()
         existing = [item for status in ("open", "awaiting_reasoning", "claimed", "reasoning", "response_received", "validating")
                     for item in self.store.search(status=status)
-                    if item.objective == text.strip() and (parent is None or item.parent_logical_id == parent.logical_consultation_id)]
+                    if item.objective == text.strip()
+                    and (parent is None or item.parent_logical_id == parent.logical_consultation_id)
+                    and self._reusable_existing_consultation(item)]
         consultation = max(existing, key=lambda item: item.updated_at, default=None)
         if consultation is None:
             consultation = self._allocate(text, parent=parent, session_id=session_id,

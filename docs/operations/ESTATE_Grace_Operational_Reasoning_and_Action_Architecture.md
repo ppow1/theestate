@@ -126,3 +126,10 @@ the supported browser seam returns `LIVE_APP_NOT_FOUND` and
 `composer_ready=false`. The stale titled conversation was corrected out of
 target preference, but attaching the installed app to the Work surface needs
 Steward/UI action. No live completion claim is made beyond the evidence above.
+## 2026-08-08 live transport boundary note
+
+The canonical Open WebUI path now includes a proven Streamable HTTP checkpoint:
+MCP initialize/tools-list success alone is insufficient. The existing Live
+compatibility adapter and public route must also support an authenticated
+session GET stream and clean session close. The repair preserved the seven
+Comms8 tools and the existing CME-owned reasoning path.

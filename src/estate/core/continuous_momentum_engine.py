@@ -12,6 +12,8 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any, Callable, Iterable
 
+from estate.core.grace_parallel_portfolio import claim_activation, list_activations
+
 SCHEMA_VERSION = "estate.continuous-momentum-cycle.v1"
 MODES = {"simulation", "dry_run", "live"}
 PERMISSIONS = {"recommendation", "preauthorized", "delegated", "protected", "prohibited"}
@@ -237,7 +239,32 @@ class ChatGPTReasoningCMEOwner:
 
     def _eligible(self) -> Any | None:
         candidates = self.store.search(status="awaiting_reasoning")
-        return candidates[0] if candidates else None
+        # Open WebUI may append bounded title/tag maintenance consultations
+        # beginning with ``### Task``.  They remain durable work, but explicit
+        # Steward objectives must receive deterministic priority so metadata
+        # generation cannot starve a live Grace lane.
+        candidates.sort(key=lambda item: (
+            str(item.question or "").lstrip().startswith("### Task"),
+            item.created_at or "",
+            str(item.logical_consultation_id),
+        ))
+        for candidate in candidates:
+            if not candidate.ec8_request_id or not self.read_request:
+                return candidate
+            try:
+                authoritative = self._authoritative(candidate) or {}
+            except Exception:
+                # Preserve the existing fail-closed launch boundary when the
+                # authoritative transport cannot be read.  A later tick can
+                # retry the observation without mutating consultation truth.
+                return candidate
+            if authoritative.get("state") not in {"expired", "resolved"}:
+                return candidate
+            # A consultation row can remain awaiting_reasoning after its
+            # external request has expired or been resolved.  It is retained
+            # for history/reconciliation, but must not monopolize CME or be
+            # relaunched against a terminal request.
+        return None
 
     def _lock_record(self) -> dict[str, Any] | None:
         if not self.lock_path.exists():
@@ -330,6 +357,25 @@ class ChatGPTReasoningCMEOwner:
             return stale
         if float(state.get("backoff_until") or 0) > self.now():
             return {"status": "BACKOFF", **state}
+        # CME must respect the durable reasoning reservation before selecting
+        # another logical lane.  The browser worker is a physical singleton
+        # today; selecting a held lane while another reservation is ACTIVE
+        # would let the generic worker claim a different request and corrupt
+        # CME/worker correlation.
+        active_reservations = [
+            item for item in list_activations(self.store, states={"RESERVED", "LAUNCHING", "ACTIVE"})
+            if item.worker_class == "reasoning" and item.provider_key == "chatgpt-browser"
+        ]
+        if any(item.state in {"LAUNCHING", "ACTIVE"} for item in active_reservations):
+            current = next(item for item in active_reservations if item.state in {"LAUNCHING", "ACTIVE"})
+            self._release_lock()
+            return self._write_state(
+                "WAITING_FOR_AUTHORITATIVE_COMPLETION",
+                logical_consultation_id=current.continuation_logical_id,
+                activation_id=current.activation_id,
+                reason="reasoning_capacity_in_use",
+                active_activation_id=current.activation_id,
+            )
         pid = state.get("pid")
         if state.get("state") in {"STARTING", "PROCESSING", "WAITING_FOR_AUTHORITATIVE_COMPLETION"} and self._alive(pid):
             return {"status": "ALREADY_RUNNING", **state}
@@ -349,16 +395,43 @@ class ChatGPTReasoningCMEOwner:
                 result = self._write_state("WAITING_FOR_AUTHORITATIVE_COMPLETION", activation_id=activation_id, logical_consultation_id=consultation.logical_consultation_id, reason="active_comms8_lease")
                 self._release_lock()
                 return result
+            capacity_value = os.environ.get("ESTATE_REASONING_CAPACITY", "1")
+            try:
+                reasoning_capacity = int(capacity_value)
+            except (TypeError, ValueError):
+                reasoning_capacity = None
+            reservation = claim_activation(
+                self.store,
+                root_logical_id=consultation.root_logical_id,
+                continuation_logical_id=consultation.logical_consultation_id,
+                worker_class="reasoning",
+                provider_key="chatgpt-browser",
+                idempotency_key=f"{consultation.root_logical_id}:{consultation.logical_consultation_id}:reasoning",
+                capacity=reasoning_capacity,
+                controller_pid=os.getpid(),
+            )
+            if reservation.get("status") != "RESERVED":
+                self._release_lock()
+                return self._write_state(
+                    "WAITING_FOR_AUTHORITATIVE_COMPLETION",
+                    logical_consultation_id=consultation.logical_consultation_id,
+                    reason=reservation.get("reason") or "reasoning_capacity_held",
+                )
+            selected_activation_id = reservation["activation_id"]
             history = state.get("activation_history")
             history_kwargs = {"activation_history": history} if history else {}
-            self._write_state("WAKE_PENDING", activation_id=activation_id, logical_consultation_id=consultation.logical_consultation_id, root_consultation_id=consultation.root_logical_id, **history_kwargs)
+            self._write_state("WAKE_PENDING", activation_id=activation_id, activation_reservation_id=selected_activation_id, logical_consultation_id=consultation.logical_consultation_id, root_consultation_id=consultation.root_logical_id, **history_kwargs)
             log_path = self.state_path.with_name(f"{activation_id}.log")
             log = log_path.open("a", encoding="utf-8")
             command = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(self.wrapper), "--once"]
-            self._write_state("STARTING", activation_id=activation_id, logical_consultation_id=consultation.logical_consultation_id, launch_time=datetime.now(timezone.utc).isoformat(timespec="seconds"), **history_kwargs)
-            process = self.launcher(command, cwd=str(self.wrapper.parent.parent), env=os.environ.copy(), stdout=log, stderr=log)
-            self._write_state("PROCESSING", activation_id=activation_id, pid=getattr(process, "pid", None), logical_consultation_id=consultation.logical_consultation_id, **history_kwargs)
-            return {"status": "STARTED", "activation_id": activation_id, "pid": getattr(process, "pid", None), "logical_consultation_id": consultation.logical_consultation_id}
+            self._write_state("STARTING", activation_id=activation_id, activation_reservation_id=selected_activation_id, logical_consultation_id=consultation.logical_consultation_id, launch_time=datetime.now(timezone.utc).isoformat(timespec="seconds"), **history_kwargs)
+            environment = os.environ.copy()
+            environment["ESTATE_RESERVED_CONTINUATION_ID"] = consultation.logical_consultation_id
+            environment["ESTATE_RESERVED_EC8_REQUEST_ID"] = consultation.ec8_request_id or ""
+            environment["ESTATE_RESERVED_ACTIVATION_ID"] = selected_activation_id
+            process = self.launcher(command, cwd=str(self.wrapper.parent.parent), env=environment, stdout=log, stderr=log)
+            self._write_state("PROCESSING", activation_id=activation_id, activation_reservation_id=selected_activation_id, pid=getattr(process, "pid", None), logical_consultation_id=consultation.logical_consultation_id, **history_kwargs)
+            return {"status": "STARTED", "activation_id": activation_id, "activation_reservation_id": selected_activation_id, "pid": getattr(process, "pid", None), "logical_consultation_id": consultation.logical_consultation_id}
         except Exception as exc:
             self._release_lock()
             return self._write_state("ERROR", activation_id=activation_id, reason=type(exc).__name__ + ":" + str(exc), backoff_until=self.now() + self.backoff_seconds)
@@ -387,7 +460,7 @@ class ChatGPTReasoningCMEOwner:
 
     def activate_until_settled(self, *, timeout_seconds: int = 660, poll_seconds: float = 1.0) -> dict[str, Any]:
         started = self.tick()
-        if started.get("status") in {"EMPTY_QUEUE", "BACKOFF", "ALREADY_RUNNING", "WAITING_FOR_AUTHORITATIVE_COMPLETION"}:
+        if started.get("status") in {"EMPTY_QUEUE", "BACKOFF", "ALREADY_RUNNING", "WAITING_FOR_AUTHORITATIVE_COMPLETION"} or started.get("state") == "IDLE" or started.get("result") == "EMPTY_QUEUE":
             return started
         deadline = self.now() + timeout_seconds
         while self.now() < deadline:

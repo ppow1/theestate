@@ -1,0 +1,9 @@
+name: GRACE_PARALLEL_LANE_B_READONLY
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, get a second opinion on whether an explicitly optional local listener should be reported as degraded rather than failed. Keep this read-only, do not execute or modify anything, and report only evidence-backed reasoning."
+    expect:
+      not_contains: ["I executed", "I modified the repository"]
+timeouts:
+  timeout: 120000
