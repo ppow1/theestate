@@ -97,8 +97,11 @@ When promoted, first determine which existing Estate subsystems can absorb cookb
 
 The Steward promoted and accepted the Living Troubleshooting Foundation. It now
 provides deterministic provenance, applicability/staleness detection, a
-provider-neutral reconciliation contract, structured change-impact packets,
-machine query, and local static HTML. PL-0040 remains open for incremental
-Estate-wide coverage. Automated universal probes, autonomous Grace cookbook
+provider-neutral reconciliation contract, validated change-impact packets,
+machine query, locally rendered process diagrams, an auditable accepted-baseline
+lifecycle, and active 06:00 Estate-local reconciliation through the existing
+Operations Scheduler. This foundation slice is complete; incremental
+Estate-wide checkpoint coverage remains ordinary follow-on work rather than a
+foundation blocker. Automated universal probes, autonomous Grace cookbook
 consultation, and automated remediation remain future work; remediation is not
 authorized by this foundation.

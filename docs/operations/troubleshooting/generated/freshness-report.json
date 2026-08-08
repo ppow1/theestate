@@ -1,16 +1,16 @@
 {
   "checkpoint_counts": {
     "PROPOSED": 0,
-    "REVALIDATION_REQUIRED": 0,
+    "REVALIDATION_REQUIRED": 12,
     "STALE": 0,
     "UNKNOWN": 0,
-    "VALIDATED": 12
+    "VALIDATED": 0
   },
   "duration_seconds": 0,
-  "generated_at": "2026-08-08T10:40:00Z",
+  "generated_at": "2000-01-01T00:00:00Z",
   "implementation_state": "CURRENT_LOCAL_STATE",
   "mode": "build",
-  "pending_reasoning_review": 0,
+  "pending_reasoning_review": 12,
   "provider_independence": "Stage 1 completed without an AI provider",
   "reasoning_provider_required": false,
   "report_version": "1.0.0"

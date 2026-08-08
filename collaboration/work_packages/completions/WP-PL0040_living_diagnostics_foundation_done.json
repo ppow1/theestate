@@ -3,13 +3,13 @@
   "source_parking_lot_id": "PL-0040",
   "status": "implemented",
   "branch": "work",
-  "scope": "Provider-neutral deterministic provenance, applicability, reconciliation, query and static cookbook foundation",
+  "scope": "Provider-neutral deterministic provenance, accepted-baseline lifecycle, validated incremental reconciliation, scheduled daily execution, query and static cookbook foundation",
   "artifacts": ["src/estate/diagnostics/living.py", "tools/estate_diagnostics.py", "schemas/troubleshooting", "docs/operations/troubleshooting"],
   "seeded_workflows": 12,
   "seeded_checkpoints": 12,
   "historical_replays": 8,
-  "decisions": ["Path plus content hash and Git identity is the universal artifact revision", "Semantic versions are declared only when meaningful", "AI may interpret candidate knowledge but does not own validation truth", "Operations Scheduler remains scheduling authority"],
-  "limitations": ["Estate-wide coverage remains incremental", "Running installation provenance is not universal", "Reasoned maintenance capability integration is future", "Scheduler registration activation remains an Operations action"],
+  "decisions": ["Path plus content hash and Git identity is the universal artifact revision", "Semantic versions are declared only when meaningful", "AI may interpret candidate knowledge but does not own validation truth", "Operations Scheduler owns the active 06:00 Estate-local job", "Baseline advancement is an explicit audited acceptance action", "Invalid packets never suppress undeclared-change detection", "Authored Mermaid is rendered to deterministic inline SVG without network dependencies"],
+  "limitations": ["Estate-wide checkpoint coverage remains incremental", "Running installation provenance is not universal", "Reasoned maintenance capability integration is optional future Stage 2 work"],
   "not_implemented": ["new service", "new database", "new scheduler", "autonomous remediation", "Grace runtime integration"],
   "active_grace_parallelism_runtime_modified": false
 }

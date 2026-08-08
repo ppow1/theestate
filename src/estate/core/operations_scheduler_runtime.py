@@ -6,6 +6,7 @@ from typing import Any
 
 from estate.core.operations_runtime_service import OperationsRuntimeService
 from estate.core.operations_scheduler import OperationsScheduler
+from estate.diagnostics.living import reconcile
 
 
 class OperationsSchedulerRuntime:
@@ -37,8 +38,12 @@ class OperationsSchedulerRuntime:
             lease_id = item["lease_id"]
             for _ in range(item.get("catch_up_runs", 1)):
                 try:
-                    result = service.run_once(dry_run=False, mode=job.runtime_mode, max_audit_requests=job.max_audit_requests)
-                    status = "failed" if result.get("runtime_state") == "failed" or result.get("errors") else "completed"
+                    if job.runtime_mode == "living-diagnostics-reconcile":
+                        result = reconcile(self.scheduler.root)
+                        status = "failed" if result.get("reconciliation_outcome") in {"ACCEPTED_BASELINE_MISSING", "ACCEPTED_BASELINE_INVALID"} else "completed"
+                    else:
+                        result = service.run_once(dry_run=False, mode=job.runtime_mode, max_audit_requests=job.max_audit_requests)
+                        status = "failed" if result.get("runtime_state") == "failed" or result.get("errors") else "completed"
                     error = "; ".join(result.get("errors") or []) or None
                 except Exception as exc:  # preserve scheduler state for Office visibility
                     result = {"error": str(exc)}; status = "failed"; error = str(exc)
