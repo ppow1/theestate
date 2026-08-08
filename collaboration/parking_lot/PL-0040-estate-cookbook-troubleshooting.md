@@ -1,6 +1,6 @@
 # PL-0040 — Estate Cookbook Troubleshooting
 
-Status: Captured
+Status: Foundation Implemented — Estate-wide coverage remains incremental
 Priority: High
 Category: Estate Operations / Troubleshooting / Diagnostic Engineering
 Originator: Pat / Steward
@@ -92,3 +92,13 @@ When promoted, first determine which existing Estate subsystems can absorb cookb
 - The implementation reference explicitly identifies Estate-wide cookbook troubleshooting and diagnostic tooling as deliberate future work.
 - Existing detached process-sensitive test harness: `tools/cme_owner_isolation.py`.
 - Canonical Parking Lot process: `AI_COMMUNICATION_HINTS.md`.
+
+## 2026-08-08 Promotion Outcome
+
+The Steward promoted and accepted the Living Troubleshooting Foundation. It now
+provides deterministic provenance, applicability/staleness detection, a
+provider-neutral reconciliation contract, structured change-impact packets,
+machine query, and local static HTML. PL-0040 remains open for incremental
+Estate-wide coverage. Automated universal probes, autonomous Grace cookbook
+consultation, and automated remediation remain future work; remediation is not
+authorized by this foundation.

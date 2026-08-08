@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/diagnostic_impact_packet_v1",
+  "title": "Provider-neutral Diagnostic Impact Packet v1",
+  "type": "object",
+  "required": ["packet_version", "change_id", "author_provenance", "changed_files", "source_revision", "confidence"],
+  "properties": {
+    "packet_version": {"const": "1.0.0"}, "change_id": {"type": "string"}, "work_package_id": {"type": ["string", "null"]}, "estate_change_id": {"type": ["string", "null"]},
+    "author_provenance": {"type": "object"}, "changed_files": {"type": "array", "items": {"type": "string"}}, "changed_components": {"type": "array"}, "changed_interfaces": {"type": "array"}, "changed_schemas": {"type": "array"},
+    "behavior_before": {}, "behavior_after": {}, "expected_inputs": {"type": "array"}, "expected_outputs": {"type": "array"}, "dependencies_read": {"type": "array"}, "dependencies_called": {"type": "array"}, "resources_written": {"type": "array"},
+    "new_failure_modes": {"type": "array"}, "changed_failure_modes": {"type": "array"}, "removed_failure_modes": {"type": "array"}, "new_or_changed_logs": {"type": "array"}, "new_or_changed_status_codes": {"type": "array"},
+    "tests_added_or_changed": {"type": "array"}, "validation_evidence": {"type": "array"}, "recommended_checkpoint_impacts": {"type": "array"}, "preliminary_troubleshooting_notes": {"type": "array"}, "prohibited_recovery_actions": {"type": "array"}, "activation_restart_impact": {},
+    "source_revision": {"type": "string"}, "confidence": {"enum": ["PROVEN", "SUPPORTED", "CANDIDATE", "UNKNOWN"]}
+  }
+}

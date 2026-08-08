@@ -1,0 +1,11 @@
+{
+  "job_id": "living_diagnostics_full_reconciliation",
+  "owner": "operations_scheduler",
+  "schedule": {"kind": "daily", "local_time": "06:00", "timezone": "ESTATE_LOCAL"},
+  "command": ["python", "tools/estate_diagnostics.py", "reconcile", "--accepted-manifest", "operations/diagnostics/accepted-implementation-manifest.json"],
+  "provider_dependency": "NONE",
+  "notification_policy": "material_exceptions_only",
+  "unchanged_outcomes": ["IMPLEMENTATION_UNCHANGED", "COOKBOOK_CURRENT"],
+  "state": "ELIGIBLE_FOR_CANONICAL_SCHEDULER_REGISTRATION",
+  "note": "Declarative registration only; no duplicate scheduler is introduced. Activation remains an Operations Scheduler action."
+}

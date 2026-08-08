@@ -1,0 +1,911 @@
+{
+  "checkpoints": [
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "1.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "resident_gateway",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "CONTEXT_REQUIRED"
+      ],
+      "historical_incidents": [
+        "CONTEXT_REQUIRED"
+      ],
+      "keywords": [
+        "conversation",
+        "unanswered",
+        "grace",
+        "conversation",
+        "entry",
+        "grace",
+        "ordinary",
+        "conversation",
+        "entry"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "CONTEXT_REQUIRED"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/resident_gateway.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "resident_gateway",
+      "symptoms": [
+        "conversation unanswered"
+      ],
+      "title": "Grace conversation entry",
+      "validated_against": {
+        "components": {
+          "resident_gateway": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/resident_gateway.py": "sha256:b35ffeace481b1c0c94a6c14416948bcf9e6f83c9750825e47ff75af24784116"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "Grace ordinary conversation entry"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "2.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "consultation_store",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "ACTIVE_LEASE"
+      ],
+      "historical_incidents": [
+        "ACTIVE_LEASE"
+      ],
+      "keywords": [
+        "queued",
+        "but",
+        "never",
+        "claimed",
+        "consultation",
+        "eligibility",
+        "consultation",
+        "creation",
+        "/",
+        "eligibility"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "ACTIVE_LEASE"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/continuous_momentum_engine.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "consultation_store",
+      "symptoms": [
+        "queued but never claimed"
+      ],
+      "title": "Consultation eligibility",
+      "validated_against": {
+        "components": {
+          "consultation_store": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/continuous_momentum_engine.py": "sha256:a585e4371410b33c146e9a112e2dabaec1daee53d87f0798ae3f0fb379ef7f62"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "consultation creation / eligibility"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "3.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "continuous_momentum_engine",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "ACTIVE_LEASE",
+        "STALE_OWNER"
+      ],
+      "historical_incidents": [
+        "ACTIVE_LEASE"
+      ],
+      "keywords": [
+        "cme",
+        "owner",
+        "stale",
+        "cme",
+        "activation",
+        "ownership",
+        "cme",
+        "reasoning",
+        "activation"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "ACTIVE_LEASE",
+        "STALE_OWNER"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/continuous_momentum_engine.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "continuous_momentum_engine",
+      "symptoms": [
+        "cme owner stale"
+      ],
+      "title": "CME activation ownership",
+      "validated_against": {
+        "components": {
+          "continuous_momentum_engine": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/continuous_momentum_engine.py": "sha256:a585e4371410b33c146e9a112e2dabaec1daee53d87f0798ae3f0fb379ef7f62"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "CME reasoning activation"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "4.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "comms8",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "MCP_NOT_INVOKED"
+      ],
+      "historical_incidents": [
+        "MCP_NOT_INVOKED"
+      ],
+      "keywords": [
+        "message",
+        "was",
+        "not",
+        "picked",
+        "up",
+        "comms8",
+        "lifecycle",
+        "evidence",
+        "comms8",
+        "lifecycle"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "MCP_NOT_INVOKED"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "comms8",
+      "symptoms": [
+        "message was not picked up"
+      ],
+      "title": "Comms8 lifecycle evidence",
+      "validated_against": {
+        "components": {
+          "comms8": "NOT_DECLARED"
+        },
+        "files": {
+          "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md": "sha256:86ea1b62d2b7ae6d1712a16c8a09e203eca49b9aacd36a15d1f4d074029a023a"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "Comms8 lifecycle"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "5.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "comms8",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "COMPOSER_NOT_READY",
+        "REQUEST_PROCESSING_LIMITATION"
+      ],
+      "historical_incidents": [
+        "COMPOSER_NOT_READY"
+      ],
+      "keywords": [
+        "composer",
+        "missing",
+        "browser",
+        "composer",
+        "readiness",
+        "chatgpt",
+        "browser/composer",
+        "readiness"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "COMPOSER_NOT_READY",
+        "REQUEST_PROCESSING_LIMITATION"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "comms8",
+      "symptoms": [
+        "composer missing"
+      ],
+      "title": "Browser composer readiness",
+      "validated_against": {
+        "components": {
+          "comms8": "NOT_DECLARED"
+        },
+        "files": {
+          "docs/mcp/Estate_Comms8_MCP_App_Repair_and_Correct_Creation_Reference.md": "sha256:86ea1b62d2b7ae6d1712a16c8a09e203eca49b9aacd36a15d1f4d074029a023a"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "ChatGPT browser/composer readiness"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "6.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "reason_execute_orchestration",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "MALFORMED_EXECUTION_RECOMMENDED",
+        "CLAIM_NEXT_SCHEMA_NOT_USED"
+      ],
+      "historical_incidents": [
+        "MALFORMED_EXECUTION_RECOMMENDED"
+      ],
+      "keywords": [
+        "recommendation",
+        "not",
+        "executed",
+        "reason",
+        "to",
+        "execute",
+        "recommendation",
+        "reason",
+        "->",
+        "execute",
+        "handoff"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "MALFORMED_EXECUTION_RECOMMENDED",
+        "CLAIM_NEXT_SCHEMA_NOT_USED"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/execution_dispatch.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "reason_execute_orchestration",
+      "symptoms": [
+        "recommendation not executed"
+      ],
+      "title": "Reason to execute recommendation",
+      "validated_against": {
+        "components": {
+          "reason_execute_orchestration": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/execution_dispatch.py": "sha256:389e815f106384d2443148e5c0c95c789cce850f2648cf635566367a45ff49f3"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "reason -> execute handoff"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "7.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "reason_execute_orchestration",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "PROVIDER_QUOTA_CAPACITY"
+      ],
+      "historical_incidents": [
+        "PROVIDER_QUOTA_CAPACITY"
+      ],
+      "keywords": [
+        "provider",
+        "quota",
+        "exhausted",
+        "execution",
+        "provider",
+        "attempt",
+        "execution",
+        "provider",
+        "attempt"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "PROVIDER_QUOTA_CAPACITY"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/execution_attempt_runtime.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "reason_execute_orchestration",
+      "symptoms": [
+        "provider quota exhausted"
+      ],
+      "title": "Execution provider attempt",
+      "validated_against": {
+        "components": {
+          "reason_execute_orchestration": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/execution_attempt_runtime.py": "sha256:35a5d3557eacfeb86e866b51151c416baeb2ab6af356a25d56c1b15163660e5d"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "execution provider attempt"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "8.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "reason_execute_orchestration",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "EVIDENCE_ACQUISITION_EXHAUSTION",
+        "MALFORMED_EVIDENCE_REQUEST"
+      ],
+      "historical_incidents": [
+        "EVIDENCE_ACQUISITION_EXHAUSTION"
+      ],
+      "keywords": [
+        "execution",
+        "evidence",
+        "missing",
+        "evidence",
+        "continuation",
+        "evidence",
+        "->",
+        "continuation",
+        "codex",
+        "says",
+        "done",
+        "grace",
+        "did",
+        "not",
+        "answer"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "EVIDENCE_ACQUISITION_EXHAUSTION",
+        "MALFORMED_EVIDENCE_REQUEST"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/execution_result_reconciliation_runtime.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "reason_execute_orchestration",
+      "symptoms": [
+        "execution evidence missing",
+        "codex says done grace did not answer"
+      ],
+      "title": "Evidence continuation",
+      "validated_against": {
+        "components": {
+          "reason_execute_orchestration": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/execution_result_reconciliation_runtime.py": "sha256:b7d77d599f44bb1d4bc19a6241369d345a4a104c51a444484ad03df1aecce9e2"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "evidence -> continuation"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "9.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "resident_gateway",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "STEWARD_DECISION_REQUIRED"
+      ],
+      "historical_incidents": [
+        "STEWARD_DECISION_REQUIRED"
+      ],
+      "keywords": [
+        "grace",
+        "did",
+        "not",
+        "answer",
+        "grace",
+        "final",
+        "synthesis",
+        "grace",
+        "final",
+        "synthesis"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "STEWARD_DECISION_REQUIRED"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/core/grace_momentum_service.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "resident_gateway",
+      "symptoms": [
+        "grace did not answer"
+      ],
+      "title": "Grace final synthesis",
+      "validated_against": {
+        "components": {
+          "resident_gateway": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/core/grace_momentum_service.py": "sha256:2f722e75913cc0c163b601a09db3b677458bfda14945bf0d2e2f9fcaba686411"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "Grace final synthesis"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "10.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "model_control",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "BOOTSTRAP_FALLBACK"
+      ],
+      "historical_incidents": [
+        "BOOTSTRAP_FALLBACK"
+      ],
+      "keywords": [
+        "which",
+        "model",
+        "is",
+        "grace",
+        "using",
+        "resolved",
+        "resident",
+        "model",
+        "resident",
+        "model",
+        "/",
+        "ollama",
+        "selection"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "BOOTSTRAP_FALLBACK"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/model_control/resident_model_assignment.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "model_control",
+      "symptoms": [
+        "which model is grace using"
+      ],
+      "title": "Resolved resident model",
+      "validated_against": {
+        "components": {
+          "model_control": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/model_control/resident_model_assignment.py": "sha256:a3f1673dd366725e8a10b185e9a9ede02c60fac692a6b765ea6f28a2a8dc79a0"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "resident model / Ollama selection"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "11.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "living_diagnostics",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "DIRTY_WORKTREE"
+      ],
+      "historical_incidents": [
+        "DIRTY_WORKTREE"
+      ],
+      "keywords": [
+        "worktree",
+        "dirty",
+        "repository",
+        "and",
+        "worktree",
+        "identity",
+        "git/worktree",
+        "repository",
+        "safety"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "DIRTY_WORKTREE"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "src/estate/diagnostics/living.py"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "living_diagnostics",
+      "symptoms": [
+        "worktree dirty"
+      ],
+      "title": "Repository and worktree identity",
+      "validated_against": {
+        "components": {
+          "living_diagnostics": "NOT_DECLARED"
+        },
+        "files": {
+          "src/estate/diagnostics/living.py": "sha256:ea6a740a77409053808f7dfbc9acb36e73a7c032376135018fa2ac838c26e722"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "Git/worktree repository safety"
+    },
+    {
+      "activation_restart_boundary": "The owning component only, after evidence capture.",
+      "authority": "Owning durable record, event, attempt, evidence, or actual turn metadata.",
+      "checkpoint_id": "12.1.1",
+      "checkpoint_revision": "1.0.0",
+      "component_id": "continuous_momentum_engine",
+      "escalation_condition": "Authority remains unavailable or correction exceeds granted authority.",
+      "expected_input": "A durable upstream record with correlation identity.",
+      "expected_output": "A durable authoritative downstream record or explicit failure state.",
+      "failure_codes": [
+        "PROCESS_OBSERVER_EFFECT"
+      ],
+      "historical_incidents": [
+        "PROCESS_OBSERVER_EFFECT"
+      ],
+      "keywords": [
+        "process",
+        "observer",
+        "effect",
+        "detached",
+        "process-sensitive",
+        "test",
+        "detached",
+        "process-sensitive",
+        "testing"
+      ],
+      "knowledge_provenance": {
+        "evidence": [
+          "repository source",
+          "historical work-package evidence"
+        ],
+        "method": "HUMAN"
+      },
+      "known_failures": [
+        "PROCESS_OBSERVER_EFFECT"
+      ],
+      "likely_causes": [
+        "dependency unavailable or state/schema mismatch"
+      ],
+      "maturity": "OBSERVED",
+      "next_checkpoints": [],
+      "previous_checkpoints": [],
+      "probe_summary": "Inspect the narrow authoritative boundary and correlate identities before changing state.",
+      "prohibited_actions": [
+        "Do not restart unrelated Estate services",
+        "Do not infer success from UI appearance alone"
+      ],
+      "purpose": "Localize the first unproven boundary using authoritative evidence.",
+      "recovery_summary": "Repair only the failed boundary, then verify authoritative downstream evidence.",
+      "recovery_verification": "Required output exists and the next checkpoint consumes it.",
+      "source_dependencies": [
+        "docs/operations/ESTATE_Grace_Reasoning_Loop_Implementation_and_Operations.md"
+      ],
+      "status": "VALIDATED",
+      "subsystem": "continuous_momentum_engine",
+      "symptoms": [
+        "process observer effect"
+      ],
+      "title": "Detached process-sensitive test",
+      "validated_against": {
+        "components": {
+          "continuous_momentum_engine": "NOT_DECLARED"
+        },
+        "files": {
+          "docs/operations/ESTATE_Grace_Reasoning_Loop_Implementation_and_Operations.md": "sha256:9821e02454ad442cca8a0da76ab3af3add0e5189140c9352b1519c7744653318"
+        },
+        "interfaces": {},
+        "repository_commit": "00ee3d2"
+      },
+      "validated_at": "2026-08-08T00:00:00Z",
+      "workflow": "detached process-sensitive testing"
+    }
+  ],
+  "diagrams": {
+    "browser": "flowchart LR\n Request-->Composer-->Submit-->InteractionEvidence",
+    "cme": "flowchart LR\n Eligible-->Reserve-->Owner-->Reason",
+    "comms8": "flowchart LR\n Queued-->Claimed-->Delivered-->Acknowledged",
+    "provenance": "flowchart LR\n Source-->Hash-->Manifest-->Applicability-->Cookbook",
+    "reason_execute": "flowchart LR\n Reason-->Execute-->Evidence-->Continue-->Synthesis",
+    "seven_step": "flowchart LR\n A[Define]-->B[Verify]-->C[Localize]-->D[Causes]-->E[Smallest safe action]-->F[Verify restoration]-->G[Preserve]"
+  },
+  "document_revision": "1.0.0",
+  "format_version": "1.0.0",
+  "method": [
+    "DEFINE THE SYMPTOM",
+    "VERIFY THE SYMPTOM",
+    "LOCALIZE THE FAILURE BOUNDARY",
+    "IDENTIFY PROBABLE CAUSES",
+    "PERFORM THE SMALLEST SAFE PROBE OR CORRECTION",
+    "VERIFY RESTORATION",
+    "PRESERVE THE KNOWLEDGE"
+  ],
+  "title": "Estate Living Troubleshooting Cookbook"
+}
