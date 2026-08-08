@@ -91,7 +91,7 @@ async function readiness(page, url, {navigate = true} = {}) {
   if (!text.trim()) return {status: FAILURE_CLASSES.RESIDENT_SURFACE_UNAVAILABLE, url: page.url()};
   const composer = await firstVisible(page, SELECTORS.composer);
   const grace = /\bgrace\b/i.test(text);
-  return {status: composer && grace ? 'OPENWEBUI_READY' : (grace ? 'MODEL_SURFACE_UNAVAILABLE' : 'RESIDENT_SURFACE_UNAVAILABLE'), url: page.url(), grace_visible: grace, composer_usable: Boolean(composer), title: await page.title()};
+  return {status: composer && grace ? 'OPENWEBUI_READY' : (grace ? 'MODEL_SURFACE_UNAVAILABLE' : (composer ? FAILURE_CLASSES.RESIDENT_NOT_FOUND : 'RESIDENT_SURFACE_UNAVAILABLE')), url: page.url(), grace_visible: grace, composer_usable: Boolean(composer), title: await page.title()};
 }
 
 async function isAuthenticatedSurface(page, result) {
