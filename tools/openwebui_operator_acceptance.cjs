@@ -43,6 +43,13 @@ function gitRevision() {
 
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
+async function waitForRenderedSurface(page, timeout = 10000) {
+  await page.waitForFunction(() => {
+    const body = document.body?.innerText?.trim() || '';
+    return body.length > 0 || Boolean(document.querySelector('textarea, [contenteditable="true"]'));
+  }, {timeout}).catch(() => {});
+}
+
 function defaultProfilePath() {
   return path.join(ROOT, 'runtime', 'browser', 'openwebui-operator-profile');
 }
@@ -82,16 +89,14 @@ async function readiness(page, url, {navigate = true} = {}) {
   // DOMContentLoaded only proves that the Svelte shell arrived. Wait for the
   // rendered semantic surface so a healthy asset deployment is not reported
   // as empty merely because hydration is still in flight.
-  await page.waitForFunction(() => {
-    const body = document.body?.innerText?.trim() || '';
-    return body.length > 0 || Boolean(document.querySelector('textarea, [contenteditable="true"]'));
-  }, {timeout: 10000}).catch(() => {});
+  await waitForRenderedSurface(page);
   const text = await visibleText(page);
   if (/sign in|log in|login/i.test(text) && !/chat|new chat/i.test(text)) return {status: FAILURE_CLASSES.LOGIN_REQUIRED, url: page.url()};
   if (!text.trim()) return {status: FAILURE_CLASSES.RESIDENT_SURFACE_UNAVAILABLE, url: page.url()};
   const composer = await firstVisible(page, SELECTORS.composer);
-  const grace = /\bgrace\b/i.test(text);
-  return {status: composer && grace ? 'OPENWEBUI_READY' : (grace ? 'MODEL_SURFACE_UNAVAILABLE' : (composer ? FAILURE_CLASSES.RESIDENT_NOT_FOUND : 'RESIDENT_SURFACE_UNAVAILABLE')), url: page.url(), grace_visible: grace, composer_usable: Boolean(composer), title: await page.title()};
+  const residents = await discoverResidents(page);
+  const grace = residents.some(item => item.display_name === 'Grace') || /\bgrace\b/i.test(text);
+  return {status: composer && grace ? 'OPENWEBUI_READY' : (grace ? 'MODEL_SURFACE_UNAVAILABLE' : (composer ? FAILURE_CLASSES.RESIDENT_NOT_FOUND : 'RESIDENT_SURFACE_UNAVAILABLE')), url: page.url(), grace_visible: grace, composer_usable: Boolean(composer), residents, title: await page.title()};
 }
 
 async function isAuthenticatedSurface(page, result) {
@@ -172,28 +177,87 @@ async function authBootstrap(options) {
 }
 
 async function discoverResidents(page) {
-  const text = await visibleText(page);
   const names = ['Grace', 'Alfred', 'Helen', 'Ingrid', 'Evelyn', 'Blue'];
-  return names.filter(name => new RegExp(`\\b${name}\\b`, 'i').test(text)).map(display_name => ({display_name, visible: true}));
+  const picker = await firstVisible(page, SELECTORS.modelPicker);
+  if (!picker) {
+    const text = await visibleText(page);
+    return names.filter(name => new RegExp(`\\b${name}\\b`, 'i').test(text)).map(display_name => ({display_name, visible: true, source: 'page_text'}));
+  }
+  const expanded = await picker.getAttribute('aria-expanded').catch(() => null);
+  if (expanded !== 'true') await picker.click().catch(() => {});
+  await page.waitForFunction(() => Boolean(document.querySelector('[role="option"], [role="listbox"]')), {timeout: 3000}).catch(() => {});
+  const result = [];
+  for (const display_name of names) {
+    const exact = page.getByText(display_name, {exact: true});
+    let visible = false;
+    for (let i = 0; i < await exact.count().catch(() => 0); i++) visible ||= await exact.nth(i).isVisible().catch(() => false);
+    if (visible) result.push({display_name, visible: true, source: 'model_picker'});
+  }
+  if (expanded !== 'true') await page.keyboard.press('Escape').catch(() => {});
+  return result;
 }
 
 async function selectResident(page, resident) {
-  const exact = page.getByText(resident, {exact: true}).first();
-  if (await exact.count() && await exact.isVisible().catch(() => false)) {
-    await exact.click().catch(() => {});
-    await wait(250);
+  const picker = await firstVisible(page, SELECTORS.modelPicker);
+  if (!picker) throw Object.assign(new Error('Open WebUI model picker not found'), {classification: FAILURE_CLASSES.MODEL_SURFACE_UNAVAILABLE});
+  if (await picker.getAttribute('aria-expanded').catch(() => null) !== 'true') await picker.click();
+  await page.waitForFunction(() => Boolean(document.querySelector('[role="option"], [role="listbox"]')), {timeout: 3000}).catch(() => {});
+  const exact = page.getByText(resident, {exact: true});
+  let option = null;
+  for (let i = 0; i < await exact.count().catch(() => 0); i++) {
+    if (await exact.nth(i).isVisible().catch(() => false)) { option = exact.nth(i); break; }
   }
-  const text = await visibleText(page);
-  if (!new RegExp(`\\b${resident}\\b`, 'i').test(text)) throw Object.assign(new Error(`Resident not visible: ${resident}`), {classification: FAILURE_CLASSES.RESIDENT_NOT_FOUND});
-  const controls = (await page.locator('button').allTextContents().catch(() => [])).map(x => x.trim()).filter(Boolean);
-  return {display_name: resident, ui_text_confirmed: true, visible_model_controls: controls.slice(0, 20)};
+  if (!option) throw Object.assign(new Error(`Resident not visible in model picker: ${resident}`), {classification: FAILURE_CLASSES.RESIDENT_NOT_FOUND});
+  await option.click();
+  await page.waitForFunction((expected) => (document.querySelector('button[aria-label*="selected model" i]')?.getAttribute('aria-label') || '').toLowerCase().includes(expected.toLowerCase()), resident, {timeout: 5000}).catch(() => {});
+  const selected_control = await picker.getAttribute('aria-label').catch(() => null);
+  if (!selected_control || !selected_control.toLowerCase().includes(resident.toLowerCase())) throw Object.assign(new Error(`Resident selection was not confirmed: ${resident}`), {classification: FAILURE_CLASSES.MODEL_SURFACE_UNAVAILABLE});
+  // Read back the authenticated catalog through the same browser origin. This
+  // is correlation evidence only; it never creates or mutates model state.
+  const catalog = await page.evaluate(async () => {
+    try {
+      const response = await fetch('/api/models');
+      if (!response.ok) return null;
+      return await response.json();
+    } catch { return null; }
+  }).catch(() => null);
+  const models = Array.isArray(catalog?.data) ? catalog.data : (Array.isArray(catalog) ? catalog : []);
+  const selected_model_catalog_entry = models.find(model => {
+    const text = `${model.id || ''} ${model.name || ''} ${model.meta?.title || ''}`.toLowerCase();
+    return text.includes(resident.toLowerCase()) && !text.includes('grounded-test');
+  });
+  const canonical_model_catalog_entry = resident === 'Grace'
+    ? models.find(model => model.id === 'estate/grace-grounded-test')
+    : null;
+  const selectedMeta = selected_model_catalog_entry?.info?.meta || selected_model_catalog_entry?.meta || {};
+  const canonicalInfo = canonical_model_catalog_entry?.info || canonical_model_catalog_entry || {};
+  return {
+    display_name: resident,
+    ui_text_confirmed: true,
+    selected_control,
+    selection_source: 'model_picker_aria_label',
+    selected_model_catalog_entry: selected_model_catalog_entry ? {
+      id: selected_model_catalog_entry.id || null,
+      name: selected_model_catalog_entry.name || null,
+      owned_by: selected_model_catalog_entry.owned_by || null,
+      resident_id: selectedMeta.resident_id || selectedMeta.residentId || null,
+      resident_gateway_capable: selectedMeta.resident_gateway_capable ?? null
+    } : null,
+    canonical_model_catalog_entry: canonical_model_catalog_entry ? {
+      id: canonical_model_catalog_entry.id || null,
+      name: canonical_model_catalog_entry.name || null,
+      owned_by: canonical_model_catalog_entry.owned_by || null,
+      base_model_id: canonicalInfo.base_model_id || null
+    } : null
+  };
 }
 
 async function freshConversation(page, url) {
   await page.goto(url, {waitUntil: 'domcontentloaded', timeout: 15000});
+  await waitForRenderedSurface(page);
   const button = await firstVisible(page, SELECTORS.newConversation);
   if (button) await button.click().catch(() => {});
-  await wait(300);
+  await waitForRenderedSurface(page, 10000);
   return {url: page.url(), title: await page.title(), started_at: new Date().toISOString()};
 }
 
@@ -201,7 +265,8 @@ async function assistantTexts(page) {
   for (const selector of SELECTORS.assistant) {
     const locator = page.locator(selector);
     if (await locator.count().catch(() => 0)) {
-      return (await locator.allTextContents()).map(x => x.trim()).filter(Boolean);
+      const texts = (await locator.allTextContents()).map(x => x.trim()).filter(Boolean);
+      if (texts.length) return texts;
     }
   }
   return [];
@@ -223,8 +288,11 @@ async function sendTurn(page, message, options, evidence, turnNumber) {
   let stableSince = 0;
   while (Date.now() < deadline) {
     const current = await assistantTexts(page);
-    if (current.length > before.length) {
-      latest = current[current.length - 1];
+    // Open WebUI can mount an empty assistant container before streaming and
+    // then fill that same node. Compare content, not only node counts.
+    const newTexts = current.filter(text => text && !before.includes(text));
+    if (newTexts.length) {
+      latest = newTexts[newTexts.length - 1];
       if (latest) {
         if (latest === (sendTurn.lastText || '')) stableSince ||= Date.now(); else { stableSince = Date.now(); sendTurn.lastText = latest; }
         const stop = await firstVisible(page, SELECTORS.stop);
@@ -245,20 +313,36 @@ async function executeScenario(file, options) {
   const evidence = makeEvidence(runId());
   const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), scenario: scenario.name, started_at: new Date().toISOString(), status: 'RUNNING', failure_class: null, evidence_dir: evidence.dir};
   writeJson(path.join(evidence.dir, 'scenario.json'), scenario);
-  const session = await openSession(options, evidence);
+  const shared = options._sharedSession || null;
+  const baseSession = shared || await openSession(options, evidence);
+  const ownsSession = !shared;
+  const page = ownsSession ? baseSession.page : await baseSession.context.newPage();
+  const session = ownsSession ? baseSession : {
+    ...baseSession,
+    page,
+    browserErrors: [],
+    networkErrors: [],
+    close: async () => { await page.close().catch(() => {}); }
+  };
+  if (shared && options.capture !== false) {
+    page.on('pageerror', error => session.browserErrors.push({timestamp: new Date().toISOString(), type: 'pageerror', message: String(error.message || error)}));
+    page.on('console', message => { if (['error', 'warning'].includes(message.type())) session.browserErrors.push({timestamp: new Date().toISOString(), type: message.type(), message: message.text()}); });
+    page.on('requestfailed', request => session.networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: request.method(), url: request.url(), failure: request.failure()?.errorText || 'request_failed'})));
+    page.on('response', response => { if (response.status() >= 400) session.networkErrors.push(sanitizeNetwork({timestamp: new Date().toISOString(), method: response.request().method(), url: response.url(), status: response.status(), failure: `HTTP_${response.status()}`})); });
+  }
   const turns = [];
   try {
-    await session.context.tracing.start({screenshots: true, snapshots: true, sources: false});
+    if (ownsSession) await session.context.tracing.start({screenshots: true, snapshots: true, sources: false});
     const url = options.url || DEFAULT_URL;
-    const ready = await readiness(session.page, url);
+    const ready = await readiness(page, url);
     manifest.readiness = ready;
     if (ready.status !== 'OPENWEBUI_READY') throw Object.assign(new Error(`Readiness: ${ready.status}`), {classification: ready.status});
-    const resident = await selectResident(session.page, scenario.resident);
-    manifest.resident = resident;
-    const conversation = scenario.fresh_conversation === false ? {url: session.page.url()} : await freshConversation(session.page, url);
+    const conversation = scenario.fresh_conversation === false ? {url: page.url()} : await freshConversation(page, url);
     manifest.conversation = conversation;
+    const resident = await selectResident(page, scenario.resident);
+    manifest.resident = resident;
     for (let i = 0; i < scenario.turns.length; i++) {
-      const result = await sendTurn(session.page, scenario.turns[i].send, {...options, ...(scenario.timeouts || {})}, evidence, i + 1);
+      const result = await sendTurn(page, scenario.turns[i].send, {...options, ...(scenario.timeouts || {})}, evidence, i + 1);
       const assertion = matchesExpectation(result.assistant, scenario.turns[i].expect);
       turns.push({...result, assertion});
       if (!assertion.passed) throw Object.assign(new Error(`Turn ${i + 1} semantic expectation failed`), {classification: FAILURE_CLASSES.UNKNOWN});
@@ -270,8 +354,8 @@ async function executeScenario(file, options) {
     manifest.status = 'BLOCKED';
     manifest.failure_class = error.classification || FAILURE_CLASSES.UNKNOWN;
     manifest.error = error.message;
-    await session.page.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {});
-    await session.page.locator('body').innerText().then(text => fs.writeFileSync(path.join(evidence.dir, 'dom-summary.txt'), text.slice(0, 12000), 'utf8')).catch(() => {});
+    await page.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {});
+    await page.locator('body').innerText().then(text => fs.writeFileSync(path.join(evidence.dir, 'dom-summary.txt'), text.slice(0, 12000), 'utf8')).catch(() => {});
   } finally {
     manifest.completed_at = new Date().toISOString();
     manifest.console = session.browserErrors;
@@ -279,7 +363,7 @@ async function executeScenario(file, options) {
     writeJson(path.join(evidence.dir, 'console.json'), session.browserErrors);
     writeJson(path.join(evidence.dir, 'network.json'), session.networkErrors);
     if (turns.length) fs.writeFileSync(path.join(evidence.dir, 'response.txt'), turns.map(x => `Turn ${x.turn}\n${x.assistant}`).join('\n\n'), 'utf8');
-    await session.context.tracing.stop({path: path.join(evidence.dir, 'trace.zip')}).catch(() => {});
+    if (ownsSession) await session.context.tracing.stop({path: path.join(evidence.dir, 'trace.zip')}).catch(() => {});
     writeCompletion(evidence, manifest);
     await session.close();
   }
@@ -289,11 +373,22 @@ async function executeScenario(file, options) {
 
 async function executeConcurrent(files, options) {
   if (files.length < 2) throw new Error('concurrent requires --scenario-a and --scenario-b');
-  // Independent persistent contexts make accidental conversation crossover
-  // impossible. Each child run owns its own evidence and page lifecycle.
+  // Chromium locks a persistent user-data directory. Share one authenticated
+  // context and use independent pages so concurrent acceptance never corrupts
+  // the operator profile or silently falls back to a second auth state.
   const started = new Date().toISOString();
-  const codes = await Promise.all(files.map(file => executeScenario(file, {...options, headed: options.headed, 'concurrent-parent-started': started})));
-  return codes.every(code => code === 0) ? 0 : 2;
+  const sharedSession = await openSession(options, makeEvidence(runId()));
+  try {
+    const codes = await Promise.all(files.map(file => executeScenario(file, {
+      ...options,
+      headed: options.headed,
+      'concurrent-parent-started': started,
+      _sharedSession: sharedSession
+    })));
+    return codes.every(code => code === 0) ? 0 : 2;
+  } finally {
+    await sharedSession.close();
+  }
 }
 
 async function main() {
@@ -317,8 +412,8 @@ async function main() {
     }
     if (command === 'chat') {
       if (manifest.readiness.status !== 'OPENWEBUI_READY') throw Object.assign(new Error(manifest.readiness.status), {classification: manifest.readiness.status});
-      manifest.resident = await selectResident(session.page, options.resident || 'Grace');
       manifest.conversation = await freshConversation(session.page, manifest.url);
+      manifest.resident = await selectResident(session.page, options.resident || 'Grace');
       const result = await sendTurn(session.page, options.message || 'Hello Grace. Please reply with a brief readiness acknowledgement.', options, evidence, 1);
       manifest.response = result;
       fs.writeFileSync(path.join(evidence.dir, 'response.txt'), result.assistant, 'utf8');

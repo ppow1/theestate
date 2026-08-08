@@ -10,9 +10,10 @@ const SELECTORS = Object.freeze({
     '[contenteditable="true"]'
   ],
   send: [
+    '#send-message-button[type="submit"]',
+    'form button[type="submit"]:not(#generate-message-pair-button)',
     'button[aria-label*="send" i]',
-    'button[title*="send" i]',
-    'button:has(svg)'
+    'button[title*="send" i]'
   ],
   stop: [
     'button[aria-label*="stop" i]',
@@ -27,6 +28,8 @@ const SELECTORS = Object.freeze({
   assistant: [
     '[data-message-author-role="assistant"]',
     '[data-role="assistant"]',
+    '[class~="chat-assistant"]',
+    '#response-content-container',
     'article[data-message-id]'
   ],
   user: [
