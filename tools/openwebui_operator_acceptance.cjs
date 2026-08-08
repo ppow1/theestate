@@ -69,6 +69,13 @@ async function openSession(options, evidence) {
 async function readiness(page, url) {
   try { await page.goto(url, {waitUntil: 'domcontentloaded', timeout: 15000}); }
   catch (error) { return {status: FAILURE_CLASSES.OPENWEBUI_UNAVAILABLE, error: error.message, url: page.url()}; }
+  // DOMContentLoaded only proves that the Svelte shell arrived. Wait for the
+  // rendered semantic surface so a healthy asset deployment is not reported
+  // as empty merely because hydration is still in flight.
+  await page.waitForFunction(() => {
+    const body = document.body?.innerText?.trim() || '';
+    return body.length > 0 || Boolean(document.querySelector('textarea, [contenteditable="true"]'));
+  }, {timeout: 10000}).catch(() => {});
   const text = await visibleText(page);
   if (/sign in|log in|login/i.test(text) && !/chat|new chat/i.test(text)) return {status: FAILURE_CLASSES.LOGIN_REQUIRED, url: page.url()};
   if (!text.trim()) return {status: FAILURE_CLASSES.RESIDENT_SURFACE_UNAVAILABLE, url: page.url()};
