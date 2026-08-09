@@ -1,5 +1,5 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
 
 
@@ -10,6 +10,19 @@ def test_detects_explicit_metadata_command():
     )
     assert command["objective"] == "Repair the dashboard."
     assert command["source"] == "metadata"
+
+
+def test_bounded_text_intent_is_explicit_and_ordinary_chat_is_not_executable():
+    assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run a small bounded local text task.")["state"] == "execution_requested"
+    assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, what is the Estate status?")["state"] == "conversation_only"
+    assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run something locally.")["state"] == "execution_blocked"
+
+
+def test_bounded_text_request_fails_closed_without_fresh_physical_evidence(tmp_path):
+    code, body = chat_completion({"model": "estate/grace", "messages": [{"role": "user", "content": "Grace, run a small bounded local text task."}], "metadata": {"session_id": "bounded-blocked"}}, root=tmp_path)
+    assert code == 200
+    assert body["estate"]["bounded_local_text"]["state"] == "execution_blocked"
+    assert body["estate"]["provider_execution_performed"] is False
 
 
 def test_openwebui_chat_initiates_existing_helen_grace_dispatch_workflow(tmp_path):

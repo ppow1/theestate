@@ -1079,3 +1079,13 @@ Classification: Estate Internal
 
 Summary:
 Added registered UUID-bound Ollama runtime lanes, fail-closed allocation-to-lane equality checks, provider adapter lane and receipt evidence, dynamic Office/operator projection correlation, and the current two-button external Stream Deck transport change. Candidate 4090 lane process launch and delayed endpoint readiness were observed without model invocation. Grace browser execution, live model placement, P100 qualification, and destructive recovery remain unproven; no GPU stress, SDXL, P100 32B, reboot, or recovery operation was performed.
+
+EC-000218 - Connected Grace chat to governed local execution
+
+Timestamp: 2026-08-09 00:00:00
+Location: A:\\theestate-ec000218
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added the explicit bounded local-text intent boundary to the Grace resident gateway and connected accepted requests through GraceHelenEngineeringComposition, PTM readiness, Helen capability evidence, Engineering authorization, compute selection/reservation, Dispatch, the registered UUID-bound Qwen lane, provider reconciliation, and Grace completion receipts. Ordinary conversation and ambiguous execution remain non-executing or blocked. Deterministic validation passed; candidate blue/green runtime readiness was blocked because governed local execution was disabled, so no live provider model or Playwright conversation was run.

@@ -186,7 +186,11 @@ def _canonical_execution_authority(root: Path, objective_id: str, action_id: str
         return {}
     if isinstance(objective_authority, dict) and objective_authority != action_authority:
         raise ValueError("Grace objective and action execution authority conflict")
-    if isinstance(metadata, dict) and metadata and metadata != action_authority:
+    comparable_metadata = dict(metadata or {}) if isinstance(metadata, dict) else {}
+    comparable_metadata.pop("runtime_lane_id", None)
+    comparable_authority = dict(action_authority or {}) if isinstance(action_authority, dict) else {}
+    comparable_authority.pop("runtime_lane_id", None)
+    if comparable_metadata and comparable_metadata != comparable_authority:
         raise ValueError("caller execution metadata is not the canonical Grace authority")
     source_path = action_record[0]
     prompt_source = str(source_path.relative_to(root)).replace("\\", "/")
@@ -399,6 +403,19 @@ class GraceHelenEngineeringComposition:
             idempotency_key=f"{idempotency_key or commission['idempotency_key']}:dispatch",
         )
         return {"commission": accepted, "authorization": authorization, "dispatch": dispatch, "provider_execution": "pending_dispatch_consumer", "institutional_acceptance_state": "not_granted"}
+
+    def execute_registered_dispatch(self, dispatch_id: str, authorization_id: str, grace_objective_id: str) -> dict[str, Any]:
+        """Run one authorized Dispatch item through the registered adapter and reconcile it."""
+        from estate.core.execution_adapter_handoff_runtime import run_registered_handoff_adapter
+
+        handoff = run_registered_handoff_adapter(dispatch_id, self.root)
+        if handoff.get("status") != "completed":
+            self._state(grace_objective_id, "failed" if handoff.get("status") == "failed" else "completion_rejected", dispatch_id=dispatch_id, execution_errors=handoff.get("errors") or handoff.get("result", {}).get("errors", []))
+            return {"handoff": handoff, "status": handoff.get("status", "blocked"), "provider_execution": "not_completed"}
+        result = ExecutionProviderAdapterResult(**handoff["result"])
+        completion = self.reconcile_validate_complete(authorization_id, result, validation_passed=True)
+        receipt = self.receive_completion(completion["completion_id"], grace_objective_id)
+        return {"handoff": handoff, "result": result.to_dict(), "completion": completion, "receipt": receipt, "status": "completed", "provider_execution": "completed"}
 
     def authorize_dispatch(self, commission_id: str, *, provider_id: str, provider_type: str, adapter_reference: str, idempotency_key: str | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
         commission = _load(self._path(COMMISSIONS, commission_id))
