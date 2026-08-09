@@ -1,0 +1,33 @@
+{
+  "schema_version": "estate.gpu-runtime-lanes.v1",
+  "lanes": [
+    {
+      "runtime_lane_id": "qwen.local.text.4090",
+      "provider_id": "qwen.local.text",
+      "endpoint_type": "ollama-http",
+      "endpoint_address": "http://127.0.0.1:12409",
+      "host_id": "DESKTOP-JA3RPNQ",
+      "compute_resource_id": "DESKTOP-JA3RPNQ:nvidia:GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+      "gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+      "model_identity": "qwen3:8b",
+      "environment_binding": {
+        "CUDA_VISIBLE_DEVICES": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+        "OLLAMA_HOST": "127.0.0.1:12409"
+      }
+    },
+    {
+      "runtime_lane_id": "qwen.local.text.p100-1",
+      "provider_id": "qwen.local.text",
+      "endpoint_type": "ollama-http",
+      "endpoint_address": "http://127.0.0.1:12100",
+      "host_id": "DESKTOP-JA3RPNQ",
+      "compute_resource_id": "DESKTOP-JA3RPNQ:nvidia:GPU-6785b322-899d-8eec-e817-31d83279a414",
+      "gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+      "model_identity": "qwen3:8b",
+      "environment_binding": {
+        "CUDA_VISIBLE_DEVICES": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+        "OLLAMA_HOST": "127.0.0.1:12100"
+      }
+    }
+  ]
+}

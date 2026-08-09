@@ -1069,3 +1069,13 @@ Classification: Estate Internal
 
 Summary:
 Integrated the repository-owned Playwright Open WebUI operator acceptance harness and preserved the first bounded placement preflight. Deterministic harness tests passed, but live acceptance was blocked because Open WebUI was unavailable, the canonical runtime configuration targeted a different dirty checkout, the current Grace resident engineering path does not perform provider execution, fresh governed capacity evidence was absent, and the RTX 4090 had approximately 1.8 GiB free for configured qwen3:8b. No workload or destructive GPU operation was performed.
+
+EC-000217 - Added governed GPU-pinned runtime lanes
+
+Timestamp: 2026-08-09 00:00:00
+Location: A:\\theestate-ec000217
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Added registered UUID-bound Ollama runtime lanes, fail-closed allocation-to-lane equality checks, provider adapter lane and receipt evidence, dynamic Office/operator projection correlation, and the current two-button external Stream Deck transport change. Candidate 4090 lane process launch and delayed endpoint readiness were observed without model invocation. Grace browser execution, live model placement, P100 qualification, and destructive recovery remain unproven; no GPU stress, SDXL, P100 32B, reboot, or recovery operation was performed.

@@ -32,6 +32,8 @@ from estate.core.execution_provider_adapter import (
 )
 from estate.core.paths import ESTATE_ROOT
 from estate.core.authority_schema_runtime import require_valid
+from estate.core.compute_resources import ComputeResourceRequirements
+from estate.core.gpu_runtime_lanes import RuntimeLane, load_registered_lanes, require_allocation_matches_lane
 
 PROVIDER_ID = "qwen.local.text"
 ADAPTER_ID = "qwen-local-ollama-text-adapter"
@@ -194,7 +196,33 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 errors.append(f"Qwen output is outside the permitted documentation boundary: {path}")
         if document_outputs and not document_outputs[0].startswith("docs/"):
             errors.append("the Qwen document artifact must be under docs/")
+        requirements = ComputeResourceRequirements.from_dict(request.compute_resource_requirements)
+        if requirements.requires_gpu:
+            lane_id = str(extension.get("runtime_lane_id") or "")
+            lane = next((candidate for candidate in load_registered_lanes(self.root) if candidate.runtime_lane_id == lane_id), None)
+            if lane is None:
+                errors.append("required GPU execution needs a registered runtime lane")
+            else:
+                try:
+                    require_allocation_matches_lane(allocated_gpu_uuid=requirements.required_gpu_uuid, allocated_resource_id=requirements.required_resource_id, lane=lane)
+                except PermissionError as exc:
+                    errors.append(str(exc))
+                if lane.provider_id != request.provider_id or lane.model_identity != config["model_identity"]:
+                    errors.append("runtime lane is incompatible with the selected provider or model")
         return errors
+
+    def _runtime_lane(self, request: ExecutionProviderAdapterRequest, config: dict[str, Any]) -> RuntimeLane | None:
+        requirements = ComputeResourceRequirements.from_dict(request.compute_resource_requirements)
+        if not requirements.requires_gpu:
+            return None
+        lane_id = str((request.provider_extension or {}).get("runtime_lane_id") or "")
+        lane = next((candidate for candidate in load_registered_lanes(self.root) if candidate.runtime_lane_id == lane_id), None)
+        if lane is None:
+            raise PermissionError("registered runtime lane disappeared before provider invocation")
+        require_allocation_matches_lane(allocated_gpu_uuid=requirements.required_gpu_uuid, allocated_resource_id=requirements.required_resource_id, lane=lane)
+        if lane.provider_id != request.provider_id or lane.model_identity != config["model_identity"]:
+            raise PermissionError("selected runtime lane does not match the governed provider/model")
+        return lane
 
     def validate_request(self, request: ExecutionProviderAdapterRequest) -> AdapterValidationStatus:
         base = request.validate(); errors = list(base.errors); warnings = list(base.warnings)
@@ -257,6 +285,11 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "expected_outputs": list(request.expected_outputs),
             "artifact_path": extension.get("artifact_path"),
             "provider_receipt_path": receipt_ref,
+            "runtime_lane_id": request.metadata.get("runtime_lane_evidence", {}).get("runtime_lane_id"),
+            "allocated_compute_resource_id": (request.compute_resource_requirements or {}).get("required_resource_id"),
+            "allocated_gpu_uuid": (request.compute_resource_requirements or {}).get("required_gpu_uuid"),
+            "runtime_bound_gpu_uuid": request.metadata.get("runtime_lane_evidence", {}).get("gpu_uuid"),
+            "runtime_process_id": request.metadata.get("runtime_lane_evidence", {}).get("process_id"),
         }
         payload = {
             "schema_version": "estate.provider-receipt.v1", "provider_id": PROVIDER_ID,
@@ -419,7 +452,10 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         config = self._config(); target_errors, document_target, _ = self._target_collision_errors(request)
         if target_errors:
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
-        endpoint = config["endpoint_address"].rstrip("/"); metadata = request.metadata; extension = request.provider_extension or {}; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(extension.get("provider_receipt_path") or metadata.get("provider_receipt_path") or "").replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
+        lane = self._runtime_lane(request, config)
+        endpoint = (lane.endpoint_address if lane else config["endpoint_address"]).rstrip("/"); metadata = request.metadata; extension = request.provider_extension or {}; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(extension.get("provider_receipt_path") or metadata.get("provider_receipt_path") or "").replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
+        if lane:
+            metadata["runtime_lane_evidence"] = lane.to_dict()
         injection = metadata.get("test_failure_injection")
         if injection and os.environ.get("ESTATE_ENABLE_PROVIDER_FAILURE_INJECTION") != "1":
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Provider failure injection is disabled outside explicit validation mode.", validation_status="failed", errors=["provider failure injection requires explicit validation enablement"], metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
@@ -478,7 +514,7 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 raise OSError(f"success receipt staging failed: {str(exc)[:400]}") from exc
             self._publish_no_replace(staging_dir / "success-receipt", receipt_target)
             self._remove_staging_directory(staging_dir)
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback boundary.", artifacts=[document_path, receipt_ref], validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": "completed"})
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback runtime lane.", artifacts=[document_path, receipt_ref], validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": "completed", "runtime_lane_id": lane.runtime_lane_id if lane else None, "runtime_bound_gpu_uuid": lane.gpu_uuid if lane else None})
         except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError, NotImplementedError) as exc:
             timeout_state = "timed_out" if isinstance(exc, (TimeoutError, socket.timeout)) or "timed out" in str(exc).lower() else "completed_within_limit"
             error_details = [str(exc)[:500]]
