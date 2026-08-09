@@ -1,5 +1,5 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, _qwen_minimum_safe_vram_mib
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
 
 
@@ -16,6 +16,15 @@ def test_bounded_text_intent_is_explicit_and_ordinary_chat_is_not_executable():
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run a small bounded local text task.")["state"] == "execution_requested"
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, what is the Estate status?")["state"] == "conversation_only"
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run something locally.")["state"] == "execution_blocked"
+
+
+def test_qwen_model_specific_vram_floor_fails_closed_when_missing(tmp_path):
+    config = tmp_path / "config/providers/qwen_local_text.json"
+    config.parent.mkdir(parents=True)
+    config.write_text('{"minimum_safe_vram_mib": 8192}\n', encoding="utf-8")
+    assert _qwen_minimum_safe_vram_mib(tmp_path) == 8192
+    config.write_text('{}\n', encoding="utf-8")
+    assert _qwen_minimum_safe_vram_mib(tmp_path) is None
 
 
 def test_bounded_text_request_fails_closed_without_fresh_physical_evidence(tmp_path):

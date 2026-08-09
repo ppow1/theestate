@@ -40,6 +40,19 @@ def _root(root: Path | None = None) -> Path:
     return root or (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
 
 
+def _qwen_minimum_safe_vram_mib(root: Path) -> int | None:
+    """Load the model-specific admission floor; never substitute a generic floor."""
+    path = root / "config/providers/qwen_local_text.json"
+    try:
+        config = json.loads(path.read_text(encoding="utf-8"))
+        value = config.get("minimum_safe_vram_mib")
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+            return None
+        return int(value)
+    except (OSError, ValueError, TypeError):
+        return None
+
+
 def detect_engineering_assignment_command(payload: dict[str, Any], user_message: str) -> dict[str, Any] | None:
     """Return command metadata when a chat turn explicitly requests assignment initiation."""
     metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
@@ -96,12 +109,15 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if intent["state"] != "execution_requested":
         return intent if intent["state"] == "execution_blocked" else None
     rootp = _root(root)
+    minimum_safe_vram_mib = _qwen_minimum_safe_vram_mib(rootp)
+    if minimum_safe_vram_mib is None:
+        return {"state": "execution_blocked", "reason": "model-specific safe VRAM admission requirement is unavailable", "provider_execution_performed": False}
     observations = collect_nvidia_smi()
     if not observations:
         return {"state": "execution_blocked", "reason": "fresh physical compute evidence is unavailable", "provider_execution_performed": False}
     write_compute_projection(observations, rootp)
     preferred = next((row.nvidia_uuid for row in observations if "4090" in row.name), None)
-    requirements = ComputeResourceRequirements(requires_gpu=True, minimum_vram_mib=512, preferred_gpu_uuid=preferred, freshness_seconds=120)
+    requirements = ComputeResourceRequirements(requires_gpu=True, minimum_vram_mib=minimum_safe_vram_mib, preferred_gpu_uuid=preferred, freshness_seconds=120)
     placement = select_resource(observations, requirements)
     if not placement.get("eligible") or not placement.get("selected"):
         return {"state": "execution_blocked", "reason": placement.get("reason", "no eligible GPU"), "placement": placement, "provider_execution_performed": False}

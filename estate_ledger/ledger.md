@@ -1089,3 +1089,13 @@ Classification: Estate Internal
 
 Summary:
 Added the explicit bounded local-text intent boundary to the Grace resident gateway and connected accepted requests through GraceHelenEngineeringComposition, PTM readiness, Helen capability evidence, Engineering authorization, compute selection/reservation, Dispatch, the registered UUID-bound Qwen lane, provider reconciliation, and Grace completion receipts. Ordinary conversation and ambiguous execution remain non-executing or blocked. Deterministic validation passed; candidate blue/green runtime readiness was blocked because governed local execution was disabled, so no live provider model or Playwright conversation was run.
+
+EC-000219 - Enabled candidate Grace governed execution acceptance
+
+Timestamp: 2026-08-09 00:00:00
+Location: A:\\theestate-ec000219
+Status: Implemented / live browser blocked
+Classification: Estate Internal
+
+Summary:
+Enabled the existing candidate-scoped Grace governed execution and provider-effects readiness through authenticated Engineering provider admission, preserving PTM, Helen, Engineering, Dispatch, adapter, and UUID-bound runtime-lane gates. Added a model-specific qwen3:8b safe VRAM admission floor, candidate enablement procedure, readiness/capacity evidence, and diagnostic impact record. Candidate readiness and the 4090 lane passed; the repository Playwright harness reached candidate Open WebUI but stopped at LOGIN_REQUIRED before Grace interaction. No model workload or destructive GPU operation was performed.
