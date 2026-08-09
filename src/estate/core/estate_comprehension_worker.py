@@ -124,7 +124,11 @@ def _quality(payload: dict[str, Any], packet: dict[str, Any]) -> tuple[str, list
 
 def _persist_telemetry(root: Path, *, batch_id: str, telemetry: dict[str, Any]) -> None:
     with connect(root, create=False) as connection:
-        connection.execute("UPDATE comprehension_batches SET result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (telemetry["quality"], "; ".join(telemetry.get("reasons", [])) or None, _now(), batch_id))
+        state = "RETRYABLE" if telemetry["quality"] == "RETRYABLE_PROVIDER_FAILURE" else ("FAILED" if telemetry["quality"] == "INVALID_RESULT" else None)
+        if state:
+            connection.execute("UPDATE comprehension_batches SET state=?, result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (state, telemetry["quality"], "; ".join(telemetry.get("reasons", [])) or None, _now(), batch_id))
+        else:
+            connection.execute("UPDATE comprehension_batches SET result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (telemetry["quality"], "; ".join(telemetry.get("reasons", [])) or None, _now(), batch_id))
 
 
 def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model: str | None = None, worker_identity: str = "estate-local-comprehension-worker", asset_prefix: str | None = None, timeout: float = 120.0) -> dict[str, Any]:
@@ -167,6 +171,7 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             validate_result(base, payload)
             ingested = ingest_result(base, payload)
             telemetry = {"quality": quality, "reasons": reasons, "duration_ms": payload["telemetry"]["duration_ms"], "difficulty": difficulty, "candidate_count": ingested.get("candidate_count", 0), "result_id": payload["result_id"]}
+            _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
             results.append({"batch_id": batch_id, **telemetry})
         except (ValueError, json.JSONDecodeError, PopulationScopeError) as exc:
             telemetry = {"quality": "INVALID_RESULT", "reasons": [str(exc)[:500]], "duration_ms": round((time.perf_counter() - started) * 1000, 2)}
