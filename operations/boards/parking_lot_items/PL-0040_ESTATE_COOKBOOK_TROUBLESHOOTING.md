@@ -71,3 +71,17 @@ incident is the first acceptance fixture, including the separate WinError 1224
 harness failure and unresolved 0x133 forensics. Estate-wide population,
 autonomous consultation, remediation, and the PL-0042 investigation remain
 future work.
+
+## Estate comprehension infrastructure slice (2026-08-09)
+
+The existing PL-0040 diagnostics owner now provides a normalized,
+revision-grounded comprehension model for Living Diagnostics, Grace
+reasoning-to-execution, and Operations Scheduler reconciliation. It preserves
+evidence-qualified relationships, workflows, checkpoints, failure seams,
+Cookbook references, deterministic Mermaid views, bounded provider-neutral
+packets, and source-change revalidation state.
+
+The packet boundary remains proposal-only and cannot mutate canonical truth,
+advance an accepted baseline, promote knowledge, or authorize remediation.
+This milestone proves bounded comprehension infrastructure only; it does not
+perform Estate-wide population or close PL-0040.

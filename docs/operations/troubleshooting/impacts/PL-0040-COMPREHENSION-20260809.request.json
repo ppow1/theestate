@@ -1,0 +1,33 @@
+{
+  "change_id": "PL-0040-COMPREHENSION-20260809",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-COMPREHENSION",
+  "author_provenance": {"kind": "HUMAN", "actor": "Codex"},
+  "changed_files": [
+    "docs/operations/troubleshooting/README.md",
+    "docs/operations/troubleshooting/comprehension.json",
+    "schemas/troubleshooting/comprehension_model_v1.schema.json",
+    "src/estate/diagnostics/__init__.py",
+    "src/estate/diagnostics/comprehension.py",
+    "tools/estate_diagnostics.py",
+    "tests/test_troubleshooting_comprehension.py"
+  ],
+  "changed_components": ["living_diagnostics", "troubleshooting_comprehension"],
+  "changed_schemas": ["schemas/troubleshooting/comprehension_model_v1.schema.json"],
+  "behavior_before": "Living Diagnostics provided provenance, checkpoint applicability, Cookbook knowledge, and candidate query, but no normalized structural comprehension model or bounded subsystem packet.",
+  "behavior_after": "The existing diagnostics owner can build a revision-grounded component/workflow/checkpoint/failure-seam model, render deterministic Mermaid views, classify source staleness, and export provider-neutral bounded packets.",
+  "expected_inputs": ["Authored comprehension model", "repository source paths", "Cookbook/candidate knowledge references"],
+  "expected_outputs": ["Enriched comprehension model", "component/workflow Mermaid views", "bounded comprehension packet", "staleness classification"],
+  "dependencies_read": ["existing Living Diagnostics reconciliation", "existing Cookbook knowledge", "Operations Scheduler job registration"],
+  "dependencies_called": ["existing diagnostics CLI", "existing Git provenance"],
+  "resources_written": ["requested comprehension output directory only", "first-pass diagnostic packet"],
+  "new_failure_modes": ["authored comprehension model references missing source", "source change requires comprehension revalidation"],
+  "changed_failure_modes": ["none"],
+  "tests_added_or_changed": ["tests/test_troubleshooting_comprehension.py"],
+  "validation_evidence": ["48 focused diagnostics/troubleshooting tests passed", "CLI build/query/diagram/packet acceptance passed"],
+  "recommended_checkpoint_impacts": ["LD-DEVELOPER-INGESTION", "LD.INGESTION.1", "LD.RECONCILIATION.1"],
+  "preliminary_troubleshooting_notes": ["Treat inferred relationships and candidate seams as non-canonical.", "When source hashes change, revalidate affected understanding before relying on it."],
+  "prohibited_recovery_actions": ["Do not create a second registry or scheduler.", "Do not let a provider mutate the canonical model or authorize remediation."],
+  "activation_restart_impact": "No runtime restart. The model and views are deterministic repository artifacts; the existing scheduler remains the reconciliation owner.",
+  "confidence": "SUPPORTED"
+}

@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from estate.diagnostics.living import DiagnosticsRepository, GENERATED, SOURCE, advance_accepted_baseline, build, canonical_json, generate_manifest, reconcile
 from estate.diagnostics.impact import create_packet, local_ai_delta, preserve_candidate, query_candidates
 from estate.diagnostics.knowledge import ingest_candidate, query_knowledge, validate_knowledge
+from estate.diagnostics.comprehension import build_model, comprehension_packet, query_model
 
 
 def validate(root: Path) -> dict:
@@ -49,6 +50,14 @@ def main() -> int:
     kv=knowledge_sub.add_parser("validate"); kv.add_argument("path",type=Path)
     ki=knowledge_sub.add_parser("ingest"); ki.add_argument("path",type=Path)
     kq=knowledge_sub.add_parser("query"); kq.add_argument("phrase",nargs="?")
+    comprehension=sub.add_parser("comprehension"); comprehension_sub=comprehension.add_subparsers(dest="comprehension_command",required=True)
+    cb=comprehension_sub.add_parser("build"); cb.add_argument("--output",type=Path,required=True)
+    cc=comprehension_sub.add_parser("component"); cc.add_argument("component_id")
+    cw=comprehension_sub.add_parser("workflow"); cw.add_argument("workflow_id")
+    cq=comprehension_sub.add_parser("query"); cq.add_argument("phrase")
+    cp=comprehension_sub.add_parser("packet"); cp.add_argument("scope"); cp.add_argument("--output",type=Path,required=True)
+    cd=comprehension_sub.add_parser("diagram"); cd.add_argument("scope",nargs="?",default="components")
+    cs=comprehension_sub.add_parser("stale")
     args=parser.parse_args(); root=args.root.resolve(); repo=DiagnosticsRepository(root)
     if args.command=="build": result=build(root)
     elif args.command=="validate": result=validate(root)
@@ -76,6 +85,30 @@ def main() -> int:
             value = json.loads(path.read_text(encoding="utf-8")); value = value.get("knowledge", value) if isinstance(value, dict) else value
             destination = ingest_candidate(root, value); result={"status":"CANDIDATE_PRESERVED","path":destination.relative_to(root).as_posix(),"canonical_promotion":False}
         else: result=query_knowledge(root,args.phrase)
+    elif args.command=="comprehension":
+        output = args.output if getattr(args, "output", None) and args.output.is_absolute() else (root / args.output if getattr(args, "output", None) else None)
+        model = build_model(root, output if args.comprehension_command == "build" else None)
+        if args.comprehension_command == "build":
+            try: output_name = output.relative_to(root).as_posix()
+            except ValueError: output_name = str(output)
+            result = {"status":"BUILT", "output":output_name, "model_id":model["model_id"], "source_revision":model["provenance"]["repository_revision"], "component_count":len(model["components"]), "workflow_count":len(model["workflows"]), "checkpoint_count":len(model["checkpoints"]), "failure_seam_count":len(model["failure_seams"]), "staleness":model["staleness"]}
+        elif args.comprehension_command == "component":
+            result = next((x for x in model["components"] if x["component_id"] == args.component_id), None)
+        elif args.comprehension_command == "workflow":
+            result = next((x for x in model["workflows"] if x["workflow_id"] == args.workflow_id), None)
+        elif args.comprehension_command == "query":
+            result = query_model(model, args.phrase)
+        elif args.comprehension_command == "diagram":
+            from estate.diagnostics.comprehension import render_mermaid
+            result = {"scope":args.scope, "source_revision":model["provenance"]["repository_revision"], "mermaid":render_mermaid(model, args.scope)}
+        elif args.comprehension_command == "stale":
+            result = model["staleness"]
+        else:
+            packet = comprehension_packet(root, model, args.scope)
+            output.parent.mkdir(parents=True, exist_ok=True); output.write_text(canonical_json(packet), encoding="utf-8")
+            try: output_name = output.relative_to(root).as_posix()
+            except ValueError: output_name = str(output)
+            result = {"status":"PACKET_BUILT", "output":output_name, "scope":args.scope, "source_revision":packet["source_revision"], "canonical_mutation":False}
     elif args.command=="local-ai-delta": result=local_ai_delta(root)
     else: result=reconcile(root,args.accepted_manifest,args.impact_packet,"incremental" if args.incremental else "full")
     if json_requested or not isinstance(result,list): print(canonical_json(result),end="")

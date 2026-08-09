@@ -1,0 +1,141 @@
+{
+  "activation_restart_impact": "No runtime restart. The model and views are deterministic repository artifacts; the existing scheduler remains the reconciliation owner.",
+  "author_provenance": {
+    "actor": "Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "The existing diagnostics owner can build a revision-grounded component/workflow/checkpoint/failure-seam model, render deterministic Mermaid views, classify source staleness, and export provider-neutral bounded packets.",
+  "behavior_before": "Living Diagnostics provided provenance, checkpoint applicability, Cookbook knowledge, and candidate query, but no normalized structural comprehension model or bounded subsystem packet.",
+  "change_id": "PL-0040-COMPREHENSION-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "33243e3b13be09affd0b3165e72a03e5dae77cd1",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "4037f829e8ba9c31ae86c3a115f5960ae2a7bbad44c15ec480a575554402a76b",
+      "state": "DIRTY",
+      "worktree_git_blob": "3a0f5a1bcb1e97af462e3734cee5c81dc592df5c",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/comprehension.json",
+      "path": "docs/operations/troubleshooting/comprehension.json",
+      "sha256": "363174e5144093673f4dc38ffcaaeaaf045accf2aaa8fa5bc34689080ca13fc2",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "ca245b1a8cea83dccb99578773f4728e7f39459b",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "HEAD:schemas/troubleshooting/comprehension_model_v1.schema.json",
+      "path": "schemas/troubleshooting/comprehension_model_v1.schema.json",
+      "sha256": "93d9c3d0fccd1488e1c2714145d8f584e16932013a440b1e53e2c5e30d5ab723",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "ee9746f71d0f6fa51b953b928dfc33334649816b",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "cf23c590f36e2627d4818a65ec718818a2229f10",
+      "path": "src/estate/diagnostics/__init__.py",
+      "sha256": "92b6e1067ad1db4733b518684f6ff6f858ae11c894b45ef988512b85503eb319",
+      "state": "DIRTY",
+      "worktree_git_blob": "90365eccaca0fbcc60caa20806a239a0c60c8f87",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:src/estate/diagnostics/comprehension.py",
+      "path": "src/estate/diagnostics/comprehension.py",
+      "sha256": "964f17c6ae465094ca6b01500f4a90b2b636e1288875277369f90e38f81fe35e",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "1cb96e86d8e42041f3d7b8e887fdf40040d09573",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "b4136da64b92a233a651c7097762400b8acc162a",
+      "path": "tools/estate_diagnostics.py",
+      "sha256": "42b90595dda5f9f033590813e1903b07ef97bfbfe224b5c549c57a0633fc06c7",
+      "state": "DIRTY",
+      "worktree_git_blob": "0209fe3d86fe8769b4de535322b14118ccfbd77e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:tests/test_troubleshooting_comprehension.py",
+      "path": "tests/test_troubleshooting_comprehension.py",
+      "sha256": "c529e456825e8569762032d768ec8612e9ac31a452afca7674b04d8300a3f7ac",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "7af900e82eff39bfb876edf25ff400ecda611f17",
+      "worktree_state": "untracked"
+    }
+  ],
+  "changed_components": [
+    "living_diagnostics",
+    "troubleshooting_comprehension"
+  ],
+  "changed_failure_modes": [
+    "none"
+  ],
+  "changed_files": [
+    "docs/operations/troubleshooting/README.md",
+    "docs/operations/troubleshooting/comprehension.json",
+    "schemas/troubleshooting/comprehension_model_v1.schema.json",
+    "src/estate/diagnostics/__init__.py",
+    "src/estate/diagnostics/comprehension.py",
+    "tools/estate_diagnostics.py",
+    "tests/test_troubleshooting_comprehension.py"
+  ],
+  "changed_schemas": [
+    "schemas/troubleshooting/comprehension_model_v1.schema.json"
+  ],
+  "confidence": "SUPPORTED",
+  "dependencies_called": [
+    "existing diagnostics CLI",
+    "existing Git provenance"
+  ],
+  "dependencies_read": [
+    "existing Living Diagnostics reconciliation",
+    "existing Cookbook knowledge",
+    "Operations Scheduler job registration"
+  ],
+  "estate_change_id": "PL-0040-COMPREHENSION",
+  "expected_inputs": [
+    "Authored comprehension model",
+    "repository source paths",
+    "Cookbook/candidate knowledge references"
+  ],
+  "expected_outputs": [
+    "Enriched comprehension model",
+    "component/workflow Mermaid views",
+    "bounded comprehension packet",
+    "staleness classification"
+  ],
+  "implementation_revision": "f523b9cc6250fd2bb1427ca9a812ce2a1ac515f0",
+  "new_failure_modes": [
+    "authored comprehension model references missing source",
+    "source change requires comprehension revalidation"
+  ],
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "Treat inferred relationships and candidate seams as non-canonical.",
+    "When source hashes change, revalidate affected understanding before relying on it."
+  ],
+  "prohibited_recovery_actions": [
+    "Do not create a second registry or scheduler.",
+    "Do not let a provider mutate the canonical model or authorize remediation."
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-DEVELOPER-INGESTION",
+    "LD.INGESTION.1",
+    "LD.RECONCILIATION.1"
+  ],
+  "resources_written": [
+    "requested comprehension output directory only",
+    "first-pass diagnostic packet"
+  ],
+  "source_revision": "f523b9cc6250fd2bb1427ca9a812ce2a1ac515f0",
+  "tests_added_or_changed": [
+    "tests/test_troubleshooting_comprehension.py"
+  ],
+  "validation_evidence": [
+    "48 focused diagnostics/troubleshooting tests passed",
+    "CLI build/query/diagram/packet acceptance passed"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

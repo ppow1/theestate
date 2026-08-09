@@ -160,6 +160,35 @@ same payload is idempotent, while a conflicting payload with an existing
 different `knowledge_id` is required for a separate source or conflict so both
 records remain queryable for later governed review.
 
+## Estate comprehension model
+
+`comprehension.json` is the authored structural model for bounded Estate
+comprehension. It keeps components, evidence-qualified relationships,
+workflows, checkpoints, and failure seams in one normalized source.
+`src/estate/diagnostics/comprehension.py` enriches it with exact repository
+revision and source hashes, classifies source changes as
+`REVALIDATION_REQUIRED`, and generates reproducible Mermaid views. Generated
+views are not a second source of truth.
+
+Use the existing diagnostics CLI with a test-safe output directory:
+
+```text
+python tools/estate_diagnostics.py comprehension build --output PATH
+python tools/estate_diagnostics.py comprehension component living_diagnostics
+python tools/estate_diagnostics.py comprehension workflow WF.GRACE.EXECUTION
+python tools/estate_diagnostics.py comprehension query "evidence"
+python tools/estate_diagnostics.py comprehension diagram WF.GRACE.EXECUTION
+python tools/estate_diagnostics.py comprehension packet WF.GRACE.EXECUTION --output PACKET.json
+python tools/estate_diagnostics.py comprehension stale
+```
+
+Comprehension packets are bounded provider-neutral proposals. They may expose
+candidate components, relationships, checkpoints, probes, seams, conflicts,
+and revalidation requests, but cannot mutate the model, advance the accepted
+baseline, promote Cookbook knowledge, or authorize remediation. Existing
+Cookbook and candidate knowledge is linked by reference; historical evidence is
+not rewritten when source understanding becomes stale.
+
 ## Historical replay set
 
 Seeded evidence maps stale owner/active lease, composer not ready, request

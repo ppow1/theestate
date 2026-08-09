@@ -122,3 +122,24 @@ incident is the first acceptance fixture, including the separate WinError 1224
 harness failure and unresolved 0x133 forensics. Estate-wide population,
 autonomous consultation, remediation, and the PL-0042 investigation remain
 future work.
+
+## Estate comprehension infrastructure slice (2026-08-09)
+
+The existing PL-0040 diagnostics owner now has an authored, normalized
+comprehension model for three bounded subsystems: Living Diagnostics, Grace
+reasoning-to-execution, and Operations Scheduler reconciliation. The model
+records source-grounded components, evidence-qualified relationships,
+workflows, stable checkpoints, and deterministic, historical, or candidate
+failure seams. The existing Cookbook is linked by reference rather than
+duplicated.
+
+The diagnostics CLI can build revision-grounded model views, render
+deterministic Mermaid component/workflow diagrams, query bounded model content,
+export provider-neutral comprehension packets, and classify source changes as
+`REVALIDATION_REQUIRED`. Provider packets remain proposal-only: they cannot
+mutate canonical model/Cookbook truth, advance an accepted baseline, or
+authorize remediation.
+
+This is a controlled comprehension-infrastructure milestone, not Estate-wide
+population, autonomous consultation, universal probe coverage, canonical
+promotion, or remediation authority.
