@@ -111,3 +111,14 @@ Git/worktree provenance, preserves non-promoted candidate knowledge, and exports
 a bounded local-AI review delta through the same CLI and reconciliation owner.
 An overnight local-AI reviewer remains future work, as do Estate-wide cookbook
 population and universal probes.
+
+## Structured knowledge slice (2026-08-09)
+
+The existing PL-0040 lane now includes a provider-neutral operational knowledge
+contract for typed incident/troubleshooting records and governed lifecycle
+states. Candidate knowledge is separate from canonical checkpoints; promotion
+requires evidence and local AI cannot perform it. The Tesla P100/RTX 4090
+incident is the first acceptance fixture, including the separate WinError 1224
+harness failure and unresolved 0x133 forensics. Estate-wide population,
+autonomous consultation, remediation, and the PL-0042 investigation remain
+future work.

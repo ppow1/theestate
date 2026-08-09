@@ -60,3 +60,14 @@ Still incremental/future: Estate-wide checkpoint population, an autonomous
 overnight local-AI reviewer, universal deterministic probes, autonomous Grace
 cookbook consultation, and automatic remediation. This update does not close
 PL-0040 or authorize those capabilities.
+
+## Structured knowledge slice (2026-08-09)
+
+The existing PL-0040 lane now includes a provider-neutral operational knowledge
+contract for typed incident/troubleshooting records and governed lifecycle
+states. Candidate knowledge is separate from canonical checkpoints; promotion
+requires evidence and local AI cannot perform it. The Tesla P100/RTX 4090
+incident is the first acceptance fixture, including the separate WinError 1224
+harness failure and unresolved 0x133 forensics. Estate-wide population,
+autonomous consultation, remediation, and the PL-0042 investigation remain
+future work.

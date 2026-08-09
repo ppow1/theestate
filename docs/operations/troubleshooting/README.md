@@ -136,6 +136,24 @@ process-sensitive CME ownership proof directly under an observer that can kill
 its child. The harness is referenced operationally but is not present in this
 repository revision; the current repository source explains the boundary.
 
+## Structured operational knowledge
+
+`schemas/troubleshooting/operational_knowledge_v1.schema.json` and
+`src/estate/diagnostics/knowledge.py` add typed incident/troubleshooting
+records for symptoms, observations, measurements, baselines, hypotheses,
+contradictory evidence, probes, failed or successful recovery, verification,
+non-actions, risky actions, stop/escalation conditions, and unresolved
+diagnoses. Candidates are preserved under
+`operations/diagnostics/candidates/knowledge/`; ingestion never edits the
+canonical cookbook. Verified/canonical states require governed evidence, and
+local-AI provenance cannot self-promote.
+
+The first acceptance fixture is
+`operations/diagnostics/candidates/knowledge/PL0040-GPU-DUAL-INCIDENT.json`.
+It keeps PnP, PCIe, NVML, and CUDA layers distinct, records both recovery
+outcomes, preserves the separate WinError 1224 harness problem, and leaves
+the 0x133 watchdog cause unresolved.
+
 ## Historical replay set
 
 Seeded evidence maps stale owner/active lease, composer not ready, request

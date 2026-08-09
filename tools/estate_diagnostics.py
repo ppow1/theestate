@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from estate.diagnostics.living import DiagnosticsRepository, GENERATED, SOURCE, advance_accepted_baseline, build, canonical_json, generate_manifest, reconcile
 from estate.diagnostics.impact import create_packet, local_ai_delta, preserve_candidate, query_candidates
+from estate.diagnostics.knowledge import ingest_candidate, query_knowledge, validate_knowledge
 
 
 def validate(root: Path) -> dict:
@@ -44,6 +45,10 @@ def main() -> int:
     create=impact_sub.add_parser("create");create.add_argument("--request",type=Path,required=True);create.add_argument("--output",type=Path,required=True)
     candidates=sub.add_parser("candidates");candidates.add_argument("phrase",nargs="?")
     sub.add_parser("local-ai-delta")
+    knowledge=sub.add_parser("knowledge"); knowledge_sub=knowledge.add_subparsers(dest="knowledge_command",required=True)
+    kv=knowledge_sub.add_parser("validate"); kv.add_argument("path",type=Path)
+    ki=knowledge_sub.add_parser("ingest"); ki.add_argument("path",type=Path)
+    kq=knowledge_sub.add_parser("query"); kq.add_argument("phrase",nargs="?")
     args=parser.parse_args(); root=args.root.resolve(); repo=DiagnosticsRepository(root)
     if args.command=="build": result=build(root)
     elif args.command=="validate": result=validate(root)
@@ -62,6 +67,14 @@ def main() -> int:
         output=args.output if args.output.is_absolute() else root/args.output; output.parent.mkdir(parents=True,exist_ok=True); output.write_text(canonical_json(result),encoding="utf-8")
         result={"status":"ACCEPTED","packet":str(output),"change_id":result["change_id"]}
     elif args.command=="candidates": result=query_candidates(root,args.phrase)
+    elif args.command=="knowledge":
+        path = args.path if getattr(args, "path", None) and args.path.is_absolute() else (root / args.path if getattr(args, "path", None) else None)
+        if args.knowledge_command == "validate":
+            value = json.loads(path.read_text(encoding="utf-8")); value = value.get("knowledge", value) if isinstance(value, dict) else value
+            errors = validate_knowledge(value); result={"valid":not errors,"errors":errors}
+        elif args.knowledge_command == "ingest":
+            destination = ingest_candidate(root, json.loads(path.read_text(encoding="utf-8"))); result={"status":"CANDIDATE_PRESERVED","path":destination.relative_to(root).as_posix(),"canonical_promotion":False}
+        else: result=query_knowledge(root,args.phrase)
     elif args.command=="local-ai-delta": result=local_ai_delta(root)
     else: result=reconcile(root,args.accepted_manifest,args.impact_packet,"incremental" if args.incremental else "full")
     if json_requested or not isinstance(result,list): print(canonical_json(result),end="")
