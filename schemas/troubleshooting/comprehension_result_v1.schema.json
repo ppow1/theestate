@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/comprehension_result_v1",
+  "title": "Estate bounded comprehension result v1",
+  "type": "object",
+  "required": ["contract", "result_id", "batch_id", "source_revision", "provider", "items"],
+  "properties": {
+    "contract": {"const": "estate.troubleshooting.comprehension.result.v1"},
+    "result_id": {"type": "string", "minLength": 1},
+    "batch_id": {"type": "string", "minLength": 1},
+    "source_revision": {"type": "string", "minLength": 1},
+    "provider": {
+      "type": "object",
+      "required": ["type", "worker_identity"],
+      "properties": {"type": {"type": "string"}, "model": {"type": ["string", "null"]}, "worker_identity": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["asset_id"],
+        "properties": {
+          "asset_id": {"type": "string", "minLength": 1},
+          "lifecycle": {"enum": ["CANDIDATE", "PROPOSED"]},
+          "purpose": {"type": ["string", "null"]},
+          "owner_candidate": {"type": ["string", "null"]},
+          "summary": {"type": ["string", "null"]},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "unresolved_questions": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

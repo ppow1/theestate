@@ -212,7 +212,7 @@ python -m estate.cli.main knowledge-index --backend sqlite packet WF.LD.RECONCIL
 python -m estate.cli.main knowledge-index --backend sqlite rebuild --root ESTATE_ROOT
 ```
 
-Migration version 1 is applied transactionally and future incompatible
+Migration version 2 is applied transactionally and future incompatible
 versions fail closed. Unchanged content is not reprocessed; changed
 comprehended assets become `REVALIDATION_REQUIRED` while historical revisions
 remain in the index. The query/packet boundary is provider-neutral and exposes
@@ -220,6 +220,39 @@ candidate outputs only: no consumer can promote knowledge, advance an accepted
 baseline, or authorize remediation. SQLite is local-first and supports the
 current single-writer/occasional-reader boundary; residents consume the query
 layer rather than issuing SQL.
+
+## Governed population and comprehension workers
+
+`population-scope.json` is the explicit v1 admission contract. It is evaluated
+before traversal and requires the Git worktree to have the governed
+`ppow1/theestate` remote. The initial boundary admits repository source,
+tests/tools, governed documentation, schemas/migrations, operational and
+collaboration definitions, and selected small registries. `runtime`, Git
+internals, evidence, generated troubleshooting views, credential patterns, and
+other unadmitted adjacent directories are excluded; `data`, `archive`, and
+`residents` are metadata/no-content boundaries. Unknown adjacent roots are
+reported for review without content traversal.
+
+The first deterministic inventory and future bounded scans use:
+
+```text
+python -m estate.cli.main knowledge-index --backend sqlite scope-show --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite scope-validate src/estate/diagnostics --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite scan --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite coverage --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite next-batch --limit 10 --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite batch-packet BATCH_ID --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite work-status --root ESTATE_ROOT
+```
+
+Work packets contain selected structural assets and hashes only. A conforming
+provider returns `schemas/troubleshooting/comprehension_result_v1.schema.json`
+material keyed by assigned asset IDs. Deterministic validation rejects unknown
+assets, added filesystem paths, unknown fields, revision mismatches, and
+VERIFIED/CANONICAL self-promotion. Ingestion preserves provider/model/worker
+provenance, is idempotent for identical results, preserves conflicts, and
+leaves human review required. No provider can expand scope or authorize
+remediation.
 
 ## Historical replay set
 
