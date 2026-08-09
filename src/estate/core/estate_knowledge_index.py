@@ -331,3 +331,72 @@ def format_query_report(result: dict[str, Any]) -> str:
     for match in result.get("results", []):
         lines.extend(["", f"- {match['path']} (score {match['score']})", f"  title: {match.get('title')}", f"  type: {match.get('artifact_type')} | owner: {match.get('owner')} | classification: {match.get('classification')}", f"  snippet: {match.get('snippet', '')}"])
     return "\n".join(lines)
+
+
+# The JSON index remains the compatibility/retrieval projection.  These lazy
+# adapters let the existing owner expose the relational projection without a
+# second registry or a competing CLI owner (the SQLite module imports this
+# module's governed source helpers).
+def sqlite_init(root=None):
+    from estate.core.estate_knowledge_store import init_store
+    return init_store(root)
+
+
+def sqlite_scan(root=None, **kwargs):
+    from estate.core.estate_knowledge_store import scan
+    return scan(root, **kwargs)
+
+
+def sqlite_rebuild(root=None, **kwargs):
+    from estate.core.estate_knowledge_store import rebuild
+    return rebuild(root, **kwargs)
+
+
+def sqlite_status(root=None):
+    from estate.core.estate_knowledge_store import store_status
+    return store_status(root)
+
+
+def sqlite_coverage(root=None):
+    from estate.core.estate_knowledge_store import coverage
+    return coverage(root)
+
+
+def sqlite_query(query="", root=None, **kwargs):
+    from estate.core.estate_knowledge_store import query_assets
+    return query_assets(query, root=root, **kwargs)
+
+
+def sqlite_unknown(root=None, **kwargs):
+    from estate.core.estate_knowledge_store import unknown_assets
+    return unknown_assets(root, **kwargs)
+
+
+def sqlite_stale(root=None):
+    from estate.core.estate_knowledge_store import stale_assets
+    return stale_assets(root)
+
+
+def sqlite_graph(root=None, **kwargs):
+    from estate.core.estate_knowledge_store import graph
+    return graph(root, **kwargs)
+
+
+def sqlite_progress(root=None):
+    from estate.core.estate_knowledge_store import scan_progress
+    return scan_progress(root)
+
+
+def sqlite_packet(root=None, scope=None):
+    from estate.core.estate_knowledge_store import build_index_packet
+    return build_index_packet(root, scope)
+
+
+def sqlite_lifecycle(root=None):
+    from estate.core.estate_knowledge_store import lifecycle_candidates
+    return lifecycle_candidates(root)
+
+
+def sqlite_knowledge(root=None, **kwargs):
+    from estate.core.estate_knowledge_store import query_knowledge
+    return query_knowledge(root, **kwargs)

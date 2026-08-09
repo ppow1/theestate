@@ -54,6 +54,19 @@ from estate.core.estate_knowledge_index import (
     query_index as query_knowledge_index,
     rebuild_index as rebuild_knowledge_index,
     status as knowledge_index_status,
+    sqlite_coverage,
+    sqlite_graph,
+    sqlite_init,
+    sqlite_knowledge,
+    sqlite_lifecycle,
+    sqlite_packet,
+    sqlite_progress,
+    sqlite_query,
+    sqlite_rebuild,
+    sqlite_scan,
+    sqlite_stale,
+    sqlite_status,
+    sqlite_unknown,
 )
 from estate.core.global_search_command_palette import search_global_palette, execute_registered_command, format_palette_report
 from estate.core.document_registry import load_document_registry, format_document_registry
@@ -1908,6 +1921,37 @@ def cmd_estate_search(args):
 def cmd_knowledge_index(args):
     root = Path(args.root) if getattr(args, "root", None) else Path.cwd()
     action = args.knowledge_index_action
+    if getattr(args, "backend", "legacy") == "sqlite":
+        if action == "init" or action == "migrate":
+            payload = sqlite_init(root)
+        elif action == "rebuild":
+            payload = sqlite_rebuild(root, scope=args.scope, limit=args.limit)
+        elif action == "scan" or action == "resume":
+            payload = sqlite_scan(root, scope=args.scope, limit=args.limit, phase="RESUME" if action == "resume" else "DETERMINISTIC")
+        elif action == "status":
+            payload = sqlite_status(root)
+        elif action == "coverage":
+            payload = sqlite_coverage(root)
+        elif action == "progress":
+            payload = sqlite_progress(root)
+        elif action == "unknown":
+            payload = sqlite_unknown(root, limit=args.limit)
+        elif action == "stale":
+            payload = sqlite_stale(root)
+        elif action == "graph":
+            payload = sqlite_graph(root, scope=args.scope)
+        elif action == "packet":
+            payload = sqlite_packet(root, args.scope)
+        elif action == "lifecycle":
+            payload = sqlite_lifecycle(root)
+        elif action == "knowledge":
+            payload = sqlite_knowledge(root, phrase=args.query or "", limit=args.limit)
+        elif action == "query":
+            payload = sqlite_query(args.query or "", root=root, owner=args.owner, tag=args.tag, status_filter=args.asset_status, limit=args.limit)
+        else:
+            raise SystemExit(1)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return
     if action == "rebuild":
         payload = rebuild_knowledge_index(root, write=True)
     elif action == "update":
@@ -3694,15 +3738,40 @@ def main(argv=None):
     p = sub.add_parser("knowledge-index", help="Build, inspect, and query the governed Estate knowledge index")
     p.add_argument("--root", help="Estate root path; defaults to the current working directory")
     p.add_argument("--json", action="store_true", help="Print JSON output")
+    p.add_argument("--backend", choices=["legacy", "sqlite"], default="legacy", help="Index projection to use; SQLite is the relational institutional index")
     sp = p.add_subparsers(dest="knowledge_index_action", required=True)
-    sp.add_parser("rebuild", help="Rebuild the knowledge index from local artifacts").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("update", help="Incrementally refresh changed index entries").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("status", help="Print index status").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("inspect", help="Detect stale or missing index entries").set_defaults(func=cmd_knowledge_index)
+    for name, help_text in (("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities")):
+        if name == "status":
+            continue
+        child = sp.add_parser(name, help=help_text)
+        if name == "knowledge":
+            child.add_argument("query", nargs="?", default="", help="Knowledge title or identifier phrase")
+            child.add_argument("--limit", type=int, default=100)
+        child.set_defaults(func=cmd_knowledge_index)
+    for name, help_text in (("scan", "Incrementally scan a bounded repository scope"), ("resume", "Resume a bounded deterministic scan"), ("rebuild", "Rebuild the SQLite projection from governed files")):
+        if name == "rebuild":
+            continue
+        child = sp.add_parser(name, help=help_text)
+        child.add_argument("--scope", help="Repository-relative file or directory scope")
+        child.add_argument("--limit", type=int, default=None, help="Maximum files to process")
+        child.set_defaults(func=cmd_knowledge_index)
+    rb = sp.add_parser("rebuild", help="Rebuild the SQLite projection from governed files")
+    rb.add_argument("--scope", help="Repository-relative file or directory scope")
+    rb.add_argument("--limit", type=int, default=None, help="Maximum files to process")
+    rb.set_defaults(func=cmd_knowledge_index)
+    for name, help_text in (("graph", "Build a bounded component graph"), ("packet", "Build a provider-neutral indexed comprehension packet")):
+        child = sp.add_parser(name, help=help_text)
+        child.add_argument("scope", help="Component or workflow identifier")
+        child.set_defaults(func=cmd_knowledge_index)
     q = sp.add_parser("query", help="Query indexed Estate artifacts")
     q.add_argument("query", nargs="?", default="", help="Keyword query")
     q.add_argument("--artifact-type", help="Filter by normalized artifact type")
     q.add_argument("--owner", help="Filter by owner")
+    q.add_argument("--tag", help="Filter by deterministic or candidate tag (SQLite backend)")
+    q.add_argument("--asset-status", dest="asset_status", help="Filter by indexed asset status (SQLite backend)")
     q.add_argument("--classification", help="Filter by classification")
     q.add_argument("--include-private", action="store_true", help="Include protected private records")
     q.add_argument("--limit", type=int, default=20, help="Maximum results")

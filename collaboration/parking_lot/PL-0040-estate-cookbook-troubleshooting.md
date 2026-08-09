@@ -143,3 +143,20 @@ authorize remediation.
 This is a controlled comprehension-infrastructure milestone, not Estate-wide
 population, autonomous consultation, universal probe coverage, canonical
 promotion, or remediation authority.
+
+## Indexed institutional knowledge infrastructure slice (2026-08-09)
+
+The existing knowledge-index owner now has a migration-governed SQLite runtime
+projection for bounded Estate repository inventory and relational retrieval.
+It records revision/blob/content provenance, scan progress, deterministic
+classification, unknown reasons, ownership and purpose state, many-to-many
+tags, component/workflow/checkpoint/failure-seam links, lifecycle assessments,
+and revalidation state. The projection is rebuildable and does not replace Git,
+governed JSON, evidence, or canonical Cookbook truth.
+
+The existing CLI exposes SQLite initialization, bounded scan/resume, rebuild,
+coverage, unknown/stale/lifecycle queries, graph output, and provider-neutral
+comprehension packets. This is a bounded indexed-institutional-knowledge
+milestone; Estate-wide population, autonomous local-AI consultation, canonical
+promotion workflow, resident-facing service exposure, and remediation remain
+future work.

@@ -85,3 +85,17 @@ The packet boundary remains proposal-only and cannot mutate canonical truth,
 advance an accepted baseline, promote knowledge, or authorize remediation.
 This milestone proves bounded comprehension infrastructure only; it does not
 perform Estate-wide population or close PL-0040.
+
+## Indexed institutional knowledge infrastructure slice (2026-08-09)
+
+The existing PL-0040 owner now includes a migration-governed SQLite projection
+for bounded deterministic repository inventory, scan/resume state, provenance,
+ownership/purpose/tag classification, relational component/workflow/checkpoint
+and failure-seam links, coverage, lifecycle assessment, staleness, graph views,
+and bounded provider-neutral packets. The database is runtime-generated and
+rebuildable; Git and governed artifacts remain authoritative.
+
+This milestone supports controlled indexed population but does not perform
+Estate-wide population, autonomous provider review, canonical promotion,
+resident API exposure, or remediation. PL-0040 remains open for those later
+milestones.

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.knowledge_store.v1",
+  "title": "Estate Knowledge Store status contract",
+  "type": "object",
+  "required": ["schema_version", "database", "migration_version"],
+  "properties": {
+    "schema_version": {"const": "estate.knowledge_store.v1"},
+    "database": {"type": "string", "minLength": 1},
+    "migration_version": {"type": "integer", "minimum": 1},
+    "asset_count": {"type": "integer", "minimum": 0},
+    "component_count": {"type": "integer", "minimum": 0},
+    "workflow_count": {"type": "integer", "minimum": 0}
+  },
+  "additionalProperties": true
+}

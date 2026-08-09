@@ -9,8 +9,9 @@ verify downstream recovery, and preserve evidence.
 
 `cookbook.json` is the canonical authored knowledge. The implementation
 manifest, search index, freshness report, and HTML below `generated/` are
-derived; never edit them. No service, database, model, or external provider is
-required.
+derived; never edit them. No service, daemon, model, or external provider is
+required. The relational index described below is a rebuildable local runtime
+projection, not a new authority.
 
 ## Provenance contract
 
@@ -188,6 +189,37 @@ and revalidation requests, but cannot mutate the model, advance the accepted
 baseline, promote Cookbook knowledge, or authorize remediation. Existing
 Cookbook and candidate knowledge is linked by reference; historical evidence is
 not rewritten when source understanding becomes stale.
+
+## Estate institutional knowledge index
+
+The existing `estate.core.estate_knowledge_index` owner now exposes a
+transactional SQLite projection for Estate-scale relational retrieval. Git,
+governed JSON, evidence, and canonical model files remain authoritative;
+SQLite stores rebuildable inventory, scan history, ownership/purpose state,
+component/workflow/checkpoint links, failure seams, lifecycle assessments, and
+provenance-bearing relationships. The runtime database is ignored at
+`runtime/search/estate_knowledge_index.sqlite3` and is safe to rebuild.
+
+Use the same CLI owner for bounded deterministic population:
+
+```text
+python -m estate.cli.main knowledge-index --backend sqlite init --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite scan --scope docs/operations/troubleshooting --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite coverage --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite query "checkpoint" --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite graph WF.LD.RECONCILE --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite packet WF.LD.RECONCILE --root ESTATE_ROOT
+python -m estate.cli.main knowledge-index --backend sqlite rebuild --root ESTATE_ROOT
+```
+
+Migration version 1 is applied transactionally and future incompatible
+versions fail closed. Unchanged content is not reprocessed; changed
+comprehended assets become `REVALIDATION_REQUIRED` while historical revisions
+remain in the index. The query/packet boundary is provider-neutral and exposes
+candidate outputs only: no consumer can promote knowledge, advance an accepted
+baseline, or authorize remediation. SQLite is local-first and supports the
+current single-writer/occasional-reader boundary; residents consume the query
+layer rather than issuing SQL.
 
 ## Historical replay set
 
