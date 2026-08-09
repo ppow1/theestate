@@ -1059,3 +1059,13 @@ Classification: Estate Internal
 
 Summary:
 Forward-integrated the validated physical compute-resource substrate onto current main architecture. Added N-device NVIDIA UUID identity and telemetry evidence, deterministic health/capacity classification, provider-neutral compute requirements, current Dispatch and provider-adapter/schema propagation, governed scheduler reservation hooks, dynamic Office Compute projection, deterministic tests, current architecture documentation, and a Diagnostic Impact Packet. Preserved Grace/PTM/Helen/Engineering authority gates and PL-0042 safety boundaries; no GPU workload or destructive recovery was performed.
+
+EC-000097 - Validate Grace Open WebUI GPU workload placement
+
+Timestamp: 2026-08-09 00:00:00
+Location: A:\\theestate-ec000097
+Status: Blocked
+Classification: Estate Internal
+
+Summary:
+Integrated the repository-owned Playwright Open WebUI operator acceptance harness and preserved the first bounded placement preflight. Deterministic harness tests passed, but live acceptance was blocked because Open WebUI was unavailable, the canonical runtime configuration targeted a different dirty checkout, the current Grace resident engineering path does not perform provider execution, fresh governed capacity evidence was absent, and the RTX 4090 had approximately 1.8 GiB free for configured qwen3:8b. No workload or destructive GPU operation was performed.

@@ -1,0 +1,10 @@
+name: GRACE_OPENWEBUI_GROUNDING
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, what is the current CME operational state? Report only what you can verify from Estate operational truth."
+    expect:
+      contains_any: ["IDLE", "PROCESSING", "STOPPED", "EMPTY_QUEUE", "UNKNOWN"]
+validator: cme_state
+timeouts:
+  timeout: 60000

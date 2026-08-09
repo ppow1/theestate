@@ -755,3 +755,9 @@ Documented and operationally validated the Command Chair trigger namespaces for 
 EC-000096 - Integrated scalable GPU compute resource foundation
 
 Forward-integrated the validated N-device physical GPU resource substrate onto current main. Preserved current Grace, PTM, Helen, Engineering authorization, Dispatch, adapter schema, scheduler, and Office boundaries while adding UUID-based identity, deterministic per-device health/capacity evidence, resource-aware placement requirements, governed reservation hooks, dynamic Office Compute visibility, tests, documentation, and diagnostics. No GPU workloads, heavy simultaneous SDXL, or destructive recovery were performed.
+
+2026-08-09 00:00:00
+
+EC-000097 - Validate Grace Open WebUI GPU workload placement
+
+Integrated the existing Playwright Open WebUI operator acceptance harness and recorded a truthful blocked preflight. The live browser endpoint was unavailable; current resident engineering chat still reports `provider_execution_performed=false`; canonical runtime configuration targets a different dirty worktree; fresh governed capacity evidence was absent; and the intended RTX 4090 had approximately 1.8 GiB free for configured `qwen3:8b`. No workload, heavy SDXL, stress, or destructive recovery was performed. See `docs/operations/validation/EC-000097_Grace_OpenWebUI_GPU_Placement.md`.

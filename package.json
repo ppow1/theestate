@@ -1,0 +1,10 @@
+{
+  "name": "estate-openwebui-operator-acceptance",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Canonical Playwright operator-level acceptance client for Estate Open WebUI",
+  "dependencies": {
+    "playwright": "^1.55.0",
+    "yaml": "^2.8.1"
+  }
+}

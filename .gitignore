@@ -4,6 +4,11 @@ __pycache__/
 *.pyd
 .env
 .venv/
+node_modules/
+
+# Playwright operator state is local authentication/session material and is
+# never an evidence or source-control artifact.
+runtime/browser/openwebui-operator-profile/
 
 # Local Estate runtime boundary:
 # Runtime projections, resident/session state, local approvals, attachment
