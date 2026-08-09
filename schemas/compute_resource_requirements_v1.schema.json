@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.compute-resource-requirements.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "requires_gpu": {"type": "boolean"},
+    "minimum_vram_mib": {"type": ["number", "null"], "minimum": 0},
+    "required_compute_capability": {"type": ["string", "null"]},
+    "required_resource_id": {"type": ["string", "null"]},
+    "preferred_resource_id": {"type": ["string", "null"]},
+    "required_gpu_uuid": {"type": ["string", "null"]},
+    "preferred_gpu_uuid": {"type": ["string", "null"]},
+    "excluded_resource_ids": {"type": "array", "items": {"type": "string"}},
+    "compatibility_tags": {"type": "array", "items": {"type": "string"}},
+    "reservation_reference": {"type": ["string", "null"]},
+    "evidence_reference": {"type": ["string", "null"]},
+    "freshness_seconds": {"type": ["integer", "null"], "exclusiveMinimum": 0}
+  }
+}

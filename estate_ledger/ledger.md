@@ -1049,3 +1049,13 @@ Classification: Estate Internal / Restricted backup payload
 
 Summary:
 Preserved the verified Command Chair HID identities and trigger namespaces for the paired white controllers, E9s macropad, UtechSmart Venus Pro, and AI-KSEN LCKEY; recorded the failed generic LCKEY provisioning path and safe resume procedure; added an exact six-file base64 recovery bundle with SHA-256 metadata; and added a PowerShell restore/verification tool. The historical Venus Pro profile remains Restricted because it contains obsolete credential macros.
+
+EC-000096 - Integrated scalable GPU compute resource foundation
+
+Timestamp: 2026-08-09 00:00:00
+Location: A:\\theestate-ec000096
+Status: Draft
+Classification: Estate Internal
+
+Summary:
+Forward-integrated the validated physical compute-resource substrate onto current main architecture. Added N-device NVIDIA UUID identity and telemetry evidence, deterministic health/capacity classification, provider-neutral compute requirements, current Dispatch and provider-adapter/schema propagation, governed scheduler reservation hooks, dynamic Office Compute projection, deterministic tests, current architecture documentation, and a Diagnostic Impact Packet. Preserved Grace/PTM/Helen/Engineering authority gates and PL-0042 safety boundaries; no GPU workload or destructive recovery was performed.

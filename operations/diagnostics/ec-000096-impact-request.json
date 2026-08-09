@@ -1,0 +1,32 @@
+{
+  "packet_id": "EC-000096",
+  "component": "compute-resource-foundation",
+  "intended_behavior": "Integrate N-device physical GPU identity, telemetry, deterministic health/capacity evidence, resource-aware Dispatch/provider contracts, governed reservation hooks, and Office visibility into current main without weakening Grace/PTM/Engineering authority gates.",
+  "changed_files": [
+    "src/estate/core/compute_resources.py",
+    "src/estate/core/compute_office_panel.py",
+    "src/estate/core/execution_dispatch.py",
+    "src/estate/core/execution_provider_adapter.py",
+    "src/estate/core/governed_provider_scheduler.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/operations_center_settings.py",
+    "src/estate/core/authority_schema_runtime.py",
+    "schemas/compute_resource_requirements_v1.schema.json",
+    "schemas/execution_provider_adapter_request_v1.schema.json",
+    "tests/test_compute_resources.py",
+    "tests/test_steward_command_center.py",
+    "docs/architecture/compute_resource_foundation.md",
+    "estate_ledger/ledger.md"
+  ],
+  "dependencies": ["current Execution Dispatch technical gates", "current provider adapter JSON schema", "governed provider scheduler", "Office command surface", "NVIDIA read-only nvidia-smi evidence"],
+  "invariants": ["host plus NVIDIA UUID is canonical identity", "runtime ordinal is observational only", "health and capacity remain separate", "required physical GPU fails closed", "Office and Grace cannot mutate hardware", "existing authority gates remain required"],
+  "failure_seams": ["malformed telemetry", "NVML disappearance", "PnP problem state", "stale evidence", "UUID mismatch", "insufficient VRAM", "reservation overbooking", "schema or Dispatch gate regression"],
+  "probes": ["pytest -q tests/test_compute_resources.py", "pytest -q tests/test_execution_dispatch.py tests/test_execution_provider_adapter.py tests/test_governed_provider_scheduler.py", "python -m py_compile changed Python modules", "read-only nvidia-smi/PnP/PyTorch enumeration only"],
+  "evidence": ["source commit 001eb915df3915db9a62fd0cb5da5f11f06a9e96 as historical donor", "collaboration/parking_lot/PL-0042 from source history", "focused test reports", "runtime/compute_resources/gpus.json when live observation is performed"],
+  "boundaries": ["reload Dispatch and adapter request before new handoff", "scheduler reservation remains separate from Dispatch release", "no destructive GPU recovery", "no heavy simultaneous SDXL"],
+  "affected_checkpoints": ["LD-DEVELOPER-INGESTION"],
+  "proposed_knowledge": [{"state": "CANDIDATE", "text": "When a required GPU UUID is absent, stale, identity-mismatched, or reserved, stop admission and require fresh governed placement evidence; never fall back by ordinal, CPU, model, runtime, or provider."}],
+  "confidence": "HIGH",
+  "source": {"kind": "human", "actor": "Codex"}
+}

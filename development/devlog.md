@@ -749,3 +749,9 @@ Implemented WP-0534 with a metadata-only Codex CLI capability discovery runtime,
 EC-000095 - Preserved Command Chair HID integration checkpoint
 
 Documented and operationally validated the Command Chair trigger namespaces for two identical white encoder controllers, the E9s Vial controller, and the two-profile UtechSmart Venus Pro mouse. Preserved the AI-KSEN LCKEY identity, protocol incompatibility evidence, official-software dependency, and safe continuation path. Added a Restricted six-file backup bundle containing the E9s factory backup and all Venus Pro source/intermediate/final profiles, plus a PowerShell decoder that verifies every restored file by SHA-256.
+
+2026-08-09 00:00:00
+
+EC-000096 - Integrated scalable GPU compute resource foundation
+
+Forward-integrated the validated N-device physical GPU resource substrate onto current main. Preserved current Grace, PTM, Helen, Engineering authorization, Dispatch, adapter schema, scheduler, and Office boundaries while adding UUID-based identity, deterministic per-device health/capacity evidence, resource-aware placement requirements, governed reservation hooks, dynamic Office Compute visibility, tests, documentation, and diagnostics. No GPU workloads, heavy simultaneous SDXL, or destructive recovery were performed.
