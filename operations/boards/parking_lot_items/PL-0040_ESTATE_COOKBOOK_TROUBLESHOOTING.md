@@ -115,3 +115,15 @@ be expanded by a provider. Result ingestion is fail-closed, idempotent for
 identical output, conflict-preserving, and permanently candidate-only pending
 governed review. This does not authorize unattended local-AI population,
 canonical promotion, resident service exposure, or remediation.
+
+## Governed local-AI comprehension operations (2026-08-09)
+
+The existing owner now provides a bounded `knowledge-index work-run`
+operation over the already-admitted queue. It reuses the loopback Ollama
+provider, performs a live health/model check, sends only Estate-built packets,
+requires structured candidate JSON, validates evidence and assigned identity,
+and records model/source provenance and quality outcome. The first real run
+completed two troubleshooting work units as accepted candidates requiring
+human review. Local AI remains a provider, not an authority: scope expansion,
+canonical promotion, baseline advancement, remediation, and unattended
+recurring scheduling remain prohibited.

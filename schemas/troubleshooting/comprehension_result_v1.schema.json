@@ -27,11 +27,17 @@
           "owner_candidate": {"type": ["string", "null"]},
           "summary": {"type": ["string", "null"]},
           "tags": {"type": "array", "items": {"type": "string"}},
-          "unresolved_questions": {"type": "array", "items": {"type": "string"}}
+          "unresolved_questions": {"type": "array", "items": {"type": "string"}},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "verification_state": {"type": "string"}
         },
         "additionalProperties": false
       }
-    }
+    },
+    "quality": {"enum": ["ACCEPTED_CANDIDATE", "PARTIAL_CANDIDATE", "NEEDS_MORE_CONTEXT", "RETRYABLE_PROVIDER_FAILURE", "INVALID_RESULT", "CONFLICT_REVIEW_REQUIRED", "HIGHER_REASONING_REQUIRED", "HUMAN_REVIEW_REQUIRED"]},
+    "telemetry": {"type": "object"},
+    "context_requests": {"type": "array", "items": {"type": "string"}},
+    "unsupported_assertions": {"type": "array", "items": {"type": "string"}}
   },
   "additionalProperties": false
 }

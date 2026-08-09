@@ -177,3 +177,20 @@ assigned asset identity and source revision, preserves provider provenance and
 conflicts, and retains all results as candidate material requiring human or
 governed review. Local-AI execution, unattended estate-wide comprehension,
 canonical promotion, resident APIs, and remediation remain future milestones.
+
+## Governed local-AI comprehension operations slice (2026-08-09)
+
+The same population owner now exposes an operator-invoked `knowledge-index`
+local worker. It checks the existing loopback Ollama provider, selects bounded
+authorized batches, sends only deterministic packets, parses structured JSON,
+applies evidence and scope quality gates, and persists provider/model/source
+provenance as candidate interpretations. Results remain reviewable and no
+provider can add paths, mutate canonical knowledge, advance an accepted
+baseline, or authorize remediation.
+
+The first real run used two troubleshooting batches and produced two
+`ACCEPTED_CANDIDATE` results with human review still required. This is a
+controlled local-AI worker milestone, not autonomous recurring operation,
+Estate-wide comprehension, canonical promotion, resident API exposure, or
+remediation authority. Difficulty benchmark expansion and recurring Scheduler
+integration remain follow-on work.

@@ -139,6 +139,7 @@ from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.helen_readiness import build_readiness
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
+from estate.core.estate_comprehension_worker import provider_status as comprehension_provider_status, run_local as run_local_comprehension, review_queue as comprehension_review_queue
 from estate.core.resident_gateway import serve as serve_resident_gateway, gateway_status
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 from estate.core.planning_provider import PlanningProviderRequest
@@ -1966,6 +1967,12 @@ def cmd_knowledge_index(args):
             payload = sqlite_work_status(root)
         elif action == "work-retry":
             payload = sqlite_work_retry(root, args.batch_id)
+        elif action == "provider-status":
+            payload = comprehension_provider_status(timeout=getattr(args, "timeout", 4.0), model=getattr(args, "model", None))
+        elif action == "work-run":
+            payload = run_local_comprehension(root, limit=args.limit, max_bytes=args.max_bytes, model=args.model, worker_identity=args.worker_identity, asset_prefix=args.asset_prefix, timeout=args.timeout)
+        elif action == "work-review":
+            payload = comprehension_review_queue(root)
         elif action in {"result-validate", "result-ingest"}:
             request = json.loads(Path(args.input).read_text(encoding="utf-8"))
             payload = sqlite_result_validate(root, request) if action == "result-validate" else sqlite_result_ingest(root, request)
@@ -3770,7 +3777,7 @@ def main(argv=None):
     sp.add_parser("update", help="Incrementally refresh changed index entries").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("status", help="Print index status").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("inspect", help="Detect stale or missing index entries").set_defaults(func=cmd_knowledge_index)
-    for name, help_text in (("scope-show", "Show the governed population scope"), ("scope-validate", "Validate a requested scope against the governed contract"), ("scope-review", "Report adjacent boundaries without traversing them"), ("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities"), ("next-batch", "Create the next bounded comprehension work batch"), ("work-status", "Show comprehension work batches"), ("result-validate", "Validate a provider result without ingesting it"), ("result-ingest", "Ingest a validated provider result as candidate material")):
+    for name, help_text in (("scope-show", "Show the governed population scope"), ("scope-validate", "Validate a requested scope against the governed contract"), ("scope-review", "Report adjacent boundaries without traversing them"), ("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities"), ("next-batch", "Create the next bounded comprehension work batch"), ("work-status", "Show comprehension work batches"), ("work-review", "Show failed and review-required work"), ("provider-status", "Check the governed local inference provider"), ("work-run", "Run bounded local comprehension work"), ("result-validate", "Validate a provider result without ingesting it"), ("result-ingest", "Ingest a validated provider result as candidate material")):
         if name == "status":
             continue
         child = sp.add_parser(name, help=help_text)
@@ -3787,6 +3794,16 @@ def main(argv=None):
             child.add_argument("--provider-type")
             child.add_argument("--provider-model")
             child.add_argument("--worker-identity")
+        elif name == "provider-status":
+            child.add_argument("--model")
+            child.add_argument("--timeout", type=float, default=4.0)
+        elif name == "work-run":
+            child.add_argument("--limit", type=int, default=1)
+            child.add_argument("--max-bytes", type=int, default=65536)
+            child.add_argument("--model")
+            child.add_argument("--timeout", type=float, default=120.0)
+            child.add_argument("--worker-identity", default="estate-local-comprehension-worker")
+            child.add_argument("--asset-prefix")
         elif name in {"result-validate", "result-ingest"}:
             child.add_argument("--input", required=True)
         child.set_defaults(func=cmd_knowledge_index)

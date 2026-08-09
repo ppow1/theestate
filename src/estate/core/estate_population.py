@@ -389,9 +389,14 @@ def validate_result(root: str | Path | None, payload: dict[str, Any]) -> dict[st
     for key in ("result_id", "batch_id", "source_revision", "provider", "items"):
         if key not in payload:
             raise PopulationScopeError(f"comprehension result missing {key}")
-    allowed_top = {"contract", "result_id", "batch_id", "source_revision", "provider", "items"}
+    allowed_top = {"contract", "result_id", "batch_id", "source_revision", "provider", "items", "quality", "telemetry", "context_requests", "unsupported_assertions"}
     if set(payload) - allowed_top:
         raise PopulationScopeError("unknown comprehension result fields")
+    if "quality" in payload and payload["quality"] not in {"ACCEPTED_CANDIDATE", "PARTIAL_CANDIDATE", "NEEDS_MORE_CONTEXT", "RETRYABLE_PROVIDER_FAILURE", "INVALID_RESULT", "CONFLICT_REVIEW_REQUIRED", "HIGHER_REASONING_REQUIRED", "HUMAN_REVIEW_REQUIRED"}:
+        raise PopulationScopeError("unknown comprehension quality outcome")
+    for key in ("context_requests", "unsupported_assertions"):
+        if key in payload and (not isinstance(payload[key], list) or not all(isinstance(value, str) for value in payload[key])):
+            raise PopulationScopeError(f"{key} must be a list of strings")
     provider = payload["provider"]
     if not isinstance(provider, dict) or not provider.get("type") or not provider.get("worker_identity"):
         raise PopulationScopeError("provider type and worker_identity are required")
@@ -412,12 +417,14 @@ def validate_result(root: str | Path | None, payload: dict[str, Any]) -> dict[st
     for item in payload["items"]:
         if not isinstance(item, dict) or item.get("asset_id") not in allowed:
             raise PopulationScopeError("provider result contains an asset outside its assigned batch")
-        if set(item) - {"asset_id", "lifecycle", "purpose", "owner_candidate", "summary", "tags", "unresolved_questions"}:
+        if set(item) - {"asset_id", "lifecycle", "purpose", "owner_candidate", "summary", "tags", "unresolved_questions", "evidence_refs", "verification_state"}:
             raise PopulationScopeError("unknown provider interpretation fields")
         if item.get("lifecycle", "CANDIDATE") not in {"CANDIDATE", "PROPOSED"}:
             raise PopulationScopeError("provider interpretation must remain candidate/proposed")
         if "path" in item or "filesystem_path" in item:
             raise PopulationScopeError("provider results may not introduce filesystem paths")
+        if "evidence_refs" in item and (not isinstance(item["evidence_refs"], list) or not all(isinstance(ref, str) for ref in item["evidence_refs"])):
+            raise PopulationScopeError("evidence_refs must be a list of strings")
     return {"valid": True, "batch_id": payload["batch_id"], "asset_count": len(payload["items"]), "provider_type": provider["type"], "candidate_only": True}
 
 

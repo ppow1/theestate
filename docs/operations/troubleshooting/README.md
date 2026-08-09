@@ -262,3 +262,20 @@ context required, malformed execution/evidence requests, evidence exhaustion,
 Steward escalation, provider quota/capacity, observer effect, bootstrap fallback,
 and dirty worktree ambiguity. Replay queries select the authority and smallest
 safe action; they do not reconstruct unsupported incident detail.
+### Bounded local-AI comprehension
+
+The existing SQLite population owner supports an operator-invoked local
+worker. Check the loopback provider, then run a bounded batch:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m estate.cli.main knowledge-index --backend sqlite --json provider-status
+python -m estate.cli.main knowledge-index --backend sqlite --json work-run --limit 1 --max-bytes 65536
+python -m estate.cli.main knowledge-index --backend sqlite --json work-review
+```
+
+The worker reuses the governed Ollama boundary, receives only deterministic
+packets, and stores structured results as candidate interpretations. Local AI
+cannot expand scope, browse raw paths, promote canonical truth, advance an
+accepted baseline, or authorize remediation. Provider failures, malformed
+responses, weak evidence, and ambiguity remain reviewable outcomes.
