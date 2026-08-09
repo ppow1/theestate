@@ -34,6 +34,13 @@ def test_invalid_state_rejected():
         OperationalEvent.from_dict(event_payload(state="Mystery"))
 
 
+def test_operator_attention_event_types_are_canonical():
+    required = OperationalEvent.from_dict(event_payload(event_type="Operator Attention Required", state="Waiting", requires_attention=True))
+    resolved = OperationalEvent.from_dict(event_payload(event_type="Operator Attention Resolved", state="Completed"))
+    assert required.requires_attention is True
+    assert resolved.state == "Completed"
+
+
 def test_event_artifact_written(tmp_path):
     event = OperationalEvent.from_dict(event_payload())
     path = append_event_artifact(event, root=tmp_path)

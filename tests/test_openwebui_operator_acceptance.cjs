@@ -9,6 +9,7 @@ const {matchesExpectation, loadScenario} = require('../tools/openwebui-operator/
 const {safePath, sanitizeNetwork} = require('../tools/openwebui-operator/evidence.cjs');
 const {compareCmeClaim} = require('../tools/openwebui-operator/ground_truth.cjs');
 const {defaultProfilePath, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, authBootstrapOutcome} = require('../tools/openwebui_operator_acceptance.cjs');
+const {emitOperatorAttention, readEvents} = require('../tools/openwebui-operator/operator-attention.cjs');
 
 test('auth bootstrap and normal acceptance share the same default profile', () => {
   assert.equal(defaultProfilePath(), path.resolve('runtime/browser/openwebui-operator-profile'));
@@ -25,6 +26,22 @@ test('auth bootstrap outcomes distinguish success, timeout, and cancellation', (
   assert.equal(authBootstrapOutcome({authenticated: true, readinessResult: {status: 'OPENWEBUI_READY'}}).classification, 'AUTH_BOOTSTRAP_COMPLETE');
   assert.equal(authBootstrapOutcome({timedOut: true}).classification, 'AUTH_BOOTSTRAP_TIMEOUT');
   assert.equal(authBootstrapOutcome({cancelled: true}).classification, 'AUTH_BOOTSTRAP_CANCELLED');
+});
+
+test('LOGIN_REQUIRED attention is deduplicated and resolves without secrets', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'estate-attention-'));
+  const required = emitOperatorAttention({root, runId: 'run-1', url: 'http://127.0.0.1:8081/auth?token=secret'});
+  const duplicate = emitOperatorAttention({root, runId: 'run-1', url: 'http://127.0.0.1:8081/auth?token=secret'});
+  const resolved = emitOperatorAttention({root, runId: 'run-1', url: 'http://127.0.0.1:8081', status: 'resolved'});
+  const events = readEvents(root);
+  assert.equal(required.duplicate, false);
+  assert.equal(duplicate.duplicate, true);
+  assert.equal(events.length, 2);
+  assert.equal(events[0].event_type, 'Operator Attention Required');
+  assert.equal(events[1].event_type, 'Operator Attention Resolved');
+  assert.equal(events[0].metadata.surface, 'http://127.0.0.1:8081/auth');
+  assert.equal(JSON.stringify(events).includes('secret'), false);
+  assert.equal(resolved.event.metadata.status, 'resolved');
 });
 
 test('scenario expectations are semantic and bounded', () => {

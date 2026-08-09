@@ -1099,3 +1099,13 @@ Classification: Estate Internal
 
 Summary:
 Enabled the existing candidate-scoped Grace governed execution and provider-effects readiness through authenticated Engineering provider admission, preserving PTM, Helen, Engineering, Dispatch, adapter, and UUID-bound runtime-lane gates. Added a model-specific qwen3:8b safe VRAM admission floor, candidate enablement procedure, readiness/capacity evidence, and diagnostic impact record. Candidate readiness and the 4090 lane passed; the repository Playwright harness reached candidate Open WebUI but stopped at LOGIN_REQUIRED before Grace interaction. No model workload or destructive GPU operation was performed.
+
+EC-000220 - Added Open WebUI auth bootstrap and operator attention event
+
+Timestamp: 2026-08-09 00:00:00
+Location: A:\\theestate-ec000220
+Status: Implemented / live acceptance blocked by GPU device-loss stop condition
+Classification: Estate Internal
+
+Summary:
+Extended the existing Playwright operator acceptance so LOGIN_REQUIRED emits one deduplicated, secret-free operator-attention event, launches the existing headed auth-bootstrap with the same dedicated persistent profile, waits for bounded authentication, correlates resolution/timeout/cancellation, and resumes the original acceptance after success. Extended the canonical operational-event types without creating a Notifier or delivery channel. Live headed authentication and automatic resume passed; before a Grace prompt could be submitted, the P100 disappeared from NVIDIA visibility, triggering the preserved PL-0042 stop boundary. Candidate services were shut down; no model or destructive recovery was performed.

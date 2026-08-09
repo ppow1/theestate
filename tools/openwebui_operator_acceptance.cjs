@@ -9,6 +9,7 @@ const {SELECTORS, firstVisible, visibleText} = require('./openwebui-operator/sel
 const {runId, makeEvidence, writeJson, sanitizeNetwork, writeCompletion, ROOT} = require('./openwebui-operator/evidence.cjs');
 const {loadScenario, matchesExpectation} = require('./openwebui-operator/scenario.cjs');
 const {compareCmeClaim, readCmeState} = require('./openwebui-operator/ground_truth.cjs');
+const {emitOperatorAttention} = require('./openwebui-operator/operator-attention.cjs');
 
 const VERSION = '0.1.0';
 const DEFAULT_URL = process.env.ESTATE_OPENWEBUI_URL || 'http://127.0.0.1:8080';
@@ -104,6 +105,20 @@ async function isAuthenticatedSurface(page, result) {
   const text = await visibleText(page);
   if (/sign in to open webui|enter your password|don't have an account/i.test(text)) return false;
   return Boolean(await firstVisible(page, SELECTORS.composer)) || /new chat|chat history|open webui/i.test(text);
+}
+
+async function ensureAuthenticatedSession(options, session, evidence, url) {
+  let ready = await readiness(session.page, url);
+  if (ready.status !== FAILURE_CLASSES.LOGIN_REQUIRED) return {session, readiness: ready, credential_flow: false};
+  const attention = emitOperatorAttention({root: ROOT, runId: evidence.run, url, profilePath: path.relative(ROOT, options.profile || defaultProfilePath())});
+  await session.close();
+  const bootstrapCode = await authBootstrap({...options, url, profile: options.profile || defaultProfilePath()});
+  const status = bootstrapCode === 0 ? 'resolved' : (bootstrapCode === 130 ? 'cancelled' : 'timed_out');
+  const resolution = emitOperatorAttention({root: ROOT, runId: evidence.run, url, profilePath: path.relative(ROOT, options.profile || defaultProfilePath()), status});
+  if (bootstrapCode !== 0) return {session: null, readiness: {status: status === 'timed_out' ? 'AUTH_BOOTSTRAP_TIMEOUT' : 'AUTH_BOOTSTRAP_CANCELLED'}, credential_flow: true, attention, resolution};
+  session = await openSession({...options, profile: options.profile || defaultProfilePath()}, evidence);
+  ready = await readiness(session.page, url);
+  return {session, readiness: ready, credential_flow: true, attention, resolution};
 }
 
 function authBootstrapOutcome({cancelled = false, timedOut = false, readinessResult = null, authenticated = false} = {}) {
@@ -314,12 +329,14 @@ async function executeScenario(file, options) {
   const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), scenario: scenario.name, started_at: new Date().toISOString(), status: 'RUNNING', failure_class: null, evidence_dir: evidence.dir};
   writeJson(path.join(evidence.dir, 'scenario.json'), scenario);
   const shared = options._sharedSession || null;
-  const baseSession = shared || await openSession(options, evidence);
+  let baseSession = shared || await openSession(options, evidence);
   const ownsSession = !shared;
-  const page = ownsSession ? baseSession.page : await baseSession.context.newPage();
-  const session = ownsSession ? baseSession : {
+  let session = baseSession;
+  let authInfo = null;
+  const pageForSession = ownsSession ? baseSession.page : await baseSession.context.newPage();
+  session = ownsSession ? baseSession : {
     ...baseSession,
-    page,
+    page: pageForSession,
     browserErrors: [],
     networkErrors: [],
     close: async () => { await page.close().catch(() => {}); }
@@ -332,9 +349,16 @@ async function executeScenario(file, options) {
   }
   const turns = [];
   try {
+    if (ownsSession) {
+      authInfo = await ensureAuthenticatedSession(options, session, evidence, options.url || DEFAULT_URL);
+      session = authInfo.session;
+      if (authInfo.credential_flow) manifest.authentication_bootstrap = {credential_flow: true, attention_event_id: authInfo.attention?.event.event_id, resolution_event_id: authInfo.resolution?.event.event_id, profile_path: path.relative(ROOT, options.profile || defaultProfilePath())};
+      if (!session) throw Object.assign(new Error(authInfo.readiness.status), {classification: authInfo.readiness.status});
+    }
+    const page = session.page;
     if (ownsSession) await session.context.tracing.start({screenshots: true, snapshots: true, sources: false});
     const url = options.url || DEFAULT_URL;
-    const ready = await readiness(page, url);
+    const ready = authInfo?.readiness || await readiness(page, url);
     manifest.readiness = ready;
     if (ready.status !== 'OPENWEBUI_READY') throw Object.assign(new Error(`Readiness: ${ready.status}`), {classification: ready.status});
     const conversation = scenario.fresh_conversation === false ? {url: page.url()} : await freshConversation(page, url);
@@ -354,18 +378,20 @@ async function executeScenario(file, options) {
     manifest.status = 'BLOCKED';
     manifest.failure_class = error.classification || FAILURE_CLASSES.UNKNOWN;
     manifest.error = error.message;
-    await page.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {});
-    await page.locator('body').innerText().then(text => fs.writeFileSync(path.join(evidence.dir, 'dom-summary.txt'), text.slice(0, 12000), 'utf8')).catch(() => {});
+    if (!authInfo?.credential_flow) {
+      await session?.page?.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {});
+      await session?.page?.locator('body').innerText().then(text => fs.writeFileSync(path.join(evidence.dir, 'dom-summary.txt'), text.slice(0, 12000), 'utf8')).catch(() => {});
+    }
   } finally {
     manifest.completed_at = new Date().toISOString();
-    manifest.console = session.browserErrors;
-    manifest.network = session.networkErrors;
-    writeJson(path.join(evidence.dir, 'console.json'), session.browserErrors);
-    writeJson(path.join(evidence.dir, 'network.json'), session.networkErrors);
+    manifest.console = session?.browserErrors || [];
+    manifest.network = session?.networkErrors || [];
+    writeJson(path.join(evidence.dir, 'console.json'), manifest.console);
+    writeJson(path.join(evidence.dir, 'network.json'), manifest.network);
     if (turns.length) fs.writeFileSync(path.join(evidence.dir, 'response.txt'), turns.map(x => `Turn ${x.turn}\n${x.assistant}`).join('\n\n'), 'utf8');
-    if (ownsSession) await session.context.tracing.stop({path: path.join(evidence.dir, 'trace.zip')}).catch(() => {});
+    if (ownsSession && session) await session.context.tracing.stop({path: path.join(evidence.dir, 'trace.zip')}).catch(() => {});
     writeCompletion(evidence, manifest);
-    await session.close();
+    if (ownsSession && session) await session.close();
   }
   console.log(JSON.stringify(manifest, null, 2));
   return manifest.status === 'PASS' ? 0 : 2;
@@ -377,8 +403,12 @@ async function executeConcurrent(files, options) {
   // context and use independent pages so concurrent acceptance never corrupts
   // the operator profile or silently falls back to a second auth state.
   const started = new Date().toISOString();
-  const sharedSession = await openSession(options, makeEvidence(runId()));
+  const sharedEvidence = makeEvidence(runId());
+  let sharedSession = await openSession(options, sharedEvidence);
   try {
+    const authInfo = await ensureAuthenticatedSession(options, sharedSession, sharedEvidence, options.url || DEFAULT_URL);
+    sharedSession = authInfo.session;
+    if (!sharedSession) return 2;
     const codes = await Promise.all(files.map(file => executeScenario(file, {
       ...options,
       headed: options.headed,
@@ -387,7 +417,7 @@ async function executeConcurrent(files, options) {
     })));
     return codes.every(code => code === 0) ? 0 : 2;
   } finally {
-    await sharedSession.close();
+    if (sharedSession) await sharedSession.close();
   }
 }
 
@@ -399,15 +429,20 @@ async function main() {
   if (command === 'concurrent') return executeConcurrent([options['scenario-a'], options['scenario-b']].filter(Boolean), options);
   if (!['readiness', 'doctor', 'chat'].includes(command)) throw new Error(`Unknown command: ${command}`);
   const evidence = makeEvidence(runId());
-  const session = await openSession(options, evidence);
+  let session = await openSession(options, evidence);
+  let authInfo = null;
   const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), started_at: new Date().toISOString(), status: 'PASS', url: options.url || DEFAULT_URL};
   try {
     manifest.browser = {playwright_version: require('playwright/package.json').version, browser: process.env.PLAYWRIGHT_BROWSERS_PATH || 'managed'};
-    manifest.readiness = await readiness(session.page, manifest.url);
+    authInfo = await ensureAuthenticatedSession(options, session, evidence, manifest.url);
+    session = authInfo.session;
+    if (authInfo.credential_flow) manifest.authentication_bootstrap = {credential_flow: true, attention_event_id: authInfo.attention?.event.event_id, resolution_event_id: authInfo.resolution?.event.event_id, profile_path: path.relative(ROOT, options.profile || defaultProfilePath())};
+    if (!session) throw Object.assign(new Error(authInfo.readiness.status), {classification: authInfo.readiness.status});
+    manifest.readiness = authInfo.readiness;
     manifest.residents = await discoverResidents(session.page);
     if (command === 'readiness' && manifest.readiness.status !== 'OPENWEBUI_READY') manifest.status = 'BLOCKED';
     manifest.authentication = manifest.readiness.status === 'LOGIN_REQUIRED' ? 'LOGIN_REQUIRED' : 'NOT_ESTABLISHED_OR_NOT_REQUIRED';
-    if (manifest.readiness.status !== 'OPENWEBUI_READY') {
+    if (manifest.readiness.status !== 'OPENWEBUI_READY' && !authInfo.credential_flow) {
       await session.page.screenshot({path: path.join(evidence.screenshots, `${command}-readiness.png`), fullPage: true}).catch(() => {});
     }
     if (command === 'chat') {
@@ -423,12 +458,12 @@ async function main() {
       manifest.recommended_activation_boundary = manifest.readiness.status === 'LOGIN_REQUIRED' ? 'AUTOMATION_PAUSED_FOR_HUMAN' : 'OPENWEBUI_SERVICE_OR_UI_BOUNDARY';
       if (manifest.readiness.status === 'LOGIN_REQUIRED') manifest.recommended_command = AUTH_BOOTSTRAP_COMMAND;
     }
-  } catch (error) { manifest.status = 'BLOCKED'; manifest.failure_class = error.classification || FAILURE_CLASSES.UNKNOWN; manifest.error = error.message; await session.page.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {}); }
-  finally { manifest.completed_at = new Date().toISOString(); manifest.console = session.browserErrors; manifest.network = session.networkErrors; writeJson(path.join(evidence.dir, 'console.json'), session.browserErrors); writeJson(path.join(evidence.dir, 'network.json'), session.networkErrors); writeCompletion(evidence, manifest); await session.close(); }
+  } catch (error) { manifest.status = 'BLOCKED'; manifest.failure_class = error.classification || FAILURE_CLASSES.UNKNOWN; manifest.error = error.message; if (!authInfo?.credential_flow) await session?.page?.screenshot({path: path.join(evidence.screenshots, 'failure.png'), fullPage: true}).catch(() => {}); }
+  finally { manifest.completed_at = new Date().toISOString(); manifest.console = session?.browserErrors || []; manifest.network = session?.networkErrors || []; writeJson(path.join(evidence.dir, 'console.json'), manifest.console); writeJson(path.join(evidence.dir, 'network.json'), manifest.network); writeCompletion(evidence, manifest); if (session) await session.close(); }
   console.log(JSON.stringify(manifest, null, 2));
   return manifest.status === 'PASS' ? 0 : 2;
 }
 
 if (require.main === module) main().then(code => process.exitCode = code).catch(error => { console.error(error.stack || error); process.exitCode = 1; });
 
-module.exports = {VERSION, FAILURE_CLASSES, DEFAULT_AUTH_BOOTSTRAP_TIMEOUT, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, args, defaultProfilePath, readiness, isAuthenticatedSurface, authBootstrapOutcome, discoverResidents, selectResident, assistantTexts, matchesExpectation};
+module.exports = {VERSION, FAILURE_CLASSES, DEFAULT_AUTH_BOOTSTRAP_TIMEOUT, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, args, defaultProfilePath, readiness, isAuthenticatedSurface, authBootstrapOutcome, ensureAuthenticatedSession, discoverResidents, selectResident, assistantTexts, matchesExpectation};
