@@ -18,8 +18,8 @@ from typing import Any, Iterable
 from estate.core.estate_knowledge_index import SOURCE_LOCATIONS, _registry_by_path, classification_for, estate_root, owner_for
 
 DB_RELATIVE = Path("runtime/search/estate_knowledge_index.sqlite3")
-STORE_SCHEMA_VERSION = "estate.knowledge_store.v1"
-MIGRATION_VERSION = 1
+STORE_SCHEMA_VERSION = "estate.knowledge_store.v2"
+MIGRATION_VERSION = 2
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules", "runtime", "generated", "browser_profiles", "evidence"}
 
 MIGRATIONS = {
@@ -117,6 +117,64 @@ MIGRATIONS = {
     CREATE INDEX IF NOT EXISTS idx_checkpoints_workflow ON checkpoints(workflow_id, sequence_no);
     CREATE INDEX IF NOT EXISTS idx_lifecycle_state ON lifecycle_assessments(state, current_state);
     INSERT OR REPLACE INTO schema_meta(key, value) VALUES ('store_schema', 'estate.knowledge_store.v1');
+    """,
+    2: """
+    ALTER TABLE assets ADD COLUMN scope_policy TEXT NOT NULL DEFAULT 'STRUCTURAL_SCAN';
+    ALTER TABLE assets ADD COLUMN provider_content_allowed INTEGER NOT NULL DEFAULT 1;
+    CREATE TABLE IF NOT EXISTS population_scopes (
+      scope_id TEXT PRIMARY KEY, schema_version TEXT NOT NULL, repository TEXT NOT NULL,
+      source_path TEXT NOT NULL, source_revision TEXT NOT NULL, loaded_at TEXT NOT NULL,
+      current_state TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS scope_entries (
+      scope_id TEXT NOT NULL REFERENCES population_scopes(scope_id), pattern TEXT NOT NULL,
+      policy TEXT NOT NULL, reason TEXT NOT NULL, authority TEXT NOT NULL,
+      introduced_revision TEXT NOT NULL, child_traversal INTEGER NOT NULL,
+      provider_content INTEGER NOT NULL, deterministic_scan INTEGER NOT NULL,
+      PRIMARY KEY(scope_id, pattern)
+    );
+    CREATE TABLE IF NOT EXISTS scope_boundaries (
+      boundary_id TEXT PRIMARY KEY, scope_id TEXT NOT NULL REFERENCES population_scopes(scope_id),
+      path TEXT NOT NULL, policy TEXT NOT NULL, reason TEXT NOT NULL,
+      source_revision TEXT NOT NULL, observed_at TEXT NOT NULL, current_state TEXT NOT NULL,
+      UNIQUE(scope_id, path)
+    );
+    CREATE TABLE IF NOT EXISTS future_scope_candidates (
+      candidate_id TEXT PRIMARY KEY, path TEXT NOT NULL, reason TEXT NOT NULL,
+      recommended_policy TEXT NOT NULL, source_revision TEXT NOT NULL,
+      observed_at TEXT NOT NULL, current_state TEXT NOT NULL, UNIQUE(path, source_revision)
+    );
+    CREATE TABLE IF NOT EXISTS comprehension_batches (
+      batch_id TEXT PRIMARY KEY, scope_id TEXT NOT NULL, source_revision TEXT NOT NULL,
+      selection_reason TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+      provider_type TEXT, provider_model TEXT, worker_identity TEXT,
+      state TEXT NOT NULL, attempt_count INTEGER NOT NULL DEFAULT 0,
+      result_state TEXT, failure_reason TEXT, packet_hash TEXT
+    );
+    CREATE TABLE IF NOT EXISTS comprehension_batch_assets (
+      batch_id TEXT NOT NULL REFERENCES comprehension_batches(batch_id),
+      asset_id TEXT NOT NULL REFERENCES assets(asset_id), position INTEGER NOT NULL,
+      PRIMARY KEY(batch_id, asset_id)
+    );
+    CREATE TABLE IF NOT EXISTS comprehension_results (
+      result_id TEXT PRIMARY KEY, batch_id TEXT NOT NULL REFERENCES comprehension_batches(batch_id),
+      provider_type TEXT NOT NULL, provider_model TEXT, worker_identity TEXT NOT NULL,
+      source_revision TEXT NOT NULL, input_hash TEXT NOT NULL, output_hash TEXT NOT NULL,
+      output_json TEXT NOT NULL, validation_state TEXT NOT NULL, created_at TEXT NOT NULL,
+      human_review_required INTEGER NOT NULL DEFAULT 1, UNIQUE(batch_id, output_hash)
+    );
+    CREATE TABLE IF NOT EXISTS candidate_interpretations (
+      interpretation_id TEXT PRIMARY KEY, result_id TEXT NOT NULL REFERENCES comprehension_results(result_id),
+      batch_id TEXT NOT NULL, asset_id TEXT NOT NULL REFERENCES assets(asset_id),
+      candidate_json TEXT NOT NULL, lifecycle TEXT NOT NULL, provider_type TEXT NOT NULL,
+      provider_model TEXT, worker_identity TEXT NOT NULL, source_revision TEXT NOT NULL,
+      content_hash TEXT NOT NULL, created_at TEXT NOT NULL, validation_state TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_assets_scope_policy ON assets(scope_policy, provider_content_allowed);
+    CREATE INDEX IF NOT EXISTS idx_batch_state ON comprehension_batches(state, updated_at);
+    CREATE INDEX IF NOT EXISTS idx_batch_asset ON comprehension_batch_assets(asset_id);
+    CREATE INDEX IF NOT EXISTS idx_candidate_asset ON candidate_interpretations(asset_id, created_at);
+    UPDATE schema_meta SET value='estate.knowledge_store.v2' WHERE key='store_schema';
     """
 }
 
@@ -411,7 +469,8 @@ def query_assets(query: str = "", root: str | Path | None = None, *, limit: int 
         if status_filter: clauses.append("(a.scan_status=? OR a.comprehension_status=? OR a.current_state=?)"); params.extend([status_filter, status_filter, status_filter])
         if tag: clauses.append("EXISTS (SELECT 1 FROM tags t WHERE t.asset_id=a.asset_id AND t.tag=?)"); params.append(tag)
         where = " WHERE " + " AND ".join(clauses) if clauses else ""
-        rows = _rows(connection, "SELECT a.asset_id,a.current_path,a.current_content_hash,a.file_type,a.classification,a.scan_status,a.comprehension_status,a.owner,a.purpose_summary,a.unknown_reason,a.current_source_revision FROM assets a" + where + " ORDER BY a.current_path LIMIT ?", tuple(params + [limit]))
+        query_sql = "SELECT a.asset_id,a.current_path,a.current_content_hash,a.file_type,a.classification,a.scan_status,a.comprehension_status,a.owner,a.purpose_summary,a.unknown_reason,a.current_source_revision FROM assets a" + where + " ORDER BY a.current_path"
+        rows = _rows(connection, query_sql + (" LIMIT ?" if not terms else ""), tuple(params + ([limit] if not terms else [])))
         if terms: rows = [row for row in rows if all(term in json.dumps(row).lower() for term in terms)]
         return {"schema_version":STORE_SCHEMA_VERSION,"query":query,"results":rows[:limit],"match_count":len(rows[:limit])}
 

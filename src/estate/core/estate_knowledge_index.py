@@ -348,8 +348,8 @@ def sqlite_scan(root=None, **kwargs):
 
 
 def sqlite_rebuild(root=None, **kwargs):
-    from estate.core.estate_knowledge_store import rebuild
-    return rebuild(root, **kwargs)
+    from estate.core.estate_population import governed_rebuild
+    return governed_rebuild(root)
 
 
 def sqlite_status(root=None):
@@ -400,3 +400,53 @@ def sqlite_lifecycle(root=None):
 def sqlite_knowledge(root=None, **kwargs):
     from estate.core.estate_knowledge_store import query_knowledge
     return query_knowledge(root, **kwargs)
+
+
+def sqlite_scope(root=None, **kwargs):
+    from estate.core.estate_population import scope_report
+    return scope_report(root, **kwargs)
+
+
+def sqlite_validate_scope(root=None, **kwargs):
+    from estate.core.estate_population import validate_requested_scope
+    return validate_requested_scope(root, **kwargs)
+
+
+def sqlite_governed_scan(root=None, **kwargs):
+    from estate.core.estate_population import governed_scan
+    return governed_scan(root, **kwargs)
+
+
+def sqlite_population_coverage(root=None):
+    from estate.core.estate_population import population_coverage
+    return population_coverage(root)
+
+
+def sqlite_next_batch(root=None, **kwargs):
+    from estate.core.estate_population import next_batch
+    return next_batch(root, **kwargs)
+
+
+def sqlite_batch_packet(root=None, batch_id=None, **kwargs):
+    from estate.core.estate_population import batch_packet
+    return batch_packet(root, batch_id, **kwargs)
+
+
+def sqlite_result_validate(root=None, payload=None):
+    from estate.core.estate_population import validate_result
+    return validate_result(root, payload)
+
+
+def sqlite_result_ingest(root=None, payload=None):
+    from estate.core.estate_population import ingest_result
+    return ingest_result(root, payload)
+
+
+def sqlite_work_status(root=None):
+    from estate.core.estate_population import work_status
+    return work_status(root)
+
+
+def sqlite_work_retry(root=None, batch_id=None):
+    from estate.core.estate_population import retry_batch
+    return retry_batch(root, batch_id)

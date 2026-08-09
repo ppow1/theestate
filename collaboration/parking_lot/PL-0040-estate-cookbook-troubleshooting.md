@@ -160,3 +160,20 @@ comprehension packets. This is a bounded indexed-institutional-knowledge
 milestone; Estate-wide population, autonomous local-AI consultation, canonical
 promotion workflow, resident-facing service exposure, and remediation remain
 future work.
+
+## Governed population and resumable worker slice (2026-08-09)
+
+The PL-0040 owner now includes the explicit
+`docs/operations/troubleshooting/population-scope.json` admission contract.
+Scope is checked before traversal against the governed `ppow1/theestate` Git
+worktree. Structural, metadata-only, no-content, and excluded policies are
+recorded in SQLite; symlink/root/path escapes fail closed; unknown adjacent
+areas are reported without content traversal.
+
+The first deterministic governed inventory completed over 5,827 admitted
+assets. The SQLite owner now selects resumable bounded comprehension batches,
+builds content-limited provider-neutral packets, validates provider results by
+assigned asset identity and source revision, preserves provider provenance and
+conflicts, and retains all results as candidate material requiring human or
+governed review. Local-AI execution, unattended estate-wide comprehension,
+canonical promotion, resident APIs, and remediation remain future milestones.

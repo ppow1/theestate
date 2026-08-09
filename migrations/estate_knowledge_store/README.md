@@ -4,10 +4,12 @@ The SQLite projection is owned by `estate.core.estate_knowledge_index` and
 implemented by `estate.core.estate_knowledge_store`. `MIGRATIONS` is an
 ordered, versioned migration map; the store applies it transactionally and
 records the version in SQLite `PRAGMA user_version`. The committed schema
-contract is `data/schemas/estate_knowledge_store_v1.schema.json`.
+contracts are `data/schemas/estate_knowledge_store_v1.schema.json` and
+`data/schemas/estate_knowledge_store_v2.schema.json`.
 
-The current migration is version 1. A database with a newer version fails
-closed. Runtime state is generated at
+The current migration is version 2. Migration 2 adds scope policy, scope
+boundary, comprehension-batch, provider-result, and candidate-interpretation
+tables. A database with a newer version fails closed. Runtime state is generated at
 `runtime/search/estate_knowledge_index.sqlite3` and is ignored by Git. It can
 be rebuilt from Git-governed files with:
 

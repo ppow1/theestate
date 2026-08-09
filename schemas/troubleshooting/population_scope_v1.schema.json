@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/population_scope_v1",
+  "title": "Estate governed population scope v1",
+  "type": "object",
+  "required": ["schema_version", "scope_id", "repository", "entries"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "scope_id": {"type": "string", "minLength": 1},
+    "repository": {
+      "type": "object",
+      "required": ["name", "remote_url"],
+      "properties": {"name": {"const": "theestate"}, "remote_url": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pattern", "policy", "reason", "authority", "introduced_revision", "child_traversal", "provider_content", "deterministic_scan"],
+        "properties": {
+          "pattern": {"type": "string", "minLength": 1},
+          "policy": {"enum": ["STRUCTURAL_SCAN", "METADATA_ONLY", "NO_CONTENT", "EXCLUDED"]},
+          "reason": {"type": "string", "minLength": 1},
+          "authority": {"type": "string", "minLength": 1},
+          "introduced_revision": {"type": "string", "minLength": 1},
+          "child_traversal": {"type": "boolean"},
+          "provider_content": {"type": "boolean"},
+          "deterministic_scan": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

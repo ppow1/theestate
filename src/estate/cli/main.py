@@ -58,6 +58,16 @@ from estate.core.estate_knowledge_index import (
     sqlite_graph,
     sqlite_init,
     sqlite_knowledge,
+    sqlite_batch_packet,
+    sqlite_governed_scan,
+    sqlite_next_batch,
+    sqlite_population_coverage,
+    sqlite_result_ingest,
+    sqlite_result_validate,
+    sqlite_scope,
+    sqlite_validate_scope,
+    sqlite_work_retry,
+    sqlite_work_status,
     sqlite_lifecycle,
     sqlite_packet,
     sqlite_progress,
@@ -1922,16 +1932,22 @@ def cmd_knowledge_index(args):
     root = Path(args.root) if getattr(args, "root", None) else Path.cwd()
     action = args.knowledge_index_action
     if getattr(args, "backend", "legacy") == "sqlite":
-        if action == "init" or action == "migrate":
+        if action == "scope-show":
+            payload = sqlite_scope(root)
+        elif action == "scope-validate":
+            payload = sqlite_validate_scope(root, requested=args.requested_scope)
+        elif action == "scope-review":
+            payload = sqlite_scope(root, output=args.output)
+        elif action == "init" or action == "migrate":
             payload = sqlite_init(root)
         elif action == "rebuild":
             payload = sqlite_rebuild(root, scope=args.scope, limit=args.limit)
         elif action == "scan" or action == "resume":
-            payload = sqlite_scan(root, scope=args.scope, limit=args.limit, phase="RESUME" if action == "resume" else "DETERMINISTIC")
+            payload = sqlite_governed_scan(root, requested=args.scope, limit=getattr(args, "limit", None))
         elif action == "status":
             payload = sqlite_status(root)
         elif action == "coverage":
-            payload = sqlite_coverage(root)
+            payload = sqlite_population_coverage(root)
         elif action == "progress":
             payload = sqlite_progress(root)
         elif action == "unknown":
@@ -1942,6 +1958,17 @@ def cmd_knowledge_index(args):
             payload = sqlite_graph(root, scope=args.scope)
         elif action == "packet":
             payload = sqlite_packet(root, args.scope)
+        elif action == "batch-packet":
+            payload = sqlite_batch_packet(root, args.batch_id, max_bytes=args.max_bytes)
+        elif action == "next-batch":
+            payload = sqlite_next_batch(root, limit=args.limit, provider_type=args.provider_type, provider_model=args.provider_model, worker_identity=args.worker_identity)
+        elif action == "work-status":
+            payload = sqlite_work_status(root)
+        elif action == "work-retry":
+            payload = sqlite_work_retry(root, args.batch_id)
+        elif action in {"result-validate", "result-ingest"}:
+            request = json.loads(Path(args.input).read_text(encoding="utf-8"))
+            payload = sqlite_result_validate(root, request) if action == "result-validate" else sqlite_result_ingest(root, request)
         elif action == "lifecycle":
             payload = sqlite_lifecycle(root)
         elif action == "knowledge":
@@ -3743,13 +3770,24 @@ def main(argv=None):
     sp.add_parser("update", help="Incrementally refresh changed index entries").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("status", help="Print index status").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("inspect", help="Detect stale or missing index entries").set_defaults(func=cmd_knowledge_index)
-    for name, help_text in (("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities")):
+    for name, help_text in (("scope-show", "Show the governed population scope"), ("scope-validate", "Validate a requested scope against the governed contract"), ("scope-review", "Report adjacent boundaries without traversing them"), ("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities"), ("next-batch", "Create the next bounded comprehension work batch"), ("work-status", "Show comprehension work batches"), ("result-validate", "Validate a provider result without ingesting it"), ("result-ingest", "Ingest a validated provider result as candidate material")):
         if name == "status":
             continue
         child = sp.add_parser(name, help=help_text)
+        if name == "scope-validate":
+            child.add_argument("requested_scope", nargs="?", default=None)
+        elif name == "scope-review":
+            child.add_argument("--output")
         if name == "knowledge":
             child.add_argument("query", nargs="?", default="", help="Knowledge title or identifier phrase")
             child.add_argument("--limit", type=int, default=100)
+        elif name == "next-batch":
+            child.add_argument("--limit", type=int, default=10)
+            child.add_argument("--provider-type")
+            child.add_argument("--provider-model")
+            child.add_argument("--worker-identity")
+        elif name in {"result-validate", "result-ingest"}:
+            child.add_argument("--input", required=True)
         child.set_defaults(func=cmd_knowledge_index)
     for name, help_text in (("scan", "Incrementally scan a bounded repository scope"), ("resume", "Resume a bounded deterministic scan"), ("rebuild", "Rebuild the SQLite projection from governed files")):
         if name == "rebuild":
@@ -3762,6 +3800,13 @@ def main(argv=None):
     rb.add_argument("--scope", help="Repository-relative file or directory scope")
     rb.add_argument("--limit", type=int, default=None, help="Maximum files to process")
     rb.set_defaults(func=cmd_knowledge_index)
+    bp = sp.add_parser("batch-packet", help="Build a bounded provider-neutral packet for a work batch")
+    bp.add_argument("batch_id")
+    bp.add_argument("--max-bytes", type=int, default=262144)
+    bp.set_defaults(func=cmd_knowledge_index)
+    wr = sp.add_parser("work-retry", help="Mark a comprehension batch retryable")
+    wr.add_argument("batch_id")
+    wr.set_defaults(func=cmd_knowledge_index)
     for name, help_text in (("graph", "Build a bounded component graph"), ("packet", "Build a provider-neutral indexed comprehension packet")):
         child = sp.add_parser(name, help=help_text)
         child.add_argument("scope", help="Component or workflow identifier")

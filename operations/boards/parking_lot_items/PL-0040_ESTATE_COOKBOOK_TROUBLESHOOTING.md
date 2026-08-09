@@ -99,3 +99,19 @@ This milestone supports controlled indexed population but does not perform
 Estate-wide population, autonomous provider review, canonical promotion,
 resident API exposure, or remediation. PL-0040 remains open for those later
 milestones.
+
+## Governed population and resumable worker slice (2026-08-09)
+
+The existing lane now has a versioned repository population scope and a
+deterministic pre-traversal enforcement boundary. The first admitted inventory
+completed over 5,827 assets while excluding generated/runtime/evidence/Git
+internals and limiting data/archive/resident material to metadata or no-content
+policies.
+
+SQLite migration 2 adds scope boundaries, resumable comprehension batches,
+provider-result provenance, and candidate interpretation history. Work packets
+are selected by the Estate, contain only assigned structural assets, and cannot
+be expanded by a provider. Result ingestion is fail-closed, idempotent for
+identical output, conflict-preserving, and permanently candidate-only pending
+governed review. This does not authorize unattended local-AI population,
+canonical promotion, resident service exposure, or remediation.
