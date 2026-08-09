@@ -5,6 +5,7 @@ import pytest
 from estate.core.estate_population import (
     PopulationScopeError,
     _relative,
+    _within_requested,
     load_scope,
     resolve_entry,
     validate_requested_scope,
@@ -38,3 +39,9 @@ def test_requested_scope_must_be_admitted_and_repository_root_is_verified():
         validate_requested_scope(ROOT, "runtime")
     with pytest.raises(PopulationScopeError):
         validate_requested_scope(ROOT, "not-an-admitted-sibling")
+
+
+def test_bounded_missing_detection_does_not_cross_requested_scope():
+    assert _within_requested("src/estate/core/worker.py", "src/estate/core")
+    assert not _within_requested("docs/README.md", "src/estate/core")
+    assert _within_requested("docs/README.md", None)

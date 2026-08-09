@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from estate.core.estate_comprehension_worker import _extract_json, _quality, difficulty_for, provider_status
+from estate.core.estate_comprehension_worker import _estate_result_id, _extract_json, _quality, difficulty_for, provider_status
 from estate.core.estate_population import PopulationScopeError, validate_result
 
 
@@ -57,3 +57,9 @@ def test_difficulty_is_deterministic():
     assert difficulty_for({"assets": [{"path": "docs/readme.md"}]}) == "LEVEL_1"
     assert difficulty_for({"assets": [{"path": "src/estate/core/worker.py"}]}) == "LEVEL_2"
     assert difficulty_for({"assets": [{"path": "src/estate/diagnostics/x.py"}]}) == "LEVEL_3"
+    assert difficulty_for({"assets": [{"path": "collaboration/parking_lot/old.md"}]}) == "LEVEL_4"
+
+
+def test_estate_result_identity_is_batch_scoped_and_provider_id_independent():
+    payload = {"source_revision": "rev", "items": [{"asset_id": "asset:1"}], "result_id": "model-placeholder"}
+    assert _estate_result_id("batch:one", payload) != _estate_result_id("batch:two", payload)

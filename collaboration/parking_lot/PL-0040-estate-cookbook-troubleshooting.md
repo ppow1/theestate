@@ -194,3 +194,23 @@ controlled local-AI worker milestone, not autonomous recurring operation,
 Estate-wide comprehension, canonical promotion, resident API exposure, or
 remediation authority. Difficulty benchmark expansion and recurring Scheduler
 integration remain follow-on work.
+
+## Local-AI quality benchmark and controlled burn-down (2026-08-09)
+
+The governed worker was benchmarked against real admitted schemas, Estate
+implementation, diagnostics, and ambiguous PL-0040/PL-0032 material. The
+benchmark report is recorded at
+`docs/operations/troubleshooting/benchmarks/PL-0040-LOCAL-AI-BENCHMARK-20260809.json`.
+
+Evidence supports `ROUTINE_LOCAL_AI` for the tested Level 1 schema class,
+`LOCAL_AI_WITH_REVIEW` for Level 2 and the small Level 3 sample, and
+`ESCALATE_TO_STRONGER_REASONING` for Level 4 despite valid candidate output.
+Three Level 1 schema candidates were then processed from the real backlog;
+all remained candidate-only and human-review-required. Pending canonical
+comprehension did not decrease, so coverage was not inflated.
+
+The benchmark also found and repaired two bounded plumbing defects: requested
+subtree scans no longer mark unrelated assets missing, and provider-generated
+placeholder result IDs are replaced by Estate-owned batch-scoped identities.
+Unattended local-AI scheduling, automatic candidate application, canonical
+promotion, and remediation remain unauthorized and unwarranted.

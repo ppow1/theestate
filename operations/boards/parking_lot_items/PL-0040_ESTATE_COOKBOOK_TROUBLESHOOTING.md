@@ -127,3 +127,15 @@ completed two troubleshooting work units as accepted candidates requiring
 human review. Local AI remains a provider, not an authority: scope expansion,
 canonical promotion, baseline advancement, remediation, and unattended
 recurring scheduling remain prohibited.
+
+## Local-AI quality benchmark and controlled burn-down (2026-08-09)
+
+Real admitted schemas, implementation, diagnostics, and ambiguous parking-lot
+material were benchmarked through the existing Ollama-backed worker. Level 1
+schema work is routed `ROUTINE_LOCAL_AI`; Level 2 and the small Level 3 sample
+are `LOCAL_AI_WITH_REVIEW`; Level 4 remains
+`ESCALATE_TO_STRONGER_REASONING`. Three real Level 1 schema candidates were
+processed with no canonical promotion. The benchmark report and Diagnostic
+Impact Packet preserve the observed conflicts, stale-packet rejections,
+timeout, throughput, and coverage delta. No unattended scheduling or
+remediation is authorized.

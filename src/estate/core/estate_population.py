@@ -50,6 +50,13 @@ def _relative(value: str | Path) -> str:
     return "." if raw in {"", "."} else path.as_posix().strip("/")
 
 
+def _within_requested(path: str, requested: str | None) -> bool:
+    if not requested:
+        return True
+    prefix = _relative(requested).rstrip("/")
+    return path == prefix or path.startswith(prefix + "/")
+
+
 def load_scope(root: str | Path | None = None) -> dict[str, Any]:
     base = estate_root(root).resolve()
     path = base / SCOPE_PATH
@@ -303,6 +310,8 @@ def governed_scan(root: str | Path | None = None, *, requested: str | None = Non
                     failed += 1
             missing = 0
             for row in connection.execute("SELECT asset_id,current_path FROM assets WHERE current_state='CURRENT'").fetchall():
+                if not _within_requested(row["current_path"], requested):
+                    continue
                 if row["current_path"] not in seen_paths:
                     entry = resolve_entry(scope, row["current_path"])
                     if entry and entry["policy"] != "EXCLUDED":
@@ -341,8 +350,8 @@ def next_batch(root: str | Path | None = None, *, limit: int = 10, provider_type
         params: list[Any] = []
         if asset_prefix:
             prefix = _relative(asset_prefix)
-            query += " AND a.current_path LIKE ?"
-            params.append(prefix.rstrip("/") + "/%")
+            query += " AND (a.current_path = ? OR a.current_path LIKE ?)"
+            params.extend([prefix, prefix.rstrip("/") + "/%"])
         query += " ORDER BY CASE WHEN a.current_state='REVALIDATION_REQUIRED' THEN 0 ELSE 1 END,a.current_path LIMIT ?"
         params.append(max(1, min(limit, 100)))
         rows = connection.execute(query, tuple(params)).fetchall()

@@ -7,6 +7,7 @@ transport provider; it never receives filesystem authority or promotion power.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import time
 import uuid
@@ -60,6 +61,8 @@ def difficulty_for(packet: dict[str, Any]) -> str:
     assets = packet.get("assets") or []
     paths = [str(a.get("path", "")).lower() for a in assets]
     joined = " ".join(paths)
+    if any(x in joined for x in ("parking_lot", "legacy", "historical", "deprecated", "supersession", "conflict")):
+        return "LEVEL_4"
     if len(assets) > 3 or any(x in joined for x in ("workflow", "scheduler", "grace", "diagnostic")):
         return "LEVEL_3"
     if any(x.endswith((".md", ".json", ".yaml", ".yml")) for x in paths):
@@ -104,6 +107,11 @@ def _extract_json(text: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError("provider response JSON must be an object")
     return value
+
+
+def _estate_result_id(batch_id: str, payload: dict[str, Any]) -> str:
+    material = json.dumps({"batch_id": batch_id, "source_revision": payload.get("source_revision"), "items": payload.get("items", [])}, sort_keys=True, separators=(",", ":"))
+    return "result:" + hashlib.sha256(material.encode("utf-8")).hexdigest()[:32]
 
 
 def _quality(payload: dict[str, Any], packet: dict[str, Any]) -> tuple[str, list[str]]:
@@ -156,7 +164,9 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             payload = _extract_json(response["text"])
             payload["batch_id"] = batch_id
             payload["source_revision"] = packet["source_revision"]
-            payload["result_id"] = payload.get("result_id") if payload.get("result_id") not in {None, "", "provider-generated"} else "result:" + uuid.uuid4().hex
+            # Provider result IDs are advisory only. Estate owns identity so a
+            # model placeholder cannot collide across independent work units.
+            payload["result_id"] = _estate_result_id(batch_id, payload)
             payload["provider"] = {"type": "local_ai", "model": health.get("model"), "worker_identity": worker_identity}
             for item in payload.get("items", []):
                 item.setdefault("lifecycle", "CANDIDATE")
