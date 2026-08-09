@@ -134,7 +134,7 @@ class ExecutionProviderAdapterRequest:
             validation_required=bool(data.get("validation_required", True)),
             boundary_review_reference=data.get("boundary_review_reference"),
             decision_reference=data.get("decision_reference"),
-            metadata={**(data.get("metadata") or {}), **(metadata or {})},
+            metadata={**(data.get("metadata") or {}), "compute_resource_requirements": data.get("compute_resource_requirements") or {}, **(metadata or {})},
         )
 
     def validate(self) -> AdapterValidationStatus:

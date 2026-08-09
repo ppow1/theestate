@@ -42,6 +42,7 @@ from estate.core.office_validation_actions import inspect_validation_control_cen
 from estate.core.office_mailbox_control import refresh_mailbox_control_center, open_message_detail, mark_message_read_state, route_message, local_attention_acknowledge, inspect_delivery_failures
 from estate.core.resident_task_visibility import write_resident_task_board, build_resident_task_board
 from estate.core.office_executive_workspace import build_executive_workspace, render_executive_workspace_markdown
+from estate.core.compute_office_panel import refresh_compute_panel
 from estate.core.collaboration_messages import acknowledge_message, create_reply
 from estate.core.office_personnel_directory import open_employee_detail as mailbox_open_employee_detail
 
@@ -757,6 +758,11 @@ def resident_task_board_open_detail(root=None, resident_id: str | None = None, r
     row = rows[0]
     return _completed('resident_task_board.open_detail', 'Open resident task detail', 'resident-task-board', 'estate.core.resident_task_visibility.build_resident_task_board', f"Detail ready for {row.get('resident_name')}; source artifact {row.get('source_artifact')} last updated {row.get('source_last_updated') or 'unknown'}.", read=row.get('source_links') or ['runtime/residents/task_status.json'], state=['resident task detail selected'], request_id=params.get('request_id'))
 
+def compute_refresh(root=None, live: bool | str = False, **params: Any) -> OfficeActionResult:
+    is_live = str(live).lower() == 'true' if isinstance(live, str) else bool(live)
+    payload = refresh_compute_panel(_root(root), live=is_live)
+    return _completed('compute.refresh', 'Refresh compute resource visibility', 'compute', 'estate.core.compute_office_panel.refresh_compute_panel', f"Compute projection refreshed with {payload.get('resource_count', 0)} physical resource(s).", read=['nvidia-smi (read-only)' if is_live else 'runtime/compute_resources/gpus.json'], written=['runtime/compute_resources/gpus.json'], state=['compute resource projection refreshed'], request_id=params.get('request_id'))
+
 HANDLERS: dict[str, Callable[..., OfficeActionResult]] = {f.__name__: f for f in []}
 HANDLERS.update({
  'ai_services.refresh_local_inventory': refresh_ai_services,
@@ -798,6 +804,7 @@ HANDLERS.update({
  'daily_board.generate_morning_briefing': generate_daily_briefing,
  'orchestrator_intake.record_decision': record_orchestrator_intake_decision,
  'operations_control.record_decision': record_operations_control_decision,
+ 'compute.refresh': compute_refresh,
  'operations_surface.inspect_evidence': operations_inspect_evidence,
  'operations_surface.hold_control': operations_hold_control,
  'operations_surface.trigger_cycle': operations_cycle_control,
@@ -920,6 +927,7 @@ ACTION_CONTROLS = [
  {'action_id':'operations_surface.inspect_evidence','label':'Inspect operations evidence','target_tab':'operational-activity','handler':'operations_inspect_evidence','availability':'available','requires_input':'evidence_path','note':'Reads an existing evidence file under the Estate root and returns truthful status.'},
  {'action_id':'orchestrator_intake.record_decision','label':'Record Orchestrator intake decision','target_tab':'operational-activity','handler':'record_orchestrator_intake_decision','availability':'available','requires_input':'intake_id,decision,decided_by','note':'Records a durable decision artifact; does not schedule or execute work.'},
  {'action_id':'operations_control.record_decision','label':'Record operations-control decision','target_tab':'operational-activity','handler':'record_operations_control_decision','availability':'available','requires_input':'decision_type,target_type,decided_by','note':'Writes an operations-control decision artifact; does not execute providers.'},
+ {'action_id':'compute.refresh','label':'Refresh compute resource visibility','target_tab':'compute','handler':'compute_refresh','availability':'available','requires_input':'live','note':'Read-only physical GPU evidence projection; Office is not the scheduler and performs no recovery.'},
  {'action_id':'operational_activity.refresh','label':'Refresh operational activity','target_tab':'operational-activity','handler':'refresh_operational_activity','availability':'available'},
  {'action_id':'operational_activity.acknowledge_attention','label':'Acknowledge attention item','target_tab':'operational-activity','handler':'acknowledge_operational_activity','availability':'available','requires_input':'activity_id,acknowledged_by,reason','note':'Records local durable acknowledgement evidence; source activity is not falsified.'},
  {'action_id':'operational_activity.route_to_workspace','label':'Route to controlling workspace','target_tab':'operational-activity','handler':'route_operational_activity','availability':'available','requires_input':'activity_id,route_target'},

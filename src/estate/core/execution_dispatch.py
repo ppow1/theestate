@@ -161,6 +161,7 @@ class DispatchRequest:
     attention_required: bool = False
     attention_reason: str | None = None
     provider_metadata: dict[str, Any] = field(default_factory=dict)
+    compute_resource_requirements: dict[str, Any] = field(default_factory=dict)
     created_at: str | None = None
     updated_at: str | None = None
 
@@ -197,6 +198,8 @@ def dispatch_request_from_dict(data: dict[str, Any]) -> DispatchRequest:
         values[key] = _coerce_list(values.get(key))
     metadata = values.get("provider_metadata")
     values["provider_metadata"] = metadata if isinstance(metadata, dict) else {}
+    requirements = values.get("compute_resource_requirements")
+    values["compute_resource_requirements"] = requirements if isinstance(requirements, dict) else {}
     values["state"] = _clean_state(values.get("state"))
     return DispatchRequest(**values)
 
@@ -224,6 +227,11 @@ def _validate_request(request: DispatchRequest) -> None:
         errors.append("provider is not in allowed_providers")
     if request.provider and request.provider in request.forbidden_providers:
         errors.append("provider is forbidden")
+    try:
+        from estate.core.compute_resources import ComputeResourceRequirements
+        ComputeResourceRequirements.from_dict(request.compute_resource_requirements).validate()
+    except ValueError as exc:
+        errors.append(f"compute resource requirements are invalid: {exc}")
     if errors:
         raise ValueError("; ".join(errors))
 
