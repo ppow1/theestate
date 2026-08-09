@@ -154,6 +154,12 @@ It keeps PnP, PCIe, NVML, and CUDA layers distinct, records both recovery
 outcomes, preserves the separate WinError 1224 harness problem, and leaves
 the 0x133 watchdog cause unresolved.
 
+Candidate ingestion is append-preserving by knowledge identity: repeating the
+same payload is idempotent, while a conflicting payload with an existing
+`knowledge_id` fails closed and leaves the earlier candidate untouched. A
+different `knowledge_id` is required for a separate source or conflict so both
+records remain queryable for later governed review.
+
 ## Historical replay set
 
 Seeded evidence maps stale owner/active lease, composer not ready, request

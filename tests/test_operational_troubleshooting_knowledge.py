@@ -52,3 +52,14 @@ def test_candidate_ingestion_never_promotes_or_mutates_canonical(tmp_path):
     promoted["lifecycle"] = "CANONICAL"
     promoted["promotion"] = {"actor": "local-model", "evidence_refs": ["review"], "decision": "PROMOTED"}
     with pytest.raises(KnowledgeError): ingest_candidate(tmp_path, promoted)
+
+def test_duplicate_knowledge_is_idempotent_but_conflicts_fail_closed(tmp_path):
+    value = payload()
+    first = ingest_candidate(tmp_path, value)
+    assert ingest_candidate(tmp_path, copy.deepcopy(value)) == first
+    conflicting = copy.deepcopy(value)
+    conflicting["records"][0]["statement"] = "conflicting candidate statement"
+    with pytest.raises(KnowledgeError, match="conflicting candidate"):
+        ingest_candidate(tmp_path, conflicting)
+    stored = json.loads(first.read_text(encoding="utf-8"))
+    assert stored["knowledge"]["records"][0]["statement"] == value["records"][0]["statement"]

@@ -73,7 +73,8 @@ def main() -> int:
             value = json.loads(path.read_text(encoding="utf-8")); value = value.get("knowledge", value) if isinstance(value, dict) else value
             errors = validate_knowledge(value); result={"valid":not errors,"errors":errors}
         elif args.knowledge_command == "ingest":
-            destination = ingest_candidate(root, json.loads(path.read_text(encoding="utf-8"))); result={"status":"CANDIDATE_PRESERVED","path":destination.relative_to(root).as_posix(),"canonical_promotion":False}
+            value = json.loads(path.read_text(encoding="utf-8")); value = value.get("knowledge", value) if isinstance(value, dict) else value
+            destination = ingest_candidate(root, value); result={"status":"CANDIDATE_PRESERVED","path":destination.relative_to(root).as_posix(),"canonical_promotion":False}
         else: result=query_knowledge(root,args.phrase)
     elif args.command=="local-ai-delta": result=local_ai_delta(root)
     else: result=reconcile(root,args.accepted_manifest,args.impact_packet,"incremental" if args.incremental else "full")

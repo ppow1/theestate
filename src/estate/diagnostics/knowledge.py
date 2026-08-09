@@ -63,6 +63,14 @@ def ingest_candidate(root: Path, payload: dict[str, Any]) -> Path:
     if payload["lifecycle"] in {"VERIFIED", "CANONICAL"}: raise KnowledgeError("promotion is a governed operation, not candidate ingestion")
     destination = root / KNOWLEDGE_CANDIDATE_DIR / f"{payload['knowledge_id']}.json"
     destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        try:
+            existing = json.loads(destination.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise KnowledgeError(f"existing candidate is unreadable: {destination}") from exc
+        if existing.get("knowledge") == payload and existing.get("canonical_promotion") is False:
+            return destination
+        raise KnowledgeError(f"conflicting candidate already exists for knowledge_id: {payload['knowledge_id']}")
     candidate = {"candidate_version": "1.0", "canonical_promotion": False, "knowledge": payload}
     destination.write_text(canonical_json(candidate), encoding="utf-8")
     return destination

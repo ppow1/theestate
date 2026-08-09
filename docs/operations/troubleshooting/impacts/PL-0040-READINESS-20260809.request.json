@@ -1,0 +1,33 @@
+{
+  "packet_version": "1.0.0",
+  "change_id": "PL-0040-READINESS-20260809",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-READINESS-DUPLICATE-GUARD",
+  "author_provenance": {"kind": "HUMAN", "actor": "Pat / Steward authorized Codex"},
+  "changed_files": [
+    "docs/operations/troubleshooting/README.md",
+    "src/estate/diagnostics/knowledge.py",
+    "tests/test_operational_troubleshooting_knowledge.py",
+    "tools/estate_diagnostics.py"
+  ],
+  "changed_components": ["operational_troubleshooting_knowledge", "living_diagnostics_cli"],
+  "changed_schemas": [],
+  "behavior_before": "Candidate ingestion silently overwrote an existing candidate when the same knowledge_id was submitted with different content, and CLI ingestion did not unwrap the repository's candidate wrapper format.",
+  "behavior_after": "Identical duplicate ingestion is idempotent; conflicting duplicate knowledge_id ingestion fails closed without overwriting evidence; CLI validation and ingestion accept the same wrapped candidate input.",
+  "expected_inputs": ["validated operational knowledge candidate", "repository candidate wrapper or direct knowledge payload"],
+  "expected_outputs": ["preserved candidate", "explicit conflict rejection", "provider-neutral candidate query"],
+  "dependencies_read": ["operational knowledge validator", "existing GPU candidate fixture", "PL-0040 readiness acceptance"],
+  "dependencies_called": ["Python standard library", "existing Estate diagnostics CLI"],
+  "resources_written": ["operations/diagnostics/candidates/knowledge/"],
+  "new_failure_modes": ["conflicting duplicate knowledge_id rejected without overwrite"],
+  "changed_failure_modes": ["wrapped repository candidate can use the supported CLI ingestion path"],
+  "tests_added_or_changed": ["tests/test_operational_troubleshooting_knowledge.py"],
+  "validation_evidence": ["python -m pytest -q tests/test_operational_troubleshooting_knowledge.py tests/test_living_diagnostics_ingestion.py tests/test_estate_diagnostic_impact.py tests/test_estate_living_diagnostics.py", "isolated CLI round-trip for GPU, Diagnostic Impact Packet-derived, and WP-0039 candidates", "isolated conflicting duplicate ingestion rejected with destination hash unchanged", "python tools/estate_diagnostics.py --root TEMP validate --json"],
+  "recommended_checkpoint_impacts": ["LD-DEVELOPER-INGESTION"],
+  "preliminary_troubleshooting_notes": ["Treat candidate identity conflicts as review material; never silently replace prior evidence."],
+  "prohibited_recovery_actions": ["Do not overwrite conflicting candidates", "Do not promote candidates during readiness acceptance", "Do not run bulk local-AI population"],
+  "activation_restart_impact": "No runtime restart; CLI and candidate file handling only.",
+  "source_revision": "WORKTREE",
+  "implementation_revision": "WORKTREE",
+  "confidence": "CANDIDATE"
+}
