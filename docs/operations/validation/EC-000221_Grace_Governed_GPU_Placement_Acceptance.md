@@ -1,6 +1,6 @@
 # EC-000221 — Grace governed GPU placement acceptance
 
-Status: **Blocked after one bounded visible task; no provider execution**  
+Status: **Blocked after one bounded visible task; routing repaired, governed completion not proven**
 Predecessor: `origin/feature/ec-000220-openwebui-auth-attention` at `0f209dd0de042245db985c85c9c17cbbfe8bfc57`  
 Lane: `feature/ec-000221-grace-governed-gpu-placement`
 
@@ -61,26 +61,54 @@ the P100. `qwen.local.text.4090` reported the same full UUID in its lane binding
 `CUDA_VISIBLE_DEVICES`, and compute resource identity. No P100 workload, stress,
 benchmark, reset, reboot, or driver operation occurred.
 
+## Candidate-only bridge routing repair
+
+The canonical owner of the stale `11435` endpoint was the shared external
+Open WebUI database row `config.key = openai.api_base_urls`; it was not browser
+state, Grace model-picker metadata, or a candidate process environment. The
+blue/green controller already owned the Gateway slot map (`blue=11435`,
+`green=11436`) but did not bind that slot identity into the persisted WebUI
+endpoint before candidate readiness.
+
+The controller now performs a candidate-scoped binding through that existing
+controller boundary. Before green WebUI readiness it resolves the one managed
+local endpoint to `http://127.0.0.1:11436/v1`, and readiness fails closed unless
+that exact endpoint matches the selected green Gateway slot. The prior endpoint
+list is recorded without API keys and restored when green stops. Blue remains
+bound to `http://127.0.0.1:11435/v1`; production was not promoted or repointed.
+The browser cannot inject this endpoint. Deterministic coverage is in
+`tests/test_canonical_webui_gateway_runtime.py` (18 passing tests).
+
+The repaired green candidate reached `validated` with
+`bridge_endpoint=http://127.0.0.1:11436/v1` and
+`bridge_slot_consistent=true`. Its catalog contained `estate/grace`, and the
+visible browser selected Grace. After shutdown the canonical database endpoint
+was restored to `http://127.0.0.1:11435/v1`.
+
 ## Single bounded task result
 
 Exactly one bounded Grace task was submitted through visible Playwright using the
-machine-local profile. The UI selected Grace and displayed the composer, but the
-candidate returned `Model '' was not found`. The response was captured at:
+machine-local profile after the routing repair. The UI selected Grace and the
+candidate accepted the request through the repaired route, but the bounded
+harness ended with `RESPONSE_NOT_OBSERVED` before a visible response arrived.
+The candidate log subsequently recorded `assistant_completion_emitted_to_ui`
+with a 406-character response after the harness timeout; no visible Grace result
+was captured. Evidence:
 
-`runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556`
+`runtime/evidence/openwebui-operator/openwebui-operator-20260810011856906-97049da1`
 
-The candidate log records that the browser payload contained `estate/grace`, then
-the deployed Grace bridge attempted its configured `127.0.0.1:11435` endpoint while
-the EC-000221 candidate Gateway was correctly listening on `11436`. That stale
-active-slot bridge endpoint caused the downstream model resolution to collapse to
-`Model ''`. No PTM/Helen/Engineering
-reservation/Dispatch/adapter/provider receipt chain was created, no Qwen model was
-loaded, and no provider execution occurred. Therefore allocation UUID == runtime
-lane UUID == provider receipt UUID, Office Compute correlation, and Stream Deck
-projection compatibility remain unproven. A second prompt was deliberately not sent.
+The prior `Model '' was not found` evidence remains preserved at
+`runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556`;
+the new run did not reproduce it. No PTM/Helen/Engineering reservation/Dispatch/
+adapter/provider receipt chain was created in the repository runtime artifacts,
+and no provider receipt or visible Grace result was captured. Therefore allocation
+UUID == runtime lane UUID == provider receipt UUID, Office Compute correlation,
+and Stream Deck projection compatibility remain unproven. A second prompt was
+deliberately not sent after the new blocker.
 
 After stopping only the EC-000221 candidate services and the 4090 lane, both GPUs
-remained healthy: P100 9 MiB used/0% utilization and RTX 4090 2422 MiB used/8%
-utilization; both retained their verified UUID and PCI identity.
+remained healthy: P100 9 MiB used/0% utilization and RTX 4090 2424 MiB used/10%
+utilization; both retained their verified UUID and PCI identity. The P100 remained
+idle throughout.
 
 This record preserves the blocked acceptance evidence and does not close PL-0042.

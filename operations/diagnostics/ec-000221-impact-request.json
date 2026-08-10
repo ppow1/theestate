@@ -1,7 +1,7 @@
 {
   "change_id": "EC-000221",
   "title": "Complete Grace governed GPU placement acceptance",
-  "status": "implemented_profile_correction_live_acceptance_blocked_model_resolution",
+  "status": "candidate_bridge_routing_repaired_live_acceptance_blocked_response_not_observed",
   "predecessor": "EC-000220",
   "changed_artifacts": [
     "tools/openwebui-operator/profile.cjs",
@@ -20,6 +20,8 @@
     "machine-local browser profile is outside every worktree and never evidence storage",
     "auth-bootstrap and normal acceptance resolve one identical profile",
     "candidate Open WebUI server state remains separate from browser profile state",
+    "candidate WebUI bridge endpoint must equal the controller-selected Gateway slot",
+    "candidate route binding restores the prior active-slot endpoint on shutdown",
     "full physical GPU UUID identity is required and the P100 is never an implicit fallback",
     "no second task is submitted after the bounded task failure"
   ],
@@ -29,7 +31,8 @@
     "headed Open WebUI readiness with Grace/composer",
     "machine-local profile resolver node tests",
     "nvidia-smi and Windows PnP pre/postflight",
-    "UUID-pinned qwen.local.text.4090 lane health"
+    "UUID-pinned qwen.local.text.4090 lane health",
+    "candidate bridge slot-consistency readiness assertion"
   ],
   "privacy_boundary": "No cookies, tokens, browser databases, localStorage, credentials, or absolute profile paths entered Git or acceptance evidence.",
   "remaining_unproven": [
@@ -37,6 +40,20 @@
     "allocation UUID == runtime lane UUID == provider receipt UUID",
     "Office Compute and Stream Deck correlation"
   ],
+  "candidate_routing_owner": {
+    "owner": "canonical_webui_gateway_runtime controller plus shared Open WebUI config row openai.api_base_urls",
+    "green_endpoint_verified": "http://127.0.0.1:11436/v1",
+    "blue_endpoint_preserved": "http://127.0.0.1:11435/v1",
+    "mismatch_fails_closed": true,
+    "production_repointed": false
+  },
+  "new_live_attempt": {
+    "submitted": true,
+    "visible_grace_result": false,
+    "failure_class": "RESPONSE_NOT_OBSERVED",
+    "completion_logged_after_harness_timeout": true,
+    "retry_submitted": false
+  },
   "evidence": [
     "runtime/evidence/openwebui-operator/openwebui-operator-20260810010507681-a3558220",
     "runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556",
