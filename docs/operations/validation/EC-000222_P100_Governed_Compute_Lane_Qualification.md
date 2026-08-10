@@ -1,6 +1,6 @@
 # EC-000222 — P100 governed compute-lane qualification
 
-Status: **Partially Accepted / new visible P100 execution and authorization persistence succeeded; postflight safety baseline was not clean**
+Status: **Accepted / governed P100 lane qualified; simultaneous dual-GPU execution remains unproven**
 
 Predecessor: `feature/ec-000221-grace-governed-gpu-placement` at `6842df3dafa949e392f888af28559d1888b419ef`
 Branch: `feature/ec-000222-p100-governed-compute-lane`
@@ -64,7 +64,9 @@ New governed IDs: objective `grace-obj-de80132692f3`; action `grace-act-7c4d2dc4
 
 The new immutable Engineering authorization directly contains `execution_authority.compute_resource_requirements.required_gpu_uuid` equal to `GPU-6785b322-899d-8eec-e817-31d83279a414` and `required_resource_id` equal to `DESKTOP-JA3RPNQ:nvidia:GPU-6785b322-899d-8eec-e817-31d83279a414`. Those values remained equal through objective metadata, commission, reservation, Dispatch, adapter request, allocation, P100 lane binding, and provider receipt. The selected lane was `qwen.local.text.p100-1`; no `qwen.local.text.4090` selection or RTX 4090 allocation was observed.
 
-The visible execution itself completed successfully. Immediately after cleanly stopping only the EC-000222 green candidate and temporary P100 lane, the required clean postflight could not be established: read-only telemetry showed P100 89% utilization/101.29 W with 7,572 MiB free and RTX 4090 298 MiB free. `nvidia-smi` attributed the P100 load to unrelated Ollama `llama-server.exe` PID 15868 and the 4090 load to unrelated Ollama `llama-server.exe` PID 22468. No process was killed or altered. Both devices remained present with PnP `OK` and unchanged UUID/PCI identities, but EC-000222 remains **Partially Accepted** because the final safety baseline was not clean. No retry or recovery action was performed. The remaining qualification boundary is a clean postflight confirmation and, separately, simultaneous dual-GPU work.
+The visible execution itself completed successfully. An immediate postflight observation was preserved as historical evidence: unrelated Ollama `llama-server.exe` processes were still resident on both GPUs, so that observation was not used as the final ownership determination. No process was killed or altered.
+
+The later read-only closure observation found no listeners on `12100`, `8767`, `11436`, or `8081`; no EC-000222 candidate command line; and no temporary P100 lane process. Remaining GPU processes were independently identified as unrelated Ollama/UI processes. P100 telemetry was 0% utilization with 7,572 MiB free; both GPUs remained present with NVML visibility, unchanged UUID/PCI identities, and Windows PnP `OK`. No Estate workload remained active. Under the cleanup criterion, external residency did not prevent closure. EC-000222 is therefore **Accepted**. Simultaneous dual-GPU governed execution remains explicitly unproven.
 
 After the safety baseline returned to a light state, exactly one visible request was submitted at `runtime/evidence/openwebui-operator/openwebui-operator-20260810030011068-c35952b4`. Playwright observed `OPENWEBUI_READY`, reused the machine-local profile, and observed Grace’s completed authoritative response. Objective `grace-obj-4ec15f18f471`, action `grace-act-0362f2ef0bd8`, PTM `res_01KZMSTFMSYN2GDVPD277KMHGY`, Helen `heldet-73c080c964ee`, Engineering commission `engcom-66cb782e81d2`, authorization `engauth-662ba4e13fc5`, reservation `gpu-reservation-grace-obj-4ec15f18f471`, Dispatch `dispatch-b9d17ceede33`, adapter `adapter-dispatch-b9d17ceede33`, and Grace receipt `gracereceipt-87999379541e` were created. The provider receipt is `runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-4ec15f18f471.json`.
 
