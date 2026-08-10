@@ -40,7 +40,7 @@ SOURCE_PATHS = {
     "recall_audit_log": "runtime/audit/recall_audit_log.json",
     "notification_router": "runtime/notifications/notification_router_report.json",
     "gotify_delivery": "runtime/notifications/gotify_delivery_report.json",
-    "notification_center": "runtime/notifications/notification_center_workspace.json",
+    "notification_center": "runtime/notifications/operations_notification_center.json",
     "morning_briefing": "runtime/operations/morning_briefing.json",
 }
 

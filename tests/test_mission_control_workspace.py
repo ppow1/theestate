@@ -37,7 +37,7 @@ def test_mission_control_all_sources_ready_when_artifacts_exist(tmp_path):
         "runtime/validation/local_operational_validation_run.json",
         "runtime/mailboxes/synchronization_duty.json",
         "runtime/audit/recall_audit_log.json",
-        "runtime/notifications/notification_center_workspace.json",
+        "runtime/notifications/operations_notification_center.json",
     ]:
         write_json(tmp_path, rel, {"summary": {"ok": True}})
     for rel in [

@@ -22,7 +22,7 @@ MISSION_SOURCES = {
     "mailboxes": "runtime/mailboxes/synchronization_duty.json",
     "decisions": "operations/steward/decision_queue.md",
     "recalls": "runtime/audit/recall_audit_log.json",
-    "notifications": "runtime/notifications/notification_center_workspace.json",
+    "notifications": "runtime/notifications/operations_notification_center.json",
     "roadmap": "operations/boards/roadmap.md",
     "capability_dependencies": "runtime/capabilities/capability_dependency_visualization.json",
     "capability_gap_report": "runtime/capabilities/capability_gap_report.json",

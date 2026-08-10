@@ -22,7 +22,7 @@ SOURCE_PATHS = {
     "validation_metrics": "runtime/validation/validation_metrics_dashboard.json",
     "worker_runtime_monitor": "runtime/workers/worker_runtime_monitor.json",
     "autonomous_operations_control_loop": "runtime/autonomy/autonomous_operations_state.json",
-    "notification_center": "runtime/notifications/notification_center_workspace.json",
+    "notification_center": "runtime/notifications/operations_notification_center.json",
     "steward_presence_state": "runtime/steward/steward_presence_state.json",
     "operations_board": "runtime/operations/operations_board.json",
 }

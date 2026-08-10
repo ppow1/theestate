@@ -20,7 +20,7 @@ SOURCE_ARTIFACTS = {
     "mission_control": ["runtime/steward/mission_control_workspace.json"],
     "workers": ["runtime/workers/worker_runtime_monitor.json", "runtime/workers/worker_runtime_heartbeat.json"],
     "validation": ["runtime/validation/local_operational_validation_run.json", "runtime/audit/latest.json"],
-    "notifications": ["runtime/notifications/notification_router_report.json", "runtime/notifications/notification_center_workspace.json"],
+    "notifications": ["runtime/notifications/notification_router_report.json", "runtime/notifications/operations_notification_center.json"],
     "mailboxes": ["runtime/collaboration/mailbox_index.json", "collaboration/mailboxes/index.json", "runtime/mailboxes/synchronization_duty_latest.json"],
     "service_health": ["runtime/services/service_status_board.json", "runtime/services/service_health_registry.json"],
     "work_packages": ["runtime/work_packages/assignment_queue.json"],

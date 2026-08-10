@@ -15,7 +15,7 @@ def baseline(root, *, validation=None, workers=None, autonomy=None, presence="pr
     write_json(root, "runtime/validation/validation_metrics_dashboard.json", {"summary": validation or {"pass_count": 2, "conditional_pass_count": 0, "fail_count": 0, "open_observation_count": 0, "confirmed_defect_count": 0}})
     write_json(root, "runtime/workers/worker_runtime_monitor.json", {"summary": workers or {"active_worker_count": 0, "idle_worker_count": 1, "blocked_worker_count": 0, "stale_worker_count": 0, "offline_worker_count": 0, "unknown_worker_count": 0}})
     write_json(root, "runtime/autonomy/autonomous_operations_state.json", autonomy or {"decision": "continue", "status": "continuation_allowed_advisory"})
-    write_json(root, "runtime/notifications/notification_center_workspace.json", {"notifications": []})
+    write_json(root, "runtime/notifications/operations_notification_center.json", {"notifications": []})
     write_json(root, "runtime/steward/steward_presence_state.json", {"current_state": presence})
     write_json(root, "runtime/operations/operations_board.json", {"blocked_work": []})
 

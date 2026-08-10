@@ -1569,7 +1569,7 @@ VALIDATION_RECIPES: dict[str, dict[str, Any]] = {
             _cmd('python -m estate.cli.main operations-notification-center --json'),
             _cmd('pytest -q tests/test_operations_notification_center.py'),
             _cmd('python -m estate.cli.main steward-command-center --json'),
-            _cmd('test -f runtime/notifications/operations_notification_center.json && test -f operations/notifications/operations_notification_center.md && rg -q "Operations Center Notification Center" runtime/steward/command_center.html'),
+            _cmd('python -c "from pathlib import Path; paths=[\'runtime/notifications/operations_notification_center.json\', \'operations/notifications/operations_notification_center.md\', \'runtime/steward/command_center.html\']; assert all(Path(path).is_file() for path in paths); assert \'Operations Center Notification Center\' in Path(paths[2]).read_text(encoding=\'utf-8\')"'),
             _cmd('python -m estate.cli.main validation-production-readiness --json', required=False),
         ],
     },
