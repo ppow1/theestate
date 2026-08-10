@@ -1,0 +1,75 @@
+{
+  "change_id": "PL-0040-LEVEL1-QUALIFICATION-MATRIX-20260810",
+  "source_parking_lot": "PL-0040",
+  "source_revision": "3add234d2c946db74a8fb3b8c0db29fc1115be2c",
+  "database": {
+    "schema": "estate.knowledge_store.v7",
+    "integrity_check": "ok",
+    "attempts": 32,
+    "escalations": 2,
+    "applied_assertions": 44,
+    "application_history": 47,
+    "evidence_facts": 41462,
+    "new_evidence_facts_since_recovery": 108,
+    "wal_bytes": 0,
+    "active_work_units": 0
+  },
+  "checkpoint": {
+    "migration_units": {
+      "accepted": 1,
+      "invalid": 2,
+      "timeouts": 0,
+      "escalations": 0,
+      "note": "One coder citation failure; one qwen3:8b asset-revision mismatch; one qwen3:8b accepted candidate. Stop affected class pending deterministic revalidation."
+    },
+    "documentation_units": {
+      "accepted": 5,
+      "invalid": 0,
+      "timeouts": 0,
+      "escalations": 0,
+      "provider_models": ["qwen3-coder:30b-qwencode-20k"]
+    },
+    "provider_latency": {
+      "documentation_seconds_observed": [6.848, 7.197, 7.622, 8.653, 12.898],
+      "migration_seconds_observed": [2.731, 15.655, 38.892],
+      "provider_timeouts": 0
+    }
+  },
+  "matrix": {
+    "JSON_SCHEMA": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Existing qualified coder evidence plus preserved bounded comparison evidence."
+    },
+    "SIMPLE_CONFIGURATION": {
+      "primary_model": "qwen3:8b",
+      "fallback_model": "qwen3-coder:30b-qwencode-20k",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Existing persisted two-model control sample and review-qualified routing."
+    },
+    "REGISTRIES_CONTRACTS": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Coder primary; qwen3:8b remains DISALLOWED_FOR_CLASS after preserved citation failures."
+    },
+    "MIGRATIONS": {
+      "primary_model": "qwen3:8b",
+      "fallback_model": "qwen3-coder:30b-qwencode-20k",
+      "readiness": "NOT_YET_PROVEN",
+      "basis": "Insufficient valid coverage and current source-revision mismatch on an admitted asset."
+    },
+    "DOCUMENTATION": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Five accepted bounded candidates from actual admitted documentation assets; fallback not yet independently sampled."
+    }
+  },
+  "scheduled_level1": "SCHEDULED_LEVEL1_NOT_YET_WARRANTED",
+  "canonical_mutation": false,
+  "scheduler_activated": false,
+  "gpu_or_windows_changes": false,
+  "confidence": "GOVERNED_BOUNDED_CHECKPOINT"
+}

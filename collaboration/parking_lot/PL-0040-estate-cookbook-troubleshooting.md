@@ -327,3 +327,44 @@ with qwen3-coder preferred and qwen3:8b disallowed for the class;
 `SIMPLE_CONFIGURATION = LOCAL_AI_WITH_REVIEW` with qwen3:8b preferred for the
 small sample; and `JSON_SCHEMA = NOT_YET_PROVEN` for this routing campaign.
 No scheduler is enabled or warranted.
+
+## Level-1 qualification matrix checkpoint (2026-08-10)
+
+The recovered matrix resumed from the durable SQLite checkpoint without
+replaying the 24 completed schema qualification units or the completed
+comparison result. The recovered comparison remained accepted, and no active
+work unit was present before resumption.
+
+The two admitted migration assets were processed only through bounded
+checkpoints. qwen3-coder returned one citation-invalid result and the route
+stopped. qwen3:8b returned one accepted candidate for the real migration JSON
+asset, while the second admitted `migrations/estate_knowledge_store/README.md`
+unit failed closed because its indexed source revision/content no longer
+matched the current repository state. Migration qualification therefore remains
+`NOT_YET_PROVEN`; the stale asset must be deterministically revalidated before
+further inference.
+
+Five actual admitted documentation assets were processed with
+qwen3-coder:30b-qwencode-20k. All five results were valid bounded candidates,
+with no invalid citations, unsupported-result failures, timeouts, or new
+escalations. Documentation is `LOCAL_AI_WITH_REVIEW` pending a broader sample
+and fallback evidence.
+
+The matrix checkpoint now supports:
+
+- `JSON_SCHEMA`: primary qwen3-coder:30b-qwencode-20k; fallback qwen3:8b;
+  `LOCAL_AI_WITH_REVIEW`.
+- `SIMPLE_CONFIGURATION`: primary qwen3:8b; fallback
+  qwen3-coder:30b-qwencode-20k; `LOCAL_AI_WITH_REVIEW`.
+- `REGISTRIES_CONTRACTS`: primary qwen3-coder:30b-qwencode-20k; qwen3:8b is
+  disallowed for this class; `LOCAL_AI_WITH_REVIEW`.
+- `MIGRATIONS`: primary qwen3:8b on the limited valid sample; fallback
+  qwen3-coder:30b-qwencode-20k; `NOT_YET_PROVEN`.
+- `DOCUMENTATION`: primary qwen3-coder:30b-qwencode-20k; fallback qwen3:8b;
+  `LOCAL_AI_WITH_REVIEW`.
+
+After the checkpoint, SQLite integrity remained `ok`; evidence facts grew from
+41,354 to 41,462, attempts reached 32, escalations remained 2, applied
+assertions remained 44, and application history remained 47. No scheduler,
+GPU stress, driver, CUDA, or Windows configuration action was taken.
+`SCHEDULED_LEVEL1_NOT_YET_WARRANTED` remains the governing conclusion.
