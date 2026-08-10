@@ -1,6 +1,6 @@
 import json
 
-from estate.core.steward_annunciator import present_attention
+from estate.core.steward_annunciator import present_attention, run_live_test
 from estate.core.steward_attention import record_action
 
 
@@ -55,3 +55,14 @@ def test_urgent_has_precedence_for_visual_severity(tmp_path, monkeypatch):
     monkeypatch.setattr("estate.core.steward_annunciator.aggregate_attention", lambda *args, **kwargs: payload)
     state = present_attention(tmp_path, presenter=Recorder())
     assert state["severity"] == "urgent" and state["severity_rank"] == 0
+
+
+def test_live_test_boundary_is_mockable_without_audio(monkeypatch):
+    class FakePresenter:
+        def ding(self): return {"api": "mock-ding"}
+        def speak(self, text): return {"api": "mock-tts", "text": text}
+    monkeypatch.setattr("estate.core.steward_annunciator.WindowsPresenter", FakePresenter)
+    result = run_live_test()
+    assert result["success"] is True
+    assert result["ding"]["api"] == "mock-ding"
+    assert result["tts"]["api"] == "mock-tts"

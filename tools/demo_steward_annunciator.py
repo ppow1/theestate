@@ -28,7 +28,7 @@ def main():
         second = present_attention(root, presenter=speaker)
         record_action(first["active_item_ids"][0], "acknowledge", root=root)
         cleared = present_attention(root, presenter=speaker)
-        print(json.dumps({"demo_root": str(root), "presentations": speaker.calls, "first_active": first["active"], "second_new_item_count": second["last_run"]["new_item_count"], "cleared_active": cleared["active"]}, indent=2, sort_keys=True))
+        print(json.dumps({"demo_root": str(root), "presentations": speaker.calls, "first_active": first["active"], "second_new_item_count": second["last_run"]["new_item_count"], "cleared_active": not cleared["active"]}, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

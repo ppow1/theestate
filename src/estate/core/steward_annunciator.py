@@ -47,22 +47,64 @@ class Presenter(Protocol):
 class WindowsPresenter:
     """Small local adapter: MessageBeep plus Windows System.Speech TTS."""
 
-    def announce(self, item: dict[str, Any]) -> None:
+    def ding(self) -> dict[str, Any]:
+        if os.name != "nt":
+            raise RuntimeError("WindowsPresenter requires Windows")
         import winsound
 
-        winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
-        text = announcement_text(item)
+        # MessageBeep uses the current interactive user's Windows default sound
+        # endpoint; it does not select or estimate a Bluetooth device.
+        result = winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+        return {"api": "winsound.MessageBeep", "flag": "MB_ICONEXCLAMATION", "returned": result}
+
+    def speak(self, text: str) -> dict[str, Any]:
         if os.name != "nt":
             raise RuntimeError("WindowsPresenter requires Windows")
         env = os.environ.copy()
-        env["ESTATE_ANNUNCIATOR_TEXT"] = text
+        env["ESTATE_ANNUNCIATOR_TEXT"] = str(text)
         script = (
             "Add-Type -AssemblyName System.Speech; "
             "$s=New-Object System.Speech.Synthesis.SpeechSynthesizer; "
             "$s.Speak($env:ESTATE_ANNUNCIATOR_TEXT)"
         )
-        subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
-                       check=True, capture_output=True, text=True, env=env)
+        result = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                                check=False, capture_output=True, text=True, env=env)
+        if result.returncode:
+            raise RuntimeError(f"System.Speech failed ({result.returncode}): {result.stderr.strip()}")
+        return {"api": "System.Speech.Synthesis.SpeechSynthesizer.Speak", "returncode": result.returncode, "stdout": result.stdout.strip(), "stderr": result.stderr.strip()}
+
+    def announce(self, item: dict[str, Any]) -> None:
+        self.ding()
+        self.speak(announcement_text(item))
+
+
+def run_live_test(text: str = "The Estate needs your input on Project 5") -> dict[str, Any]:
+    """Run one explicit live ding and one live local TTS call; never used by tests."""
+    presenter = WindowsPresenter()
+    result: dict[str, Any] = {
+        "mode": "LIVE",
+        "text": text,
+        "process": {"user": os.environ.get("USERNAME"), "session_name": os.environ.get("SESSIONNAME"), "session_id": None},
+        "endpoint_policy": "current interactive user's Windows default audio endpoint",
+        "endpoint_discovery": "not resolved by the presenter; no endpoint override is made",
+        "ding": {"success": False},
+        "tts": {"success": False},
+    }
+    try:
+        import ctypes
+        result["process"]["session_id"] = ctypes.windll.kernel32.WTSGetActiveConsoleSessionId()
+    except Exception:
+        pass
+    try:
+        result["ding"] = {"success": True, **presenter.ding()}
+    except Exception as exc:
+        result["ding"] = {"success": False, "exception": f"{type(exc).__name__}: {exc}"}
+    try:
+        result["tts"] = {"success": True, **presenter.speak(text)}
+    except Exception as exc:
+        result["tts"] = {"success": False, "exception": f"{type(exc).__name__}: {exc}"}
+    result["success"] = result["ding"]["success"] and result["tts"]["success"]
+    return result
 
 
 def announcement_text(item: dict[str, Any]) -> str:

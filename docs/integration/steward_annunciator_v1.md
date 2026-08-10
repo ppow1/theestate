@@ -18,6 +18,22 @@ short `winsound.MessageBeep` and Windows `System.Speech` TTS; it does not estima
 Bluetooth distance or call a cloud service. Future Linux/KAMRUI and phone presenters
 consume the same state/protocol and do not become attention authorities.
 
+For explicit live acceptance, run this only from the signed-in interactive Windows
+user session (it intentionally makes one sound and one utterance):
+
+```powershell
+cd A:\theestate
+PYTHONPATH=src python -m estate.cli.main steward-attention live-test --text "The Estate needs your input on Project 5" --json
+```
+
+The result reports separate ding/TTS success, exceptions, stderr, and the session
+context. Both mechanisms use the current interactive user's Windows default audio
+endpoint; the presenter does not override endpoint selection.
+
+`winsound.MessageBeep` returning `None` is normal for this Windows API and is not a
+boolean audible-confirmation signal. The live command reports no exception for the
+call, while TTS reports its PowerShell return code and stderr.
+
 Safe offline demonstration:
 
 ```powershell
