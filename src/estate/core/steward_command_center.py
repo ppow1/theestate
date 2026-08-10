@@ -119,7 +119,6 @@ ARTIFACTS = {
     "gotify_delivery": ["runtime/notifications/gotify_delivery_report.json"],
     "notification_center": ["runtime/notifications/operations_notification_center.json", "operations/notifications/operations_notification_center.md"],
     "recall_decision_model": ["docs/operations/Steward_Recall_Decision_Model_v1.md", "data/policy/steward_recall_reasons.json"],
-    "worker_heartbeat": ["runtime/workers/worker_runtime_heartbeat.json", "runtime/workers/heartbeat.json", "operations/workers/runtime_heartbeat.md"],
     "worker_runtime_monitor": ["runtime/workers/worker_runtime_monitor.json", "operations/workers/worker_runtime_monitor.md"],
     "steward_presence": ["runtime/steward/steward_presence_state.json", "operations/steward/steward_presence_state.md"],
     "execution_activity": ["runtime/execution_activity/current.json", "runtime/execution_activity/report.md"],
@@ -428,7 +427,6 @@ def _build_validation_health_dashboard(root):
         _artifact_health(root, "dependency_graph", "Dependency graph report"),
         _artifact_health(root, "mailbox_sync", "Mailbox synchronization report"),
         _artifact_health(root, "recall_audit", "Recall audit report"),
-        _artifact_health(root, "worker_heartbeat", "Worker heartbeat report", stale_after_hours=2),
         _artifact_health(root, "worker_runtime_monitor", "Worker runtime monitor", stale_after_hours=2),
     ]
     completions = _completion_records(root)

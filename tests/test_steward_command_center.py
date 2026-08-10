@@ -5,7 +5,7 @@ from urllib.request import urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from estate.core.steward_command_center import generate_command_center, render_command_center_html, serve_command_center
+from estate.core.steward_command_center import _active_worker_count, _build_validation_health_dashboard, generate_command_center, render_command_center_html, serve_command_center
 from estate.ai_services.discovery import rediscover
 
 
@@ -54,6 +54,30 @@ def test_command_center_degrades_gracefully_when_artifacts_are_missing(tmp_path)
     assert payload["panels"]["alfred_resident_card"]["available"] is False
     assert "Supporting artifact is not available yet." in html
     assert "No pending Steward decisions were found" in html
+
+
+def test_optional_worker_heartbeat_does_not_create_readiness_missing_warning(tmp_path):
+    write_json(tmp_path, "runtime/workers/worker_runtime_monitor.json", {
+        "generated_at": "2026-07-04T10:00:00Z",
+        "summary": {
+            "worker_count": 2,
+            "active_worker_count": 0,
+            "idle_worker_count": 0,
+            "blocked_worker_count": 0,
+            "stale_worker_count": 0,
+            "offline_worker_count": 0,
+            "unknown_worker_count": 2,
+            "warning_count": 0,
+        },
+        "workers": [],
+        "warnings": [],
+    })
+
+    dashboard = _build_validation_health_dashboard(tmp_path)
+
+    assert _active_worker_count(tmp_path) == 0
+    assert not any(check["label"] == "Worker heartbeat report" for check in dashboard["data"]["checks"])
+    assert not any("worker_runtime_heartbeat.json" in warning for check in dashboard["data"]["checks"] for warning in check["warnings"])
 
 
 def test_command_center_starts_local_http_server(tmp_path):
@@ -176,6 +200,7 @@ def test_validation_health_dashboard_shows_pass_warning_fail_stale_and_missing_s
     write_json(tmp_path, "runtime/capabilities/capability_lifecycle_report.json", {"summary": {"warning_count": 1}, "warnings": [{"type": "lifecycle_gap", "message": "Capability has missing validation evidence."}]})
     write_json(tmp_path, "runtime/dependencies/dependency_graph.json", {"summary": {"failed": 1}, "warnings": []})
     write_json(tmp_path, "runtime/workers/worker_runtime_heartbeat.json", {"summary": {"worker_count": 2, "stale_worker_count": 1, "status_counts": {"active": 1, "blocked": 1}, "warning_count": 1}, "warnings": []})
+    write_json(tmp_path, "runtime/workers/worker_runtime_monitor.json", {"summary": {"worker_count": 2, "stale_worker_count": 1, "status_counts": {"active": 1, "blocked": 1}, "warning_count": 1}, "warnings": []})
     # Leave mailbox synchronization missing and make recall audit stale.
     (tmp_path / "runtime/mailboxes/synchronization_duty_latest.json").unlink()
     import os, time
@@ -192,7 +217,7 @@ def test_validation_health_dashboard_shows_pass_warning_fail_stale_and_missing_s
     assert states["Dependency graph report"] == "fail"
     assert states["Mailbox synchronization report"] == "missing"
     assert states["Recall audit report"] == "warning"
-    assert states["Worker heartbeat report"] == "warning"
+    assert states["Worker runtime monitor"] == "warning"
     assert health["overall_health"] == "fail"
     assert "Capability has missing validation evidence." in html
     assert "runtime/dependencies/dependency_graph.json" in html
