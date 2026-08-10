@@ -33,7 +33,7 @@ def _root(tmp_path: Path) -> Path:
 def test_fresh_store_migrates_and_newer_schema_fails_closed(tmp_path):
     root = _root(tmp_path)
     result = init_store(root)
-    assert result["migration_version"] == 3
+    assert result["migration_version"] == 5
     db = root / "runtime/search/estate_knowledge_index.sqlite3"
     with sqlite3.connect(db) as connection:
         connection.execute("PRAGMA user_version=99")

@@ -155,6 +155,7 @@ from estate.core.estate_comprehension_governance import (
     reverse_application as comprehension_reverse_application,
     revalidate_applications as comprehension_revalidate_applications,
 )
+from estate.core.estate_deterministic_evidence import corroboration_exceptions as deterministic_corroboration_exceptions, evidence_assertion as deterministic_evidence_assertion, evidence_asset as deterministic_evidence_asset, extract_evidence as deterministic_extract_evidence
 from estate.core.resident_gateway import serve as serve_resident_gateway, gateway_status
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 from estate.core.planning_provider import PlanningProviderRequest
@@ -1990,6 +1991,16 @@ def cmd_knowledge_index(args):
             payload = comprehension_review_queue(root)
         elif action == "review-extract":
             payload = comprehension_extract_assertions(root, interpretation_id=getattr(args, "interpretation_id", None))
+        elif action == "evidence-extract":
+            payload = deterministic_extract_evidence(root, asset_ids=args.asset_id)
+        elif action == "evidence-asset":
+            payload = deterministic_evidence_asset(root, args.asset_id)
+        elif action == "evidence-assertion":
+            payload = deterministic_evidence_assertion(root, args.assertion_id)
+        elif action == "corroborate":
+            payload = comprehension_corroborate(root, assertion_ids=args.assertion_id, asset_id=getattr(args, "asset_id", None))
+        elif action == "corroboration-exceptions":
+            payload = deterministic_corroboration_exceptions(root)
         elif action == "review-summary":
             payload = comprehension_review_summary(root, asset_id=getattr(args, "asset_id", None))
         elif action == "review-batch":
@@ -3821,7 +3832,7 @@ def main(argv=None):
     sp.add_parser("update", help="Incrementally refresh changed index entries").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("status", help="Print index status").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("inspect", help="Detect stale or missing index entries").set_defaults(func=cmd_knowledge_index)
-    for name, help_text in (("scope-show", "Show the governed population scope"), ("scope-validate", "Validate a requested scope against the governed contract"), ("scope-review", "Report adjacent boundaries without traversing them"), ("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities"), ("next-batch", "Create the next bounded comprehension work batch"), ("work-status", "Show comprehension work batches"), ("work-review", "Show failed and review-required work"), ("review-extract", "Extract assertion-level candidate material"), ("review-summary", "Summarize assertion review state"), ("review-batch", "Corroborate and review a bounded assertion batch"), ("review-asset", "Corroborate and review one asset"), ("review-exceptions", "List assertion review exceptions"), ("review-approve", "Approve one corroborated low-risk assertion"), ("review-reject", "Reject one assertion"), ("review-defer", "Defer one assertion"), ("review-escalate", "Escalate one assertion"), ("application-eligible", "List eligible indexed applications"), ("application-apply", "Apply eligible indexed understanding"), ("application-history", "Show application history"), ("application-reverse", "Reverse one indexed application"), ("application-revalidate", "Queue changed applications for revalidation"), ("application-coverage", "Show assertion/application coverage"), ("resident-query", "Query applied understanding through the resident-neutral layer"), ("provider-status", "Check the governed local inference provider"), ("work-run", "Run bounded local comprehension work"), ("result-validate", "Validate a provider result without ingesting it"), ("result-ingest", "Ingest a validated provider result as candidate material")):
+    for name, help_text in (("scope-show", "Show the governed population scope"), ("scope-validate", "Validate a requested scope against the governed contract"), ("scope-review", "Report adjacent boundaries without traversing them"), ("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities"), ("next-batch", "Create the next bounded comprehension work batch"), ("work-status", "Show comprehension work batches"), ("work-review", "Show failed and review-required work"), ("review-extract", "Extract assertion-level candidate material"), ("evidence-extract", "Extract revision-grounded deterministic evidence facts"), ("evidence-asset", "Show deterministic evidence facts for an asset"), ("evidence-assertion", "Show evidence linked to an assertion"), ("corroborate", "Corroborate assertions from independent evidence"), ("corroboration-exceptions", "List assertions lacking sufficient deterministic support"), ("review-summary", "Summarize assertion review state"), ("review-batch", "Corroborate and review a bounded assertion batch"), ("review-asset", "Corroborate and review one asset"), ("review-exceptions", "List assertion review exceptions"), ("review-approve", "Approve one corroborated low-risk assertion"), ("review-reject", "Reject one assertion"), ("review-defer", "Defer one assertion"), ("review-escalate", "Escalate one assertion"), ("application-eligible", "List eligible indexed applications"), ("application-apply", "Apply eligible indexed understanding"), ("application-history", "Show application history"), ("application-reverse", "Reverse one indexed application"), ("application-revalidate", "Queue changed applications for revalidation"), ("application-coverage", "Show assertion/application coverage"), ("resident-query", "Query applied understanding through the resident-neutral layer"), ("provider-status", "Check the governed local inference provider"), ("work-run", "Run bounded local comprehension work"), ("result-validate", "Validate a provider result without ingesting it"), ("result-ingest", "Ingest a validated provider result as candidate material")):
         if name == "status":
             continue
         child = sp.add_parser(name, help=help_text)
@@ -3834,6 +3845,15 @@ def main(argv=None):
             child.add_argument("--limit", type=int, default=100)
         elif name == "review-extract":
             child.add_argument("--interpretation-id")
+        elif name == "evidence-extract":
+            child.add_argument("--asset-id", action="append")
+        elif name == "evidence-asset":
+            child.add_argument("asset_id")
+        elif name == "evidence-assertion":
+            child.add_argument("assertion_id")
+        elif name == "corroborate":
+            child.add_argument("--assertion-id", action="append")
+            child.add_argument("--asset-id")
         elif name in {"review-summary", "review-exceptions", "application-history"}:
             child.add_argument("--asset-id")
         elif name == "review-batch":

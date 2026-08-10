@@ -11,16 +11,18 @@ import estate.core.estate_comprehension_governance as governance
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _setup(tmp_path, monkeypatch, *, purpose="schema or structured contract", owner="estate", tags=("SCHEMA",)):
+def _setup(tmp_path, monkeypatch, *, purpose="Estate bounded comprehension result v1", owner="estate", tags=("SCHEMA",)):
     db = tmp_path / "projection.sqlite3"
     monkeypatch.setattr(store, "database_path", lambda root=None: db)
     monkeypatch.setattr(governance, "database_path", lambda root=None: db)
     with store.connect(ROOT) as connection:
         asset_id = "asset:test-governed"
         content_hash = "hash-current"
-        connection.execute("INSERT INTO assets(asset_id,current_path,repository,current_source_revision,current_git_blob,current_content_hash,file_type,extension,size_bytes,classification,scan_status,comprehension_status,purpose_summary,owner,unknown_reason,first_seen,last_seen,last_scanned,last_comprehended,source_kind,current_state,scope_policy,provider_content_allowed) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (asset_id, "schemas/test.schema.json", "https://github.com/ppow1/theestate.git", "rev-current", None, content_hash, "schema", ".json", 10, "estate_internal", "CLASSIFIED", "PARTIAL", purpose, owner, None, "now", "now", "now", None, "DETERMINISTIC", "CURRENT", "STRUCTURAL_SCAN", 1))
+        connection.execute("INSERT INTO assets(asset_id,current_path,repository,current_source_revision,current_git_blob,current_content_hash,file_type,extension,size_bytes,classification,scan_status,comprehension_status,purpose_summary,owner,unknown_reason,first_seen,last_seen,last_scanned,last_comprehended,source_kind,current_state,scope_policy,provider_content_allowed) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (asset_id, "schemas/troubleshooting/comprehension_result_v1.schema.json", "https://github.com/ppow1/theestate.git", "rev-current", None, content_hash, "schema", ".json", 10, "estate_internal", "CLASSIFIED", "PARTIAL", purpose, owner, None, "now", "now", "now", None, "DETERMINISTIC", "CURRENT", "STRUCTURAL_SCAN", 1))
+        if owner:
+            connection.execute("INSERT INTO ownership(asset_id,owner,confidence,source_kind,source_ref,source_revision,is_current) VALUES(?,?,?,?,?,?,1)", (asset_id, owner, "HIGH", "DETERMINISTIC", "tests/test_estate_comprehension_governance.py", "rev-current"))
         for tag in tags:
-            connection.execute("INSERT INTO tags(asset_id,tag,source_kind,confidence,source_ref,source_revision,current_state) VALUES(?,?,?,?,?,?,?)", (asset_id, tag, "DETERMINISTIC", "HIGH", "schemas/test.schema.json", "rev-current", "CURRENT"))
+            connection.execute("INSERT INTO tags(asset_id,tag,source_kind,confidence,source_ref,source_revision,current_state) VALUES(?,?,?,?,?,?,?)", (asset_id, tag, "DETERMINISTIC", "HIGH", "schemas/troubleshooting/comprehension_result_v1.schema.json", "rev-current", "CURRENT"))
         result_id = "result:test"
         batch_id = "batch:test"
         interpretation_id = "interpretation:test"
@@ -36,7 +38,8 @@ def test_assertion_extraction_corroboration_review_and_idempotent_application(tm
     assert governance.extract_assertions(ROOT, interpretation_id=interpretation_id)["assertions_created"] == 3
     assert governance.extract_assertions(ROOT, interpretation_id=interpretation_id)["assertions_created"] == 0
     result = governance.corroborate(ROOT, asset_id=asset_id)
-    assert result["counts"]["CORROBORATED"] == 3
+    assert result["counts"]["CORROBORATED"] == 2
+    assert result["counts"]["PARTIALLY_CORROBORATED"] == 1
     reviewed = governance.review_batch(ROOT, asset_prefix="schemas")
     assert reviewed["reviewed"] == 3
     eligible = governance.eligible(ROOT)
@@ -84,7 +87,7 @@ def test_partial_corroboration_is_reviewable_but_not_full_approval(tmp_path, mon
     asset_id, interpretation_id = _setup(tmp_path, monkeypatch)
     with store.connect(ROOT, create=False) as connection:
         candidate = json.loads(connection.execute("SELECT candidate_json FROM candidate_interpretations WHERE interpretation_id=?", (interpretation_id,)).fetchone()[0])
-        candidate["purpose"] = "different semantic wording"
+        candidate["purpose"] = "Estate comprehension contract"
         connection.execute("UPDATE candidate_interpretations SET candidate_json=? WHERE interpretation_id=?", (json.dumps(candidate), interpretation_id))
     governance.extract_assertions(ROOT, interpretation_id=interpretation_id)
     governance.corroborate(ROOT, asset_id=asset_id)
@@ -137,9 +140,9 @@ def test_resident_neutral_query_separates_history_and_related_assets(tmp_path, m
     governance.corroborate(ROOT, asset_id=asset_id)
     governance.review_batch(ROOT, asset_prefix="schemas")
     governance.apply_eligible(ROOT, actor_id="policy", actor_type="deterministic_policy")
-    grace = governance.resident_query(ROOT, role="grace", query="test.schema")
-    historian = governance.resident_query(ROOT, role="historian", query="test.schema")
-    researcher = governance.resident_query(ROOT, role="researcher", query="test.schema")
+    grace = governance.resident_query(ROOT, role="grace", query="comprehension_result")
+    historian = governance.resident_query(ROOT, role="historian", query="comprehension_result")
+    researcher = governance.resident_query(ROOT, role="researcher", query="comprehension_result")
     assert grace["applied_understanding"] and not grace["application_history"]
     assert historian["application_history"]
     assert researcher["related_assets"]

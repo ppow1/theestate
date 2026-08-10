@@ -227,3 +227,15 @@ revalidation, and resident-neutral retrieval. Coverage advances only from
 applied indexed purpose/owner state; candidate generation and schema-valid
 provider output do not advance it. No Level-2, Level-3, or Level-4 candidate is
 processed by the Level-1 burn-down, and no recurring scheduler is enabled.
+
+## Deterministic corroboration expansion (2026-08-09)
+
+The knowledge-index owner now stores reusable revision-grounded evidence facts
+and assertion-to-fact links. The bounded extractor reads only already-admitted
+inventory assets and supports schema metadata/structure, Python imports and
+definitions, explicit source/test/documentation references, deterministic
+ownership, component mappings, and derived schema tags. Facts preserve source
+asset, target, exact value, path/location, source revision/hash, extractor,
+certainty, and current/stale state. Provider-derived candidate material is not
+accepted as evidence. Corroboration exposes linked facts and keeps unresolved
+semantic assertions out of application eligibility.

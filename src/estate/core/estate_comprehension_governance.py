@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -17,6 +18,7 @@ from typing import Any, Iterable
 
 from estate.core.estate_knowledge_store import connect, database_path
 from estate.core.estate_population import validate_requested_scope
+from estate.core.estate_deterministic_evidence import extract_evidence, link_facts
 
 CORROBORATION_STATES = {"CORROBORATED", "PARTIALLY_CORROBORATED", "NOT_CORROBORATED", "CONTRADICTED", "NOT_DETERMINISTICALLY_VERIFIABLE"}
 REVIEW_STATES = {"PENDING", "APPROVED", "PARTIALLY_APPROVED", "REQUEST_MORE_CONTEXT", "REJECTED", "ESCALATED", "DEFERRED"}
@@ -95,43 +97,83 @@ def extract_assertions(root: str | Path | None = None, *, interpretation_id: str
 
 
 def corroborate(root: str | Path | None = None, *, assertion_ids: Iterable[str] | None = None, asset_id: str | None = None) -> dict[str, Any]:
-    """Apply only mechanical evidence checks; semantic inference stays unresolved."""
+    """Derive assertion state from revision-grounded, provider-independent facts."""
     base = _root(root)
     counts: dict[str, int] = {}
+    selected_assets: set[str] = set()
+    with connect(base, create=False) as connection:
+        selected_assets = {row["asset_id"] for row in _assertion_rows(connection, assertion_ids, asset_id=asset_id)}
+    evidence_run = extract_evidence(base, asset_ids=selected_assets)
     with connect(base, create=False) as connection:
         rows = _assertion_rows(connection, assertion_ids, asset_id=asset_id)
         for row in rows:
             state = "NOT_DETERMINISTICALLY_VERIFIABLE"
             reason = "assertion kind has no deterministic corroboration rule"
             strength = "PROVIDER_INFERENCE"
+            linked: list[str] = []
             current_hash = row["current_content_hash"]
             if row["source_hash"] != current_hash:
-                state, reason = "CONTRADICTED", "source content hash changed after candidate creation"
+                state, reason = "NOT_DETERMINISTICALLY_VERIFIABLE", "candidate source changed; corroboration requires revalidation"
             elif row["assertion_kind"] == "OWNER":
-                strength = "AUTHORITATIVE_REGISTRY"
-                if row["owner"] and row["proposed_value"] == row["owner"]:
-                    state, reason = "CORROBORATED", "proposed owner equals current deterministic owner metadata"
-                elif row["owner"]:
-                    state, reason = "CONTRADICTED", "proposed owner conflicts with current deterministic owner metadata"
+                facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND fact_kind='OWNER_EVIDENCE' AND current_state='CURRENT'", (row["asset_id"],))
+                matching = [fact for fact in facts if json.loads(fact["value_json"]).get("owner") == row["proposed_value"]]
+                if matching:
+                    state, reason = "CORROBORATED", "candidate owner matches independent ownership evidence"
+                    strength = matching[0]["certainty"]
+                    linked = [fact["fact_id"] for fact in matching]
+                elif facts:
+                    state, reason = "CONTRADICTED", "candidate owner conflicts with independent ownership evidence"
+                    strength = facts[0]["certainty"]
+                    linked = [fact["fact_id"] for fact in facts]
                 else:
                     state, reason = "NOT_CORROBORATED", "no deterministic owner is currently indexed"
             elif row["assertion_kind"] == "PURPOSE":
-                strength = "DETERMINISTIC_SOURCE_RELATIONSHIP"
-                if row["purpose_summary"] and row["proposed_value"] == row["purpose_summary"]:
-                    state, reason = "CORROBORATED", "proposed purpose equals current deterministic classification"
-                elif row["purpose_summary"]:
-                    state, reason = "PARTIALLY_CORROBORATED", "asset has deterministic purpose classification but proposed wording differs"
+                facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND current_state='CURRENT' AND fact_kind IN ('SCHEMA_METADATA','SCHEMA_STRUCTURE','PYTHON_REFERENCE','TEST_REFERENCE','DOCUMENTATION_REFERENCE','SOURCE_REFERENCE')", (row["asset_id"],))
+                candidate_tokens = {token for token in re.findall(r"[a-z0-9]+", (row["proposed_value"] or "").lower()) if len(token) > 2}
+                metadata = [fact for fact in facts if fact["fact_kind"] in {"SCHEMA_METADATA", "SCHEMA_STRUCTURE"}]
+                metadata_tokens = set()
+                for fact in metadata:
+                    value = json.loads(fact["value_json"])
+                    metadata_tokens |= {token for token in re.findall(r"[a-z0-9]+", json.dumps(value).lower()) if len(token) > 2}
+                overlap = candidate_tokens & metadata_tokens
+                relationships = [fact for fact in facts if fact["fact_kind"] not in {"SCHEMA_METADATA", "SCHEMA_STRUCTURE"}]
+                linked = [fact["fact_id"] for fact in metadata if overlap]
+                linked.extend(fact["fact_id"] for fact in relationships)
+                if "not" in candidate_tokens and "schema" in metadata_tokens:
+                    state, reason = "CONTRADICTED", "candidate explicitly denies the deterministic schema classification"
+                    strength = "DERIVED_STATIC_ANALYSIS"
+                elif len(overlap) >= 2 and relationships:
+                    state, reason = "CORROBORATED", "purpose terms align with schema metadata and independent repository references"
+                    strength = "DERIVED_STATIC_ANALYSIS"
+                elif overlap:
+                    state, reason = "PARTIALLY_CORROBORATED", "purpose terms align with schema metadata but independent relationship evidence is limited"
+                    strength = "DERIVED_STATIC_ANALYSIS"
+                elif facts:
+                    state, reason = "NOT_CORROBORATED", "repository facts exist but do not support the proposed purpose wording"
+                    strength = "DETERMINISTIC_SOURCE_RELATIONSHIP"
                 else:
                     state, reason = "NOT_CORROBORATED", "no deterministic purpose is currently indexed"
             elif row["assertion_kind"] == "DETERMINISTIC_TAG":
-                tag = connection.execute("SELECT 1 FROM tags WHERE asset_id=? AND tag=? AND current_state='CURRENT'", (row["asset_id"], row["proposed_value"])).fetchone()
-                strength = "DETERMINISTIC_TAG"
-                state, reason = (("CORROBORATED", "tag already exists in the deterministic index") if tag else ("NOT_CORROBORATED", "tag is not present in the deterministic index"))
+                facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND fact_kind='TAG_DERIVATION' AND current_state='CURRENT'", (row["asset_id"],))
+                matching = [fact for fact in facts if json.loads(fact["value_json"]).get("tag") == row["proposed_value"]]
+                linked = [fact["fact_id"] for fact in matching]
+                strength = "DETERMINISTIC_SOURCE_RELATIONSHIP"
+                state, reason = (("CORROBORATED", "tag is derived from independent inventory/schema evidence") if matching else ("NOT_CORROBORATED", "no independent deterministic tag derivation found"))
+            elif row["assertion_kind"] == "COMPONENT_LINKAGE":
+                facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND fact_kind='COMPONENT_LINKAGE' AND current_state='CURRENT'", (row["asset_id"],))
+                matching = [fact for fact in facts if row["proposed_value"] in fact["value_json"]]
+                linked = [fact["fact_id"] for fact in matching or facts]
+                state, reason = (("CORROBORATED", "component linkage is explicitly indexed from source evidence") if matching else ("NOT_CORROBORATED", "no explicit component linkage evidence found"))
+                strength = "DETERMINISTIC_SOURCE_RELATIONSHIP"
             elif row["assertion_kind"] == "UNRESOLVED_QUESTION":
                 state, reason = "NOT_DETERMINISTICALLY_VERIFIABLE", "candidate explicitly preserved an unresolved question"
-            connection.execute("UPDATE candidate_assertions SET corroboration_state=?,corroboration_reason=?,evidence_strength=?,review_state=?,updated_at=? WHERE assertion_id=?", (state,reason,strength,"EXCEPTION" if state in {"CONTRADICTED","NOT_DETERMINISTICALLY_VERIFIABLE"} else "PENDING",_now(),row["assertion_id"]))
+            link_facts(connection, row["assertion_id"], linked, "SUPPORTS" if state in {"CORROBORATED", "PARTIALLY_CORROBORATED"} else "CONTEXT")
+            next_review = row["review_state"]
+            if row["review_state"] in {"PENDING", "EXCEPTION"}:
+                next_review = "EXCEPTION" if state in {"CONTRADICTED", "NOT_DETERMINISTICALLY_VERIFIABLE"} else "PENDING"
+            connection.execute("UPDATE candidate_assertions SET corroboration_state=?,corroboration_reason=?,evidence_strength=?,review_state=?,updated_at=? WHERE assertion_id=?", (state,reason,strength,next_review,_now(),row["assertion_id"]))
             counts[state] = counts.get(state, 0) + 1
-    return {"status":"CORROBORATED","counts":counts,"assertions":sum(counts.values()),"canonical_mutation":False}
+    return {"status":"CORROBORATED","counts":counts,"assertions":sum(counts.values()),"evidence_run":evidence_run,"canonical_mutation":False}
 
 
 def review_summary(root: str | Path | None = None, *, asset_id: str | None = None) -> dict[str, Any]:

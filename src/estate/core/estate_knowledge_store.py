@@ -18,8 +18,8 @@ from typing import Any, Iterable
 from estate.core.estate_knowledge_index import SOURCE_LOCATIONS, _registry_by_path, classification_for, estate_root, owner_for
 
 DB_RELATIVE = Path("runtime/search/estate_knowledge_index.sqlite3")
-STORE_SCHEMA_VERSION = "estate.knowledge_store.v3"
-MIGRATION_VERSION = 3
+STORE_SCHEMA_VERSION = "estate.knowledge_store.v5"
+MIGRATION_VERSION = 5
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules", "runtime", "generated", "browser_profiles", "evidence"}
 
 MIGRATIONS = {
@@ -214,6 +214,54 @@ MIGRATIONS = {
     CREATE INDEX IF NOT EXISTS idx_assertion_asset ON candidate_assertions(asset_id, application_state);
     CREATE INDEX IF NOT EXISTS idx_application_asset ON applied_comprehension(asset_id, state);
     UPDATE schema_meta SET value='estate.knowledge_store.v3' WHERE key='store_schema';
+    """,
+    4: """
+    CREATE TABLE IF NOT EXISTS evidence_facts (
+      fact_id TEXT PRIMARY KEY, fact_kind TEXT NOT NULL,
+      source_asset_id TEXT NOT NULL REFERENCES assets(asset_id),
+      target_asset_id TEXT REFERENCES assets(asset_id), value_json TEXT NOT NULL,
+      evidence_path TEXT NOT NULL, evidence_location TEXT, source_revision TEXT NOT NULL,
+      source_hash TEXT NOT NULL, extractor TEXT NOT NULL, certainty TEXT NOT NULL,
+      current_state TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+      UNIQUE(fact_kind, source_asset_id, target_asset_id, value_json, evidence_path, evidence_location, source_revision, source_hash)
+    );
+    CREATE TABLE IF NOT EXISTS assertion_evidence (
+      assertion_id TEXT NOT NULL REFERENCES candidate_assertions(assertion_id),
+      fact_id TEXT NOT NULL REFERENCES evidence_facts(fact_id), relation TEXT NOT NULL,
+      linked_at TEXT NOT NULL, PRIMARY KEY(assertion_id, fact_id, relation)
+    );
+    CREATE INDEX IF NOT EXISTS idx_evidence_target ON evidence_facts(target_asset_id, current_state, fact_kind);
+    CREATE INDEX IF NOT EXISTS idx_evidence_source ON evidence_facts(source_asset_id, source_hash, current_state);
+    CREATE INDEX IF NOT EXISTS idx_assertion_evidence_fact ON assertion_evidence(fact_id);
+    UPDATE schema_meta SET value='estate.knowledge_store.v4' WHERE key='store_schema';
+    """,
+    5: """
+    DROP TABLE IF EXISTS assertion_evidence_v5;
+    DROP TABLE IF EXISTS evidence_facts_v5;
+    CREATE TABLE evidence_facts_v5 (
+      fact_id TEXT PRIMARY KEY, fact_kind TEXT NOT NULL,
+      source_asset_id TEXT NOT NULL REFERENCES assets(asset_id),
+      target_asset_id TEXT REFERENCES assets(asset_id), value_json TEXT NOT NULL,
+      evidence_path TEXT NOT NULL, evidence_location TEXT, source_revision TEXT NOT NULL,
+      source_hash TEXT NOT NULL, extractor TEXT NOT NULL, certainty TEXT NOT NULL,
+      current_state TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+      UNIQUE(fact_kind, source_asset_id, target_asset_id, value_json, evidence_path, evidence_location, source_revision, source_hash)
+    );
+    CREATE TABLE assertion_evidence_v5 (
+      assertion_id TEXT NOT NULL REFERENCES candidate_assertions(assertion_id),
+      fact_id TEXT NOT NULL REFERENCES evidence_facts_v5(fact_id), relation TEXT NOT NULL,
+      linked_at TEXT NOT NULL, PRIMARY KEY(assertion_id, fact_id, relation)
+    );
+    INSERT INTO evidence_facts_v5 SELECT * FROM evidence_facts;
+    INSERT INTO assertion_evidence_v5 SELECT * FROM assertion_evidence;
+    DROP TABLE assertion_evidence;
+    DROP TABLE evidence_facts;
+    ALTER TABLE evidence_facts_v5 RENAME TO evidence_facts;
+    ALTER TABLE assertion_evidence_v5 RENAME TO assertion_evidence;
+    CREATE INDEX IF NOT EXISTS idx_evidence_target ON evidence_facts(target_asset_id, current_state, fact_kind);
+    CREATE INDEX IF NOT EXISTS idx_evidence_source ON evidence_facts(source_asset_id, source_hash, current_state);
+    CREATE INDEX IF NOT EXISTS idx_assertion_evidence_fact ON assertion_evidence(fact_id);
+    UPDATE schema_meta SET value='estate.knowledge_store.v5' WHERE key='store_schema';
     """
 }
 

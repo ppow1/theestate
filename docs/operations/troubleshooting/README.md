@@ -266,6 +266,19 @@ they do not advance coverage or authorize source changes. Provider identity is
 never reviewer authority. The Level-1 campaign uses the existing bounded worker
 and does not schedule recurring work or process Levels 2–4.
 
+### Deterministic corroboration evidence
+
+The existing knowledge-index owner also provides reusable evidence facts and
+assertion links through the v5 SQLite projection. Facts come from admitted
+inventory and preserve exact values, paths/locations, source revision/hash,
+extractor, certainty, and stale state. Supported fact families include schema
+metadata and structure, Python imports/definitions, explicit references from
+source/tests/documentation, deterministic ownership and component mappings,
+and derived schema tags. Candidate/provider fields are never used as
+independent evidence. Query with `evidence-asset`, `evidence-assertion`,
+`corroborate`, and `corroboration-exceptions`; ambiguous semantic assertions
+remain outside automatic application.
+
 ## Historical replay set
 
 Seeded evidence maps stale owner/active lease, composer not ready, request

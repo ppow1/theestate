@@ -153,3 +153,14 @@ only from applied indexed purpose/owner state; candidate generation and
 schema-valid provider output do not advance it. No Level-2, Level-3, or
 Level-4 candidate is processed by the Level-1 burn-down, and no recurring
 scheduler is enabled.
+
+## Deterministic corroboration expansion (2026-08-09)
+
+The SQLite owner now stores reusable revision-grounded evidence facts and
+assertion-to-fact links. Schema metadata/structure, Python static structure,
+explicit source/test/documentation references, deterministic ownership,
+component mappings, and derived schema tags are extracted from admitted
+inventory assets. Provider-derived candidate material cannot become evidence.
+Facts retain source hashes and stale state; the evidence and corroboration CLI
+surfaces expose why an assertion is supported or remains an exception. The
+five real Level-1 assertions were rerun unchanged and remained unverifiable.
