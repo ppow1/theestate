@@ -1,9 +1,11 @@
 import shutil
 import subprocess
 import sys
+from dataclasses import replace
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard
+from estate.core.engineering_capacity_runtime import _fuel_gauge, generate_engineering_capacity_dashboard
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 from estate.core.provider_health import ProviderHealthRecord, write_health_record
 
@@ -31,3 +33,28 @@ def test_engineering_capacity_dashboard_cli(tmp_path):
     result = subprocess.run([sys.executable, "-m", "estate.cli.main", "engineering-capacity-dashboard", "--json"], cwd=tmp_path, text=True, capture_output=True, env={"PYTHONPATH": str(Path.cwd() / "src")})
     assert result.returncode == 0, result.stdout + result.stderr
     assert "cloud_codex_seat_count" in result.stdout
+
+
+def test_wp0532_state_mapping_preserves_unknown_and_quota_override():
+    for state, expected in {"idle": 100, "available": 85, "busy": 55, "saturated": 20, "quota_limited": 0, "unknown": None}.items():
+        assert _fuel_gauge({"capacity_state": state, "health_status": "available"})["percent"] == expected
+    assert _fuel_gauge({"capacity_state": "busy", "health_status": "available", "quota_remaining": 1, "max_jobs": 4})["percent"] == 25
+
+
+def test_wp0532_provider_projection_is_separate_and_freshness_is_explicit(tmp_path):
+    copy_catalog(tmp_path)
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    old = (now - timedelta(hours=2)).isoformat().replace("+00:00", "Z")
+    health = replace(ProviderHealthRecord.create(provider_id="codex.execution.cli", status="available", reported_by="test", message="ready"), checked_at=old)
+    capacity = replace(ProviderCapacityRecord.create(provider_id="codex.execution.cli", capacity_state="busy", reported_by="test", max_jobs=4, quota_remaining=1), checked_at=old)
+    write_health_record(health, root=tmp_path)
+    write_capacity_record(capacity, root=tmp_path)
+    payload = generate_engineering_capacity_dashboard(root=tmp_path, write=False, stale_after_minutes=30)
+    provider = next(item for item in payload["providers"] if item["provider_id"] == "codex.execution.cli")
+    assert provider["engineering_provider_capacity"]["index"] == 25
+    assert provider["engineering_provider_capacity"]["freshness"]["state"] == "stale"
+    assert "gpus.json" not in payload["source_artifacts"]
+    assert "RTX 4090" not in str(provider)
+    missing = next(item for item in payload["providers"] if item["capacity_state"] == "unknown")
+    assert missing["engineering_provider_capacity"]["index"] is None
+    assert missing["engineering_provider_capacity"]["freshness"]["state"] == "unknown"

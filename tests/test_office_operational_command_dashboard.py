@@ -1,6 +1,10 @@
 import json
+import shutil
+from pathlib import Path
 
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
+from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
+from estate.core.provider_health import ProviderHealthRecord, write_health_record
 from estate.core.steward_command_center import generate_command_center, render_command_center_html
 
 
@@ -68,3 +72,20 @@ def test_operational_dashboard_actions_are_real_and_safe(tmp_path):
     assert result["outcome"] == "completed"
     assert result["target_tab"] == "operational-dashboard"
     assert "provider" not in " ".join(result.get("runtime_state_changed") or []).lower()
+
+
+def test_operational_dashboard_renders_engineering_provider_capacity_from_runtime_projection(tmp_path):
+    target = tmp_path / "config" / "providers"
+    target.mkdir(parents=True)
+    shutil.copy(Path("config/providers/catalog.json"), target / "catalog.json")
+    write_health_record(ProviderHealthRecord.create(provider_id="codex.execution.cli", status="available", reported_by="test", message="ready"), root=tmp_path)
+    write_capacity_record(ProviderCapacityRecord.create(provider_id="codex.execution.cli", capacity_state="available", reported_by="test", max_jobs=4, quota_remaining=3), root=tmp_path)
+    payload = generate_command_center(tmp_path, write=True)
+    dashboard = payload["panels"]["office_operational_command_dashboard"]["data"]
+    provider = next(item for item in dashboard["engineering_provider_capacity"]["providers"] if item["provider_id"] == "codex.execution.cli")
+    assert provider["engineering_provider_capacity"]["index"] == 75
+    assert (tmp_path / "runtime/engineering_capacity/dashboard.json").is_file()
+    html = render_command_center_html(payload)
+    assert "Engineering Provider Capacity" in html
+    assert "codex.execution.cli" in html
+    assert "not physical GPU capacity" in html

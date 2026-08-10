@@ -8,6 +8,7 @@ launches workers, consumes cloud seats, or schedules work.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +52,21 @@ def _fuel_gauge(provider: dict[str, Any]) -> dict[str, Any]:
     return {"percent": percent, "state": "empty" if blocked else capacity_state, "basis": "latest provider health/capacity artifacts"}
 
 
+def _freshness(provider: dict[str, Any], *, stale_after_minutes: int) -> dict[str, Any]:
+    observed_at = provider.get("last_checked_at")
+    result = {"state": "unknown", "observed_at": observed_at, "threshold_minutes": stale_after_minutes}
+    if not observed_at:
+        return result
+    try:
+        parsed = datetime.fromisoformat(str(observed_at).replace("Z", "+00:00"))
+        age = max(0.0, (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds())
+    except (TypeError, ValueError):
+        return result
+    result["age_seconds"] = int(age)
+    result["state"] = "stale" if age > stale_after_minutes * 60 else "current"
+    return result
+
+
 def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, stale_after_minutes: int = 30, write: bool = True) -> dict[str, Any]:
     root_path = _root(root)
     provider_summary = generate_provider_health_summary(root=root_path, write=True)
@@ -63,6 +79,7 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
         item = dict(provider)
         item["capacity_kind"] = _provider_kind(item)
         item["fuel_gauge"] = _fuel_gauge(item)
+        item["engineering_provider_capacity"] = {"index": item["fuel_gauge"].get("percent"), "state": item["capacity_state"], "basis": item["fuel_gauge"].get("basis"), "freshness": _freshness(item, stale_after_minutes=stale_after_minutes)}
         providers.append(item)
         if item["capacity_kind"] == "cloud_codex_seat":
             cloud_seats.append(item)
@@ -101,6 +118,7 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
         "providers": providers,
         "workers": workers,
         "source_artifacts": ["runtime/providers/health/status/summary.json", "runtime/workers/worker_runtime_monitor.json"],
+        "freshness_contract": {"provider_observation_stale_after_minutes": stale_after_minutes, "unknown_without_observation": True},
         "office_install_handoff": {"dashboard_json": str(RUNTIME_JSON), "dashboard_markdown": str(RUNTIME_MD), "operator_handoff": str(OFFICE_HANDOFF_MD)},
     }
     if write:
@@ -115,12 +133,14 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
 
 def format_engineering_capacity_dashboard(payload: dict[str, Any]) -> str:
     s = payload.get("summary", {})
-    lines = ["# Engineering Capacity Runtime Dashboard", "", f"Generated: {payload.get('generated_at')}", "", "Advisory only: this dashboard does not launch workers, consume Codex seats, or schedule work.", "", "## Summary", f"- Providers observed: {s.get('provider_count', 0)}", f"- Cloud Codex seats: {s.get('cloud_codex_seat_count', 0)}", f"- Constrained Cloud Codex seats: {s.get('constrained_cloud_codex_seat_count', 0)}", f"- Local worker providers: {s.get('local_worker_provider_count', 0)}", f"- Workers observed: {s.get('worker_count', 0)}", f"- Idle workers: {s.get('idle_worker_count', 0)}", f"- Blocked workers: {s.get('blocked_worker_count', 0)}", f"- Worker warnings: {s.get('worker_warning_count', 0)}", f"- Recommended next action: {s.get('recommended_next_action')}", "", "## Cloud Codex Seat Fuel Gauges"]
-    if not payload.get("cloud_codex_seats"):
-        lines.append("- No cloud Codex seat provider evidence found.")
-    for p in payload.get("cloud_codex_seats") or []:
-        gauge = p.get("fuel_gauge") or {}
-        lines.append(f"- {p.get('provider_id')}: {p.get('health_status')} / {p.get('capacity_state')}; fuel={gauge.get('percent') if gauge.get('percent') is not None else 'unknown'}%; queue={p.get('queue_depth')}")
+    lines = ["# Engineering Provider Capacity Runtime Dashboard", "", f"Generated: {payload.get('generated_at')}", "", "Engineering Provider Capacity is an advisory provider-availability index. It is not physical GPU utilization, GPU capacity, or an Estate-wide composite resource percentage.", "", "## Summary", f"- Providers observed: {s.get('provider_count', 0)}", f"- Providers with Codex capacity: {s.get('cloud_codex_seat_count', 0)}", f"- Constrained providers: {s.get('constrained_cloud_codex_seat_count', 0)}", f"- Local worker providers: {s.get('local_worker_provider_count', 0)}", f"- Workers observed: {s.get('worker_count', 0)}", f"- Idle workers: {s.get('idle_worker_count', 0)}", f"- Blocked workers: {s.get('blocked_worker_count', 0)}", f"- Worker warnings: {s.get('worker_warning_count', 0)}", f"- Recommended next action: {s.get('recommended_next_action')}", "", "## Engineering Provider Capacity"]
+    if not payload.get("providers"):
+        lines.append("- No provider evidence found.")
+    for p in payload.get("providers") or []:
+        capacity = p.get("engineering_provider_capacity") or {}
+        freshness = capacity.get("freshness") or {}
+        index = capacity.get("index")
+        lines.append(f"- {p.get('provider_id')}: index={index if index is not None else 'unknown'}/100; state={capacity.get('state')}; freshness={freshness.get('state')}; observed={freshness.get('observed_at') or 'unknown'}; queue={p.get('queue_depth')}")
     lines += ["", "## Local Worker Runtime"]
     if not payload.get("workers"):
         lines.append("- No worker runtime evidence found.")

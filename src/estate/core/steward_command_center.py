@@ -29,6 +29,7 @@ from estate.core.steward_attention import aggregate_attention
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
+from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard
 from estate.core.steward_annunciator import VISUAL_PROJECTION_VERSION
 from estate.core.office_operational_activity import load_office_operational_activity
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
@@ -1090,6 +1091,7 @@ def generate_command_center(root=None, write=True, *, fast_start=False):
         "resident_conversations_workspace": build_resident_conversations_workspace(root),
         "resident_task_board": {"available": True, "path": "runtime/office/steward_participant_board.json", "kind": "office_resident_task_board", "data": (write_resident_task_board(root)["board"] if write else build_resident_task_board(root))},
         "ai_services_models": build_steward_ai_services_panel(root),
+        "engineering_capacity": (_read_artifact(root, ["runtime/engineering_capacity/dashboard.json"]) if fast_start else {"available": True, "path": "runtime/engineering_capacity/dashboard.json", "kind": "engineering_provider_capacity", "data": generate_engineering_capacity_dashboard(root=root, write=write)}),
         "steward_awareness_runtime": generate_steward_awareness_runtime(root=root, write=write),
         "steward_recall_operations": _build_steward_recall_operations(root),
         "operations_notification_center": {"available": True, "path": "runtime/notifications/operations_notification_center.json", "kind": "json", "data": generate_operations_notification_center(root=root, write=write)},
@@ -1272,6 +1274,7 @@ def _office_operational_command_dashboard(root, panels):
     merge = _first_dict((panels.get("merge_discovery") or {}).get("data"))
     post_merge = _first_dict((panels.get("post_merge_audit") or {}).get("data"))
     ai_services = _first_dict((panels.get("ai_services_models") or {}).get("data"))
+    engineering_capacity = _first_dict((panels.get("engineering_capacity") or {}).get("data"))
     execution = _execution_control_panel(root)
 
     sections = pipeline.get("sections") or {}
@@ -1325,7 +1328,7 @@ def _office_operational_command_dashboard(root, panels):
         "exceptions_requiring_attention": len(exceptions),
     }
     filters = {"repository": sorted({r.get("repository") for r in repositories if r.get("repository")}), "department": sorted(dept_counts), "campaign": sorted({i.get("work_package_id") for i in active_items if i.get("work_package_id")}), "severity": sorted({str(e.get("severity") or e.get("priority") or "normal") for e in exceptions}), "age": ["<24h", "1-7d", ">7d", "unknown"]}
-    return {"available": True, "path": "runtime/steward/command_center.html#operational-dashboard", "kind": "office_operational_command_dashboard", "data": {"summary": summary, "filters": filters, "exceptions": exceptions[:25], "repositories": repositories, "department_commitments": dept_counts, "campaigns": active_items[:25], "provider_warnings": provider_warnings, "evidence_sources": {k: (panels.get(k) or {}).get("path") for k in ["operations_runtime","background_operations","traffic_controller_panel","operational_activity","work_package_pipeline","office_personnel_directory","validation_health_dashboard","post_merge_audit","merge_discovery","ai_services_models"]}, "classification": "Estate Internal summaries only; drill-down exposes local artifact paths, not secrets.", "authority_boundaries": ["operational progress", "validation evidence", "institutional acceptance remain distinct", "no automatic acceptance or provider bypass"]}}
+    return {"available": True, "path": "runtime/steward/command_center.html#operational-dashboard", "kind": "office_operational_command_dashboard", "data": {"summary": summary, "filters": filters, "exceptions": exceptions[:25], "repositories": repositories, "department_commitments": dept_counts, "campaigns": active_items[:25], "provider_warnings": provider_warnings, "engineering_provider_capacity": engineering_capacity, "evidence_sources": {k: (panels.get(k) or {}).get("path") for k in ["operations_runtime","background_operations","traffic_controller_panel","operational_activity","work_package_pipeline","office_personnel_directory","validation_health_dashboard","post_merge_audit","merge_discovery","ai_services_models","engineering_capacity"]}, "classification": "Estate Internal summaries only; drill-down exposes local artifact paths, not secrets.", "authority_boundaries": ["operational progress", "validation evidence", "institutional acceptance remain distinct", "no automatic acceptance or provider bypass"]}}
 
 def _office_operational_command_dashboard_html(artifact):
     if not artifact.get("available"):
@@ -1340,7 +1343,19 @@ def _office_operational_command_dashboard_html(artifact):
     depts = "".join(f"<tr><td>{html.escape(str(k))}</td><td>{html.escape(str(v))}</td></tr>" for k,v in (data.get("department_commitments") or {}).items()) or "<tr><td colspan='2'>No department commitments found.</td></tr>"
     campaigns = "".join(f"<tr><td>{html.escape(str(c.get('work_package_id')))}</td><td>{html.escape(str(c.get('state')))}</td><td>{html.escape(str(c.get('owner')))}</td><td>{_artifact_link(c.get('path'))}</td></tr>" for c in data.get("campaigns") or [])
     sources = "".join(f"<li>{html.escape(str(k))}: {_artifact_link(v)}</li>" for k,v in (data.get("evidence_sources") or {}).items())
-    return f"<section class='office-operational-dashboard'><p>Executive command dashboard refreshed from durable runtime artifacts. It separates operational progress, validation evidence, and institutional acceptance.</p><div class='mailbox-kpis'>{kpis}</div><h3>Filters</h3><div class='settings-grid'>{filter_html}</div><h3>Exceptions requiring Steward attention</h3><table><thead><tr><th>Severity</th><th>Item</th><th>Evidence</th><th>Control</th></tr></thead><tbody>{ex_rows}</tbody></table><h3>Repository targets</h3><table><tbody>{repos}</tbody></table><h3>Department commitments</h3><table><tbody>{depts}</tbody></table><h3>Campaign progress</h3><table><tbody>{campaigns}</tbody></table><h3>Provider warnings and recovery</h3><ul>{''.join(f'<li>{html.escape(str(w))}</li>' for w in data.get('provider_warnings') or ['No provider capacity warnings found.'])}</ul><p class='source'>{html.escape(str(data.get('classification')))} Boundaries: {html.escape('; '.join(data.get('authority_boundaries') or []))}</p><details><summary>Canonical evidence sources</summary><ul>{sources}</ul></details></section>"
+    capacity = data.get("engineering_provider_capacity") or {}
+    provider_rows = []
+    for provider in capacity.get("providers") or []:
+        item = provider.get("engineering_provider_capacity") or {}
+        freshness = item.get("freshness") or {}
+        value = item.get("index")
+        value_text = f"{value}/100" if isinstance(value, (int, float)) else "unknown / 100"
+        bar = f"<progress max='100' value='{html.escape(str(value))}'>{html.escape(str(value))}</progress>" if isinstance(value, (int, float)) else "<span class='placeholder'>No numeric evidence</span>"
+        provider_rows.append(f"<tr><td>{html.escape(str(provider.get('display_name') or provider.get('provider_id') or 'unknown'))}<br><span class='source'>{html.escape(str(provider.get('provider_id') or ''))}</span></td><td>{bar}<br><strong>{html.escape(value_text)}</strong></td><td>{html.escape(str(item.get('state') or 'unknown'))}</td><td>{html.escape(str(freshness.get('state') or 'unknown'))}<br><span class='source'>observed={html.escape(str(freshness.get('observed_at') or 'unknown'))}</span></td></tr>")
+    capacity_html = "<section class='pipeline-section engineering-provider-capacity'><h3>Engineering Provider Capacity</h3><p>Advisory provider-availability index (0–100). This is not physical GPU capacity or an Estate-wide resource percentage.</p>"
+    capacity_html += "<table><thead><tr><th>Provider</th><th>Capacity index</th><th>Provider state</th><th>Freshness / observation</th></tr></thead><tbody>" + ("".join(provider_rows) or "<tr><td colspan='4'>Provider capacity evidence unavailable.</td></tr>") + "</tbody></table>"
+    capacity_html += f"<p class='source'>Source: {_artifact_link((data.get('evidence_sources') or {}).get('engineering_capacity'))}; stale after {html.escape(str((capacity.get('freshness_contract') or {}).get('provider_observation_stale_after_minutes', 'unknown')))} minutes.</p></section>"
+    return f"<section class='office-operational-dashboard'><p>Executive command dashboard refreshed from durable runtime artifacts. It separates operational progress, validation evidence, and institutional acceptance.</p><div class='mailbox-kpis'>{kpis}</div>{capacity_html}<h3>Filters</h3><div class='settings-grid'>{filter_html}</div><h3>Exceptions requiring Steward attention</h3><table><thead><tr><th>Severity</th><th>Item</th><th>Evidence</th><th>Control</th></tr></thead><tbody>{ex_rows}</tbody></table><h3>Repository targets</h3><table><tbody>{repos}</tbody></table><h3>Department commitments</h3><table><tbody>{depts}</tbody></table><h3>Campaign progress</h3><table><tbody>{campaigns}</tbody></table><h3>Provider warnings and recovery</h3><ul>{''.join(f'<li>{html.escape(str(w))}</li>' for w in data.get('provider_warnings') or ['No provider capacity warnings found.'])}</ul><p class='source'>{html.escape(str(data.get('classification')))} Boundaries: {html.escape('; '.join(data.get('authority_boundaries') or []))}</p><details><summary>Canonical evidence sources</summary><ul>{sources}</ul></details></section>"
 
 def _placeholder_panel(panel_id, title, description, source="future Office package"):
     return {"available": False, "path": source, "kind": "placeholder", "panel_id": panel_id, "title": title, "placeholder": description}
@@ -3155,7 +3170,7 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
     def refresh_payload():
         nonlocal payload_cache, html_cache
         try:
-            refreshed = generate_command_center(root=root, write=True)
+            refreshed = generate_command_center(root=root, write=True, fast_start=True)
             payload_cache = refreshed
             html_cache = render_command_center_html(refreshed).encode("utf-8")
         except Exception:

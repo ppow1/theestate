@@ -1,6 +1,6 @@
 # Engineering Capacity Runtime
 
-The Engineering Capacity Runtime combines provider health/capacity evidence with local worker runtime evidence into an Office-readable dashboard.
+The Engineering Capacity Runtime combines provider health/capacity evidence with local worker runtime evidence into an Office-readable dashboard. Engineering Provider Capacity is an advisory provider-availability index. It is not physical GPU utilization, GPU capacity, or an Estate-wide composite resource percentage; RTX 4090 and Tesla P100 records are outside this calculation.
 
 ## Artifacts
 
@@ -15,6 +15,8 @@ python -m estate.cli.main engineering-capacity-dashboard
 ```
 
 The runtime is advisory only. It does not launch workers, consume cloud Codex seats, or schedule work.
+
+Provider freshness is evaluated from the latest provider health/capacity observation (`last_checked_at`). The default threshold is 30 minutes through `stale_after_minutes`; older evidence is shown as `stale`, while missing or invalid observation time is `unknown`. A stale numeric index remains visible with its stale state; missing evidence remains unknown rather than becoming 0. Each provider is rendered separately. When both are available, `quota_remaining / max_jobs` overrides the state mapping.
 
 ## Verified Codex Seat-Capacity Evidence — 2026-07-12
 
