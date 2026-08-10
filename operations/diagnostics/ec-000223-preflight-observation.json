@@ -1,0 +1,18 @@
+{
+  "estate_change": "EC-000223",
+  "utility": "tools/gpu-parallel-preflight.ps1",
+  "observation_type": "basic_read_only_health_gate",
+  "preflight_invoked": false,
+  "preflight_json": null,
+  "preflight_exit_code": null,
+  "status": "GPU_HEALTH_FAILURE",
+  "reasons": [
+    "RTX 4090 observed at PCI 00000000:06:00.0; required 00000000:07:00.0",
+    "Tesla P100 required UUID absent from NVML",
+    "Tesla P100 matching PnP device not observed"
+  ],
+  "workload_launched": false,
+  "dual_gpu_acceptance": "BLOCKED",
+  "deterministic_tests": "10 passed",
+  "powershell_parser": "PASS"
+}

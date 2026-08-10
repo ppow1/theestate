@@ -1,0 +1,145 @@
+import json
+import subprocess
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "tools" / "gpu-parallel-preflight.ps1"
+P100 = "GPU-6785b322-899d-8eec-e817-31d83279a414"
+RTX = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+
+
+def _smi(p100_free=12000, rtx_free=16000, p100_util=0, rtx_util=0, p100_power=34, rtx_power=35, p100_name="Tesla P100-PCIE-16GB", rtx_name="NVIDIA GeForce RTX 4090", p100_pci="00000000:04:00.0", rtx_pci="00000000:07:00.0", p100_uuid=P100, rtx_uuid=RTX):
+    return "\n".join(
+        [
+            f"{rtx_uuid},{rtx_name},{rtx_pci},{24564-rtx_free},{rtx_free},24564,{rtx_util},42,{rtx_power}",
+            f"{p100_uuid},{p100_name},{p100_pci},{16384-p100_free},{p100_free},16384,{p100_util},42,{p100_power}",
+        ]
+    )
+
+
+def _pnp(p100_status="OK", rtx_status="OK"):
+    return [
+        {"name": "NVIDIA GeForce RTX 4090", "status": rtx_status, "problem_code": 0},
+        {"name": "Tesla P100-PCIE-16GB", "status": p100_status, "problem_code": 0},
+    ]
+
+
+def _run(tmp_path, smi=None, apps="", pnp=None, processes=None, ports=None):
+    pnp_path = tmp_path / "pnp.json"
+    process_path = tmp_path / "processes.json"
+    port_path = tmp_path / "ports.json"
+    pnp_path.write_text(json.dumps(_pnp() if pnp is None else pnp), encoding="utf-8")
+    process_path.write_text(json.dumps([] if processes is None else processes), encoding="utf-8")
+    port_path.write_text(json.dumps([] if ports is None else ports), encoding="utf-8")
+    command = [
+        "pwsh",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        str(SCRIPT),
+        "-Json",
+        "-NvidiaSmiOutput",
+        smi or _smi(),
+        "-ComputeAppsOutput",
+        apps,
+        "-PnpOutput",
+        str(pnp_path),
+        "-ProcessFixture",
+        str(process_path),
+        "-PortFixture",
+        str(port_path),
+        "-RepoRoot",
+        str(ROOT),
+    ]
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    payload = json.loads(result.stdout)
+    return result.returncode, payload
+
+
+def test_healthy_idle_fixture_passes(tmp_path):
+    code, result = _run(tmp_path)
+    assert code == 0
+    assert result["status"] == "PASS"
+    assert all(item["ready"] for item in result["resources"])
+
+
+def test_capacity_floor_blocks_each_gpu(tmp_path):
+    code, result = _run(tmp_path, smi=_smi(rtx_free=8191))
+    assert code == 2
+    assert result["status"] == "PRECHECK_BLOCKED"
+    code, result = _run(tmp_path, smi=_smi(p100_free=4095))
+    assert code == 2
+    assert result["status"] == "PRECHECK_BLOCKED"
+
+
+def test_missing_wrong_uuid_and_wrong_pci_are_health_failures(tmp_path):
+    missing = _smi().splitlines()[0]
+    assert _run(tmp_path, smi=missing)[1]["status"] == "GPU_HEALTH_FAILURE"
+    assert _run(tmp_path, smi=_smi(rtx_uuid="GPU-wrong"))[1]["status"] == "GPU_HEALTH_FAILURE"
+    assert _run(tmp_path, smi=_smi(p100_pci="00000000:09:00.0"))[1]["status"] == "GPU_HEALTH_FAILURE"
+
+
+def test_pnp_and_malformed_output_fail_safely(tmp_path):
+    code, result = _run(tmp_path, pnp=_pnp(p100_status="Error"))
+    assert code == 3
+    assert result["status"] == "GPU_HEALTH_FAILURE"
+    code, result = _run(tmp_path, smi="not,csv")
+    assert code == 4
+    assert result["status"] == "PREFLIGHT_TOOL_ERROR"
+
+
+def test_external_material_compute_blocks(tmp_path):
+    apps = f"15868, C:\\ollama\\llama-server.exe, 8706, {P100}"
+    code, result = _run(tmp_path, smi=_smi(p100_util=53, p100_power=98), apps=apps, processes=[{"pid": 15868, "name": "llama-server.exe", "executable_path": "C:\\ollama\\llama-server.exe", "command_line": "llama-server.exe", "parent_pid": 1}])
+    assert code == 2
+    assert result["status"] == "PRECHECK_BLOCKED"
+    p100 = next(item for item in result["resources"] if item["gpu_uuid"] == P100)
+    assert p100["material_external_load"] is True
+
+
+def test_resident_vram_without_material_compute_is_allowed(tmp_path):
+    apps = f"15868, C:\\ollama\\llama-server.exe, 8706, {P100}"
+    code, result = _run(tmp_path, smi=_smi(p100_util=0, p100_power=34), apps=apps, processes=[{"pid": 15868, "name": "llama-server.exe", "executable_path": "C:\\ollama\\llama-server.exe", "command_line": "llama-server.exe", "parent_pid": 1}])
+    assert code == 0
+    assert result["status"] == "PASS"
+
+
+def test_unknown_compute_process_ownership_blocks_conservatively(tmp_path):
+    apps = f"15868, unknown-worker.exe, 128, {P100}"
+    code, result = _run(tmp_path, apps=apps, processes=[])
+    assert code == 2
+    assert result["status"] == "PRECHECK_BLOCKED"
+    p100 = next(item for item in result["resources"] if item["gpu_uuid"] == P100)
+    assert p100["unknown_compute_ownership"] is True
+    assert p100["compute_processes"][0]["ownership"] == "UNKNOWN"
+
+
+def test_external_and_unknown_lane_ports_block(tmp_path):
+    external = [{"port": 12409, "pid": 77}]
+    processes = [{"pid": 77, "name": "ollama.exe", "executable_path": "C:\\ollama\\ollama.exe", "command_line": "ollama.exe serve", "parent_pid": 1}]
+    assert _run(tmp_path, ports=external, processes=processes)[1]["status"] == "PRECHECK_BLOCKED"
+    unknown = [{"port": 12100, "pid": 78}]
+    assert _run(tmp_path, ports=unknown, processes=[])[1]["status"] == "PRECHECK_BLOCKED"
+
+
+def test_expected_estate_lane_port_is_allowed(tmp_path):
+    processes = [{"pid": 99, "name": "python.exe", "executable_path": str(ROOT / "python.exe"), "command_line": f"python {ROOT} --lane qwen.local.text.4090", "parent_pid": 1}]
+    code, result = _run(tmp_path, ports=[{"port": 12409, "pid": 99}], processes=processes)
+    assert code == 0
+    assert result["status"] == "PASS"
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    assert rtx["lane_port_owner"]["ownership"] == "ESTATE_OWNED"
+
+
+def test_json_contract_and_script_is_read_only():
+    source = SCRIPT.read_text(encoding="utf-8").lower()
+    for forbidden in (
+        "stop-process", "taskkill", "stop-service", "restart-service",
+        "ollama unload", "nvidia-smi.*--gpu-reset", "disable-pnpdevice",
+        "enable-pnpdevice", "restart-computer", "stop-computer", "shutdown",
+        "pnputil", "devcon", "torch", "diffusers", "llama-server.*--prompt",
+    ):
+        assert forbidden not in source
+    assert all(token in source for token in ('status', 'resources', 'exit_code', 'uuid', 'pci_bus', 'lane_port'))
