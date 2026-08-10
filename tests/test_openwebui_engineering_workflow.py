@@ -1,6 +1,6 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
 from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, _qwen_minimum_safe_vram_mib
-from estate.core.resident_gateway import _bounded_local_text_content
+from estate.core.resident_gateway import _bounded_local_text_content, _grace_runtime_operation_response
 from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
 
@@ -21,6 +21,13 @@ def test_bounded_text_intent_is_explicit_and_ordinary_chat_is_not_executable():
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, LIVE_BOUNDED_PROMPT) == {"state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"}
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, what is the Estate status?")["state"] == "conversation_only"
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run something locally.")["state"] == "execution_blocked"
+
+
+def test_bounded_prompt_with_runtime_keywords_bypasses_read_only_runtime_layer():
+    prompt = "Grace, run a small bounded local text task on the governed P100 compute lane: write one short sentence about a safe operational checkpoint; include no secrets and perform no hardware actions."
+    payload = {"model": "estate/grace", "messages": [{"role": "user", "content": prompt}]}
+    assert detect_bounded_local_text_intent(payload, prompt)["state"] == "execution_requested"
+    assert _grace_runtime_operation_response(payload, root=".") is None
 
 
 def test_qwen_model_specific_vram_floor_fails_closed_when_missing(tmp_path):

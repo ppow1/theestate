@@ -30,10 +30,16 @@
   "grace_acceptance": {
     "submitted": true,
     "status": "blocked",
-    "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810020425856-9ae00508",
-    "visible_result": "RUNTIME_UNAVAILABLE",
-    "root_cause": "candidate resident Gateway inherited active Grace runtime URL 127.0.0.1:8766 instead of green 127.0.0.1:8767",
-    "correction": "controller injects ESTATE_GRACE_MOMENTUM_URL from selected blue/green slot",
+    "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810022309077-c275cc98",
+    "visible_result": "AUTHORITATIVE_RESULT (runtime availability; no active objective)",
+    "historical_prior_attempt": {
+      "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810020425856-9ae00508",
+      "visible_result": "RUNTIME_UNAVAILABLE",
+      "root_cause": "candidate resident Gateway inherited active Grace runtime URL 127.0.0.1:8766 instead of green 127.0.0.1:8767"
+    },
+    "root_cause": "explicit bounded intent was classified correctly but the read-only Grace runtime compatibility layer intercepted the prompt because it contained the ordinary words checkpoint and provider",
+    "correction": "explicit execution_requested bounded intent now takes precedence over read-only runtime keyword inference; green slot URL injection remains enforced",
+    "governed_artifacts_created": false,
     "retry_submitted": false
   },
   "health": {

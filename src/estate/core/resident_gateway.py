@@ -100,6 +100,13 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     # operational terms such as "dispatch" or "objective".
     if detect_engineering_assignment_command(payload, text):
         return None
+    # Explicit bounded execution is governed by the workflow below. It must
+    # take precedence over this read-only compatibility layer even when the
+    # request mentions ordinary operational words such as "checkpoint" or
+    # "provider".
+    bounded_intent = detect_bounded_local_text_intent(payload, text)
+    if bounded_intent.get("state") == "execution_requested":
+        return None
     explicit_runtime_operations = (
         "list_grace_runtime_operations",
         "get_runtime_readiness",

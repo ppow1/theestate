@@ -63,6 +63,14 @@ def test_process_command_injects_matching_grace_runtime_slot_url(tmp_path):
     assert environment["ESTATE_GRACE_MOMENTUM_URL"] == "http://127.0.0.1:8767"
 
 
+def test_process_command_injects_blue_grace_runtime_slot_url(tmp_path):
+    value = config(tmp_path)
+    value["open_webui"]["secret_key_file"] = str(tmp_path / "secret")
+    (tmp_path / "secret").write_text("test-secret", encoding="utf-8")
+    _, _, _, environment = runtime._process_command(value, runtime.SLOTS["blue"])
+    assert environment["ESTATE_GRACE_MOMENTUM_URL"] == "http://127.0.0.1:8766"
+
+
 def test_gateway_semantic_readiness_requires_grace(monkeypatch, tmp_path):
     value = config(tmp_path)
     monkeypatch.setattr(runtime, "_http_json", lambda url: (200, {"data": [{"id": "estate/grace", "estate": {"resident_id": "grace", "resident_gateway_capable": True, "privileged_actions_enabled": False}}]}))
