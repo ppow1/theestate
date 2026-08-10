@@ -6,4 +6,4 @@ param(
 
 $ErrorActionPreference = 'Stop'
 # Informational only: this action only focuses the existing Office dashboard.
-Start-Process ($OfficeUrl.TrimEnd('/') + '/#operational-dashboard&gpu=' + $Gpu.ToLowerInvariant())
+Start-Process ($OfficeUrl.TrimEnd('/') + '/#operational-dashboard?gpu=' + $Gpu.ToLowerInvariant())
