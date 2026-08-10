@@ -663,6 +663,18 @@ def test_steward_recall_operations_view_handles_no_recalls_and_missing_artifacts
     assert payload["status_bar"]["active_recall_count"] == 0
     assert "No recall requests were found in available local artifacts." in html
     assert "Missing recall artifact" in html
+    assert "gotify_delivery" not in recall_panel["data"]["missing_sources"]
+    assert recall_panel["data"]["optional_missing_sources"] == ["gotify_delivery"]
+    assert "Optional recall delivery unavailable (not commissioned): gotify_delivery" in html
+
+
+def test_recall_required_sources_still_report_missing_without_gotify(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    data = payload["panels"]["steward_recall_operations"]["data"]
+
+    assert "recall_audit" in data["missing_sources"]
+    assert "notification_router" in data["missing_sources"]
+    assert "gotify_delivery" not in data["missing_sources"]
 
 
 def test_alfred_chat_ui_and_surface_versions_are_visible(tmp_path):

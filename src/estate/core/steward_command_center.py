@@ -992,9 +992,10 @@ def _build_steward_recall_operations(root):
 
     recall_list = sorted(recalls.values(), key=lambda item: str(item.get("timestamp") or ""), reverse=True)
     active_count = sum(1 for item in recall_list if item.get("active"))
-    missing_sources = [name for name, artifact in sources.items() if not artifact.get("available")]
+    missing_sources = [name for name, artifact in sources.items() if name != "gotify_delivery" and not artifact.get("available")]
+    optional_missing_sources = [name for name, artifact in sources.items() if name == "gotify_delivery" and not artifact.get("available")]
     available = True
-    return {"available": available, "path": "runtime/audit/recall_audit_log.json; runtime/notifications/notification_router_report.json", "kind": "steward_recall_operations", "placeholder": None, "data": {"summary": {"recall_count": len(recall_list), "active_recall_count": active_count, "missing_source_count": len(missing_sources)}, "recalls": recall_list, "missing_sources": missing_sources, "sources": {name: _source_status(artifact) for name, artifact in sources.items()}, "constraints": {"does_not_send_recalls": True, "does_not_approve_recalls": True, "does_not_bypass_alfred": True}}}
+    return {"available": available, "path": "runtime/audit/recall_audit_log.json; runtime/notifications/notification_router_report.json", "kind": "steward_recall_operations", "placeholder": None, "data": {"summary": {"recall_count": len(recall_list), "active_recall_count": active_count, "missing_source_count": len(missing_sources), "optional_missing_source_count": len(optional_missing_sources)}, "recalls": recall_list, "missing_sources": missing_sources, "optional_missing_sources": optional_missing_sources, "sources": {name: _source_status(artifact) for name, artifact in sources.items()}, "constraints": {"does_not_send_recalls": True, "does_not_approve_recalls": True, "does_not_bypass_alfred": True}}}
 
 
 def _operations_control_surface_panel(root, *, fast_start=False):
@@ -2107,6 +2108,8 @@ def _steward_recall_operations_html(artifact):
         out.append("</tbody></table>")
     if data.get("missing_sources"):
         out.append(f"<p class='placeholder'>Missing recall artifact(s): {html.escape(', '.join(data.get('missing_sources')))}</p>")
+    if data.get("optional_missing_sources"):
+        out.append(f"<p class='placeholder'>Optional recall delivery unavailable (not commissioned): {html.escape(', '.join(data.get('optional_missing_sources')))}</p>")
     sources = data.get("sources") or {}
     out.append("<p class='source'>Sources: " + "; ".join(f"{html.escape(name)}: {html.escape(str((src or {}).get('path') or (src or {}).get('placeholder') or 'not available'))}" for name, src in sources.items()) + ". Alfred remains the recall authority path; this panel is read-only.</p></div>")
     return "".join(out)
