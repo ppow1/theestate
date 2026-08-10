@@ -16,7 +16,7 @@ PROFILE_VERSION = 1
 DEFAULT_PROFILE = "mission-control"
 AVAILABLE_PANELS = {
     "home", "mission-control", "validation", "roadmap", "projects", "work-packages",
-    "mailboxes", "recalls", "daily-board", "parking", "search", "settings", "about",
+    "mailboxes", "recalls", "daily-board", "operational-dashboard", "parking", "search", "settings", "about",
     "alfred", "helen", "resident-conversations",
 }
 

@@ -61,6 +61,7 @@ OFFICE_NAVIGATION = [
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
+    {"id": "operational-dashboard", "label": "Operational Command", "panel": "office_operational_command_dashboard", "tab": "operational-dashboard"},
     {"id": "operational-activity", "label": "Operational Activity", "panel": "operational_activity", "tab": "operational-activity"},
     {"id": "execution-control", "label": "Execution Control", "panel": "execution_control", "tab": "execution-control"},
     {"id": "active-projects", "label": "Active Projects", "panel": "work_package_pipeline", "tab": "projects"},
@@ -86,6 +87,7 @@ OFFICE_TABS = [
     {"id": "resident-conversations", "label": "Resident Conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models"},
     {"id": "daily-board", "label": "Daily Board"},
+    {"id": "operational-dashboard", "label": "Operational Command"},
     {"id": "operational-activity", "label": "Operational Activity"},
     {"id": "execution-control", "label": "Execution Control"},
     {"id": "projects", "label": "Projects"},
@@ -2776,8 +2778,6 @@ def render_command_center_html(payload):
         active_tab = "settings" if "settings" in visible_tabs else (tab_bodies[0][0] if tab_bodies else "home")
     workspace = "".join(_workspace_section(tab_id, label, body, active=(tab_id == active_tab)) for i, (tab_id, label, body) in enumerate(tab_bodies))
     auxiliary_panels = ""
-    if p.get("office_operational_command_dashboard", {}).get("available"):
-        auxiliary_panels += "<section hidden><h2>Office Operational Command Dashboard</h2>" + _office_operational_command_dashboard_html(p.get("office_operational_command_dashboard", {})) + "</section>"
     if p.get("office_personnel_directory", {}).get("available"):
         auxiliary_panels += "<section hidden>" + _office_personnel_directory_html(p.get("office_personnel_directory", {})) + "</section>"
     settings_workspace = ((payload.get("settings_manager") or {}).get("settings") or {}).get("workspace", {})

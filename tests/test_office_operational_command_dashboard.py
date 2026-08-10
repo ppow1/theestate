@@ -89,3 +89,22 @@ def test_operational_dashboard_renders_engineering_provider_capacity_from_runtim
     assert "Engineering Provider Capacity" in html
     assert "codex.execution.cli" in html
     assert "not physical GPU capacity" in html
+
+
+def test_operational_command_is_reachable_without_merging_operational_activity(tmp_path):
+    payload = generate_command_center(tmp_path, write=False)
+    navigation = {item["id"]: item for item in payload["navigation"]["items"]}
+    tabs = {item["id"]: item for item in payload["tabs"]}
+    assert navigation["operational-dashboard"]["label"] == "Operational Command"
+    assert navigation["operational-dashboard"]["panel"] == "office_operational_command_dashboard"
+    assert tabs["operational-dashboard"]["label"] == "Operational Command"
+    assert "operational-dashboard" in {item["id"] for item in payload["tabs"]}
+    assert "operational-activity" in {item["id"] for item in payload["tabs"]}
+
+    html = render_command_center_html(payload)
+    assert "data-tab='operational-dashboard'" in html
+    assert "id='workspace-operational-dashboard'" in html
+    assert "id='workspace-operational-activity'" in html
+    assert "Office Operational Command Dashboard" in html
+    assert html.count("Engineering Provider Capacity") == 1
+    assert "#operational-dashboard" in html
