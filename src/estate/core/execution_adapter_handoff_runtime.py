@@ -142,7 +142,7 @@ def _validate_dispatch_metadata_schema(root: Path, metadata: dict[str, Any]) -> 
         if not engineering_dir.exists():
             engineering_dir = Path(__file__).resolve().parents[3] / "schemas/engineering"
         resources = []
-        for name, directory in (("commission_ptm_evidence_v1.schema.json", engineering_dir), ("commission_execution_authority_v1.schema.json", engineering_dir), ("qwen_local_text_execution_extension_v1.schema.json", schema_path.parent.parent / "providers")):
+        for name, directory in (("commission_ptm_evidence_v1.schema.json", engineering_dir), ("commission_execution_authority_v1.schema.json", engineering_dir), ("qwen_local_text_execution_extension_v1.schema.json", schema_path.parent.parent / "providers"), ("compute_resource_requirements_v1.schema.json", schema_path.parent.parent)):
             nested = json.loads((directory / name).read_text(encoding="utf-8"))
             resources.append((nested["$id"], Resource.from_contents(nested)))
         registry = Registry().with_resources(resources)

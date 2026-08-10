@@ -1,6 +1,6 @@
 # EC-000222 — P100 governed compute-lane qualification
 
-Status: **Partially Accepted / Grace acceptance blocked after one bounded attempt**
+Status: **Partially Accepted / final live result placement succeeded; authorization persistence correction requires a future governed rerun**
 
 Predecessor: `feature/ec-000221-grace-governed-gpu-placement` at `6842df3dafa949e392f888af28559d1888b419ef`
 Branch: `feature/ec-000222-p100-governed-compute-lane`
@@ -55,5 +55,11 @@ This leaves the Grace/Open WebUI P100 portion unaccepted in this session while p
 The canonical loss point was `_target_lane()` in the bounded Open WebUI workflow: without a symbolic physical-resource selector in the browser message, the Gateway defaulted to the ordinary qwen3:8b/4090 lane. The process environment hint `ESTATE_GOVERNED_LOCAL_TEXT_LANE` was not present in the candidate Gateway and was never a valid substitute for a required physical constraint. The correction recognizes only narrow symbolic P100 language, resolves it through the registered Tesla P100 observation and `qwen.local.text.p100-1` lane, writes the resulting required UUID/resource into objective metadata and the existing Engineering composition, and rejects raw UUIDs, arbitrary lane IDs, and unknown physical selectors.
 
 Deterministic coverage passed for symbolic mapping, raw-placement rejection, no-fallback behavior, objective/Engineering path compatibility, and the existing 4090/P100/router/profile suites. A new live request was not submitted after this correction because the immediate preflight found an unrelated existing RTX 4090 `llama-server` workload at approximately 95% utilization and 340 W. The process was not launched or terminated by EC-000222. The P100 remained present and healthy, but the two-GPU safety baseline was not acceptable for another live attempt.
+
+## Final live P100 result
+
+After the safety baseline returned to a light state, exactly one visible request was submitted at `runtime/evidence/openwebui-operator/openwebui-operator-20260810030011068-c35952b4`. Playwright observed `OPENWEBUI_READY`, reused the machine-local profile, and observed Grace’s completed authoritative response. Objective `grace-obj-4ec15f18f471`, action `grace-act-0362f2ef0bd8`, PTM `res_01KZMSTFMSYN2GDVPD277KMHGY`, Helen `heldet-73c080c964ee`, Engineering commission `engcom-66cb782e81d2`, authorization `engauth-662ba4e13fc5`, reservation `gpu-reservation-grace-obj-4ec15f18f471`, Dispatch `dispatch-b9d17ceede33`, adapter `adapter-dispatch-b9d17ceede33`, and Grace receipt `gracereceipt-87999379541e` were created. The provider receipt is `runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-4ec15f18f471.json`.
+
+Objective, commission, Dispatch, adapter request, allocation, runtime lane, and provider receipt all prove P100 UUID/resource equality. Post-run inspection found that the Engineering authorization’s nested `execution_authority` record did not retain `compute_resource_requirements`; the canonical authority normalizer had dropped that field before authorization persistence. The normalizer and handoff schema registry are now corrected and deterministic coverage passes, but the live authorization record is immutable historical evidence and was not rewritten. Therefore the final status remains partially accepted pending a future authorized rerun; no second live request was submitted in this session.
 
 Office Compute correlation is available through `runtime/execution_activity/current.json` and `runtime/execution_activity/report.md`; the canonical Stream Deck resource projection remains the same multi-GPU projection and exposes the P100 UUID/resource telemetry. Concurrency remains unproven and is the next milestone.

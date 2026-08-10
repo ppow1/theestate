@@ -216,6 +216,8 @@ def _canonical_execution_authority(root: Path, objective_id: str, action_id: str
         "grace_action_id": action_id,
         "prompt_source_record": prompt_source,
     }
+    if isinstance(action_authority.get("compute_resource_requirements"), dict):
+        authority["compute_resource_requirements"] = dict(action_authority["compute_resource_requirements"])
     authority["prompt_source_digest"] = hashlib.sha256(source_path.read_bytes()).hexdigest()
     return authority
 
