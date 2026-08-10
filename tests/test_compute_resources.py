@@ -6,6 +6,8 @@ from estate.core.compute_resources import (
     ComputeResourceObservation,
     ComputeResourceRequirements,
     ComputeReservationLedger,
+    ExpectedGPU,
+    build_gpu_inventory,
     canonical_resource_id,
     classify_observation,
     reconcile_runtime_ordinals,
@@ -39,7 +41,7 @@ def test_missing_identity_and_disappearance_fail_closed():
     classify_observation(device, now="2026-08-09T12:00:10Z")
     req = ComputeResourceRequirements(requires_gpu=True, required_resource_id=device.resource_id)
     result = select_resource([device], req)
-    assert device.health_state == "unavailable"
+    assert device.health_state == "LOST"
     assert result["eligible"] is False
     assert "no fallback" in result["reason"]
 
@@ -47,7 +49,7 @@ def test_missing_identity_and_disappearance_fail_closed():
 def test_stale_and_vram_capacity_are_distinct_from_health():
     device = _device("GPU-low", "P100", free=100)
     classify_observation(device, now="2026-08-09T12:04:00Z", freshness_seconds=30, required_vram_mib=1000)
-    assert device.health_state == "stale"
+    assert device.health_state == "UNKNOWN"
     assert device.capacity_state == "insufficient"
 
 
@@ -83,3 +85,28 @@ def test_office_projection_is_dynamic_for_n_devices():
     assert panel["resource_count"] == 3
     assert {row["nvidia_uuid"] for row in panel["resources"]} == {"GPU-1", "GPU-2", "GPU-3"}
     assert panel["read_only"] is True
+
+
+def test_expected_dual_gpu_inventory_maps_reversed_runtime_ordinals():
+    p100 = _device("GPU-p100", "Tesla P100-PCIE-16GB")
+    rtx = _device("GPU-4090", "NVIDIA GeForce RTX 4090")
+    expected = [ExpectedGPU("GPU-p100", "Tesla P100-PCIE-16GB", "04:00.0"), ExpectedGPU("GPU-4090", "NVIDIA GeForce RTX 4090", "07:00.0")]
+    rows = build_gpu_inventory(expected, [p100, rtx], windows_devices=[{"name": "Tesla P100-PCIE-16GB", "present": True, "problem_code": 0}, {"name": "NVIDIA GeForce RTX 4090", "present": True, "problem_code": 0}], runtime_devices=[{"ordinal": 0, "name": "NVIDIA GeForce RTX 4090"}, {"ordinal": 1, "name": "Tesla P100-PCIE-16GB"}], now="2026-08-09T12:00:10Z")
+    assert [(row.expected_name, row.cuda_index, row.health_state, row.dispatch_allowed) for row in rows] == [("Tesla P100-PCIE-16GB", 1, "HEALTHY", True), ("NVIDIA GeForce RTX 4090", 0, "HEALTHY", True)]
+
+
+def test_missing_nvml_and_windows_phantom_are_lost_independently():
+    expected = [ExpectedGPU("GPU-p100", "Tesla P100-PCIE-16GB", "04:00.0"), ExpectedGPU("GPU-4090", "NVIDIA GeForce RTX 4090", "07:00.0")]
+    rtx = _device("GPU-4090", "NVIDIA GeForce RTX 4090")
+    rows = build_gpu_inventory(expected, [rtx], windows_devices=[{"name": "Tesla P100-PCIE-16GB", "present": False, "problem_code": 45}, {"name": "NVIDIA GeForce RTX 4090", "present": True, "problem_code": 0}], now="2026-08-09T12:00:10Z")
+    assert rows[0].health_state == "LOST" and not rows[0].dispatch_allowed
+    assert rows[1].health_state == "HEALTHY" and rows[1].dispatch_allowed
+
+
+def test_cuda_visibility_and_identity_mismatch_fail_closed_without_reroute():
+    expected = [ExpectedGPU("GPU-p100", "Tesla P100-PCIE-16GB", "04:00.0"), ExpectedGPU("GPU-4090", "NVIDIA GeForce RTX 4090", "07:00.0")]
+    p100 = _device("GPU-p100", "wrong name")
+    rtx = _device("GPU-4090", "NVIDIA GeForce RTX 4090")
+    rows = build_gpu_inventory(expected, [p100, rtx], windows_devices=[{"name": "Tesla P100-PCIE-16GB", "present": True, "problem_code": 0}, {"name": "NVIDIA GeForce RTX 4090", "present": True, "problem_code": 0}], runtime_devices=[{"ordinal": 0, "name": "NVIDIA GeForce RTX 4090"}], now="2026-08-09T12:00:10Z")
+    assert rows[0].health_state == "UNKNOWN" and not rows[0].dispatch_allowed
+    assert rows[1].health_state == "HEALTHY" and rows[1].cuda_index == 0
