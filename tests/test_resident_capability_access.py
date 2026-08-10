@@ -37,13 +37,15 @@ def test_helen_has_workforce_capabilities_without_undeclared_ollama_access():
 
 
 def test_grace_commissioned_capabilities_are_deterministic_and_bounded():
-    first = resolve_resident_capabilities("Grace", requested_tools=["resident_chat", "work_package_draft", "runtime_presence_update"])
-    second = resolve_resident_capabilities("grace", requested_tools=["resident_chat", "work_package_draft", "runtime_presence_update"])
+    first = resolve_resident_capabilities("Grace", requested_tools=["resident_chat", "work_package_draft", "runtime_presence_update", "codex_seat_fuel_read"])
+    second = resolve_resident_capabilities("grace", requested_tools=["resident_chat", "work_package_draft", "runtime_presence_update", "codex_seat_fuel_read"])
     assert first["state"] == "active"
     assert first["declared_capabilities"] == second["declared_capabilities"]
     assert by_tool(first, "resident_chat")["state"] in {APPROVED, APPROVAL_REQUIRED}
     assert by_tool(first, "work_package_draft")["state"] == APPROVAL_REQUIRED
     assert by_tool(first, "runtime_presence_update")["state"] in {APPROVED, APPROVAL_REQUIRED}
+    assert by_tool(first, "codex_seat_fuel_read")["state"] == APPROVED
+    assert by_tool(first, "codex_seat_fuel_read")["operation"] == "read-codex-seat-fuel"
 
 
 def test_unknown_resident_receives_no_implied_access():

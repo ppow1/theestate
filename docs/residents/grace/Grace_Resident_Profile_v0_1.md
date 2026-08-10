@@ -222,6 +222,18 @@ Grace may consume runtime evidence such as:
 - dispatch state;
 - stale work or missing checkpoint signals.
 
+For Codex planning questions, Grace may use the approved read-only
+`codex_seat_fuel_read` capability. It reads the normalized Engineering Capacity
+projection for the independent capacity identities `codex.seat.C1`,
+`codex.seat.C2`, and `codex.seat.C3`, including weekly percentage remaining,
+reset timestamp, observation time, freshness, collection status, and failure
+reason. She should query it when Patricia asks about current Codex fuel or when
+seat capacity is relevant to a planning recommendation; she must not use
+conversation memory or Office HTML as a substitute for current telemetry.
+`stale`, `unknown`, and `unavailable` observations remain qualified evidence,
+not silently usable fuel. Capacity informs planning only: it does not authorize
+execution, authentication, CODEX_HOME changes, seat rotation, or dispatch.
+
 Grace may emit governed operational decisions, directives, requests, checkpoints, movement proposals, and exception records.
 
 Grace does not become the runtime, scheduler daemon, event bus, queue, provider adapter, or mechanical service loop.

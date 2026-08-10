@@ -13,16 +13,19 @@ from pathlib import Path
 from typing import Any
 
 from estate.core.consultation_store import ConsultationStore
+from estate.core.paths import ESTATE_ROOT
 
 
 DEFAULT_DATABASE = Path(r"A:\theestate-data\consultations\consultations.db")
 DEFAULT_CME_STATE = Path(r"A:\theestate-data\chatgpt-mailbox-worker\cme-owner-state.json")
 TERMINAL_TURN_STATES = {"response_received", "resolved", "closed"}
+ENGINEERING_CAPACITY_PATH = Path("runtime/engineering_capacity/dashboard.json")
 
 
 def is_operational_state_query(message: str) -> bool:
     """Conservative boundary for mutable/current Estate state questions."""
     text = str(message or "").lower()
+    codex_fuel = "codex" in text and any(term in text for term in ("fuel", "quota", "capacity", "seat", "reset", "remaining"))
     signals = (
         ("operational" in text and ("status" in text or "state" in text or "memory" in text)),
         ("most recent" in text and "consultation" in text),
@@ -35,13 +38,14 @@ def is_operational_state_query(message: str) -> bool:
         ("currently blocked" in text),
         ("provenance" in text and ("record" in text or "authoritative evidence" in text or "action" in text)),
     )
-    return any(signals)
+    return codex_fuel or any(signals)
 
 
 def classify_operational_request(message: str) -> dict[str, Any]:
     """Classify the small gateway boundary without becoming a general planner."""
     text = str(message or "")
     lower = text.lower()
+    codex_fuel = "codex" in lower and any(term in lower for term in ("fuel", "quota", "capacity", "seat", "reset", "remaining"))
     operational = is_operational_state_query(text)
     composite_signals = (
         "did you" in lower, "actually record" in lower, "authoritative evidence" in lower,
@@ -51,6 +55,8 @@ def classify_operational_request(message: str) -> dict[str, Any]:
         "authoritatively_completed" in lower, "pending_execution" in lower,
         "insufficient_evidence" in lower,
     )
+    if codex_fuel:
+        return {"mode": "direct_authoritative_read", "requires_operational_read": True, "composite": False, "capability": "codex_seat_fuel_read"}
     if not operational:
         return {"mode": "conceptual", "requires_operational_read": False, "composite": False}
     composite = any(composite_signals) or text.count("\n") >= 3
@@ -165,6 +171,44 @@ def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_codex_seat_fuel(*, engineering_capacity_path: str | Path | None = None) -> dict[str, Any]:
+    """Read the existing normalized Codex seat projection without mutation."""
+    path = Path(engineering_capacity_path) if engineering_capacity_path is not None else ESTATE_ROOT / ENGINEERING_CAPACITY_PATH
+    source = str(path).replace("\\", "/")
+    try:
+        dashboard = _read_json(path)
+    except FileNotFoundError:
+        return {"authoritative": False, "source": source, "seats": [], "unavailable_reason": "Engineering Capacity dashboard is unavailable."}
+    except (OSError, json.JSONDecodeError):
+        return {"authoritative": False, "source": source, "seats": [], "unavailable_reason": "Engineering Capacity dashboard could not be read."}
+    observations = dashboard.get("codex_seat_observations") if isinstance(dashboard, dict) else None
+    if not isinstance(observations, list):
+        return {"authoritative": False, "source": source, "seats": [], "unavailable_reason": "Codex seat observations are unavailable from the Engineering Capacity projection."}
+    seats = []
+    for item in observations:
+        if not isinstance(item, dict):
+            continue
+        seats.append({
+            "seat_id": item.get("logical_seat_id"),
+            "capacity_identity": item.get("capacity_identity"),
+            "weekly_limit_percent_left": item.get("weekly_limit_percent_left"),
+            "weekly_limit_reset_at": item.get("weekly_limit_reset_at"),
+            "observed_at": item.get("observed_at"),
+            "freshness": item.get("freshness") or {"state": "unknown"},
+            "collection_status": item.get("collection_status", "unavailable"),
+            "failure_reason": item.get("failure_reason") or item.get("reason"),
+        })
+    usable = [item for item in seats if isinstance(item.get("weekly_limit_percent_left"), (int, float)) and isinstance(item.get("freshness"), dict) and item["freshness"].get("state") == "current" and item.get("collection_status") == "available"]
+    return {
+        "authoritative": bool(seats),
+        "source": source,
+        "seats": seats,
+        "most_capacity_seat": max(usable, key=lambda item: item["weekly_limit_percent_left"])["seat_id"] if usable else None,
+        "planning_candidates": [item["seat_id"] for item in sorted(usable, key=lambda item: item["weekly_limit_percent_left"], reverse=True)],
+        "unavailable_reason": None if seats else "No Codex seat observations are available.",
+    }
+
+
 def _classification(record: Any) -> str | None:
     response = record.response
     if not isinstance(response, dict):
@@ -212,7 +256,8 @@ def _completed_root_summary(store: ConsultationStore) -> dict[str, Any] | None:
 
 
 def read_operational_snapshot(*, database_path: str | Path = DEFAULT_DATABASE,
-                              cme_state_path: str | Path = DEFAULT_CME_STATE) -> dict[str, Any]:
+                              cme_state_path: str | Path = DEFAULT_CME_STATE,
+                              engineering_capacity_path: str | Path | None = None) -> dict[str, Any]:
     """Return a bounded snapshot without writing any Estate state."""
     db_path = Path(database_path)
     state_path = Path(cme_state_path)
@@ -255,6 +300,7 @@ def read_operational_snapshot(*, database_path: str | Path = DEFAULT_DATABASE,
             operational = None
             provenance["operational_state"] = _fact(None, "cme_runtime", authoritative=False, unavailable=reason)
             unavailable.append(reason)
+    codex_seat_fuel = read_codex_seat_fuel(engineering_capacity_path=engineering_capacity_path)
     return {
         "schema_version": "estate.grace.operational_memory.v1",
         "operation": "read_operational_snapshot",
@@ -265,17 +311,33 @@ def read_operational_snapshot(*, database_path: str | Path = DEFAULT_DATABASE,
         "provenance": provenance,
         "unavailable": unavailable,
         "mutation_performed": False,
+        "codex_seat_fuel": codex_seat_fuel,
     }
 
 
 def render_operational_snapshot(snapshot: dict[str, Any]) -> str:
     """Render only values present in the authoritative snapshot."""
+    codex = snapshot.get("codex_seat_fuel") or {}
+    codex_lines = []
+    if codex.get("authoritative"):
+        codex_lines = ["Authoritative Codex seat fuel read:"]
+        for seat in codex.get("seats") or []:
+            freshness = seat.get("freshness") or {}
+            remaining = seat.get("weekly_limit_percent_left")
+            value = f"{remaining}% left" if isinstance(remaining, (int, float)) else "unknown"
+            failure = f"; failure={seat.get('failure_reason')}" if seat.get("failure_reason") else ""
+            codex_lines.append(f"- {seat.get('seat_id')} ({seat.get('capacity_identity')}): weekly fuel {value}; reset {seat.get('weekly_limit_reset_at') or 'unknown'}; observed {seat.get('observed_at') or 'unknown'}; freshness {freshness.get('state', 'unknown')}; collection {seat.get('collection_status', 'unavailable')}{failure}")
+        codex_lines.append(f"- Highest current weekly capacity: {codex.get('most_capacity_seat') or 'none'}; planning candidates: {', '.join(codex.get('planning_candidates') or []) or 'none'}.")
+        codex_lines.append(f"Source: {codex.get('source')}; read-only planning evidence, not execution authorization.")
+    elif codex.get("unavailable_reason"):
+        codex_lines = [f"Codex seat fuel: unavailable ({codex.get('unavailable_reason')})."]
+    prefix = "\n".join(codex_lines)
     if not snapshot.get("authoritative"):
         missing = "; ".join(snapshot.get("unavailable") or ["authoritative state unavailable"])
-        return f"STATE_UNAVAILABLE / unable to verify authoritative Estate operational state ({missing})."
+        return (prefix + "\n" if prefix else "") + f"STATE_UNAVAILABLE / unable to verify authoritative Estate operational state ({missing})."
     latest = snapshot.get("latest_completed_consultation") or {}
     execution = "execution occurred" if latest.get("execution_occurred") else "reasoning only; no execution record exists"
-    return ("Authoritative Estate operational read:\n"
+    return ((prefix + "\n" if prefix else "") + "Authoritative Estate operational read:\n"
             f"1. Current operational status: {snapshot.get('operational_state')}.\n"
             f"2. Most recent completed consultation root: {latest.get('root_logical_id')}.\n"
             f"3. Final state: {latest.get('final_state')} (latest turn {latest.get('latest_turn_logical_id')}).\n"

@@ -35,6 +35,7 @@ RESPONSE_GUIDANCE = {
 ACTION_CATEGORIES: dict[str, dict[str, Any]] = {
     "conversation": {"classification": "conversation_only", "default": ALLOWED, "reason": "Conversation is informational and performs no privileged action."},
     "observe": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Observation is read-only local awareness."},
+    "read-codex-seat-fuel": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Codex seat fuel is normalized read-only planning evidence; it does not authorize execution or authentication."},
     "summarize": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Summaries are non-authoritative operational views."},
     "search": {"classification": "non_authoritative", "default": ALLOWED, "reason": "Local search is informational only."},
     "draft": {"classification": "proposal", "default": ALLOWED, "reason": "Drafts may be prepared but are not approvals."},
@@ -78,7 +79,7 @@ RESIDENT_RULES = {
     },
     "grace": {
         "resident": "Grace",
-        "allowed": ["conversation", "observe", "summarize", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
+        "allowed": ["conversation", "observe", "read-codex-seat-fuel", "summarize", "propose", "route", "request-steward-decision", "update-resident-runtime-state"],
         "approval_required": ["create-work-package-draft", "send-mailbox-message-artifact", "external-notification-network-action"],
         "escalation_required": [],
         "denied": ["run-validation-command", "execute-work-package", "approve-merge-work", "modify-personnel-identity", "modify-governance-artifact"],

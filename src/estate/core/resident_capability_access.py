@@ -52,6 +52,7 @@ TOOL_SPECS: dict[str, ToolSpec] = {
     "mailbox_message_draft": ToolSpec("mailbox_message_draft", "Mailbox message artifact draft", "routing", "send-mailbox-message-artifact", requires_approval=True, approval_reason="Mailbox artifacts can affect workflows."),
     "work_package_draft": ToolSpec("work_package_draft", "Work-package draft", "planning", "create-work-package-draft", requires_approval=True, approval_reason="Work-package drafts require Steward review before becoming authoritative."),
     "runtime_presence_update": ToolSpec("runtime_presence_update", "Runtime presence update", "runtime", "update-resident-runtime-state", description="Bounded resident presence/state update."),
+    "codex_seat_fuel_read": ToolSpec("codex_seat_fuel_read", "Codex seat fuel read", "information", "read-codex-seat-fuel", description="Read-only normalized Engineering Capacity observations for Codex seats C1, C2, and C3; no authentication, execution, or seat mutation."),
     "ollama_text": ToolSpec("ollama_text", "Local Ollama text generation", "model", "summarize", executable="ollama", connector="local_ollama", description="Local-only text generation when Ollama is installed and models are available."),
     "validation_command": ToolSpec("validation_command", "Validation command execution", "validation", "run-validation-command", executable="pytest", description="Validation command execution authority."),
     "merge_approval": ToolSpec("merge_approval", "Merge approval", "governance", "approve-merge-work", description="Merge approval authority."),
@@ -61,7 +62,7 @@ TOOL_SPECS: dict[str, ToolSpec] = {
 RESIDENT_SPECS: dict[str, ResidentSpec] = {
     "alfred": ResidentSpec("alfred", "Alfred", ("coordination", "routing", "steward_attention_protection", "resident_chat"), ("local_search", "resident_chat", "mailbox_message_draft", "work_package_draft", "runtime_presence_update", "ollama_text"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify")),
     "helen": ResidentSpec("helen", "Helen", ("workforce_fit", "capability_review", "resident_health", "assignment_advice"), ("local_search", "resident_chat", "mailbox_message_draft", "work_package_draft", "runtime_presence_update"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify", "ollama_text")),
-    "grace": ResidentSpec("grace", "Grace", ("operational_service", "sequence_planning", "dispatch_handoff_request", "resident_chat"), ("resident_chat", "runtime_presence_update", "mailbox_message_draft", "work_package_draft"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify", "ollama_text"), candidate=False),
+    "grace": ResidentSpec("grace", "Grace", ("operational_service", "sequence_planning", "dispatch_handoff_request", "resident_chat", "codex_capacity_read"), ("resident_chat", "runtime_presence_update", "codex_seat_fuel_read", "mailbox_message_draft", "work_package_draft"), denied_tools=("validation_command", "merge_approval", "personnel_identity_modify", "ollama_text"), candidate=False),
 }
 
 def _now() -> str:

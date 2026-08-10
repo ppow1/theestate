@@ -7,6 +7,7 @@ from estate.core.grace_operational_memory import (
     enforce_terminal_provenance_status,
     is_operational_state_query,
     read_operational_snapshot,
+    read_codex_seat_fuel,
     render_operational_snapshot,
 )
 
@@ -67,6 +68,32 @@ def test_operational_read_is_read_only_and_does_not_surface_plausible_fake_ids(t
 def test_boundary_is_narrow_for_conceptual_conversation():
     assert is_operational_state_query("What makes Grace a good operations resident?") is False
     assert is_operational_state_query("Tell me the current operational status and latest consultation.") is True
+
+
+def test_grace_reads_all_codex_seats_from_normalized_engineering_capacity(tmp_path):
+    path = tmp_path / "dashboard.json"
+    path.write_text(json.dumps({"codex_seat_observations": [
+        {"logical_seat_id": "C1", "capacity_identity": "codex.seat.C1", "weekly_limit_percent_left": 41, "weekly_limit_reset_at": "2026-08-15T20:32:40Z", "observed_at": "2026-08-10T20:00:00Z", "freshness": {"state": "current"}, "collection_status": "available"},
+        {"logical_seat_id": "C2", "capacity_identity": "codex.seat.C2", "weekly_limit_percent_left": 99, "weekly_limit_reset_at": "2026-08-17T20:19:46Z", "observed_at": "2026-08-10T20:00:01Z", "freshness": {"state": "current"}, "collection_status": "available"},
+        {"logical_seat_id": "C3", "capacity_identity": "codex.seat.C3", "weekly_limit_percent_left": None, "weekly_limit_reset_at": None, "observed_at": "2026-08-10T20:00:02Z", "freshness": {"state": "stale"}, "collection_status": "unavailable", "failure_reason": "collector unavailable"},
+    ]}), encoding="utf-8")
+    result = read_codex_seat_fuel(engineering_capacity_path=path)
+    assert [seat["seat_id"] for seat in result["seats"]] == ["C1", "C2", "C3"]
+    assert result["most_capacity_seat"] == "C2"
+    assert result["seats"][1]["weekly_limit_reset_at"] == "2026-08-17T20:19:46Z"
+    assert result["seats"][2]["freshness"]["state"] == "stale"
+    assert result["seats"][2]["failure_reason"] == "collector unavailable"
+
+
+def test_codex_fuel_render_preserves_read_only_and_unavailable_boundary(tmp_path):
+    path = tmp_path / "dashboard.json"
+    path.write_text(json.dumps({"codex_seat_observations": [{"logical_seat_id": "C1", "capacity_identity": "codex.seat.C1", "weekly_limit_percent_left": 41, "weekly_limit_reset_at": "2026-08-15T20:32:40Z", "observed_at": "2026-08-10T20:00:00Z", "freshness": {"state": "current"}, "collection_status": "available"}, {"logical_seat_id": "C2", "capacity_identity": "codex.seat.C2", "weekly_limit_percent_left": None, "weekly_limit_reset_at": None, "observed_at": "2026-08-10T19:00:00Z", "freshness": {"state": "unknown"}, "collection_status": "unavailable", "failure_reason": "not collected"}]}), encoding="utf-8")
+    snapshot = read_operational_snapshot(database_path=tmp_path / "missing.db", cme_state_path=tmp_path / "missing-cme.json", engineering_capacity_path=path)
+    rendered = render_operational_snapshot(snapshot)
+    assert "C1 (codex.seat.C1): weekly fuel 41% left" in rendered
+    assert "C2 (codex.seat.C2): weekly fuel unknown" in rendered
+    assert "failure=not collected" in rendered
+    assert "read-only planning evidence, not execution authorization" in rendered
 
 
 def test_grace_gateway_operational_query_bypasses_model_and_session_mutation(monkeypatch, tmp_path):
