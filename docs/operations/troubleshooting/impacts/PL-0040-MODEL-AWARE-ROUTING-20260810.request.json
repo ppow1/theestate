@@ -1,0 +1,13 @@
+{
+  "packet_version": "1.0.0",
+  "change_id": "PL-0040-MODEL-AWARE-ROUTING-20260810",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-MODEL-AWARE-LOCAL-COMPREHENSION-ROUTING",
+  "author_provenance": {"kind": "HUMAN", "actor": "Pat / Steward-authorized Codex"},
+  "phase_a_commit": "9ea522a943f67e5677957e9142003a87e0652bc2",
+  "changed_files": ["src/estate/core/estate_comprehension_routing.py", "src/estate/core/estate_comprehension_worker.py", "src/estate/core/estate_knowledge_store.py", "src/estate/cli/main.py", "tests/test_estate_comprehension_routing.py", "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md"],
+  "scope": ["REGISTRIES_CONTRACTS", "SIMPLE_CONFIGURATION", "JSON_SCHEMA"],
+  "prohibited_actions": ["scheduler activation", "GPU stress/reset/reconfiguration", "provider authority expansion", "canonical promotion", "unbounded retries", "duplicate application"],
+  "expected_outputs": ["model/class profiles", "explainable route decisions", "bounded escalation lineage", "class-specific readiness"],
+  "confidence": "CANDIDATE"
+}

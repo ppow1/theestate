@@ -304,3 +304,26 @@ zero invalid citations. No invalid output was admitted and no new assertion
 became application-eligible because the existing deterministic corroboration
 and review policy correctly rejected unsupported semantic claims. Scheduling
 remains unwarranted; qwen3:8b is not proven for this citation-sensitive class.
+
+## Model-aware local comprehension routing (2026-08-10)
+
+The valid provider/evidence hardening was committed as
+`9ea522a943f67e5677957e9142003a87e0652bc2` with the truthful message
+`fix: preserve Estate comprehension provider failure evidence`. The four
+generated troubleshooting artifacts remain outside that commit.
+
+The existing worker now classifies admitted work and records explainable
+model/class route decisions plus fallback lineage in SQLite v7. Registry work
+is routed away from qwen3:8b after its two invalid results and to
+qwen3-coder:30b-qwencode-20k, which produced valid results on both exact prior
+registry assets. Simple configuration controls produced valid results on both
+qwen3:8b and qwen3-coder. Explicit comparison runs remain review-required when
+qualification evidence is incomplete. Failed attempts and all candidate
+interpretations remain preserved; routing does not choose institutional truth
+or create applications.
+
+Current bounded evidence supports `REGISTRIES_CONTRACTS = LOCAL_AI_WITH_REVIEW`
+with qwen3-coder preferred and qwen3:8b disallowed for the class;
+`SIMPLE_CONFIGURATION = LOCAL_AI_WITH_REVIEW` with qwen3:8b preferred for the
+small sample; and `JSON_SCHEMA = NOT_YET_PROVEN` for this routing campaign.
+No scheduler is enabled or warranted.

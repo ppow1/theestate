@@ -19,6 +19,7 @@ from estate.core.estate_population import (
     record_comprehension_attempt, validate_result,
 )
 from estate.core.estate_deterministic_evidence import extract_evidence
+from estate.core.estate_comprehension_routing import record_escalation, select_route, work_class
 from estate.core.estate_knowledge_store import connect, _now
 from estate.core.resident_interaction import LocalOllamaAdapter
 
@@ -172,12 +173,31 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             packet = batch_packet(base, batch_id, max_bytes=max_bytes)
             packet_hash = hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
             difficulty = difficulty_for(packet)
-            response = adapter.generate(resident="comprehension-worker", prompt=_prompt(packet, difficulty), model=health.get("model"))
+            cls = work_class(packet.get("assets", [{}])[0].get("path", ""))
+            route = select_route(base, cls, requested_model=model)
+            selected_model = route.get("selected_model")
+            if not selected_model:
+                telemetry = {"quality": "ROUTE_BLOCKED", "reasons": [route.get("reason", "no qualified route")], "route": route, "duration_ms": round((time.perf_counter() - started) * 1000, 2)}
+                _persist_telemetry(base, batch_id=batch_id, telemetry={"quality": "INVALID_RESULT", "reasons": telemetry["reasons"]})
+                results.append({"batch_id": batch_id, **telemetry})
+                break
+            with connect(base, create=False) as connection:
+                connection.execute("UPDATE comprehension_batches SET provider_model=? WHERE batch_id=?", (selected_model, batch_id))
+                prior = connection.execute("""SELECT b.batch_id,ca.attempt_id FROM comprehension_batches b
+                  JOIN comprehension_batch_assets ba ON ba.batch_id=b.batch_id
+                  JOIN assets a ON a.asset_id=ba.asset_id
+                  LEFT JOIN comprehension_attempts ca ON ca.batch_id=b.batch_id
+                  WHERE a.current_path=? AND b.state='FAILED' AND b.provider_model=?
+                  ORDER BY b.created_at DESC LIMIT 1""", (packet["assets"][0]["path"], health.get("model"))).fetchone()
+            if model is None and prior and selected_model != health.get("model"):
+                weaker = next((row for row in route.get("decisions", []) if row.get("model") == health.get("model")), {})
+                record_escalation(base, work_class_name=cls, initial_batch_id=prior[0], fallback_batch_id=batch_id, initial_attempt_id=prior[1], fallback_attempt_id=attempt_id, reason=weaker.get("reason", "weaker route disallowed by recorded failures"), state="FALLBACK_ROUTED")
+            response = adapter.generate(resident="comprehension-worker", prompt=_prompt(packet, difficulty), model=selected_model)
             if not response.get("ok"):
                 metadata = response.get("metadata", {})
                 reason = metadata.get("fallback_reason", "local provider failed")
                 telemetry = {"quality": "RETRYABLE_PROVIDER_FAILURE", "reasons": [reason], "duration_ms": round((time.perf_counter() - started) * 1000, 2), "difficulty": difficulty, "provider_metadata": metadata}
-                record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=None, provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=None, validation_state="PROVIDER_FAILURE", validation_code=metadata.get("timeout_phase"), validation_message=reason, telemetry=telemetry)
+                record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=None, provider_type="local_ai", provider_model=selected_model, worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=None, validation_state="PROVIDER_FAILURE", validation_code=metadata.get("timeout_phase"), validation_message=reason, telemetry={**telemetry, "route": route, "work_class": cls})
                 _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
                 results.append({"batch_id": batch_id, **telemetry})
                 # A provider timeout is a circuit-breaker event for this
@@ -192,21 +212,21 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             # Provider result IDs are advisory only. Estate owns identity so a
             # model placeholder cannot collide across independent work units.
             payload["result_id"] = _estate_result_id(batch_id, payload)
-            payload["provider"] = {"type": "local_ai", "model": health.get("model"), "worker_identity": worker_identity}
+            payload["provider"] = {"type": "local_ai", "model": selected_model, "worker_identity": worker_identity}
             for item in payload.get("items", []):
                 item.setdefault("lifecycle", "CANDIDATE")
                 item.setdefault("evidence_refs", [])
             quality, reasons = _quality(payload, packet)
             payload["quality"] = quality
-            payload["telemetry"] = {"difficulty": difficulty, "duration_ms": round((time.perf_counter() - started) * 1000, 2), "packet_bytes": len(json.dumps(packet).encode()), "provider": response.get("metadata", {})}
+            payload["telemetry"] = {"difficulty": difficulty, "work_class": cls, "route": route, "duration_ms": round((time.perf_counter() - started) * 1000, 2), "packet_bytes": len(json.dumps(packet).encode()), "provider": response.get("metadata", {})}
             payload["unsupported_assertions"] = payload.get("unsupported_assertions", [])
             if quality == "PARTIAL_CANDIDATE":
                 # Preserve a structured candidate but make the review state explicit.
                 payload["context_requests"] = payload.get("context_requests", [])
-            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=payload["result_id"], provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=response.get("text"), validation_state="RECEIVED", telemetry=payload["telemetry"])
+            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=payload["result_id"], provider_type="local_ai", provider_model=selected_model, worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=response.get("text"), validation_state="RECEIVED", telemetry=payload["telemetry"])
             validate_result(base, payload, packet=packet)
             ingested = ingest_result(base, payload, packet=packet)
-            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=payload["result_id"], provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=response.get("text"), validation_state="VALIDATED_CANDIDATE", telemetry=payload["telemetry"])
+            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=payload["result_id"], provider_type="local_ai", provider_model=selected_model, worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=response.get("text"), validation_state="VALIDATED_CANDIDATE", telemetry=payload["telemetry"])
             telemetry = {"quality": quality, "reasons": reasons, "duration_ms": payload["telemetry"]["duration_ms"], "difficulty": difficulty, "candidate_count": ingested.get("candidate_count", 0), "result_id": payload["result_id"]}
             _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
             results.append({"batch_id": batch_id, **telemetry})
@@ -214,7 +234,7 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             message = str(exc)[:500]
             code = message.split(":", 1)[0] if ":" in message else "INVALID_RESULT"
             telemetry = {"quality": "INVALID_RESULT", "reasons": [message], "duration_ms": round((time.perf_counter() - started) * 1000, 2)}
-            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=locals().get("payload", {}).get("result_id"), provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=locals().get("packet", {}).get("source_revision", "UNKNOWN"), packet_version=locals().get("packet", {}).get("packet_version"), prompt_contract_version=locals().get("packet", {}).get("prompt_contract_version"), packet_hash=locals().get("packet_hash"), raw_output=response.get("text") if "response" in locals() and response else None, validation_state="INVALID_RESULT", validation_code=code, validation_message=message, telemetry=telemetry)
+            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=locals().get("payload", {}).get("result_id"), provider_type="local_ai", provider_model=locals().get("selected_model") or health.get("model"), worker_identity=worker_identity, source_revision=locals().get("packet", {}).get("source_revision", "UNKNOWN"), packet_version=locals().get("packet", {}).get("packet_version"), prompt_contract_version=locals().get("packet", {}).get("prompt_contract_version"), packet_hash=locals().get("packet_hash"), raw_output=response.get("text") if "response" in locals() and response else None, validation_state="INVALID_RESULT", validation_code=code, validation_message=message, telemetry=telemetry)
             _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
             results.append({"batch_id": batch_id, **telemetry})
             # Invalid packet-local citations are a direct circuit-breaker event.

@@ -18,8 +18,8 @@ from typing import Any, Iterable
 from estate.core.estate_knowledge_index import SOURCE_LOCATIONS, _registry_by_path, classification_for, estate_root, owner_for
 
 DB_RELATIVE = Path("runtime/search/estate_knowledge_index.sqlite3")
-STORE_SCHEMA_VERSION = "estate.knowledge_store.v6"
-MIGRATION_VERSION = 6
+STORE_SCHEMA_VERSION = "estate.knowledge_store.v7"
+MIGRATION_VERSION = 7
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules", "runtime", "generated", "browser_profiles", "evidence"}
 
 MIGRATIONS = {
@@ -276,6 +276,23 @@ MIGRATIONS = {
     CREATE INDEX IF NOT EXISTS idx_comprehension_attempt_batch ON comprehension_attempts(batch_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_comprehension_attempt_state ON comprehension_attempts(validation_state, created_at);
     UPDATE schema_meta SET value='estate.knowledge_store.v6' WHERE key='store_schema';
+    """,
+    7: """
+    CREATE TABLE IF NOT EXISTS comprehension_route_decisions (
+      decision_id TEXT PRIMARY KEY, work_class TEXT NOT NULL, model_id TEXT NOT NULL,
+      route_state TEXT NOT NULL, selected INTEGER NOT NULL, reason TEXT NOT NULL,
+      evidence_json TEXT NOT NULL, decided_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS comprehension_escalations (
+      escalation_id TEXT PRIMARY KEY, work_class TEXT NOT NULL,
+      initial_batch_id TEXT NOT NULL REFERENCES comprehension_batches(batch_id),
+      fallback_batch_id TEXT REFERENCES comprehension_batches(batch_id),
+      initial_attempt_id TEXT, fallback_attempt_id TEXT, reason TEXT NOT NULL,
+      state TEXT NOT NULL, created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_route_class ON comprehension_route_decisions(work_class, decided_at);
+    CREATE INDEX IF NOT EXISTS idx_escalation_batch ON comprehension_escalations(initial_batch_id, created_at);
+    UPDATE schema_meta SET value='estate.knowledge_store.v7' WHERE key='store_schema';
     """
 }
 

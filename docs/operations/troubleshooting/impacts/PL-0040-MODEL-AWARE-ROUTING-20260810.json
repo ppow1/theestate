@@ -1,0 +1,18 @@
+{
+  "change_id": "PL-0040-MODEL-AWARE-ROUTING-20260810",
+  "author_provenance": {"kind": "HUMAN", "actor": "Pat / Steward-authorized Codex"},
+  "phase_a": {"commit": "9ea522a943f67e5677957e9142003a87e0652bc2", "message": "fix: preserve Estate comprehension provider failure evidence", "tests": "53 focused tests passed", "publication": "not yet pushed"},
+  "architecture": {"schema_version": "estate.knowledge_store.v7", "route_table": "comprehension_route_decisions", "lineage_table": "comprehension_escalations", "classification": "existing comprehension worker classifies admitted asset paths", "authority": "provider-neutral Estate routing; no canonical authority"},
+  "route_states": ["PRIMARY", "FALLBACK", "REVIEW_REQUIRED", "DISALLOWED_FOR_CLASS", "TEMPORARILY_SUSPENDED", "NOT_YET_QUALIFIED"],
+  "routing_evidence": {
+    "REGISTRIES_CONTRACTS": {"qwen3:8b": {"attempts": 2, "valid": 0, "invalid_results": 2, "citation_failures": 1, "route": "DISALLOWED_FOR_CLASS"}, "qwen3-coder:30b-qwencode-20k": {"attempts": 7, "valid": 7, "invalid_results": 0, "route": "PRIMARY"}},
+    "SIMPLE_CONFIGURATION": {"qwen3:8b": {"attempts": 2, "valid": 2, "invalid_results": 0, "route": "PRIMARY"}, "qwen3-coder:30b-qwencode-20k": {"attempts": 2, "valid": 2, "invalid_results": 0, "route": "REVIEW_REQUIRED"}},
+    "JSON_SCHEMA": {"route": "NOT_YET_PROVEN", "reason": "no isolated routing qualification sample in this campaign"}
+  },
+  "acceptance": {"exact_registry_assets": ["data/registry/capabilities.json", "data/registry/services.json"], "exact_registry_fallback_results": 2, "additional_registry_assets": ["data/registry/artifact_provenance_schema.json", "data/registry/documents.json"], "simple_configuration_controls": ["data/discovery/catalog.json", "data/discovery/metrics.json"], "additional_config_comparison_results": 2, "invalid_outputs_admitted": 0, "canonical_mutation": false, "duplicate_applications": 0},
+  "escalation": {"records": 2, "initial_failures_preserved": true, "fallback_model": "qwen3-coder:30b-qwencode-20k", "same_source_revision": true, "same_packet_boundary": true, "lineage_queryable": true, "repair_attempts": 0, "repair_policy": "not automatically attempted; route failure to qualified stronger model"},
+  "readiness": {"JSON_SCHEMA": "NOT_YET_PROVEN", "SIMPLE_CONFIGURATION": "LOCAL_AI_WITH_REVIEW", "REGISTRIES_CONTRACTS": "LOCAL_AI_WITH_REVIEW", "preferred_models": {"JSON_SCHEMA": null, "SIMPLE_CONFIGURATION": "qwen3:8b", "REGISTRIES_CONTRACTS": "qwen3-coder:30b-qwencode-20k"}, "scheduler": "SCHEDULED_LEVEL1_NOT_YET_WARRANTED"},
+  "database": {"attempts": 13, "escalations": 2, "applied_assertions_unchanged": 41, "integrity_check": "ok"},
+  "tests": ["routing profile/selection/suspension tests passed", "focused worker/store/population/evidence/governance tests passed", "provider invalid output preservation regression passed", "no scheduler/GPU action"],
+  "confidence": "CANDIDATE"
+}
