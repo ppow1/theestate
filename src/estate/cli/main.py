@@ -2157,7 +2157,13 @@ def cmd_steward_attention(args):
     elif args.steward_attention_action == "live-test":
         payload = run_live_test(args.text)
     elif args.steward_attention_action == "watch":
-        payload = watch_attention(root=getattr(args, "root", None), interval_seconds=args.interval, max_cycles=None if args.cycles == 0 else args.cycles)
+        presenter = None
+        if getattr(args, "dry_run", False):
+            class _DryRunPresenter:
+                def announce(self, item):
+                    return None
+            presenter = _DryRunPresenter()
+        payload = watch_attention(root=getattr(args, "root", None), interval_seconds=args.interval, max_cycles=None if args.cycles == 0 else args.cycles, presenter=presenter)
     else:
         raise SystemExit(f"Unknown steward-attention action: {args.steward_attention_action}")
     if getattr(args, "json", False):
@@ -4284,7 +4290,7 @@ def main(argv=None):
     q.add_argument("--text", default="The Estate needs your input on Project 5")
     q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
     q = sa.add_parser("watch", help="Poll the canonical attention aggregate and present newly actionable items")
-    q.add_argument("--root"); q.add_argument("--interval", type=float, default=15.0); q.add_argument("--cycles", type=int, default=0, help="0 runs until Ctrl+C")
+    q.add_argument("--root"); q.add_argument("--interval", type=float, default=15.0); q.add_argument("--cycles", type=int, default=0, help="0 runs until Ctrl+C"); q.add_argument("--dry-run", action="store_true", help="Suppress sound/TTS while exercising baseline and edge-trigger behavior")
     q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
 
     p = sub.add_parser("audit-summary")

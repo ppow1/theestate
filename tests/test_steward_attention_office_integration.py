@@ -25,9 +25,9 @@ def test_watch_presents_canonical_attention_source_once(tmp_path):
     seed(tmp_path); recorder = Recorder()
     result = watch_attention(tmp_path, interval_seconds=1, max_cycles=2, presenter=recorder)
     assert result["cycles_run"] == 2
-    assert result["cycles"][0]["presented_count"] == 1
+    assert result["cycles"][0]["presented_count"] == 0
     assert result["cycles"][1]["new_item_count"] == 0
-    assert len(recorder.items) == 1
+    assert len(recorder.items) == 0
 
 
 def test_operations_center_banner_and_existing_acknowledge_action_clear(tmp_path):

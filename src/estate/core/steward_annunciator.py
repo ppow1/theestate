@@ -120,6 +120,61 @@ def _actionable(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [i for i in items if i.get("classification") in ACTIONABLE and i.get("status") == "open"]
 
 
+def _item_signature(item: dict[str, Any]) -> dict[str, Any]:
+    """Capture stable attention state without volatile timestamps or aggregates."""
+    return {
+        "classification": item.get("classification"),
+        "status": item.get("status"),
+        "requested_steward_action": item.get("requested_steward_action"),
+    }
+
+
+def _item_signatures(items: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    return {str(item["id"]): _item_signature(item) for item in items if item.get("id")}
+
+
+def _should_announce(previous: dict[str, Any] | None, current: dict[str, Any]) -> bool:
+    if current.get("classification") not in ACTIONABLE or current.get("status") != "open":
+        return False
+    if previous is None:
+        return True
+    previous_classification = previous.get("classification")
+    if previous_classification not in ACTIONABLE:
+        return True
+    return SEVERITY_RANK[current["classification"]] < SEVERITY_RANK[previous_classification]
+
+
+def _baseline_state(previous: dict[str, Any], items: list[dict[str, Any]], now: str | None = None) -> dict[str, Any]:
+    active = _actionable(items)
+    severity = min((i["classification"] for i in active), key=lambda c: SEVERITY_RANK[c], default=None)
+    return {
+        **previous,
+        "schema_version": ANNUNCIATOR_SCHEMA_VERSION,
+        "generated_at": now or _now(),
+        "consumer_boundary": "presenter-only; canonical attention and Office actions remain authoritative",
+        "baseline_established": True,
+        "active": bool(active),
+        "severity": severity,
+        "severity_rank": SEVERITY_RANK.get(severity),
+        "severity_label": {"urgent": "URGENT", "decision_required": "DECISION REQUIRED", "attention_soon": "ATTENTION SOON"}.get(severity),
+        "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
+        "active_item_ids": sorted(i["id"] for i in active),
+        "observed_items": _item_signatures(items),
+        "pending_presentations": {},
+        "last_run": {"new_item_count": 0, "presented_count": 0, "failure_count": 0, "failures": [], "baseline": True},
+    }
+
+
+def establish_startup_baseline(root: str | Path | None = None, *, now: str | None = None) -> dict[str, Any]:
+    """Persist current attention as watcher baseline without invoking a presenter."""
+    base = Path(root) if root is not None else Path.cwd()
+    previous = _read(base / ANNUNCIATOR_PATH)
+    aggregate = aggregate_attention(base, write=True)
+    state = _baseline_state(previous, aggregate.get("items", []), now=now)
+    _write(base, state)
+    return state
+
+
 def sync_annunciator_state(root: str | Path | None = None) -> dict[str, Any]:
     """Refresh only the durable visual projection after an existing attention action."""
     base = Path(root) if root is not None else Path.cwd()
@@ -146,6 +201,7 @@ def watch_attention(root: str | Path | None = None, *, interval_seconds: float =
     """Run the existing attention aggregate poll in the signed-in user session."""
     if interval_seconds < 1:
         raise ValueError("interval_seconds must be at least 1 second")
+    establish_startup_baseline(root)
     cycles = []
     index = 0
     while max_cycles is None or index < max_cycles:
@@ -164,20 +220,32 @@ def present_attention(root: str | Path | None = None, *, presenter: Presenter | 
     base = Path(root) if root is not None else Path.cwd()
     previous = _read(base / ANNUNCIATOR_PATH)
     aggregate = aggregate_attention(base, write=True)
+    all_items = [i for i in aggregate.get("items", []) if i.get("id")]
     active = _actionable(aggregate.get("items", []))
     active_ids = {i["id"] for i in active}
     presented = dict(previous.get("presented", {}))
     events = list(previous.get("events", []))
+    observed = previous.get("observed_items") if isinstance(previous.get("observed_items"), dict) else {
+        str(i["id"]): _item_signature(i) for i in previous.get("items", []) if i.get("id")
+    }
+    pending = previous.get("pending_presentations") if isinstance(previous.get("pending_presentations"), dict) else {}
     failures: list[dict[str, Any]] = []
-    new_items = [i for i in active if i["id"] not in presented]
+    new_items = [
+        i for i in active
+        if _should_announce(observed.get(str(i["id"])), _item_signature(i))
+        or (str(i["id"]) in pending and pending[str(i["id"])] == _item_signature(i))
+    ]
     adapter = presenter or WindowsPresenter()
     for item in sorted(new_items, key=lambda i: (SEVERITY_RANK[i["classification"]], i["title"])):
+        item_id = str(item["id"])
         try:
             adapter.announce(item)
-            presented[item["id"]] = {"presented_at": now or _now(), "classification": item["classification"]}
-            events.append({"event": "presented", "item_id": item["id"], "severity": item["classification"], "at": now or _now()})
+            presented[item_id] = {"presented_at": now or _now(), "classification": item["classification"]}
+            pending.pop(item_id, None)
+            events.append({"event": "presented", "item_id": item_id, "severity": item["classification"], "at": now or _now()})
         except Exception as exc:  # presenter failure must not hide the visual alarm
-            failure = {"event": "presenter_failure", "item_id": item["id"], "error": str(exc), "at": now or _now()}
+            pending[item_id] = _item_signature(item)
+            failure = {"event": "presenter_failure", "item_id": item_id, "error": str(exc), "at": now or _now()}
             failures.append(failure)
             events.append(failure)
     # Bound history while retaining durable fingerprints for all currently active items.
@@ -195,6 +263,9 @@ def present_attention(root: str | Path | None = None, *, presenter: Presenter | 
         "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
         "active_item_ids": sorted(active_ids),
         "presented": presented,
+        "baseline_established": bool(previous.get("baseline_established")),
+        "observed_items": _item_signatures(all_items),
+        "pending_presentations": pending,
         "events": events,
         "last_run": {"new_item_count": len(new_items), "presented_count": len(new_items) - len(failures), "failure_count": len(failures), "failures": failures},
     }

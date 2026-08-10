@@ -42,6 +42,18 @@ cd A:\theestate
 `.\launch_operations_center.ps1 -Stop` stops both. The watcher is a bounded poller
 over the existing attention aggregate, not a second event source or notification bus.
 
+Watcher startup establishes a quiet baseline from the current canonical attention set;
+existing open items are shown visually but are not spoken. Subsequent polls announce
+only new actionable items or explicit severity escalation, such as `attention_soon`
+to `decision_required` or `urgent`. For a safe operator smoke check without sound or
+TTS, run one mocked baseline cycle:
+
+```powershell
+cd A:\theestate
+$env:PYTHONPATH="src"
+python -m estate.cli.main steward-attention watch --cycles 1 --interval 1 --dry-run --json
+```
+
 `winsound.MessageBeep` returning `None` is normal for this Windows API and is not a
 boolean audible-confirmation signal. The live command reports no exception for the
 call, while TTS reports its PowerShell return code and stderr.
