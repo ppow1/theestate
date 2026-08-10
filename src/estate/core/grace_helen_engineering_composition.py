@@ -119,7 +119,15 @@ def _provider_extension(root: Path, determination: dict[str, Any], authority: di
     """Build the closed provider extension from canonical Helen/config evidence."""
     if provider_id != "qwen.local.text":
         return None
-    config_path = root / "config/providers/qwen_local_text.json"
+    config_relative = str(authority.get("provider_config_path") or "").replace("\\", "/")
+    if not config_relative and authority.get("runtime_lane_id"):
+        from estate.core.gpu_runtime_lanes import load_registered_lanes
+        lane = next((item for item in load_registered_lanes(root) if item.runtime_lane_id == authority["runtime_lane_id"]), None)
+        config_relative = lane.provider_config_path if lane else ""
+    config_relative = config_relative or "config/providers/qwen_local_text.json"
+    if not config_relative.startswith("config/providers/") or ".." in config_relative.split("/"):
+        raise ValueError("provider configuration path is not an approved provider config")
+    config_path = root / config_relative
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -162,6 +170,7 @@ def _provider_extension(root: Path, determination: dict[str, Any], authority: di
         "evidence_observed_at": str(observed).replace("+00:00", "Z"),
         "evidence_expires_at": str(expires).replace("+00:00", "Z"),
         "authorized_model_identity": config["model_identity"],
+        "provider_config_path": config_relative,
         "provider_receipt_path": receipt_paths[0],
         "artifact_path": artifact_paths[0],
         "provider_health_evidence": health_evidence,

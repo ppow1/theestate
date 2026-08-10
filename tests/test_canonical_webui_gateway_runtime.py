@@ -54,6 +54,15 @@ def test_process_command_contains_explicit_canonical_state(tmp_path):
     assert environment["PYTHONPATH"] == str((Path(__file__).parents[1] / "src").resolve())
 
 
+def test_process_command_injects_matching_grace_runtime_slot_url(tmp_path):
+    value = config(tmp_path)
+    value["open_webui"]["secret_key_file"] = str(tmp_path / "secret")
+    (tmp_path / "secret").write_text("test-secret", encoding="utf-8")
+    _, gateway, _, environment = runtime._process_command(value, runtime.SLOTS["green"])
+    assert gateway[-1] == str(Path(value["source_root"]).resolve())
+    assert environment["ESTATE_GRACE_MOMENTUM_URL"] == "http://127.0.0.1:8767"
+
+
 def test_gateway_semantic_readiness_requires_grace(monkeypatch, tmp_path):
     value = config(tmp_path)
     monkeypatch.setattr(runtime, "_http_json", lambda url: (200, {"data": [{"id": "estate/grace", "estate": {"resident_id": "grace", "resident_gateway_capable": True, "privileged_actions_enabled": False}}]}))

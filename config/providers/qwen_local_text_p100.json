@@ -1,0 +1,16 @@
+{
+  "provider_id": "qwen.local.text",
+  "adapter_id": "qwen-local-ollama-text-adapter",
+  "adapter_version": "1.0.0",
+  "endpoint_type": "ollama-http",
+  "endpoint_address": "http://127.0.0.1:12100",
+  "model_identity": "llama3.2:3b",
+  "context_limit": 8192,
+  "timeout_seconds": 120,
+  "supported_capabilities": ["text_generation", "documentation_draft", "bounded_repository_read"],
+  "health_check": {"method": "GET", "path": "/api/tags", "requires_model_present": true},
+  "output_limits": {"max_output_tokens": 120, "max_artifact_bytes": 200000},
+  "network_policy": "loopback_only",
+  "evidence_freshness_seconds": 120,
+  "minimum_safe_vram_mib": 4096
+}

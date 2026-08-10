@@ -55,6 +55,8 @@ class RuntimeLane:
     started_at: str | None = None
     observed_at: str | None = None
     freshness_seconds: int = 120
+    provider_config_path: str = "config/providers/qwen_local_text.json"
+    minimum_vram_mib: int | None = None
 
     def validate(self) -> None:
         for key in ("runtime_lane_id", "provider_id", "endpoint_type", "endpoint_address", "host_id", "compute_resource_id", "gpu_uuid", "model_identity"):
@@ -73,6 +75,10 @@ class RuntimeLane:
             raise ValueError("runtime lane OLLAMA_HOST must equal its endpoint")
         if self.freshness_seconds < 1:
             raise ValueError("runtime lane freshness_seconds must be positive")
+        if not self.provider_config_path.startswith("config/providers/") or ".." in self.provider_config_path.replace("\\", "/").split("/"):
+            raise ValueError("runtime lane provider configuration must remain under config/providers")
+        if self.minimum_vram_mib is not None and (isinstance(self.minimum_vram_mib, bool) or self.minimum_vram_mib < 1):
+            raise ValueError("runtime lane minimum_vram_mib must be positive")
 
     def to_dict(self) -> dict[str, Any]:
         self.validate()

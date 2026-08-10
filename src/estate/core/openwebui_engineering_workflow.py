@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 import hashlib
 import json
+import os
 from uuid import uuid4
 
 from estate.core.compute_resources import ComputeReservationLedger, ComputeResourceRequirements, collect_nvidia_smi, select_resource, write_compute_projection
@@ -40,17 +41,36 @@ def _root(root: Path | None = None) -> Path:
     return root or (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
 
 
-def _qwen_minimum_safe_vram_mib(root: Path) -> int | None:
-    """Load the model-specific admission floor; never substitute a generic floor."""
-    path = root / "config/providers/qwen_local_text.json"
+def _provider_config(root: Path, relative: str) -> dict[str, Any] | None:
+    """Load a model-specific provider instance; never substitute a generic one."""
+    path = root / relative
     try:
         config = json.loads(path.read_text(encoding="utf-8"))
-        value = config.get("minimum_safe_vram_mib")
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
-            return None
-        return int(value)
+        return config if isinstance(config, dict) else None
     except (OSError, ValueError, TypeError):
         return None
+
+
+def _qwen_minimum_safe_vram_mib(root: Path) -> int | None:
+    config = _provider_config(root, "config/providers/qwen_local_text.json")
+    value = config.get("minimum_safe_vram_mib") if config else None
+    return int(value) if isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0 else None
+
+
+def _target_lane(root: Path, observations: list[Any]) -> tuple[Any, dict[str, Any], Any] | None:
+    lanes = load_registered_lanes(root)
+    requested = os.environ.get("ESTATE_GOVERNED_LOCAL_TEXT_LANE", "").strip()
+    if requested:
+        lane = next((item for item in lanes if item.runtime_lane_id == requested), None)
+        if lane is None:
+            return None
+        config = _provider_config(root, lane.provider_config_path)
+        selected = next((row for row in observations if row.nvidia_uuid == lane.gpu_uuid and row.resource_id == lane.compute_resource_id), None)
+        return (lane, config, selected) if config and selected else None
+    preferred = next((row for row in observations if "4090" in row.name), None)
+    lane = next((item for item in lanes if item.provider_id == "qwen.local.text" and item.model_identity == "qwen3:8b" and (not preferred or item.gpu_uuid == preferred.nvidia_uuid)), None)
+    config = _provider_config(root, lane.provider_config_path if lane else "config/providers/qwen_local_text.json") if lane else None
+    return (lane, config, preferred) if lane and config and preferred else None
 
 
 def detect_engineering_assignment_command(payload: dict[str, Any], user_message: str) -> dict[str, Any] | None:
@@ -109,23 +129,24 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if intent["state"] != "execution_requested":
         return intent if intent["state"] == "execution_blocked" else None
     rootp = _root(root)
-    minimum_safe_vram_mib = _qwen_minimum_safe_vram_mib(rootp)
-    if minimum_safe_vram_mib is None:
-        return {"state": "execution_blocked", "reason": "model-specific safe VRAM admission requirement is unavailable", "provider_execution_performed": False}
     observations = collect_nvidia_smi()
     if not observations:
         return {"state": "execution_blocked", "reason": "fresh physical compute evidence is unavailable", "provider_execution_performed": False}
     write_compute_projection(observations, rootp)
-    preferred = next((row.nvidia_uuid for row in observations if "4090" in row.name), None)
-    requirements = ComputeResourceRequirements(requires_gpu=True, minimum_vram_mib=minimum_safe_vram_mib, preferred_gpu_uuid=preferred, freshness_seconds=120)
+    target = _target_lane(rootp, observations)
+    if not target:
+        return {"state": "execution_blocked", "reason": "governed local-text target lane or its physical resource is unavailable", "provider_execution_performed": False}
+    lane, config, target_observation = target
+    minimum_safe_vram_mib = lane.minimum_vram_mib or config.get("minimum_safe_vram_mib")
+    if not isinstance(minimum_safe_vram_mib, int) or minimum_safe_vram_mib < 1:
+        return {"state": "execution_blocked", "reason": "model-specific safe VRAM admission requirement is unavailable", "provider_execution_performed": False}
+    requirements = ComputeResourceRequirements(requires_gpu=True, minimum_vram_mib=minimum_safe_vram_mib, preferred_gpu_uuid=lane.gpu_uuid, required_gpu_uuid=lane.gpu_uuid, required_resource_id=lane.compute_resource_id, freshness_seconds=120)
     placement = select_resource(observations, requirements)
     if not placement.get("eligible") or not placement.get("selected"):
         return {"state": "execution_blocked", "reason": placement.get("reason", "no eligible GPU"), "placement": placement, "provider_execution_performed": False}
     selected = next(row for row in observations if row.resource_id == placement["selected"])
-    lanes = load_registered_lanes(rootp)
-    lane_selection = select_runtime_lane(lanes, provider_id="qwen.local.text", model_identity="qwen3:8b", required_gpu_uuid=selected.nvidia_uuid, required_resource_id=selected.resource_id)
-    lane = next((row for row in lanes if row.runtime_lane_id == lane_selection.get("selected")), None)
-    if lane is None:
+    lane_selection = select_runtime_lane([lane], provider_id="qwen.local.text", model_identity=lane.model_identity, required_gpu_uuid=selected.nvidia_uuid, required_resource_id=selected.resource_id)
+    if not lane_selection.get("eligible"):
         return {"state": "execution_blocked", "reason": "no registered runtime lane matches the selected physical GPU", "placement": placement, "lane_selection": lane_selection, "provider_execution_performed": False}
     lane_health = endpoint_health(lane)
     if not lane_health.get("healthy"):
@@ -133,7 +154,8 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     objective = GraceObjective.create(requested_by="Steward via Open WebUI", title="Bounded local text task", summary=user_message.strip(), work_package_id="WP-0649", owner="qwen-local-text", checkpoint="Grace records provider receipt and physical placement evidence; acceptance remains with Engineering and the Steward.", metadata={"summary_safe": True, "openwebui_bounded_local_text": True})
     artifact_path = f"docs/operations/examples/grace_bounded_local_text_{objective.objective_id}.md"
     receipt_path = f"runtime/engineering_adapter_receipts/grace_bounded_local_text_{objective.objective_id}.json"
-    authority = {"allowed_read_paths": ["docs/operations/Governed_Qwen_Local_Text_Provider.md", "config/providers/qwen_local_text.json"], "allowed_write_paths": [artifact_path, receipt_path], "expected_outputs": [artifact_path, receipt_path], "runtime_lane_id": lane.runtime_lane_id}
+    provider_config_path = lane.provider_config_path
+    authority = {"allowed_read_paths": ["docs/operations/Governed_Qwen_Local_Text_Provider.md", provider_config_path], "allowed_write_paths": [artifact_path, receipt_path], "expected_outputs": [artifact_path, receipt_path], "runtime_lane_id": lane.runtime_lane_id}
     objective.metadata["execution_authority"] = authority
     grace = GraceOperationsRuntime(rootp)
     action, paths = grace.conduct_objective(objective)
@@ -143,7 +165,7 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     health_path.write_text(json.dumps({"provider_id": "qwen.local.text", "runtime_lane_id": lane.runtime_lane_id, "endpoint_health": lane_health, "observed_at": utc_now()}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     inquiry = GraceHelenEngineeringComposition(rootp).request_capability(objective.objective_id, "text_generation", constraints=["bounded artifact", "one provider receipt", "UUID-pinned runtime lane"])
     comp = GraceHelenEngineeringComposition(rootp)
-    determination = comp.determine_capability(inquiry["capability_request_id"], disposition="qualified_and_available", worker_profile_id="qwen-local-text", qualification_evidence=["config/providers/qwen_local_text.json", str(health_path.relative_to(rootp)).replace("\\", "/")], availability_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], capacity_evidence=["runtime/compute_resources/gpus.json"], provider_health_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], evidence_observed_at=utc_now())
+    determination = comp.determine_capability(inquiry["capability_request_id"], disposition="qualified_and_available", worker_profile_id="qwen-local-text", qualification_evidence=[provider_config_path, str(health_path.relative_to(rootp)).replace("\\", "/")], availability_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], capacity_evidence=["runtime/compute_resources/gpus.json"], provider_health_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], evidence_observed_at=utc_now())
     event = _readiness_event(rootp, objective)
     reservation_id = f"gpu-reservation-{objective.objective_id}"
     ComputeReservationLedger(rootp).reserve(reservation_id=reservation_id, resource_id=selected.resource_id, workload_id=objective.objective_id, minimum_vram_mib=requirements.minimum_vram_mib)

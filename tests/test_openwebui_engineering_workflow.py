@@ -1,5 +1,6 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
 from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, _qwen_minimum_safe_vram_mib
+from estate.core.resident_gateway import _bounded_local_text_content
 from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
 
@@ -29,6 +30,16 @@ def test_qwen_model_specific_vram_floor_fails_closed_when_missing(tmp_path):
     assert _qwen_minimum_safe_vram_mib(tmp_path) == 8192
     config.write_text('{}\n', encoding="utf-8")
     assert _qwen_minimum_safe_vram_mib(tmp_path) is None
+
+
+def test_bounded_visible_placement_uses_authoritative_receipt_metadata():
+    content = _bounded_local_text_content({
+        "state": "execution_completed",
+        "lane": {"runtime_lane_id": "qwen.local.text.p100-1"},
+        "placement": {"selected": "host:nvidia:GPU-P100"},
+        "execution": {"result": {"summary": "completed", "metadata": {"runtime_bound_gpu_uuid": "GPU-P100"}}},
+    })
+    assert '"gpu_uuid": "GPU-P100"' in content
 
 
 def test_bounded_text_request_fails_closed_without_fresh_physical_evidence(tmp_path):

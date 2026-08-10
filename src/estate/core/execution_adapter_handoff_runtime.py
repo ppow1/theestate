@@ -209,7 +209,14 @@ def _validate_provider_extension(root: Path, item: DispatchQueueItem, metadata: 
                 errors.append(f"provider-health evidence digest mismatch: {path}")
         except (ValueError, OSError) as exc:
             errors.append(str(exc))
-    config_path = root / "config/providers/qwen_local_text.json"
+    config_relative = str(extension.get("provider_config_path") or "config/providers/qwen_local_text.json").replace("\\", "/")
+    try:
+        config_name, config_path = _canonical_repo_path(root, config_relative, "provider_config_path", require_file=True)
+        if not config_name.startswith("config/providers/") or not config_name.endswith(".json"):
+            raise ValueError("provider_config_path must point to config/providers JSON")
+    except (ValueError, OSError) as exc:
+        errors.append(str(exc))
+        config_path = root / "config/providers/qwen_local_text.json"
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
         if config.get("provider_id") != item.provider:
@@ -217,8 +224,8 @@ def _validate_provider_extension(root: Path, item: DispatchQueueItem, metadata: 
             config = json.loads(fallback.read_text(encoding="utf-8"))
         if config.get("model_identity") != extension.get("authorized_model_identity") or config.get("provider_id") != item.provider or config.get("adapter_id") != extension.get("adapter_id") or config.get("adapter_version") != extension.get("adapter_version"):
             errors.append("Qwen provider configuration does not match authorized extension")
-        if config.get("endpoint_address") != "http://127.0.0.1:11434" or config.get("network_policy") != "loopback_only":
-            errors.append("Qwen endpoint policy is not the canonical loopback configuration")
+        if config.get("endpoint_type") != "ollama-http" or config.get("network_policy") != "loopback_only" or not str(config.get("endpoint_address", "")).startswith("http://127.0.0.1:"):
+            errors.append("Qwen endpoint policy is not an approved loopback configuration")
     except (OSError, ValueError) as exc:
         errors.append(f"Qwen provider configuration unavailable: {exc}")
     return errors
