@@ -1,0 +1,46 @@
+{
+  "change_id": "EC-000221",
+  "title": "Complete Grace governed GPU placement acceptance",
+  "status": "implemented_profile_correction_live_acceptance_blocked_model_resolution",
+  "predecessor": "EC-000220",
+  "changed_artifacts": [
+    "tools/openwebui-operator/profile.cjs",
+    "tools/openwebui_operator_acceptance.cjs",
+    "tools/openwebui-operator/operator-attention.cjs",
+    "tests/test_openwebui_operator_acceptance.cjs",
+    "docs/operations/validation/EC-000221_Grace_Governed_GPU_Placement_Acceptance.md"
+  ],
+  "failure_seams": [
+    "worktree-relative Playwright profile caused false continuity loss",
+    "candidate Open WebUI launched without canonical external DATA_DIR/DATABASE_URL/secret",
+    "shared Grace bridge retained active-slot endpoint 127.0.0.1:11435 while green candidate Gateway listened on 11436",
+    "visible bounded task returned Model '' was not found before governed dispatch"
+  ],
+  "invariants": [
+    "machine-local browser profile is outside every worktree and never evidence storage",
+    "auth-bootstrap and normal acceptance resolve one identical profile",
+    "candidate Open WebUI server state remains separate from browser profile state",
+    "full physical GPU UUID identity is required and the P100 is never an implicit fallback",
+    "no second task is submitted after the bounded task failure"
+  ],
+  "probes_and_tests": [
+    "read-only HTTP candidate surface probes",
+    "canonical candidate controller validation",
+    "headed Open WebUI readiness with Grace/composer",
+    "machine-local profile resolver node tests",
+    "nvidia-smi and Windows PnP pre/postflight",
+    "UUID-pinned qwen.local.text.4090 lane health"
+  ],
+  "privacy_boundary": "No cookies, tokens, browser databases, localStorage, credentials, or absolute profile paths entered Git or acceptance evidence.",
+  "remaining_unproven": [
+    "successful governed PTM-to-provider execution",
+    "allocation UUID == runtime lane UUID == provider receipt UUID",
+    "Office Compute and Stream Deck correlation"
+  ],
+  "evidence": [
+    "runtime/evidence/openwebui-operator/openwebui-operator-20260810010507681-a3558220",
+    "runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556",
+    "A:/AI/Tools/EstateStreamDeckMVP/Core/state/canonical-runtime/green-processes.json"
+  ],
+  "future_reuse_invariant": "Different isolated Estate worktrees resolve to estate-openwebui-operator-profile under the machine-local Estate state root."
+}

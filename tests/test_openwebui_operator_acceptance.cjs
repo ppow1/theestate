@@ -8,12 +8,38 @@ const path = require('node:path');
 const {matchesExpectation, loadScenario} = require('../tools/openwebui-operator/scenario.cjs');
 const {safePath, sanitizeNetwork} = require('../tools/openwebui-operator/evidence.cjs');
 const {compareCmeClaim} = require('../tools/openwebui-operator/ground_truth.cjs');
-const {defaultProfilePath, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, authBootstrapOutcome} = require('../tools/openwebui_operator_acceptance.cjs');
+const {defaultProfilePath, selectedProfilePath, resolveProfilePath, PROFILE_ID, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, authBootstrapOutcome} = require('../tools/openwebui_operator_acceptance.cjs');
+const {canonicalProfilePath, PROFILE_ENV} = require('../tools/openwebui-operator/profile.cjs');
 const {emitOperatorAttention, readEvents} = require('../tools/openwebui-operator/operator-attention.cjs');
 
 test('auth bootstrap and normal acceptance share the same default profile', () => {
-  assert.equal(defaultProfilePath(), path.resolve('runtime/browser/openwebui-operator-profile'));
+  assert.equal(defaultProfilePath(), canonicalProfilePath());
+  assert.equal(selectedProfilePath({}), defaultProfilePath());
   assert.match(AUTH_BOOTSTRAP_COMMAND, /auth-bootstrap/);
+});
+
+test('profile resolution is independent of worktree roots and stays outside repositories', () => {
+  const env = {LOCALAPPDATA: 'C:\\Users\\test\\AppData\\Local'};
+  const first = canonicalProfilePath(env, 'win32');
+  const second = canonicalProfilePath(env, 'win32');
+  assert.equal(first, second);
+  assert.equal(first, 'C:\\Users\\test\\AppData\\Local\\TheEstate\\browser\\openwebui-operator-profile');
+  assert.equal(first.startsWith('A:\\theestate'), false);
+  assert.equal(first.includes('theestate-ec-000221'), false);
+});
+
+test('explicit profile and environment override precedence are deterministic', () => {
+  const env = {LOCALAPPDATA: 'C:\\Users\\test\\AppData\\Local', [PROFILE_ENV]: 'D:\\EstateState\\operator'};
+  assert.equal(resolveProfilePath(undefined, env, 'win32'), 'D:\\EstateState\\operator');
+  assert.equal(resolveProfilePath('E:\\Explicit\\operator', env, 'win32'), 'E:\\Explicit\\operator');
+});
+
+test('profile evidence is symbolic and never exposes the machine path', () => {
+  const env = {LOCALAPPDATA: 'C:\\Users\\test\\AppData\\Local'};
+  const evidence = require('../tools/openwebui-operator/profile.cjs').profileEvidence(undefined, env, 'win32');
+  assert.equal(evidence.profile_id, PROFILE_ID);
+  assert.equal(JSON.stringify(evidence).includes('C:\\Users'), false);
+  assert.equal(JSON.stringify(evidence).includes('cookie'), false);
 });
 
 test('auth bootstrap privacy disables credential-bearing evidence', () => {

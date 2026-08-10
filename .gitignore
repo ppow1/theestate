@@ -5,6 +5,7 @@ __pycache__/
 .env
 .venv/
 node_modules/
+/.webui_secret_key
 
 # Playwright operator state is local authentication/session material and is
 # never an evidence or source-control artifact.

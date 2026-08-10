@@ -27,7 +27,7 @@ function readEvents(root) {
   return events;
 }
 
-function emitOperatorAttention({root, runId, url, profilePath = 'runtime/browser/openwebui-operator-profile', status = 'required', timestamp = new Date().toISOString()}) {
+function emitOperatorAttention({root, runId, url, profilePath = 'estate-openwebui-operator-profile', status = 'required', timestamp = new Date().toISOString()}) {
   if (!EVENT_TYPES[status]) throw new Error(`unsupported operator attention status: ${status}`);
   const eventId = `ope-openwebui-auth-${runId}-${status}`;
   const existing = readEvents(root).find(event => event.event_id === eventId);
