@@ -1,10 +1,12 @@
 import json
+import os
 import subprocess
 import uuid
 from pathlib import Path
 
 from estate.core.codex_bridge import (
     CodexBridgeRequest,
+    CODEX_SEAT_HOMES,
     build_codex_command,
     normalize_text,
     parse_jsonl_output,
@@ -151,6 +153,65 @@ def test_default_command_shape_places_top_level_options_before_exec():
         "--json",
         "-",
     ]
+
+
+def test_explicit_seat_profiles_use_isolated_child_codex_homes_without_parent_mutation(monkeypatch):
+    parent_home = r"A:\AI\CodexProfiles\default-parent"
+    monkeypatch.setenv("CODEX_HOME", parent_home)
+    captured = []
+
+    def fake_process(*args, **kwargs):
+        captured.append(kwargs["env"])
+        return subprocess.CompletedProcess(args=args[0], returncode=0, stdout=b"", stderr=b"")
+
+    for seat in ("C1", "C2", "C3"):
+        root = make_root(f"seat_{seat}")
+        run_codex_bridge_request(
+            request(root, codex_home_profile=seat),
+            root=root,
+            run_process=fake_process,
+        )
+
+    assert [env["CODEX_HOME"] for env in captured] == [str(CODEX_SEAT_HOMES[seat]) for seat in ("C1", "C2", "C3")]
+    assert os.environ["CODEX_HOME"] == parent_home
+    assert len({env["CODEX_HOME"] for env in captured}) == 3
+
+
+def test_unknown_profile_is_rejected_before_child_process_and_cannot_use_parent_home(monkeypatch):
+    parent_home = r"A:\AI\CodexProfiles\default-parent"
+    monkeypatch.setenv("CODEX_HOME", parent_home)
+    calls = []
+    root = make_root("unknown_profile_execution")
+
+    result = run_codex_bridge_request(
+        request(root, codex_home_profile="unknown-seat"),
+        root=root,
+        run_process=lambda *args, **kwargs: calls.append(kwargs),
+    )
+
+    assert result.status == "policy_denied"
+    assert "provider profile is unknown" in result.validation_errors
+    assert calls == []
+    assert os.environ["CODEX_HOME"] == parent_home
+
+
+def test_legacy_generic_profile_preserves_parent_codex_home_in_child(monkeypatch):
+    parent_home = r"A:\AI\CodexProfiles\default-parent"
+    monkeypatch.setenv("CODEX_HOME", parent_home)
+    captured = []
+    root = make_root("generic_profile_environment")
+
+    run_codex_bridge_request(
+        request(root, codex_home_profile="default"),
+        root=root,
+        run_process=lambda *args, **kwargs: (
+            captured.append(kwargs["env"])
+            or subprocess.CompletedProcess(args=args[0], returncode=0, stdout=b"", stderr=b"")
+        ),
+    )
+
+    assert captured[0]["CODEX_HOME"] == parent_home
+    assert os.environ["CODEX_HOME"] == parent_home
 
 
 def test_jsonl_parser_extracts_final_message_and_token_usage():

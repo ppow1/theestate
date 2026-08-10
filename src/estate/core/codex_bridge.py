@@ -28,8 +28,18 @@ SANDBOX_READ_ONLY = "read-only"
 SANDBOX_WORKSPACE_WRITE = "workspace-write"
 PROHIBITED_SANDBOX = "danger-full-access"
 ALLOWED_SANDBOXES = {SANDBOX_READ_ONLY, SANDBOX_WORKSPACE_WRITE}
+CODEX_SEAT_HOMES = {
+    "C1": Path(r"A:\AI\CodexProfiles\C1"),
+    "C2": Path(r"A:\AI\CodexProfiles\C2"),
+    "C3": Path(r"A:\AI\CodexProfiles\C3"),
+}
 ALLOWED_PROVIDER_PROFILES = {
-    "codex-cli-openai": {"default", "chatgpt-business-default", "sandbox-offline"},
+    "codex-cli-openai": {
+        "default",
+        "chatgpt-business-default",
+        "sandbox-offline",
+        *CODEX_SEAT_HOMES,
+    },
     "codex-cli-ollama": {"default", "local-ollama"},
 }
 FORBIDDEN_PATH_SEGMENTS = {".git", ".codex", "runtime"}
@@ -482,6 +492,20 @@ def build_codex_command(request: CodexBridgeRequest) -> list[str]:
     return command
 
 
+def build_codex_environment(request: CodexBridgeRequest) -> dict[str, str]:
+    """Build the child-only environment for the selected bridge profile.
+
+    Generic legacy profiles intentionally inherit the parent environment. The
+    explicit C1/C2/C3 profiles override only CODEX_HOME with their approved,
+    non-secret home path. The parent process environment is never mutated.
+    """
+    environment = os.environ.copy()
+    seat_home = CODEX_SEAT_HOMES.get(request.codex_home_profile)
+    if seat_home is not None:
+        environment["CODEX_HOME"] = str(seat_home)
+    return environment
+
+
 def _redacted_command(command: Sequence[str]) -> list[str]:
     redacted: list[str] = []
     redact_next = False
@@ -810,6 +834,7 @@ def run_codex_bridge_request(
             input=_read_prompt(prompt_path).encode("utf-8"),
             capture_output=True,
             check=False,
+            env=build_codex_environment(request),
         )
         stdout_raw = getattr(completed, "stdout", b"")
         stderr_raw = getattr(completed, "stderr", b"")
