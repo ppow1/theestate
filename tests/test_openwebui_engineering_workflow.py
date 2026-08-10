@@ -5,6 +5,7 @@ from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
 
 LIVE_BOUNDED_PROMPT = "Grace, run a small bounded local text task: write one short sentence confirming that this governed task used the UUID-bound RTX 4090 lane; include no secrets and perform no hardware actions."
+P100_LIVE_PROMPT = "Grace, run a small bounded local text task using the governed P100 compute lane, produce one short sentence, and tell me which physical GPU executed it."
 
 
 def test_detects_explicit_metadata_command():
@@ -28,6 +29,26 @@ def test_bounded_prompt_with_runtime_keywords_bypasses_read_only_runtime_layer()
     payload = {"model": "estate/grace", "messages": [{"role": "user", "content": prompt}]}
     assert detect_bounded_local_text_intent(payload, prompt)["state"] == "execution_requested"
     assert _grace_runtime_operation_response(payload, root=".") is None
+
+
+def test_exact_p100_prompt_precedes_runtime_inference_in_both_modes(monkeypatch, tmp_path):
+    payload = {"model": "estate/grace", "messages": [{"role": "user", "content": P100_LIVE_PROMPT}]}
+    assert detect_bounded_local_text_intent(payload, P100_LIVE_PROMPT) == {
+        "state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"
+    }
+    assert _grace_runtime_operation_response(payload, root=tmp_path) is None
+
+    calls = []
+    def fake_handler(payload, *, user_message, session_id, root, stream=False):
+        calls.append(stream)
+        return {"id": "bounded-precedence", "object": "chat.completion.chunk" if stream else "chat.completion", "created": 0, "model": "estate/grace", "choices": [{"index": 0, "delta": {"content": "governed"}}] if stream else [{"index": 0, "message": {"content": "governed"}}], "estate": {"bounded_local_text": {"state": "execution_requested"}}}
+
+    monkeypatch.setattr(resident_gateway, "_bounded_local_text_chat_completion", fake_handler)
+    code, _ = chat_completion({**payload, "stream": False}, root=tmp_path)
+    assert code == 200
+    code, _ = chat_completion_stream({**payload, "stream": True}, root=tmp_path)
+    assert code == 200
+    assert calls == [False, True]
 
 
 def test_qwen_model_specific_vram_floor_fails_closed_when_missing(tmp_path):

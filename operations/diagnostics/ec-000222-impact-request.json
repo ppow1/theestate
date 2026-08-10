@@ -30,16 +30,38 @@
   "grace_acceptance": {
     "submitted": true,
     "status": "blocked",
-    "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810022309077-c275cc98",
-    "visible_result": "AUTHORITATIVE_RESULT (runtime availability; no active objective)",
+    "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810023945567-d63bcc32",
+    "visible_result": "completed governed response, but wrong physical GPU: qwen.local.text.4090",
     "historical_prior_attempt": {
       "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810020425856-9ae00508",
       "visible_result": "RUNTIME_UNAVAILABLE",
       "root_cause": "candidate resident Gateway inherited active Grace runtime URL 127.0.0.1:8766 instead of green 127.0.0.1:8767"
     },
-    "root_cause": "explicit bounded intent was classified correctly but the read-only Grace runtime compatibility layer intercepted the prompt because it contained the ordinary words checkpoint and provider",
-    "correction": "explicit execution_requested bounded intent now takes precedence over read-only runtime keyword inference; green slot URL injection remains enforced",
-    "governed_artifacts_created": false,
+    "historical_keyword_interception_attempt": {
+      "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810022309077-c275cc98",
+      "visible_result": "AUTHORITATIVE_RESULT (runtime availability; no active objective)",
+      "root_cause": "read-only Grace runtime keyword inference intercepted explicit bounded intent containing checkpoint and provider"
+    },
+    "root_cause": "P100 lane selection was not propagated as a required compute-resource requirement from the browser-created Grace request; governed execution defaulted to qwen.local.text.4090 despite ESTATE_GOVERNED_LOCAL_TEXT_LANE=qwen.local.text.p100-1",
+    "correction": "explicit execution_requested bounded intent now takes precedence over read-only runtime keyword inference; green slot URL injection remains enforced; resource propagation remains blocked for follow-up work",
+    "governed_artifacts_created": true,
+    "placement_status": "blocked_wrong_gpu",
+    "observed_chain": {
+      "objective_id": "grace-obj-f2c203f51875",
+      "action_id": "grace-act-61af5a3ec052",
+      "ptm_resolution_id": "res_01KZMRN3HQ7Z2WQ3DBXJJ8HM5M",
+      "helen_determination_id": "heldet-83d49d79352a",
+      "engineering_commission_id": "engcom-b7826bbe5976",
+      "engineering_authorization_id": "engauth-2ec4f9a56672",
+      "reservation_id": "gpu-reservation-grace-obj-f2c203f51875",
+      "dispatch_id": "dispatch-3820d01a140c",
+      "adapter_request_id": "adapter-dispatch-3820d01a140c",
+      "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-f2c203f51875.json",
+      "grace_receipt_id": "gracereceipt-a037c8e7034d",
+      "selected_lane": "qwen.local.text.4090",
+      "selected_gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+    },
+    "required_p100_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
     "retry_submitted": false
   },
   "health": {
@@ -51,5 +73,5 @@
     "postflight": "both present; PnP OK; P100 0% utilization; no device-loss symptom"
   },
   "safety": ["no concurrency", "no P100 32B", "no SDXL", "no stress", "no reset", "no reboot", "no driver operation"],
-  "remaining_unproven": ["visible Grace/Open WebUI P100 execution after candidate runtime URL correction", "simultaneous dual-GPU work"]
+  "remaining_unproven": ["visible Grace/Open WebUI P100 execution with fail-closed P100 resource propagation", "simultaneous dual-GPU work"]
 }
