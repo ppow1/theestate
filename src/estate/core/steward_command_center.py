@@ -9,6 +9,7 @@ import html
 import json
 import re
 import os
+import threading
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -98,6 +99,8 @@ OFFICE_TABS = [
     {"id": "help", "label": "Help"},
     {"id": "about", "label": "About"},
 ]
+
+COMMAND_CENTER_PAYLOAD_CACHE = Path("runtime/steward/command_center_payload.json")
 
 ARTIFACTS = {
     "morning_briefing": ["runtime/operations/morning_briefing.json", "operations/briefings/morning_briefing.md"],
@@ -992,13 +995,32 @@ def _build_steward_recall_operations(root):
     return {"available": available, "path": "runtime/audit/recall_audit_log.json; runtime/notifications/notification_router_report.json", "kind": "steward_recall_operations", "placeholder": None, "data": {"summary": {"recall_count": len(recall_list), "active_recall_count": active_count, "missing_source_count": len(missing_sources)}, "recalls": recall_list, "missing_sources": missing_sources, "sources": {name: _source_status(artifact) for name, artifact in sources.items()}, "constraints": {"does_not_send_recalls": True, "does_not_approve_recalls": True, "does_not_bypass_alfred": True}}}
 
 
-def _operations_control_surface_panel(root):
+def _operations_control_surface_panel(root, *, fast_start=False):
+    if fast_start:
+        constraints = {"does_not_grant_final_acceptance": True, "traffic_controller_constraints_preserved": True, "provider_execution_performed": False}
+        return {
+            "available": True,
+            "path": "runtime/operations_runtime/status/latest.json; runtime/operations_scheduler/status.json; runtime/background_operations/watch_state.json",
+            "kind": "operations_control_surface",
+            "data": {
+                "host": {"host_state": "stale", "status_refresh": "deferred until after HTTP startup"},
+                "runtime": {},
+                "scheduler": {},
+                "watches": {},
+                "post_merge_audit": {},
+                "merge_discovery": {},
+                "background_operations": {},
+                "summary": {"host_state": "stale", "fault": "Operational host status refresh is pending."},
+                "constraints": constraints,
+            },
+            "constraints": constraints,
+        }
     def safe(call, fallback):
         try:
             return call()
         except Exception as exc:
             return {**fallback, "error": f"{type(exc).__name__}: {exc}"}
-    host = safe(lambda: OperationsRuntimeHost(root=root).status(), {"host_state": "unavailable"})
+    host = ({"host_state": "stale", "status_refresh": "deferred until after HTTP startup"} if fast_start else safe(lambda: OperationsRuntimeHost(root=root).status(), {"host_state": "unavailable"}))
     runtime = safe(lambda: load_operations_runtime_status(root), {"summary": {}})
     scheduler = safe(lambda: OperationsSchedulerRuntime(root).list(), {"jobs": []})
     watches = safe(lambda: OperationalWatchRuntime(root).list(), {"watches": [], "summary": {}})
@@ -1043,7 +1065,7 @@ def _safe_office_personnel_directory(root, write=True):
     except Exception as exc:
         return {"available": False, "path": "runtime/steward/office_personnel_directory.json", "kind": "office_personnel_directory", "placeholder": f"Personnel directory unavailable: {exc}", "data": {"personnel": [], "summary": {}}}
 
-def generate_command_center(root=None, write=True):
+def generate_command_center(root=None, write=True, *, fast_start=False):
     root = _root(root)
     resident_cards = build_resident_cards(root)
     resident_panels = {f"{str(card.get('name', '')).lower()}_resident_card": card for card in resident_cards["cards"]}
@@ -1054,7 +1076,7 @@ def generate_command_center(root=None, write=True):
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
         "operational_activity": load_office_operational_activity(root),
-        "operations_control_surface": _operations_control_surface_panel(root),
+        "operations_control_surface": _operations_control_surface_panel(root, fast_start=fast_start),
         "execution_control": _execution_control_panel(root),
         "traffic_controller_panel": load_office_traffic_controller_panel(root),
         "orchestrator_intake_decisions": load_office_intake_decision_surface(root),
@@ -1102,7 +1124,36 @@ def generate_command_center(root=None, write=True):
         out = root / "runtime" / "steward" / "command_center.html"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(render_command_center_html(payload), encoding="utf-8")
+        (root / COMMAND_CENTER_PAYLOAD_CACHE).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return payload
+
+
+def _fast_command_center_snapshot(root):
+    generated_at = _now()
+    settings_manager = load_operations_center_settings(root)
+    panels = {
+        "steward_attention": _steward_attention_panel_fast(root),
+        "operations_control_surface": _operations_control_surface_panel(root, fast_start=True),
+        "validation_status": _read_artifact(root, ARTIFACTS["validation_status"]),
+        "settings": _settings_panel(root),
+        "operations_center_layout": _operations_center_layout_framework({}, generated_at),
+    }
+    status_bar = _build_status_bar(root, panels, generated_at)
+    return {
+        "version": 1,
+        "payload_version": generated_at,
+        "generated_at": generated_at,
+        "local_only": True,
+        "panels": panels,
+        "navigation": _office_navigation(panels, settings_manager),
+        "tabs": _office_tabs(panels, settings_manager),
+        "layout_framework": panels["operations_center_layout"],
+        "workspace_profile": {},
+        "settings_manager": settings_manager,
+        "office_actions": {tab["id"]: controls_for_tab(tab["id"]) for tab in OFFICE_TABS},
+        "status_bar": status_bar,
+        "activity_console": {"events": [{"timestamp": generated_at, "source": "steward.command_center", "topic": "startup", "severity": "info", "message": "Operations Center is starting; full local panels will refresh in the background."}]},
+    }
 
 
 
@@ -1306,6 +1357,18 @@ def _steward_attention_panel(root, write=True):
     annunciator = _read_artifact(root, ["runtime/office/steward_annunciator.json"])
     state = annunciator.get("data") if annunciator.get("available") and isinstance(annunciator.get("data"), dict) else {"active": False, "severity": None, "items": [], "active_item_ids": []}
     return {"available": True, "path": "runtime/office/steward_attention_items.json; runtime/office/steward_annunciator.json", "kind": "steward_attention_annunciator", "data": {"aggregate": aggregate, "annunciator": state, "acknowledgement_authority": "estate.core.steward_attention.record_action via Office action endpoint", "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "presentation": "fixed corner banner plus Steward Attention tab"}}}
+
+
+def _steward_attention_panel_fast(root):
+    """Read only the durable annunciator artifact for HTTP refreshes.
+
+    Full aggregate generation belongs to the startup snapshot and watcher.  A
+    browser poll must remain responsive while the canonical aggregate is being
+    scanned or another local writer is updating artifacts.
+    """
+    annunciator = _read_artifact(root, ["runtime/office/steward_annunciator.json"])
+    state = annunciator.get("data") if annunciator.get("available") and isinstance(annunciator.get("data"), dict) else {"active": False, "severity": None, "items": [], "active_item_ids": []}
+    return {"available": True, "path": "runtime/office/steward_annunciator.json", "kind": "steward_attention_annunciator", "data": {"aggregate": {}, "annunciator": state, "acknowledgement_authority": "estate.core.steward_attention.record_action via Office action endpoint", "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "presentation": "fixed corner banner plus Steward Attention tab"}}}
 
 
 def _office_navigation(panels, settings_manager=None):
@@ -2990,13 +3053,21 @@ window.addEventListener('load', () => { updateUiRuntimeDiagnostic('ready', 'UI r
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
     root = _root(root)
-    generate_command_center(root=root, write=True)
+    payload_path = root / COMMAND_CENTER_PAYLOAD_CACHE
+    try:
+        payload_cache = json.loads(payload_path.read_text(encoding="utf-8"))
+        if not isinstance(payload_cache, dict) or not isinstance(payload_cache.get("panels"), dict):
+            raise ValueError("invalid command center payload cache")
+    except (OSError, ValueError, json.JSONDecodeError):
+        payload_cache = _fast_command_center_snapshot(root)
+    html_cache = render_command_center_html(payload_cache).encode("utf-8")
 
     class Handler(SimpleHTTPRequestHandler):
         def do_GET(self):
+            nonlocal payload_cache, html_cache
             parsed = urlparse(self.path)
             if parsed.path in ("/", "/index.html", "/command-center"):
-                html_doc = render_command_center_html(generate_command_center(root=root, write=True)).encode("utf-8")
+                html_doc = html_cache
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(html_doc)))
@@ -3004,22 +3075,21 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 self.wfile.write(html_doc)
                 return
             if parsed.path == "/api/office/payload":
-                payload = generate_command_center(root=root, write=False)
-                body = json.dumps({"payload_version": payload.get("payload_version"), "generated_at": payload.get("generated_at"), "stale": False, "tabs": payload.get("tabs"), "navigation": payload.get("navigation"), "annunciator_html": _steward_attention_html(payload.get("panels", {}).get("steward_attention", {}), banner=True)}, indent=2, sort_keys=True).encode("utf-8")
+                panel = _steward_attention_panel_fast(root)
+                body = json.dumps({"payload_version": payload_cache.get("payload_version"), "generated_at": payload_cache.get("generated_at"), "stale": False, "tabs": payload_cache.get("tabs"), "navigation": payload_cache.get("navigation"), "annunciator_html": _steward_attention_html(panel, banner=True)}, indent=2, sort_keys=True).encode("utf-8")
                 self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
             if self.path == "/status.json":
-                if os.environ.get("ESTATE_BOOTSTRAP_STATUS_FAST") == "1":
-                    body = json.dumps({"generated_at": _now(), "status": "running", "local_only": True}).encode("utf-8")
-                else:
-                    payload = generate_command_center(root=root, write=False)
-                    body = json.dumps({
-                        "generated_at": payload.get("generated_at"),
-                        "annunciator_html": _steward_attention_html(payload.get("panels", {}).get("steward_attention", {}), banner=True),
-                        "status_bar": payload.get("status_bar"),
-                        "activity_console": payload.get("activity_console"),
-                        "status_bar_html": _status_bar_html(payload.get("status_bar", {})),
-                        "activity_console_html": _activity_console_html(payload.get("activity_console", {})),
-                    }).encode("utf-8")
+                panel = _steward_attention_panel_fast(root)
+                body = json.dumps({
+                    "generated_at": _now(),
+                    "status": "running",
+                    "local_only": True,
+                    "annunciator_html": _steward_attention_html(panel, banner=True),
+                    "status_bar": payload_cache.get("status_bar"),
+                    "activity_console": payload_cache.get("activity_console"),
+                    "status_bar_html": _status_bar_html(payload_cache.get("status_bar", {})),
+                    "activity_console_html": _activity_console_html(payload_cache.get("activity_console", {})),
+                }).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))
@@ -3043,6 +3113,7 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
             self.send_error(404, "Command center only serves the local dashboard and local resident APIs.")
 
         def do_POST(self):
+            nonlocal payload_cache, html_cache
             parsed = urlparse(self.path); parts = [p for p in parsed.path.split("/") if p]
             length = int(self.headers.get("Content-Length", "0") or "0")
             try:
@@ -3052,8 +3123,9 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
             if parts == ["api", "office", "actions", "execute"]:
                 action_id = data.pop("action_id", "")
                 payload = execute_office_action(action_id, root=root, **data)
-                latest = generate_command_center(root=root, write=False)
-                payload["payload_version"] = latest.get("payload_version")
+                payload_cache["panels"]["steward_attention"] = _steward_attention_panel_fast(root)
+                html_cache = render_command_center_html(payload_cache).encode("utf-8")
+                payload["payload_version"] = payload_cache.get("payload_version")
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "chat":
                 payload = process_chat(parts[2], data.get("message") or data.get("user_message") or "", session_id=data.get("session_id"), action=data.get("action") or "summarize", root=root, attachments=data.get("attachments") or [])
             elif len(parts) == 4 and parts[:2] == ["api", "residents"] and parts[3] == "forget":
@@ -3065,4 +3137,18 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
             body = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
             self.send_response(200 if payload.get("outcome") != "failed" and payload.get("ok", True) else 400); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
 
-    return ThreadingHTTPServer((host, port), Handler)
+    server = ThreadingHTTPServer((host, port), Handler)
+
+    def refresh_payload():
+        nonlocal payload_cache, html_cache
+        try:
+            refreshed = generate_command_center(root=root, write=True)
+            payload_cache = refreshed
+            html_cache = render_command_center_html(refreshed).encode("utf-8")
+        except Exception:
+            # The cached/degraded snapshot remains available if a runtime probe
+            # is unavailable while the background refresh is running.
+            return
+
+    threading.Thread(target=refresh_payload, name="operations-center-payload-refresh", daemon=True).start()
+    return server

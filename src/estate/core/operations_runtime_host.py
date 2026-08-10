@@ -47,8 +47,8 @@ def _state_dir(state_dir: Path | None = None) -> Path:
 
 
 
-def _run_command(cmd: list[str], *, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, cwd=str(cwd) if cwd else None, text=True, capture_output=True, check=False)
+def _run_command(cmd: list[str], *, cwd: Path | None = None, timeout: float | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(cmd, cwd=str(cwd) if cwd else None, text=True, capture_output=True, check=False, timeout=timeout)
 
 def _quote_ps(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
@@ -297,7 +297,10 @@ class OperationsRuntimeHost:
     def _query_windows_task(self, task_name: str | None = None) -> dict[str, Any]:
         managed_task_name = task_name or self._scheduled_task_name_for_management()
         query = ["schtasks", "/Query", "/TN", managed_task_name, "/FO", "LIST", "/V"]
-        result = _run_command(query)
+        try:
+            result = _run_command(query, timeout=2.0)
+        except subprocess.TimeoutExpired as exc:
+            return {"scheduled_task_exists": False, "scheduled_task_state": None, "scheduled_task_name": managed_task_name, "query_command": query, "query_returncode": None, "query_stdout": (exc.stdout or ""), "query_stderr": (exc.stderr or ""), "query_timed_out": True}
         exists = result.returncode == 0
         state = None
         for line in result.stdout.splitlines():
@@ -307,7 +310,10 @@ class OperationsRuntimeHost:
         return {"scheduled_task_exists": exists, "scheduled_task_state": state, "scheduled_task_name": managed_task_name, "query_command": query, "query_returncode": result.returncode, "query_stdout": result.stdout, "query_stderr": result.stderr}
 
     def _runtime_revision(self) -> str | None:
-        result = _run_command(["git", "rev-parse", "HEAD"], cwd=self.root)
+        try:
+            result = _run_command(["git", "rev-parse", "HEAD"], cwd=self.root, timeout=2.0)
+        except subprocess.TimeoutExpired:
+            return None
         return result.stdout.strip() if result.returncode == 0 else None
 
     def install(self) -> dict[str, Any]:

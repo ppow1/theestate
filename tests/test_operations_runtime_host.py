@@ -94,7 +94,7 @@ def test_windows_install_executes_and_verifies_scheduled_task(tmp_path, monkeypa
     class R:
         def __init__(self, rc=0, out="", err=""):
             self.returncode=rc; self.stdout=out; self.stderr=err
-    def fake(cmd, cwd=None):
+    def fake(cmd, cwd=None, timeout=None):
         calls.append(cmd)
         if cmd[:2] == ["schtasks","/Query"]:
             return R(0, "Status: Ready\n")
@@ -151,7 +151,7 @@ def test_windows_uninstall_deletes_and_verifies_removal(tmp_path, monkeypatch):
     class R:
         def __init__(self, rc=0):
             self.returncode=rc; self.stdout=""; self.stderr=""
-    def fake(cmd, cwd=None):
+    def fake(cmd, cwd=None, timeout=None):
         calls.append(cmd)
         if cmd[:2] == ["schtasks","/Query"]:
             return R(1)
@@ -179,7 +179,7 @@ def test_windows_uninstall_uses_manifest_task_name_when_cli_task_name_omitted(tm
             self.stdout = ""
             self.stderr = ""
 
-    def fake(cmd, cwd=None):
+    def fake(cmd, cwd=None, timeout=None):
         calls.append(cmd)
         if cmd[:2] == ["schtasks", "/Query"]:
             return R(1)
