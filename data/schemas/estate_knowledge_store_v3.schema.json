@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/estate_knowledge_store_v3",
+  "title": "Estate rebuildable knowledge projection v3",
+  "type": "object",
+  "required": ["schema_version", "candidate_assertions", "review_decisions", "applied_comprehension", "application_history", "revalidation_queue"],
+  "properties": {
+    "schema_version": {"const": "estate.knowledge_store.v3"},
+    "candidate_assertions": {"type": "array"},
+    "review_decisions": {"type": "array"},
+    "applied_comprehension": {"type": "array"},
+    "application_history": {"type": "array"},
+    "revalidation_queue": {"type": "array"}
+  },
+  "additionalProperties": true
+}

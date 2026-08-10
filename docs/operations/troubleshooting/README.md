@@ -254,6 +254,18 @@ provenance, is idempotent for identical results, preserves conflicts, and
 leaves human review required. No provider can expand scope or authorize
 remediation.
 
+### Governed comprehension candidate application
+
+Candidate interpretations remain provider output until assertion-level
+corroboration and review. The knowledge-index owner records evidence strength,
+review decisions, application history, reversibility, and source-change
+revalidation. Only low-risk, deterministically corroborated assertions may be
+applied to the non-canonical indexed comprehension projection. Conflicts,
+unsupported claims, and lifecycle or failure-seam inferences remain exceptions;
+they do not advance coverage or authorize source changes. Provider identity is
+never reviewer authority. The Level-1 campaign uses the existing bounded worker
+and does not schedule recurring work or process Levels 2–4.
+
 ## Historical replay set
 
 Seeded evidence maps stale owner/active lease, composer not ready, request

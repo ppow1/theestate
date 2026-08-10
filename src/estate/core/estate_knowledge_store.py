@@ -18,8 +18,8 @@ from typing import Any, Iterable
 from estate.core.estate_knowledge_index import SOURCE_LOCATIONS, _registry_by_path, classification_for, estate_root, owner_for
 
 DB_RELATIVE = Path("runtime/search/estate_knowledge_index.sqlite3")
-STORE_SCHEMA_VERSION = "estate.knowledge_store.v2"
-MIGRATION_VERSION = 2
+STORE_SCHEMA_VERSION = "estate.knowledge_store.v3"
+MIGRATION_VERSION = 3
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules", "runtime", "generated", "browser_profiles", "evidence"}
 
 MIGRATIONS = {
@@ -175,6 +175,45 @@ MIGRATIONS = {
     CREATE INDEX IF NOT EXISTS idx_batch_asset ON comprehension_batch_assets(asset_id);
     CREATE INDEX IF NOT EXISTS idx_candidate_asset ON candidate_interpretations(asset_id, created_at);
     UPDATE schema_meta SET value='estate.knowledge_store.v2' WHERE key='store_schema';
+    """,
+    3: """
+    CREATE TABLE IF NOT EXISTS candidate_assertions (
+      assertion_id TEXT PRIMARY KEY, interpretation_id TEXT NOT NULL REFERENCES candidate_interpretations(interpretation_id),
+      result_id TEXT NOT NULL REFERENCES comprehension_results(result_id), asset_id TEXT NOT NULL REFERENCES assets(asset_id),
+      assertion_kind TEXT NOT NULL, proposed_value TEXT, evidence_refs TEXT NOT NULL, confidence TEXT NOT NULL,
+      evidence_strength TEXT NOT NULL, corroboration_state TEXT NOT NULL, corroboration_reason TEXT,
+      review_state TEXT NOT NULL, application_state TEXT NOT NULL, conflict_state TEXT NOT NULL,
+      provider_type TEXT NOT NULL, provider_model TEXT, worker_identity TEXT NOT NULL,
+      source_revision TEXT NOT NULL, source_hash TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+      UNIQUE(interpretation_id, assertion_kind, proposed_value)
+    );
+    CREATE TABLE IF NOT EXISTS review_decisions (
+      decision_id TEXT PRIMARY KEY, assertion_id TEXT NOT NULL REFERENCES candidate_assertions(assertion_id),
+      decision TEXT NOT NULL, reviewer_id TEXT NOT NULL, reviewer_type TEXT NOT NULL, rationale TEXT NOT NULL,
+      evidence_refs TEXT NOT NULL, source_revision TEXT NOT NULL, decided_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS applied_comprehension (
+      application_id TEXT PRIMARY KEY, assertion_id TEXT NOT NULL REFERENCES candidate_assertions(assertion_id),
+      asset_id TEXT NOT NULL REFERENCES assets(asset_id), field_name TEXT NOT NULL, applied_value TEXT NOT NULL,
+      source_revision TEXT NOT NULL, source_hash TEXT NOT NULL, reviewer_id TEXT NOT NULL, applied_at TEXT NOT NULL,
+      state TEXT NOT NULL, UNIQUE(assertion_id, state)
+    );
+    CREATE TABLE IF NOT EXISTS application_history (
+      history_id TEXT PRIMARY KEY, application_id TEXT NOT NULL REFERENCES applied_comprehension(application_id),
+      event_type TEXT NOT NULL, prior_value TEXT, new_value TEXT, evidence_refs TEXT NOT NULL,
+      source_revision TEXT NOT NULL, actor_id TEXT NOT NULL, actor_type TEXT NOT NULL, occurred_at TEXT NOT NULL,
+      reason TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS revalidation_queue (
+      queue_id TEXT PRIMARY KEY, assertion_id TEXT NOT NULL REFERENCES candidate_assertions(assertion_id),
+      asset_id TEXT NOT NULL REFERENCES assets(asset_id), prior_source_revision TEXT NOT NULL,
+      current_source_revision TEXT NOT NULL, prior_source_hash TEXT NOT NULL, current_source_hash TEXT NOT NULL,
+      state TEXT NOT NULL, reason TEXT NOT NULL, queued_at TEXT NOT NULL, resolved_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_assertion_review ON candidate_assertions(review_state, corroboration_state);
+    CREATE INDEX IF NOT EXISTS idx_assertion_asset ON candidate_assertions(asset_id, application_state);
+    CREATE INDEX IF NOT EXISTS idx_application_asset ON applied_comprehension(asset_id, state);
+    UPDATE schema_meta SET value='estate.knowledge_store.v3' WHERE key='store_schema';
     """
 }
 

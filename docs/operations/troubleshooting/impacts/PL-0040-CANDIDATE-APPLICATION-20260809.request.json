@@ -1,0 +1,97 @@
+{
+  "packet_version": "1.0.0",
+  "change_id": "PL-0040-CANDIDATE-APPLICATION-20260809",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-GOVERNED-CANDIDATE-APPLICATION",
+  "author_provenance": {
+    "kind": "HUMAN",
+    "actor": "Steward-authorized Codex"
+  },
+  "changed_files": [
+    "src/estate/core/estate_comprehension_governance.py",
+    "src/estate/core/estate_knowledge_store.py",
+    "src/estate/cli/main.py",
+    "data/schemas/estate_knowledge_store_v3.schema.json",
+    "migrations/estate_knowledge_store/README.md",
+    "tests/test_estate_comprehension_governance.py",
+    "tests/test_estate_knowledge_store.py",
+    "docs/operations/troubleshooting/README.md",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_components": [
+    "estate_knowledge_index",
+    "estate_population",
+    "estate_comprehension_worker",
+    "estate_diagnostics_cli",
+    "living_diagnostics"
+  ],
+  "changed_schemas": [
+    "data/schemas/estate_knowledge_store_v3.schema.json"
+  ],
+  "behavior_before": "Candidate interpretations were retained as review-required provider results, without assertion-level corroboration, governed application, application history, or revalidation.",
+  "behavior_after": "The existing knowledge-index owner extracts assertions, corroborates deterministic evidence, routes review, applies only eligible low-risk assertions to a non-canonical projection, records history, supports reversal and source-change revalidation, and exposes resident-neutral queries.",
+  "expected_inputs": [
+    "candidate interpretations",
+    "current asset identity and source hashes",
+    "deterministic tags and ownership metadata",
+    "governed reviewer decision"
+  ],
+  "expected_outputs": [
+    "assertion records",
+    "corroboration states",
+    "review decisions",
+    "application projection and history",
+    "coverage state"
+  ],
+  "dependencies_read": [
+    "Estate Knowledge Index",
+    "SQLite store and migrations",
+    "governed population pipeline",
+    "local-AI comprehension worker",
+    "PL-0040 benchmark and routing evidence"
+  ],
+  "dependencies_called": [
+    "SQLite",
+    "Estate knowledge-index CLI",
+    "Diagnostic Impact tooling",
+    "Git"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 governed application tables"
+  ],
+  "new_failure_modes": [
+    "provider identity cannot review or apply its own output",
+    "conflicting applications are blocked",
+    "source changes require targeted revalidation",
+    "unsupported assertions remain review exceptions"
+  ],
+  "changed_failure_modes": [
+    "candidate generation and schema-valid provider output no longer imply comprehension coverage"
+  ],
+  "tests_added_or_changed": [
+    "tests/test_estate_comprehension_governance.py",
+    "tests/test_estate_knowledge_store.py"
+  ],
+  "validation_evidence": [
+    "focused governance/store/population/worker tests passed",
+    "three actual Level-1 benchmark schema candidates reviewed",
+    "five assertions routed to REQUEST_MORE_CONTEXT and zero applied",
+    "canonical Cookbook and source files were not mutated"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "prohibited_recovery_actions": [
+    "canonical Cookbook mutation",
+    "recurring scheduler activation",
+    "Level-2, Level-3, or Level-4 processing",
+    "provider self-approval",
+    "source deletion, archival, or deprecation"
+  ],
+  "activation_restart_impact": "No daemon or scheduler is changed. Existing store opens migrate to schema v3; no restart is required.",
+  "source_revision": "0ced9e704e1d2222336856a6f3334f410cd76551",
+  "implementation_revision": "0ced9e704e1d2222336856a6f3334f410cd76551",
+  "confidence": "CANDIDATE"
+}

@@ -139,3 +139,17 @@ processed with no canonical promotion. The benchmark report and Diagnostic
 Impact Packet preserve the observed conflicts, stale-packet rejections,
 timeout, throughput, and coverage delta. No unattended scheduling or
 remediation is authorized.
+
+## Governed candidate application slice (2026-08-09)
+
+The existing SQLite knowledge-index owner now normalizes candidate fields into
+assertions, records deterministic corroboration and evidence strength, stores
+review decisions, and applies only low-risk corroborated assertions through a
+transactional non-canonical projection. Provider results remain immutable;
+provider identities cannot review or apply their own output. Application
+history records prior/new values and supports reversal, conflict blocking,
+source-change revalidation, and resident-neutral retrieval. Coverage advances
+only from applied indexed purpose/owner state; candidate generation and
+schema-valid provider output do not advance it. No Level-2, Level-3, or
+Level-4 candidate is processed by the Level-1 burn-down, and no recurring
+scheduler is enabled.
