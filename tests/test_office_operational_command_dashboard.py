@@ -158,8 +158,30 @@ def test_gpu_hash_route_focuses_detail_after_dashboard_materialization(tmp_path)
     html = render_command_center_html(generate_command_center(tmp_path, write=False))
     assert "function focusGpuFromHash()" in html
     assert "document.getElementById('gpu-detail-' + gpu)" in html
-    assert "setTimeout(focus, 250)" in html
+    assert "[0, 100, 300, 700, 1200]" in html
+    assert "window.scrollTo" in html
+    assert "target.focus({preventScroll:true})" in html
     assert "currentDashboard.replaceWith(nextDashboard); focusGpuFromHash();" in html
+
+
+def test_gpu_lost_reason_and_compact_service_access_strip_are_truthful(tmp_path):
+    seed_dashboard_artifacts(tmp_path)
+    manifest = tmp_path / "runtime" / "ai_services" / "implementations" / "open_webui" / "service.manifest.json"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text(json.dumps({"default_endpoint": "http://127.0.0.1:8080"}), encoding="utf-8")
+    devices = [ComputeResourceObservation(
+        resource_id=canonical_resource_id("host-a", "GPU-2"),
+        host_id="host-a", nvidia_uuid="GPU-2", name="Tesla P100",
+        logical_gpu_id="GPU2", health_state="LOST", health_reasons=["Windows reports the expected physical device absent or in a problem state"],
+        health_classification="DEVICE_MISSING", observed_at="2026-08-10T20:00:00Z",
+    )]
+    write_compute_projection(devices, tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+    assert "Windows reports the expected physical device absent or in a problem state" in html
+    assert "id='service-access-strip'" in html
+    assert "Estate Core" in html and "Resident Gateway" in html and "Open WebUI" in html
+    assert "target='_blank'" in html
+    assert "read-only local service evidence" in html
 
 
 def test_served_operations_center_refreshes_codex_seat_quota_without_restart(monkeypatch, tmp_path):
