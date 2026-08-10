@@ -16,7 +16,7 @@
       "additionalProperties": false
     },
     "packet_version": {"const": "estate.troubleshooting.comprehension.work_packet.v2"},
-    "prompt_contract_version": {"const": "estate.troubleshooting.evidence_enriched_prompt.v1"},
+    "prompt_contract_version": {"const": "estate.troubleshooting.evidence_enriched_prompt.v2"},
     "items": {
       "type": "array",
       "items": {
@@ -31,7 +31,7 @@
           "classification": {"type": ["string", "null"]},
           "tags": {"type": "array", "items": {"type": "string"}},
           "unresolved_questions": {"type": "array", "items": {"type": "string"}},
-          "evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^fact:[0-9a-f]{64}$"}},
           "verification_state": {"type": "string"}
         },
         "additionalProperties": false

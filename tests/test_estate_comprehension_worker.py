@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from estate.core.estate_comprehension_worker import _estate_result_id, _extract_json, _quality, difficulty_for, provider_status
-from estate.core.estate_population import PopulationScopeError, validate_result
+from estate.core.estate_population import PopulationScopeError, packet_citation_errors, validate_result
 
 
 def test_provider_status_is_truthful_and_has_no_authority():
@@ -34,7 +34,7 @@ def test_quality_downgrades_unsupported_certainty_without_evidence():
     packet = {"assets": [{"asset_id": "asset:1"}]}
     payload = {"items": [{"asset_id": "asset:1", "purpose": "certain fact", "evidence_refs": []}]}
     quality, reasons = _quality(payload, packet)
-    assert quality == "PARTIAL_CANDIDATE"
+    assert quality == "INVALID_RESULT"
     assert reasons
 
 
@@ -42,14 +42,33 @@ def test_evidence_enriched_quality_requires_packet_fact_citation():
     packet = {
         "packet_version": "estate.troubleshooting.comprehension.work_packet.v2",
         "assets": [{"asset_id": "asset:1"}],
-        "evidence_fact_ids": ["fact:1"],
+        "evidence_fact_ids": ["fact:" + "1" * 64],
     }
-    accepted, reasons = _quality({"items": [{"asset_id": "asset:1", "purpose": "JSON Schema contract", "evidence_refs": ["fact:1"]}]}, packet)
+    accepted, reasons = _quality({"items": [{"asset_id": "asset:1", "purpose": "JSON Schema contract", "evidence_refs": ["fact:" + "1" * 64]}]}, packet)
     assert accepted == "ACCEPTED_CANDIDATE"
     assert not reasons
-    rejected, reasons = _quality({"items": [{"asset_id": "asset:1", "purpose": "unsupported claim", "evidence_refs": ["fact:invented"]}]}, packet)
-    assert rejected == "PARTIAL_CANDIDATE"
+    rejected, reasons = _quality({"items": [{"asset_id": "asset:1", "purpose": "unsupported claim", "evidence_refs": ["fact:" + "2" * 64]}]}, packet)
+    assert rejected == "INVALID_RESULT"
     assert reasons
+
+
+def test_prompt_names_packet_local_fact_namespace():
+    from estate.core.estate_comprehension_worker import _prompt
+    prompt = _prompt({"evidence_fact_ids": ["fact:" + "1" * 64], "assets": []}, "LEVEL_1")
+    assert "ALLOWED_EVIDENCE_FACT_IDS" in prompt
+    assert "Never cite an asset_id" in prompt
+
+
+def test_packet_citation_error_taxonomy_is_fail_closed():
+    fact = "fact:" + "a" * 64
+    allowed = {fact}
+    assert packet_citation_errors({"purpose": "claim", "evidence_refs": []}, allowed)[0]["code"] == "MISSING_EVIDENCE_CITATION"
+    assert packet_citation_errors({"purpose": "claim", "evidence_refs": ["asset:1"]}, allowed)[0]["code"] == "MALFORMED_EVIDENCE_ID"
+    omitted = "fact:" + "b" * 64
+    assert packet_citation_errors({"purpose": "claim", "evidence_refs": [omitted]}, allowed, {omitted})[0]["code"] == "EVIDENCE_ID_NOT_IN_PACKET"
+    invented = "fact:" + "c" * 64
+    assert packet_citation_errors({"purpose": "claim", "evidence_refs": [invented]}, allowed, set())[0]["code"] == "EVIDENCE_ID_UNKNOWN"
+    assert not packet_citation_errors({"purpose": None, "evidence_refs": []}, allowed)
 
 
 def test_result_with_invented_asset_or_path_is_rejected(tmp_path):

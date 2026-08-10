@@ -1,0 +1,17 @@
+{
+  "packet_version": "1.0.0",
+  "change_id": "PL-0040-CONFIG-REGISTRY-CITATION-20260810",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-CONFIGURATION-REGISTRY-EVIDENCE-CITATION-HARDENING",
+  "author_provenance": {"kind": "HUMAN", "actor": "Pat / Steward-authorized Codex"},
+  "scope": ["data/registry/capabilities.json", "data/registry/services.json", "data/discovery/catalog.json", "data/discovery/metrics.json"],
+  "changed_files": ["src/estate/core/estate_knowledge_store.py", "src/estate/core/estate_population.py", "src/estate/core/estate_comprehension_worker.py", "schemas/troubleshooting/comprehension_result_v1.schema.json", "tests/test_estate_comprehension_worker.py", "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md"],
+  "behavior_before": "Provider outputs that omitted a packet fact, used an asset placeholder, or cited a non-admitted fact were rejected with generic validation and raw output was not retained as an attempt record.",
+  "behavior_after": "The provider receives an explicit packet-local fact namespace; result validation distinguishes missing, malformed, unknown, and globally-known-but-omitted fact IDs before candidate admission; raw invalid attempts and telemetry are preserved; citation failure stops the bounded checkpoint.",
+  "expected_outputs": ["packet-local citation taxonomy", "raw invalid-attempt evidence", "bounded citation circuit breaker", "prompt/schema contract v2", "Checkpoint-B re-acceptance evidence"],
+  "dependencies_read": ["PL-0040", "PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810", "Estate Knowledge Index v5", "evidence-enriched worker", "deterministic evidence engine"],
+  "new_failure_modes": ["qwen3:8b may copy illustrative placeholders or mutate long fact IDs despite explicit packet instructions"],
+  "prohibited_actions": ["provider self-approval", "global SQLite access by provider", "continuing after citation circuit breaker", "scheduler activation", "GPU stress/reset/reconfiguration", "canonical promotion", "source mutation"],
+  "source_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "confidence": "CANDIDATE"
+}

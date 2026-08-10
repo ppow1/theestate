@@ -26,6 +26,8 @@ def test_schema_metadata_consumer_and_assertion_evidence_are_queryable(tmp_path,
     assert result["relationships_found"] >= 1
     second = evidence.extract_evidence(ROOT, asset_ids=[asset_id])
     assert second["facts_created_or_reused"] == result["facts_created_or_reused"]
+    assert second["facts_new"] == 0
+    assert second["facts_reused"] == second["facts_created_or_reused"]
     with store.connect(ROOT, create=False) as connection:
         purpose_id = connection.execute("SELECT assertion_id FROM candidate_assertions WHERE assertion_kind='PURPOSE'").fetchone()[0]
     governance.corroborate(ROOT, assertion_ids=[purpose_id])

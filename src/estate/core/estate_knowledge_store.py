@@ -18,8 +18,8 @@ from typing import Any, Iterable
 from estate.core.estate_knowledge_index import SOURCE_LOCATIONS, _registry_by_path, classification_for, estate_root, owner_for
 
 DB_RELATIVE = Path("runtime/search/estate_knowledge_index.sqlite3")
-STORE_SCHEMA_VERSION = "estate.knowledge_store.v5"
-MIGRATION_VERSION = 5
+STORE_SCHEMA_VERSION = "estate.knowledge_store.v6"
+MIGRATION_VERSION = 6
 EXCLUDED_PARTS = {".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules", "runtime", "generated", "browser_profiles", "evidence"}
 
 MIGRATIONS = {
@@ -262,6 +262,20 @@ MIGRATIONS = {
     CREATE INDEX IF NOT EXISTS idx_evidence_source ON evidence_facts(source_asset_id, source_hash, current_state);
     CREATE INDEX IF NOT EXISTS idx_assertion_evidence_fact ON assertion_evidence(fact_id);
     UPDATE schema_meta SET value='estate.knowledge_store.v5' WHERE key='store_schema';
+    """,
+    6: """
+    CREATE TABLE IF NOT EXISTS comprehension_attempts (
+      attempt_id TEXT PRIMARY KEY, batch_id TEXT NOT NULL REFERENCES comprehension_batches(batch_id),
+      result_id TEXT, provider_type TEXT NOT NULL, provider_model TEXT,
+      worker_identity TEXT NOT NULL, source_revision TEXT NOT NULL,
+      packet_version TEXT, prompt_contract_version TEXT, packet_hash TEXT,
+      raw_output TEXT, validation_state TEXT NOT NULL, validation_code TEXT,
+      validation_message TEXT, telemetry_json TEXT, created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_comprehension_attempt_batch ON comprehension_attempts(batch_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_comprehension_attempt_state ON comprehension_attempts(validation_state, created_at);
+    UPDATE schema_meta SET value='estate.knowledge_store.v6' WHERE key='store_schema';
     """
 }
 

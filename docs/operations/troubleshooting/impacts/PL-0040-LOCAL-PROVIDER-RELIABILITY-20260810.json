@@ -1,0 +1,141 @@
+{
+  "activation_restart_impact": "No service, daemon, scheduler, GPU, driver, or Windows configuration changes.",
+  "author_provenance": {
+    "actor": "Pat / Steward-authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "Provider attempts expose bounded phase timing and response metadata, provider failure stops the current invocation, and evidence facts reuse unchanged hash-grounded logical facts with explicit new/reused counts. The exact timed-out schema was retried safely, but a later registry/config checkpoint stopped on two invalid evidence citations.",
+  "behavior_before": "Provider generation exposed only coarse success/failure metadata, a provider failure did not stop the current bounded loop, and evidence extraction attempted broad source-fact work for every selected asset without reporting new versus reused facts.",
+  "change_id": "PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "0293b1991a58a77ceff2b69ded20d60827901497",
+      "path": "src/estate/core/resident_interaction.py",
+      "sha256": "d2964719fbe1c2dd13c202854dc750872dbfeda8071bec5a92b5325803542d44",
+      "state": "DIRTY",
+      "worktree_git_blob": "d7e988eedc60fd2e0e6e49c33f3b3d089a8fdfdb",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "e922b1fe4ee354d69d02755c54e3b78eca4f2e5f",
+      "path": "src/estate/core/estate_comprehension_worker.py",
+      "sha256": "efe1cb6710a613a967d4e3e3ea4153f0c0b92bba35e390305c57d5aa3477b7b7",
+      "state": "DIRTY",
+      "worktree_git_blob": "b634f431fb42007b92c809055f80dc2584585163",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "50c4482a98d2ae5ac63e06539046125b53cdbf9d",
+      "path": "src/estate/core/estate_deterministic_evidence.py",
+      "sha256": "c05268a05d12878d093e6a653ff47d65c61f73ae96d90c0a31b6e3b2912bc3ce",
+      "state": "DIRTY",
+      "worktree_git_blob": "70c6eb771fe7f8a7325147d25d8a43965a6834ec",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "afc3ed7c0283eba2ce671dadfbb47a78264cd941",
+      "path": "tests/test_estate_deterministic_evidence.py",
+      "sha256": "dc4feb66615ed4ea919290a00025bff55b83ff0b7e1e66177a1fb8cff37307f2",
+      "state": "DIRTY",
+      "worktree_git_blob": "19d35709ebacddeb17863c3ae4b3e674c9e13474",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "4380bb87094d078178dcd9afba8d665bb89d71ae",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "3356845b70f7aa054b9f9096478e24047935fb00c3d93cd8f3dfca8cdc648a0b",
+      "state": "DIRTY",
+      "worktree_git_blob": "53a666364f8ba356d5e2aaa182dd08c52d990188",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/impacts/PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810.request.json",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810.request.json",
+      "sha256": "9aedbd319417b344c2a49301e55812987f257fe2842cfe04e22252973816cc9e",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "edebe585486a04db718f4b43460dff96c9416b0d",
+      "worktree_state": "untracked"
+    }
+  ],
+  "changed_components": [
+    "local_ollama_provider_boundary",
+    "estate_comprehension_worker",
+    "estate_deterministic_evidence",
+    "estate_knowledge_index",
+    "living_diagnostics"
+  ],
+  "changed_failure_modes": [
+    "provider failure now stops the current bounded invocation instead of dequeuing more work"
+  ],
+  "changed_files": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/estate_comprehension_worker.py",
+    "src/estate/core/estate_deterministic_evidence.py",
+    "tests/test_estate_deterministic_evidence.py",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "docs/operations/troubleshooting/impacts/PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810.request.json"
+  ],
+  "changed_schemas": [],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "SQLite v5 runtime store",
+    "Ollama /api/tags and /api/generate",
+    "knowledge-index CLI"
+  ],
+  "dependencies_read": [
+    "PL-0040",
+    "controlled Level-1 scale packet",
+    "Estate Knowledge Index v5",
+    "evidence-enriched worker",
+    "deterministic evidence engine",
+    "existing retry and review/application owners"
+  ],
+  "estate_change_id": "PL-0040-LOCAL-PROVIDER-RELIABILITY-AND-EVIDENCE-SCALE-HARDENING",
+  "expected_inputs": [
+    "existing governed work batches",
+    "admitted assets",
+    "bounded evidence packets",
+    "local Ollama endpoint",
+    "existing v5 SQLite store"
+  ],
+  "expected_outputs": [
+    "phase-aware provider telemetry",
+    "preserved retry failure and recovery attempt",
+    "incremental evidence metrics",
+    "checkpoint quality and stop evidence"
+  ],
+  "implementation_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "new_failure_modes": [
+    "provider outputs can fail closed for missing or out-of-packet evidence citations",
+    "registry/config comprehension remains operationally unsuitable for continuation after citation failures"
+  ],
+  "packet_version": "1.0.0",
+  "prohibited_recovery_actions": [
+    "provider self-approval",
+    "continuing after invalid citation stop",
+    "scheduler activation",
+    "GPU stress/reset/reconfiguration",
+    "source mutation, deletion, archival, or deprecation",
+    "canonical promotion"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 candidate, evidence, review, application, and retry state"
+  ],
+  "source_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "tests_added_or_changed": [
+    "tests/test_estate_deterministic_evidence.py"
+  ],
+  "validation_evidence": [
+    "focused evidence, worker, population, and applicable provider-boundary tests passed; four unrelated live resident-interaction environment tests remain failing",
+    "qwen3:8b bounded probes completed in 1.74s cold and 1.27s repeated; qwen3-coder:30b-qwencode-20k completed in 0.44s",
+    "the timed-out capability_reevaluation schema retried in 17.39s with a new batch/result identity",
+    "Checkpoint A completed eight additional engineering schemas with zero invalid results",
+    "Checkpoint B completed seven registry/config candidates but stopped after two invalid citation results; no later class was attempted",
+    "unchanged evidence extraction reported zero new facts on the repeated run; SQLite integrity_check returned ok"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

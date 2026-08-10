@@ -10,6 +10,7 @@ import fnmatch
 import hashlib
 import json
 import os
+import re
 import time
 import uuid
 from pathlib import Path, PurePosixPath
@@ -26,8 +27,9 @@ SCOPE_PATH = Path("docs/operations/troubleshooting/population-scope.json")
 SCOPE_SCHEMA = "estate.population_scope.v1"
 PACKET_CONTRACT = "estate.troubleshooting.comprehension.work_packet.v1"
 PACKET_VERSION = "estate.troubleshooting.comprehension.work_packet.v2"
-PROMPT_CONTRACT_VERSION = "estate.troubleshooting.evidence_enriched_prompt.v1"
+PROMPT_CONTRACT_VERSION = "estate.troubleshooting.evidence_enriched_prompt.v2"
 RESULT_CONTRACT = "estate.troubleshooting.comprehension.result.v1"
+EVIDENCE_FACT_ID_PATTERN = re.compile(r"^fact:[0-9a-f]{64}$")
 POLICIES = {"STRUCTURAL_SCAN", "METADATA_ONLY", "NO_CONTENT", "EXCLUDED"}
 REPOSITORY_URL = "https://github.com/ppow1/theestate.git"
 
@@ -511,14 +513,50 @@ def validate_result(root: str | Path | None, payload: dict[str, Any], *, packet:
         if packet is None:
             raise PopulationScopeError("evidence-enriched result requires the exact provider packet for citation validation")
         allowed_facts = set(packet.get("evidence_fact_ids") or [])
+        with connect(context["root"], create=False) as connection:
+            known_facts = {row[0] for row in connection.execute("SELECT fact_id FROM evidence_facts WHERE fact_id IN ({})".format(",".join("?" for _ in allowed_facts | {ref for item in payload["items"] for ref in (item.get("evidence_refs") or [])})), tuple(allowed_facts | {ref for item in payload["items"] for ref in (item.get("evidence_refs") or [])})).fetchall()} if allowed_facts or any(item.get("evidence_refs") for item in payload["items"]) else set()
         for item in payload["items"]:
-            positive = any(item.get(key) for key in ("purpose", "owner_candidate", "summary", "classification")) or bool(item.get("tags"))
-            refs = set(item.get("evidence_refs") or [])
-            if positive and not refs.intersection(allowed_facts):
-                raise PopulationScopeError("positive evidence-enriched assertion requires a current packet evidence_fact_id")
-            if not refs.issubset(allowed_facts | allowed):
-                raise PopulationScopeError("provider result contains an evidence reference outside the admitted packet")
+            errors = packet_citation_errors(item, allowed_facts, known_facts)
+            if errors:
+                first = errors[0]
+                raise PopulationScopeError(f"{first['code']}: {first['message']}")
     return {"valid": True, "batch_id": payload["batch_id"], "asset_count": len(payload["items"]), "provider_type": provider["type"], "candidate_only": True}
+
+
+def packet_citation_errors(item: dict[str, Any], allowed_facts: set[str], known_facts: set[str] | None = None) -> list[dict[str, str]]:
+    """Return precise packet-local citation failures before candidate admission."""
+    refs = item.get("evidence_refs") or []
+    positive = any(item.get(key) for key in ("purpose", "owner_candidate", "summary", "classification")) or bool(item.get("tags"))
+    errors: list[dict[str, str]] = []
+    if positive and not refs:
+        errors.append({"code": "MISSING_EVIDENCE_CITATION", "message": "positive assertion has no evidence_refs"})
+        return errors
+    known = known_facts or set()
+    for ref in refs:
+        if not isinstance(ref, str) or not EVIDENCE_FACT_ID_PATTERN.fullmatch(ref):
+            errors.append({"code": "MALFORMED_EVIDENCE_ID", "message": f"evidence reference is not a fact ID: {ref!r}"})
+        elif ref not in allowed_facts:
+            code = "EVIDENCE_ID_NOT_IN_PACKET" if ref in known else "EVIDENCE_ID_UNKNOWN"
+            errors.append({"code": code, "message": f"evidence fact {ref} is not admitted in this packet" if code.endswith("PACKET") else f"evidence fact {ref} is unknown"})
+    return errors
+
+
+def record_comprehension_attempt(root: str | Path | None, *, attempt_id: str, batch_id: str, result_id: str | None,
+                                 provider_type: str, provider_model: str | None, worker_identity: str,
+                                 source_revision: str, packet_version: str | None, prompt_contract_version: str | None,
+                                 packet_hash: str | None, raw_output: str | None, validation_state: str,
+                                 validation_code: str | None = None, validation_message: str | None = None,
+                                 telemetry: dict[str, Any] | None = None) -> None:
+    with connect(validate_requested_scope(root)["root"], create=False) as connection:
+        now = _now()
+        connection.execute("""INSERT OR REPLACE INTO comprehension_attempts
+          (attempt_id,batch_id,result_id,provider_type,provider_model,worker_identity,source_revision,
+           packet_version,prompt_contract_version,packet_hash,raw_output,validation_state,validation_code,
+           validation_message,telemetry_json,created_at,updated_at)
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (attempt_id, batch_id, result_id, provider_type,
+          provider_model, worker_identity, source_revision, packet_version, prompt_contract_version, packet_hash,
+          raw_output, validation_state, validation_code, validation_message,
+          _canonical(telemetry or {}), now, now))
 
 
 def ingest_result(root: str | Path | None, payload: dict[str, Any], *, packet: dict[str, Any] | None = None) -> dict[str, Any]:

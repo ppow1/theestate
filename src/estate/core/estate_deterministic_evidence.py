@@ -81,8 +81,26 @@ def _insert_fact(connection, *, fact_kind: str, source: dict[str, Any], target: 
                  value: Any, location: str | None, extractor: str, certainty: str,
                  revision: str, source_hash: str) -> str:
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    # Revision changes alone do not create a new logical fact. Reuse the
+    # existing hash-grounded fact so a new checkout revision does not multiply
+    # unchanged evidence. A genuinely changed source hash still creates a new
+    # historical fact and the caller marks the prior hash stale.
+    existing = connection.execute(
+        """SELECT fact_id,current_state FROM evidence_facts
+           WHERE fact_kind=? AND source_asset_id=? AND target_asset_id IS ?
+             AND value_json=? AND evidence_path=? AND evidence_location IS ?
+             AND source_hash=? AND extractor=?
+           ORDER BY CASE WHEN current_state='CURRENT' THEN 0 ELSE 1 END, updated_at DESC
+           LIMIT 1""",
+        (fact_kind, source["asset_id"], target["asset_id"] if target else None, encoded,
+         source["current_path"], location, source_hash, extractor),
+    ).fetchone()
+    if existing:
+        if existing[1] != "CURRENT":
+            connection.execute("UPDATE evidence_facts SET current_state='CURRENT',updated_at=? WHERE fact_id=?", (_now(), existing[0]))
+        return existing[0]
     fact_id = "fact:" + _sha({"kind": fact_kind, "source": source["asset_id"], "target": target["asset_id"] if target else None,
-                               "value": value, "path": source["current_path"], "location": location, "revision": revision, "hash": source_hash})
+                               "value": value, "path": source["current_path"], "location": location, "hash": source_hash, "extractor": extractor})
     now = _now()
     connection.execute(
         """INSERT OR IGNORE INTO evidence_facts
@@ -194,6 +212,7 @@ def extract_evidence(root: str | Path | None = None, *, asset_ids: Iterable[str]
     revision = context["source_revision"]
     started = time.perf_counter()
     with connect(base, create=False) as connection:
+        fact_count_before = connection.execute("SELECT COUNT(*) FROM evidence_facts").fetchone()[0]
         targets = [row for row in _asset_rows(connection, asset_ids) if row["current_state"] != "MISSING"]
         target_paths = {row["current_path"] for row in targets}
         target_by_path = {row["current_path"]: row for row in targets}
@@ -241,7 +260,9 @@ def extract_evidence(root: str | Path | None = None, *, asset_ids: Iterable[str]
                              extractor=EXTRACTOR, certainty="DETERMINISTIC_SOURCE_RELATIONSHIP",
                              revision=revision, source_hash=source_hash)
                 facts += 1
-        return {"status": "READY", "facts_created_or_reused": facts, "relationships_found": relationships,
+        fact_count_after = connection.execute("SELECT COUNT(*) FROM evidence_facts").fetchone()[0]
+        return {"status": "READY", "facts_created_or_reused": facts, "facts_new": max(0, fact_count_after - fact_count_before),
+                "facts_reused": max(0, facts - max(0, fact_count_after - fact_count_before)), "relationships_found": relationships,
                 "assets": len(targets), "source_revision": revision, "elapsed_ms": round((time.perf_counter() - started) * 1000, 2),
                 "database": str(database_path(base)), "canonical_mutation": False}
 

@@ -239,3 +239,68 @@ asset, target, exact value, path/location, source revision/hash, extractor,
 certainty, and current/stale state. Provider-derived candidate material is not
 accepted as evidence. Corroboration exposes linked facts and keeps unresolved
 semantic assertions out of application eligibility.
+
+## Controlled Level-1 production scale acceptance (2026-08-10)
+
+The controlled scale acceptance was started against five admitted engineering
+schemas using the existing evidence-enriched worker and single-worker bounded
+processing. Five results completed; one subsequent schema work unit timed out
+after 180 seconds and was recorded as retryable. The hard-stop condition was
+honored, so no configuration, migration, documentation, or registry class was
+processed and no scheduler was enabled.
+
+The five completed results produced 17 assertions. Independent evidence
+extraction corroborated 14 of them; 11 low-risk purpose, schema-classification,
+and deterministic-tag assertions passed non-provider review and were applied
+transactionally. Three summary assertions remained non-eligible, and coverage
+advanced only for the four assets whose applied understanding completed the
+existing purpose/classification rule. SQLite integrity remained valid and the
+four pre-existing generated troubleshooting changes remained outside this
+campaign. This is a stopped scale-acceptance result, not proof of Estate-wide
+or scheduled Level-1 operation; multi-class volume and provider-latency
+stability remain open.
+
+## Local provider reliability and evidence-index scale hardening (2026-08-10)
+
+The stopped scale acceptance was resumed only through bounded, single-worker
+checkpoints. The exact timed-out schema was retried through the existing work
+path and completed with a new batch/result identity, preserving the original
+retryable failure. Provider telemetry now records discovery duration, request
+start/duration, response bytes, first complete response time, and timeout
+phase; a provider failure stops the current bounded invocation.
+
+Evidence extraction now reuses unchanged hash-grounded facts across revision
+changes and reports new versus reused facts. An unchanged extraction repeated
+with zero new facts after the initial identity transition. Checkpoint A
+completed eight additional engineering schemas without invalid results.
+Checkpoint B was stopped after two invalid evidence-citation results: one
+missing a packet fact ID and one citing a fact outside the packet. No migration,
+documentation, or further registry checkpoint was attempted, and scheduling
+remains unwarranted. The invalid-result stop is preserved in the associated
+Diagnostic Impact Packet.
+
+## Configuration / registry evidence-citation hardening (2026-08-10)
+
+The reliability work was preserved and extended with a packet-local citation
+boundary. The evidence-enriched prompt now separates exact packet asset IDs
+from the `fact:<sha256>` evidence namespace, requires exact supplied asset IDs,
+and tells the provider to remain unresolved when no admitted fact supports a
+claim. The result schema checks fact-ID shape, while deterministic Estate
+validation checks dynamic packet membership before candidate admission.
+
+Invalid attempts are now preserved in the SQLite v6 `comprehension_attempts`
+ledger with raw provider output, packet/prompt versions, packet hash,
+validation code, and telemetry. Citation failures use precise fail-closed
+categories and stop the bounded invocation. The prior reliability packet
+remains historical evidence; this packet supersedes its citation seam without
+deleting the failed outputs that are available.
+
+Checkpoint B re-acceptance recovered both original assets. qwen3:8b produced
+two further invalid outputs and was stopped: one copied an illustrative asset
+placeholder and one invented a near-match fact ID. qwen3-coder produced valid
+candidate results for both `data/registry/capabilities.json` and
+`data/registry/services.json`; two bounded `data/discovery` controls also had
+zero invalid citations. No invalid output was admitted and no new assertion
+became application-eligible because the existing deterministic corroboration
+and review policy correctly rejected unsupported semantic claims. Scheduling
+remains unwarranted; qwen3:8b is not proven for this citation-sensitive class.

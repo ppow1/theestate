@@ -15,7 +15,8 @@ from pathlib import Path
 from typing import Any
 
 from estate.core.estate_population import (
-    PACKET_VERSION, PopulationScopeError, batch_packet, ingest_result, next_batch, validate_result,
+    PACKET_VERSION, PopulationScopeError, batch_packet, ingest_result, next_batch, packet_citation_errors,
+    record_comprehension_attempt, validate_result,
 )
 from estate.core.estate_deterministic_evidence import extract_evidence
 from estate.core.estate_knowledge_store import connect, _now
@@ -79,7 +80,13 @@ def _prompt(packet: dict[str, Any], difficulty: str) -> str:
     return (
         "You are a bounded Estate comprehension provider. Return ONLY one JSON object, no markdown. "
         "Do not browse files, call tools, invent paths, promote truth, or recommend remediation. "
-        "Use only supplied asset_id values and cite evidence_refs using supplied asset_id values. "
+        "Use only supplied asset_id values for asset_id fields. Evidence citations are a separate namespace. "
+        "ALLOWED_EVIDENCE_FACT_IDS are the exact fact:... IDs in packet.evidence_fact_ids and deterministic_evidence. "
+        "For every positive assertion, evidence_refs MUST contain only one or more exact IDs from ALLOWED_EVIDENCE_FACT_IDS. "
+        "Never cite an asset_id, path, filename, prose description, global fact ID not in this packet, or invented ID. "
+        "If no allowed supplied fact supports a positive claim, emit unresolved/no-claim instead. "
+        "Each items[].asset_id MUST exactly equal one of the packet asset IDs; never output placeholders such as supplied, same batch, or same revision. "
+        "Return one item for each supplied asset, using its exact asset_id. "
         "Use the deterministic_evidence supplied inside each asset; do not browse files or databases. "
         "If supplied evidence supports a narrow low-risk claim, emit it rather than defaulting to unresolved. "
         "Every positive purpose, owner_candidate, summary, classification, or tag needs one or more exact evidence_fact_id values in evidence_refs. "
@@ -90,8 +97,8 @@ def _prompt(packet: dict[str, Any], difficulty: str) -> str:
         '{"contract":"estate.troubleshooting.comprehension.result.v1",'
         '"result_id":"provider-generated", "batch_id":"same batch", "source_revision":"same revision",'
         '"provider":{"type":"local_ai","model":"model","worker_identity":"worker"},'
-        '"packet_version":"estate.troubleshooting.comprehension.work_packet.v2", "prompt_contract_version":"estate.troubleshooting.evidence_enriched_prompt.v1",'
-        '"quality":"PARTIAL_CANDIDATE", "items":[{"asset_id":"supplied",'
+        '"packet_version":"estate.troubleshooting.comprehension.work_packet.v2", "prompt_contract_version":"estate.troubleshooting.evidence_enriched_prompt.v2",'
+        '"quality":"PARTIAL_CANDIDATE", "items":[{"asset_id":"EXACT_PACKET_ASSET_ID",'
         '"lifecycle":"CANDIDATE","purpose":null,"owner_candidate":null,"summary":null,"classification":null,'
         '"tags":[],"evidence_refs":[],"unresolved_questions":[]}],'
         '"context_requests":[],"unsupported_assertions":[]}\n'
@@ -121,30 +128,27 @@ def _estate_result_id(batch_id: str, payload: dict[str, Any]) -> str:
 
 
 def _quality(payload: dict[str, Any], packet: dict[str, Any]) -> tuple[str, list[str]]:
-    supplied = {a["asset_id"] for a in packet.get("assets", [])}
     supplied_facts = set(packet.get("evidence_fact_ids") or [])
     reasons: list[str] = []
     for item in payload.get("items", []):
-        refs = item.get("evidence_refs") or []
-        positive = any(item.get(k) for k in ("purpose", "owner_candidate", "summary", "classification")) or bool(item.get("tags"))
-        if positive and not set(refs).intersection(supplied_facts):
-            reasons.append(f"{item.get('asset_id')}: assertion without evidence_refs")
-        if not set(refs).issubset(supplied | supplied_facts):
-            reasons.append(f"{item.get('asset_id')}: evidence_refs outside supplied packet")
+        reasons.extend(f"{item.get('asset_id')}: {error['code']} - {error['message']}" for error in packet_citation_errors(item, supplied_facts))
     if payload.get("context_requests"):
         return "NEEDS_MORE_CONTEXT", reasons
     if reasons:
-        return "PARTIAL_CANDIDATE", reasons
+        return "INVALID_RESULT", reasons
     return "ACCEPTED_CANDIDATE", []
 
 
 def _persist_telemetry(root: Path, *, batch_id: str, telemetry: dict[str, Any]) -> None:
     with connect(root, create=False) as connection:
         state = "RETRYABLE" if telemetry["quality"] == "RETRYABLE_PROVIDER_FAILURE" else ("FAILED" if telemetry["quality"] == "INVALID_RESULT" else None)
+        reason = "; ".join(telemetry.get("reasons", [])) or None
+        if telemetry.get("provider_metadata"):
+            reason = json.dumps({"message": reason, "provider_metadata": telemetry["provider_metadata"]}, sort_keys=True, separators=(",", ":"))
         if state:
-            connection.execute("UPDATE comprehension_batches SET state=?, result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (state, telemetry["quality"], "; ".join(telemetry.get("reasons", [])) or None, _now(), batch_id))
+            connection.execute("UPDATE comprehension_batches SET state=?, result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (state, telemetry["quality"], reason, _now(), batch_id))
         else:
-            connection.execute("UPDATE comprehension_batches SET result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (telemetry["quality"], "; ".join(telemetry.get("reasons", [])) or None, _now(), batch_id))
+            connection.execute("UPDATE comprehension_batches SET result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (telemetry["quality"], reason, _now(), batch_id))
 
 
 def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model: str | None = None, worker_identity: str = "estate-local-comprehension-worker", asset_prefix: str | None = None, timeout: float = 120.0, allow_reprocess: bool = False) -> dict[str, Any]:
@@ -160,18 +164,26 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
         if batch.get("status") == "NO_WORK":
             break
         batch_id = batch["batch_id"]
+        attempt_id = "attempt:" + uuid.uuid4().hex
         processed_assets.update(batch.get("asset_ids") or [])
         started = time.perf_counter()
         try:
             extract_evidence(base, asset_ids=batch.get("asset_ids") or [])
             packet = batch_packet(base, batch_id, max_bytes=max_bytes)
+            packet_hash = hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
             difficulty = difficulty_for(packet)
             response = adapter.generate(resident="comprehension-worker", prompt=_prompt(packet, difficulty), model=health.get("model"))
             if not response.get("ok"):
-                telemetry = {"quality": "RETRYABLE_PROVIDER_FAILURE", "reasons": [response.get("metadata", {}).get("fallback_reason", "local provider failed")], "duration_ms": round((time.perf_counter() - started) * 1000, 2), "difficulty": difficulty}
+                metadata = response.get("metadata", {})
+                reason = metadata.get("fallback_reason", "local provider failed")
+                telemetry = {"quality": "RETRYABLE_PROVIDER_FAILURE", "reasons": [reason], "duration_ms": round((time.perf_counter() - started) * 1000, 2), "difficulty": difficulty, "provider_metadata": metadata}
+                record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=None, provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=None, validation_state="PROVIDER_FAILURE", validation_code=metadata.get("timeout_phase"), validation_message=reason, telemetry=telemetry)
                 _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
                 results.append({"batch_id": batch_id, **telemetry})
-                continue
+                # A provider timeout is a circuit-breaker event for this
+                # bounded invocation. Preserve the retryable batch and stop
+                # dequeuing further work until an operator explicitly resumes.
+                break
             payload = _extract_json(response["text"])
             payload["batch_id"] = batch_id
             payload["source_revision"] = packet["source_revision"]
@@ -186,20 +198,29 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
                 item.setdefault("evidence_refs", [])
             quality, reasons = _quality(payload, packet)
             payload["quality"] = quality
-            payload["telemetry"] = {"difficulty": difficulty, "duration_ms": round((time.perf_counter() - started) * 1000, 2), "packet_bytes": len(json.dumps(packet).encode())}
+            payload["telemetry"] = {"difficulty": difficulty, "duration_ms": round((time.perf_counter() - started) * 1000, 2), "packet_bytes": len(json.dumps(packet).encode()), "provider": response.get("metadata", {})}
             payload["unsupported_assertions"] = payload.get("unsupported_assertions", [])
             if quality == "PARTIAL_CANDIDATE":
                 # Preserve a structured candidate but make the review state explicit.
                 payload["context_requests"] = payload.get("context_requests", [])
+            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=payload["result_id"], provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=response.get("text"), validation_state="RECEIVED", telemetry=payload["telemetry"])
             validate_result(base, payload, packet=packet)
             ingested = ingest_result(base, payload, packet=packet)
+            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=payload["result_id"], provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=packet["source_revision"], packet_version=packet.get("packet_version"), prompt_contract_version=packet.get("prompt_contract_version"), packet_hash=packet_hash, raw_output=response.get("text"), validation_state="VALIDATED_CANDIDATE", telemetry=payload["telemetry"])
             telemetry = {"quality": quality, "reasons": reasons, "duration_ms": payload["telemetry"]["duration_ms"], "difficulty": difficulty, "candidate_count": ingested.get("candidate_count", 0), "result_id": payload["result_id"]}
             _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
             results.append({"batch_id": batch_id, **telemetry})
         except (ValueError, json.JSONDecodeError, PopulationScopeError) as exc:
-            telemetry = {"quality": "INVALID_RESULT", "reasons": [str(exc)[:500]], "duration_ms": round((time.perf_counter() - started) * 1000, 2)}
+            message = str(exc)[:500]
+            code = message.split(":", 1)[0] if ":" in message else "INVALID_RESULT"
+            telemetry = {"quality": "INVALID_RESULT", "reasons": [message], "duration_ms": round((time.perf_counter() - started) * 1000, 2)}
+            record_comprehension_attempt(base, attempt_id=attempt_id, batch_id=batch_id, result_id=locals().get("payload", {}).get("result_id"), provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, source_revision=locals().get("packet", {}).get("source_revision", "UNKNOWN"), packet_version=locals().get("packet", {}).get("packet_version"), prompt_contract_version=locals().get("packet", {}).get("prompt_contract_version"), packet_hash=locals().get("packet_hash"), raw_output=response.get("text") if "response" in locals() and response else None, validation_state="INVALID_RESULT", validation_code=code, validation_message=message, telemetry=telemetry)
             _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
             results.append({"batch_id": batch_id, **telemetry})
+            # Invalid packet-local citations are a direct circuit-breaker event.
+            # Preserve the raw attempt and stop this bounded checkpoint.
+            if code in {"MISSING_EVIDENCE_CITATION", "MALFORMED_EVIDENCE_ID", "EVIDENCE_ID_NOT_IN_PACKET", "EVIDENCE_ID_UNKNOWN", "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION"}:
+                break
     return {"status": "COMPLETED", "provider_health": health, "work_units": results, "counts": {quality: sum(1 for row in results if row.get("quality") == quality) for quality in sorted(QUALITY)}}
 
 
