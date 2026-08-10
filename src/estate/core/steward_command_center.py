@@ -190,6 +190,8 @@ def _count_mailboxes(root):
                 return value
     if isinstance(data, dict) and isinstance(data.get("mailboxes"), list):
         return len(data["mailboxes"])
+    if isinstance(data, dict) and isinstance(data.get("message_count"), int):
+        return data["message_count"]
     return None
 
 
@@ -2320,7 +2322,7 @@ def _status_bar_html(status):
         ("Validation", status.get("validation_state")),
         ("Health", status.get("health_state")),
         ("Decisions", status.get("pending_decisions")),
-        ("Mailbox", status.get("mailbox_count")),
+        ("Mailbox messages", status.get("mailbox_count")),
         ("Mail open", status.get("mailbox_open_count")),
         ("Mail ack", status.get("mailbox_ack_required_count")),
         ("Mail warn", status.get("mailbox_warning_count")),

@@ -80,6 +80,24 @@ def test_optional_worker_heartbeat_does_not_create_readiness_missing_warning(tmp
     assert not any("worker_runtime_heartbeat.json" in warning for check in dashboard["data"]["checks"] for warning in check["warnings"])
 
 
+def test_mailbox_status_uses_current_index_message_count_and_labels_concept(tmp_path):
+    write_json(tmp_path, "collaboration/mailboxes/index.json", {
+        "generated_at": "2026-08-10T02:09:24Z",
+        "message_count": 24,
+        "messages": [],
+    })
+    write_json(tmp_path, "runtime/mailboxes/synchronization_duty.json", {"summary": {"warning_count": 0}})
+
+    payload = generate_command_center(tmp_path, write=False)
+    html = render_command_center_html(payload)
+
+    assert payload["status_bar"]["mailbox_count"] == 24
+    assert "Mailbox messages" in html
+    assert "Mailbox messages</strong> <span>24</span>" in html
+    mission_sources = payload["panels"]["mission_control_workspace"]["data"]["sources"]
+    assert next(source for source in mission_sources if source["name"] == "mailboxes")["available"] is True
+
+
 def test_command_center_starts_local_http_server(tmp_path):
     seed_inputs(tmp_path)
     server = serve_command_center(host="127.0.0.1", port=0, root=tmp_path)
