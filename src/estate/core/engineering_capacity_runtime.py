@@ -15,6 +15,7 @@ from typing import Any
 from estate.core.paths import ESTATE_ROOT
 from estate.core.provider_health import generate_provider_health_summary, utc_now_iso, _write_json
 from estate.core.provider_capacity import load_capacity_records
+from estate.core.codex_seat_telemetry import CODEX_SEATS, TELEMETRY_JSON
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor
 
 RUNTIME_JSON = Path("runtime/engineering_capacity/dashboard.json")
@@ -24,7 +25,6 @@ OFFICE_HANDOFF_MD = Path("operations/engineering_capacity/runtime_dashboard.md")
 CLOUD_CODEX_HINTS = ("codex", "openai", "chatgpt")
 LOCAL_WORKER_HINTS = ("local", "cli", "worker", "ollama")
 FUEL_STATES = {"idle": 100, "available": 85, "busy": 55, "saturated": 20, "quota_limited": 0, "unknown": None}
-CODEX_SEATS = ("C1", "C2", "C3")
 
 
 def _root(root: str | Path | None = None) -> Path:
@@ -71,6 +71,45 @@ def _freshness(provider: dict[str, Any], *, stale_after_minutes: int) -> dict[st
 
 def _codex_seat_observations(root: Path, *, stale_after_minutes: int) -> list[dict[str, Any]]:
     """Project one logical seat per observation; never derive a percentage from absence."""
+    telemetry_path = root / TELEMETRY_JSON
+    if telemetry_path.is_file():
+        try:
+            telemetry = json.loads(telemetry_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            telemetry = {}
+        telemetry_by_seat = {
+            item.get("seat_id"): item
+            for item in telemetry.get("seats", [])
+            if isinstance(item, dict) and item.get("seat_id") in CODEX_SEATS
+        }
+        if telemetry_by_seat:
+            observations = []
+            for seat in CODEX_SEATS:
+                item = dict(telemetry_by_seat.get(seat) or {})
+                observed_at = item.get("observed_at")
+                successful = item.get("collection_status") == "available" and observed_at is not None
+                observations.append({
+                    "logical_seat_id": seat,
+                    "capacity_identity": item.get("capacity_identity", f"codex.seat.{seat}"),
+                    "execution_modes": item.get("execution_modes", ["cli"]),
+                    "execution_surface": item.get("execution_surface", "codex-cli"),
+                    "source": item.get("source", "codex app-server account/rateLimits/read"),
+                    "observation_timestamp": observed_at,
+                    "observed_at": observed_at,
+                    "freshness": _freshness({"last_checked_at": observed_at}, stale_after_minutes=stale_after_minutes),
+                    "capacity_state": "available" if successful else "unknown",
+                    "native_capacity_fields": item.get("native_rate_limits", {}),
+                    "windows": item.get("windows", []),
+                    "account": item.get("account", {}),
+                    "weekly_limit_percent_left": item.get("weekly_limit_percent_left"),
+                    "weekly_limit_reset_at": item.get("weekly_limit_reset_at"),
+                    "collection_success": successful,
+                    "collection_status": item.get("collection_status", "unavailable"),
+                    "failure_reason": item.get("failure_reason"),
+                    "reason": item.get("failure_reason"),
+                })
+            return observations
+
     records = {}
     for record in load_capacity_records(root):
         metadata = record.metadata if isinstance(record.metadata, dict) else {}
@@ -90,7 +129,7 @@ def _codex_seat_observations(root: Path, *, stale_after_minutes: int) -> list[di
                 "capacity_state": "unknown",
                 "native_capacity_fields": {},
                 "collection_success": False,
-                "reason": "installed Codex CLI exposes no supported noninteractive capacity/usage mechanism",
+                "reason": "no Codex seat telemetry observation is available",
             })
             continue
         metadata = record.metadata if isinstance(record.metadata, dict) else {}
@@ -139,6 +178,7 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
     warning_count = len(worker_monitor.get("warnings") or [])
     constrained_cloud = [p for p in cloud_seats if p.get("health_status") in {"blocked", "offline", "out_of_quota"} or p.get("capacity_state") in {"saturated", "quota_limited"}]
     seat_observations = _codex_seat_observations(root_path, stale_after_minutes=stale_after_minutes)
+    has_real_seat_telemetry = any(item.get("collection_success") for item in seat_observations)
 
     recommended = "Capacity evidence is green; Steward may assign work using normal governance."
     if constrained_cloud or blocked_workers or warning_count:
@@ -167,7 +207,8 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
         "codex_seat_observations": seat_observations,
         "providers": providers,
         "workers": workers,
-        "source_artifacts": ["runtime/providers/health/status/summary.json", "runtime/workers/worker_runtime_monitor.json"],
+        "source_artifacts": ["runtime/providers/health/status/summary.json", "runtime/workers/worker_runtime_monitor.json", str(TELEMETRY_JSON)],
+        "codex_seat_telemetry_available": has_real_seat_telemetry,
         "freshness_contract": {"provider_observation_stale_after_minutes": stale_after_minutes, "unknown_without_observation": True},
         "office_install_handoff": {"dashboard_json": str(RUNTIME_JSON), "dashboard_markdown": str(RUNTIME_MD), "operator_handoff": str(OFFICE_HANDOFF_MD)},
     }
@@ -185,7 +226,7 @@ def format_engineering_capacity_dashboard(payload: dict[str, Any]) -> str:
     s = payload.get("summary", {})
     lines = ["# Engineering Provider Capacity Runtime Dashboard", "", f"Generated: {payload.get('generated_at')}", "", "Engineering Provider Capacity is an advisory provider-availability index. It is not physical GPU utilization, GPU capacity, or an Estate-wide composite resource percentage.", "", "## Summary", f"- Providers observed: {s.get('provider_count', 0)}", f"- Providers with Codex capacity: {s.get('cloud_codex_seat_count', 0)}", f"- Constrained providers: {s.get('constrained_cloud_codex_seat_count', 0)}", f"- Codex seat observations: {s.get('codex_seat_observation_count', 0)}", f"- Local worker providers: {s.get('local_worker_provider_count', 0)}", f"- Workers observed: {s.get('worker_count', 0)}", f"- Idle workers: {s.get('idle_worker_count', 0)}", f"- Blocked workers: {s.get('blocked_worker_count', 0)}", f"- Worker warnings: {s.get('worker_warning_count', 0)}", f"- Recommended next action: {s.get('recommended_next_action')}", "", "## Codex Seat Capacity Observations"]
     for observation in payload.get("codex_seat_observations") or []:
-        lines.append(f"- {observation.get('logical_seat_id')}: state={observation.get('capacity_state')}; collection={'success' if observation.get('collection_success') else 'unknown/unavailable'}; freshness={(observation.get('freshness') or {}).get('state')}; observed={observation.get('observation_timestamp') or 'unknown'}; reason={observation.get('reason') or 'none'}")
+        lines.append(f"- {observation.get('logical_seat_id')}: weekly_left={observation.get('weekly_limit_percent_left') if observation.get('weekly_limit_percent_left') is not None else 'unknown'}; reset={observation.get('weekly_limit_reset_at') or 'unknown'}; collection={'success' if observation.get('collection_success') else 'unknown/unavailable'}; freshness={(observation.get('freshness') or {}).get('state')}; observed={observation.get('observation_timestamp') or 'unknown'}; reason={observation.get('reason') or 'none'}")
     lines.append("")
     lines.append("## Engineering Provider Capacity")
     if not payload.get("providers"):

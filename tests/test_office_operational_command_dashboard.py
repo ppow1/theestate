@@ -91,6 +91,30 @@ def test_operational_dashboard_renders_engineering_provider_capacity_from_runtim
     assert "not physical GPU capacity" in html
 
 
+def test_operational_dashboard_renders_real_codex_seat_fuel_instead_of_generic_heuristic(tmp_path):
+    target = tmp_path / "config" / "providers"
+    target.mkdir(parents=True)
+    shutil.copy(Path("config/providers/catalog.json"), target / "catalog.json")
+    write_health_record(ProviderHealthRecord.create(provider_id="codex.execution.cli", status="available", reported_by="test", message="ready"), root=tmp_path)
+    write_capacity_record(ProviderCapacityRecord.create(provider_id="codex.execution.cli", capacity_state="busy", reported_by="test", max_jobs=4, quota_remaining=1), root=tmp_path)
+    write_json(tmp_path, "runtime/engineering_capacity/codex_seat_telemetry.json", {
+        "version": 1,
+        "seats": [
+            {"seat_id": seat, "capacity_identity": f"codex.seat.{seat}", "collection_status": "available", "observed_at": "2026-08-10T12:00:00Z", "weekly_limit_percent_left": percent, "weekly_limit_reset_at": "2026-08-15T16:32:00Z", "windows": [], "native_rate_limits": {}, "account": {"type": "chatgpt"}}
+            for seat, percent in (("C1", 88), ("C2", 63), ("C3", 36))
+        ],
+    })
+
+    payload = generate_command_center(tmp_path, write=True)
+    html = render_command_center_html(payload)
+
+    assert "Codex Seat C1" in html
+    assert "Codex Seat C2" in html
+    assert "Codex Seat C3" in html
+    assert "88% left" in html
+    assert "codex.execution.cli" not in html
+
+
 def test_operational_command_is_reachable_without_merging_operational_activity(tmp_path):
     payload = generate_command_center(tmp_path, write=False)
     navigation = {item["id"]: item for item in payload["navigation"]["items"]}

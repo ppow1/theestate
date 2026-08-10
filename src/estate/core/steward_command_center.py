@@ -1346,8 +1346,12 @@ def _office_operational_command_dashboard_html(artifact):
     campaigns = "".join(f"<tr><td>{html.escape(str(c.get('work_package_id')))}</td><td>{html.escape(str(c.get('state')))}</td><td>{html.escape(str(c.get('owner')))}</td><td>{_artifact_link(c.get('path'))}</td></tr>" for c in data.get("campaigns") or [])
     sources = "".join(f"<li>{html.escape(str(k))}: {_artifact_link(v)}</li>" for k,v in (data.get("evidence_sources") or {}).items())
     capacity = data.get("engineering_provider_capacity") or {}
+    seat_observations = capacity.get("codex_seat_observations") or []
+    real_seat_observations = [item for item in seat_observations if item.get("collection_success")]
     provider_rows = []
     for provider in capacity.get("providers") or []:
+        if real_seat_observations and provider.get("provider_id") == "codex.execution.cli":
+            continue
         item = provider.get("engineering_provider_capacity") or {}
         freshness = item.get("freshness") or {}
         value = item.get("index")
@@ -1355,7 +1359,17 @@ def _office_operational_command_dashboard_html(artifact):
         bar = f"<progress max='100' value='{html.escape(str(value))}'>{html.escape(str(value))}</progress>" if isinstance(value, (int, float)) else "<span class='placeholder'>No numeric evidence</span>"
         provider_rows.append(f"<tr><td>{html.escape(str(provider.get('display_name') or provider.get('provider_id') or 'unknown'))}<br><span class='source'>{html.escape(str(provider.get('provider_id') or ''))}</span></td><td>{bar}<br><strong>{html.escape(value_text)}</strong></td><td>{html.escape(str(item.get('state') or 'unknown'))}</td><td>{html.escape(str(freshness.get('state') or 'unknown'))}<br><span class='source'>observed={html.escape(str(freshness.get('observed_at') or 'unknown'))}</span></td></tr>")
     capacity_html = "<section class='pipeline-section engineering-provider-capacity'><h3>Engineering Provider Capacity</h3><p>Advisory provider-availability index (0–100). This is not physical GPU capacity or an Estate-wide resource percentage.</p>"
-    capacity_html += "<table><thead><tr><th>Provider</th><th>Capacity index</th><th>Provider state</th><th>Freshness / observation</th></tr></thead><tbody>" + ("".join(provider_rows) or "<tr><td colspan='4'>Provider capacity evidence unavailable.</td></tr>") + "</tbody></table>"
+    if real_seat_observations:
+        seat_rows = []
+        for observation in seat_observations:
+            value = observation.get("weekly_limit_percent_left")
+            value_text = f"{value}% left" if isinstance(value, (int, float)) else "unknown"
+            bar = f"<progress max='100' value='{html.escape(str(value))}'>{html.escape(str(value))}</progress>" if isinstance(value, (int, float)) else "<span class='placeholder'>No numeric evidence</span>"
+            freshness = observation.get("freshness") or {}
+            seat_rows.append(f"<tr><td>Codex Seat {html.escape(str(observation.get('logical_seat_id')))}<br><span class='source'>{html.escape(str(observation.get('capacity_identity') or ''))}</span></td><td>{bar}<br><strong>{html.escape(value_text)}</strong></td><td>{html.escape(str(observation.get('weekly_limit_reset_at') or 'unknown'))}</td><td>{html.escape(str(freshness.get('state') or 'unknown'))}<br><span class='source'>observed={html.escape(str(observation.get('observed_at') or 'unknown'))}</span></td></tr>")
+        capacity_html += "<h4>Codex Seat Quota (one shared identity per seat)</h4><table><thead><tr><th>Seat</th><th>Weekly fuel</th><th>Reset</th><th>Freshness / observation</th></tr></thead><tbody>" + "".join(seat_rows) + "</tbody></table>"
+    provider_body = "".join(provider_rows) or ("<tr><td colspan='4'>Generic provider capacity presentation superseded by per-seat Codex telemetry.</td></tr>" if real_seat_observations else "<tr><td colspan='4'>Provider capacity evidence unavailable.</td></tr>")
+    capacity_html += "<table><thead><tr><th>Provider</th><th>Capacity index</th><th>Provider state</th><th>Freshness / observation</th></tr></thead><tbody>" + provider_body + "</tbody></table>"
     capacity_html += f"<p class='source'>Source: {_artifact_link((data.get('evidence_sources') or {}).get('engineering_capacity'))}; stale after {html.escape(str((capacity.get('freshness_contract') or {}).get('provider_observation_stale_after_minutes', 'unknown')))} minutes.</p></section>"
     return f"<section class='office-operational-dashboard'><p>Executive command dashboard refreshed from durable runtime artifacts. It separates operational progress, validation evidence, and institutional acceptance.</p><div class='mailbox-kpis'>{kpis}</div>{capacity_html}<h3>Filters</h3><div class='settings-grid'>{filter_html}</div><h3>Exceptions requiring Steward attention</h3><table><thead><tr><th>Severity</th><th>Item</th><th>Evidence</th><th>Control</th></tr></thead><tbody>{ex_rows}</tbody></table><h3>Repository targets</h3><table><tbody>{repos}</tbody></table><h3>Department commitments</h3><table><tbody>{depts}</tbody></table><h3>Campaign progress</h3><table><tbody>{campaigns}</tbody></table><h3>Provider warnings and recovery</h3><ul>{''.join(f'<li>{html.escape(str(w))}</li>' for w in data.get('provider_warnings') or ['No provider capacity warnings found.'])}</ul><p class='source'>{html.escape(str(data.get('classification')))} Boundaries: {html.escape('; '.join(data.get('authority_boundaries') or []))}</p><details><summary>Canonical evidence sources</summary><ul>{sources}</ul></details></section>"
 

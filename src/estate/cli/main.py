@@ -131,6 +131,7 @@ from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity
 from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard, format_engineering_capacity_dashboard
 from estate.core.codex_status_cost_characterization import characterize_codex_status_cost, format_codex_status_cost_characterization
 from estate.core.codex_cli_capability_discovery import discover_codex_cli_capabilities, format_codex_cli_capability_discovery
+from estate.core.codex_seat_telemetry import collect_codex_seat_telemetry, format_codex_seat_telemetry
 from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider, format_engineering_provider_routing
 from estate.core.engineering_provider_health_runtime import collect_provider_health, load_current_provider_health, format_provider_health_report
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
@@ -882,6 +883,18 @@ def cmd_engineering_capacity_dashboard(args):
             print(format_engineering_capacity_dashboard(payload))
     except (OSError, ValueError) as exc:
         print(f"Engineering capacity dashboard failed: {exc}")
+        raise SystemExit(1)
+
+
+def cmd_codex_seat_telemetry(args):
+    try:
+        payload = collect_codex_seat_telemetry(timeout_seconds=args.timeout_seconds, write=True)
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(format_codex_seat_telemetry(payload), end="")
+    except Exception as exc:
+        print(f"Codex seat telemetry failed: {exc}")
         raise SystemExit(1)
 
 
@@ -4131,6 +4144,11 @@ def main(argv=None):
     p.add_argument("--json", action="store_true")
     p.add_argument("--stale-after-minutes", type=int, default=30)
     p.set_defaults(func=cmd_engineering_capacity_dashboard)
+
+    p = sub.add_parser("codex-seat-telemetry", help="Collect read-only rate-limit telemetry for C1/C2/C3")
+    p.add_argument("--timeout-seconds", type=int, default=20)
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_codex_seat_telemetry)
 
     p = sub.add_parser("codex-status-cost-characterization", help="Characterize Codex CLI status polling cost evidence")
     p.add_argument("--json", action="store_true")
