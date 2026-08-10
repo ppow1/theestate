@@ -4,7 +4,7 @@ import urllib.request
 
 from estate.core.office_command_surface import execute_office_action
 from estate.core.steward_annunciator import present_attention, watch_attention
-from estate.core.steward_command_center import generate_command_center, render_command_center_html, serve_command_center
+from estate.core.steward_command_center import _steward_attention_html, generate_command_center, render_command_center_html, serve_command_center
 
 
 class Recorder:
@@ -42,6 +42,58 @@ def test_operations_center_banner_and_existing_acknowledge_action_clear(tmp_path
     cleared = json.loads((tmp_path / "runtime/office/steward_annunciator.json").read_text())
     assert cleared["active"] is False
     assert cleared["active_item_ids"] == []
+
+
+def visual_item(item_id, classification="decision_required"):
+    return {"id": item_id, "title": item_id, "summary": item_id, "classification": classification, "status": "open", "requested_steward_action": "review"}
+
+
+def visual_panel(aggregate_items, annunciator_items):
+    return {"data": {"aggregate": {"items": aggregate_items}, "annunciator": {"active": bool(annunciator_items), "severity": "decision_required", "severity_label": "DECISION REQUIRED", "items": annunciator_items}}}
+
+
+def test_historical_visual_baseline_is_hidden_but_detail_backlog_remains(tmp_path):
+    historical = [visual_item(f"WP-{i:04d}") for i in range(100)]
+    panel = visual_panel(historical, [])
+
+    banner = _steward_attention_html(panel, banner=True)
+    detail = _steward_attention_html(panel)
+
+    assert " hidden" in banner
+    assert all(item["id"] not in banner for item in historical)
+    assert all(item["id"] in detail for item in historical)
+
+
+def test_visual_annunciator_shows_one_new_item_and_no_duplicate(tmp_path):
+    item = visual_item("new-item")
+    panel = visual_panel([item], [item])
+    banner = _steward_attention_html(panel, banner=True)
+
+    assert banner.count("data-item-id='new-item'") == 1
+    assert " hidden" not in banner
+
+
+def test_visual_annunciator_bounds_multiple_new_items(tmp_path):
+    items = [visual_item(f"new-{i}") for i in range(5)]
+    banner = _steward_attention_html(visual_panel(items, items), banner=True)
+
+    assert "data-item-id='new-0'" in banner
+    assert "data-item-id='new-2'" in banner
+    assert "data-item-id='new-3'" not in banner
+    assert "+2 additional new item(s)" in banner
+
+
+def test_acknowledging_new_visual_item_clears_annunciator_without_mutating_backlog(tmp_path):
+    seed(tmp_path); state = present_attention(tmp_path, presenter=Recorder())
+    before = json.loads((tmp_path / "runtime/office/steward_attention_items.json").read_text())
+    result = execute_office_action("attention.acknowledge", root=tmp_path, item_id=state["active_item_ids"][0], actor="Steward")
+    after_state = json.loads((tmp_path / "runtime/office/steward_annunciator.json").read_text())
+    after = json.loads((tmp_path / "runtime/office/steward_attention_items.json").read_text())
+
+    assert result["outcome"] == "completed"
+    assert after_state["active"] is False
+    assert after_state["active_item_ids"] == []
+    assert {item["id"] for item in before["items"]} == {item["id"] for item in after["items"]}
 
 
 def test_served_operations_center_exposes_remote_banner_payload(tmp_path):

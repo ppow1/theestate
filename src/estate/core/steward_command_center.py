@@ -29,6 +29,7 @@ from estate.core.steward_attention import aggregate_attention
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
+from estate.core.steward_annunciator import VISUAL_PROJECTION_VERSION
 from estate.core.office_operational_activity import load_office_operational_activity
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
 from estate.core.background_operations_runtime import load_background_operations_status
@@ -1356,6 +1357,8 @@ def _steward_attention_panel(root, write=True):
     aggregate = aggregate_attention(root, write=write)
     annunciator = _read_artifact(root, ["runtime/office/steward_annunciator.json"])
     state = annunciator.get("data") if annunciator.get("available") and isinstance(annunciator.get("data"), dict) else {"active": False, "severity": None, "items": [], "active_item_ids": []}
+    if state.get("visual_projection_version") != VISUAL_PROJECTION_VERSION:
+        state = {**state, "active": False, "severity": None, "severity_rank": None, "severity_label": None, "items": [], "active_item_ids": []}
     return {"available": True, "path": "runtime/office/steward_attention_items.json; runtime/office/steward_annunciator.json", "kind": "steward_attention_annunciator", "data": {"aggregate": aggregate, "annunciator": state, "acknowledgement_authority": "estate.core.steward_attention.record_action via Office action endpoint", "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "presentation": "fixed corner banner plus Steward Attention tab"}}}
 
 
@@ -1368,6 +1371,8 @@ def _steward_attention_panel_fast(root):
     """
     annunciator = _read_artifact(root, ["runtime/office/steward_annunciator.json"])
     state = annunciator.get("data") if annunciator.get("available") and isinstance(annunciator.get("data"), dict) else {"active": False, "severity": None, "items": [], "active_item_ids": []}
+    if state.get("visual_projection_version") != VISUAL_PROJECTION_VERSION:
+        state = {**state, "active": False, "severity": None, "severity_rank": None, "severity_label": None, "items": [], "active_item_ids": []}
     return {"available": True, "path": "runtime/office/steward_annunciator.json", "kind": "steward_attention_annunciator", "data": {"aggregate": {}, "annunciator": state, "acknowledgement_authority": "estate.core.steward_attention.record_action via Office action endpoint", "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "presentation": "fixed corner banner plus Steward Attention tab"}}}
 
 
@@ -1685,17 +1690,20 @@ def _steward_attention_html(panel, *, banner=False):
     data = (panel or {}).get("data") or {}
     state = data.get("annunciator") or {}
     active = bool(state.get("active"))
-    items = state.get("items") or []
+    items = state.get("items") or [] if banner else ((data.get("aggregate") or {}).get("items") or [])
     severity = str(state.get("severity_label") or state.get("severity") or "ATTENTION")
+    visible_items = items[:3] if banner else items
     rows = "".join(
         "<li><strong>" + html.escape(str(item.get("classification") or "attention")) + "</strong> — " + html.escape(str(item.get("title") or item.get("id"))) + "<br><span class='source'>" + html.escape(str(item.get("summary") or "")) + "</span> "
         + "<button type='button' class='office-action' data-office-action='attention.acknowledge' data-item-id='" + html.escape(str(item.get("id") or ""), quote=True) + "' data-actor='Steward' data-note='Acknowledged from the Office of the Steward.'>Acknowledge</button></li>"
-        for item in items
+        for item in visible_items
     ) or "<li class='placeholder'>No active actionable Steward attention items.</li>"
     if banner:
+        if len(items) > len(visible_items):
+            rows += "<li class='placeholder'>+" + html.escape(str(len(items) - len(visible_items))) + " additional new item(s); open Steward Attention for details.</li>"
         hidden = "" if active else " hidden"
-        return "<aside id='steward-annunciator-banner' class='steward-annunciator-banner office-actions' role='status' aria-live='assertive'" + hidden + " style='position:fixed;top:.75rem;right:.75rem;z-index:30;max-width:min(30rem, calc(100vw - 1.5rem));background:#fff8e8;color:#241f1a;border:2px solid #8b6f3d;border-left:.55rem solid #8b6f3d;border-radius:10px;box-shadow:0 4px 16px #0003;padding:.7rem 1rem;pointer-events:auto'><strong>⚠ Steward attention: " + html.escape(severity) + "</strong><ul>" + rows + "</ul><p class='source'>Persistent until the underlying Steward attention action clears it. This banner does not take focus.</p><pre class='office-action-result'>No action run yet.</pre></aside>"
-    return _panel("Steward Attention", "<p class='source'>Canonical source: Steward attention aggregate. Acknowledgement uses the existing Office action endpoint and clears only when the underlying item action is recorded.</p><p><strong>Visual state:</strong> " + html.escape("ACTIVE — " + severity if active else "CLEAR") + "</p><ul>" + rows + "</ul><pre class='office-action-result'>No action run yet.</pre>", "ready" if active else "placeholder")
+        return "<aside id='steward-annunciator-banner' class='steward-annunciator-banner office-actions' role='status' aria-live='assertive'" + hidden + " style='position:fixed;top:.75rem;right:.75rem;z-index:30;max-width:min(24rem, calc(100vw - 1.5rem));max-height:18rem;overflow:auto;background:#fff8e8;color:#241f1a;border:2px solid #8b6f3d;border-left:.55rem solid #8b6f3d;border-radius:10px;box-shadow:0 4px 16px #0003;padding:.7rem 1rem;pointer-events:auto'><strong>⚠ Steward attention: " + html.escape(severity) + "</strong><ul>" + rows + "</ul><p class='source'>New actionable attention only; persistent until the canonical attention action clears it. This banner does not take focus.</p><pre class='office-action-result'>No action run yet.</pre></aside>"
+    return _panel("Steward Attention", "<p class='source'>Canonical source: Steward attention aggregate. The complete backlog remains available here; the compact banner shows only newly actionable edge-triggered items. Acknowledgement uses the existing Office action endpoint and clears only when the underlying item action is recorded.</p><p><strong>Visual annunciator:</strong> " + html.escape("ACTIVE — " + severity if active else "CLEAR") + "</p><ul>" + rows + "</ul><pre class='office-action-result'>No action run yet.</pre>", "ready" if items else "placeholder")
 
 def _panel(title, body, status="placeholder"):
     return f'<section class="panel {html.escape(status)}"><h2>{html.escape(title)}</h2>{body}</section>'

@@ -17,6 +17,7 @@ from estate.core.steward_attention import aggregate_attention
 
 ANNUNCIATOR_SCHEMA_VERSION = "steward_annunciator_state.v1"
 ANNUNCIATOR_PATH = Path("runtime/office/steward_annunciator.json")
+VISUAL_PROJECTION_VERSION = "steward_visual_projection.v1"
 ACTIONABLE = {"urgent", "decision_required", "attention_soon"}
 SEVERITY_RANK = {"urgent": 0, "decision_required": 1, "attention_soon": 2}
 
@@ -145,20 +146,19 @@ def _should_announce(previous: dict[str, Any] | None, current: dict[str, Any]) -
 
 
 def _baseline_state(previous: dict[str, Any], items: list[dict[str, Any]], now: str | None = None) -> dict[str, Any]:
-    active = _actionable(items)
-    severity = min((i["classification"] for i in active), key=lambda c: SEVERITY_RANK[c], default=None)
     return {
         **previous,
         "schema_version": ANNUNCIATOR_SCHEMA_VERSION,
         "generated_at": now or _now(),
         "consumer_boundary": "presenter-only; canonical attention and Office actions remain authoritative",
         "baseline_established": True,
-        "active": bool(active),
-        "severity": severity,
-        "severity_rank": SEVERITY_RANK.get(severity),
-        "severity_label": {"urgent": "URGENT", "decision_required": "DECISION REQUIRED", "attention_soon": "ATTENTION SOON"}.get(severity),
-        "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
-        "active_item_ids": sorted(i["id"] for i in active),
+        "visual_projection_version": VISUAL_PROJECTION_VERSION,
+        "active": False,
+        "severity": None,
+        "severity_rank": None,
+        "severity_label": None,
+        "items": [],
+        "active_item_ids": [],
         "observed_items": _item_signatures(items),
         "pending_presentations": {},
         "last_run": {"new_item_count": 0, "presented_count": 0, "failure_count": 0, "failures": [], "baseline": True},
@@ -180,17 +180,20 @@ def sync_annunciator_state(root: str | Path | None = None) -> dict[str, Any]:
     base = Path(root) if root is not None else Path.cwd()
     previous = _read(base / ANNUNCIATOR_PATH)
     active = _actionable(aggregate_attention(base, write=True).get("items", []))
-    severity = min((i["classification"] for i in active), key=lambda c: SEVERITY_RANK[c], default=None)
+    active_by_id = {i["id"]: i for i in active}
+    visual = [i for i in (previous.get("items") or []) if i.get("id") in active_by_id] if previous.get("baseline_established") else []
+    severity = min((i["classification"] for i in visual), key=lambda c: SEVERITY_RANK[c], default=None)
     state = dict(previous)
     state.update({
         "schema_version": ANNUNCIATOR_SCHEMA_VERSION,
         "generated_at": _now(),
-        "active": bool(active),
+        "visual_projection_version": VISUAL_PROJECTION_VERSION,
+        "active": bool(visual),
         "severity": severity,
         "severity_rank": SEVERITY_RANK.get(severity),
         "severity_label": {"urgent": "URGENT", "decision_required": "DECISION REQUIRED", "attention_soon": "ATTENTION SOON"}.get(severity),
-        "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
-        "active_item_ids": sorted(i["id"] for i in active),
+        "items": visual,
+        "active_item_ids": sorted(i["id"] for i in visual),
     })
     _write(base, state)
     return state
@@ -229,6 +232,7 @@ def present_attention(root: str | Path | None = None, *, presenter: Presenter | 
         str(i["id"]): _item_signature(i) for i in previous.get("items", []) if i.get("id")
     }
     pending = previous.get("pending_presentations") if isinstance(previous.get("pending_presentations"), dict) else {}
+    visual = {str(i["id"]): i for i in (previous.get("items") or []) if str(i.get("id")) in active_ids}
     failures: list[dict[str, Any]] = []
     new_items = [
         i for i in active
@@ -238,6 +242,7 @@ def present_attention(root: str | Path | None = None, *, presenter: Presenter | 
     adapter = presenter or WindowsPresenter()
     for item in sorted(new_items, key=lambda i: (SEVERITY_RANK[i["classification"]], i["title"])):
         item_id = str(item["id"])
+        visual[item_id] = {"id": item_id, "title": item["title"], "summary": item["summary"], "classification": item["classification"], "requested_steward_action": item["requested_steward_action"], "announcement": announcement_text(item)}
         try:
             adapter.announce(item)
             presented[item_id] = {"presented_at": now or _now(), "classification": item["classification"]}
@@ -250,20 +255,22 @@ def present_attention(root: str | Path | None = None, *, presenter: Presenter | 
             events.append(failure)
     # Bound history while retaining durable fingerprints for all currently active items.
     events = events[-100:]
-    severity = min((i["classification"] for i in active), key=lambda c: SEVERITY_RANK[c], default=None)
+    visual_items = [visual[item_id] for item_id in sorted(visual) if item_id in active_ids]
+    severity = min((i["classification"] for i in visual_items), key=lambda c: SEVERITY_RANK[c], default=None)
     state = {
         "schema_version": ANNUNCIATOR_SCHEMA_VERSION,
         "generated_at": now or _now(),
         "consumer_boundary": "presenter-only; canonical attention and Office actions remain authoritative",
-        "active": bool(active),
+        "active": bool(visual_items),
         "severity": severity,
         "severity_rank": SEVERITY_RANK.get(severity),
         "severity_label": {"urgent": "URGENT", "decision_required": "DECISION REQUIRED", "attention_soon": "ATTENTION SOON"}.get(severity),
         "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "always_visible_consumer": "edge_or_corner_alarm"},
-        "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
-        "active_item_ids": sorted(active_ids),
+        "items": visual_items,
+        "active_item_ids": sorted(i["id"] for i in visual_items),
         "presented": presented,
         "baseline_established": bool(previous.get("baseline_established")),
+        "visual_projection_version": VISUAL_PROJECTION_VERSION,
         "observed_items": _item_signatures(all_items),
         "pending_presentations": pending,
         "events": events,
