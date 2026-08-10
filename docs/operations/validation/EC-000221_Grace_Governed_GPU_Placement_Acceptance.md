@@ -106,11 +106,12 @@ observed and stabilized, but it was the truthful governed failure response:
 
 Evidence:
 
-`runtime/evidence/openwebui-operator/openwebui-operator-20260810011856906-97049da1`
+`runtime/evidence/openwebui-operator/openwebui-operator-20260810012728987-58337d10`
 
 The prior `Model '' was not found` evidence remains preserved at
 `runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556`;
-the new run did not reproduce it. No PTM/Helen/Engineering reservation/Dispatch/
+the new run did not reproduce it. The earlier response-observation evidence remains
+preserved at `runtime/evidence/openwebui-operator/openwebui-operator-20260810011856906-97049da1`.
 The governed chain was durably entered on the additional attempt: objective
 `grace-obj-4467e057b928`, Helen determination `heldet-08d35f6843fc`, Engineering
 commission `engcom-23777d25b083`, authorization `engauth-29697e395783`, PTM
