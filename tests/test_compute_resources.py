@@ -8,6 +8,7 @@ from estate.core.compute_resources import (
     ComputeReservationLedger,
     ExpectedGPU,
     build_gpu_inventory,
+    build_grace_gpu_preflight,
     canonical_resource_id,
     classify_observation,
     reconcile_runtime_ordinals,
@@ -110,3 +111,12 @@ def test_cuda_visibility_and_identity_mismatch_fail_closed_without_reroute():
     rows = build_gpu_inventory(expected, [p100, rtx], windows_devices=[{"name": "Tesla P100-PCIE-16GB", "present": True, "problem_code": 0}, {"name": "NVIDIA GeForce RTX 4090", "present": True, "problem_code": 0}], runtime_devices=[{"ordinal": 0, "name": "NVIDIA GeForce RTX 4090"}], now="2026-08-09T12:00:10Z")
     assert rows[0].health_state == "UNKNOWN" and not rows[0].dispatch_allowed
     assert rows[1].health_state == "HEALTHY" and rows[1].cuda_index == 0
+
+
+def test_dual_gpu_preflight_requires_all_expected_devices():
+    expected = [ExpectedGPU("GPU-p100", "Tesla P100-PCIE-16GB"), ExpectedGPU("GPU-4090", "NVIDIA GeForce RTX 4090")]
+    rows = build_gpu_inventory(expected, [_device("GPU-4090", "NVIDIA GeForce RTX 4090")], runtime_devices=[], now="2026-08-09T12:00:10Z")
+    result = build_grace_gpu_preflight(expected=expected, observations=rows)
+    assert result["dual_gpu_dispatch_safe"] is False
+    assert result["overall_health"] == "UNSAFE_TO_DISPATCH"
+    assert result["resources"][0]["health_classification"] == "NVML_UNAVAILABLE"

@@ -18,6 +18,16 @@ contradictory evidence fails closed for that physical GPU and never reroutes
 to its sibling. The P100 cold-recovery condition and prohibited heavy race
 remain documented by reference in PL-0042.
 
+`python -m estate.cli.main grace-gpu-preflight --json` runs the bounded,
+read-only dual-GPU gate. It reports both physical identities, NVIDIA and CUDA
+ordinals, CUDA/PyTorch visibility, PnP evidence when available, telemetry, the
+health classification, and `dual_gpu_dispatch_safe`. `--write-projection`
+refreshes the existing compute projection; the command performs no workload,
+reset, recovery, CPU fallback, or driver action. This is the pre-dispatch
+evidence surface for Grace parallelism and a future Estate Cookbook
+troubleshooting ingestion source; it does not close PL-0042 or authorize heavy
+concurrency.
+
 `ComputeResourceRequirements` is the provider-neutral placement contract. It
 supports GPU requirement, minimum free VRAM, compute capability, preferred or
 required physical resource, exclusions, compatibility tags, reservation

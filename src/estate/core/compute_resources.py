@@ -10,6 +10,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import platform
 import subprocess
 from dataclasses import asdict, dataclass, field
@@ -248,6 +249,7 @@ def build_gpu_inventory(expected: Iterable[ExpectedGPU], observations: Iterable[
         match = next((row for row in windows if _device_name(row.get("name")) == _device_name(spec.expected_name) or (spec.pci_bus_id and str(row.get("pci_bus_id", "")).endswith(spec.pci_bus_id))), None)
         if match is not None:
             item.windows_present = bool(match.get("present", match.get("status", "OK") == "OK"))
+            item.pnp_status = match.get("status")
             item.windows_problem_code = match.get("problem_code")
             item.pnp_present = item.windows_present
             item.pnp_problem_code = item.windows_problem_code
@@ -260,20 +262,17 @@ def build_gpu_inventory(expected: Iterable[ExpectedGPU], observations: Iterable[
         if not item.identity_consistent:
             item.health_state = "UNKNOWN"
             item.health_classification = "IDENTITY_MISMATCH"
-            item.health_classification = "IDENTITY_MISMATCH"
             item.health_reasons = ["authoritative UUID/name/PCI identity mapping disagrees"]
             item.dispatch_allowed = False
             item.dispatch_reason = item.health_reasons[0]
         elif runtime_devices and item.cuda_present is False:
             item.health_state = "LOST"
             item.health_classification = "CUDA_UNAVAILABLE"
-            item.health_classification = "CUDA_UNAVAILABLE"
             item.health_reasons = ["CUDA/PyTorch cannot see the expected physical device"]
             item.dispatch_allowed = False
             item.dispatch_reason = item.health_reasons[0]
         elif item.windows_present is False or item.windows_problem_code not in (None, 0):
             item.health_state = "LOST"
-            item.health_classification = "DEVICE_MISSING"
             item.health_classification = "DEVICE_MISSING"
             item.health_reasons = ["Windows reports the expected physical device absent or in a problem state"]
             item.dispatch_allowed = False
@@ -296,6 +295,7 @@ def build_grace_gpu_preflight(*, expected: Iterable[ExpectedGPU] = GRACE_EXPECTE
     return {
         "schema_version": "dual_gpu_preflight.v1",
         "generated_at": utc_now(),
+        "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
         "expected_gpu_count": len(expected_list),
         "observed_gpu_count": len(inventory),
         "dual_gpu_dispatch_safe": safe,
