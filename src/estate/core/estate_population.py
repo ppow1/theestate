@@ -30,12 +30,29 @@ PACKET_VERSION = "estate.troubleshooting.comprehension.work_packet.v2"
 PROMPT_CONTRACT_VERSION = "estate.troubleshooting.evidence_enriched_prompt.v2"
 RESULT_CONTRACT = "estate.troubleshooting.comprehension.result.v1"
 EVIDENCE_FACT_ID_PATTERN = re.compile(r"^fact:[0-9a-f]{64}$")
+MIGRATION_ASSERTION_FACT_KINDS = {
+    "MIGRATION_CLASSIFICATION": {"MIGRATION_CLASSIFICATION"},
+    "PURPOSE": {"MIGRATION_PURPOSE", "MIGRATION_TRANSFORMATION"},
+    "SCHEMA_VERSION_TRANSITION": {"MIGRATION_SCHEMA_VERSION", "MIGRATION_SCHEMA_RANGE", "MIGRATION_VERSION_CURRENT", "MIGRATION_SCHEMA_VERSION_TRANSITION"},
+    "AFFECTED_TABLE": {"MIGRATION_AFFECTED_TABLE"},
+    "AFFECTED_INDEX": {"MIGRATION_AFFECTED_INDEX"},
+    "COMPONENT_LINKAGE": {"MIGRATION_COMPONENT", "COMPONENT_LINKAGE", "MIGRATION_LOADER"},
+    "MIGRATION_ORDER_RELATIONSHIP": {"MIGRATION_ORDER_RELATIONSHIP", "MIGRATION_SCHEMA_VERSION_TRANSITION"},
+}
 POLICIES = {"STRUCTURAL_SCAN", "METADATA_ONLY", "NO_CONTENT", "EXCLUDED"}
 REPOSITORY_URL = "https://github.com/ppow1/theestate.git"
 
 
 class PopulationScopeError(KnowledgeStoreError):
     pass
+
+
+class PacketFreshnessError(PopulationScopeError):
+    """A work packet cannot be built from the current deterministic state."""
+
+    def __init__(self, code: str, message: str):
+        self.code = code
+        super().__init__(f"{code}: {message}")
 
 
 def _canonical(value: Any) -> str:
@@ -393,7 +410,9 @@ def _packet_evidence(connection, asset_ids: list[str], *, limit: int = 24, max_b
            LEFT JOIN assets source ON source.asset_id=ef.source_asset_id
            LEFT JOIN assets target ON target.asset_id=ef.target_asset_id
            WHERE ef.target_asset_id IN (""" + marks + """) AND ef.current_state='CURRENT'
-           ORDER BY CASE ef.certainty
+             AND source.current_state='CURRENT' AND ef.source_hash=source.current_content_hash
+           ORDER BY CASE WHEN target.current_path LIKE 'migrations/%' AND ef.fact_kind LIKE 'MIGRATION_%' THEN 0 ELSE 1 END,
+             CASE ef.certainty
              WHEN 'AUTHORITATIVE_GOVERNANCE' THEN 0
              WHEN 'AUTHORITATIVE_REGISTRY' THEN 1
              WHEN 'DETERMINISTIC_SOURCE_RELATIONSHIP' THEN 2
@@ -409,6 +428,12 @@ def _packet_evidence(connection, asset_ids: list[str], *, limit: int = 24, max_b
     used = 0
     for row in rows:
         target = row["target_asset_id"]
+        if str(row["target_path"] or "").startswith("migrations/") and not (
+            str(row["fact_kind"]).startswith("MIGRATION_")
+            or row["fact_kind"] in {"COMPONENT_LINKAGE", "OWNER_EVIDENCE"}
+        ):
+            omitted[target] += 1
+            continue
         if len(selected.get(target, [])) >= max(1, limit):
             omitted[target] += 1
             continue
@@ -443,6 +468,11 @@ def batch_packet(root: str | Path | None, batch_id: str, *, max_bytes: int = 262
         batch = connection.execute("SELECT * FROM comprehension_batches WHERE batch_id=?", (batch_id,)).fetchone()
         if not batch:
             raise PopulationScopeError(f"unknown comprehension batch: {batch_id}")
+        if batch["source_revision"] != context["source_revision"]:
+            raise PacketFreshnessError(
+                "STALE_PACKET_SOURCE_REVISION",
+                f"batch {batch_id} revision {batch['source_revision']} does not match current repository revision {context['source_revision']}; deterministic revalidation is required",
+            )
         assets = []
         batch_rows = _batch_rows(connection, batch_id)
         asset_ids = [row["asset_id"] for row in batch_rows]
@@ -451,17 +481,38 @@ def batch_packet(root: str | Path | None, batch_id: str, *, max_bytes: int = 262
         for row in batch_rows:
             if row["scope_policy"] != "STRUCTURAL_SCAN" or not row["provider_content_allowed"]:
                 raise PopulationScopeError(f"batch contains non-provider asset: {row['current_path']}")
+            if row["current_state"] != "CURRENT" or row["current_source_revision"] != batch["source_revision"]:
+                raise PacketFreshnessError(
+                    "ASSET_REVALIDATION_REQUIRED",
+                    f"{row['current_path']} is indexed at {row['current_source_revision']} with state {row['current_state']}, not batch revision {batch['source_revision']}",
+                )
             path = Path(context["root"]) / row["current_path"]
-            if not path.is_file() or _hash(path) != row["current_content_hash"]:
-                raise PopulationScopeError(f"asset changed or disappeared before packet creation: {row['current_path']}")
+            if not path.is_file():
+                raise PacketFreshnessError("ASSET_REVALIDATION_REQUIRED", f"{row['current_path']} disappeared before packet creation")
+            actual_hash = _hash(path)
+            if actual_hash != row["current_content_hash"]:
+                raise PacketFreshnessError(
+                    "STALE_ASSET_CONTENT_HASH",
+                    f"{row['current_path']} current hash {actual_hash} does not match indexed hash {row['current_content_hash']}; deterministic revalidation is required",
+                )
+            actual_blob = _git(Path(context["root"]), "hash-object", "--", row["current_path"])
+            if not row["current_git_blob"] or actual_blob != row["current_git_blob"]:
+                raise PacketFreshnessError(
+                    "STALE_ASSET_GIT_BLOB",
+                    f"{row['current_path']} current Git blob {actual_blob} does not match indexed blob {row['current_git_blob'] or 'UNKNOWN'}; deterministic revalidation is required",
+                )
             content = path.read_text(encoding="utf-8", errors="replace")
             encoded = content.encode("utf-8")[:remaining]
             content = encoded.decode("utf-8", errors="ignore")
             remaining -= len(content.encode("utf-8"))
-            asset = {"asset_id": row["asset_id"], "path": row["current_path"], "source_revision": row["current_source_revision"], "content_hash": row["current_content_hash"], "scope_policy": row["scope_policy"], "content": content, "deterministic_evidence": evidence_by_asset.get(row["asset_id"], [])}
+            asset = {"asset_id": row["asset_id"], "path": row["current_path"], "source_revision": row["current_source_revision"], "git_blob": row["current_git_blob"], "content_hash": row["current_content_hash"], "scope_policy": row["scope_policy"], "content": content, "deterministic_evidence": evidence_by_asset.get(row["asset_id"], [])}
             asset["evidence_omitted"] = omitted_by_asset.get(row["asset_id"], 0)
             assets.append(asset)
-        packet = {"contract": PACKET_CONTRACT, "packet_version": PACKET_VERSION, "prompt_contract_version": PROMPT_CONTRACT_VERSION, "provider_neutral": True, "batch_id": batch_id, "scope_id": batch["scope_id"], "source_revision": batch["source_revision"], "selection_reason": batch["selection_reason"], "evidence_selection_policy": {"max_facts_per_asset": evidence_limit, "max_evidence_bytes": evidence_bytes, "relationship_depth": 1, "omitted_context": any(omitted_by_asset.values())}, "evidence_fact_ids": evidence_ids, "assets": assets, "component_context": [], "workflow_context": [], "known_knowledge": [], "allowed_outputs": ["PURPOSE", "SCHEMA_CLASSIFICATION", "DETERMINISTIC_TAG", "COMPONENT_LINKAGE", "OWNER", "UNRESOLVED_QUESTION", "NEEDS_MORE_CONTEXT", "NO_ASSERTABLE_CLAIM"], "forbidden_actions": ["add filesystem paths", "read outside packet", "mutate canonical files", "promote truth", "advance accepted baseline", "authorize remediation"]}
+        migration_packet = bool(assets) and all(str(asset["path"]).startswith("migrations/") for asset in assets)
+        allowed_outputs = ["PURPOSE", "SCHEMA_CLASSIFICATION", "DETERMINISTIC_TAG", "COMPONENT_LINKAGE", "OWNER", "UNRESOLVED_QUESTION", "NEEDS_MORE_CONTEXT", "NO_ASSERTABLE_CLAIM"]
+        if migration_packet:
+            allowed_outputs = ["MIGRATION_CLASSIFICATION", "PURPOSE", "SCHEMA_VERSION_TRANSITION", "AFFECTED_TABLE", "AFFECTED_INDEX", "COMPONENT_LINKAGE", "MIGRATION_ORDER_RELATIONSHIP", "UNRESOLVED_QUESTION", "NO_ASSERTABLE_CLAIM"]
+        packet = {"contract": PACKET_CONTRACT, "packet_version": PACKET_VERSION, "prompt_contract_version": PROMPT_CONTRACT_VERSION, "provider_neutral": True, "batch_id": batch_id, "scope_id": batch["scope_id"], "source_revision": batch["source_revision"], "selection_reason": batch["selection_reason"], "freshness": {"state": "CURRENT", "repository_revision": context["source_revision"], "asset_hashes_verified": True, "asset_git_blobs_verified": True, "evidence_hashes_verified": True}, "work_class": "MIGRATIONS" if migration_packet else None, "evidence_selection_policy": {"max_facts_per_asset": evidence_limit, "max_evidence_bytes": evidence_bytes, "relationship_depth": 1, "omitted_context": any(omitted_by_asset.values())}, "evidence_fact_ids": evidence_ids, "assets": assets, "component_context": [], "workflow_context": [], "known_knowledge": [], "allowed_outputs": allowed_outputs, "forbidden_actions": ["add filesystem paths", "read outside packet", "mutate canonical files", "promote truth", "advance accepted baseline", "authorize remediation", "infer rollback safety", "infer destructive or non-destructive semantics from naming"]}
         return packet
 
 
@@ -499,7 +550,7 @@ def validate_result(root: str | Path | None, payload: dict[str, Any], *, packet:
     for item in payload["items"]:
         if not isinstance(item, dict) or item.get("asset_id") not in allowed:
             raise PopulationScopeError("provider result contains an asset outside its assigned batch")
-        if set(item) - {"asset_id", "lifecycle", "purpose", "owner_candidate", "summary", "classification", "tags", "unresolved_questions", "evidence_refs", "verification_state"}:
+        if set(item) - {"asset_id", "lifecycle", "purpose", "owner_candidate", "summary", "classification", "tags", "unresolved_questions", "evidence_refs", "verification_state", "assertions"}:
             raise PopulationScopeError("unknown provider interpretation fields")
         if item.get("lifecycle", "CANDIDATE") not in {"CANDIDATE", "PROPOSED"}:
             raise PopulationScopeError("provider interpretation must remain candidate/proposed")
@@ -509,21 +560,40 @@ def validate_result(root: str | Path | None, payload: dict[str, Any], *, packet:
             raise PopulationScopeError("evidence_refs must be a list of strings")
         if item.get("classification") is not None and not isinstance(item["classification"], str):
             raise PopulationScopeError("classification must be a string or null")
+        if "assertions" in item:
+            if not isinstance(item["assertions"], list):
+                raise PopulationScopeError("assertions must be an array")
+            for assertion in item["assertions"]:
+                if not isinstance(assertion, dict) or set(assertion) - {"kind", "value", "evidence_refs"}:
+                    raise PopulationScopeError("invalid migration assertion fields")
+                if not isinstance(assertion.get("kind"), str) or assertion.get("value") is not None and not isinstance(assertion.get("value"), str):
+                    raise PopulationScopeError("migration assertion kind/value must be strings")
+                if not isinstance(assertion.get("evidence_refs"), list) or not all(isinstance(ref, str) for ref in assertion["evidence_refs"]):
+                    raise PopulationScopeError("migration assertion evidence_refs must be a list of strings")
     if payload.get("packet_version") == PACKET_VERSION:
         if packet is None:
             raise PopulationScopeError("evidence-enriched result requires the exact provider packet for citation validation")
         allowed_facts = set(packet.get("evidence_fact_ids") or [])
+        cited_facts = {
+            ref for item in payload["items"]
+            for ref in list(item.get("evidence_refs") or []) + [ref for assertion in item.get("assertions") or [] for ref in assertion.get("evidence_refs") or []]
+        }
         with connect(context["root"], create=False) as connection:
-            known_facts = {row[0] for row in connection.execute("SELECT fact_id FROM evidence_facts WHERE fact_id IN ({})".format(",".join("?" for _ in allowed_facts | {ref for item in payload["items"] for ref in (item.get("evidence_refs") or [])})), tuple(allowed_facts | {ref for item in payload["items"] for ref in (item.get("evidence_refs") or [])})).fetchall()} if allowed_facts or any(item.get("evidence_refs") for item in payload["items"]) else set()
+            fact_query_ids = allowed_facts | cited_facts
+            known_facts = {row[0] for row in connection.execute("SELECT fact_id FROM evidence_facts WHERE fact_id IN ({})".format(",".join("?" for _ in fact_query_ids)), tuple(fact_query_ids)).fetchall()} if fact_query_ids else set()
+        packet_fact_kinds = {
+            fact["evidence_fact_id"]: fact["fact_kind"]
+            for asset in packet.get("assets") or [] for fact in asset.get("deterministic_evidence") or []
+        }
         for item in payload["items"]:
-            errors = packet_citation_errors(item, allowed_facts, known_facts)
+            errors = packet_citation_errors(item, allowed_facts, known_facts, fact_kinds=packet_fact_kinds, allowed_assertion_kinds=set(packet.get("allowed_outputs") or []))
             if errors:
                 first = errors[0]
                 raise PopulationScopeError(f"{first['code']}: {first['message']}")
     return {"valid": True, "batch_id": payload["batch_id"], "asset_count": len(payload["items"]), "provider_type": provider["type"], "candidate_only": True}
 
 
-def packet_citation_errors(item: dict[str, Any], allowed_facts: set[str], known_facts: set[str] | None = None) -> list[dict[str, str]]:
+def packet_citation_errors(item: dict[str, Any], allowed_facts: set[str], known_facts: set[str] | None = None, *, fact_kinds: dict[str, str] | None = None, allowed_assertion_kinds: set[str] | None = None) -> list[dict[str, str]]:
     """Return precise packet-local citation failures before candidate admission."""
     refs = item.get("evidence_refs") or []
     positive = any(item.get(key) for key in ("purpose", "owner_candidate", "summary", "classification")) or bool(item.get("tags"))
@@ -538,6 +608,33 @@ def packet_citation_errors(item: dict[str, Any], allowed_facts: set[str], known_
         elif ref not in allowed_facts:
             code = "EVIDENCE_ID_NOT_IN_PACKET" if ref in known else "EVIDENCE_ID_UNKNOWN"
             errors.append({"code": code, "message": f"evidence fact {ref} is not admitted in this packet" if code.endswith("PACKET") else f"evidence fact {ref} is unknown"})
+    if allowed_assertion_kinds and "MIGRATION_CLASSIFICATION" in allowed_assertion_kinds and fact_kinds is not None:
+        legacy_authorization = {
+            "purpose": MIGRATION_ASSERTION_FACT_KINDS["PURPOSE"],
+            "classification": MIGRATION_ASSERTION_FACT_KINDS["MIGRATION_CLASSIFICATION"],
+            "owner_candidate": set(),
+            "summary": set(),
+        }
+        for field, authorized_kinds in legacy_authorization.items():
+            if item.get(field) and not any(fact_kinds.get(ref) in authorized_kinds for ref in refs):
+                errors.append({"code": "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION", "message": f"packet evidence is not authorized for migration {field}"})
+    for assertion in item.get("assertions") or []:
+        kind = assertion.get("kind")
+        assertion_refs = assertion.get("evidence_refs") or []
+        if allowed_assertion_kinds is not None and kind not in allowed_assertion_kinds:
+            errors.append({"code": "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION", "message": f"assertion kind {kind!r} is not authorized by this packet"})
+            continue
+        if assertion.get("value") and not assertion_refs:
+            errors.append({"code": "MISSING_EVIDENCE_CITATION", "message": f"positive {kind} assertion has no evidence_refs"})
+            continue
+        for ref in assertion_refs:
+            if not isinstance(ref, str) or not EVIDENCE_FACT_ID_PATTERN.fullmatch(ref):
+                errors.append({"code": "MALFORMED_EVIDENCE_ID", "message": f"evidence reference is not a fact ID: {ref!r}"})
+            elif ref not in allowed_facts:
+                code = "EVIDENCE_ID_NOT_IN_PACKET" if ref in known else "EVIDENCE_ID_UNKNOWN"
+                errors.append({"code": code, "message": f"evidence fact {ref} is not admitted in this packet" if code.endswith("PACKET") else f"evidence fact {ref} is unknown"})
+            elif fact_kinds is not None and kind in MIGRATION_ASSERTION_FACT_KINDS and fact_kinds.get(ref) not in MIGRATION_ASSERTION_FACT_KINDS[kind]:
+                errors.append({"code": "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION", "message": f"{fact_kinds.get(ref) or 'UNKNOWN'} evidence is not authorized for {kind}"})
     return errors
 
 

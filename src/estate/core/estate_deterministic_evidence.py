@@ -6,6 +6,7 @@ assertions only through the governed corroboration service.
 """
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import re
@@ -200,6 +201,108 @@ def _python_structure_facts(connection, source: dict[str, Any], text: str, revis
     return count
 
 
+def _migration_self_facts(connection, source: dict[str, Any], text: str, revision: str, source_hash: str) -> int:
+    """Extract only explicit, low-risk migration metadata from a migration asset."""
+    if not source["current_path"].startswith("migrations/"):
+        return 0
+    count = 0
+
+    def add(kind: str, value: Any, location: str) -> None:
+        nonlocal count
+        _insert_fact(
+            connection, fact_kind=kind, source=source, target=source, value=value,
+            location=location, extractor=EXTRACTOR, certainty="DERIVED_STATIC_ANALYSIS",
+            revision=revision, source_hash=source_hash,
+        )
+        count += 1
+
+    add("MIGRATION_CLASSIFICATION", "MIGRATION", "governed-scope:migrations")
+    try:
+        document = json.loads(text)
+    except json.JSONDecodeError:
+        document = None
+    if isinstance(document, dict):
+        for key, kind in (
+            ("migration_id", "MIGRATION_ID"),
+            ("schema_version", "MIGRATION_SCHEMA_VERSION"),
+            ("purpose", "MIGRATION_PURPOSE"),
+            ("applies_to", "MIGRATION_COMPONENT"),
+        ):
+            if isinstance(document.get(key), str):
+                add(kind, document[key], f"json-pointer:/{key}")
+        for index, action in enumerate(document.get("actions") or []):
+            if isinstance(action, str):
+                add("MIGRATION_TRANSFORMATION", action, f"json-pointer:/actions/{index}")
+        if isinstance(document.get("destructive"), bool):
+            add(
+                "MIGRATION_DESTRUCTIVE_DECLARATION",
+                {"declared": document["destructive"], "not_a_safety_proof": True},
+                "json-pointer:/destructive",
+            )
+        return count
+
+    current = re.search(r"current migration is version\s+(\d+)", text, re.I)
+    if current:
+        add("MIGRATION_VERSION_CURRENT", int(current.group(1)), _line_for(text, current.group(0)) or "text")
+    schema_range = re.search(r"estate_knowledge_store_v(\d+)\.schema\.json`?\s+through\s+`?data/schemas/estate_knowledge_store_v(\d+)\.schema\.json", text, re.I)
+    if schema_range:
+        add("MIGRATION_SCHEMA_RANGE", {"first": int(schema_range.group(1)), "last": int(schema_range.group(2))}, _line_for(text, schema_range.group(0)) or "text")
+    for match in re.finditer(r"Migration\s+(\d+)\s+(.+?)(?=Migration\s+\d+|A database with|$)", text.replace("\n", " "), re.I):
+        add("MIGRATION_ORDER_RELATIONSHIP", {"version": int(match.group(1)), "description": " ".join(match.group(2).split()).rstrip(". ")}, f"migration:{match.group(1)}")
+    for module in re.findall(r"`(estate\.core\.[A-Za-z0-9_]+)`", text):
+        add("MIGRATION_LOADER", module, _line_for(text, module) or "text")
+    return count
+
+
+def _migration_store_facts(connection, base: Path, target: dict[str, Any], revision: str) -> int:
+    """Link the documented SQLite migration map to its admitted source implementation."""
+    if target["current_path"] != "migrations/estate_knowledge_store/README.md":
+        return 0
+    source = connection.execute("SELECT * FROM assets WHERE current_path='src/estate/core/estate_knowledge_store.py'").fetchone()
+    if not source:
+        return 0
+    source = dict(source)
+    path = base / source["current_path"]
+    text = _read(path)
+    if text is None:
+        return 0
+    source_hash = _file_hash(path)
+    if source_hash != source["current_content_hash"] or source["current_state"] != "CURRENT":
+        return 0
+    try:
+        tree = ast.parse(text)
+        assignment = next(
+            node for node in tree.body
+            if isinstance(node, ast.Assign) and any(isinstance(name, ast.Name) and name.id == "MIGRATIONS" for name in node.targets)
+        )
+        migrations = ast.literal_eval(assignment.value)
+    except (SyntaxError, ValueError, StopIteration):
+        return 0
+    if not isinstance(migrations, dict):
+        return 0
+    count = 0
+
+    def add(kind: str, value: Any, location: str) -> None:
+        nonlocal count
+        _insert_fact(
+            connection, fact_kind=kind, source=source, target=target, value=value,
+            location=location, extractor=EXTRACTOR, certainty="DERIVED_STATIC_ANALYSIS",
+            revision=revision, source_hash=source_hash,
+        )
+        count += 1
+
+    versions = sorted(version for version in migrations if isinstance(version, int))
+    add("MIGRATION_LOADER", {"module": "estate.core.estate_knowledge_store", "map": "MIGRATIONS", "versions": versions}, "symbol:MIGRATIONS")
+    for version in versions:
+        sql = str(migrations[version])
+        add("MIGRATION_SCHEMA_VERSION_TRANSITION", {"from": version - 1, "to": version}, f"MIGRATIONS[{version}]")
+        for table in sorted(set(re.findall(r"(?:CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?|ALTER\s+TABLE)\s+[\"']?([A-Za-z_][A-Za-z0-9_]*)", sql, re.I))):
+            add("MIGRATION_AFFECTED_TABLE", {"version": version, "table": table}, f"MIGRATIONS[{version}]")
+        for index in sorted(set(re.findall(r"CREATE\s+(?:UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?\s+[\"']?([A-Za-z_][A-Za-z0-9_]*)", sql, re.I))):
+            add("MIGRATION_AFFECTED_INDEX", {"version": version, "index": index}, f"MIGRATIONS[{version}]")
+    return count
+
+
 def extract_evidence(root: str | Path | None = None, *, asset_ids: Iterable[str] | None = None) -> dict[str, Any]:
     """Extract/update facts for selected assets using the existing inventory.
 
@@ -230,6 +333,8 @@ def extract_evidence(root: str | Path | None = None, *, asset_ids: Iterable[str]
             if target["file_type"] == "schema":
                 facts += _schema_facts(connection, target, target, text, revision, source_hash)
             facts += _owner_and_component_facts(connection, target, revision, source_hash)
+            facts += _migration_self_facts(connection, target, text, revision, source_hash)
+            facts += _migration_store_facts(connection, base, target, revision)
         # A single admitted-inventory pass supplies reusable consumers for all selected targets.
         for source in source_rows:
             if source["current_path"] in target_paths or source["file_type"] in {"binary", "other"}:

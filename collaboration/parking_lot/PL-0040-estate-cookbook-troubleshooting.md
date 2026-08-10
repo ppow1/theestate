@@ -368,3 +368,46 @@ After the checkpoint, SQLite integrity remained `ok`; evidence facts grew from
 assertions remained 44, and application history remained 47. No scheduler,
 GPU stress, driver, CUDA, or Windows configuration action was taken.
 `SCHEDULED_LEVEL1_NOT_YET_WARRANTED` remains the governing conclusion.
+
+## Migration class revalidation and qualification (2026-08-10)
+
+The migration checkpoint was reconstructed without replaying unrelated classes.
+The prior coder result for
+`migrations/WP-0545_provider_benchmark_backfill_v1.json` failed
+`MISSING_EVIDENCE_CITATION`; the prior qwen3:8b result for that asset was a
+valid no-positive-claim candidate; and the README unit failed before provider
+dispatch because the index still held revision `800634b...`/hash `a4f3cc27...`
+after the file changed at `b240d882...`. The stale attempt's copied raw output
+and packet metadata were traced to per-loop worker state leakage and remain
+preserved as historical evidence rather than rewritten.
+
+The existing governed scan path refreshed both admitted migration assets at the
+current revision and retained all prior `asset_revisions`. Packet construction
+now requires the current batch/repository revision, asset revision, content
+hash, Git blob, and hash-current deterministic evidence before generation.
+Stale work returns a precise `REVALIDATION_REQUIRED` result with no provider
+dispatch and no inherited raw output.
+
+Migration packets now select explicit migration identity, purpose, component,
+transformation, version/order, loader/map, affected-table, and affected-index
+facts rather than generic filename references. Typed positive assertions require
+packet-local fact IDs authorized for the assertion kind. Rollback safety and
+destructive semantics remain outside inference unless explicitly proven.
+
+The entire current migration population is two assets. qwen3:8b produced two
+invalid current outputs using unauthorized assertion kinds; both raw outputs
+were preserved and neither was admitted. qwen3-coder:30b-qwencode-20k produced
+two validated candidates. All seven accepted positive assertions were
+deterministically corroborated; review applied exactly three low-risk
+non-canonical projections (JSON purpose and both migration classifications),
+and duplicate application returned zero. Both assets advanced from `PARTIAL`
+to `COMPREHENDED` only through existing governed application/coverage
+semantics.
+
+`MIGRATIONS` is now `LOCAL_AI_WITH_REVIEW` with
+qwen3-coder:30b-qwencode-20k primary. qwen3:8b is the named comparison/fallback
+model but is `DISALLOWED_FOR_CLASS`, so it is not an operational fallback. The
+full Level-1 matrix has no remaining `NOT_YET_PROVEN` class and therefore
+recommends `SCHEDULED_LEVEL1_WARRANTED`; Scheduler was not activated. Canonical
+truth, Grace, parallelism, GPU, CUDA, driver, and Windows configuration were not
+changed.

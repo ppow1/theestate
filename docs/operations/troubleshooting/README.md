@@ -212,7 +212,7 @@ python -m estate.cli.main knowledge-index --backend sqlite packet WF.LD.RECONCIL
 python -m estate.cli.main knowledge-index --backend sqlite rebuild --root ESTATE_ROOT
 ```
 
-Migration version 2 is applied transactionally and future incompatible
+Migration version 7 is applied transactionally and future incompatible
 versions fail closed. Unchanged content is not reprocessed; changed
 comprehended assets become `REVALIDATION_REQUIRED` while historical revisions
 remain in the index. The query/packet boundary is provider-neutral and exposes
@@ -253,6 +253,22 @@ VERIFIED/CANONICAL self-promotion. Ingestion preserves provider/model/worker
 provenance, is idempotent for identical results, preserves conflicts, and
 leaves human review required. No provider can expand scope or authorize
 remediation.
+
+Packet construction is also the pre-provider freshness boundary. The batch
+revision must match the current repository revision; every asset must be
+current at that revision; indexed content hashes and Git blobs must match the
+worktree; and only current evidence whose source hash matches its indexed
+source asset may enter the packet. Failure returns a precise
+`REVALIDATION_REQUIRED` result and does not dispatch generation. Refresh stale
+assets only through the governed `knowledge-index scan --scope PATH` path so
+prior `asset_revisions` and historical attempts remain intact.
+
+Migration packets use a narrow evidence profile rather than generic repository
+references. Deterministic facts cover explicit migration identity, purpose,
+component, transformations, version/order relationships, loader/map metadata,
+and affected tables/indexes where executable SQL proves them. Positive typed
+migration assertions carry their own packet-local citations. Rollback safety
+and destructive/non-destructive semantics are never inferred from names.
 
 ### Governed comprehension candidate application
 

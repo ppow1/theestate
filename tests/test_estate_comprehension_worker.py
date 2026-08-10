@@ -71,6 +71,22 @@ def test_packet_citation_error_taxonomy_is_fail_closed():
     assert not packet_citation_errors({"purpose": None, "evidence_refs": []}, allowed)
 
 
+def test_migration_assertions_require_packet_local_authorized_evidence():
+    migration_fact = "fact:" + "d" * 64
+    unrelated_fact = "fact:" + "e" * 64
+    item = {"asset_id": "asset:1", "assertions": [{"kind": "AFFECTED_TABLE", "value": "assets", "evidence_refs": [migration_fact]}]}
+    assert not packet_citation_errors(
+        item, {migration_fact}, fact_kinds={migration_fact: "MIGRATION_AFFECTED_TABLE"},
+        allowed_assertion_kinds={"AFFECTED_TABLE"},
+    )
+    missing = {"asset_id": "asset:1", "assertions": [{"kind": "AFFECTED_TABLE", "value": "assets", "evidence_refs": []}]}
+    assert packet_citation_errors(missing, {migration_fact}, fact_kinds={migration_fact: "MIGRATION_AFFECTED_TABLE"}, allowed_assertion_kinds={"AFFECTED_TABLE"})[0]["code"] == "MISSING_EVIDENCE_CITATION"
+    out_of_packet = {"asset_id": "asset:1", "assertions": [{"kind": "AFFECTED_TABLE", "value": "assets", "evidence_refs": [unrelated_fact]}]}
+    assert packet_citation_errors(out_of_packet, {migration_fact}, {unrelated_fact}, fact_kinds={migration_fact: "MIGRATION_AFFECTED_TABLE"}, allowed_assertion_kinds={"AFFECTED_TABLE"})[0]["code"] == "EVIDENCE_ID_NOT_IN_PACKET"
+    unauthorized = {"asset_id": "asset:1", "assertions": [{"kind": "AFFECTED_TABLE", "value": "assets", "evidence_refs": [migration_fact]}]}
+    assert packet_citation_errors(unauthorized, {migration_fact}, fact_kinds={migration_fact: "MIGRATION_PURPOSE"}, allowed_assertion_kinds={"AFFECTED_TABLE"})[0]["code"] == "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION"
+
+
 def test_result_with_invented_asset_or_path_is_rejected(tmp_path):
     from estate.core.estate_knowledge_store import init_store, connect
     from estate.core.estate_population import governed_scan, next_batch, batch_packet

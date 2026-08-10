@@ -76,3 +76,23 @@ def test_evidence_fact_source_hash_is_revision_aware(tmp_path, monkeypatch):
         assert old_hashes
         assert connection.execute("SELECT COUNT(*) FROM evidence_facts WHERE current_state='STALE'").fetchone()[0] > 0
         assert connection.execute("SELECT COUNT(*) FROM evidence_facts WHERE current_state='CURRENT' AND source_hash='changed-source-hash'").fetchone()[0] > 0
+
+
+def test_migration_evidence_exposes_explicit_metadata_and_store_transitions(tmp_path, monkeypatch):
+    from estate.core.estate_population import governed_scan
+
+    db = tmp_path / "projection.sqlite3"
+    monkeypatch.setattr(store, "database_path", lambda root=None: db)
+    monkeypatch.setattr(evidence, "database_path", lambda root=None: db)
+    store.init_store(ROOT)
+    governed_scan(ROOT, requested="migrations")
+    governed_scan(ROOT, requested="src/estate/core/estate_knowledge_store.py")
+    with store.connect(ROOT, create=False) as connection:
+        json_asset = connection.execute("SELECT asset_id FROM assets WHERE current_path='migrations/WP-0545_provider_benchmark_backfill_v1.json'").fetchone()[0]
+        readme_asset = connection.execute("SELECT asset_id FROM assets WHERE current_path='migrations/estate_knowledge_store/README.md'").fetchone()[0]
+    evidence.extract_evidence(ROOT, asset_ids=[json_asset, readme_asset])
+    with store.connect(ROOT, create=False) as connection:
+        json_kinds = {row[0] for row in connection.execute("SELECT fact_kind FROM evidence_facts WHERE target_asset_id=? AND current_state='CURRENT'", (json_asset,))}
+        readme_kinds = {row[0] for row in connection.execute("SELECT fact_kind FROM evidence_facts WHERE target_asset_id=? AND current_state='CURRENT'", (readme_asset,))}
+    assert {"MIGRATION_CLASSIFICATION", "MIGRATION_ID", "MIGRATION_PURPOSE", "MIGRATION_COMPONENT", "MIGRATION_TRANSFORMATION", "MIGRATION_DESTRUCTIVE_DECLARATION"} <= json_kinds
+    assert {"MIGRATION_VERSION_CURRENT", "MIGRATION_SCHEMA_RANGE", "MIGRATION_ORDER_RELATIONSHIP", "MIGRATION_LOADER", "MIGRATION_SCHEMA_VERSION_TRANSITION", "MIGRATION_AFFECTED_TABLE", "MIGRATION_AFFECTED_INDEX"} <= readme_kinds

@@ -166,3 +166,40 @@ def test_resident_neutral_query_separates_history_and_related_assets(tmp_path, m
     assert grace["applied_understanding"] and not grace["application_history"]
     assert historian["application_history"]
     assert researcher["related_assets"]
+
+
+def test_migration_assertions_are_corroborated_reviewed_and_applied_once(tmp_path, monkeypatch):
+    import estate.core.estate_deterministic_evidence as evidence
+    from estate.core.estate_population import governed_scan, validate_requested_scope
+
+    db = tmp_path / "projection.sqlite3"
+    monkeypatch.setattr(store, "database_path", lambda root=None: db)
+    monkeypatch.setattr(governance, "database_path", lambda root=None: db)
+    monkeypatch.setattr(evidence, "database_path", lambda root=None: db)
+    store.init_store(ROOT)
+    path = "migrations/WP-0545_provider_benchmark_backfill_v1.json"
+    governed_scan(ROOT, requested=path)
+    revision = validate_requested_scope(ROOT)["source_revision"]
+    with store.connect(ROOT, create=False) as connection:
+        asset = connection.execute("SELECT asset_id,current_content_hash FROM assets WHERE current_path=?", (path,)).fetchone()
+    evidence.extract_evidence(ROOT, asset_ids=[asset[0]])
+    with store.connect(ROOT) as connection:
+        facts = {row[0]: (row[1], json.loads(row[2])) for row in connection.execute("SELECT fact_kind,fact_id,value_json FROM evidence_facts WHERE target_asset_id=? AND current_state='CURRENT' AND fact_kind IN ('MIGRATION_CLASSIFICATION','MIGRATION_PURPOSE')", (asset[0],))}
+        candidate = {
+            "asset_id": asset[0], "lifecycle": "CANDIDATE", "purpose": None,
+            "owner_candidate": None, "summary": None, "classification": None, "tags": [],
+            "evidence_refs": [], "unresolved_questions": [],
+            "assertions": [
+                {"kind": "MIGRATION_CLASSIFICATION", "value": "MIGRATION", "evidence_refs": [facts["MIGRATION_CLASSIFICATION"][0]]},
+                {"kind": "PURPOSE", "value": facts["MIGRATION_PURPOSE"][1], "evidence_refs": [facts["MIGRATION_PURPOSE"][0]]},
+            ],
+        }
+        connection.execute("INSERT INTO comprehension_batches(batch_id,scope_id,source_revision,selection_reason,created_at,updated_at,provider_type,provider_model,worker_identity,state,attempt_count,result_state) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", ("batch:migration", "scope", revision, "test", "now", "now", "local_ai", "qwen3:8b", "migration-worker", "COMPLETED", 1, "ACCEPTED_CANDIDATE"))
+        connection.execute("INSERT INTO comprehension_results(result_id,batch_id,provider_type,provider_model,worker_identity,source_revision,input_hash,output_hash,output_json,validation_state,created_at,human_review_required) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", ("result:migration", "batch:migration", "local_ai", "qwen3:8b", "migration-worker", revision, "input", "output", json.dumps({"items": [candidate]}), "VALIDATED_CANDIDATE", "now", 1))
+        connection.execute("INSERT INTO candidate_interpretations(interpretation_id,result_id,batch_id,asset_id,candidate_json,lifecycle,provider_type,provider_model,worker_identity,source_revision,content_hash,created_at,validation_state) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)", ("interpretation:migration", "result:migration", "batch:migration", asset[0], json.dumps(candidate), "CANDIDATE", "local_ai", "qwen3:8b", "migration-worker", revision, asset[1], "now", "CANDIDATE_REVIEW_REQUIRED"))
+    assert governance.extract_assertions(ROOT, interpretation_id="interpretation:migration")["assertions_created"] == 2
+    result = governance.corroborate(ROOT, asset_id=asset[0])
+    assert result["counts"] == {"CORROBORATED": 2}
+    assert governance.review_batch(ROOT, asset_prefix="migrations")["reviewed"] == 2
+    assert governance.apply_eligible(ROOT, actor_id="deterministic-review", actor_type="deterministic_policy")["applied_count"] == 2
+    assert governance.apply_eligible(ROOT, actor_id="deterministic-review", actor_type="deterministic_policy")["applied_count"] == 0

@@ -28,15 +28,28 @@ def work_class(path: str) -> str:
 
 
 def _stats(connection, model: str, cls: str) -> dict[str, int]:
-    rows = connection.execute("""SELECT ca.validation_state,ca.validation_code FROM comprehension_attempts ca
+    rows = connection.execute("""SELECT ca.validation_state,ca.validation_code,ca.source_revision=a.current_source_revision AS current_revision,a.asset_id FROM comprehension_attempts ca
       JOIN comprehension_batch_assets ba ON ba.batch_id=ca.batch_id JOIN assets a ON a.asset_id=ba.asset_id
       WHERE ca.provider_model=? AND (?='OTHER_LEVEL1' OR (?='REGISTRIES_CONTRACTS' AND a.current_path LIKE 'data/registry/%') OR (?='SIMPLE_CONFIGURATION' AND a.current_path LIKE 'data/%' AND a.current_path NOT LIKE 'data/registry/%') OR (?='DOCUMENTATION' AND a.current_path LIKE '%.md') OR (?='MIGRATIONS' AND a.current_path LIKE 'migrations/%') OR (?='JSON_SCHEMA' AND a.current_path LIKE 'schemas/%.json'))""", (model, cls, cls, cls, cls, cls, cls)).fetchall()
-    return {"attempts": len(rows), "valid": sum(r[0] == "VALIDATED_CANDIDATE" for r in rows), "invalid_results": sum(r[0] == "INVALID_RESULT" for r in rows), "invalid_citations": sum(r[1] in {"MISSING_EVIDENCE_CITATION", "MALFORMED_EVIDENCE_ID", "EVIDENCE_ID_NOT_IN_PACKET", "EVIDENCE_ID_UNKNOWN", "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION"} for r in rows), "timeouts": sum(r[0] == "PROVIDER_FAILURE" for r in rows)}
+    citation_codes = {"MISSING_EVIDENCE_CITATION", "MALFORMED_EVIDENCE_ID", "EVIDENCE_ID_NOT_IN_PACKET", "EVIDENCE_ID_UNKNOWN", "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION"}
+    current = [row for row in rows if row[2]]
+    return {
+        "attempts": len(rows), "valid": sum(r[0] == "VALIDATED_CANDIDATE" for r in rows),
+        "invalid_results": sum(r[0] == "INVALID_RESULT" for r in rows),
+        "invalid_citations": sum(r[1] in citation_codes for r in rows),
+        "timeouts": sum(r[0] == "PROVIDER_FAILURE" for r in rows),
+        "current_attempts": len(current), "current_valid": sum(r[0] == "VALIDATED_CANDIDATE" for r in current),
+        "current_invalid_results": sum(r[0] == "INVALID_RESULT" for r in current),
+        "current_invalid_citations": sum(r[1] in citation_codes for r in current),
+        "current_timeouts": sum(r[0] == "PROVIDER_FAILURE" for r in current),
+        "current_valid_assets": len({r[3] for r in current if r[0] == "VALIDATED_CANDIDATE"}),
+    }
 
 
 def select_route(root: str | Path, cls: str, *, requested_model: str | None = None) -> dict[str, Any]:
     with connect(root, create=False) as connection:
         stats = {model: _stats(connection, model, cls) for model in MODELS}
+        class_population = connection.execute("SELECT COUNT(*) FROM assets WHERE current_path LIKE 'migrations/%' AND scope_policy='STRUCTURAL_SCAN' AND current_state='CURRENT'").fetchone()[0] if cls == "MIGRATIONS" else None
         if requested_model:
             candidates = [requested_model]
         else:
@@ -45,7 +58,11 @@ def select_route(root: str | Path, cls: str, *, requested_model: str | None = No
         decisions = []
         for model in candidates:
             s = stats.get(model, {"attempts": 0, "valid": 0, "invalid_citations": 0, "timeouts": 0})
-            if model == "qwen3:8b" and cls == "REGISTRIES_CONTRACTS" and (s.get("invalid_citations", 0) or s.get("invalid_results", 0)):
+            if cls == "MIGRATIONS" and (s.get("current_invalid_citations", 0) or s.get("current_invalid_results", 0)):
+                state, reason = "DISALLOWED_FOR_CLASS", f"{model} has {s.get('current_invalid_results', 0)} invalid current-revision migration results ({s.get('current_invalid_citations', 0)} citation/authorization failures)"
+            elif cls == "MIGRATIONS" and class_population and s.get("current_valid_assets", 0) == class_population and s.get("current_valid", 0) == s.get("current_attempts", 0):
+                state, reason = "PRIMARY", f"{model} has valid current-revision results for all {class_population} admitted migration assets"
+            elif model == "qwen3:8b" and cls == "REGISTRIES_CONTRACTS" and (s.get("invalid_citations", 0) or s.get("invalid_results", 0)):
                 state, reason = "DISALLOWED_FOR_CLASS", f"{model} has {s.get('invalid_results', 0)} invalid results ({s.get('invalid_citations', 0)} classified citation failures) for {cls}"
             elif s["timeouts"] >= 2:
                 state, reason = "TEMPORARILY_SUSPENDED", f"{model} has repeated provider failures for {cls}"

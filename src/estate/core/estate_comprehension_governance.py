@@ -24,7 +24,17 @@ CORROBORATION_STATES = {"CORROBORATED", "PARTIALLY_CORROBORATED", "NOT_CORROBORA
 REVIEW_STATES = {"PENDING", "APPROVED", "PARTIALLY_APPROVED", "REQUEST_MORE_CONTEXT", "REJECTED", "ESCALATED", "DEFERRED"}
 APPLICATION_STATES = {"NOT_ELIGIBLE", "ELIGIBLE", "APPLIED", "REVALIDATION_REQUIRED", "REVERSED", "SUPERSEDED"}
 DECISIONS = {"APPROVE_FOR_INDEX_APPLICATION", "APPROVE_PARTIAL", "REQUEST_MORE_CONTEXT", "REJECT_UNSUPPORTED", "REJECT_CONTRADICTED", "ESCALATE_STRONGER_REASONING", "ESCALATE_HUMAN", "DEFER"}
-LOW_RISK_KINDS = {"PURPOSE", "OWNER", "DETERMINISTIC_TAG", "SCHEMA_CLASSIFICATION", "COMPONENT_LINKAGE"}
+LOW_RISK_KINDS = {"PURPOSE", "OWNER", "DETERMINISTIC_TAG", "SCHEMA_CLASSIFICATION", "COMPONENT_LINKAGE", "MIGRATION_CLASSIFICATION"}
+MIGRATION_FACT_KINDS = {
+    "MIGRATION_CLASSIFICATION": {"MIGRATION_CLASSIFICATION"},
+    "SCHEMA_CLASSIFICATION": {"MIGRATION_CLASSIFICATION"},
+    "PURPOSE": {"MIGRATION_PURPOSE", "MIGRATION_TRANSFORMATION"},
+    "SCHEMA_VERSION_TRANSITION": {"MIGRATION_SCHEMA_VERSION", "MIGRATION_SCHEMA_RANGE", "MIGRATION_VERSION_CURRENT", "MIGRATION_SCHEMA_VERSION_TRANSITION"},
+    "AFFECTED_TABLE": {"MIGRATION_AFFECTED_TABLE"},
+    "AFFECTED_INDEX": {"MIGRATION_AFFECTED_INDEX"},
+    "COMPONENT_LINKAGE": {"MIGRATION_COMPONENT", "COMPONENT_LINKAGE", "MIGRATION_LOADER"},
+    "MIGRATION_ORDER_RELATIONSHIP": {"MIGRATION_ORDER_RELATIONSHIP", "MIGRATION_SCHEMA_VERSION_TRANSITION"},
+}
 FORBIDDEN_REVIEWER_TYPES = {"local_ai", "provider", "model"}
 
 
@@ -72,20 +82,25 @@ def extract_assertions(root: str | Path | None = None, *, interpretation_id: str
     with connect(base, create=False) as connection:
         clauses = "WHERE ci.interpretation_id=?" if interpretation_id else ""
         params = (interpretation_id,) if interpretation_id else ()
-        candidates = _rows(connection, "SELECT ci.*,cr.provider_type AS result_provider_type,cr.provider_model AS result_provider_model,cr.worker_identity AS result_worker_identity,a.current_content_hash FROM candidate_interpretations ci JOIN comprehension_results cr ON cr.result_id=ci.result_id JOIN assets a ON a.asset_id=ci.asset_id " + clauses + " ORDER BY ci.created_at", params)
+        candidates = _rows(connection, "SELECT ci.*,cr.provider_type AS result_provider_type,cr.provider_model AS result_provider_model,cr.worker_identity AS result_worker_identity,a.current_content_hash,a.current_path FROM candidate_interpretations ci JOIN comprehension_results cr ON cr.result_id=ci.result_id JOIN assets a ON a.asset_id=ci.asset_id " + clauses + " ORDER BY ci.created_at", params)
         for candidate in candidates:
             data = json.loads(candidate["candidate_json"])
             values: list[tuple[str, str | None, str, list[str], str]] = []
-            if data.get("purpose"):
+            migration_candidate = candidate["current_path"].startswith("migrations/")
+            typed_kinds = {assertion.get("kind") for assertion in data.get("assertions") or []}
+            if data.get("purpose") and not (migration_candidate and "PURPOSE" in typed_kinds):
                 values.append(("PURPOSE", str(data["purpose"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             if data.get("owner_candidate"):
                 values.append(("OWNER", str(data["owner_candidate"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
-            if data.get("classification"):
-                values.append(("SCHEMA_CLASSIFICATION", str(data["classification"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
+            if data.get("classification") and not (migration_candidate and "MIGRATION_CLASSIFICATION" in typed_kinds):
+                values.append(("MIGRATION_CLASSIFICATION" if migration_candidate else "SCHEMA_CLASSIFICATION", str(data["classification"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             for tag in data.get("tags") or []:
                 values.append(("DETERMINISTIC_TAG", str(tag), "LOW", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             if data.get("summary"):
                 values.append(("SUMMARY", str(data["summary"]), "LOW", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
+            for assertion in data.get("assertions") or []:
+                if assertion.get("kind") in MIGRATION_FACT_KINDS and assertion.get("value"):
+                    values.append((assertion["kind"], str(assertion["value"]), "MEDIUM", list(assertion.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             for question in data.get("unresolved_questions") or []:
                 values.append(("UNRESOLVED_QUESTION", str(question), "UNKNOWN", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             if not values:
@@ -116,6 +131,31 @@ def corroborate(root: str | Path | None = None, *, assertion_ids: Iterable[str] 
             current_hash = row["current_content_hash"]
             if row["source_hash"] != current_hash:
                 state, reason = "NOT_DETERMINISTICALLY_VERIFIABLE", "candidate source changed; corroboration requires revalidation"
+            elif row["current_path"].startswith("migrations/") and row["assertion_kind"] in MIGRATION_FACT_KINDS:
+                cited = json.loads(row["evidence_refs"] or "[]")
+                marks = ",".join("?" for _ in cited)
+                facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND current_state='CURRENT' AND fact_id IN (" + marks + ")", (row["asset_id"], *cited)) if cited else []
+                authorized = [fact for fact in facts if fact["fact_kind"] in MIGRATION_FACT_KINDS[row["assertion_kind"]]]
+                proposed = str(row["proposed_value"] or "").strip().lower()
+                matching = []
+                for fact in authorized:
+                    value = json.loads(fact["value_json"])
+                    candidates = [str(value).lower(), json.dumps(value, sort_keys=True).lower()]
+                    if isinstance(value, dict):
+                        candidates.extend(str(item).lower() for item in value.values())
+                        if "from" in value and "to" in value:
+                            candidates.extend((f"{value['from']} -> {value['to']}", f"{value['from']} to {value['to']}"))
+                    if proposed and any(proposed == candidate or proposed in candidate for candidate in candidates):
+                        matching.append(fact)
+                linked = [fact["fact_id"] for fact in matching or authorized]
+                if matching:
+                    state, reason = "CORROBORATED", "migration assertion exactly matches packet-cited deterministic migration evidence"
+                    strength = matching[0]["certainty"]
+                elif authorized:
+                    state, reason = "NOT_CORROBORATED", "cited migration evidence is authorized for the assertion kind but does not support the proposed value"
+                    strength = authorized[0]["certainty"]
+                else:
+                    state, reason = "NOT_CORROBORATED", "no current packet-cited deterministic migration evidence supports the assertion"
             elif row["assertion_kind"] == "OWNER":
                 facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND fact_kind='OWNER_EVIDENCE' AND current_state='CURRENT'", (row["asset_id"],))
                 matching = [fact for fact in facts if json.loads(fact["value_json"]).get("owner") == row["proposed_value"]]
@@ -255,7 +295,7 @@ def review_asset(root: str | Path | None, asset_id: str, *, reviewer_id: str = "
 def eligible(root: str | Path | None = None) -> dict[str, Any]:
     base = _root(root)
     with connect(base, create=False) as connection:
-        rows = _rows(connection, "SELECT ca.*,a.current_path,a.current_content_hash,a.current_source_revision FROM candidate_assertions ca JOIN assets a ON a.asset_id=ca.asset_id WHERE ca.application_state='ELIGIBLE' AND ca.source_hash=a.current_content_hash AND ca.assertion_kind IN ('PURPOSE','OWNER','DETERMINISTIC_TAG','SCHEMA_CLASSIFICATION','COMPONENT_LINKAGE') AND ca.conflict_state='NONE' ORDER BY ca.created_at")
+        rows = _rows(connection, "SELECT ca.*,a.current_path,a.current_content_hash,a.current_source_revision FROM candidate_assertions ca JOIN assets a ON a.asset_id=ca.asset_id WHERE ca.application_state='ELIGIBLE' AND ca.source_hash=a.current_content_hash AND ca.assertion_kind IN ('PURPOSE','OWNER','DETERMINISTIC_TAG','SCHEMA_CLASSIFICATION','COMPONENT_LINKAGE','MIGRATION_CLASSIFICATION') AND ca.conflict_state='NONE' ORDER BY ca.created_at")
     return {"eligible_count":len(rows),"assertions":rows,"canonical_mutation":False}
 
 
@@ -279,7 +319,7 @@ def apply_eligible(root: str | Path | None = None, *, assertion_ids: Iterable[st
             connection.executemany("UPDATE candidate_assertions SET conflict_state='CONTRADICTORY_APPLICATIONS',application_state='NOT_ELIGIBLE',review_state='EXCEPTION',updated_at=? WHERE assertion_id=?", [(now, assertion_id) for assertion_id in conflicted])
             rows = [row for row in rows if row["assertion_id"] not in conflicted]
         for row in rows:
-            field = {"PURPOSE":"purpose_summary","OWNER":"owner","SCHEMA_CLASSIFICATION":"classification","COMPONENT_LINKAGE":"purpose_summary","DETERMINISTIC_TAG":"tag"}[row["assertion_kind"]]
+            field = {"PURPOSE":"purpose_summary","OWNER":"owner","SCHEMA_CLASSIFICATION":"classification","MIGRATION_CLASSIFICATION":"classification","COMPONENT_LINKAGE":"purpose_summary","DETERMINISTIC_TAG":"tag"}[row["assertion_kind"]]
             prior = None if field == "tag" else connection.execute(f"SELECT {field} FROM assets WHERE asset_id=?", (row["asset_id"],)).fetchone()[0]
             application_id = "application:" + uuid.uuid4().hex
             now = _now()

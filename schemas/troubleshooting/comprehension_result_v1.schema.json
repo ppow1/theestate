@@ -30,6 +30,19 @@
           "summary": {"type": ["string", "null"]},
           "classification": {"type": ["string", "null"]},
           "tags": {"type": "array", "items": {"type": "string"}},
+          "assertions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "value", "evidence_refs"],
+              "properties": {
+                "kind": {"enum": ["MIGRATION_CLASSIFICATION", "PURPOSE", "SCHEMA_VERSION_TRANSITION", "AFFECTED_TABLE", "AFFECTED_INDEX", "COMPONENT_LINKAGE", "MIGRATION_ORDER_RELATIONSHIP"]},
+                "value": {"type": ["string", "null"]},
+                "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^fact:[0-9a-f]{64}$"}}
+              },
+              "additionalProperties": false
+            }
+          },
           "unresolved_questions": {"type": "array", "items": {"type": "string"}},
           "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^fact:[0-9a-f]{64}$"}},
           "verification_state": {"type": "string"}
