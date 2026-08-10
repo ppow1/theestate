@@ -154,6 +154,14 @@ def test_operational_command_is_reachable_without_merging_operational_activity(t
     assert "#operational-dashboard" in html
 
 
+def test_gpu_hash_route_focuses_detail_after_dashboard_materialization(tmp_path):
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+    assert "function focusGpuFromHash()" in html
+    assert "document.getElementById('gpu-detail-' + gpu)" in html
+    assert "setTimeout(focus, 250)" in html
+    assert "currentDashboard.replaceWith(nextDashboard); focusGpuFromHash();" in html
+
+
 def test_served_operations_center_refreshes_codex_seat_quota_without_restart(monkeypatch, tmp_path):
     values = iter((42,))
 

@@ -7,6 +7,7 @@ from estate.core.compute_resources import (
     ComputeResourceRequirements,
     ComputeReservationLedger,
     ExpectedGPU,
+    GRACE_EXPECTED_GPUS,
     build_gpu_inventory,
     build_grace_gpu_preflight,
     canonical_resource_id,
@@ -19,6 +20,13 @@ from estate.core.compute_resources import (
 )
 from estate.core.execution_dispatch import DispatchRequest, dispatch_request_from_dict
 from estate.core.compute_office_panel import build_compute_panel
+
+
+def test_grace_logical_gpu_identity_is_stable_by_uuid_not_nvidia_index():
+    assert [(item.expected_name, item.nvidia_uuid, item.pci_bus_id) for item in GRACE_EXPECTED_GPUS] == [
+        ("NVIDIA GeForce RTX 4090", "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "06:00.0"),
+        ("Tesla P100-PCIE-16GB", "GPU-6785b322-899d-8eec-e817-31d83279a414", "04:00.0"),
+    ]
 
 
 def _device(uuid, name, *, free=10000, ordinal=None):

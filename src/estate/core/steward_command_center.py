@@ -2474,7 +2474,7 @@ async function refreshOperationsChrome(){
     const currentDashboard = document.querySelector('#workspace-operational-dashboard .office-operational-dashboard');
     if(nextStatus && currentStatus) currentStatus.replaceWith(nextStatus);
     if(nextConsole && currentConsole) currentConsole.replaceWith(nextConsole);
-    if(nextDashboard && currentDashboard) currentDashboard.replaceWith(nextDashboard);
+    if(nextDashboard && currentDashboard) { currentDashboard.replaceWith(nextDashboard); focusGpuFromHash(); }
   }catch(error){ console.debug('Quiet refresh skipped', error); }
 }
 window.addEventListener('load', () => { if(window.startOfficeAutoRefresh) startOfficeAutoRefresh(); else refreshOperationsChrome(); });
@@ -2843,7 +2843,7 @@ function activateOfficeTab(id, persist=true, push=true){
 }
 function applyWorkspaceProfile(profile){ if(!profile) return; if(profile.panel_arrangements && profile.panel_arrangements.activity_console_visible === false){ const consoleEl = document.querySelector('#activity-console'); if(consoleEl) consoleEl.setAttribute('hidden',''); } if(profile.active_tab) activateOfficeTab(profile.active_tab, false); }
 function normalizeNavigationState(value){ return value === 'expanded' ? 'collapsed' : (value || 'collapsed'); }
-function focusGpuFromHash(){ const params = new URLSearchParams((location.hash.split('?')[1] || '')); const gpu = (params.get('gpu') || '').toLowerCase(); if(gpu === 'gpu1' || gpu === 'gpu2'){ setTimeout(() => document.getElementById('gpu-detail-' + gpu)?.scrollIntoView({block:'center'}), 0); } }
+function focusGpuFromHash(){ const params = new URLSearchParams((location.hash.split('?')[1] || '')); const gpu = (params.get('gpu') || '').toLowerCase(); if(gpu === 'gpu1' || gpu === 'gpu2'){ const focus = () => document.getElementById('gpu-detail-' + gpu)?.scrollIntoView({block:'center'}); setTimeout(focus, 0); setTimeout(focus, 250); } }
 function restoreLayoutPreferences(){ const prefs = readLayoutPreferences(); prefs.left_navigation = normalizeNavigationState(prefs.left_navigation || prefs.navigation_state); applyWorkspaceProfile(WORKSPACE_PROFILE.profile); const hashTab = decodeURIComponent((location.hash || '').replace(/^#/, '')).split('?')[0]; if(hashTab && validOfficeTab(hashTab)) activateOfficeTab(hashTab, true, false); else if(prefs.active_tab && validOfficeTab(prefs.active_tab)) activateOfficeTab(prefs.active_tab, false, false); focusGpuFromHash(); }
 function bindOfficeNavigation(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-tab]'); if(button){ event.preventDefault(); activateOfficeTab(button.dataset.tab, true, true); const drawer = button.closest('#office-navigation details'); if(drawer) drawer.open = false; } }); updateUiRuntimeDiagnostic('ready', 'UI runtime: scripts loaded / navigation bound / active tab: ' + getActiveOfficeTab()); }
 window.addEventListener('popstate', () => { const hashTab = decodeURIComponent((location.hash || '').replace(/^#/, '')).split('?')[0]; if(hashTab) activateOfficeTab(hashTab, true, false); focusGpuFromHash(); });

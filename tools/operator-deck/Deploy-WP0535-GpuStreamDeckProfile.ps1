@@ -87,6 +87,20 @@ if ([string]::IsNullOrWhiteSpace($BackupRoot)) { $BackupRoot = Join-Path $Plugin
 New-Item -ItemType Directory -Force -Path $BackupRoot | Out-Null
 Copy-Item -LiteralPath $pageManifest -Destination (Join-Path $BackupRoot 'active-page-manifest.json') -Force
 
+$defaultBackupRoot = Join-Path $BackupRoot 'default-profiles'
+New-Item -ItemType Directory -Force -Path $defaultBackupRoot | Out-Null
+Get-ChildItem -LiteralPath $ProfileRoot -Directory -Filter '*.sdProfile' | ForEach-Object {
+    $manifestPath = Join-Path $_.FullName 'manifest.json'
+    if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
+        try {
+            $defaultManifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+            if ($defaultManifest.Name -eq 'Default Profile') {
+                Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $defaultBackupRoot $_.Name) -Recurse -Force
+            }
+        } catch { }
+    }
+}
+
 foreach ($slot in @('0,2','1,2','2,2','3,2','4,2','5,2','6,2','7,2','0,3','1,3','2,3','3,3')) { Remove-Action $actions $slot }
 Set-Action $actions '0,2' (Copy-Action $cpu)
 Set-Action $actions '1,2' (Copy-Action $gpu1)
