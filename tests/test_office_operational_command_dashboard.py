@@ -9,6 +9,7 @@ from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity
 from estate.core.provider_health import ProviderHealthRecord, write_health_record
 import estate.core.steward_command_center as steward_command_center
 from estate.core.steward_command_center import generate_command_center, render_command_center_html, serve_command_center
+from estate.core.compute_resources import ComputeResourceObservation, canonical_resource_id, classify_observation, write_compute_projection
 
 
 def write_json(root, rel, payload):
@@ -118,6 +119,22 @@ def test_operational_dashboard_renders_real_codex_seat_fuel_instead_of_generic_h
     assert "codex.execution.cli" not in html
 
 
+def test_operational_dashboard_renders_shared_two_gpu_observability(tmp_path):
+    seed_dashboard_artifacts(tmp_path)
+    devices = []
+    for uuid, name, used in (("GPU-1", "RTX 4090", 6000), ("GPU-2", "Tesla P100", 2000)):
+        device = ComputeResourceObservation(resource_id=canonical_resource_id("host-a", uuid), host_id="host-a", nvidia_uuid=uuid, name=name, memory_total_mib=16000, memory_used_mib=used, memory_free_mib=16000-used, utilization_percent=62 if uuid == "GPU-1" else 4, observed_at="2026-08-10T20:00:00Z")
+        devices.append(classify_observation(device, now="2026-08-10T20:00:10Z"))
+    write_compute_projection(devices, tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+    assert "GPU Operational Observability" in html
+    assert "GPU1" in html and "GPU2" in html
+    assert "62% compute" in html and "4% compute" in html
+    assert "37.5% VRAM" in html and "12.5% VRAM" in html
+    assert "No Estate-recognized reservation" in html
+    assert "#gpu-detail-gpu1" in html and "#gpu-detail-gpu2" in html
+
+
 def test_operational_command_is_reachable_without_merging_operational_activity(tmp_path):
     payload = generate_command_center(tmp_path, write=False)
     navigation = {item["id"]: item for item in payload["navigation"]["items"]}
@@ -165,6 +182,7 @@ def test_served_operations_center_refreshes_codex_seat_quota_without_restart(mon
         return payload
 
     monkeypatch.setattr(steward_command_center, "collect_codex_seat_telemetry", fake_collect)
+    monkeypatch.setattr(steward_command_center, "discover_grace_gpus", lambda: [])
     monkeypatch.setattr(steward_command_center.time, "monotonic", iter((0.0, 31.0, 31.0)).__next__)
     server = serve_command_center(host="127.0.0.1", port=0, root=tmp_path)
     thread = threading.Thread(target=server.serve_forever, daemon=True)

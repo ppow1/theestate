@@ -12,7 +12,10 @@ from estate.core.compute_resources import (
     canonical_resource_id,
     classify_observation,
     reconcile_runtime_ordinals,
+    build_compute_projection,
+    read_gpu_operational_view,
     select_resource,
+    write_compute_projection,
 )
 from estate.core.execution_dispatch import DispatchRequest, dispatch_request_from_dict
 from estate.core.compute_office_panel import build_compute_panel
@@ -86,6 +89,19 @@ def test_office_projection_is_dynamic_for_n_devices():
     assert panel["resource_count"] == 3
     assert {row["nvidia_uuid"] for row in panel["resources"]} == {"GPU-1", "GPU-2", "GPU-3"}
     assert panel["read_only"] is True
+
+
+def test_operational_projection_separates_compute_vram_and_stable_gpu_labels(tmp_path):
+    first = _device("GPU-1", "RTX 4090", free=8000)
+    first.memory_used_mib = 8000
+    second = _device("GPU-2", "Tesla P100", free=12000)
+    write_compute_projection([first, second], tmp_path)
+    rows = read_gpu_operational_view(tmp_path)
+    assert [row["logical_gpu_id"] for row in rows] == ["GPU1", "GPU2"]
+    assert rows[0]["utilization_percent"] is None
+    assert rows[0]["vram_utilization_percent"] == 50.0
+    assert rows[0]["allocation"]["state"] == "unallocated"
+    assert "ownership evidence" in rows[0]["allocation"]["reason"]
 
 
 def test_expected_dual_gpu_inventory_maps_reversed_runtime_ordinals():

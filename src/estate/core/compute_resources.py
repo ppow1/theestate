@@ -85,6 +85,7 @@ class ComputeResourceObservation:
     dispatch_allowed: bool = False
     dispatch_reason: str = "identity and health have not been established"
     health_classification: str = "UNSAFE_TO_DISPATCH"
+    logical_gpu_id: str | None = None
 
     def __post_init__(self) -> None:
         if not self.nvidia_uuid.strip():
@@ -95,7 +96,12 @@ class ComputeResourceObservation:
             raise ValueError("invalid compute resource state")
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        total = data.get("memory_total_mib")
+        used = data.get("memory_used_mib")
+        data["vram_utilization_percent"] = round((used / total) * 100, 2) if isinstance(total, (int, float)) and total > 0 and isinstance(used, (int, float)) else None
+        data["freshness"] = "current" if data.get("health_state") != "UNKNOWN" else "unknown"
+        return data
 
 
 @dataclass(frozen=True)
@@ -395,8 +401,39 @@ def collect_windows_display_devices(*, runner=subprocess.run) -> list[dict[str, 
 
 
 def build_compute_projection(observations: Iterable[ComputeResourceObservation], *, workloads: list[dict[str, Any]] | None = None) -> dict[str, Any]:
-    devices = [o.to_dict() for o in observations]
+    devices = []
+    for index, observation in enumerate(observations, start=1):
+        if not observation.logical_gpu_id:
+            observation.logical_gpu_id = f"GPU{index}"
+        devices.append(observation.to_dict())
     return {"schema_version": "compute_resources.v1", "generated_at": utc_now(), "resource_count": len(devices), "resources": devices, "workloads": workloads or [], "canonical_identity": "host_id + NVIDIA UUID; runtime ordinal is observational only", "safe_recovery": "classify and stop admission; no automatic reset, reconfigure, reboot, or cold cycle"}
+
+
+def read_gpu_operational_view(root: str | Path | None = None) -> list[dict[str, Any]]:
+    """Read the existing GPU projection and recognized Estate reservations.
+
+    Native process activity is deliberately not treated as Estate ownership;
+    only the governed reservation ledger can establish an Estate allocation.
+    """
+    base = Path(root) if root is not None else ESTATE_ROOT
+    try:
+        payload = json.loads((base / GPU_SNAPSHOT).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    reservations = ComputeReservationLedger(base)._load()
+    active = {str(row.get("resource_id")): row for row in reservations if row.get("state") == "reserved"}
+    result = []
+    for index, item in enumerate(payload.get("resources") or [], start=1):
+        if not isinstance(item, dict):
+            continue
+        row = dict(item)
+        row.setdefault("logical_gpu_id", f"GPU{index}")
+        total, used = row.get("memory_total_mib"), row.get("memory_used_mib")
+        row.setdefault("vram_utilization_percent", round((used / total) * 100, 2) if isinstance(total, (int, float)) and total > 0 and isinstance(used, (int, float)) else None)
+        reservation = active.get(str(row.get("resource_id")))
+        row["allocation"] = {"state": "allocated", "reservation_id": reservation.get("reservation_id"), "workload_id": reservation.get("workload_id")} if reservation else {"state": "unallocated", "reason": "No Estate-recognized reservation; native process activity is not ownership evidence."}
+        result.append(row)
+    return result
 
 
 def write_compute_projection(observations: Iterable[ComputeResourceObservation], root: str | Path | None = None, *, workloads: list[dict[str, Any]] | None = None) -> dict[str, Any]:
