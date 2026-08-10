@@ -1,7 +1,7 @@
 {
   "change_id": "EC-000221",
   "title": "Complete Grace governed GPU placement acceptance",
-  "status": "candidate_bridge_routing_repaired_live_acceptance_blocked_response_not_observed",
+  "status": "streaming_governed_path_repaired_live_acceptance_blocked_provider_contract_and_receipt_schema",
   "predecessor": "EC-000220",
   "changed_artifacts": [
     "tools/openwebui-operator/profile.cjs",
@@ -14,7 +14,10 @@
     "worktree-relative Playwright profile caused false continuity loss",
     "candidate Open WebUI launched without canonical external DATA_DIR/DATABASE_URL/secret",
     "shared Grace bridge retained active-slot endpoint 127.0.0.1:11435 while green candidate Gateway listened on 11436",
-    "visible bounded task returned Model '' was not found before governed dispatch"
+    "visible bounded task returned Model '' was not found before governed dispatch",
+    "streaming bounded intent fell through to ordinary Grace conversation",
+    "provider artifact failed the governed content contract",
+    "failure receipt placement UUID fields were absent from the governed correlation schema"
   ],
   "invariants": [
     "machine-local browser profile is outside every worktree and never evidence storage",
@@ -22,6 +25,8 @@
     "candidate Open WebUI server state remains separate from browser profile state",
     "candidate WebUI bridge endpoint must equal the controller-selected Gateway slot",
     "candidate route binding restores the prior active-slot endpoint on shutdown",
+    "streaming bounded intent enters the governed Grace/Helen/Engineering path",
+    "provider receipts may record allocated and runtime UUID correlation fields",
     "full physical GPU UUID identity is required and the P100 is never an implicit fallback",
     "no second task is submitted after the bounded task failure"
   ],
@@ -36,7 +41,7 @@
   ],
   "privacy_boundary": "No cookies, tokens, browser databases, localStorage, credentials, or absolute profile paths entered Git or acceptance evidence.",
   "remaining_unproven": [
-    "successful governed PTM-to-provider execution",
+    "successful governed PTM-to-provider execution and durable provider receipt",
     "allocation UUID == runtime lane UUID == provider receipt UUID",
     "Office Compute and Stream Deck correlation"
   ],
@@ -49,14 +54,20 @@
   },
   "new_live_attempt": {
     "submitted": true,
-    "visible_grace_result": false,
-    "failure_class": "RESPONSE_NOT_OBSERVED",
-    "completion_logged_after_harness_timeout": true,
+    "visible_grace_result": true,
+    "visible_grace_result_status": "execution_failed",
+    "failure_class": "provider_artifact_contract_then_failure_receipt_schema",
+    "streaming_governed_entry": true,
+    "live_provider_called": true,
+    "completion_logged_after_harness_timeout": false,
     "retry_submitted": false
   },
   "evidence": [
     "runtime/evidence/openwebui-operator/openwebui-operator-20260810010507681-a3558220",
     "runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556",
+    "runtime/evidence/openwebui-operator/openwebui-operator-20260810012728987-58337d10",
+    "runtime/execution_adapters/results/adapter-dispatch-6a2f115f8f7f.json",
+    "runtime/operations/grace/objective_states/grace-obj-4467e057b928.json",
     "A:/AI/Tools/EstateStreamDeckMVP/Core/state/canonical-runtime/green-processes.json"
   ],
   "future_reuse_invariant": "Different isolated Estate worktrees resolve to estate-openwebui-operator-profile under the machine-local Estate state root."

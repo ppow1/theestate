@@ -1,6 +1,6 @@
 # EC-000221 — Grace governed GPU placement acceptance
 
-Status: **Blocked after one bounded visible task; routing repaired, governed completion not proven**
+Status: **Blocked after one bounded visible task; streaming dispatch repaired, provider contract/receipt persistence prevented completion**
 Predecessor: `origin/feature/ec-000220-openwebui-auth-attention` at `0f209dd0de042245db985c85c9c17cbbfe8bfc57`  
 Lane: `feature/ec-000221-grace-governed-gpu-placement`
 
@@ -85,26 +85,49 @@ The repaired green candidate reached `validated` with
 visible browser selected Grace. After shutdown the canonical database endpoint
 was restored to `http://127.0.0.1:11435/v1`.
 
-## Single bounded task result
+## Response correlation and governed-path correction
 
-Exactly one bounded Grace task was submitted through visible Playwright using the
-machine-local profile after the routing repair. The UI selected Grace and the
-candidate accepted the request through the repaired route, but the bounded
-harness ended with `RESPONSE_NOT_OBSERVED` before a visible response arrived.
-The candidate log subsequently recorded `assistant_completion_emitted_to_ui`
-with a 406-character response after the harness timeout; no visible Grace result
-was captured. Evidence:
+The prior `RESPONSE_NOT_OBSERVED` was CASE 3, not a Playwright timeout. The exact
+prompt classified as `execution_requested / bounded_local_text`, but the
+streaming Resident Gateway path omitted the bounded handler and fell through to
+ordinary Grace conversation. The resulting 406-character assistant response was:
+
+`Grace here. Pat, we move by sequence: stop the noise, pick the operational objective, assign the handoff, set the checkpoint, then close the loop. I am available as Director of Operations; give me the constraint and I will turn it into movement: Grace, run a small bounded local text task: write one short sentence confirming that this governed task used the UUID-bound RTX 4090 lane; include no secrets an`
+
+The correction invokes the same bounded handler from streaming before ordinary
+conversation. Deterministic coverage proves the exact live prompt and streaming
+entry. No timeout was increased.
+
+Exactly one additional bounded Grace task was then submitted through visible
+Playwright using the machine-local profile. This time the response was visibly
+observed and stabilized, but it was the truthful governed failure response:
+
+`{"reason":"governed execution did not complete","status":"execution_failed"}`
+
+Evidence:
 
 `runtime/evidence/openwebui-operator/openwebui-operator-20260810011856906-97049da1`
 
 The prior `Model '' was not found` evidence remains preserved at
 `runtime/evidence/openwebui-operator/openwebui-operator-20260810010633934-fd967556`;
 the new run did not reproduce it. No PTM/Helen/Engineering reservation/Dispatch/
-adapter/provider receipt chain was created in the repository runtime artifacts,
-and no provider receipt or visible Grace result was captured. Therefore allocation
-UUID == runtime lane UUID == provider receipt UUID, Office Compute correlation,
-and Stream Deck projection compatibility remain unproven. A second prompt was
-deliberately not sent after the new blocker.
+The governed chain was durably entered on the additional attempt: objective
+`grace-obj-4467e057b928`, Helen determination `heldet-08d35f6843fc`, Engineering
+commission `engcom-23777d25b083`, authorization `engauth-29697e395783`, PTM
+readiness `res_01KZMMGVZ1GW2A2Q34TXC077M0`, reservation
+`gpu-reservation-grace-obj-4467e057b928`, Dispatch `dispatch-6a2f115f8f7f`, and
+adapter request `adapter-dispatch-6a2f115f8f7f`. The adapter result proves
+`live_provider_called=true` and the selected lane was `qwen.local.text.4090`.
+
+The provider response failed the governed artifact-content contract because the
+short model response did not contain the required bounded capability statements.
+While writing the truthful failure receipt, validation then rejected the five
+placement correlation properties (`allocated_compute_resource_id`,
+`allocated_gpu_uuid`, `runtime_bound_gpu_uuid`, `runtime_lane_id`, and
+`runtime_process_id`) as undeclared inside `governed_correlation`. The schema now
+declares those fields, preserving UUID evidence for future governed receipts.
+Because this was the one permitted new live attempt and no successful provider
+receipt exists, acceptance remains blocked; no retry was sent.
 
 After stopping only the EC-000221 candidate services and the 4090 lane, both GPUs
 remained healthy: P100 9 MiB used/0% utilization and RTX 4090 2424 MiB used/10%

@@ -1,6 +1,9 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
 from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, _qwen_minimum_safe_vram_mib
+from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
+
+LIVE_BOUNDED_PROMPT = "Grace, run a small bounded local text task: write one short sentence confirming that this governed task used the UUID-bound RTX 4090 lane; include no secrets and perform no hardware actions."
 
 
 def test_detects_explicit_metadata_command():
@@ -14,6 +17,7 @@ def test_detects_explicit_metadata_command():
 
 def test_bounded_text_intent_is_explicit_and_ordinary_chat_is_not_executable():
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run a small bounded local text task.")["state"] == "execution_requested"
+    assert detect_bounded_local_text_intent({"model": "estate/grace"}, LIVE_BOUNDED_PROMPT) == {"state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"}
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, what is the Estate status?")["state"] == "conversation_only"
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run something locally.")["state"] == "execution_blocked"
 
@@ -32,6 +36,22 @@ def test_bounded_text_request_fails_closed_without_fresh_physical_evidence(tmp_p
     assert code == 200
     assert body["estate"]["bounded_local_text"]["state"] == "execution_blocked"
     assert body["estate"]["provider_execution_performed"] is False
+
+
+def test_streaming_bounded_text_enters_governed_handler(monkeypatch, tmp_path):
+    observed = {}
+
+    def fake_handler(payload, *, user_message, session_id, root, stream):
+        observed.update({"payload": payload, "user_message": user_message, "session_id": session_id, "root": root, "stream": stream})
+        return {"id": "bounded-test", "object": "chat.completion.chunk", "created": 0, "model": "estate/grace", "choices": [{"delta": {"content": "governed"}}], "estate": {"bounded_local_text": {"state": "execution_blocked"}}}
+
+    monkeypatch.setattr(resident_gateway, "_bounded_local_text_chat_completion", fake_handler)
+    code, body = chat_completion_stream({"model": "estate/grace", "stream": True, "messages": [{"role": "user", "content": LIVE_BOUNDED_PROMPT}], "metadata": {"session_id": "stream-bounded"}}, root=tmp_path)
+    assert code == 200
+    chunks = list(body)
+    assert chunks[0]["estate"]["bounded_local_text"]["state"] == "execution_blocked"
+    assert observed["stream"] is True
+    assert observed["session_id"] == "stream-bounded"
 
 
 def test_openwebui_chat_initiates_existing_helen_grace_dispatch_workflow(tmp_path):

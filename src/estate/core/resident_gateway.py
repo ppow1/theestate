@@ -437,6 +437,9 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
     image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, stream=True)
     if image_assignment is not None:
         return 200, image_assignment
+    bounded_text = _bounded_local_text_chat_completion(payload, user_message=user_message, session_id=session_id, root=root, stream=True)
+    if bounded_text is not None:
+        return 200, bounded_text
     workflow_body = _engineering_assignment_chat_completion(
         payload, user_message=user_message, session_id=session_id, root=root, stream=True
     )
