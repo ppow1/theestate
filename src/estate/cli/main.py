@@ -58,6 +58,7 @@ from estate.core import estate_discovery_engine
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
 from estate.core.steward_attention import aggregate_attention, create_briefing as create_steward_attention_briefing, record_action as record_steward_attention_action, format_briefing as format_steward_attention_briefing
+from estate.core.steward_annunciator import present_attention, format_annunciator
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, format_worker_runtime_monitor
@@ -838,6 +839,24 @@ def cmd_providers_health_set(args):
         print(f"Summary: {paths['summary_json']}")
     except (OSError, ValueError) as exc:
         print(f"Provider health set failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_grace_gpu_preflight(args):
+    """Run the bounded, read-only Grace dual-GPU admission gate."""
+    try:
+        from estate.core.compute_resources import build_grace_gpu_preflight, discover_grace_gpus, write_compute_projection
+        observations = discover_grace_gpus()
+        payload = build_grace_gpu_preflight(observations=observations)
+        if args.write_projection:
+            write_compute_projection(observations, root=args.root)
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            for resource in payload["resources"]:
+                print(f"{resource['name']}: {resource['health_classification']} (CUDA ordinal={resource.get('cuda_index')}, NVIDIA ordinal={resource.get('nvidia_smi_index')})")
+            print(f"Overall: dual_gpu_dispatch_safe={payload['dual_gpu_dispatch_safe']}")
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"Grace GPU preflight failed: {exc}")
         raise SystemExit(1)
 
 def cmd_providers_capacity_set(args):
@@ -2127,12 +2146,22 @@ def cmd_steward_attention(args):
         payload = create_steward_attention_briefing(kind=args.kind, root=getattr(args, "root", None), write=True)
     elif args.steward_attention_action == "action":
         payload = record_steward_attention_action(args.item_id, args.action, actor=args.actor, root=getattr(args, "root", None), until=args.until, delegate_to=args.delegate_to, note=args.note)
+    elif args.steward_attention_action == "present":
+        presenter = None
+        if getattr(args, "dry_run", False):
+            class _DryRunPresenter:
+                def announce(self, item):
+                    return None
+            presenter = _DryRunPresenter()
+        payload = present_attention(root=getattr(args, "root", None), presenter=presenter)
     else:
         raise SystemExit(f"Unknown steward-attention action: {args.steward_attention_action}")
     if getattr(args, "json", False):
         print(json.dumps(payload, indent=2, sort_keys=True))
     elif args.steward_attention_action == "briefing":
         print(format_steward_attention_briefing(payload))
+    elif args.steward_attention_action == "present":
+        print(format_annunciator(payload))
     else:
         print(json.dumps(payload.get("summary", payload), indent=2, sort_keys=True))
 
@@ -4078,6 +4107,12 @@ def main(argv=None):
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_providers_health_summary)
 
+    p = sub.add_parser("grace-gpu-preflight", help="Run the read-only guarded Grace dual-GPU identity and health gate")
+    p.add_argument("--json", action="store_true", help="Print machine-readable preflight evidence")
+    p.add_argument("--write-projection", action="store_true", help="Refresh the existing compute resource projection")
+    p.add_argument("--root", help="Projection root when --write-projection is used")
+    p.set_defaults(func=cmd_grace_gpu_preflight)
+
     p = sub.add_parser("engineering-capacity-dashboard", help="Generate Engineering Capacity Runtime dashboard")
     p.add_argument("--json", action="store_true")
     p.add_argument("--stale-after-minutes", type=int, default=30)
@@ -4234,6 +4269,9 @@ def main(argv=None):
     q.add_argument("--kind", default="on_demand", choices=["morning", "on_demand", "exception"]); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
     q = sa.add_parser("action", help="Persist an Office-transport attention action")
     q.add_argument("--item-id", required=True); q.add_argument("--action", required=True, choices=["snooze", "acknowledge", "delegate", "dismiss", "resolve"]); q.add_argument("--actor", default="steward"); q.add_argument("--until"); q.add_argument("--delegate-to"); q.add_argument("--note"); q.add_argument("--root"); q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
+    q = sa.add_parser("present", help="Present newly actionable attention and write the durable visual annunciator")
+    q.add_argument("--root"); q.add_argument("--dry-run", action="store_true", help="Mock sound/TTS and print each presentation")
+    q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
 
     p = sub.add_parser("audit-summary")
     p.add_argument("--json", action="store_true", help="Print saved audit summary JSON")

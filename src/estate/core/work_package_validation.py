@@ -3503,3 +3503,22 @@ VALIDATION_RECIPES["WP-0511"] = {
         _cmd("python -c \"import json; from pathlib import Path; from estate.core.office_functional_audit import run_office_functional_audit; run_office_functional_audit(); required=['runtime/steward/office_functional_audit.json','runtime/steward/office_functional_audit_summary.json','runtime/steward/office_repair_waves.json','operations/steward/office_functional_audit.md']; missing=[p for p in required if not Path(p).is_file()]; assert not missing, missing; r=json.loads(Path('collaboration/work_packages/completions/WP-0511_codex_done.json').read_text()); assert r['settings_persistence_verified'] and r['import_export_verified'] and not r['live_provider_calls_made']\""),
     ],
 }
+
+VALIDATION_RECIPES["WP-4214"] = {
+    "recipe_id": "wp-4214-steward-attention-annunciator-v1",
+    "title": "WP-4214 — Steward Attention Annunciator v1",
+    "description": "Validates the canonical-attention presenter boundary, durable deduplication, local demo, and completion artifacts without real audio or cloud calls.",
+    "required_checks": ["Presenter and focused tests pass", "Presenter/demo modules compile", "Silent demo proves deduplication and clearing", "Completion receipt and documentation exist"],
+    "observational_checks": ["Real Windows sound/TTS is host-local and intentionally not invoked by automated validation"],
+    "expected_artifacts": ["src/estate/core/steward_annunciator.py", "src/estate/cli/main.py", "tests/test_steward_annunciator.py", "tools/demo_steward_annunciator.py", "docs/integration/steward_annunciator_v1.md", "operations/validation/reports/WP-4214_steward_attention_annunciator_v1.md", "collaboration/work_packages/completions/WP-4214_codex_done.json"],
+    "failure_criteria": ["Any required command exits non-zero", "Validation emits real audio/TTS", "A second attention authority, router, queue, or cloud dependency is introduced"],
+    "success_criteria": ["Required commands exit zero", "Unchanged items are not re-presented", "Existing attention actions clear the visual state"],
+    "continue_on_failure": True,
+    "commands": [
+        _cmd("python -m py_compile src/estate/core/steward_annunciator.py tools/demo_steward_annunciator.py"),
+        _cmd("pytest -q tests/test_steward_attention.py tests/test_steward_annunciator.py --basetemp Temp/pytest-wp4214-recipe"),
+        _cmd("python tools/demo_steward_annunciator.py"),
+        _cmd("python -c \"from pathlib import Path; paths=['src/estate/core/steward_annunciator.py','src/estate/cli/main.py','tests/test_steward_annunciator.py','tools/demo_steward_annunciator.py','docs/integration/steward_annunciator_v1.md','operations/validation/reports/WP-4214_steward_attention_annunciator_v1.md','collaboration/work_packages/completions/WP-4214_codex_done.json']; missing=[p for p in paths if not Path(p).is_file()]; assert not missing, missing\""),
+        _cmd("python -c \"import json; from pathlib import Path; d=json.loads(Path('collaboration/work_packages/completions/WP-4214_codex_done.json').read_text()); assert d['work_package_id']=='WP-4214' and d['ready_for_ca_review'] is True and d['pull_request_not_applicable_reason']\""),
+    ],
+}

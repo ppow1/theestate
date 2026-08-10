@@ -1,0 +1,125 @@
+"""Local presentation boundary for the canonical Steward attention aggregate.
+
+This module owns durable presentation bookkeeping only. Attention items and their
+actions remain owned by ``steward_attention`` and their source systems.
+"""
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Protocol
+
+from estate.core.steward_attention import aggregate_attention
+
+ANNUNCIATOR_SCHEMA_VERSION = "steward_annunciator_state.v1"
+ANNUNCIATOR_PATH = Path("runtime/office/steward_annunciator.json")
+ACTIONABLE = {"urgent", "decision_required", "attention_soon"}
+SEVERITY_RANK = {"urgent": 0, "decision_required": 1, "attention_soon": 2}
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _read(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except json.JSONDecodeError:
+        return {}
+
+
+def _write(root: Path, payload: dict[str, Any]) -> None:
+    path = root / ANNUNCIATOR_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+class Presenter(Protocol):
+    def announce(self, item: dict[str, Any]) -> None: ...
+
+
+class WindowsPresenter:
+    """Small local adapter: MessageBeep plus Windows System.Speech TTS."""
+
+    def announce(self, item: dict[str, Any]) -> None:
+        import winsound
+
+        winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+        text = announcement_text(item)
+        if os.name != "nt":
+            raise RuntimeError("WindowsPresenter requires Windows")
+        env = os.environ.copy()
+        env["ESTATE_ANNUNCIATOR_TEXT"] = text
+        script = (
+            "Add-Type -AssemblyName System.Speech; "
+            "$s=New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+            "$s.Speak($env:ESTATE_ANNUNCIATOR_TEXT)"
+        )
+        subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                       check=True, capture_output=True, text=True, env=env)
+
+
+def announcement_text(item: dict[str, Any]) -> str:
+    title = str(item.get("title") or "an attention item")
+    if title.lower().endswith("needs attention"):
+        subject = title[:-len("needs attention")].strip()
+        return f"The Estate needs your input on {subject}".rstrip()
+    return f"The Estate needs your input on {title}".rstrip()
+
+
+def _actionable(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [i for i in items if i.get("classification") in ACTIONABLE and i.get("status") == "open"]
+
+
+def present_attention(root: str | Path | None = None, *, presenter: Presenter | None = None,
+                      now: str | None = None) -> dict[str, Any]:
+    """Poll canonical attention, announce only unseen actionable items, and persist state."""
+    base = Path(root) if root is not None else Path.cwd()
+    previous = _read(base / ANNUNCIATOR_PATH)
+    aggregate = aggregate_attention(base, write=True)
+    active = _actionable(aggregate.get("items", []))
+    active_ids = {i["id"] for i in active}
+    presented = dict(previous.get("presented", {}))
+    events = list(previous.get("events", []))
+    failures: list[dict[str, Any]] = []
+    new_items = [i for i in active if i["id"] not in presented]
+    adapter = presenter or WindowsPresenter()
+    for item in sorted(new_items, key=lambda i: (SEVERITY_RANK[i["classification"]], i["title"])):
+        try:
+            adapter.announce(item)
+            presented[item["id"]] = {"presented_at": now or _now(), "classification": item["classification"]}
+            events.append({"event": "presented", "item_id": item["id"], "severity": item["classification"], "at": now or _now()})
+        except Exception as exc:  # presenter failure must not hide the visual alarm
+            failure = {"event": "presenter_failure", "item_id": item["id"], "error": str(exc), "at": now or _now()}
+            failures.append(failure)
+            events.append(failure)
+    # Bound history while retaining durable fingerprints for all currently active items.
+    events = events[-100:]
+    severity = min((i["classification"] for i in active), key=lambda c: SEVERITY_RANK[c], default=None)
+    state = {
+        "schema_version": ANNUNCIATOR_SCHEMA_VERSION,
+        "generated_at": now or _now(),
+        "consumer_boundary": "presenter-only; canonical attention and Office actions remain authoritative",
+        "active": bool(active),
+        "severity": severity,
+        "severity_rank": SEVERITY_RANK.get(severity),
+        "severity_label": {"urgent": "URGENT", "decision_required": "DECISION REQUIRED", "attention_soon": "ATTENTION SOON"}.get(severity),
+        "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "always_visible_consumer": "edge_or_corner_alarm"},
+        "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
+        "active_item_ids": sorted(active_ids),
+        "presented": presented,
+        "events": events,
+        "last_run": {"new_item_count": len(new_items), "presented_count": len(new_items) - len(failures), "failure_count": len(failures), "failures": failures},
+    }
+    _write(base, state)
+    return state
+
+
+def format_annunciator(state: dict[str, Any]) -> str:
+    return json.dumps({"active": state.get("active"), "severity": state.get("severity"), "items": state.get("items", []), "last_run": state.get("last_run", {})}, indent=2, sort_keys=True)
