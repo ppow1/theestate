@@ -274,6 +274,32 @@ def collect_codex_seat_telemetry(
         collect_codex_seat(seat, codex_binary=codex_binary, timeout_seconds=timeout_seconds, run_process=run_process)
         for seat in seats
     ]
+    if write:
+        previous_by_seat: dict[str, dict[str, Any]] = {}
+        previous_path = root_path / TELEMETRY_JSON
+        try:
+            previous = json.loads(previous_path.read_text(encoding="utf-8"))
+            previous_by_seat = {
+                item.get("seat_id"): item
+                for item in previous.get("seats", [])
+                if isinstance(item, dict) and item.get("seat_id") in CODEX_SEAT_HOMES
+            }
+        except (OSError, json.JSONDecodeError):
+            previous_by_seat = {}
+        for index, observation in enumerate(observations):
+            if observation.get("collection_status") == "available":
+                continue
+            previous_observation = previous_by_seat.get(observation.get("seat_id")) or {}
+            if previous_observation.get("weekly_limit_percent_left") is None or not previous_observation.get("observed_at"):
+                continue
+            observations[index] = {
+                **previous_observation,
+                "collection_attempted_at": observation.get("collection_attempted_at"),
+                "collection_status": "stale",
+                "failure_reason": observation.get("failure_reason") or "refresh failed; retaining last valid observation",
+                "last_collection_status": "unavailable",
+                "last_failure_reason": observation.get("failure_reason"),
+            }
     payload = {
         "version": 1,
         "generated_at": _utc_now(),

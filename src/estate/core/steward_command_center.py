@@ -10,6 +10,7 @@ import json
 import re
 import os
 import threading
+import time
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -30,6 +31,7 @@ from estate.core.capability_dependency_visualization import generate_capability_
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
 from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard
+from estate.core.codex_seat_telemetry import collect_codex_seat_telemetry
 from estate.core.steward_annunciator import VISUAL_PROJECTION_VERSION
 from estate.core.office_operational_activity import load_office_operational_activity
 from estate.core.office_traffic_controller_panel import load_office_traffic_controller_panel
@@ -1347,7 +1349,7 @@ def _office_operational_command_dashboard_html(artifact):
     sources = "".join(f"<li>{html.escape(str(k))}: {_artifact_link(v)}</li>" for k,v in (data.get("evidence_sources") or {}).items())
     capacity = data.get("engineering_provider_capacity") or {}
     seat_observations = capacity.get("codex_seat_observations") or []
-    real_seat_observations = [item for item in seat_observations if item.get("collection_success")]
+    real_seat_observations = [item for item in seat_observations if item.get("collection_success") or item.get("has_valid_observation")]
     provider_rows = []
     for provider in capacity.get("providers") or []:
         if real_seat_observations and provider.get("provider_id") == "codex.execution.cli":
@@ -1358,7 +1360,7 @@ def _office_operational_command_dashboard_html(artifact):
         value_text = f"{value}/100" if isinstance(value, (int, float)) else "unknown / 100"
         bar = f"<progress max='100' value='{html.escape(str(value))}'>{html.escape(str(value))}</progress>" if isinstance(value, (int, float)) else "<span class='placeholder'>No numeric evidence</span>"
         provider_rows.append(f"<tr><td>{html.escape(str(provider.get('display_name') or provider.get('provider_id') or 'unknown'))}<br><span class='source'>{html.escape(str(provider.get('provider_id') or ''))}</span></td><td>{bar}<br><strong>{html.escape(value_text)}</strong></td><td>{html.escape(str(item.get('state') or 'unknown'))}</td><td>{html.escape(str(freshness.get('state') or 'unknown'))}<br><span class='source'>observed={html.escape(str(freshness.get('observed_at') or 'unknown'))}</span></td></tr>")
-    capacity_html = "<section class='pipeline-section engineering-provider-capacity'><h3>Engineering Provider Capacity</h3><p>Advisory provider-availability index (0–100). This is not physical GPU capacity or an Estate-wide resource percentage.</p>"
+    capacity_html = "<section id='engineering-capacity-panel' class='pipeline-section engineering-provider-capacity'><h3>Engineering Provider Capacity</h3><p>Advisory provider-availability index (0–100). This is not physical GPU capacity or an Estate-wide resource percentage.</p>"
     if real_seat_observations:
         seat_rows = []
         for observation in seat_observations:
@@ -1366,7 +1368,9 @@ def _office_operational_command_dashboard_html(artifact):
             value_text = f"{value}% left" if isinstance(value, (int, float)) else "unknown"
             bar = f"<progress max='100' value='{html.escape(str(value))}'>{html.escape(str(value))}</progress>" if isinstance(value, (int, float)) else "<span class='placeholder'>No numeric evidence</span>"
             freshness = observation.get("freshness") or {}
-            seat_rows.append(f"<tr><td>Codex Seat {html.escape(str(observation.get('logical_seat_id')))}<br><span class='source'>{html.escape(str(observation.get('capacity_identity') or ''))}</span></td><td>{bar}<br><strong>{html.escape(value_text)}</strong></td><td>{html.escape(str(observation.get('weekly_limit_reset_at') or 'unknown'))}</td><td>{html.escape(str(freshness.get('state') or 'unknown'))}<br><span class='source'>observed={html.escape(str(observation.get('observed_at') or 'unknown'))}</span></td></tr>")
+            failure = observation.get("failure_reason") or observation.get("last_failure_reason")
+            failure_html = f"<br><span class='placeholder'>collection: {html.escape(str(failure))}</span>" if failure else ""
+            seat_rows.append(f"<tr><td>Codex Seat {html.escape(str(observation.get('logical_seat_id')))}<br><span class='source'>{html.escape(str(observation.get('capacity_identity') or ''))}</span></td><td>{bar}<br><strong>{html.escape(value_text)}</strong></td><td>{html.escape(str(observation.get('weekly_limit_reset_at') or 'unknown'))}</td><td>{html.escape(str(freshness.get('state') or 'unknown'))}<br><span class='source'>observed={html.escape(str(observation.get('observed_at') or 'unknown'))}</span>{failure_html}</td></tr>")
         capacity_html += "<h4>Codex Seat Quota (one shared identity per seat)</h4><table><thead><tr><th>Seat</th><th>Weekly fuel</th><th>Reset</th><th>Freshness / observation</th></tr></thead><tbody>" + "".join(seat_rows) + "</tbody></table>"
     provider_body = "".join(provider_rows) or ("<tr><td colspan='4'>Generic provider capacity presentation superseded by per-seat Codex telemetry.</td></tr>" if real_seat_observations else "<tr><td colspan='4'>Provider capacity evidence unavailable.</td></tr>")
     capacity_html += "<table><thead><tr><th>Provider</th><th>Capacity index</th><th>Provider state</th><th>Freshness / observation</th></tr></thead><tbody>" + provider_body + "</tbody></table>"
@@ -2447,16 +2451,19 @@ async function refreshOperationsChrome(){
     if(!response.ok) return;
     const payload = await response.json();
     const parser = new DOMParser();
-    const doc = parser.parseFromString((payload.annunciator_html || '') + payload.status_bar_html + payload.activity_console_html, 'text/html');
+    const doc = parser.parseFromString((payload.annunciator_html || '') + payload.status_bar_html + payload.activity_console_html + (payload.operational_dashboard_html || ''), 'text/html');
     const nextAnnunciator = doc.querySelector('#steward-annunciator-banner');
     const currentAnnunciator = document.querySelector('#steward-annunciator-banner');
     if(nextAnnunciator && currentAnnunciator) currentAnnunciator.replaceWith(nextAnnunciator);
     const nextStatus = doc.querySelector('#status-bar');
     const nextConsole = doc.querySelector('#activity-console');
+    const nextDashboard = doc.querySelector('.office-operational-dashboard');
     const currentStatus = document.querySelector('#status-bar');
     const currentConsole = document.querySelector('#activity-console');
+    const currentDashboard = document.querySelector('#workspace-operational-dashboard .office-operational-dashboard');
     if(nextStatus && currentStatus) currentStatus.replaceWith(nextStatus);
     if(nextConsole && currentConsole) currentConsole.replaceWith(nextConsole);
+    if(nextDashboard && currentDashboard) currentDashboard.replaceWith(nextDashboard);
   }catch(error){ console.debug('Quiet refresh skipped', error); }
 }
 window.addEventListener('load', () => { if(window.startOfficeAutoRefresh) startOfficeAutoRefresh(); else refreshOperationsChrome(); });
@@ -3103,6 +3110,35 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
     except (OSError, ValueError, json.JSONDecodeError):
         payload_cache = _fast_command_center_snapshot(root)
     html_cache = render_command_center_html(payload_cache).encode("utf-8")
+    capacity_refresh_lock = threading.Lock()
+    last_capacity_refresh = time.monotonic()
+
+    def refresh_live_capacity_if_due(force=False):
+        """Refresh native seat quota through the existing served refresh path."""
+        nonlocal payload_cache, html_cache, last_capacity_refresh
+        settings = load_operations_center_settings(root).get("settings") or {}
+        refresh = settings.get("refresh") or {}
+        interval = max(5, int(refresh.get("quiet_refresh_seconds") or 30))
+        now = time.monotonic()
+        if not force and now - last_capacity_refresh < interval:
+            return
+        capacity_refresh_lock.acquire()
+        try:
+            now = time.monotonic()
+            if not force and now - last_capacity_refresh < interval:
+                return
+            last_capacity_refresh = now
+            collect_codex_seat_telemetry(root=root, write=True)
+            generate_engineering_capacity_dashboard(root=root, write=True)
+            refreshed = generate_command_center(root=root, write=True, fast_start=True)
+            payload_cache = refreshed
+            html_cache = render_command_center_html(refreshed).encode("utf-8")
+        except Exception:
+            # Existing cached presentation remains available; the telemetry
+            # artifact records per-seat unavailable/stale evidence.
+            return
+        finally:
+            capacity_refresh_lock.release()
 
     class Handler(SimpleHTTPRequestHandler):
         def do_GET(self):
@@ -3117,11 +3153,15 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 self.wfile.write(html_doc)
                 return
             if parsed.path == "/api/office/payload":
+                refresh_live_capacity_if_due()
                 panel = _steward_attention_panel_fast(root)
-                body = json.dumps({"payload_version": payload_cache.get("payload_version"), "generated_at": payload_cache.get("generated_at"), "stale": False, "tabs": payload_cache.get("tabs"), "navigation": payload_cache.get("navigation"), "annunciator_html": _steward_attention_html(panel, banner=True)}, indent=2, sort_keys=True).encode("utf-8")
+                operational = (payload_cache.get("panels") or {}).get("office_operational_command_dashboard") or {}
+                body = json.dumps({"payload_version": payload_cache.get("payload_version"), "generated_at": payload_cache.get("generated_at"), "stale": False, "tabs": payload_cache.get("tabs"), "navigation": payload_cache.get("navigation"), "annunciator_html": _steward_attention_html(panel, banner=True), "operational_dashboard_html": _office_operational_command_dashboard_html(operational)}, indent=2, sort_keys=True).encode("utf-8")
                 self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
             if self.path == "/status.json":
+                refresh_live_capacity_if_due()
                 panel = _steward_attention_panel_fast(root)
+                operational = (payload_cache.get("panels") or {}).get("office_operational_command_dashboard") or {}
                 body = json.dumps({
                     "generated_at": _now(),
                     "status": "running",
@@ -3131,6 +3171,7 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                     "activity_console": payload_cache.get("activity_console"),
                     "status_bar_html": _status_bar_html(payload_cache.get("status_bar", {})),
                     "activity_console_html": _activity_console_html(payload_cache.get("activity_console", {})),
+                    "operational_dashboard_html": _office_operational_command_dashboard_html(operational),
                 }).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -3181,16 +3222,4 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
 
     server = ThreadingHTTPServer((host, port), Handler)
 
-    def refresh_payload():
-        nonlocal payload_cache, html_cache
-        try:
-            refreshed = generate_command_center(root=root, write=True, fast_start=True)
-            payload_cache = refreshed
-            html_cache = render_command_center_html(refreshed).encode("utf-8")
-        except Exception:
-            # The cached/degraded snapshot remains available if a runtime probe
-            # is unavailable while the background refresh is running.
-            return
-
-    threading.Thread(target=refresh_payload, name="operations-center-payload-refresh", daemon=True).start()
     return server

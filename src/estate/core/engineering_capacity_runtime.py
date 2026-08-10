@@ -88,6 +88,10 @@ def _codex_seat_observations(root: Path, *, stale_after_minutes: int) -> list[di
                 item = dict(telemetry_by_seat.get(seat) or {})
                 observed_at = item.get("observed_at")
                 successful = item.get("collection_status") == "available" and observed_at is not None
+                has_valid_observation = item.get("weekly_limit_percent_left") is not None and observed_at is not None
+                freshness = _freshness({"last_checked_at": observed_at}, stale_after_minutes=stale_after_minutes)
+                if has_valid_observation and not successful:
+                    freshness["state"] = "stale"
                 observations.append({
                     "logical_seat_id": seat,
                     "capacity_identity": item.get("capacity_identity", f"codex.seat.{seat}"),
@@ -96,7 +100,7 @@ def _codex_seat_observations(root: Path, *, stale_after_minutes: int) -> list[di
                     "source": item.get("source", "codex app-server account/rateLimits/read"),
                     "observation_timestamp": observed_at,
                     "observed_at": observed_at,
-                    "freshness": _freshness({"last_checked_at": observed_at}, stale_after_minutes=stale_after_minutes),
+                    "freshness": freshness,
                     "capacity_state": "available" if successful else "unknown",
                     "native_capacity_fields": item.get("native_rate_limits", {}),
                     "windows": item.get("windows", []),
@@ -104,8 +108,11 @@ def _codex_seat_observations(root: Path, *, stale_after_minutes: int) -> list[di
                     "weekly_limit_percent_left": item.get("weekly_limit_percent_left"),
                     "weekly_limit_reset_at": item.get("weekly_limit_reset_at"),
                     "collection_success": successful,
+                    "has_valid_observation": has_valid_observation,
                     "collection_status": item.get("collection_status", "unavailable"),
                     "failure_reason": item.get("failure_reason"),
+                    "last_collection_status": item.get("last_collection_status"),
+                    "last_failure_reason": item.get("last_failure_reason"),
                     "reason": item.get("failure_reason"),
                 })
             return observations

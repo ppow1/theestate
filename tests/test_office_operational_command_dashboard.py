@@ -1,11 +1,14 @@
 import json
 import shutil
+import threading
+import urllib.request
 from pathlib import Path
 
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
 from estate.core.provider_capacity import ProviderCapacityRecord, write_capacity_record
 from estate.core.provider_health import ProviderHealthRecord, write_health_record
-from estate.core.steward_command_center import generate_command_center, render_command_center_html
+import estate.core.steward_command_center as steward_command_center
+from estate.core.steward_command_center import generate_command_center, render_command_center_html, serve_command_center
 
 
 def write_json(root, rel, payload):
@@ -132,3 +135,51 @@ def test_operational_command_is_reachable_without_merging_operational_activity(t
     assert "Office Operational Command Dashboard" in html
     assert html.count("Engineering Provider Capacity") == 1
     assert "#operational-dashboard" in html
+
+
+def test_served_operations_center_refreshes_codex_seat_quota_without_restart(monkeypatch, tmp_path):
+    values = iter((42,))
+
+    initial_payload = {
+        "version": 1,
+        "source": "test",
+        "seats": [
+            {"seat_id": seat, "capacity_identity": f"codex.seat.{seat}", "collection_status": "available", "observed_at": "2026-08-10T20:21:00Z", "weekly_limit_percent_left": 41, "weekly_limit_reset_at": "2026-08-15T20:32:40Z", "windows": [], "native_rate_limits": {}, "account": {"type": "chatgpt"}, "execution_modes": ["cli"], "execution_surface": "codex-cli"}
+            for seat in ("C1", "C2", "C3")
+        ],
+    }
+    write_json(tmp_path, "runtime/engineering_capacity/codex_seat_telemetry.json", initial_payload)
+    generate_command_center(tmp_path, write=True)
+
+    def fake_collect(*, root, write=True, **kwargs):
+        percent = next(values)
+        payload = {
+            "version": 1,
+            "source": "test",
+            "seats": [
+                {"seat_id": seat, "capacity_identity": f"codex.seat.{seat}", "collection_status": "available", "observed_at": f"2026-08-10T20:2{percent % 10}:00Z", "weekly_limit_percent_left": percent, "weekly_limit_reset_at": "2026-08-15T20:32:40Z", "windows": [], "native_rate_limits": {}, "account": {"type": "chatgpt"}, "execution_modes": ["cli"], "execution_surface": "codex-cli"}
+                for seat in ("C1", "C2", "C3")
+            ],
+        }
+        write_json(root, "runtime/engineering_capacity/codex_seat_telemetry.json", payload)
+        return payload
+
+    monkeypatch.setattr(steward_command_center, "collect_codex_seat_telemetry", fake_collect)
+    monkeypatch.setattr(steward_command_center.time, "monotonic", iter((0.0, 31.0, 31.0)).__next__)
+    server = serve_command_center(host="127.0.0.1", port=0, root=tmp_path)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        base = f"http://127.0.0.1:{server.server_port}"
+        initial = urllib.request.urlopen(base + "/", timeout=5).read().decode()
+        refreshed = json.loads(urllib.request.urlopen(base + "/status.json", timeout=5).read().decode())
+        assert "41% left" in initial
+        assert "42% left" in refreshed["operational_dashboard_html"]
+        assert all(f"Codex Seat {seat}" in refreshed["operational_dashboard_html"] for seat in ("C1", "C2", "C3"))
+        assert "codex.execution.cli" not in refreshed["operational_dashboard_html"]
+        assert "observed=2026-08-10T20:22:00Z" in refreshed["operational_dashboard_html"]
+        assert server.server_address[1] != 0
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)

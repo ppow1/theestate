@@ -85,3 +85,16 @@ def test_real_seat_telemetry_replaces_generic_codex_heuristic_in_dashboard(tmp_p
     assert dashboard["codex_seat_telemetry_available"] is True
     assert all(item["capacity_identity"].startswith("codex.seat.") for item in dashboard["codex_seat_observations"])
     assert dashboard["codex_seat_observations"][0]["weekly_limit_percent_left"] == 80
+
+
+def test_refresh_retains_last_valid_seat_data_when_collection_fails(tmp_path):
+    first = collect_codex_seat_telemetry(root=tmp_path, run_process=lambda *args, **kwargs: subprocess.CompletedProcess(args=args[0], returncode=0, stdout=rpc_output(20), stderr=""))
+    assert first["seats"][0]["weekly_limit_percent_left"] == 80
+
+    failed = collect_codex_seat_telemetry(root=tmp_path, run_process=lambda *args, **kwargs: subprocess.CompletedProcess(args=args[0], returncode=1, stdout="", stderr=""))
+    c1 = next(item for item in failed["seats"] if item["seat_id"] == "C1")
+    assert c1["weekly_limit_percent_left"] == 80
+    assert c1["weekly_limit_reset_at"] is not None
+    assert c1["collection_status"] == "stale"
+    assert c1["last_collection_status"] == "unavailable"
+    assert c1["failure_reason"]
