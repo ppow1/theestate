@@ -10,6 +10,7 @@ const {runId, makeEvidence, writeJson, sanitizeNetwork, writeCompletion, ROOT} =
 const {loadScenario, matchesExpectation} = require('./openwebui-operator/scenario.cjs');
 const {compareCmeClaim, readCmeState} = require('./openwebui-operator/ground_truth.cjs');
 const {emitOperatorAttention} = require('./openwebui-operator/operator-attention.cjs');
+const {PROFILE_ID, resolveProfilePath, profileEvidence} = require('./openwebui-operator/profile.cjs');
 
 const VERSION = '0.1.0';
 const DEFAULT_URL = process.env.ESTATE_OPENWEBUI_URL || 'http://127.0.0.1:8080';
@@ -52,7 +53,11 @@ async function waitForRenderedSurface(page, timeout = 10000) {
 }
 
 function defaultProfilePath() {
-  return path.join(ROOT, 'runtime', 'browser', 'openwebui-operator-profile');
+  return resolveProfilePath();
+}
+
+function selectedProfilePath(options = {}) {
+  return resolveProfilePath(options.profile);
 }
 
 async function openSession(options, evidence) {
@@ -66,7 +71,7 @@ async function openSession(options, evidence) {
     context = browser.contexts()[0];
     if (!context) throw Object.assign(new Error('CDP browser has no context'), {classification: FAILURE_CLASSES.OPENWEBUI_UNAVAILABLE});
   } else {
-    const profile = options.profile || defaultProfilePath();
+    const profile = selectedProfilePath(options);
     context = await chromium.launchPersistentContext(profile, {
       headless: options.headless === true || options.headless === 'true',
       timeout: Number(options['launch-timeout'] || 30000),
@@ -110,13 +115,14 @@ async function isAuthenticatedSurface(page, result) {
 async function ensureAuthenticatedSession(options, session, evidence, url) {
   let ready = await readiness(session.page, url);
   if (ready.status !== FAILURE_CLASSES.LOGIN_REQUIRED) return {session, readiness: ready, credential_flow: false};
-  const attention = emitOperatorAttention({root: ROOT, runId: evidence.run, url, profilePath: path.relative(ROOT, options.profile || defaultProfilePath())});
+  const profile = selectedProfilePath(options);
+  const attention = emitOperatorAttention({root: ROOT, runId: evidence.run, url, profilePath: PROFILE_ID});
   await session.close();
-  const bootstrapCode = await authBootstrap({...options, url, profile: options.profile || defaultProfilePath()});
+  const bootstrapCode = await authBootstrap({...options, url, profile});
   const status = bootstrapCode === 0 ? 'resolved' : (bootstrapCode === 130 ? 'cancelled' : 'timed_out');
-  const resolution = emitOperatorAttention({root: ROOT, runId: evidence.run, url, profilePath: path.relative(ROOT, options.profile || defaultProfilePath()), status});
+  const resolution = emitOperatorAttention({root: ROOT, runId: evidence.run, url, profilePath: PROFILE_ID, status});
   if (bootstrapCode !== 0) return {session: null, readiness: {status: status === 'timed_out' ? 'AUTH_BOOTSTRAP_TIMEOUT' : 'AUTH_BOOTSTRAP_CANCELLED'}, credential_flow: true, attention, resolution};
-  session = await openSession({...options, profile: options.profile || defaultProfilePath()}, evidence);
+  session = await openSession({...options, profile}, evidence);
   ready = await readiness(session.page, url);
   return {session, readiness: ready, credential_flow: true, attention, resolution};
 }
@@ -130,7 +136,7 @@ function authBootstrapOutcome({cancelled = false, timedOut = false, readinessRes
 
 async function authBootstrap(options) {
   const evidence = makeEvidence(runId());
-  const profile = options.profile || defaultProfilePath();
+  const profile = selectedProfilePath(options);
   const url = options.url || DEFAULT_URL;
   const timeoutSeconds = Math.max(60, Number(options.timeout || DEFAULT_AUTH_BOOTSTRAP_TIMEOUT));
   const manifest = {
@@ -139,7 +145,7 @@ async function authBootstrap(options) {
     git_revision: gitRevision(),
     run_id: evidence.run,
     command: process.argv.slice(2),
-    profile_path: profile,
+    profile: profileEvidence(profile),
     url: (() => { try { const u = new URL(url); return `${u.origin}${u.pathname}`; } catch { return String(url).split('?')[0]; } })(),
     started_at: new Date().toISOString(),
     status: 'RUNNING',
@@ -153,7 +159,7 @@ async function authBootstrap(options) {
   console.log('Complete login in the opened browser window.');
   console.log('This window uses the dedicated Estate Playwright operator profile.');
   console.log('The harness will continue automatically when the authenticated Open WebUI surface is detected.');
-  console.log(`Profile: ${profile}`);
+  console.log(`Profile: ${PROFILE_ID}`);
   try {
     await session.page.goto(url, {waitUntil: 'domcontentloaded', timeout: 15000});
     const started = Date.now();
@@ -326,7 +332,7 @@ async function sendTurn(page, message, options, evidence, turnNumber) {
 async function executeScenario(file, options) {
   const scenario = loadScenario(file);
   const evidence = makeEvidence(runId());
-  const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), scenario: scenario.name, started_at: new Date().toISOString(), status: 'RUNNING', failure_class: null, evidence_dir: evidence.dir};
+  const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), scenario: scenario.name, started_at: new Date().toISOString(), status: 'RUNNING', failure_class: null, evidence_dir: evidence.dir, profile: profileEvidence(selectedProfilePath(options))};
   writeJson(path.join(evidence.dir, 'scenario.json'), scenario);
   const shared = options._sharedSession || null;
   let baseSession = shared || await openSession(options, evidence);
@@ -352,7 +358,8 @@ async function executeScenario(file, options) {
     if (ownsSession) {
       authInfo = await ensureAuthenticatedSession(options, session, evidence, options.url || DEFAULT_URL);
       session = authInfo.session;
-      if (authInfo.credential_flow) manifest.authentication_bootstrap = {credential_flow: true, attention_event_id: authInfo.attention?.event.event_id, resolution_event_id: authInfo.resolution?.event.event_id, profile_path: path.relative(ROOT, options.profile || defaultProfilePath())};
+      if (authInfo.credential_flow) manifest.authentication_bootstrap = {credential_flow: true, attention_event_id: authInfo.attention?.event.event_id, resolution_event_id: authInfo.resolution?.event.event_id, profile_id: PROFILE_ID};
+      manifest.profile.authentication_state_reused = !authInfo.credential_flow;
       if (!session) throw Object.assign(new Error(authInfo.readiness.status), {classification: authInfo.readiness.status});
     }
     const page = session.page;
@@ -431,12 +438,13 @@ async function main() {
   const evidence = makeEvidence(runId());
   let session = await openSession(options, evidence);
   let authInfo = null;
-  const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), started_at: new Date().toISOString(), status: 'PASS', url: options.url || DEFAULT_URL};
+  const manifest = {schema_version: 'estate.openwebui.operator.v1', harness_version: VERSION, git_revision: gitRevision(), run_id: evidence.run, command: process.argv.slice(2), started_at: new Date().toISOString(), status: 'PASS', url: options.url || DEFAULT_URL, profile: profileEvidence(selectedProfilePath(options))};
   try {
     manifest.browser = {playwright_version: require('playwright/package.json').version, browser: process.env.PLAYWRIGHT_BROWSERS_PATH || 'managed'};
     authInfo = await ensureAuthenticatedSession(options, session, evidence, manifest.url);
     session = authInfo.session;
-    if (authInfo.credential_flow) manifest.authentication_bootstrap = {credential_flow: true, attention_event_id: authInfo.attention?.event.event_id, resolution_event_id: authInfo.resolution?.event.event_id, profile_path: path.relative(ROOT, options.profile || defaultProfilePath())};
+    manifest.profile.authentication_state_reused = !authInfo.credential_flow;
+    if (authInfo.credential_flow) manifest.authentication_bootstrap = {credential_flow: true, attention_event_id: authInfo.attention?.event.event_id, resolution_event_id: authInfo.resolution?.event.event_id, profile_id: PROFILE_ID};
     if (!session) throw Object.assign(new Error(authInfo.readiness.status), {classification: authInfo.readiness.status});
     manifest.readiness = authInfo.readiness;
     manifest.residents = await discoverResidents(session.page);
@@ -466,4 +474,4 @@ async function main() {
 
 if (require.main === module) main().then(code => process.exitCode = code).catch(error => { console.error(error.stack || error); process.exitCode = 1; });
 
-module.exports = {VERSION, FAILURE_CLASSES, DEFAULT_AUTH_BOOTSTRAP_TIMEOUT, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, args, defaultProfilePath, readiness, isAuthenticatedSurface, authBootstrapOutcome, ensureAuthenticatedSession, discoverResidents, selectResident, assistantTexts, matchesExpectation};
+module.exports = {VERSION, FAILURE_CLASSES, DEFAULT_AUTH_BOOTSTRAP_TIMEOUT, AUTH_BOOTSTRAP_COMMAND, AUTH_BOOTSTRAP_PRIVACY, args, defaultProfilePath, selectedProfilePath, resolveProfilePath, PROFILE_ID, readiness, isAuthenticatedSurface, authBootstrapOutcome, ensureAuthenticatedSession, discoverResidents, selectResident, assistantTexts, matchesExpectation};

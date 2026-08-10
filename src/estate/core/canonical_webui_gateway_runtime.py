@@ -221,7 +221,8 @@ def _sqlite_identity(database: Path) -> dict[str, Any]:
         models = rows("model", 'select id,name,base_model_id,meta from "model"')
         tools = rows("tool", 'select id,name from "tool"')
         functions = rows("function", 'select id,name,is_active,is_global from "function"')
-        return {"quick_check": quick, "users": users, "models": models, "tools": tools, "functions": functions}
+        configs = rows("config", 'select key,value from "config"')
+        return {"quick_check": quick, "users": users, "models": models, "tools": tools, "functions": functions, "configs": configs}
     finally:
         connection.close()
 
@@ -240,6 +241,15 @@ def webui_readiness(config: dict[str, Any], slot: Slot) -> dict[str, Any]:
     model = next((item for item in models if item["id"] == expected_model), None)
     tool_ids = {row[0] for row in state["tools"]}
     function_ids = {row[0] for row in state["functions"]}
+    config_values = {row[0]: row[1] for row in state.get("configs", [])}
+    try:
+        api_base_urls = json.loads(config_values.get("openai.api_base_urls", "[]"))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        api_base_urls = []
+    expected_gateway_url = f"http://{config['gateway']['host']}:{slot.gateway_port}/v1"
+    local_gateway_urls = [str(url).rstrip("/") for url in api_base_urls if "127.0.0.1" in str(url) or "localhost" in str(url)]
+    bridge_endpoint = local_gateway_urls[0] if len(local_gateway_urls) == 1 else None
+    bridge_slot_consistent = bridge_endpoint == expected_gateway_url
     bridge_ready = bool(
         model
         and model["base_model_id"] == webui["expected_base_model"]
@@ -253,8 +263,86 @@ def webui_readiness(config: dict[str, Any], slot: Slot) -> dict[str, Any]:
         and state["quick_check"] == "ok"
         and any(row[3] == "admin" for row in state["users"])
         and bridge_ready
+        and bridge_slot_consistent
     )
-    return {"ready": ready, "state": state, "bridge_ready": bridge_ready, "model": model}
+    return {
+        "ready": ready,
+        "state": state,
+        "bridge_ready": bridge_ready,
+        "model": model,
+        "bridge_endpoint": bridge_endpoint,
+        "expected_gateway_url": expected_gateway_url,
+        "bridge_slot_consistent": bridge_slot_consistent,
+    }
+
+
+def _bind_candidate_webui_gateway(config: dict[str, Any], slot: Slot) -> None:
+    """Bind the shared WebUI config to a managed candidate slot.
+
+    Open WebUI persists its OpenAI-compatible endpoints in the shared database;
+    process environment is only used to seed missing defaults. The controller
+    therefore owns this short-lived candidate binding and records only the
+    prior endpoint list (never API keys) for restoration on stop.
+    """
+    if slot.slot_id == "blue":
+        return
+    active_port = config["gateway"]["active_port"]
+    if _port_open(active_port):
+        raise RuntimeControlError("cannot bind candidate WebUI while active Gateway is listening")
+    database = Path(config["open_webui"]["database"])
+    state_root, _, _ = _state_paths(config)
+    binding_path = state_root / "slot-route-bindings" / f"{slot.slot_id}.json"
+    if binding_path.exists():
+        raise RuntimeControlError(f"candidate WebUI route binding already exists for {slot.slot_id}")
+    state = _sqlite_identity(database)
+    values = {row[0]: row[1] for row in state.get("configs", [])}
+    raw_urls = values.get("openai.api_base_urls")
+    try:
+        urls = json.loads(raw_urls) if raw_urls is not None else []
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise RuntimeControlError("Open WebUI api_base_urls config is invalid") from exc
+    if not isinstance(urls, list):
+        raise RuntimeControlError("Open WebUI api_base_urls config is not a list")
+    local_indexes = [index for index, url in enumerate(urls) if "127.0.0.1" in str(url) or "localhost" in str(url)]
+    if len(local_indexes) != 1:
+        raise RuntimeControlError("Open WebUI must have exactly one local Estate Gateway endpoint")
+    target = f"http://{config['gateway']['host']}:{slot.gateway_port}/v1"
+    prior_urls = [str(url) for url in urls]
+    urls[local_indexes[0]] = target
+    import sqlite3
+    connection = sqlite3.connect(database)
+    try:
+        connection.execute("update config set value=? where key=?", (json.dumps(urls), "openai.api_base_urls"))
+        if connection.total_changes != 1:
+            raise RuntimeControlError("Open WebUI api_base_urls config row is missing")
+        connection.commit()
+    finally:
+        connection.close()
+    _write_json(binding_path, {"schema_version": "estate.webui-slot-route-binding.v1", "slot_id": slot.slot_id, "prior_api_base_urls": prior_urls, "bound_api_base_url": target, "bound_at": utc_now()})
+
+
+def _restore_candidate_webui_gateway(config: dict[str, Any], slot_id: str) -> None:
+    if slot_id == "blue":
+        return
+    state_root, _, _ = _state_paths(config)
+    binding_path = state_root / "slot-route-bindings" / f"{slot_id}.json"
+    if not binding_path.exists():
+        return
+    binding = json.loads(binding_path.read_text(encoding="utf-8"))
+    prior_urls = binding.get("prior_api_base_urls")
+    if not isinstance(prior_urls, list):
+        raise RuntimeControlError("candidate WebUI route binding cannot be restored")
+    import sqlite3
+    database = Path(config["open_webui"]["database"])
+    connection = sqlite3.connect(database)
+    try:
+        connection.execute("update config set value=? where key=?", (json.dumps(prior_urls), "openai.api_base_urls"))
+        if connection.total_changes != 1:
+            raise RuntimeControlError("Open WebUI api_base_urls config row is missing during restore")
+        connection.commit()
+    finally:
+        connection.close()
+    binding_path.unlink()
 
 
 def _manifest(config: dict[str, Any], slot: Slot, status: str, validation: dict[str, Any]) -> dict[str, Any]:
@@ -436,7 +524,11 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
     grace_command, gateway_command, webui_command, env = _process_command(config, slot)
     commands = {"grace_runtime": (grace_command, Path(config["grace_runtime"]["working_directory"])), "gateway": (gateway_command, Path(config["source_root"])), "webui": (webui_command, Path(config["open_webui"]["working_directory"]))}
     processes: dict[str, subprocess.Popen[str]] = {}
+    route_bound = False
     try:
+        if "webui" in services:
+            _bind_candidate_webui_gateway(config, slot)
+            route_bound = slot.slot_id != "blue"
         for service in ("grace_runtime", "gateway", "webui"):
             if service in services:
                 command, cwd = commands[service]
@@ -467,6 +559,8 @@ def start_slot(config: dict[str, Any], slot_id: str, *, services: tuple[str, ...
         for process in processes.values():
             if process.poll() is None:
                 process.terminate()
+        if route_bound:
+            _restore_candidate_webui_gateway(config, slot.slot_id)
         raise
 
 
@@ -522,6 +616,7 @@ def stop_slot(config: dict[str, Any], slot_id: str) -> dict[str, Any]:
     _append_event(config, "stop.completed", **result)
     if not closed:
         raise RuntimeControlError(json.dumps(result, sort_keys=True))
+    _restore_candidate_webui_gateway(config, slot_id)
     return result
 
 

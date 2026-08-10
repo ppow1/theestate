@@ -113,8 +113,58 @@ def test_open_browser_reuses_healthy_runtime_without_starting(monkeypatch, tmp_p
 def test_webui_semantic_readiness_requires_admin_and_bridge(monkeypatch, tmp_path):
     value = config(tmp_path)
     monkeypatch.setattr(runtime, "_http_status", lambda url: 200)
-    monkeypatch.setattr(runtime, "_sqlite_identity", lambda database: {"quick_check": "ok", "users": [("1", "Pat", "p@example.com", "admin")], "models": [("estate/grace-grounded-test", "Grace", "estate/grace", json.dumps({"toolIds": ["grace_runtime_bridge"], "filterIds": ["grace_runtime_grounding"]}))], "tools": [("grace_runtime_bridge", "Grace")], "functions": [("grace_runtime_grounding", "Grounding", 1, 0)]})
+    monkeypatch.setattr(runtime, "_sqlite_identity", lambda database: {"quick_check": "ok", "users": [("1", "Pat", "p@example.com", "admin")], "models": [("estate/grace-grounded-test", "Grace", "estate/grace", json.dumps({"toolIds": ["grace_runtime_bridge"], "filterIds": ["grace_runtime_grounding"]}))], "tools": [("grace_runtime_bridge", "Grace")], "functions": [("grace_runtime_grounding", "Grounding", 1, 0)], "configs": [("openai.api_base_urls", json.dumps(["http://127.0.0.1:11435/v1"]))]})
     assert runtime.webui_readiness(value, runtime.SLOTS["blue"])["ready"] is True
+
+
+def test_candidate_webui_readiness_fails_when_bridge_targets_active_slot(monkeypatch, tmp_path):
+    value = config(tmp_path)
+    monkeypatch.setattr(runtime, "_http_status", lambda url: 200)
+    monkeypatch.setattr(runtime, "_sqlite_identity", lambda database: {"quick_check": "ok", "users": [("1", "Pat", "p@example.com", "admin")], "models": [("estate/grace-grounded-test", "Grace", "estate/grace", json.dumps({"toolIds": ["grace_runtime_bridge"], "filterIds": ["grace_runtime_grounding"]}))], "tools": [("grace_runtime_bridge", "Grace")], "functions": [("grace_runtime_grounding", "Grounding", 1, 0)], "configs": [("openai.api_base_urls", json.dumps(["http://127.0.0.1:11435/v1"]))]})
+    result = runtime.webui_readiness(value, runtime.SLOTS["green"])
+    assert result["bridge_endpoint"] == "http://127.0.0.1:11435/v1"
+    assert result["bridge_slot_consistent"] is False
+    assert result["ready"] is False
+
+
+def test_candidate_webui_binding_uses_controller_slot_and_restores(tmp_path, monkeypatch):
+    value = config(tmp_path)
+    database = Path(value["open_webui"]["database"])
+    connection = sqlite3.connect(database)
+    connection.execute('create table config (key text primary key, value text)')
+    connection.execute('insert into config values (?, ?)', ('openai.api_base_urls', json.dumps(['https://api.openai.com/v1', 'http://127.0.0.1:11435/v1'])))
+    connection.commit()
+    connection.close()
+    monkeypatch.setattr(runtime, "_port_open", lambda port: False)
+    runtime._bind_candidate_webui_gateway(value, runtime.SLOTS["green"])
+    bound = json.loads(sqlite3.connect(database).execute('select value from config where key="openai.api_base_urls"').fetchone()[0])
+    assert bound == ["https://api.openai.com/v1", "http://127.0.0.1:11436/v1"]
+    assert runtime.webui_readiness(value, runtime.SLOTS["green"])["bridge_slot_consistent"] is True
+    runtime._restore_candidate_webui_gateway(value, "green")
+    restored = json.loads(sqlite3.connect(database).execute('select value from config where key="openai.api_base_urls"').fetchone()[0])
+    assert restored == ["https://api.openai.com/v1", "http://127.0.0.1:11435/v1"]
+
+
+def test_blue_webui_readiness_accepts_only_blue_gateway_binding(monkeypatch, tmp_path):
+    value = config(tmp_path)
+    monkeypatch.setattr(runtime, "_http_status", lambda url: 200)
+    monkeypatch.setattr(runtime, "_sqlite_identity", lambda database: {"quick_check": "ok", "users": [("1", "Pat", "p@example.com", "admin")], "models": [("estate/grace-grounded-test", "Grace", "estate/grace", json.dumps({"toolIds": ["grace_runtime_bridge"], "filterIds": ["grace_runtime_grounding"]}))], "tools": [("grace_runtime_bridge", "Grace")], "functions": [("grace_runtime_grounding", "Grounding", 1, 0)], "configs": [("openai.api_base_urls", json.dumps(["http://127.0.0.1:11435/v1"]))]})
+    result = runtime.webui_readiness(value, runtime.SLOTS["blue"])
+    assert result["bridge_endpoint"] == "http://127.0.0.1:11435/v1"
+    assert result["bridge_slot_consistent"] is True
+
+
+def test_candidate_binding_rejects_ambiguous_or_arbitrary_local_endpoint(tmp_path, monkeypatch):
+    value = config(tmp_path)
+    database = Path(value["open_webui"]["database"])
+    connection = sqlite3.connect(database)
+    connection.execute('create table config (key text primary key, value text)')
+    connection.execute('insert into config values (?, ?)', ('openai.api_base_urls', json.dumps(['http://127.0.0.1:11435/v1', 'http://127.0.0.1:9999/v1'])))
+    connection.commit()
+    connection.close()
+    monkeypatch.setattr(runtime, "_port_open", lambda port: False)
+    with pytest.raises(runtime.RuntimeControlError, match="exactly one local"):
+        runtime._bind_candidate_webui_gateway(value, runtime.SLOTS["green"])
 
 
 def test_invalid_candidate_cannot_replace_active_slot(tmp_path, monkeypatch):
