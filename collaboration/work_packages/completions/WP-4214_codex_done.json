@@ -10,10 +10,15 @@
   "files_changed": [
     "collaboration/work_packages/pending/WP-4214_Steward_Attention_Annunciator_v1.md",
     "src/estate/core/steward_annunciator.py",
+    "src/estate/core/steward_command_center.py",
+    "src/estate/core/office_command_surface.py",
+    "src/estate/core/office_actions.py",
     "src/estate/core/work_package_validation.py",
     "src/estate/cli/main.py",
     "tests/test_steward_annunciator.py",
+    "tests/test_steward_attention_office_integration.py",
     "tools/demo_steward_annunciator.py",
+    "launch_operations_center.ps1",
     "docs/integration/steward_annunciator_v1.md",
     "operations/validation/reports/WP-4214_steward_attention_annunciator_v1.md",
     "operations/validation/reports/WP-4214_validation.md",
@@ -25,7 +30,8 @@
     "PYTHONPATH=src python tools/demo_steward_annunciator.py (passed; one mocked presentation, repeat suppressed, acknowledgement cleared)",
     "PYTHONPATH=src python -m py_compile src/estate/core/steward_annunciator.py src/estate/cli/main.py tools/demo_steward_annunciator.py (passed)",
     "PYTHONPATH=src python -m estate.cli.main steward-attention live-test --text \"The Estate needs your input on Project 5\" --json (interactive live acceptance: ding and TTS returned success; session 1)",
-    "isolated live activation with real presenter, existing acknowledge action, and durable clear (passed)"
+    "isolated live activation with real presenter, existing acknowledge action, and durable clear (passed)",
+    "Operations Center served UI/API integration and HTTP acknowledgement path (passed)"
   ],
   "known_limitations": [
     "The v1 durable visual artifact has no Windows overlay renderer; Office of the Steward or Operations Center consumes it.",

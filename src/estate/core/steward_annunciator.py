@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol
@@ -117,6 +118,44 @@ def announcement_text(item: dict[str, Any]) -> str:
 
 def _actionable(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [i for i in items if i.get("classification") in ACTIONABLE and i.get("status") == "open"]
+
+
+def sync_annunciator_state(root: str | Path | None = None) -> dict[str, Any]:
+    """Refresh only the durable visual projection after an existing attention action."""
+    base = Path(root) if root is not None else Path.cwd()
+    previous = _read(base / ANNUNCIATOR_PATH)
+    active = _actionable(aggregate_attention(base, write=True).get("items", []))
+    severity = min((i["classification"] for i in active), key=lambda c: SEVERITY_RANK[c], default=None)
+    state = dict(previous)
+    state.update({
+        "schema_version": ANNUNCIATOR_SCHEMA_VERSION,
+        "generated_at": _now(),
+        "active": bool(active),
+        "severity": severity,
+        "severity_rank": SEVERITY_RANK.get(severity),
+        "severity_label": {"urgent": "URGENT", "decision_required": "DECISION REQUIRED", "attention_soon": "ATTENTION SOON"}.get(severity),
+        "items": [{"id": i["id"], "title": i["title"], "summary": i["summary"], "classification": i["classification"], "requested_steward_action": i["requested_steward_action"], "announcement": announcement_text(i)} for i in active],
+        "active_item_ids": sorted(i["id"] for i in active),
+    })
+    _write(base, state)
+    return state
+
+
+def watch_attention(root: str | Path | None = None, *, interval_seconds: float = 15.0,
+                    max_cycles: int | None = None, presenter: Presenter | None = None) -> dict[str, Any]:
+    """Run the existing attention aggregate poll in the signed-in user session."""
+    if interval_seconds < 1:
+        raise ValueError("interval_seconds must be at least 1 second")
+    cycles = []
+    index = 0
+    while max_cycles is None or index < max_cycles:
+        state = present_attention(root, presenter=presenter)
+        cycles.append({"cycle": index + 1, "active": state["active"], "new_item_count": state["last_run"]["new_item_count"], "presented_count": state["last_run"]["presented_count"], "failure_count": state["last_run"]["failure_count"]})
+        index += 1
+        if max_cycles is not None and index >= max_cycles:
+            break
+        time.sleep(interval_seconds)
+    return {"state": "stopped", "cycles_run": len(cycles), "interval_seconds": interval_seconds, "cycles": cycles}
 
 
 def present_attention(root: str | Path | None = None, *, presenter: Presenter | None = None,

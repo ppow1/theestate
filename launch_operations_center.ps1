@@ -37,7 +37,8 @@ $requiredPaths = @(
   "README.md",
   "src/estate/cli/main.py",
   "src/estate/core/operations_center_bootstrap.py",
-  "src/estate/core/operations_center_settings.py"
+  "src/estate/core/operations_center_settings.py",
+  "src/estate/core/steward_annunciator.py"
 )
 $missingRootPaths = @($requiredPaths | Where-Object { -not (Test-Path (Join-Path $ScriptRoot $_)) })
 if ($missingRootPaths.Count -gt 0) {
@@ -83,6 +84,20 @@ if ($settings.warnings.Count -gt 0) {
 }
 
 if ($Stop) {
+  $watcherStatePath = Join-Path $ScriptRoot "runtime/office/steward_attention_watcher.json"
+  if (Test-Path $watcherStatePath) {
+    try {
+      $watcherState = Get-Content -LiteralPath $watcherStatePath -Raw | ConvertFrom-Json
+      $watcherProcess = Get-Process -Id ([int]$watcherState.pid) -ErrorAction SilentlyContinue
+      if ($watcherProcess) {
+        Stop-Process -Id $watcherProcess.Id -Force
+        Write-OperatorLine "Stopped Steward attention watcher pid $($watcherProcess.Id)."
+      }
+    } catch {
+      Write-OperatorLine "Steward attention watcher state was stale or unreadable; continuing server shutdown."
+    }
+    Remove-Item -LiteralPath $watcherStatePath -Force -ErrorAction SilentlyContinue
+  }
   Write-OperatorLine "Stopping local Operations Center server..."
   $stopPayload = Invoke-EstateJson @("-m", "estate.cli.main", "operations-center", "stop", "--json")
   Write-OperatorLine $stopPayload.message
@@ -108,6 +123,28 @@ Write-OperatorLine $startPayload.message
 Write-OperatorLine "Local URL: $($startPayload.url)"
 Write-OperatorLine "Static entry point: $($startPayload.entry_point)"
 Write-OperatorLine "Log: $($startPayload.log_file)"
+
+$watcherStatePath = Join-Path $ScriptRoot "runtime/office/steward_attention_watcher.json"
+$watcherProcess = $null
+if (Test-Path $watcherStatePath) {
+  try {
+    $watcherState = Get-Content -LiteralPath $watcherStatePath -Raw | ConvertFrom-Json
+    $watcherProcess = Get-Process -Id ([int]$watcherState.pid) -ErrorAction SilentlyContinue
+  } catch {
+    $watcherProcess = $null
+  }
+}
+if (-not $watcherProcess) {
+  $watcherProcess = Start-Process -FilePath $pythonExe -ArgumentList @(
+    "-m", "estate.cli.main", "steward-attention", "watch", "--interval", "15"
+  ) -WorkingDirectory $ScriptRoot -WindowStyle Hidden -PassThru
+  $watcherStatePath = Join-Path $ScriptRoot "runtime/office/steward_attention_watcher.json"
+  $watcherStatePath | Split-Path | ForEach-Object { New-Item -ItemType Directory -Path $_ -Force | Out-Null }
+  @{ pid = $watcherProcess.Id; started_at = (Get-Date).ToUniversalTime().ToString("o"); command = "steward-attention watch --interval 15" } | ConvertTo-Json | Set-Content -LiteralPath $watcherStatePath -Encoding UTF8
+  Write-OperatorLine "Started Steward attention watcher pid $($watcherProcess.Id) in the signed-in user session."
+} else {
+  Write-OperatorLine "Steward attention watcher already running as pid $($watcherProcess.Id)."
+}
 
 if ($startPayload.preflight) {
   Write-OperatorLine "Preflight / optional component status:"

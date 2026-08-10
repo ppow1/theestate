@@ -30,6 +30,18 @@ The result reports separate ding/TTS success, exceptions, stderr, and the sessio
 context. Both mechanisms use the current interactive user's Windows default audio
 endpoint; the presenter does not override endpoint selection.
 
+For the normal usable startup path, run the existing launcher from the signed-in
+Windows user session. It starts the existing Operations Center and a hidden
+`steward-attention watch --interval 15` companion in that same user session:
+
+```powershell
+cd A:\theestate
+.\launch_operations_center.ps1
+```
+
+`.\launch_operations_center.ps1 -Stop` stops both. The watcher is a bounded poller
+over the existing attention aggregate, not a second event source or notification bus.
+
 `winsound.MessageBeep` returning `None` is normal for this Windows API and is not a
 boolean audible-confirmation signal. The live command reports no exception for the
 call, while TTS reports its PowerShell return code and stderr.

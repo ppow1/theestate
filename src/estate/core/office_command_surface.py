@@ -45,6 +45,8 @@ from estate.core.office_executive_workspace import build_executive_workspace, re
 from estate.core.compute_office_panel import refresh_compute_panel
 from estate.core.collaboration_messages import acknowledge_message, create_reply
 from estate.core.office_personnel_directory import open_employee_detail as mailbox_open_employee_detail
+from estate.core.steward_attention import record_action
+from estate.core.steward_annunciator import sync_annunciator_state
 
 VALID_OUTCOMES = {"completed", "queued", "blocked", "failed"}
 RESULT_LOG = "runtime/steward/office_command_surface_action_results.jsonl"
@@ -724,6 +726,14 @@ def mailbox_clear_attention(root=None, attention_id: str | None = None, actor: s
     local_attention_acknowledge(attention_id, _root(root), actor=actor, reason=reason)
     return _completed('attention.clear_local', 'Clear resolved local attention', 'notifications', 'estate.core.office_mailbox_control.local_attention_acknowledge', f"Attention {attention_id} cleared locally only; authoritative source closure was not changed.", written=['runtime/steward/local_attention_acknowledgements.json','runtime/steward/mailbox_control_center.json'], state=['local attention acknowledgement persisted'], request_id=params.get('request_id'))
 
+def acknowledge_steward_attention(root=None, item_id: str | None = None, actor: str = 'Steward', note: str = 'Acknowledged from the Office of the Steward.', **params: Any) -> OfficeActionResult:
+    if not item_id:
+        return _blocked('attention.acknowledge', 'Acknowledge Steward attention', 'attention', 'estate.core.steward_attention.record_action', 'item_id is required.', request_id=params.get('request_id'))
+    base = _root(root)
+    record_action(item_id, 'acknowledge', actor=actor, root=base, note=note)
+    state = sync_annunciator_state(base)
+    return _completed('attention.acknowledge', 'Acknowledge Steward attention', 'attention', 'estate.core.steward_attention.record_action', f"Steward attention {item_id} acknowledged; annunciator active={state.get('active')}.", read=['runtime/office/steward_attention_items.json'], written=['runtime/office/steward_attention_actions.json','runtime/office/steward_attention_items.json','runtime/office/steward_annunciator.json'], state=['canonical Steward attention action persisted', 'visual annunciator projection refreshed'], request_id=params.get('request_id'))
+
 def mailbox_inspect_failures(root=None, **params: Any) -> OfficeActionResult:
     payload=inspect_delivery_failures(_root(root))
     return _completed('delivery.inspect_failures', 'Inspect delivery failures', 'notifications', 'estate.core.office_mailbox_control.inspect_delivery_failures', f"Delivery failure inspection found {payload.get('failure_count', 0)} actionable failure source(s).", read=payload.get('sources') or [], written=['runtime/steward/delivery_failure_inspection.json'], state=['delivery failure evidence inspected'], request_id=params.get('request_id'))
@@ -795,6 +805,7 @@ HANDLERS.update({
  'mailboxes.reply_or_route': mailbox_reply,
  'mailboxes.open_personnel': mailbox_open_personnel,
  'attention.clear_local': mailbox_clear_attention,
+ 'attention.acknowledge': acknowledge_steward_attention,
  'delivery.inspect_failures': mailbox_inspect_failures,
  'notifications.refresh_center': refresh_notifications,
  'notifications.local_acknowledge': local_ack_notification,
@@ -909,6 +920,7 @@ ACTION_CONTROLS = [
  {'action_id':'mailboxes.reply_or_route','label':'Reply or route','target_tab':'mailboxes','handler':'mailbox_reply','availability':'available','requires_input':'message_id,body,route_target','note':'Replies use canonical collaboration messages; routes record local route evidence.'},
  {'action_id':'mailboxes.open_personnel','label':'Open sender/recipient personnel','target_tab':'mailboxes','handler':'mailbox_open_personnel','availability':'available','requires_input':'employee_id'},
  {'action_id':'attention.clear_local','label':'Clear resolved local attention','target_tab':'notifications','handler':'mailbox_clear_attention','availability':'available','requires_input':'attention_id,actor,reason','note':'Local acknowledgement only; source closure remains distinct.'},
+ {'action_id':'attention.acknowledge','label':'Acknowledge Steward attention','target_tab':'attention','handler':'acknowledge_steward_attention','availability':'available','requires_input':'item_id,actor,note','note':'Uses the canonical Steward attention action mechanism and refreshes the durable annunciator projection.'},
  {'action_id':'delivery.inspect_failures','label':'Inspect delivery failures','target_tab':'notifications','handler':'mailbox_inspect_failures','availability':'available'},
  {'action_id':'notifications.refresh_center','label':'Refresh notification center','target_tab':'notifications','handler':'refresh_notifications','availability':'available'},
  {'action_id':'notifications.local_acknowledge','label':'Acknowledge notification locally','target_tab':'notifications','handler':'local_ack_notification','availability':'available','requires_input':'notification_id','note':'Local state only; authoritative closure is unchanged.'},

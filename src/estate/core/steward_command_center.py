@@ -24,6 +24,7 @@ from estate.core.global_search_command_palette import build_global_palette
 from estate.core.unified_institutional_search import search_institutional
 from estate.core.mission_control_workspace import build_mission_control_workspace
 from estate.core.steward_presence import generate_steward_presence_state
+from estate.core.steward_attention import aggregate_attention
 from estate.core.capability_dependency_visualization import generate_capability_dependency_visualization
 from estate.core.operator_activity_stream import generate_operator_activity_stream
 from estate.core.operations_notification_center import generate_operations_notification_center
@@ -50,6 +51,7 @@ from urllib.parse import urlparse
 
 OFFICE_NAVIGATION = [
     {"id": "home", "label": "Home", "panel": "home", "tab": "home"},
+    {"id": "attention", "label": "Steward Attention", "panel": "steward_attention", "tab": "attention"},
     {"id": "mission-control", "label": "Mission Control", "panel": "mission_control_workspace", "tab": "mission-control"},
     {"id": "alfred", "label": "Alfred", "panel": "alfred_resident_card", "tab": "alfred"},
     {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
@@ -74,6 +76,7 @@ OFFICE_NAVIGATION = [
 
 OFFICE_TABS = [
     {"id": "home", "label": "Home"},
+    {"id": "attention", "label": "Steward Attention"},
     {"id": "mission-control", "label": "Mission Control"},
     {"id": "alfred", "label": "Alfred"},
     {"id": "helen", "label": "Helen"},
@@ -1046,6 +1049,7 @@ def generate_command_center(root=None, write=True):
     resident_panels = {f"{str(card.get('name', '')).lower()}_resident_card": card for card in resident_cards["cards"]}
     panels = {
         **resident_panels,
+        "steward_attention": _steward_attention_panel(root, write=write),
         "capability_dependency_visualization": {"available": True, "path": "runtime/capabilities/capability_dependency_visualization.json", "kind": "capability_dependency_visualization", "data": generate_capability_dependency_visualization(root, write=write)},
         "mission_control_workspace": build_mission_control_workspace(root),
         "morning_briefing": _read_artifact(root, ARTIFACTS["morning_briefing"]),
@@ -1295,6 +1299,13 @@ def _global_search_panel(root):
         return {"available": True, "path": palette.get("index_path"), "kind": "global_search_command_palette", "data": {**palette, "unified_institutional_results": unified.get("results", []), "unified_diagnostics": unified.get("diagnostics", {})}}
     except Exception as exc:
         return {"available": False, "path": "runtime/search/global_command_palette.json", "kind": "global_search_command_palette", "placeholder": f"Global search palette is unavailable: {exc}"}
+
+
+def _steward_attention_panel(root, write=True):
+    aggregate = aggregate_attention(root, write=write)
+    annunciator = _read_artifact(root, ["runtime/office/steward_annunciator.json"])
+    state = annunciator.get("data") if annunciator.get("available") and isinstance(annunciator.get("data"), dict) else {"active": False, "severity": None, "items": [], "active_item_ids": []}
+    return {"available": True, "path": "runtime/office/steward_attention_items.json; runtime/office/steward_annunciator.json", "kind": "steward_attention_annunciator", "data": {"aggregate": aggregate, "annunciator": state, "acknowledgement_authority": "estate.core.steward_attention.record_action via Office action endpoint", "focus_policy": {"steals_keyboard_focus": False, "steals_mouse_focus": False, "presentation": "fixed corner banner plus Steward Attention tab"}}}
 
 
 def _office_navigation(panels, settings_manager=None):
@@ -1605,6 +1616,23 @@ def _home_workspace_html(payload):
         f"<li>Recommended next action: {html.escape(str(status.get('recommended_next_action') or 'Review local artifacts.'))}</li>",
         "</ul>",
     ])
+
+
+def _steward_attention_html(panel, *, banner=False):
+    data = (panel or {}).get("data") or {}
+    state = data.get("annunciator") or {}
+    active = bool(state.get("active"))
+    items = state.get("items") or []
+    severity = str(state.get("severity_label") or state.get("severity") or "ATTENTION")
+    rows = "".join(
+        "<li><strong>" + html.escape(str(item.get("classification") or "attention")) + "</strong> — " + html.escape(str(item.get("title") or item.get("id"))) + "<br><span class='source'>" + html.escape(str(item.get("summary") or "")) + "</span> "
+        + "<button type='button' class='office-action' data-office-action='attention.acknowledge' data-item-id='" + html.escape(str(item.get("id") or ""), quote=True) + "' data-actor='Steward' data-note='Acknowledged from the Office of the Steward.'>Acknowledge</button></li>"
+        for item in items
+    ) or "<li class='placeholder'>No active actionable Steward attention items.</li>"
+    if banner:
+        hidden = "" if active else " hidden"
+        return "<aside id='steward-annunciator-banner' class='steward-annunciator-banner office-actions' role='status' aria-live='assertive'" + hidden + " style='position:fixed;top:.75rem;right:.75rem;z-index:30;max-width:min(30rem, calc(100vw - 1.5rem));background:#fff8e8;color:#241f1a;border:2px solid #8b6f3d;border-left:.55rem solid #8b6f3d;border-radius:10px;box-shadow:0 4px 16px #0003;padding:.7rem 1rem;pointer-events:auto'><strong>⚠ Steward attention: " + html.escape(severity) + "</strong><ul>" + rows + "</ul><p class='source'>Persistent until the underlying Steward attention action clears it. This banner does not take focus.</p><pre class='office-action-result'>No action run yet.</pre></aside>"
+    return _panel("Steward Attention", "<p class='source'>Canonical source: Steward attention aggregate. Acknowledgement uses the existing Office action endpoint and clears only when the underlying item action is recorded.</p><p><strong>Visual state:</strong> " + html.escape("ACTIVE — " + severity if active else "CLEAR") + "</p><ul>" + rows + "</ul><pre class='office-action-result'>No action run yet.</pre>", "ready" if active else "placeholder")
 
 def _panel(title, body, status="placeholder"):
     return f'<section class="panel {html.escape(status)}"><h2>{html.escape(title)}</h2>{body}</section>'
@@ -2312,7 +2340,10 @@ async function refreshOperationsChrome(){
     if(!response.ok) return;
     const payload = await response.json();
     const parser = new DOMParser();
-    const doc = parser.parseFromString(payload.status_bar_html + payload.activity_console_html, 'text/html');
+    const doc = parser.parseFromString((payload.annunciator_html || '') + payload.status_bar_html + payload.activity_console_html, 'text/html');
+    const nextAnnunciator = doc.querySelector('#steward-annunciator-banner');
+    const currentAnnunciator = document.querySelector('#steward-annunciator-banner');
+    if(nextAnnunciator && currentAnnunciator) currentAnnunciator.replaceWith(nextAnnunciator);
     const nextStatus = doc.querySelector('#status-bar');
     const nextConsole = doc.querySelector('#activity-console');
     const currentStatus = document.querySelector('#status-bar');
@@ -2621,6 +2652,7 @@ def render_command_center_html(payload):
     p = payload.get("panels", {})
     tab_bodies = [
         ("home", "Home", _home_workspace_html(payload)),
+        ("attention", "Steward Attention", _steward_attention_html(p.get("steward_attention", {}))),
         ("mission-control", "Mission Control Workspace", _office_action_controls_html(payload, "mission-control") + _mission_control_html(p.get("mission_control_workspace", {})) + _steward_awareness_html(p.get("steward_awareness_runtime", {}))),
         ("alfred", "Alfred Office", "<h3>Alfred Resident Card</h3>" + _alfred_chat_html(p.get("alfred_chat", {})) + _office_action_controls_html(payload, "alfred") + _resident_html(p.get("alfred_resident_card", {}))),
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
@@ -2660,6 +2692,7 @@ def render_command_center_html(payload):
     settings_workspace = ((payload.get("settings_manager") or {}).get("settings") or {}).get("workspace", {})
     status_bar = _status_bar_html(payload.get("status_bar", {})) if settings_workspace.get("status_bar_visible", True) else ""
     activity_console = _activity_console_html(payload.get("activity_console", {})) if settings_workspace.get("bottom_activity_stream_visible", True) else ""
+    annunciator_banner = _steward_attention_html(p.get("steward_attention", {}), banner=True)
     generated = html.escape(str(payload.get("generated_at")))
     source_artifacts_json = _script_json(_snapshot_source_artifacts(payload))
     snapshot_manifest_json = _script_json(build_office_snapshot_manifest(payload))
@@ -2773,7 +2806,7 @@ async function runOfficeAction(button){
   }catch(error){ if(resultEl){ resultEl.className = 'office-action-result failed'; resultEl.textContent = JSON.stringify({outcome:'failed', steward_message:String(error), authority_gating_status:'served_mode_required'}, null, 2); } }
   finally{ pendingOfficeRequests.delete(actionId); button.disabled = false; }
 }
-async function targetedRefresh(tabId){ try{ const response = await fetch('/api/office/payload?tab=' + encodeURIComponent(tabId), {cache:'no-store'}); const payload = await response.json(); if(payload.stale) updateUiRuntimeDiagnostic('error', 'Stale payload/version detected; refreshed tab ' + tabId); return payload; }catch(error){ updateUiRuntimeDiagnostic('error', 'Recoverable targeted refresh failure: ' + error.message); return null; } }
+async function targetedRefresh(tabId){ try{ const response = await fetch('/api/office/payload?tab=' + encodeURIComponent(tabId), {cache:'no-store'}); const payload = await response.json(); const parser = new DOMParser(); const doc = parser.parseFromString(payload.annunciator_html || '', 'text/html'); const next = doc.querySelector('#steward-annunciator-banner'); const current = document.querySelector('#steward-annunciator-banner'); if(next && current) current.replaceWith(next); if(payload.stale) updateUiRuntimeDiagnostic('error', 'Stale payload/version detected; refreshed tab ' + tabId); return payload; }catch(error){ updateUiRuntimeDiagnostic('error', 'Recoverable targeted refresh failure: ' + error.message); return null; } }
 function bindOfficeActions(){ document.addEventListener('click', event => { const button = event.target.closest && event.target.closest('[data-office-action]'); if(button){ event.preventDefault(); runOfficeAction(button); } }); }
 
 
@@ -2952,7 +2985,7 @@ window.addEventListener('load', () => { updateUiRuntimeDiagnostic('ready', 'UI r
     return (
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Office of the Steward</title>\n'
         f'<style>{css}</style></head>\n'
-        f'<!-- <body> --><body{body_attrs}><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header><div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}{auxiliary_panels}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
+        f'<!-- <body> --><body{body_attrs}><script id="office-snapshot-source-artifacts" type="application/json">{source_artifacts_json}</script><script id="office-snapshot-manifest" type="application/json">{snapshot_manifest_json}</script><header><h1>Office of the Steward — Local Command Center</h1><p>Local-only Office shell. Generated: {generated}. Navigation, tabs, status, activity, and placeholders are backed by local artifacts only.</p><div class="snapshot-toolbar" aria-label="Office Snapshot export"><button id="office-snapshot-button" type="button">Office Snapshot</button><span id="office-snapshot-status" class="snapshot-status">Downloads a local ZIP; may contain internal Estate UI state. No upload is performed.</span></div><div id="ui-runtime-diagnostic" class="ui-runtime-diagnostic" data-state="not-initialized" role="status">UI runtime: script not initialized; navigation may not work</div><noscript><div class="ui-runtime-diagnostic" data-state="error">UI runtime: JavaScript is disabled; workspace tabs require JavaScript.</div></noscript></header>{annunciator_banner}<div class="office-shell">{_nav_html(payload.get("navigation", {}), active_tab)}<main class="workspace">{_tab_bar_html(payload.get("tabs", []), active_tab)}{workspace}{auxiliary_panels}</main></div>{activity_console}{status_bar}{script}{_refresh_script()}</body></html>\n'
     )
 
 def serve_command_center(host="127.0.0.1", port=8765, root=None):
@@ -2972,7 +3005,7 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                 return
             if parsed.path == "/api/office/payload":
                 payload = generate_command_center(root=root, write=False)
-                body = json.dumps({"payload_version": payload.get("payload_version"), "generated_at": payload.get("generated_at"), "stale": False, "tabs": payload.get("tabs"), "navigation": payload.get("navigation")}, indent=2, sort_keys=True).encode("utf-8")
+                body = json.dumps({"payload_version": payload.get("payload_version"), "generated_at": payload.get("generated_at"), "stale": False, "tabs": payload.get("tabs"), "navigation": payload.get("navigation"), "annunciator_html": _steward_attention_html(payload.get("panels", {}).get("steward_attention", {}), banner=True)}, indent=2, sort_keys=True).encode("utf-8")
                 self.send_response(200); self.send_header("Content-Type", "application/json; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
             if self.path == "/status.json":
                 if os.environ.get("ESTATE_BOOTSTRAP_STATUS_FAST") == "1":
@@ -2981,6 +3014,7 @@ def serve_command_center(host="127.0.0.1", port=8765, root=None):
                     payload = generate_command_center(root=root, write=False)
                     body = json.dumps({
                         "generated_at": payload.get("generated_at"),
+                        "annunciator_html": _steward_attention_html(payload.get("panels", {}).get("steward_attention", {}), banner=True),
                         "status_bar": payload.get("status_bar"),
                         "activity_console": payload.get("activity_console"),
                         "status_bar_html": _status_bar_html(payload.get("status_bar", {})),

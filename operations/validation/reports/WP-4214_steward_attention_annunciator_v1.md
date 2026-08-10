@@ -8,7 +8,7 @@ presentation artifact and not an authority, router, queue, or event bus.
 
 ## Validation
 
-- `PYTHONPATH=src python -m pytest -q tests/test_steward_attention.py tests/test_steward_annunciator.py` — passed (8 tests).
+- `PYTHONPATH=src python -m pytest -q tests/test_steward_attention.py tests/test_steward_annunciator.py tests/test_steward_attention_office_integration.py` — passed (11 tests).
 - `PYTHONPATH=src python tools/demo_steward_annunciator.py` — passed; one mocked presentation, repeat suppressed, acknowledgement cleared state.
 - `PYTHONPATH=src python -m estate.cli.main steward-attention present --dry-run --json` — passed without real sound/TTS.
 - `PYTHONPATH=src python -m py_compile src/estate/core/steward_annunciator.py tools/demo_steward_annunciator.py` — passed.
@@ -40,3 +40,26 @@ the underlying attention action has cleared the annunciator.
 - Isolated live activation: one item presented (`new_item_count: 1`,
   `presented_count: 1`), existing `acknowledge` action recorded, and durable state
   verified `active: false` with no active item IDs.
+
+## End-to-end operational slice
+
+The real source is the existing `resident_task_visibility` projection consumed by
+`steward_attention.aggregate_attention()`. Start the user-session poller with:
+
+```powershell
+cd A:\theestate
+$env:PYTHONPATH="src"
+python -m estate.cli.main steward-attention watch --interval 15
+```
+
+The existing Operations Center server then consumes the durable annunciator state.
+Its fixed corner banner and Steward Attention tab are remote-safe consumers of local
+Estate artifacts; the banner does not auto-focus or steal keyboard focus. Clicking
+`Acknowledge` posts to the existing `/api/office/actions/execute` endpoint using
+`attention.acknowledge`, which invokes canonical `record_action(..., "acknowledge")`.
+The served endpoint was exercised in focused tests over HTTP; no browser-local or
+Windows-only state is required to render the banner.
+
+The existing `launch_operations_center.ps1` now starts the watcher as a hidden
+interactive-user companion and stops it with `-Stop`; no new Windows service or
+notification runtime was introduced.

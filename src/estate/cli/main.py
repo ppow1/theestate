@@ -58,7 +58,7 @@ from estate.core import estate_discovery_engine
 from estate.core.notification_router import generate_notification_router_report, format_notification_router_report, route_notification_events
 from estate.core.morning_briefing import generate_morning_briefing, format_morning_briefing
 from estate.core.steward_attention import aggregate_attention, create_briefing as create_steward_attention_briefing, record_action as record_steward_attention_action, format_briefing as format_steward_attention_briefing
-from estate.core.steward_annunciator import present_attention, format_annunciator, run_live_test
+from estate.core.steward_annunciator import present_attention, format_annunciator, run_live_test, watch_attention
 from estate.core.gotify_adapter import send_gotify_recall, format_gotify_delivery_report
 from estate.core.worker_runtime_heartbeat import create_worker_heartbeat, generate_worker_runtime_summary, format_worker_runtime_summary
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor, format_worker_runtime_monitor
@@ -2156,6 +2156,8 @@ def cmd_steward_attention(args):
         payload = present_attention(root=getattr(args, "root", None), presenter=presenter)
     elif args.steward_attention_action == "live-test":
         payload = run_live_test(args.text)
+    elif args.steward_attention_action == "watch":
+        payload = watch_attention(root=getattr(args, "root", None), interval_seconds=args.interval, max_cycles=None if args.cycles == 0 else args.cycles)
     else:
         raise SystemExit(f"Unknown steward-attention action: {args.steward_attention_action}")
     if getattr(args, "json", False):
@@ -2165,6 +2167,8 @@ def cmd_steward_attention(args):
     elif args.steward_attention_action == "present":
         print(format_annunciator(payload))
     elif args.steward_attention_action == "live-test":
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    elif args.steward_attention_action == "watch":
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
         print(json.dumps(payload.get("summary", payload), indent=2, sort_keys=True))
@@ -4278,6 +4282,9 @@ def main(argv=None):
     q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
     q = sa.add_parser("live-test", help="LIVE: emit one ding and one local Windows TTS utterance")
     q.add_argument("--text", default="The Estate needs your input on Project 5")
+    q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
+    q = sa.add_parser("watch", help="Poll the canonical attention aggregate and present newly actionable items")
+    q.add_argument("--root"); q.add_argument("--interval", type=float, default=15.0); q.add_argument("--cycles", type=int, default=0, help="0 runs until Ctrl+C")
     q.add_argument("--json", action="store_true"); q.set_defaults(func=cmd_steward_attention)
 
     p = sub.add_parser("audit-summary")
