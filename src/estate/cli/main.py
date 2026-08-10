@@ -1976,7 +1976,7 @@ def cmd_knowledge_index(args):
         elif action == "packet":
             payload = sqlite_packet(root, args.scope)
         elif action == "batch-packet":
-            payload = sqlite_batch_packet(root, args.batch_id, max_bytes=args.max_bytes)
+            payload = sqlite_batch_packet(root, args.batch_id, max_bytes=args.max_bytes, evidence_limit=args.evidence_limit, evidence_bytes=args.evidence_bytes)
         elif action == "next-batch":
             payload = sqlite_next_batch(root, limit=args.limit, provider_type=args.provider_type, provider_model=args.provider_model, worker_identity=args.worker_identity, asset_prefix=args.asset_prefix)
         elif action == "work-status":
@@ -1986,7 +1986,7 @@ def cmd_knowledge_index(args):
         elif action == "provider-status":
             payload = comprehension_provider_status(timeout=getattr(args, "timeout", 4.0), model=getattr(args, "model", None))
         elif action == "work-run":
-            payload = run_local_comprehension(root, limit=args.limit, max_bytes=args.max_bytes, model=args.model, worker_identity=args.worker_identity, asset_prefix=args.asset_prefix, timeout=args.timeout)
+            payload = run_local_comprehension(root, limit=args.limit, max_bytes=args.max_bytes, model=args.model, worker_identity=args.worker_identity, asset_prefix=args.asset_prefix, timeout=args.timeout, allow_reprocess=args.reprocess)
         elif action == "work-review":
             payload = comprehension_review_queue(root)
         elif action == "review-extract":
@@ -3843,6 +3843,11 @@ def main(argv=None):
         if name == "knowledge":
             child.add_argument("query", nargs="?", default="", help="Knowledge title or identifier phrase")
             child.add_argument("--limit", type=int, default=100)
+        elif name == "batch-packet":
+            child.add_argument("batch_id")
+            child.add_argument("--max-bytes", type=int, default=262144)
+            child.add_argument("--evidence-limit", type=int, default=24)
+            child.add_argument("--evidence-bytes", type=int, default=16384)
         elif name == "review-extract":
             child.add_argument("--interpretation-id")
         elif name == "evidence-extract":
@@ -3900,6 +3905,7 @@ def main(argv=None):
             child.add_argument("--timeout", type=float, default=120.0)
             child.add_argument("--worker-identity", default="estate-local-comprehension-worker")
             child.add_argument("--asset-prefix")
+            child.add_argument("--reprocess", action="store_true", help="Explicitly reprocess the bounded current-revision asset for model comparison")
         elif name in {"result-validate", "result-ingest"}:
             child.add_argument("--input", required=True)
         child.set_defaults(func=cmd_knowledge_index)
@@ -3917,6 +3923,8 @@ def main(argv=None):
     bp = sp.add_parser("batch-packet", help="Build a bounded provider-neutral packet for a work batch")
     bp.add_argument("batch_id")
     bp.add_argument("--max-bytes", type=int, default=262144)
+    bp.add_argument("--evidence-limit", type=int, default=24)
+    bp.add_argument("--evidence-bytes", type=int, default=16384)
     bp.set_defaults(func=cmd_knowledge_index)
     wr = sp.add_parser("work-retry", help="Mark a comprehension batch retryable")
     wr.add_argument("batch_id")

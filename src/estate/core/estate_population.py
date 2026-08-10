@@ -13,7 +13,7 @@ import os
 import time
 import uuid
 from pathlib import Path, PurePosixPath
-from typing import Any
+from typing import Any, Iterable
 
 from estate.core.estate_knowledge_store import (
     KnowledgeStoreError, _asset_id, _file_type, _git, _hash,
@@ -25,6 +25,8 @@ from estate.core.estate_knowledge_store import (
 SCOPE_PATH = Path("docs/operations/troubleshooting/population-scope.json")
 SCOPE_SCHEMA = "estate.population_scope.v1"
 PACKET_CONTRACT = "estate.troubleshooting.comprehension.work_packet.v1"
+PACKET_VERSION = "estate.troubleshooting.comprehension.work_packet.v2"
+PROMPT_CONTRACT_VERSION = "estate.troubleshooting.evidence_enriched_prompt.v1"
 RESULT_CONTRACT = "estate.troubleshooting.comprehension.result.v1"
 POLICIES = {"STRUCTURAL_SCAN", "METADATA_ONLY", "NO_CONTENT", "EXCLUDED"}
 REPOSITORY_URL = "https://github.com/ppow1/theestate.git"
@@ -343,11 +345,19 @@ def population_coverage(root: str | Path | None = None) -> dict[str, Any]:
         return {"scope_id": context["scope_id"], "source_revision": context["source_revision"], "assets_total": row[0] or 0, "metadata_only": row[1] or 0, "no_content": row[2] or 0, "structural": row[3] or 0, "comprehended": row[4] or 0, "partial": row[5] or 0, "unknown": row[6] or 0, "stale": row[7] or 0, "unknown_owner": row[8] or 0, "unknown_purpose": row[9] or 0, "missing": connection.execute("SELECT COUNT(*) FROM assets WHERE scan_status='MISSING'").fetchone()[0], "pending_work": pending, "future_scope_boundaries": connection.execute("SELECT COUNT(*) FROM scope_boundaries").fetchone()[0], "failed_batches": connection.execute("SELECT COUNT(*) FROM comprehension_batches WHERE state='FAILED'").fetchone()[0], "database": str(database_path(context["root"]))}
 
 
-def next_batch(root: str | Path | None = None, *, limit: int = 10, provider_type: str | None = None, provider_model: str | None = None, worker_identity: str | None = None, asset_prefix: str | None = None) -> dict[str, Any]:
+def next_batch(root: str | Path | None = None, *, limit: int = 10, provider_type: str | None = None, provider_model: str | None = None, worker_identity: str | None = None, asset_prefix: str | None = None, allow_reprocess: bool = False, exclude_asset_ids: Iterable[str] = ()) -> dict[str, Any]:
     context = validate_requested_scope(root)
     with connect(context["root"], create=False) as connection:
-        query = "SELECT a.* FROM assets a WHERE a.scope_policy='STRUCTURAL_SCAN' AND (a.comprehension_status IN ('PARTIAL','UNKNOWN','STALE') OR a.current_state='REVALIDATION_REQUIRED') AND NOT EXISTS (SELECT 1 FROM comprehension_batch_assets ba JOIN comprehension_batches b ON b.batch_id=ba.batch_id WHERE ba.asset_id=a.asset_id AND (b.state IN ('OPEN','ASSIGNED','PROCESSING') OR (b.state='COMPLETED' AND a.current_state!='REVALIDATION_REQUIRED')))"
+        query = "SELECT a.* FROM assets a WHERE a.scope_policy='STRUCTURAL_SCAN' AND (a.comprehension_status IN ('PARTIAL','UNKNOWN','STALE') OR a.current_state='REVALIDATION_REQUIRED')"
+        if allow_reprocess:
+            query += " AND NOT EXISTS (SELECT 1 FROM comprehension_batch_assets ba JOIN comprehension_batches b ON b.batch_id=ba.batch_id WHERE ba.asset_id=a.asset_id AND b.state IN ('OPEN','ASSIGNED','PROCESSING'))"
+        else:
+            query += " AND NOT EXISTS (SELECT 1 FROM comprehension_batch_assets ba JOIN comprehension_batches b ON b.batch_id=ba.batch_id WHERE ba.asset_id=a.asset_id AND (b.state IN ('OPEN','ASSIGNED','PROCESSING') OR (b.state='COMPLETED' AND a.current_state!='REVALIDATION_REQUIRED')))"
         params: list[Any] = []
+        excluded = list(exclude_asset_ids)
+        if excluded:
+            query += " AND a.asset_id NOT IN (" + ",".join("?" for _ in excluded) + ")"
+            params.extend(excluded)
         if asset_prefix:
             prefix = _relative(asset_prefix)
             query += " AND (a.current_path = ? OR a.current_path LIKE ?)"
@@ -359,25 +369,84 @@ def next_batch(root: str | Path | None = None, *, limit: int = 10, provider_type
             return {"status": "NO_WORK", "scope_id": context["scope_id"], "source_revision": context["source_revision"], "asset_ids": [], "asset_count": 0}
         batch_id = "batch:" + uuid.uuid4().hex
         now = _now()
-        connection.execute("INSERT INTO comprehension_batches(batch_id,scope_id,source_revision,selection_reason,created_at,updated_at,provider_type,provider_model,worker_identity,state,attempt_count) VALUES(?,?,?,?,?,?,?,?,?,?,0)", (batch_id, context["scope_id"], context["source_revision"], "next structural assets requiring comprehension or revalidation", now, now, provider_type, provider_model, worker_identity, "ASSIGNED" if provider_type or worker_identity else "OPEN"))
+        selection_reason = "explicit bounded reprocessing for evidence-enriched model comparison" if allow_reprocess else "next structural assets requiring comprehension or revalidation"
+        connection.execute("INSERT INTO comprehension_batches(batch_id,scope_id,source_revision,selection_reason,created_at,updated_at,provider_type,provider_model,worker_identity,state,attempt_count) VALUES(?,?,?,?,?,?,?,?,?,?,0)", (batch_id, context["scope_id"], context["source_revision"], selection_reason, now, now, provider_type, provider_model, worker_identity, "ASSIGNED" if provider_type or worker_identity else "OPEN"))
         for position, row in enumerate(rows):
             connection.execute("INSERT INTO comprehension_batch_assets(batch_id,asset_id,position) VALUES(?,?,?)", (batch_id, row["asset_id"], position))
-        return {"batch_id": batch_id, "scope_id": context["scope_id"], "source_revision": context["source_revision"], "state": "ASSIGNED" if provider_type or worker_identity else "OPEN", "asset_ids": [row["asset_id"] for row in rows], "asset_count": len(rows), "selection_reason": "next structural assets requiring comprehension or revalidation"}
+        return {"batch_id": batch_id, "scope_id": context["scope_id"], "source_revision": context["source_revision"], "state": "ASSIGNED" if provider_type or worker_identity else "OPEN", "asset_ids": [row["asset_id"] for row in rows], "asset_count": len(rows), "selection_reason": selection_reason}
 
 
 def _batch_rows(connection, batch_id: str) -> list[dict[str, Any]]:
     return [dict(row) for row in connection.execute("SELECT a.* FROM assets a JOIN comprehension_batch_assets ba ON ba.asset_id=a.asset_id WHERE ba.batch_id=? ORDER BY ba.position", (batch_id,)).fetchall()]
 
 
-def batch_packet(root: str | Path | None, batch_id: str, *, max_bytes: int = 262144) -> dict[str, Any]:
+def _packet_evidence(connection, asset_ids: list[str], *, limit: int = 24, max_bytes: int = 16384) -> tuple[dict[str, list[dict[str, Any]]], list[str], dict[str, int]]:
+    """Select current, revision-grounded facts for a bounded provider packet."""
+    if not asset_ids:
+        return {}, [], {}
+    marks = ",".join("?" for _ in asset_ids)
+    rows = connection.execute(
+        """SELECT ef.*, source.current_path AS source_path, target.current_path AS target_path
+           FROM evidence_facts ef
+           LEFT JOIN assets source ON source.asset_id=ef.source_asset_id
+           LEFT JOIN assets target ON target.asset_id=ef.target_asset_id
+           WHERE ef.target_asset_id IN (""" + marks + """) AND ef.current_state='CURRENT'
+           ORDER BY CASE ef.certainty
+             WHEN 'AUTHORITATIVE_GOVERNANCE' THEN 0
+             WHEN 'AUTHORITATIVE_REGISTRY' THEN 1
+             WHEN 'DETERMINISTIC_SOURCE_RELATIONSHIP' THEN 2
+             WHEN 'EXECUTABLE_TEST' THEN 3
+             WHEN 'CURRENT_DOCUMENTATION' THEN 4
+             WHEN 'DERIVED_STATIC_ANALYSIS' THEN 5 ELSE 6 END,
+             ef.fact_kind,ef.evidence_path,ef.fact_id""",
+        tuple(asset_ids),
+    ).fetchall()
+    selected: dict[str, list[dict[str, Any]]] = {asset_id: [] for asset_id in asset_ids}
+    omitted: dict[str, int] = {asset_id: 0 for asset_id in asset_ids}
+    ids: list[str] = []
+    used = 0
+    for row in rows:
+        target = row["target_asset_id"]
+        if len(selected.get(target, [])) >= max(1, limit):
+            omitted[target] += 1
+            continue
+        fact = {
+            "evidence_fact_id": row["fact_id"],
+            "fact_kind": row["fact_kind"],
+            "source_asset_id": row["source_asset_id"],
+            "source_path": row["source_path"],
+            "target_asset_id": row["target_asset_id"],
+            "target_path": row["target_path"],
+            "value": json.loads(row["value_json"]),
+            "evidence_strength": row["certainty"],
+            "source_revision": row["source_revision"],
+            "source_hash": row["source_hash"],
+            "location": row["evidence_location"],
+            "evidence_path": row["evidence_path"],
+            "current_state": row["current_state"],
+        }
+        encoded = len(_canonical(fact).encode("utf-8"))
+        if used + encoded > max_bytes and ids:
+            omitted[target] += 1
+            continue
+        used += encoded
+        selected[target].append(fact)
+        ids.append(row["fact_id"])
+    return selected, ids, omitted
+
+
+def batch_packet(root: str | Path | None, batch_id: str, *, max_bytes: int = 262144, evidence_limit: int = 24, evidence_bytes: int = 16384) -> dict[str, Any]:
     context = validate_requested_scope(root)
     with connect(context["root"], create=False) as connection:
         batch = connection.execute("SELECT * FROM comprehension_batches WHERE batch_id=?", (batch_id,)).fetchone()
         if not batch:
             raise PopulationScopeError(f"unknown comprehension batch: {batch_id}")
         assets = []
+        batch_rows = _batch_rows(connection, batch_id)
+        asset_ids = [row["asset_id"] for row in batch_rows]
+        evidence_by_asset, evidence_ids, omitted_by_asset = _packet_evidence(connection, asset_ids, limit=evidence_limit, max_bytes=evidence_bytes)
         remaining = max(1, max_bytes)
-        for row in _batch_rows(connection, batch_id):
+        for row in batch_rows:
             if row["scope_policy"] != "STRUCTURAL_SCAN" or not row["provider_content_allowed"]:
                 raise PopulationScopeError(f"batch contains non-provider asset: {row['current_path']}")
             path = Path(context["root"]) / row["current_path"]
@@ -387,18 +456,20 @@ def batch_packet(root: str | Path | None, batch_id: str, *, max_bytes: int = 262
             encoded = content.encode("utf-8")[:remaining]
             content = encoded.decode("utf-8", errors="ignore")
             remaining -= len(content.encode("utf-8"))
-            assets.append({"asset_id": row["asset_id"], "path": row["current_path"], "source_revision": row["current_source_revision"], "content_hash": row["current_content_hash"], "scope_policy": row["scope_policy"], "content": content})
-        packet = {"contract": PACKET_CONTRACT, "provider_neutral": True, "batch_id": batch_id, "scope_id": batch["scope_id"], "source_revision": batch["source_revision"], "selection_reason": batch["selection_reason"], "assets": assets, "component_context": [], "workflow_context": [], "known_knowledge": [], "allowed_outputs": ["candidate purpose", "candidate owner", "candidate relationships", "candidate workflow/checkpoint", "candidate failure seam", "candidate lifecycle assessment", "unresolved question", "contradiction report"], "forbidden_actions": ["add filesystem paths", "read outside packet", "mutate canonical files", "promote truth", "advance accepted baseline", "authorize remediation"]}
+            asset = {"asset_id": row["asset_id"], "path": row["current_path"], "source_revision": row["current_source_revision"], "content_hash": row["current_content_hash"], "scope_policy": row["scope_policy"], "content": content, "deterministic_evidence": evidence_by_asset.get(row["asset_id"], [])}
+            asset["evidence_omitted"] = omitted_by_asset.get(row["asset_id"], 0)
+            assets.append(asset)
+        packet = {"contract": PACKET_CONTRACT, "packet_version": PACKET_VERSION, "prompt_contract_version": PROMPT_CONTRACT_VERSION, "provider_neutral": True, "batch_id": batch_id, "scope_id": batch["scope_id"], "source_revision": batch["source_revision"], "selection_reason": batch["selection_reason"], "evidence_selection_policy": {"max_facts_per_asset": evidence_limit, "max_evidence_bytes": evidence_bytes, "relationship_depth": 1, "omitted_context": any(omitted_by_asset.values())}, "evidence_fact_ids": evidence_ids, "assets": assets, "component_context": [], "workflow_context": [], "known_knowledge": [], "allowed_outputs": ["PURPOSE", "SCHEMA_CLASSIFICATION", "DETERMINISTIC_TAG", "COMPONENT_LINKAGE", "OWNER", "UNRESOLVED_QUESTION", "NEEDS_MORE_CONTEXT", "NO_ASSERTABLE_CLAIM"], "forbidden_actions": ["add filesystem paths", "read outside packet", "mutate canonical files", "promote truth", "advance accepted baseline", "authorize remediation"]}
         return packet
 
 
-def validate_result(root: str | Path | None, payload: dict[str, Any]) -> dict[str, Any]:
+def validate_result(root: str | Path | None, payload: dict[str, Any], *, packet: dict[str, Any] | None = None) -> dict[str, Any]:
     if not isinstance(payload, dict) or payload.get("contract") != RESULT_CONTRACT:
         raise PopulationScopeError("invalid comprehension result contract")
     for key in ("result_id", "batch_id", "source_revision", "provider", "items"):
         if key not in payload:
             raise PopulationScopeError(f"comprehension result missing {key}")
-    allowed_top = {"contract", "result_id", "batch_id", "source_revision", "provider", "items", "quality", "telemetry", "context_requests", "unsupported_assertions"}
+    allowed_top = {"contract", "packet_version", "prompt_contract_version", "result_id", "batch_id", "source_revision", "provider", "items", "quality", "telemetry", "context_requests", "unsupported_assertions"}
     if set(payload) - allowed_top:
         raise PopulationScopeError("unknown comprehension result fields")
     if "quality" in payload and payload["quality"] not in {"ACCEPTED_CANDIDATE", "PARTIAL_CANDIDATE", "NEEDS_MORE_CONTEXT", "RETRYABLE_PROVIDER_FAILURE", "INVALID_RESULT", "CONFLICT_REVIEW_REQUIRED", "HIGHER_REASONING_REQUIRED", "HUMAN_REVIEW_REQUIRED"}:
@@ -426,7 +497,7 @@ def validate_result(root: str | Path | None, payload: dict[str, Any]) -> dict[st
     for item in payload["items"]:
         if not isinstance(item, dict) or item.get("asset_id") not in allowed:
             raise PopulationScopeError("provider result contains an asset outside its assigned batch")
-        if set(item) - {"asset_id", "lifecycle", "purpose", "owner_candidate", "summary", "tags", "unresolved_questions", "evidence_refs", "verification_state"}:
+        if set(item) - {"asset_id", "lifecycle", "purpose", "owner_candidate", "summary", "classification", "tags", "unresolved_questions", "evidence_refs", "verification_state"}:
             raise PopulationScopeError("unknown provider interpretation fields")
         if item.get("lifecycle", "CANDIDATE") not in {"CANDIDATE", "PROPOSED"}:
             raise PopulationScopeError("provider interpretation must remain candidate/proposed")
@@ -434,12 +505,25 @@ def validate_result(root: str | Path | None, payload: dict[str, Any]) -> dict[st
             raise PopulationScopeError("provider results may not introduce filesystem paths")
         if "evidence_refs" in item and (not isinstance(item["evidence_refs"], list) or not all(isinstance(ref, str) for ref in item["evidence_refs"])):
             raise PopulationScopeError("evidence_refs must be a list of strings")
+        if item.get("classification") is not None and not isinstance(item["classification"], str):
+            raise PopulationScopeError("classification must be a string or null")
+    if payload.get("packet_version") == PACKET_VERSION:
+        if packet is None:
+            raise PopulationScopeError("evidence-enriched result requires the exact provider packet for citation validation")
+        allowed_facts = set(packet.get("evidence_fact_ids") or [])
+        for item in payload["items"]:
+            positive = any(item.get(key) for key in ("purpose", "owner_candidate", "summary", "classification")) or bool(item.get("tags"))
+            refs = set(item.get("evidence_refs") or [])
+            if positive and not refs.intersection(allowed_facts):
+                raise PopulationScopeError("positive evidence-enriched assertion requires a current packet evidence_fact_id")
+            if not refs.issubset(allowed_facts | allowed):
+                raise PopulationScopeError("provider result contains an evidence reference outside the admitted packet")
     return {"valid": True, "batch_id": payload["batch_id"], "asset_count": len(payload["items"]), "provider_type": provider["type"], "candidate_only": True}
 
 
-def ingest_result(root: str | Path | None, payload: dict[str, Any]) -> dict[str, Any]:
+def ingest_result(root: str | Path | None, payload: dict[str, Any], *, packet: dict[str, Any] | None = None) -> dict[str, Any]:
     context = validate_requested_scope(root)
-    validate_result(context["root"], payload)
+    validate_result(context["root"], payload, packet=packet)
     encoded = _canonical(payload)
     output_hash = _sha_text(encoded)
     with connect(context["root"], create=False) as connection:

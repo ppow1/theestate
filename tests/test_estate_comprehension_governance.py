@@ -52,6 +52,26 @@ def test_assertion_extraction_corroboration_review_and_idempotent_application(tm
         assert connection.execute("SELECT COUNT(*) FROM application_history").fetchone()[0] == 3
 
 
+def test_schema_classification_applies_to_classification_projection(tmp_path, monkeypatch):
+    asset_id, interpretation_id = _setup(tmp_path, monkeypatch, purpose=None, owner="estate", tags=("SCHEMA",))
+    with store.connect(ROOT) as connection:
+        candidate = json.loads(connection.execute("SELECT candidate_json FROM candidate_interpretations WHERE interpretation_id=?", (interpretation_id,)).fetchone()[0])
+        candidate["purpose"] = None
+        candidate["owner_candidate"] = None
+        candidate["tags"] = []
+        candidate["classification"] = "SCHEMA"
+        candidate["evidence_refs"] = ["fact:classification"]
+        connection.execute("INSERT INTO evidence_facts(fact_id,fact_kind,source_asset_id,target_asset_id,value_json,evidence_path,evidence_location,source_revision,source_hash,extractor,certainty,current_state,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", ("fact:classification", "TAG_DERIVATION", asset_id, asset_id, json.dumps({"rule": "file_type=schema", "tag": "SCHEMA"}), "schemas/troubleshooting/comprehension_result_v1.schema.json", "inventory:file_type", "rev-current", "hash-current", "test", "DETERMINISTIC_SOURCE_RELATIONSHIP", "CURRENT", "now", "now"))
+        connection.execute("UPDATE candidate_interpretations SET candidate_json=? WHERE interpretation_id=?", (json.dumps(candidate), interpretation_id))
+    assert governance.extract_assertions(ROOT, interpretation_id=interpretation_id)["assertions_created"] == 1
+    assert governance.corroborate(ROOT, asset_id=asset_id)["counts"]["CORROBORATED"] == 1
+    governance.review_batch(ROOT, asset_prefix="schemas")
+    assert governance.apply_eligible(ROOT, actor_id="deterministic-review", actor_type="deterministic_policy")["applied_count"] == 1
+    with store.connect(ROOT, create=False) as connection:
+        row = connection.execute("SELECT classification,purpose_summary FROM assets WHERE asset_id=?", (asset_id,)).fetchone()
+        assert tuple(row) == ("SCHEMA", None)
+
+
 def test_provider_cannot_self_approve_and_contradiction_is_rejected(tmp_path, monkeypatch):
     asset_id, interpretation_id = _setup(tmp_path, monkeypatch, owner="authoritative-owner")
     with store.connect(ROOT, create=False) as connection:

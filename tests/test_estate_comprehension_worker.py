@@ -38,6 +38,20 @@ def test_quality_downgrades_unsupported_certainty_without_evidence():
     assert reasons
 
 
+def test_evidence_enriched_quality_requires_packet_fact_citation():
+    packet = {
+        "packet_version": "estate.troubleshooting.comprehension.work_packet.v2",
+        "assets": [{"asset_id": "asset:1"}],
+        "evidence_fact_ids": ["fact:1"],
+    }
+    accepted, reasons = _quality({"items": [{"asset_id": "asset:1", "purpose": "JSON Schema contract", "evidence_refs": ["fact:1"]}]}, packet)
+    assert accepted == "ACCEPTED_CANDIDATE"
+    assert not reasons
+    rejected, reasons = _quality({"items": [{"asset_id": "asset:1", "purpose": "unsupported claim", "evidence_refs": ["fact:invented"]}]}, packet)
+    assert rejected == "PARTIAL_CANDIDATE"
+    assert reasons
+
+
 def test_result_with_invented_asset_or_path_is_rejected(tmp_path):
     from estate.core.estate_knowledge_store import init_store, connect
     from estate.core.estate_population import governed_scan, next_batch, batch_packet

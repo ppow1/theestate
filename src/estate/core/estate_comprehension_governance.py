@@ -80,6 +80,8 @@ def extract_assertions(root: str | Path | None = None, *, interpretation_id: str
                 values.append(("PURPOSE", str(data["purpose"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             if data.get("owner_candidate"):
                 values.append(("OWNER", str(data["owner_candidate"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
+            if data.get("classification"):
+                values.append(("SCHEMA_CLASSIFICATION", str(data["classification"]), "MEDIUM", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             for tag in data.get("tags") or []:
                 values.append(("DETERMINISTIC_TAG", str(tag), "LOW", list(data.get("evidence_refs") or []), "PROVIDER_INFERENCE"))
             if data.get("summary"):
@@ -159,6 +161,12 @@ def corroborate(root: str | Path | None = None, *, assertion_ids: Iterable[str] 
                 linked = [fact["fact_id"] for fact in matching]
                 strength = "DETERMINISTIC_SOURCE_RELATIONSHIP"
                 state, reason = (("CORROBORATED", "tag is derived from independent inventory/schema evidence") if matching else ("NOT_CORROBORATED", "no independent deterministic tag derivation found"))
+            elif row["assertion_kind"] == "SCHEMA_CLASSIFICATION":
+                facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND fact_kind='TAG_DERIVATION' AND current_state='CURRENT'", (row["asset_id"],))
+                matching = [fact for fact in facts if str(json.loads(fact["value_json"]).get("tag", "")).upper() == str(row["proposed_value"]).upper()]
+                linked = [fact["fact_id"] for fact in matching]
+                strength = "DETERMINISTIC_SOURCE_RELATIONSHIP"
+                state, reason = (("CORROBORATED", "classification is independently derived from inventory/schema evidence") if matching else ("NOT_CORROBORATED", "no independent deterministic classification evidence found"))
             elif row["assertion_kind"] == "COMPONENT_LINKAGE":
                 facts = _rows(connection, "SELECT * FROM evidence_facts WHERE target_asset_id=? AND fact_kind='COMPONENT_LINKAGE' AND current_state='CURRENT'", (row["asset_id"],))
                 matching = [fact for fact in facts if row["proposed_value"] in fact["value_json"]]
@@ -271,7 +279,7 @@ def apply_eligible(root: str | Path | None = None, *, assertion_ids: Iterable[st
             connection.executemany("UPDATE candidate_assertions SET conflict_state='CONTRADICTORY_APPLICATIONS',application_state='NOT_ELIGIBLE',review_state='EXCEPTION',updated_at=? WHERE assertion_id=?", [(now, assertion_id) for assertion_id in conflicted])
             rows = [row for row in rows if row["assertion_id"] not in conflicted]
         for row in rows:
-            field = {"PURPOSE":"purpose_summary","OWNER":"owner","SCHEMA_CLASSIFICATION":"purpose_summary","COMPONENT_LINKAGE":"purpose_summary","DETERMINISTIC_TAG":"tag"}[row["assertion_kind"]]
+            field = {"PURPOSE":"purpose_summary","OWNER":"owner","SCHEMA_CLASSIFICATION":"classification","COMPONENT_LINKAGE":"purpose_summary","DETERMINISTIC_TAG":"tag"}[row["assertion_kind"]]
             prior = None if field == "tag" else connection.execute(f"SELECT {field} FROM assets WHERE asset_id=?", (row["asset_id"],)).fetchone()[0]
             application_id = "application:" + uuid.uuid4().hex
             now = _now()

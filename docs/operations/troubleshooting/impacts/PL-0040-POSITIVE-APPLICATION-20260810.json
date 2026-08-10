@@ -1,0 +1,95 @@
+{
+  "activation_restart_impact": "No service, daemon, scheduler, or runtime configuration changes.",
+  "author_provenance": {
+    "actor": "Pat / Steward-authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "A bounded real Level-1 acceptance run was executed against admitted troubleshooting and registry schemas. The worker preserved candidate provenance, but no positive low-risk assertion was produced; no corroboration, review approval, application, or coverage advancement was forced.",
+  "behavior_before": "The governed v5 candidate/evidence/application pipeline existed, but no real positive local-AI assertion had reached corroboration or application.",
+  "change_id": "PL-0040-POSITIVE-APPLICATION-20260810",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.request.json",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.request.json",
+      "sha256": "2ce4cc095d871927c043cd4a015ac85e6d3d42240ac0b7db0a6f7366e7cd94e1",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "6580646af28671632f45668c0c655eb3dea6eb75",
+      "worktree_state": "untracked"
+    }
+  ],
+  "changed_components": [
+    "estate_knowledge_index",
+    "estate_population",
+    "estate_comprehension_worker",
+    "living_diagnostics"
+  ],
+  "changed_failure_modes": [
+    "none; application and review safeguards were preserved"
+  ],
+  "changed_files": [
+    "docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.request.json"
+  ],
+  "changed_schemas": [],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "SQLite v5 runtime store",
+    "admitted inventory",
+    "Ollama local provider",
+    "knowledge-index CLI"
+  ],
+  "dependencies_read": [
+    "PL-0040",
+    "Living Diagnostics",
+    "Estate Knowledge Index v5",
+    "deterministic evidence extractors",
+    "governed population pipeline",
+    "local-AI worker",
+    "benchmark routing evidence",
+    "existing impact packets"
+  ],
+  "estate_change_id": "PL-0040-POSITIVE-LEVEL1-APPLICATION-ACCEPTANCE",
+  "expected_inputs": [
+    "admitted Level-1 schema assets",
+    "bounded provider packets",
+    "revision-grounded deterministic evidence",
+    "existing review/application policy"
+  ],
+  "expected_outputs": [
+    "candidate results",
+    "independent evidence and corroboration state",
+    "review/application outcome",
+    "coverage and resident visibility evidence"
+  ],
+  "implementation_revision": "b240d8825239ab6be47a4687865fcb2659d11090",
+  "new_failure_modes": [
+    "strong repository evidence does not help if the local model emits only unresolved/no-claim output",
+    "real acceptance cannot reach application without a positive candidate",
+    "bounded worker packets lack corroboration facts by design"
+  ],
+  "packet_version": "1.0.0",
+  "prohibited_recovery_actions": [
+    "provider self-approval",
+    "hand-authored replacement candidates",
+    "canonical promotion",
+    "scheduler activation",
+    "filesystem scope expansion",
+    "source mutation, deletion, archival, or deprecation"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 candidate and evidence state"
+  ],
+  "source_revision": "b240d8825239ab6be47a4687865fcb2659d11090",
+  "tests_added_or_changed": [],
+  "validation_evidence": [
+    "provider available through governed Ollama boundary",
+    "three qwen3:8b Level-1 work units accepted and one qwen3-coder:30b-qwencode-20k Level-1 work unit accepted",
+    "25 real assets and 75 assertions were re-extracted/corroborated",
+    "zero positive low-risk assertions were produced, zero were corroborated, zero were eligible, and zero were applied",
+    "no source files or canonical Cookbook truth were mutated"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

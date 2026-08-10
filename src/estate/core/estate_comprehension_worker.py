@@ -15,8 +15,9 @@ from pathlib import Path
 from typing import Any
 
 from estate.core.estate_population import (
-    PopulationScopeError, batch_packet, ingest_result, next_batch, validate_result,
+    PACKET_VERSION, PopulationScopeError, batch_packet, ingest_result, next_batch, validate_result,
 )
+from estate.core.estate_deterministic_evidence import extract_evidence
 from estate.core.estate_knowledge_store import connect, _now
 from estate.core.resident_interaction import LocalOllamaAdapter
 
@@ -79,14 +80,19 @@ def _prompt(packet: dict[str, Any], difficulty: str) -> str:
         "You are a bounded Estate comprehension provider. Return ONLY one JSON object, no markdown. "
         "Do not browse files, call tools, invent paths, promote truth, or recommend remediation. "
         "Use only supplied asset_id values and cite evidence_refs using supplied asset_id values. "
-        "Unknown or ambiguous owner/purpose must remain null and be explained in unresolved_questions. "
-        "Every non-null purpose, owner_candidate, or summary needs at least one evidence_refs value. "
+        "Use the deterministic_evidence supplied inside each asset; do not browse files or databases. "
+        "If supplied evidence supports a narrow low-risk claim, emit it rather than defaulting to unresolved. "
+        "Every positive purpose, owner_candidate, summary, classification, or tag needs one or more exact evidence_fact_id values in evidence_refs. "
+        "Use classification for a mechanically supported class such as SCHEMA, TEST, CONFIG, MIGRATION, or DOCUMENTATION. "
+        "Use tags only for deterministic tags supported by supplied facts. Owner may be non-null only with authoritative owner evidence. "
+        "Unknown or ambiguous claims must remain null and be explained in unresolved_questions. "
         "The lifecycle must remain CANDIDATE. Contract and exact fields: "
         '{"contract":"estate.troubleshooting.comprehension.result.v1",'
         '"result_id":"provider-generated", "batch_id":"same batch", "source_revision":"same revision",'
         '"provider":{"type":"local_ai","model":"model","worker_identity":"worker"},'
+        '"packet_version":"estate.troubleshooting.comprehension.work_packet.v2", "prompt_contract_version":"estate.troubleshooting.evidence_enriched_prompt.v1",'
         '"quality":"PARTIAL_CANDIDATE", "items":[{"asset_id":"supplied",'
-        '"lifecycle":"CANDIDATE","purpose":null,"owner_candidate":null,"summary":null,'
+        '"lifecycle":"CANDIDATE","purpose":null,"owner_candidate":null,"summary":null,"classification":null,'
         '"tags":[],"evidence_refs":[],"unresolved_questions":[]}],'
         '"context_requests":[],"unsupported_assertions":[]}\n'
         f"Difficulty: {difficulty}. Packet:\n{json.dumps(safe_packet, sort_keys=True)}"
@@ -116,12 +122,14 @@ def _estate_result_id(batch_id: str, payload: dict[str, Any]) -> str:
 
 def _quality(payload: dict[str, Any], packet: dict[str, Any]) -> tuple[str, list[str]]:
     supplied = {a["asset_id"] for a in packet.get("assets", [])}
+    supplied_facts = set(packet.get("evidence_fact_ids") or [])
     reasons: list[str] = []
     for item in payload.get("items", []):
         refs = item.get("evidence_refs") or []
-        if not refs and any(item.get(k) for k in ("purpose", "owner_candidate", "summary")):
+        positive = any(item.get(k) for k in ("purpose", "owner_candidate", "summary", "classification")) or bool(item.get("tags"))
+        if positive and not set(refs).intersection(supplied_facts):
             reasons.append(f"{item.get('asset_id')}: assertion without evidence_refs")
-        if not set(refs).issubset(supplied):
+        if not set(refs).issubset(supplied | supplied_facts):
             reasons.append(f"{item.get('asset_id')}: evidence_refs outside supplied packet")
     if payload.get("context_requests"):
         return "NEEDS_MORE_CONTEXT", reasons
@@ -139,20 +147,23 @@ def _persist_telemetry(root: Path, *, batch_id: str, telemetry: dict[str, Any]) 
             connection.execute("UPDATE comprehension_batches SET result_state=?, failure_reason=?, updated_at=? WHERE batch_id=?", (telemetry["quality"], "; ".join(telemetry.get("reasons", [])) or None, _now(), batch_id))
 
 
-def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model: str | None = None, worker_identity: str = "estate-local-comprehension-worker", asset_prefix: str | None = None, timeout: float = 120.0) -> dict[str, Any]:
+def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model: str | None = None, worker_identity: str = "estate-local-comprehension-worker", asset_prefix: str | None = None, timeout: float = 120.0, allow_reprocess: bool = False) -> dict[str, Any]:
     base = _root(root)
     health = provider_status(timeout=min(timeout, 4.0), model=model)
     if not health["available"]:
         return {"status": "PROVIDER_UNAVAILABLE", "provider_health": health, "work_units": []}
     results: list[dict[str, Any]] = []
     adapter = LocalOllamaAdapter(timeout=timeout)
+    processed_assets: set[str] = set()
     for _ in range(max(1, min(limit, 20))):
-        batch = next_batch(base, limit=1, provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, asset_prefix=asset_prefix)
+        batch = next_batch(base, limit=1, provider_type="local_ai", provider_model=health.get("model"), worker_identity=worker_identity, asset_prefix=asset_prefix, allow_reprocess=allow_reprocess, exclude_asset_ids=processed_assets)
         if batch.get("status") == "NO_WORK":
             break
         batch_id = batch["batch_id"]
+        processed_assets.update(batch.get("asset_ids") or [])
         started = time.perf_counter()
         try:
+            extract_evidence(base, asset_ids=batch.get("asset_ids") or [])
             packet = batch_packet(base, batch_id, max_bytes=max_bytes)
             difficulty = difficulty_for(packet)
             response = adapter.generate(resident="comprehension-worker", prompt=_prompt(packet, difficulty), model=health.get("model"))
@@ -164,6 +175,8 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             payload = _extract_json(response["text"])
             payload["batch_id"] = batch_id
             payload["source_revision"] = packet["source_revision"]
+            payload["packet_version"] = packet.get("packet_version")
+            payload["prompt_contract_version"] = packet.get("prompt_contract_version")
             # Provider result IDs are advisory only. Estate owns identity so a
             # model placeholder cannot collide across independent work units.
             payload["result_id"] = _estate_result_id(batch_id, payload)
@@ -178,8 +191,8 @@ def run_local(root: str | Path, *, limit: int = 1, max_bytes: int = 65536, model
             if quality == "PARTIAL_CANDIDATE":
                 # Preserve a structured candidate but make the review state explicit.
                 payload["context_requests"] = payload.get("context_requests", [])
-            validate_result(base, payload)
-            ingested = ingest_result(base, payload)
+            validate_result(base, payload, packet=packet)
+            ingested = ingest_result(base, payload, packet=packet)
             telemetry = {"quality": quality, "reasons": reasons, "duration_ms": payload["telemetry"]["duration_ms"], "difficulty": difficulty, "candidate_count": ingested.get("candidate_count", 0), "result_id": payload["result_id"]}
             _persist_telemetry(base, batch_id=batch_id, telemetry=telemetry)
             results.append({"batch_id": batch_id, **telemetry})
