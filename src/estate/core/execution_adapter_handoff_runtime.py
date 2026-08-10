@@ -114,6 +114,8 @@ def build_adapter_request(item: DispatchQueueItem) -> ExecutionProviderAdapterRe
     metadata.update({
         "sandbox": item.sandbox,
         "profile_label": item.profile_label,
+        "seat_id": item.seat_id,
+        "codex_home_profile": item.seat_id or item.profile_label or "default",
         "write_scope_paths": item.allowed_write_paths,
         "authorization_reference": _auth_ref(item),
         "source": "execution_adapter_handoff_runtime",

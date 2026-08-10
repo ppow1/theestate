@@ -58,3 +58,20 @@ def test_wp0532_provider_projection_is_separate_and_freshness_is_explicit(tmp_pa
     missing = next(item for item in payload["providers"] if item["capacity_state"] == "unknown")
     assert missing["engineering_provider_capacity"]["index"] is None
     assert missing["engineering_provider_capacity"]["freshness"]["state"] == "unknown"
+
+
+def test_wp0532_projects_seats_separately_and_missing_native_evidence_is_unknown(tmp_path):
+    copy_catalog(tmp_path)
+    write_capacity_record(ProviderCapacityRecord.create(
+        provider_id="codex.execution.cli", capacity_state="unknown", reported_by="discovery",
+        message="no supported noninteractive usage mechanism",
+        metadata={"seat_id": "C2", "source": "codex-cli-capability-discovery", "collection_success": False},
+    ), root=tmp_path, validate_catalog=False)
+    payload = generate_engineering_capacity_dashboard(root=tmp_path, write=False, stale_after_minutes=30)
+    seats = {item["logical_seat_id"]: item for item in payload["codex_seat_observations"]}
+    assert set(seats) == {"C1", "C2", "C3"}
+    assert seats["C2"]["collection_success"] is False
+    assert seats["C2"]["capacity_state"] == "unknown"
+    assert seats["C2"]["freshness"]["state"] == "current"
+    assert seats["C1"]["native_capacity_fields"] == {}
+    assert seats["C1"]["reason"]

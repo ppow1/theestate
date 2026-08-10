@@ -39,6 +39,7 @@ TERMINAL_STATES = {"Completed", "Failed", "Cancelled"}
 FUTURE_WORK_STATES = {"Queued", "Waiting", "Ready"}
 ATTENTION_STATES = {"Blocked", "Awaiting Approval", "Failed"}
 CODEX_PROVIDERS = {"codex-cli-openai", "codex-cli-ollama"}
+CODEX_SEATS = {"C1", "C2", "C3"}
 
 REQUIRED_EVENT_TYPES = {
     "dispatch_enqueued",
@@ -145,6 +146,7 @@ class DispatchRequest:
     requested_by: str = "Steward"
     assigned_worker: str | None = None
     provider: str | None = None
+    seat_id: str | None = None
     profile_label: str | None = None
     classification: str | None = None
     priority: str = "Normal"
@@ -494,6 +496,8 @@ def _ensure_codex_handoff_ready(item: DispatchQueueItem) -> None:
         errors.append("allowed_read_paths are required for Codex Bridge handoff")
     if item.sandbox == "workspace-write" and not item.allowed_write_paths:
         errors.append("workspace-write handoff requires allowed_write_paths")
+    if item.seat_id and item.seat_id not in CODEX_SEATS:
+        errors.append("seat_id must be one of C1, C2, C3")
     if errors:
         raise ValueError("; ".join(errors))
 
@@ -515,8 +519,9 @@ def prepare_codex_bridge_handoff(
         "requested_by": item.requested_by,
         "provider": item.provider,
         "model": item.model,
-        "codex_home_profile": item.profile_label or "default",
-        "profile_label": item.profile_label,
+        "codex_home_profile": item.seat_id or item.profile_label or "default",
+        "profile_label": item.seat_id or item.profile_label,
+        "seat_id": item.seat_id,
         "worker_label": item.assigned_worker or "execution-dispatch",
         "cwd": ".",
         "sandbox": item.sandbox,

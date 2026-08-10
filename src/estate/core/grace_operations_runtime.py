@@ -352,6 +352,7 @@ class GraceOperationsRuntime:
                 "title": objective.title,
                 "requested_by": "Grace",
                 "assigned_worker": action.owner,
+                "seat_id": objective.metadata.get("seat_id"),
                 "classification": objective.classification,
                 "priority": objective.priority.title(),
                 "state": "Queued",
@@ -363,7 +364,7 @@ class GraceOperationsRuntime:
                 authorization_reference = f"grace/{objective.objective_id}/delegated-engineering-assignment"
                 dispatch_payload.update({
                     "provider": "codex-cli-openai",
-                    "profile_label": "default",
+                    "profile_label": objective.metadata.get("seat_id") or "default",
                     "state": "Ready",
                     "prompt_source": "collaboration/work_packages/pending/WP-0649_WebUI_Helen_Grace_Engineering_Workflow_Integration.md",
                     "sandbox": "workspace-write",

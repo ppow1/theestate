@@ -216,6 +216,26 @@ def test_prepare_codex_bridge_handoff_writes_dry_run_shape_without_live_executio
     assert not (tmp_path / "runtime/codex_bridge").exists()
 
 
+@pytest.mark.parametrize("seat", ["C1", "C2", "C3"])
+def test_codex_dispatch_seat_reaches_bridge_handoff(tmp_path, seat):
+    write_text(tmp_path, "docs/governance/workers/WP-EXAMPLE.md")
+    payload = request_payload()
+    payload["seat_id"] = seat
+    enqueue_dispatch_request(payload, tmp_path)
+    handoff = prepare_codex_bridge_handoff("dispatch-001", tmp_path)
+    assert handoff["seat_id"] == seat
+    assert handoff["codex_home_profile"] == seat
+
+
+def test_unknown_codex_dispatch_seat_is_rejected(tmp_path):
+    write_text(tmp_path, "docs/governance/workers/WP-EXAMPLE.md")
+    payload = request_payload()
+    payload["seat_id"] = "C4"
+    enqueue_dispatch_request(payload, tmp_path)
+    with pytest.raises(ValueError, match="seat_id"):
+        prepare_codex_bridge_handoff("dispatch-001", tmp_path)
+
+
 def test_deterministic_output_ordering_by_priority_created_at_and_id(tmp_path):
     enqueue_dispatch_request(request_payload(dispatch_id="dispatch-low", priority="Low", created_at="2026-07-08T00:00:00Z"), tmp_path)
     enqueue_dispatch_request(request_payload(dispatch_id="dispatch-high-b", priority="High", created_at="2026-07-08T00:01:00Z"), tmp_path)

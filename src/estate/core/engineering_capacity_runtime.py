@@ -14,6 +14,7 @@ from typing import Any
 
 from estate.core.paths import ESTATE_ROOT
 from estate.core.provider_health import generate_provider_health_summary, utc_now_iso, _write_json
+from estate.core.provider_capacity import load_capacity_records
 from estate.core.worker_runtime_monitor import generate_worker_runtime_monitor
 
 RUNTIME_JSON = Path("runtime/engineering_capacity/dashboard.json")
@@ -23,6 +24,7 @@ OFFICE_HANDOFF_MD = Path("operations/engineering_capacity/runtime_dashboard.md")
 CLOUD_CODEX_HINTS = ("codex", "openai", "chatgpt")
 LOCAL_WORKER_HINTS = ("local", "cli", "worker", "ollama")
 FUEL_STATES = {"idle": 100, "available": 85, "busy": 55, "saturated": 20, "quota_limited": 0, "unknown": None}
+CODEX_SEATS = ("C1", "C2", "C3")
 
 
 def _root(root: str | Path | None = None) -> Path:
@@ -67,6 +69,51 @@ def _freshness(provider: dict[str, Any], *, stale_after_minutes: int) -> dict[st
     return result
 
 
+def _codex_seat_observations(root: Path, *, stale_after_minutes: int) -> list[dict[str, Any]]:
+    """Project one logical seat per observation; never derive a percentage from absence."""
+    records = {}
+    for record in load_capacity_records(root):
+        metadata = record.metadata if isinstance(record.metadata, dict) else {}
+        seat = metadata.get("seat_id")
+        if seat in CODEX_SEATS and (seat not in records or record.checked_at >= records[seat].checked_at):
+            records[seat] = record
+    observations = []
+    for seat in CODEX_SEATS:
+        record = records.get(seat)
+        if record is None:
+            observations.append({
+                "logical_seat_id": seat,
+                "execution_surface": "codex-cli",
+                "source": "codex-cli-capacity-discovery",
+                "observation_timestamp": None,
+                "freshness": {"state": "unknown", "observed_at": None, "threshold_minutes": stale_after_minutes},
+                "capacity_state": "unknown",
+                "native_capacity_fields": {},
+                "collection_success": False,
+                "reason": "installed Codex CLI exposes no supported noninteractive capacity/usage mechanism",
+            })
+            continue
+        metadata = record.metadata if isinstance(record.metadata, dict) else {}
+        observed = {"last_checked_at": record.checked_at}
+        observations.append({
+            "logical_seat_id": seat,
+            "execution_surface": metadata.get("execution_surface", "codex-cli"),
+            "source": metadata.get("source", record.reported_by),
+            "observation_timestamp": record.checked_at,
+            "freshness": _freshness(observed, stale_after_minutes=stale_after_minutes),
+            "capacity_state": record.capacity_state,
+            "native_capacity_fields": metadata.get("native_capacity_fields", {}),
+            "active_jobs": record.active_jobs,
+            "max_jobs": record.max_jobs,
+            "queue_depth": record.queue_depth,
+            "quota_remaining": record.quota_remaining,
+            "quota_resets_at": record.quota_resets_at,
+            "collection_success": metadata.get("collection_success", record.capacity_state != "unknown"),
+            "reason": record.message,
+        })
+    return observations
+
+
 def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, stale_after_minutes: int = 30, write: bool = True) -> dict[str, Any]:
     root_path = _root(root)
     provider_summary = generate_provider_health_summary(root=root_path, write=True)
@@ -91,6 +138,7 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
     blocked_workers = worker_monitor.get("blocked_workers") or []
     warning_count = len(worker_monitor.get("warnings") or [])
     constrained_cloud = [p for p in cloud_seats if p.get("health_status") in {"blocked", "offline", "out_of_quota"} or p.get("capacity_state") in {"saturated", "quota_limited"}]
+    seat_observations = _codex_seat_observations(root_path, stale_after_minutes=stale_after_minutes)
 
     recommended = "Capacity evidence is green; Steward may assign work using normal governance."
     if constrained_cloud or blocked_workers or warning_count:
@@ -112,9 +160,11 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
             "blocked_worker_count": len(blocked_workers),
             "worker_warning_count": warning_count,
             "recommended_next_action": recommended,
+            "codex_seat_observation_count": len(seat_observations),
         },
         "cloud_codex_seats": cloud_seats,
         "local_worker_providers": local_providers,
+        "codex_seat_observations": seat_observations,
         "providers": providers,
         "workers": workers,
         "source_artifacts": ["runtime/providers/health/status/summary.json", "runtime/workers/worker_runtime_monitor.json"],
@@ -133,7 +183,11 @@ def generate_engineering_capacity_dashboard(*, root: str | Path | None = None, s
 
 def format_engineering_capacity_dashboard(payload: dict[str, Any]) -> str:
     s = payload.get("summary", {})
-    lines = ["# Engineering Provider Capacity Runtime Dashboard", "", f"Generated: {payload.get('generated_at')}", "", "Engineering Provider Capacity is an advisory provider-availability index. It is not physical GPU utilization, GPU capacity, or an Estate-wide composite resource percentage.", "", "## Summary", f"- Providers observed: {s.get('provider_count', 0)}", f"- Providers with Codex capacity: {s.get('cloud_codex_seat_count', 0)}", f"- Constrained providers: {s.get('constrained_cloud_codex_seat_count', 0)}", f"- Local worker providers: {s.get('local_worker_provider_count', 0)}", f"- Workers observed: {s.get('worker_count', 0)}", f"- Idle workers: {s.get('idle_worker_count', 0)}", f"- Blocked workers: {s.get('blocked_worker_count', 0)}", f"- Worker warnings: {s.get('worker_warning_count', 0)}", f"- Recommended next action: {s.get('recommended_next_action')}", "", "## Engineering Provider Capacity"]
+    lines = ["# Engineering Provider Capacity Runtime Dashboard", "", f"Generated: {payload.get('generated_at')}", "", "Engineering Provider Capacity is an advisory provider-availability index. It is not physical GPU utilization, GPU capacity, or an Estate-wide composite resource percentage.", "", "## Summary", f"- Providers observed: {s.get('provider_count', 0)}", f"- Providers with Codex capacity: {s.get('cloud_codex_seat_count', 0)}", f"- Constrained providers: {s.get('constrained_cloud_codex_seat_count', 0)}", f"- Codex seat observations: {s.get('codex_seat_observation_count', 0)}", f"- Local worker providers: {s.get('local_worker_provider_count', 0)}", f"- Workers observed: {s.get('worker_count', 0)}", f"- Idle workers: {s.get('idle_worker_count', 0)}", f"- Blocked workers: {s.get('blocked_worker_count', 0)}", f"- Worker warnings: {s.get('worker_warning_count', 0)}", f"- Recommended next action: {s.get('recommended_next_action')}", "", "## Codex Seat Capacity Observations"]
+    for observation in payload.get("codex_seat_observations") or []:
+        lines.append(f"- {observation.get('logical_seat_id')}: state={observation.get('capacity_state')}; collection={'success' if observation.get('collection_success') else 'unknown/unavailable'}; freshness={(observation.get('freshness') or {}).get('state')}; observed={observation.get('observation_timestamp') or 'unknown'}; reason={observation.get('reason') or 'none'}")
+    lines.append("")
+    lines.append("## Engineering Provider Capacity")
     if not payload.get("providers"):
         lines.append("- No provider evidence found.")
     for p in payload.get("providers") or []:
