@@ -381,6 +381,9 @@ def _process_command(config: dict[str, Any], slot: Slot) -> tuple[list[str], lis
         raise RuntimeControlError("canonical Open WebUI secret key is missing")
     env["WEBUI_SECRET_KEY"] = secret_path.read_text(encoding="utf-8").strip()
     grace_config = config["grace_runtime"]
+    # The resident Gateway must follow the same blue/green slot as Grace
+    # Momentum instead of falling back to the active runtime port.
+    env["ESTATE_GRACE_MOMENTUM_URL"] = f"http://{grace_config['host']}:{slot.grace_port}"
     grace = [grace_config["python"], grace_config["script"], "--root", grace_config["root"], "--host", grace_config["host"], "--port", str(slot.grace_port), "--mode", grace_config["mode"]]
     gateway = [config["gateway"]["python"], "-m", config["gateway"]["module"], "resident-gateway", "start", "--host", config["gateway"]["host"], "--port", str(slot.gateway_port), "--root", str(root)]
     webui = [config["open_webui"]["executable"], "serve", "--host", config["open_webui"]["host"], "--port", str(slot.webui_port)]

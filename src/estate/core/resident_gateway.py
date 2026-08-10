@@ -100,6 +100,13 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     # operational terms such as "dispatch" or "objective".
     if detect_engineering_assignment_command(payload, text):
         return None
+    # Explicit bounded execution is governed by the workflow below. It must
+    # take precedence over this read-only compatibility layer even when the
+    # request mentions ordinary operational words such as "checkpoint" or
+    # "provider".
+    bounded_intent = detect_bounded_local_text_intent(payload, text)
+    if bounded_intent.get("state") == "execution_requested":
+        return None
     explicit_runtime_operations = (
         "list_grace_runtime_operations",
         "get_runtime_readiness",
@@ -310,9 +317,11 @@ def _engineering_assignment_content(workflow: dict[str, Any]) -> str:
 
 def _bounded_local_text_content(workflow: dict[str, Any]) -> str:
     if workflow.get("state") == "execution_completed":
-        lane = workflow.get("execution", {}).get("result", {}).get("metadata", {}).get("runtime_lane_evidence", {})
+        result_metadata = workflow.get("execution", {}).get("result", {}).get("metadata", {})
+        lane = result_metadata.get("runtime_lane_evidence", {})
         placement = workflow.get("placement", {}).get("selected")
-        return json.dumps({"status": "completed", "provider": "qwen.local.text", "runtime_lane": workflow.get("lane", {}).get("runtime_lane_id"), "physical_resource": placement, "gpu_uuid": lane.get("gpu_uuid"), "summary": workflow.get("execution", {}).get("result", {}).get("summary", "bounded local text task completed")}, sort_keys=True)
+        authoritative_uuid = lane.get("gpu_uuid") or result_metadata.get("runtime_bound_gpu_uuid")
+        return json.dumps({"status": "completed", "provider": "qwen.local.text", "runtime_lane": workflow.get("lane", {}).get("runtime_lane_id"), "physical_resource": placement, "gpu_uuid": authoritative_uuid, "summary": workflow.get("execution", {}).get("result", {}).get("summary", "bounded local text task completed")}, sort_keys=True)
     return json.dumps({"status": workflow.get("state", "execution_blocked"), "reason": workflow.get("reason") or workflow.get("execution", {}).get("handoff", {}).get("errors") or "governed execution did not complete"}, sort_keys=True)
 
 

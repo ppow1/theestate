@@ -113,8 +113,8 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             raise ValueError("Qwen provider configuration identity does not match the registered adapter")
         if config["endpoint_type"] != "ollama-http" or config["network_policy"] != "loopback_only" or not _is_loopback_endpoint(config["endpoint_address"]):
             raise ValueError("Qwen endpoint must be an HTTP loopback Ollama endpoint")
-        if not isinstance(config["model_identity"], str) or not config["model_identity"].lower().startswith("qwen"):
-            raise ValueError("configured model identity must be a Qwen-family model")
+        if not isinstance(config["model_identity"], str) or not config["model_identity"].strip() or any(ch.isspace() for ch in config["model_identity"]):
+            raise ValueError("configured model identity must be a non-empty local model identity")
         if (not isinstance(config["supported_capabilities"], list)
                 or not config["supported_capabilities"]
                 or not set(config["supported_capabilities"]).issubset(SUPPORTED_CAPABILITIES)):

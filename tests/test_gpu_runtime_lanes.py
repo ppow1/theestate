@@ -46,6 +46,37 @@ def test_required_lane_does_not_fallback_to_shared_or_other_gpu():
     assert result["selected"] is None
 
 
+def test_p100_and_4090_instances_are_distinct_uuid_bound_lanes(tmp_path):
+    p100 = RuntimeLane(
+        runtime_lane_id="qwen.local.text.p100",
+        provider_id="qwen.local.text",
+        endpoint_type="ollama-http",
+        endpoint_address="http://127.0.0.1:12100",
+        host_id="host-a",
+        compute_resource_id="host-a:nvidia:GPU-P100",
+        gpu_uuid="GPU-P100",
+        model_identity="llama3.2:3b",
+        environment_binding={"CUDA_VISIBLE_DEVICES": "GPU-P100", "OLLAMA_HOST": "127.0.0.1:12100"},
+        provider_config_path="config/providers/qwen_local_text_p100.json",
+        minimum_vram_mib=4096,
+    )
+    rtx = lane("qwen.local.text.4090", "GPU-4090", 12409)
+    assert select_runtime_lane([p100, rtx], provider_id="qwen.local.text", model_identity="llama3.2:3b", required_gpu_uuid="GPU-P100", required_resource_id=p100.compute_resource_id)["selected"] == p100.runtime_lane_id
+    assert select_runtime_lane([p100, rtx], provider_id="qwen.local.text", model_identity="qwen3:8b", required_gpu_uuid="GPU-P100", required_resource_id=p100.compute_resource_id)["eligible"] is False
+
+
+def test_lane_provider_config_cannot_escape_provider_directory():
+    with pytest.raises(ValueError, match="provider configuration"):
+        RuntimeLane(
+            runtime_lane_id="bad", provider_id="qwen.local.text", endpoint_type="ollama-http",
+            endpoint_address="http://127.0.0.1:12100", host_id="host-a",
+            compute_resource_id="host-a:nvidia:GPU-P100", gpu_uuid="GPU-P100",
+            model_identity="llama3.2:3b",
+            environment_binding={"CUDA_VISIBLE_DEVICES": "GPU-P100", "OLLAMA_HOST": "127.0.0.1:12100"},
+            provider_config_path="config/providers/../secrets.json",
+        ).validate()
+
+
 def test_registered_lane_loader_rejects_ordinal_only_binding(tmp_path):
     path = tmp_path / "config/runtime/gpu_runtime_lanes.json"
     path.parent.mkdir(parents=True)

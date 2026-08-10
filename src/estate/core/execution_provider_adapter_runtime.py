@@ -131,5 +131,12 @@ def load_registered_adapter(request: ExecutionProviderAdapterRequest, *, root: s
     if request.provider_id == "codex.execution.cli":
         return CodexCliExecutionProviderAdapter(root=_root(root), bridge_runner=bridge_runner)
     if request.provider_id == "qwen.local.text":
-        return QwenLocalTextExecutionProviderAdapter(root=_root(root))
+        base = _root(root)
+        relative = str((request.provider_extension or {}).get("provider_config_path") or "config/providers/qwen_local_text.json").replace("\\", "/")
+        parts = relative.split("/")
+        if not relative.startswith("config/providers/") or any(part in {"", ".", ".."} for part in parts) or not relative.endswith(".json"):
+            raise ValueError("provider configuration path is not an approved repository-relative provider config")
+        config_path = (base / relative).resolve()
+        config_path.relative_to(base.resolve())
+        return QwenLocalTextExecutionProviderAdapter(root=base, config_path=config_path)
     raise ValueError(f"no concrete adapter registered for provider '{request.provider_id}'")
