@@ -1,8 +1,10 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, _qwen_minimum_safe_vram_mib
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane
 from estate.core.resident_gateway import _bounded_local_text_content, _grace_runtime_operation_response
 from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
+from estate.core.compute_resources import ComputeResourceObservation
+from estate.core.gpu_runtime_lanes import RuntimeLane
 
 LIVE_BOUNDED_PROMPT = "Grace, run a small bounded local text task: write one short sentence confirming that this governed task used the UUID-bound RTX 4090 lane; include no secrets and perform no hardware actions."
 P100_LIVE_PROMPT = "Grace, run a small bounded local text task using the governed P100 compute lane, produce one short sentence, and tell me which physical GPU executed it."
@@ -49,6 +51,32 @@ def test_exact_p100_prompt_precedes_runtime_inference_in_both_modes(monkeypatch,
     code, _ = chat_completion_stream({**payload, "stream": True}, root=tmp_path)
     assert code == 200
     assert calls == [False, True]
+
+
+def test_symbolic_p100_resource_intent_resolves_registered_physical_resource(tmp_path):
+    uuid = "GPU-6785b322-899d-8eec-e817-31d83279a414"
+    resource_id = f"DESKTOP-JA3RPNQ:nvidia:{uuid}"
+    observation = ComputeResourceObservation(resource_id=resource_id, host_id="DESKTOP-JA3RPNQ", nvidia_uuid=uuid, name="Tesla P100-PCIE-16GB", health_state="healthy", capacity_state="available")
+    lane = RuntimeLane(runtime_lane_id="qwen.local.text.p100-1", provider_id="qwen.local.text", endpoint_type="ollama-http", endpoint_address="http://127.0.0.1:12100", host_id="DESKTOP-JA3RPNQ", compute_resource_id=resource_id, gpu_uuid=uuid, model_identity="llama3.2:3b", environment_binding={"CUDA_VISIBLE_DEVICES": uuid, "OLLAMA_HOST": "127.0.0.1:12100"}, provider_config_path="config/providers/qwen_local_text_p100.json", minimum_vram_mib=4096)
+    (tmp_path / "config/providers").mkdir(parents=True)
+    (tmp_path / "config/providers/qwen_local_text_p100.json").write_text('{"minimum_safe_vram_mib": 4096}', encoding="utf-8")
+    import estate.core.openwebui_engineering_workflow as workflow
+    original = workflow.load_registered_lanes
+    workflow.load_registered_lanes = lambda root: [lane]
+    try:
+        assert detect_bounded_compute_resource_intent("use the governed P100 compute lane") == {"state": "required", "symbol": "p100", "source": "registered_compute_resource_symbol"}
+        selected = _target_symbolic_lane(tmp_path, [observation], "p100")
+        assert selected[0].runtime_lane_id == "qwen.local.text.p100-1"
+        assert selected[2].nvidia_uuid == uuid
+    finally:
+        workflow.load_registered_lanes = original
+
+
+def test_unknown_or_raw_placement_text_fails_closed_without_injection():
+    assert detect_bounded_compute_resource_intent("run on the Tesla V100") ["state"] == "blocked"
+    assert detect_bounded_compute_resource_intent("use GPU-46f3fd00-5454-4536-4196-5d8b727e14f2") ["state"] == "blocked"
+    assert detect_bounded_compute_resource_intent("use qwen.local.text.4090") ["state"] == "blocked"
+    assert detect_bounded_compute_resource_intent("run a small bounded local text task") == {"state": "none"}
 
 
 def test_qwen_model_specific_vram_floor_fails_closed_when_missing(tmp_path):
