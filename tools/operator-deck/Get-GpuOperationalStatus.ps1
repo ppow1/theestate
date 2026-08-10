@@ -10,8 +10,8 @@ try {
     $projection = Get-Content -LiteralPath $projectionPath -Raw | ConvertFrom-Json
     $row = @($projection.resources) | Where-Object { $_.logical_gpu_id -eq $Gpu } | Select-Object -First 1
     if ($null -eq $row) { throw "GPU projection does not contain $Gpu." }
-    $health = [string]($row.health_state ?? 'UNKNOWN')
-    $freshness = [string]($row.freshness ?? 'unknown')
+    $health = if ($null -ne $row.health_state -and [string]$row.health_state) { [string]$row.health_state } else { 'UNKNOWN' }
+    $freshness = if ($null -ne $row.freshness -and [string]$row.freshness) { [string]$row.freshness } else { 'unknown' }
     $severity = if ($freshness -in @('stale','unknown') -or $health -in @('UNKNOWN','LOST')) { 'warning' } elseif ($health -ne 'HEALTHY') { 'warning' } else { 'nominal' }
     [ordered]@{
         schema_version = 'operator_deck_gpu_status_v1'
