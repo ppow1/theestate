@@ -17,7 +17,6 @@ MISSION_SOURCES = {
     "command_center": "runtime/steward/command_center.html",
     "work_packages": "runtime/work_packages/assignment_queue.json",
     "worker_runtime": "runtime/workers/worker_runtime_monitor.json",
-    "worker_heartbeat": "runtime/workers/worker_runtime_heartbeat.json",
     "validation": "runtime/validation/local_operational_validation_run.json",
     "mailboxes": "runtime/mailboxes/synchronization_duty.json",
     "decisions": "operations/steward/decision_queue.md",
@@ -143,7 +142,7 @@ def build_mission_control_workspace(root=None, write=True):
             },
             "lanes": [
                 {"lane_id": "operations", "title": "Operations", "sources": ["command_center", "validation", "roadmap", "capability_dependencies", "capability_gap_report"]},
-                {"lane_id": "work", "title": "Work Execution", "sources": ["work_packages", "worker_runtime", "worker_heartbeat"]},
+                {"lane_id": "work", "title": "Work Execution", "sources": ["work_packages", "worker_runtime"]},
                 {"lane_id": "communications", "title": "Communications", "sources": ["mailboxes", "notifications", "decisions", "recalls"]},
             ],
             "validation_health": validation_integration,

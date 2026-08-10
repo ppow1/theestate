@@ -33,7 +33,6 @@ def test_mission_control_all_sources_ready_when_artifacts_exist(tmp_path):
     for rel in [
         "runtime/work_packages/assignment_queue.json",
         "runtime/workers/worker_runtime_monitor.json",
-        "runtime/workers/worker_runtime_heartbeat.json",
         "runtime/validation/local_operational_validation_run.json",
         "runtime/mailboxes/synchronization_duty.json",
         "runtime/audit/recall_audit_log.json",
@@ -54,6 +53,15 @@ def test_mission_control_all_sources_ready_when_artifacts_exist(tmp_path):
     assert data["summary"]["state"] == "ready"
     assert data["summary"]["ready_source_count"] == data["summary"]["source_count"]
     assert data["warnings"] == []
+
+
+def test_mission_control_does_not_require_optional_worker_heartbeat(tmp_path):
+    write_json(tmp_path, "runtime/workers/worker_runtime_monitor.json", {"summary": {"active_worker_count": 0}})
+
+    data = build_mission_control_workspace(tmp_path, write=False)["data"]
+
+    assert not any(source["name"] == "worker_heartbeat" for source in data["sources"])
+    assert not any("worker_runtime_heartbeat.json" in str(warning) for warning in data["warnings"])
 
 
 def test_command_center_exposes_mission_control_tab(tmp_path):
