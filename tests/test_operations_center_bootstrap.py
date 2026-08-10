@@ -25,6 +25,9 @@ def test_operations_center_start_status_stop_lifecycle():
         assert started["port"] == 8876
         assert started["settings_loaded"] is True
         assert any(item["name"] == "service_health_preflight" for item in started["preflight"])
+        projection = next(item for item in started["preflight"] if item["name"] == "engineering_capacity_projection")
+        assert projection["path"] == "runtime/engineering_capacity/dashboard.json"
+        assert projection["status"] == "available"
 
         status = operations_center_status()
         assert status["running"] is True

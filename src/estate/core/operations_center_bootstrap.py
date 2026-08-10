@@ -21,6 +21,7 @@ from urllib.error import URLError
 from urllib.request import urlopen
 
 from estate.core.paths import ESTATE_ROOT
+from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard
 from estate.core.operations_center_settings import load_operations_center_settings
 from estate.core.service_health_registry import generate_service_health_registry
 from estate.core.steward_command_center import generate_command_center
@@ -214,6 +215,11 @@ def operations_center_start(*, host: str = DEFAULT_HOST, port: int = DEFAULT_POR
     health = generate_service_health_registry(root=base, write=True)
     summary = health.get("summary") or {}
     preflight.append({"name": "service_health_preflight", "status": summary.get("overall_status") or "available", "path": "runtime/services/service_health_registry.json"})
+    # Fast-start consumes the durable dashboard artifact. Refresh this projection
+    # first so the Office cannot materialize a provider-only snapshot after new
+    # seat telemetry has already been collected.
+    engineering_capacity = generate_engineering_capacity_dashboard(root=base, write=True)
+    preflight.append({"name": "engineering_capacity_projection", "status": "available", "path": "runtime/engineering_capacity/dashboard.json", "codex_seat_observations": len(engineering_capacity.get("codex_seat_observations") or [])})
     command_center = generate_command_center(root=base, write=True, fast_start=True)
     preflight.append({"name": "static_entry_point", "status": "available", "path": "runtime/steward/command_center.html", "panel_count": len(command_center.get("panels") or {})})
     runtime_dir = base / "runtime" / "steward"
