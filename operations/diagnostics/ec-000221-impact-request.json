@@ -1,7 +1,7 @@
 {
   "change_id": "EC-000221",
   "title": "Complete Grace governed GPU placement acceptance",
-  "status": "streaming_governed_path_repaired_live_acceptance_blocked_provider_contract_and_receipt_schema",
+  "status": "accepted_governed_gpu_placement",
   "predecessor": "EC-000220",
   "changed_artifacts": [
     "tools/openwebui-operator/profile.cjs",
@@ -40,11 +40,7 @@
     "candidate bridge slot-consistency readiness assertion"
   ],
   "privacy_boundary": "No cookies, tokens, browser databases, localStorage, credentials, or absolute profile paths entered Git or acceptance evidence.",
-  "remaining_unproven": [
-    "successful governed PTM-to-provider execution and durable provider receipt",
-    "allocation UUID == runtime lane UUID == provider receipt UUID",
-    "Office Compute and Stream Deck correlation"
-  ],
+  "remaining_unproven": [],
   "candidate_routing_owner": {
     "owner": "canonical_webui_gateway_runtime controller plus shared Open WebUI config row openai.api_base_urls",
     "green_endpoint_verified": "http://127.0.0.1:11436/v1",
@@ -55,10 +51,13 @@
   "new_live_attempt": {
     "submitted": true,
     "visible_grace_result": true,
-    "visible_grace_result_status": "execution_failed",
-    "failure_class": "provider_artifact_contract_then_failure_receipt_schema",
+    "visible_grace_result_status": "completed",
+    "failure_class": null,
     "streaming_governed_entry": true,
     "live_provider_called": true,
+    "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-bf596a59706c.json",
+    "objective_id": "grace-obj-bf596a59706c",
+    "dispatch_id": "dispatch-342f277558bd",
     "completion_logged_after_harness_timeout": false,
     "retry_submitted": false
   },
@@ -68,6 +67,9 @@
     "runtime/evidence/openwebui-operator/openwebui-operator-20260810012728987-58337d10",
     "runtime/execution_adapters/results/adapter-dispatch-6a2f115f8f7f.json",
     "runtime/operations/grace/objective_states/grace-obj-4467e057b928.json",
+    "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-bf596a59706c.json",
+    "runtime/execution_adapters/results/adapter-dispatch-342f277558bd.json",
+    "runtime/evidence/openwebui-operator/openwebui-operator-20260810014124503-ce4cb196",
     "A:/AI/Tools/EstateStreamDeckMVP/Core/state/canonical-runtime/green-processes.json"
   ],
   "future_reuse_invariant": "Different isolated Estate worktrees resolve to estate-openwebui-operator-profile under the machine-local Estate state root."

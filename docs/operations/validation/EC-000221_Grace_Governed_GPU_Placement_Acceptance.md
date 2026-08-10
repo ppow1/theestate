@@ -1,6 +1,6 @@
 # EC-000221 — Grace governed GPU placement acceptance
 
-Status: **Blocked after one bounded visible task; streaming dispatch repaired, provider contract/receipt persistence prevented completion**
+Status: **Accepted after one final bounded visible task; governed RTX 4090 placement proven**
 Predecessor: `origin/feature/ec-000220-openwebui-auth-attention` at `0f209dd0de042245db985c85c9c17cbbfe8bfc57`  
 Lane: `feature/ec-000221-grace-governed-gpu-placement`
 
@@ -127,12 +127,51 @@ placement correlation properties (`allocated_compute_resource_id`,
 `allocated_gpu_uuid`, `runtime_bound_gpu_uuid`, `runtime_lane_id`, and
 `runtime_process_id`) as undeclared inside `governed_correlation`. The schema now
 declares those fields, preserving UUID evidence for future governed receipts.
-Because this was the one permitted new live attempt and no successful provider
-receipt exists, acceptance remains blocked; no retry was sent.
+That earlier attempt was the one permitted pre-correction live attempt; its
+failure remains preserved and no retry was sent from that attempt.
+
+## Final bounded acceptance
+
+The capability-aware contract correction was validated with 78 focused Python
+tests and 11 Node acceptance/profile tests. Exactly one final visible task then
+ran at `2026-08-10T01:41:24Z` using the reused machine-local profile. Playwright
+returned `PASS`, `OPENWEBUI_READY`, Grace selected, and a stabilized visible
+response:
+
+`{"gpu_uuid":null,"physical_resource":"DESKTOP-JA3RPNQ:nvidia:GPU-46f3fd00-5454-4536-4196-5d8b727e14f2","provider":"qwen.local.text","runtime_lane":"qwen.local.text.4090","status":"completed","summary":"Qwen local text generation completed within the governed loopback runtime lane."}`
+
+The optional `gpu_uuid` presentation field was null, but the authoritative
+`physical_resource` contains the full UUID and the receipt below is the source
+of placement truth. The generated artifact was the single sentence:
+
+`This governed task executed on UUID-bound RTX 4090 lane 'qwen.local.text.4090' as required.`
+
+Durable chain: objective `grace-obj-bf596a59706c`, action
+`grace-act-e7e0cc741b48`, PTM resolution `res_01KZMNA7XKQM28YA5M9XTGM33H`,
+Helen `heldet-e3b210c439e4`, Engineering commission `engcom-a7b47f3f516d`,
+authorization `engauth-7681eb90a3b6`, reservation
+`gpu-reservation-grace-obj-bf596a59706c`, Dispatch `dispatch-342f277558bd`,
+adapter request `adapter-dispatch-342f277558bd`, and Grace receipt
+`gracereceipt-176b055d48f0`.
+
+Provider receipt:
+`runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-bf596a59706c.json`.
+It records `qwen3:8b`, completed transaction state, the document hash, and:
+
+`required GPU UUID = allocated_gpu_uuid = runtime_bound_gpu_uuid = GPU-46f3fd00-5454-4536-4196-5d8b727e14f2`
+
+`required_resource_id = allocated_compute_resource_id = DESKTOP-JA3RPNQ:nvidia:GPU-46f3fd00-5454-4536-4196-5d8b727e14f2`
+
+Office Compute correlation is available through
+`runtime/execution_activity/current.json` and `runtime/execution_activity/report.md`,
+which correlate the completed provider result to the Dispatch and work package.
+The existing Stream Deck projection contract remains compatible through the
+canonical runtime state; no meter or projection redesign was made.
 
 After stopping only the EC-000221 candidate services and the 4090 lane, both GPUs
 remained healthy: P100 9 MiB used/0% utilization and RTX 4090 2424 MiB used/10%
 utilization; both retained their verified UUID and PCI identity. The P100 remained
 idle throughout.
 
-This record preserves the blocked acceptance evidence and does not close PL-0042.
+This record preserves all earlier blocked attempts, records the final acceptance,
+and does not close PL-0042.
