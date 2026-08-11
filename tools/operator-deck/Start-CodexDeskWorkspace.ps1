@@ -196,6 +196,7 @@ public static class EstateCodexDeskChromeV1 {
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool SetWindowText(IntPtr hwnd, string text);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hwnd, int command);
+    [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
     [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr hwnd);
     delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr state);
     public static WindowRecord[] Windows() {
@@ -226,6 +227,13 @@ function Move-ChromeWindow($Window, $Cell) {
     }
 }
 
+function Close-ManagedChromeWindow($Window) {
+    if ($Window -and [EstateCodexDeskChromeV1]::IsWindow([IntPtr]$Window.hwnd)) {
+        [EstateCodexDeskChromeV1]::PostMessage([IntPtr]$Window.hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+        Start-Sleep -Milliseconds 500
+    }
+}
+
 function Get-ChromeProfilePathFromUi($Window) {
     Add-Type -AssemblyName UIAutomationClient -ErrorAction Stop
     Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
@@ -234,33 +242,27 @@ function Get-ChromeProfilePathFromUi($Window) {
         [System.Windows.Automation.AutomationElement]::AutomationIdProperty, 'view_1012'
     )
     $address = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-    if (-not $address) { throw "Chrome address bar was not available for HWND $($Window.hwnd)." }
-    try {
-        $address.SetFocus()
-        $value = $address.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
-        $value.SetValue('chrome://version/')
-        [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
-        Start-Sleep -Seconds 2
-        $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
-        $all = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
-        for ($index = 0; $index -lt $all.Count; $index++) {
-            $name = $all.Item($index).Current.Name
-            if ($name -match '(?i)Google\\Chrome\\User Data\\Profile \d+$') { return $name }
-        }
-        throw "Chrome did not expose a profile path for HWND $($Window.hwnd)."
-    }
-    finally {
-        $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
-        $address = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-        if ($address) {
+    if (-not $address) { throw "Chrome verification window has no address control for HWND $($Window.hwnd)." }
+    $value = $address.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+    $value.SetValue('chrome://version/')
+    [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+    Start-Sleep -Seconds 2
+    $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
+    $all = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
+    for ($index = 0; $index -lt $all.Count; $index++) {
+        $name = $all.Item($index).Current.Name
+        if ($name -match '(?i)Google\\Chrome\\User Data\\Profile \d+$') {
             try {
-                $address.SetFocus()
+                $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
+                $address = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
                 $value = $address.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
                 $value.SetValue('https://chatgpt.com/')
                 [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
             } catch { }
+            return $name
         }
     }
+    throw "Chrome did not expose a profile path for HWND $($Window.hwnd)."
 }
 
 function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
@@ -268,6 +270,13 @@ function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
     $profilePath = Join-Path $chromeUserData $profileName
     if (-not (Test-Path -LiteralPath $profilePath)) { throw "Configured Chrome profile is missing for $Seat`: $profilePath" }
     $saved = $null
+    if ($chromeWindowMap.Contains($Seat)) {
+        if ($chromeWindowMap.$Seat.app_mode -ne $true) {
+            $old = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+            Close-ManagedChromeWindow $old
+            $chromeWindowMap.Remove($Seat)
+        }
+    }
     if ($chromeWindowMap.Contains($Seat)) {
         if ($chromeWindowMap.$Seat.profile_path_verified -eq $true) {
             $saved = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
@@ -278,12 +287,35 @@ function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
     }
     $profilePathVerified = $false
     if (-not $saved) {
-        $before = @(Get-ChromeWindows | ForEach-Object hwnd)
-        $launchArguments = @(
+        # App windows do not expose a writable omnibox. Verify the exact
+        # profile first in a disposable normal chrome://version window, then
+        # launch the operating ChatGPT app with the identical profile args.
+        $probeBefore = @(Get-ChromeWindows | ForEach-Object hwnd)
+        $probeArguments = @(
             "--user-data-dir=`"$chromeUserData`""
             "--profile-directory=`"$profileName`""
             '--new-window'
             'https://chatgpt.com/'
+        )
+        Start-Process -FilePath $chromeExe -ArgumentList $probeArguments | Out-Null
+        $probe = $null
+        for ($i=0; $i -lt 15; $i++) {
+            Start-Sleep -Milliseconds 500
+            $probe = Get-ChromeWindows | Where-Object { $probeBefore -notcontains $_.hwnd } | Select-Object -First 1
+            if ($probe) { break }
+        }
+        if (-not $probe) { throw "Chrome did not expose a profile verification app window for $Seat." }
+        $actualProfilePath = Get-ChromeProfilePathFromUi $probe
+        if ($actualProfilePath -ne $profilePath) {
+            Close-ManagedChromeWindow $probe
+            throw "Chrome profile mismatch for $Seat`: expected $profilePath, observed $actualProfilePath."
+        }
+        Close-ManagedChromeWindow $probe
+        $before = @(Get-ChromeWindows | ForEach-Object hwnd)
+        $launchArguments = @(
+            "--user-data-dir=`"$chromeUserData`""
+            "--profile-directory=`"$profileName`""
+            '--app=https://chatgpt.com/'
         )
         Start-Process -FilePath $chromeExe -ArgumentList $launchArguments | Out-Null
         for ($i=0; $i -lt 15; $i++) {
@@ -292,10 +324,6 @@ function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
             if ($saved) { break }
         }
         if (-not $saved) { throw "Chrome did not expose a new top-level window for $Seat." }
-        $actualProfilePath = Get-ChromeProfilePathFromUi $saved
-        if ($actualProfilePath -ne $profilePath) {
-            throw "Chrome profile mismatch for $Seat`: expected $profilePath, observed $actualProfilePath."
-        }
         $profilePathVerified = $true
     } else {
         $profilePathVerified = $chromeWindowMap.$Seat.profile_path_verified
@@ -305,8 +333,9 @@ function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
         hwnd=$saved.hwnd
         profile=$profileName
         user_data_dir=$chromeUserData
+        app_mode=$true
         profile_path_verified=$profilePathVerified
-        launch_arguments=@("--user-data-dir=`"$chromeUserData`"", "--profile-directory=`"$profileName`"", '--new-window', 'https://chatgpt.com/')
+        launch_arguments=@("--user-data-dir=`"$chromeUserData`"", "--profile-directory=`"$profileName`"", '--app=https://chatgpt.com/')
     }
 }
 
