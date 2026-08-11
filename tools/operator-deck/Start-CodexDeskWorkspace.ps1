@@ -226,32 +226,88 @@ function Move-ChromeWindow($Window, $Cell) {
     }
 }
 
-function Set-ChromeWindowTitle($Window, [string]$Title) {
-    [EstateCodexDeskChromeV1]::SetWindowText([IntPtr]$Window.hwnd, $Title) | Out-Null
+function Get-ChromeProfilePathFromUi($Window) {
+    Add-Type -AssemblyName UIAutomationClient -ErrorAction Stop
+    Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+    $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
+    $condition = New-Object System.Windows.Automation.PropertyCondition(
+        [System.Windows.Automation.AutomationElement]::AutomationIdProperty, 'view_1012'
+    )
+    $address = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+    if (-not $address) { throw "Chrome address bar was not available for HWND $($Window.hwnd)." }
+    try {
+        $address.SetFocus()
+        $value = $address.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+        $value.SetValue('chrome://version/')
+        [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+        Start-Sleep -Seconds 2
+        $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
+        $all = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
+        for ($index = 0; $index -lt $all.Count; $index++) {
+            $name = $all.Item($index).Current.Name
+            if ($name -match '(?i)Google\\Chrome\\User Data\\Profile \d+$') { return $name }
+        }
+        throw "Chrome did not expose a profile path for HWND $($Window.hwnd)."
+    }
+    finally {
+        $root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$Window.hwnd)
+        $address = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+        if ($address) {
+            try {
+                $address.SetFocus()
+                $value = $address.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern)
+                $value.SetValue('https://chatgpt.com/')
+                [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+            } catch { }
+        }
+    }
 }
 
 function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
     $profileName = [string]$SeatRecord.interactive_chrome_profile
     $profilePath = Join-Path $chromeUserData $profileName
     if (-not (Test-Path -LiteralPath $profilePath)) { throw "Configured Chrome profile is missing for $Seat`: $profilePath" }
-    $marker = "$Seat-CHROME"
     $saved = $null
     if ($chromeWindowMap.Contains($Seat)) {
-        $saved = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+        if ($chromeWindowMap.$Seat.profile_path_verified -eq $true) {
+            $saved = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+        }
+        # The persisted record is written only after chrome://version proved the
+        # exact profile path. Do not infer identity from a page title or profile
+        # menu label on reuse; those are not stable window metadata.
     }
+    $profilePathVerified = $false
     if (-not $saved) {
         $before = @(Get-ChromeWindows | ForEach-Object hwnd)
-        Start-Process -FilePath $chromeExe -ArgumentList @("--profile-directory=$profileName", '--new-window', 'https://chatgpt.com/') | Out-Null
+        $launchArguments = @(
+            "--user-data-dir=`"$chromeUserData`""
+            "--profile-directory=`"$profileName`""
+            '--new-window'
+            'https://chatgpt.com/'
+        )
+        Start-Process -FilePath $chromeExe -ArgumentList $launchArguments | Out-Null
         for ($i=0; $i -lt 15; $i++) {
             Start-Sleep -Milliseconds 500
             $saved = Get-ChromeWindows | Where-Object { $before -notcontains $_.hwnd } | Select-Object -First 1
             if ($saved) { break }
         }
         if (-not $saved) { throw "Chrome did not expose a new top-level window for $Seat." }
+        $actualProfilePath = Get-ChromeProfilePathFromUi $saved
+        if ($actualProfilePath -ne $profilePath) {
+            throw "Chrome profile mismatch for $Seat`: expected $profilePath, observed $actualProfilePath."
+        }
+        $profilePathVerified = $true
+    } else {
+        $profilePathVerified = $chromeWindowMap.$Seat.profile_path_verified
     }
-    Set-ChromeWindowTitle $saved $marker
     Move-ChromeWindow $saved $Cell
-    $chromeWindowMap[$Seat] = [ordered]@{ hwnd=$saved.hwnd; profile=$profileName; marker=$marker }
+    $chromeWindowMap[$Seat] = [ordered]@{
+        hwnd=$saved.hwnd
+        profile=$profileName
+        user_data_dir=$chromeUserData
+        profile_path_verified=$profilePathVerified
+        launch_arguments=@("--user-data-dir=`"$chromeUserData`"", "--profile-directory=`"$profileName`"", '--new-window', 'https://chatgpt.com/')
+    }
 }
 
 $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $reportPath -Encoding utf8
