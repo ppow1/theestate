@@ -219,27 +219,20 @@ function Get-TargetMonitor {
     $jsonEnd = $raw.LastIndexOf('}')
     $layout = $raw.Substring($jsonStart, $jsonEnd - $jsonStart + 1) | ConvertFrom-Json
     $script:CodexDeskRawMonitorLayout = $layout
-    $canonicalMonitors = @($layout.monitors | ForEach-Object {
-        $scale = 96.0 / [double]$_.dpi.x
-        if ($scale -le 0) { $scale = 1.0 }
+    # The monitor helper is PMv2-aware and returns physical desktop rectangles.
+    # Keep those rectangles unchanged: placement also runs PMv2-aware, and the
+    # independent physical screenshot demonstrated that 96-DPI normalization
+    # moved the desk into the wrong desktop region.
+    $physicalMonitors = @($layout.monitors | ForEach-Object {
         [pscustomobject]@{
             index=$_.index; device=$_.device; primary=$_.primary
-            bounds=[pscustomobject]@{
-                left=[int][math]::Round($_.bounds.left * $scale); top=[int][math]::Round($_.bounds.top * $scale)
-                right=[int][math]::Round($_.bounds.right * $scale); bottom=[int][math]::Round($_.bounds.bottom * $scale)
-                width=[int][math]::Round($_.bounds.width * $scale); height=[int][math]::Round($_.bounds.height * $scale)
-            }
-            work_area=[pscustomobject]@{
-                left=[int][math]::Round($_.work_area.left * $scale); top=[int][math]::Round($_.work_area.top * $scale)
-                right=[int][math]::Round($_.work_area.right * $scale); bottom=[int][math]::Round($_.work_area.bottom * $scale)
-                width=[int][math]::Round($_.work_area.width * $scale); height=[int][math]::Round($_.work_area.height * $scale)
-            }
-            reserved_edges=$_.reserved_edges; dpi=[pscustomobject]@{ x=96; y=96; scale_percent=100.0 }; slot_prefix=$_.slot_prefix
+            bounds=$_.bounds; work_area=$_.work_area
+            reserved_edges=$_.reserved_edges; dpi=$_.dpi; slot_prefix=$_.slot_prefix
         }
     })
-    $layout.monitors = $canonicalMonitors
+    $layout.monitors = $physicalMonitors
     $script:CodexDeskMonitorLayout = $layout
-    $topRow = @($canonicalMonitors | Sort-Object { ($_.bounds.top + $_.bounds.bottom) / 2 } | Select-Object -First 2)
+    $topRow = @($physicalMonitors | Sort-Object { ($_.bounds.top + $_.bounds.bottom) / 2 } | Select-Object -First 2)
     $script:CodexDeskMonitorCandidates = @($topRow)
     return $topRow | Sort-Object { $_.bounds.left } -Descending | Select-Object -First 1
 }
