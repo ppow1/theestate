@@ -17,7 +17,7 @@ if (-not $seatRecord -or -not $seatRecord.codex_home) { throw "No approved CODEX
 $previousCodexHome = $env:CODEX_HOME
 $env:CODEX_HOME = [string]$seatRecord.codex_home
 try {
-    & codex --cd $estateRoot --sandbox danger-full-access
+    & codex -m gpt-5.6-luna --cd $estateRoot --sandbox danger-full-access --ask-for-approval never
     $exitCode = $LASTEXITCODE
 }
 finally {

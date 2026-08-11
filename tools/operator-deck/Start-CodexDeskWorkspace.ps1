@@ -72,12 +72,19 @@ public static class EstateCodexDeskWindowV1 {
 }
 
 function Set-SeatWindowTitle([int]$ProcessId, [string]$Title) {
-    if (-not ('EstateCodexDeskWindowV1' -as [type])) { return }
+    if (-not ('EstateCodexDeskTitleV1' -as [type])) {
+        Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class EstateCodexDeskTitleV1 {
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool SetWindowText(IntPtr hWnd, string text);
+}
+'@
+    }
     $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
     if (-not $process) { return }
     $hwnd = $process.MainWindowHandle
-    if ($hwnd -eq 0) { $hwnd = [EstateCodexDeskWindowV1]::FindWindow([uint32]$ProcessId) }
-    if ($hwnd -ne 0) { [EstateCodexDeskWindowV1]::SetWindowText($hwnd, $Title) | Out-Null }
+    if ($hwnd -ne 0) { [EstateCodexDeskTitleV1]::SetWindowText($hwnd, $Title) | Out-Null }
 }
 
 function Get-ConsoleWindowProcessId([int]$ProcessId) {
