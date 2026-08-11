@@ -152,6 +152,7 @@ $config = Get-SeatConfig
 $monitor = Get-TargetMonitor
 $cells = New-WorkspaceCells $monitor
 $chromium = @(
+    'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
     'C:\Users\wille\AppData\Local\ms-playwright\chromium-1234\chrome-win64\chrome.exe'
     'C:\Program Files\Chromium\Application\chrome.exe'
     'C:\Program Files\Chromium\chrome.exe'
