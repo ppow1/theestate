@@ -27,7 +27,8 @@
     "max_concurrent_requests": 1,
     "request_queue": "reject_when_busy",
     "max_output_tokens": 128,
-    "context_limit": 4096
+    "context_limit": 4096,
+    "provider_options": {"think": false}
   },
   "network_policy": "loopback_only",
   "evidence_freshness_seconds": 3600

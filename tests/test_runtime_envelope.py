@@ -27,6 +27,34 @@ def test_bounded_ollama_options_reach_provider_request(tmp_path: Path):
     assert result.status == "completed"
     post = next(item for item in calls if item[0] == "POST")
     assert post[2]["options"] == {"num_ctx": 4096, "num_predict": 128}
+    assert post[2]["think"] is False
+
+
+def test_incomplete_qwen_response_remains_fail_closed(tmp_path: Path):
+    from test_qwen_local_text_execution_provider_adapter import _technical_request
+
+    request, adapter = _technical_request(tmp_path, response_text="", output_name="incomplete-qwen")
+
+    def transport(method, url, payload, timeout):
+        return (200, {"models": [{"name": "qwen3:8b"}]}) if method == "GET" else (200, {"model": "qwen3:8b", "response": "", "thinking": "hidden reasoning", "done": True, "done_reason": "length", "eval_count": 128})
+
+    adapter.http_call = transport
+    result = adapter.submit(request)
+    assert result.status == "failed"
+    assert result.errors == ["Qwen returned a malformed or incomplete response"]
+
+
+def test_completed_qwen_response_with_thinking_metadata_is_accepted(tmp_path: Path):
+    from test_qwen_local_text_execution_provider_adapter import _technical_request
+
+    request, adapter = _technical_request(tmp_path, response_text="", output_name="completed-qwen")
+
+    def transport(method, url, payload, timeout):
+        return (200, {"models": [{"name": "qwen3:8b"}]}) if method == "GET" else (200, {"model": "qwen3:8b", "response": "The bounded task completed.", "thinking": "", "done": True, "done_reason": "stop", "eval_count": 7})
+
+    adapter.http_call = transport
+    result = adapter.submit(request)
+    assert result.status == "completed"
 
 
 def test_same_lane_second_request_is_blocked(tmp_path: Path):

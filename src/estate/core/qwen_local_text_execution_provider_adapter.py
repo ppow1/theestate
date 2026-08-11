@@ -519,6 +519,9 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             runtime_policy = validate_runtime_policy(config["runtime_policy"])
             context_limit = int(runtime_policy["context_limit"])
             max_output_tokens = int(runtime_policy["max_output_tokens"])
+            provider_options = runtime_policy.get("provider_options") or {}
+            if not isinstance(provider_options, dict):
+                raise ValueError("runtime_policy.provider_options must be an object")
             if len(prompt.encode("utf-8")) > context_limit * 4:
                 raise ValueError("Qwen prompt exceeds the configured context bound")
             runtime_log_offset = runtime_log_position(self.root, lane) if lane else None
@@ -526,7 +529,9 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             with request_lease(self.root, lane.runtime_lane_id if lane else "unbound", lease_policy) as lease:
                 metadata["runtime_request_lease"] = lease
                 provider_called = True
-                status, response = self.http_call("POST", endpoint + "/api/generate", {"model": config["model_identity"], "prompt": prompt, "stream": False, "options": {"num_ctx": context_limit, "num_predict": max_output_tokens}}, int(config["timeout_seconds"]))
+                payload = {"model": config["model_identity"], "prompt": prompt, "stream": False, "options": {"num_ctx": context_limit, "num_predict": max_output_tokens}}
+                payload.update(provider_options)
+                status, response = self.http_call("POST", endpoint + "/api/generate", payload, int(config["timeout_seconds"]))
             text = response.get("response") if isinstance(response, dict) else None; actual_model = response.get("model") if isinstance(response, dict) else None
             if status >= 400 or not isinstance(text, str) or not text.strip():
                 raise ValueError("Qwen returned a malformed or incomplete response")
