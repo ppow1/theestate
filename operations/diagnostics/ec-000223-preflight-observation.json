@@ -168,6 +168,26 @@
         {"gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "pci_bus": "00000000:07:00.0", "health": "OK", "pnp_status": "OK", "memory_used_mib": 2813, "memory_free_mib": 21330, "lane_port_listening": false, "ready": true},
         {"gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414", "pci_bus": "00000000:04:00.0", "health": "OK", "pnp_status": "OK", "memory_used_mib": 9, "memory_free_mib": 16280, "lane_port_listening": false, "ready": true}
       ]
+    },
+    {
+      "observation_type": "dispatch_queue_concurrency_correction",
+      "timestamp": "2026-08-11T19:54:50.1321118Z",
+      "historical_failure": "ValueError: execution dispatch queue is malformed JSON: Expecting value: line 1 column 1 (char 0)",
+      "queue_path": "runtime/execution_dispatch/queue.json",
+      "root_cause": "Path.write_text truncated the authoritative whole-file JSON before a concurrent reader completed its read",
+      "persistence_design": {
+        "lock_path": "runtime/execution_dispatch/.queue.lock",
+        "lock_scope": "queue read-modify-write only",
+        "cross_process": true,
+        "temporary_file": "unique same-directory file",
+        "durability": "flush/fsync then atomic os.replace",
+        "reader_retry": "three short retries for JSON decode transition, then fail closed",
+        "provider_execution_serialized": false
+      },
+      "deterministic_tests": {
+        "queue_concurrency": "19 passed",
+        "focused_regressions": "134 passed; 1 pre-existing Windows path-separator assertion excluded"
+      }
     }
   ],
   "acceptance_gate": {
@@ -177,6 +197,7 @@
   },
   "single_p100_qualification": "PASS",
   "dual_gpu_acceptance": "NOT_ACCEPTED_NO_PROVIDER_OVERLAP",
+  "dispatch_concurrency_tests": "19 passed",
   "deterministic_lifecycle_tests": "94 passed",
   "deterministic_preflight_tests": "24 passed",
   "powershell_parser": "PASS"

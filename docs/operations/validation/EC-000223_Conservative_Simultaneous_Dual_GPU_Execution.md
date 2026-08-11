@@ -288,3 +288,36 @@ EC-000223 remains **Not Accepted**: the P100 backend is now singly qualified,
 but the sole concurrent retry produced no provider overlap because of the
 Dispatch queue concurrency defect. That defect is the recommended next
 milestone before any further dual-lane attempt.
+
+## Dispatch persistence concurrency correction
+
+The failed retry's exact exception was:
+
+`ValueError: execution dispatch queue is malformed JSON: Expecting value: line 1 column 1 (char 0)`
+
+from `load_dispatch_queue()` while another process was executing `_write_queue()`
+against `runtime/execution_dispatch/queue.json`. `_write_queue()` previously
+used `Path.write_text()`, which truncated the authoritative file before the
+new JSON bytes were written. The reader observed that empty/partial interval;
+this was a truncate/write race, not stale state, a missing replacement, or a
+GPU/provider failure.
+
+The correction keeps the existing whole-file queue format and adds a
+cross-process lock file at `runtime/execution_dispatch/.queue.lock`. Every
+queue read–modify–write mutation now performs: acquire lock, read the latest
+complete queue, apply one mutation, write a unique same-directory temporary
+file, flush/fsync, atomically `os.replace()` the authoritative queue, and
+release the lock. Replace retries are bounded and only handle transient Windows
+access transitions. Readers retry JSON decoding three times over a short
+bounded interval, then fail closed on persistent malformed state. Stale temp
+files are never authoritative. The critical section ends before events,
+snapshots, or provider execution; it does not serialize Grace/provider work.
+
+The deterministic queue suite has 19 passing tests: cross-process distinct
+creation, concurrent readers, distinct state updates/lost-update protection,
+stale temporary files, persistent-corruption fail-closed behavior, lock
+timeout, lock release after exceptions, and provider-execution lock-scope
+coverage. The focused Dispatch, preflight, provider, reconciliation, and
+runtime-cleanup set has 134 passes. One unrelated pre-existing Windows path
+separator assertion remains excluded from the baseline; no queue test depends
+on it.
