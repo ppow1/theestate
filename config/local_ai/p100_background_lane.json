@@ -1,0 +1,9 @@
+{
+  "model": "A:\\AI\\Models\\GGUF\\qwen3-32b-vl-instruct-polaris-hi16-heretic-uncensored-q5_k_m.gguf",
+  "backend": "A:\\AI\\Tools\\llama.cpp\\cuda\\llama-server.exe",
+  "host": "127.0.0.1",
+  "port": 18080,
+  "context": 4096,
+  "gpu_layers": 42,
+  "extra_args": ["--metrics"]
+}

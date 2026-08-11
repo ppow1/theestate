@@ -861,6 +861,34 @@ def cmd_grace_gpu_preflight(args):
         print(f"Grace GPU preflight failed: {exc}")
         raise SystemExit(1)
 
+def cmd_p100_lane_plan(args):
+    try:
+        from estate.core.p100_inference_lane import load_config, preflight_lane
+        payload = preflight_lane(load_config(args.config))
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"P100 lane: {'READY' if payload['ready'] else 'REFUSED'}")
+            for error in payload["errors"]:
+                print(f"- {error}")
+        if not payload["ready"]:
+            raise SystemExit(1)
+    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+        print(f"P100 lane preflight failed: {exc}")
+        raise SystemExit(1)
+
+def cmd_p100_lane_run(args):
+    """Start exactly one preflighted child; no restart or sibling fallback."""
+    import subprocess
+    try:
+        from estate.core.p100_inference_lane import build_launch_plan, load_config, discover_grace_gpus
+        plan = build_launch_plan(load_config(args.config), discover_grace_gpus())
+        print(json.dumps({"event": "p100_lane_started", "endpoint": plan["endpoint"], "target": plan["resolved_target"], "argv": plan["argv"]}, sort_keys=True), flush=True)
+        subprocess.run(plan["argv"], env=plan["environment"], check=False)
+    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+        print(f"P100 lane refused/failed: {exc}")
+        raise SystemExit(1)
+
 def cmd_providers_capacity_set(args):
     try:
         metadata = {"summary_safe": args.summary_safe}
@@ -4149,6 +4177,15 @@ def main(argv=None):
     p.add_argument("--write-projection", action="store_true", help="Refresh the existing compute resource projection")
     p.add_argument("--root", help="Projection root when --write-projection is used")
     p.set_defaults(func=cmd_grace_gpu_preflight)
+
+    p = sub.add_parser("p100-lane-plan", help="Run the fail-closed P100 llama.cpp lane preflight")
+    p.add_argument("--config", required=True)
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_p100_lane_plan)
+
+    p = sub.add_parser("p100-lane-run", help="Run one preflighted P100 llama.cpp lane with no fallback/restart")
+    p.add_argument("--config", required=True)
+    p.set_defaults(func=cmd_p100_lane_run)
 
     p = sub.add_parser("engineering-capacity-dashboard", help="Generate Engineering Capacity Runtime dashboard")
     p.add_argument("--json", action="store_true")

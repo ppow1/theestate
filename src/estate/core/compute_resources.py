@@ -230,7 +230,7 @@ class ExpectedGPU:
 
 
 GRACE_EXPECTED_GPUS = (
-    ExpectedGPU("GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "NVIDIA GeForce RTX 4090", "06:00.0", "primary latency-sensitive / interactive"),
+    ExpectedGPU("GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "NVIDIA GeForce RTX 4090", "07:00.0", "primary latency-sensitive / interactive"),
     ExpectedGPU("GPU-6785b322-899d-8eec-e817-31d83279a414", "Tesla P100-PCIE-16GB", "04:00.0", "bounded background / secondary inference"),
 )
 
