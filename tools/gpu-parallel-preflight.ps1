@@ -96,25 +96,29 @@ function Get-ComputeRows([string]$Raw) {
 
 function Get-GpuEngineTypeMap {
     $map = @{}
+    $errorMessage = $null
+    $sampleCount = 0
     try {
         $sample = Get-Counter '\GPU Engine(*)\Utilization Percentage' -ErrorAction Stop
+        $sampleCount = @($sample.CounterSamples).Count
         foreach ($counter in @($sample.CounterSamples)) {
             if ([string]$counter.InstanceName -match '^pid_(?<pid>\d+)_.*engtype_(?<engine>.+)$') {
                 $pidKey = [string]$Matches.pid
                 $map[$pidKey] = @(@($map[$pidKey]) + [string]$Matches.engine | Select-Object -Unique)
             }
         }
-    } catch { }
-    return $map
+    } catch { $errorMessage = [string]$_.Exception.Message }
+    return [ordered]@{ map = $map; available = ($map.Count -gt 0); sample_count = $sampleCount; error = $errorMessage }
 }
 
 function Get-ProcessMap([object]$Fixture, [bool]$UseFixture) {
     $map = @{}
     if ($UseFixture) {
         foreach ($item in @($Fixture)) { $pidValue = Get-Field $item 'pid'; if ($null -ne $pidValue) { $map[[string]$pidValue] = $item } }
-        return $map
+        return [ordered]@{ processes = $map; gpu_engine_collection = [ordered]@{ available = $null; sample_count = $null; error = $null; source = 'fixture' } }
     }
-    $gpuEngineTypes = Get-GpuEngineTypeMap
+    $gpuEngineCollection = Get-GpuEngineTypeMap
+    $gpuEngineTypes = $gpuEngineCollection.map
     foreach ($process in @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)) {
         $map[[string]$process.ProcessId] = [ordered]@{
             pid = [int]$process.ProcessId
@@ -125,7 +129,7 @@ function Get-ProcessMap([object]$Fixture, [bool]$UseFixture) {
             gpu_engine_types = @($gpuEngineTypes[[string]$process.ProcessId])
         }
     }
-    return $map
+    return [ordered]@{ processes = $map; gpu_engine_collection = [ordered]@{ available = $gpuEngineCollection.available; sample_count = $gpuEngineCollection.sample_count; error = $gpuEngineCollection.error; source = 'windows_gpu_engine_performance_counter' } }
 }
 
 function Get-PortMap([object]$Fixture, [bool]$UseFixture) {
@@ -145,7 +149,7 @@ function Get-PortMap([object]$Fixture, [bool]$UseFixture) {
 
 function Test-EstateOwnership([object]$Process, [int]$Port, [string]$Root, [string]$LaneId) {
     if ($null -eq $Process) { return 'UNKNOWN' }
-    $evidence = @([string]$Process.executable_path, [string]$Process.command_line) -join ' '
+    $evidence = @([string](Get-Field $Process 'executable_path'), [string](Get-Field $Process 'command_line')) -join ' '
     if ($evidence -match [regex]::Escape($Root) -or $evidence -match [regex]::Escape($LaneId)) { return 'ESTATE_OWNED' }
     $evidencePath = Join-Path $Root 'runtime/compute_resources/runtime_lanes.json'
     if (Test-Path -LiteralPath $evidencePath) {
@@ -160,7 +164,7 @@ function Test-EstateOwnership([object]$Process, [int]$Port, [string]$Root, [stri
     return 'UNKNOWN'
 }
 
-function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [string]$Root, [string]$LaneId, [string]$DriverModel) {
+function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [string]$Root, [string]$LaneId, [string]$DriverModel, [object]$Utilization, [object]$Power, [object]$PortRecord) {
     $pidValue = Convert-ToNumber (Get-Field $Row 'pid')
     $process = if ($null -ne $pidValue) { $ProcessMap[[string][int]$pidValue] } else { $null }
     $ownership = Test-EstateOwnership $process $Port $Root $LaneId
@@ -168,19 +172,27 @@ function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [st
     $engineTypes = @()
     if ($null -ne $process) { $engineTypes = @((Get-Field $process 'gpu_engine_types') | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }) }
     $hasComputeEngine = @($engineTypes | Where-Object { [string]$_ -match '(?i)compute|cuda' }).Count -gt 0
-    if ($ownership -eq 'UNKNOWN' -and $DriverModel -eq 'WDDM' -and $null -eq $usedMemory -and @($engineTypes).Count -gt 0 -and -not $hasComputeEngine) {
+    $hasCompleteProcessMetadata = $null -ne $process -and -not [string]::IsNullOrWhiteSpace([string](Get-Field $process 'executable_path')) -and -not [string]::IsNullOrWhiteSpace([string](Get-Field $process 'command_line'))
+    $lowAggregateLoad = $null -ne $Utilization -and $null -ne $Power -and [double]$Utilization -lt $MaterialUtilizationPercent -and [double]$Power -lt $MaterialPowerWatts
+    $lanePortSafe = $null -ne $PortRecord -and (-not [bool]$PortRecord.listening -or [string]$PortRecord.ownership -eq 'ESTATE_OWNED')
+    $positiveGraphicsContext = @($engineTypes).Count -gt 0 -and -not $hasComputeEngine
+    $boundedWddmFallback = @($engineTypes).Count -eq 0 -and $lowAggregateLoad
+    $nonConflictBasis = $null
+    if ($ownership -eq 'UNKNOWN' -and $DriverModel -eq 'WDDM' -and $null -eq $usedMemory -and $hasCompleteProcessMetadata -and $lanePortSafe -and -not $hasComputeEngine -and ($positiveGraphicsContext -or $boundedWddmFallback)) {
         $ownership = 'NON_CONFLICTING_WDDM'
+        $nonConflictBasis = if ($positiveGraphicsContext) { 'wddm_non_compute_engine_context' } else { 'wddm_bounded_low_load_fallback' }
     }
     return [ordered]@{
         pid = if ($null -ne $pidValue) { [int]$pidValue } else { $null }
         process_name = [string]$Row.process_name
         used_memory_mib = $usedMemory
         gpu_uuid = [string]$Row.gpu_uuid
-        executable_path = if ($null -ne $process) { $process.executable_path } else { $null }
-        command_line = if ($null -ne $process) { $process.command_line } else { $null }
-        parent_pid = if ($null -ne $process) { $process.parent_pid } else { $null }
+        executable_path = if ($null -ne $process) { Get-Field $process 'executable_path' } else { $null }
+        command_line = if ($null -ne $process) { Get-Field $process 'command_line' } else { $null }
+        parent_pid = if ($null -ne $process) { Get-Field $process 'parent_pid' } else { $null }
         driver_model = $DriverModel
         gpu_engine_types = $engineTypes
+        non_conflict_basis = $nonConflictBasis
         ownership = $ownership
     }
 }
@@ -264,7 +276,8 @@ function Invoke-Preflight {
         $computeRows = Get-ComputeRows $apps
         $pnpCollection = Get-PnpMap (Read-JsonFixture $PnpOutput)
         $pnp = $pnpCollection.devices
-        $processes = Get-ProcessMap (Read-JsonFixture $ProcessFixture) $UseProcessFixture
+        $processCollection = Get-ProcessMap (Read-JsonFixture $ProcessFixture) $UseProcessFixture
+        $processes = $processCollection.processes
         $ports = Get-PortMap (Read-JsonFixture $PortFixture) $UsePortFixture
         $resources = @()
         $globalReasons = @($pnpCollection.errors)
@@ -305,7 +318,8 @@ function Invoke-Preflight {
             $power = if ($null -ne $row) { Convert-ToNumber $row.power_w } else { $null }
             if ($null -ne $row -and ($null -eq $memoryFree -or $null -eq $memoryTotal -or $null -eq $util)) { $health = 'FAILURE'; $reasons += 'nvidia-smi returned incomplete device telemetry' }
             if ($null -ne $memoryFree -and $memoryFree -lt $expected.minimum_safe_free_mib) { $reasons += "free VRAM $memoryFree MiB is below the accepted floor $($expected.minimum_safe_free_mib) MiB" }
-            $gpuProcesses = @($computeRows | Where-Object { $_.gpu_uuid -eq $expected.gpu_uuid } | ForEach-Object { Get-ProcessRecord $_ $processes $expected.lane_port $RepoRoot $expected.lane_id ([string]$row.driver_model) })
+            $port = Get-PortRecord $ports $processes $expected.lane_port $RepoRoot $expected.lane_id
+            $gpuProcesses = @($computeRows | Where-Object { $_.gpu_uuid -eq $expected.gpu_uuid } | ForEach-Object { Get-ProcessRecord $_ $processes $expected.lane_port $RepoRoot $expected.lane_id ([string]$row.driver_model) $util $power $port })
             $material = $false
             $unknownComputeOwnership = $false
             $conflictingExternalCompute = $false
@@ -320,12 +334,11 @@ function Invoke-Preflight {
             if ($material) { $reasons += "material external compute activity: utilization/power/process memory crossed named preflight thresholds" }
             if ($conflictingExternalCompute) { $reasons += 'external model/CUDA worker is present; conservative preflight blocks the lane' }
             if ($unknownComputeOwnership) { $reasons += 'compute process ownership is UNKNOWN; conservative preflight blocks the lane' }
-            $port = Get-PortRecord $ports $processes $expected.lane_port $RepoRoot $expected.lane_id
             if ($port.listening -and $port.ownership -ne 'ESTATE_OWNED') { $reasons += "lane port $($expected.lane_port) is occupied by $($port.ownership) PID $($port.pid)" }
             $ready = ($health -eq 'OK' -and $null -ne $memoryFree -and $memoryFree -ge $expected.minimum_safe_free_mib -and -not $material -and -not $conflictingExternalCompute -and -not $unknownComputeOwnership -and (-not $port.listening -or $port.ownership -eq 'ESTATE_OWNED'))
             if (-not $ready -and $health -eq 'OK' -and $reasons.Count -eq 0) { $reasons += 'lane is not ready under the conservative preflight policy' }
             $resources += [ordered]@{
-                resource_id = $expected.resource_id; gpu_uuid = $expected.gpu_uuid; name = if ($null -ne $row) { [string]$row.name } else { $null }; pci_bus = if ($null -ne $row) { [string]$row.pci_bus } else { $null }; prior_observed_pci_bus = $expected.prior_observed_pci_bus; pci_topology_changed = $topologyChanged; driver_model = if ($null -ne $row) { [string]$row.driver_model } else { $null }; health = $health; pnp_status = if ($null -ne $pnpRow) { [string]$pnpRow.status } else { 'MISSING' }; pnp_friendly_name = if ($null -ne $pnpRow) { $pnpRow.friendly_name } else { $null }; pnp_name = if ($null -ne $pnpRow) { $pnpRow.name } else { $null }; pnp_instance_id = if ($null -ne $pnpRow) { [string]$pnpRow.instance_id } else { $null }; pnp_device_id = if ($null -ne $pnpRow) { $pnpRow.pnp_device_id } else { $null }; pnp_class = if ($null -ne $pnpRow) { $pnpRow.class } else { $null }; pnp_present = if ($null -ne $pnpRow) { $pnpRow.present } else { $null }; pnp_problem_code = $pnpProblemCode; pnp_config_manager_error_code = $pnpConfigManagerErrorCode; nvml_visible = ($null -ne $row); memory_used_mib = $memoryUsed; memory_free_mib = $memoryFree; memory_total_mib = $memoryTotal; minimum_safe_free_mib = $expected.minimum_safe_free_mib; utilization_percent = $util; temperature_c = $temp; power_w = $power; lane_id = $expected.lane_id; lane_port = $expected.lane_port; lane_port_owner = $port; compute_processes = $gpuProcesses; material_external_load = $material; conflicting_external_compute = $conflictingExternalCompute; unknown_compute_ownership = $unknownComputeOwnership; ready = $ready; warnings = $warnings; reasons = $reasons
+                resource_id = $expected.resource_id; gpu_uuid = $expected.gpu_uuid; name = if ($null -ne $row) { [string]$row.name } else { $null }; pci_bus = if ($null -ne $row) { [string]$row.pci_bus } else { $null }; prior_observed_pci_bus = $expected.prior_observed_pci_bus; pci_topology_changed = $topologyChanged; driver_model = if ($null -ne $row) { [string]$row.driver_model } else { $null }; health = $health; pnp_status = if ($null -ne $pnpRow) { [string]$pnpRow.status } else { 'MISSING' }; pnp_friendly_name = if ($null -ne $pnpRow) { $pnpRow.friendly_name } else { $null }; pnp_name = if ($null -ne $pnpRow) { $pnpRow.name } else { $null }; pnp_instance_id = if ($null -ne $pnpRow) { [string]$pnpRow.instance_id } else { $null }; pnp_device_id = if ($null -ne $pnpRow) { $pnpRow.pnp_device_id } else { $null }; pnp_class = if ($null -ne $pnpRow) { $pnpRow.class } else { $null }; pnp_present = if ($null -ne $pnpRow) { $pnpRow.present } else { $null }; pnp_problem_code = $pnpProblemCode; pnp_config_manager_error_code = $pnpConfigManagerErrorCode; nvml_visible = ($null -ne $row); memory_used_mib = $memoryUsed; memory_free_mib = $memoryFree; memory_total_mib = $memoryTotal; minimum_safe_free_mib = $expected.minimum_safe_free_mib; utilization_percent = $util; temperature_c = $temp; power_w = $power; lane_id = $expected.lane_id; lane_port = $expected.lane_port; lane_port_owner = $port; gpu_engine_collection = $processCollection.gpu_engine_collection; compute_processes = $gpuProcesses; material_external_load = $material; conflicting_external_compute = $conflictingExternalCompute; unknown_compute_ownership = $unknownComputeOwnership; ready = $ready; warnings = $warnings; reasons = $reasons
             }
             $globalWarnings += $warnings
             if ($health -ne 'OK') { $globalReasons += $reasons }

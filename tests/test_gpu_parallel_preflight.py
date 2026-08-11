@@ -181,6 +181,16 @@ def test_external_model_worker_blocks_even_when_current_load_is_low(tmp_path):
     assert result["status"] == "PRECHECK_BLOCKED"
 
 
+def test_unknown_wddm_executable_with_model_signature_blocks(tmp_path):
+    apps = f"76, mystery.exe, [N/A], {RTX}"
+    processes = [{"pid": 76, "name": "mystery.exe", "executable_path": "C:\\Unknown\\mystery.exe", "command_line": "mystery.exe --model local.gguf", "parent_pid": 1, "gpu_engine_types": []}]
+    code, result = _run(tmp_path, apps=apps, processes=processes)
+    assert code == 2
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    assert rtx["conflicting_external_compute"] is True
+    assert rtx["compute_processes"][0]["ownership"] == "EXTERNAL_COMPUTE"
+
+
 def test_wddm_graphics_clients_with_low_load_are_non_conflicting(tmp_path):
     apps = "\n".join([
         f"77, C:\\Windows\\System32\\ShellHost.exe, [N/A], {RTX}",
@@ -197,13 +207,25 @@ def test_wddm_graphics_clients_with_low_load_are_non_conflicting(tmp_path):
     assert {item["ownership"] for item in rtx["compute_processes"]} == {"NON_CONFLICTING_WDDM"}
 
 
-def test_wddm_process_without_engine_context_blocks_conservatively(tmp_path):
+def test_wddm_process_without_engine_context_uses_bounded_low_load_fallback(tmp_path):
     apps = f"79, unknown.exe, [N/A], {RTX}"
     processes = [{"pid": 79, "name": "unknown.exe", "executable_path": "C:\\Unknown\\unknown.exe", "command_line": "unknown.exe", "parent_pid": 1}]
+    code, result = _run(tmp_path, apps=apps, processes=processes)
+    assert code == 0, result
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    assert rtx["unknown_compute_ownership"] is False
+    assert rtx["compute_processes"][0]["ownership"] == "NON_CONFLICTING_WDDM"
+    assert rtx["compute_processes"][0]["non_conflict_basis"] == "wddm_bounded_low_load_fallback"
+
+
+def test_wddm_process_with_insufficient_metadata_still_blocks(tmp_path):
+    apps = f"81, unknown.exe, [N/A], {RTX}"
+    processes = [{"pid": 81, "name": "unknown.exe", "parent_pid": 1}]
     code, result = _run(tmp_path, apps=apps, processes=processes)
     assert code == 2, result
     rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
     assert rtx["unknown_compute_ownership"] is True
+    assert rtx["compute_processes"][0]["ownership"] == "UNKNOWN"
 
 
 def test_wddm_ui_context_still_blocks_when_aggregate_load_is_material(tmp_path):
@@ -241,6 +263,8 @@ def test_external_and_unknown_lane_ports_block(tmp_path):
     assert _run(tmp_path, ports=external, processes=processes)[1]["status"] == "PRECHECK_BLOCKED"
     unknown = [{"port": 12100, "pid": 78}]
     assert _run(tmp_path, ports=unknown, processes=[])[1]["status"] == "PRECHECK_BLOCKED"
+    unknown_4090 = [{"port": 12409, "pid": 79}]
+    assert _run(tmp_path, ports=unknown_4090, processes=[])[1]["status"] == "PRECHECK_BLOCKED"
 
 
 def test_expected_estate_lane_port_is_allowed(tmp_path):
