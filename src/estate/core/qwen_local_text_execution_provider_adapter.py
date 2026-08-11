@@ -33,7 +33,13 @@ from estate.core.execution_provider_adapter import (
 from estate.core.paths import ESTATE_ROOT
 from estate.core.authority_schema_runtime import require_valid
 from estate.core.compute_resources import ComputeResourceRequirements
-from estate.core.gpu_runtime_lanes import RuntimeLane, load_registered_lanes, require_allocation_matches_lane
+from estate.core.gpu_runtime_lanes import (
+    RuntimeLane,
+    load_registered_lanes,
+    observe_ollama_runtime_gpu_identity,
+    require_allocation_matches_lane,
+    runtime_log_position,
+)
 
 PROVIDER_ID = "qwen.local.text"
 ADAPTER_ID = "qwen-local-ollama-text-adapter"
@@ -93,10 +99,12 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
     provider_type = "execution"
 
     def __init__(self, *, root: str | Path | None = None, config_path: str | Path | None = None,
-                 http_call: Callable[..., tuple[int, dict[str, Any]]] | None = None) -> None:
+                 http_call: Callable[..., tuple[int, dict[str, Any]]] | None = None,
+                 runtime_identity_observer: Callable[[str | Path, RuntimeLane, int | None], dict[str, Any] | None] | None = None) -> None:
         self.root = _root(root)
         self.config_path = Path(config_path) if config_path else self.root / "config/providers/qwen_local_text.json"
         self.http_call = http_call or self._http_call
+        self.runtime_identity_observer = runtime_identity_observer or observe_ollama_runtime_gpu_identity
 
     def _config(self) -> dict[str, Any]:
         try:
@@ -257,6 +265,11 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
         sources = artifact_sources or {}
         extension = request.provider_extension or {}
         ptm = request.ptm_readiness or {}
+        actual_identity = request.metadata.get("actual_runtime_gpu_identity")
+        actual_uuid = actual_identity.get("nvidia_uuid") if isinstance(actual_identity, dict) else None
+        actual_resource = actual_identity.get("compute_resource_id") if isinstance(actual_identity, dict) else None
+        required_uuid = (request.compute_resource_requirements or {}).get("required_gpu_uuid")
+        required_resource = (request.compute_resource_requirements or {}).get("required_resource_id")
         correlation = {
             "provider_id": request.provider_id,
             "provider_type": request.provider_type,
@@ -286,9 +299,15 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             "artifact_path": extension.get("artifact_path"),
             "provider_receipt_path": receipt_ref,
             "runtime_lane_id": request.metadata.get("runtime_lane_evidence", {}).get("runtime_lane_id"),
-            "allocated_compute_resource_id": (request.compute_resource_requirements or {}).get("required_resource_id"),
-            "allocated_gpu_uuid": (request.compute_resource_requirements or {}).get("required_gpu_uuid"),
-            "runtime_bound_gpu_uuid": request.metadata.get("runtime_lane_evidence", {}).get("gpu_uuid"),
+            "allocated_compute_resource_id": required_resource,
+            "allocated_gpu_uuid": required_uuid,
+            "configured_required_gpu_uuid": request.metadata.get("configured_required_gpu_uuid"),
+            "configured_lane_gpu_uuid": request.metadata.get("configured_lane_gpu_uuid"),
+            "actual_runtime_gpu_identity": actual_identity,
+            "actual_runtime_gpu_uuid": actual_uuid,
+            "actual_runtime_resource_id": actual_resource,
+            "placement_match": bool(actual_uuid and actual_resource and actual_uuid == required_uuid and actual_resource == required_resource),
+            "runtime_bound_gpu_uuid": actual_uuid,
             "runtime_process_id": request.metadata.get("runtime_lane_evidence", {}).get("process_id"),
         }
         payload = {
@@ -459,8 +478,12 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Qwen local adapter request blocked by governed output collision.", validation_status="failed", errors=target_errors, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
         lane = self._runtime_lane(request, config)
         endpoint = (lane.endpoint_address if lane else config["endpoint_address"]).rstrip("/"); metadata = request.metadata; extension = request.provider_extension or {}; prompt = str(metadata.get("prompt_text") or ""); actual_model = None; document_path = next(path for path in request.expected_outputs if not str(path).replace("\\", "/").startswith("runtime/")); receipt_ref = str(extension.get("provider_receipt_path") or metadata.get("provider_receipt_path") or "").replace("\\", "/"); receipt_target = self.root / receipt_ref; staging_dir = self._new_staging_directory(request); staged_document = staging_dir / "document-output"; staged_document_hash = None; published_document = False
+        requirements = ComputeResourceRequirements.from_dict(request.compute_resource_requirements)
         if lane:
             metadata["runtime_lane_evidence"] = lane.to_dict()
+        metadata["configured_required_gpu_uuid"] = requirements.required_gpu_uuid
+        metadata["configured_lane_gpu_uuid"] = lane.gpu_uuid if lane else None
+        metadata["actual_runtime_gpu_identity"] = None
         injection = metadata.get("test_failure_injection")
         if injection and os.environ.get("ESTATE_ENABLE_PROVIDER_FAILURE_INJECTION") != "1":
             return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="blocked", started_at=started, finished_at=utc_now(), summary="Provider failure injection is disabled outside explicit validation mode.", validation_status="failed", errors=["provider failure injection requires explicit validation enablement"], metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "live_provider_called": False})
@@ -486,12 +509,25 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 raise ValueError("bounded prompt_text is required")
             if len(prompt.encode("utf-8")) > int(config["context_limit"]) * 4:
                 raise ValueError("Qwen prompt exceeds the configured context bound")
+            runtime_log_offset = runtime_log_position(self.root, lane) if lane else None
             status, response = self.http_call("POST", endpoint + "/api/generate", {"model": config["model_identity"], "prompt": prompt, "stream": False, "options": {"num_ctx": config.get("context_limit"), "num_predict": config["output_limits"]["max_output_tokens"]}}, int(config["timeout_seconds"]))
             text = response.get("response") if isinstance(response, dict) else None; actual_model = response.get("model") if isinstance(response, dict) else None
             if status >= 400 or not isinstance(text, str) or not text.strip():
                 raise ValueError("Qwen returned a malformed or incomplete response")
             if actual_model != config["model_identity"]:
                 raise ValueError("Qwen service returned a model identity different from the authorized model")
+            if requirements.requires_gpu:
+                observed_identity = self.runtime_identity_observer(self.root, lane, runtime_log_offset) if lane else None
+                metadata["actual_runtime_gpu_identity"] = observed_identity
+                actual_uuid = observed_identity.get("nvidia_uuid") if isinstance(observed_identity, dict) else None
+                actual_resource = observed_identity.get("compute_resource_id") if isinstance(observed_identity, dict) else None
+                backend_device = str(observed_identity.get("backend_device") or "") if isinstance(observed_identity, dict) else ""
+                if not actual_uuid or not actual_resource or not backend_device:
+                    raise ValueError("actual runtime GPU identity could not be established from owned backend evidence")
+                if not backend_device.upper().startswith(("CUDA", "VULKAN")):
+                    raise ValueError("GPU-required execution cannot silently fall back to a non-GPU backend")
+                if actual_uuid != requirements.required_gpu_uuid or actual_resource != requirements.required_resource_id:
+                    raise ValueError("actual runtime GPU identity does not match the required physical resource")
             eval_count = response.get("eval_count")
             if eval_count is not None and (not isinstance(eval_count, int) or eval_count > int(config["output_limits"]["max_output_tokens"])):
                 raise ValueError("Qwen output exceeds the configured token limit")
@@ -520,7 +556,8 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                 raise OSError(f"success receipt staging failed: {str(exc)[:400]}") from exc
             self._publish_no_replace(staging_dir / "success-receipt", receipt_target)
             self._remove_staging_directory(staging_dir)
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback runtime lane.", artifacts=[document_path, receipt_ref], validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": "completed", "runtime_lane_id": lane.runtime_lane_id if lane else None, "runtime_bound_gpu_uuid": lane.gpu_uuid if lane else None})
+            actual_identity = metadata.get("actual_runtime_gpu_identity")
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="completed", started_at=started, finished_at=utc_now(), summary="Qwen local text generation completed within the governed loopback runtime lane.", artifacts=[document_path, receipt_ref], validation_status="passed", metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": receipt_ref, "receipt_reference": receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": "completed", "runtime_lane_id": lane.runtime_lane_id if lane else None, "configured_required_gpu_uuid": requirements.required_gpu_uuid, "configured_lane_gpu_uuid": lane.gpu_uuid if lane else None, "actual_runtime_gpu_identity": actual_identity, "actual_runtime_gpu_uuid": actual_identity.get("nvidia_uuid") if isinstance(actual_identity, dict) else None, "actual_runtime_resource_id": actual_identity.get("compute_resource_id") if isinstance(actual_identity, dict) else None, "runtime_bound_gpu_uuid": actual_identity.get("nvidia_uuid") if isinstance(actual_identity, dict) else None, "placement_match": True if requirements.requires_gpu else None})
         except (OSError, HTTPError, URLError, TimeoutError, socket.timeout, ValueError, KeyError, json.JSONDecodeError, NotImplementedError) as exc:
             timeout_state = "timed_out" if isinstance(exc, (TimeoutError, socket.timeout)) or "timed out" in str(exc).lower() else "completed_within_limit"
             error_details = [str(exc)[:500]]
@@ -551,4 +588,5 @@ class QwenLocalTextExecutionProviderAdapter(ExecutionProviderAdapter):
                     failure_stage_cleanup = "staging_cleanup_failed"
                     error_details.append(f"failure receipt staging cleanup warning: {str(cleanup_error)[:300]}")
             retained_paths = [path for path in (staging_path, str(failure_stage)) if path and Path(path).is_dir()]
-            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_disposition": staging_disposition, "staging_directory": retained_paths[0] if retained_paths else None, "staging_directories": retained_paths, "failure_stage_cleanup": failure_stage_cleanup, "orphaned_artifacts": orphaned_artifacts, "artifact_hashes": {document_path: staged_document_hash} if staged_document_hash else {}})
+            actual_identity = metadata.get("actual_runtime_gpu_identity")
+            return ExecutionProviderAdapterResult(adapter_request_id=request.adapter_request_id, dispatch_id=request.dispatch_id, provider_id=PROVIDER_ID, status="failed", started_at=started, finished_at=utc_now(), summary="Qwen local provider invocation failed closed.", artifacts=[failure_receipt_ref] if failure_receipt_ref else [], validation_status="failed", errors=error_details, metadata={"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION, "provider_receipt": failure_receipt_ref, "receipt_reference": failure_receipt_ref, "actual_model_identity": actual_model, "live_provider_called": True, "endpoint_local": True, "transaction_state": transaction_state, "staging_disposition": staging_disposition, "staging_directory": retained_paths[0] if retained_paths else None, "staging_directories": retained_paths, "failure_stage_cleanup": failure_stage_cleanup, "orphaned_artifacts": orphaned_artifacts, "artifact_hashes": {document_path: staged_document_hash} if staged_document_hash else {}, "runtime_lane_id": lane.runtime_lane_id if lane else None, "configured_required_gpu_uuid": requirements.required_gpu_uuid, "configured_lane_gpu_uuid": lane.gpu_uuid if lane else None, "actual_runtime_gpu_identity": actual_identity, "actual_runtime_gpu_uuid": actual_identity.get("nvidia_uuid") if isinstance(actual_identity, dict) else None, "actual_runtime_resource_id": actual_identity.get("compute_resource_id") if isinstance(actual_identity, dict) else None, "runtime_bound_gpu_uuid": actual_identity.get("nvidia_uuid") if isinstance(actual_identity, dict) else None, "placement_match": False if requirements.requires_gpu else None})

@@ -40,6 +40,12 @@
         "runtime_lane_id": {"type": ["string", "null"]},
         "allocated_compute_resource_id": {"type": ["string", "null"]},
         "allocated_gpu_uuid": {"type": ["string", "null"]},
+        "configured_required_gpu_uuid": {"type": ["string", "null"]},
+        "configured_lane_gpu_uuid": {"type": ["string", "null"]},
+        "actual_runtime_gpu_identity": {"type": ["object", "null"]},
+        "actual_runtime_gpu_uuid": {"type": ["string", "null"]},
+        "actual_runtime_resource_id": {"type": ["string", "null"]},
+        "placement_match": {"type": "boolean"},
         "runtime_bound_gpu_uuid": {"type": ["string", "null"]},
         "runtime_process_id": {"type": ["integer", "string", "null"]}
       }

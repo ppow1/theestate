@@ -7,7 +7,7 @@ import pytest
 from estate.core.compute_resources import ComputeResourceRequirements
 from estate.core.compute_resources import ComputeResourceObservation
 from estate.core.compute_office_panel import build_compute_panel
-from estate.core.gpu_runtime_lanes import RuntimeLane, load_registered_lanes, require_allocation_matches_lane, select_runtime_lane
+from estate.core.gpu_runtime_lanes import RuntimeLane, lane_environment, load_registered_lanes, observe_ollama_runtime_gpu_identity, require_allocation_matches_lane, select_runtime_lane
 
 
 def lane(name: str, uuid: str, port: int) -> RuntimeLane:
@@ -56,13 +56,47 @@ def test_p100_and_4090_instances_are_distinct_uuid_bound_lanes(tmp_path):
         compute_resource_id="host-a:nvidia:GPU-P100",
         gpu_uuid="GPU-P100",
         model_identity="llama3.2:3b",
-        environment_binding={"CUDA_VISIBLE_DEVICES": "GPU-P100", "OLLAMA_HOST": "127.0.0.1:12100"},
+        environment_binding={"CUDA_VISIBLE_DEVICES": "GPU-P100", "OLLAMA_HOST": "127.0.0.1:12100", "OLLAMA_LLM_LIBRARY": "cuda_v12", "OLLAMA_VULKAN": "0", "GGML_VK_VISIBLE_DEVICES": "-1"},
         provider_config_path="config/providers/qwen_local_text_p100.json",
         minimum_vram_mib=4096,
     )
     rtx = lane("qwen.local.text.4090", "GPU-4090", 12409)
     assert select_runtime_lane([p100, rtx], provider_id="qwen.local.text", model_identity="llama3.2:3b", required_gpu_uuid="GPU-P100", required_resource_id=p100.compute_resource_id)["selected"] == p100.runtime_lane_id
     assert select_runtime_lane([p100, rtx], provider_id="qwen.local.text", model_identity="qwen3:8b", required_gpu_uuid="GPU-P100", required_resource_id=p100.compute_resource_id)["eligible"] is False
+    assert lane_environment(p100)["OLLAMA_LLM_LIBRARY"] == "cuda_v12"
+    assert lane_environment(p100)["GGML_VK_VISIBLE_DEVICES"] == "-1"
+
+
+def test_runtime_identity_comes_from_owned_log_and_fresh_inventory(tmp_path, monkeypatch):
+    selected = lane("qwen.local.text.p100", "GPU-P100", 12100)
+    log = tmp_path / "runtime/compute_resources/lane_logs/p100.stderr.log"
+    log.parent.mkdir(parents=True)
+    log.write_text("llama_prepare_model_devices: using device CUDA0 (Tesla P100-PCIE-16GB) (0000:04:00.0)\n", encoding="utf-8")
+    evidence = tmp_path / "runtime/compute_resources/runtime_lanes.json"
+    evidence.write_text(json.dumps({"lanes": [{"runtime_lane_id": selected.runtime_lane_id, "runtime_stderr_log": "runtime/compute_resources/lane_logs/p100.stderr.log"}]}), encoding="utf-8")
+    observed = ComputeResourceObservation(resource_id="host-a:nvidia:GPU-P100", host_id="host-a", nvidia_uuid="GPU-P100", name="Tesla P100-PCIE-16GB", pci_bus_id="00000000:04:00.0")
+    monkeypatch.setattr("estate.core.gpu_runtime_lanes.collect_nvidia_smi", lambda host_id: [observed])
+    identity = observe_ollama_runtime_gpu_identity(tmp_path, selected, 0)
+    assert identity["nvidia_uuid"] == "GPU-P100"
+    assert identity["compute_resource_id"] == "host-a:nvidia:GPU-P100"
+    assert identity["backend_device"] == "CUDA0"
+
+
+def test_runtime_identity_does_not_infer_uuid_from_lane_when_inventory_cannot_correlate(tmp_path, monkeypatch):
+    selected = lane("qwen.local.text.p100", "GPU-P100", 12100)
+    log = tmp_path / "runtime/compute_resources/lane_logs/p100.stderr.log"
+    log.parent.mkdir(parents=True)
+    log.write_text("using device Vulkan0 (NVIDIA GeForce RTX 4090) (0000:07:00.0)\n", encoding="utf-8")
+    (tmp_path / "runtime/compute_resources/runtime_lanes.json").write_text(json.dumps({"lanes": [{"runtime_lane_id": selected.runtime_lane_id, "runtime_stderr_log": "runtime/compute_resources/lane_logs/p100.stderr.log"}]}), encoding="utf-8")
+    monkeypatch.setattr("estate.core.gpu_runtime_lanes.collect_nvidia_smi", lambda host_id: [])
+    identity = observe_ollama_runtime_gpu_identity(tmp_path, selected, 0)
+    assert identity["nvidia_uuid"] is None
+    assert identity["compute_resource_id"] is None
+
+
+def test_runtime_identity_rejects_stale_log_when_request_offset_is_unavailable(tmp_path):
+    selected = lane("qwen.local.text.p100", "GPU-P100", 12100)
+    assert observe_ollama_runtime_gpu_identity(tmp_path, selected, None) is None
 
 
 def test_lane_provider_config_cannot_escape_provider_directory():

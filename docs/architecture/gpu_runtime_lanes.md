@@ -9,14 +9,22 @@ runtime ordinals are not accepted as identity.
 contains the lane, provider/model compatibility, loopback endpoint, resource
 ID, UUID, and an allow-listed environment binding. The lane launcher starts a
 candidate process with `CUDA_VISIBLE_DEVICES=<full UUID>` and records only
-safe process/binding evidence in `runtime/compute_resources/runtime_lanes.json`.
+safe process/binding evidence and owned runner-log paths in
+`runtime/compute_resources/runtime_lanes.json`. Backend controls are also
+allow-listed per runtime instance. For example, a CUDA-qualified instance can
+select an installed Ollama CUDA library and disable Vulkan discovery so the
+Vulkan scheduler cannot silently select another physical GPU.
 The shared machine Ollama daemon remains an existing Core dependency; it is not
 used as a fallback for a required pinned request.
 
 When a request requires a GPU, the Qwen adapter requires a registered lane and
-checks allocated resource ID and UUID equality before model execution. The
-receipt records the lane, endpoint, allocated UUID, bound UUID, and process
-identity. A mismatch or missing lane fails closed. Grace/operator text cannot
+checks allocated resource ID and UUID equality before model execution. After
+model execution it parses the owned backend's selected-device evidence and
+correlates the reported PCI device to a fresh NVIDIA inventory. The receipt
+keeps configured-required and configured-lane UUIDs separate from the actual
+runtime identity. `runtime_bound_gpu_uuid` is actual evidence only; it is
+never derived from the lane configuration. Missing or contradictory runtime
+identity fails closed before a success artifact can be published. Grace/operator text cannot
 inject an endpoint; only governed lane IDs carried by the execution authority
 are accepted.
 

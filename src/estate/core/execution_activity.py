@@ -106,6 +106,9 @@ class ExecutionActivityEvent:
     estimated_completion: str | None = None
     compute_resource_id: str | None = None
     gpu_uuid: str | None = None
+    actual_runtime_resource_id: str | None = None
+    actual_runtime_gpu_uuid: str | None = None
+    placement_match: bool | None = None
     runtime_lane_id: str | None = None
     model_identity: str | None = None
     reservation_reference: str | None = None
@@ -138,6 +141,9 @@ class ActivityItem:
     updated_at: str | None
     compute_resource_id: str | None = None
     gpu_uuid: str | None = None
+    actual_runtime_resource_id: str | None = None
+    actual_runtime_gpu_uuid: str | None = None
+    placement_match: bool | None = None
     runtime_lane_id: str | None = None
     model_identity: str | None = None
     reservation_reference: str | None = None
@@ -247,6 +253,9 @@ def normalize_activity_event(data: dict[str, Any], *, source: str = "execution_a
         "budget_source",
         "classification",
         "compute_resource_id",
+        "actual_runtime_resource_id",
+        "actual_runtime_gpu_uuid",
+        "placement_match",
         "current_assignment",
         "current_state",
         "elapsed_seconds",
@@ -300,6 +309,9 @@ def normalize_activity_event(data: dict[str, Any], *, source: str = "execution_a
         estimated_completion=_string_or_none(_first(data, "estimated_completion")),
         compute_resource_id=_string_or_none(_first(data, "compute_resource_id")),
         gpu_uuid=_string_or_none(_first(data, "gpu_uuid")),
+        actual_runtime_resource_id=_string_or_none(_first(data, "actual_runtime_resource_id")),
+        actual_runtime_gpu_uuid=_string_or_none(_first(data, "actual_runtime_gpu_uuid")),
+        placement_match=_coerce_bool(_first(data, "placement_match"), default=False) if _first(data, "placement_match") is not None else None,
         runtime_lane_id=_string_or_none(_first(data, "runtime_lane_id")),
         model_identity=_string_or_none(_first(data, "model_identity")),
         reservation_reference=_string_or_none(_first(data, "reservation_reference")),
@@ -440,6 +452,9 @@ def _item_from_events(request_id: str | None, events: list[ExecutionActivityEven
         updated_at=latest.timestamp,
         compute_resource_id=latest.compute_resource_id,
         gpu_uuid=latest.gpu_uuid,
+        actual_runtime_resource_id=latest.actual_runtime_resource_id,
+        actual_runtime_gpu_uuid=latest.actual_runtime_gpu_uuid,
+        placement_match=latest.placement_match,
         runtime_lane_id=latest.runtime_lane_id,
         model_identity=latest.model_identity,
         reservation_reference=latest.reservation_reference,

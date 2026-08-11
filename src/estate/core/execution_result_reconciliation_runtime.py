@@ -133,10 +133,13 @@ def _activity_events(item: Any, result: ExecutionProviderAdapterResult, target_s
         "validation_status": "prepared" if target_state == "Validation" else result.validation_status,
         "compute_resource_id": requirements.get("required_resource_id"),
         "gpu_uuid": requirements.get("required_gpu_uuid"),
+        "actual_runtime_resource_id": result.metadata.get("actual_runtime_resource_id"),
+        "actual_runtime_gpu_uuid": result.metadata.get("actual_runtime_gpu_uuid") or result.metadata.get("runtime_bound_gpu_uuid"),
+        "placement_match": result.metadata.get("placement_match"),
         "runtime_lane_id": extension.get("runtime_lane_id") or result.metadata.get("runtime_lane_id"),
         "model_identity": extension.get("authorized_model_identity") or result.metadata.get("actual_model_identity"),
         "reservation_reference": requirements.get("reservation_reference"),
-        "metadata": {"adapter_request_id": result.adapter_request_id, "result_content_hash": content_hash, "institutional_acceptance_state": "not_granted"},
+        "metadata": {"adapter_request_id": result.adapter_request_id, "result_content_hash": content_hash, "institutional_acceptance_state": "not_granted", "intended_compute_resource_id": requirements.get("required_resource_id"), "intended_gpu_uuid": requirements.get("required_gpu_uuid"), "actual_runtime_resource_id": result.metadata.get("actual_runtime_resource_id"), "actual_runtime_gpu_uuid": result.metadata.get("actual_runtime_gpu_uuid") or result.metadata.get("runtime_bound_gpu_uuid"), "placement_match": result.metadata.get("placement_match")},
     }
     status_event = {
         "completed": "provider_execution_completed",

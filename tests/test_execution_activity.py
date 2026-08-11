@@ -262,6 +262,9 @@ def test_multiple_physical_resources_remain_distinct_in_office_activity(tmp_path
             "provider": "qwen.local.text",
             "compute_resource_id": "host:nvidia:GPU-A",
             "gpu_uuid": "GPU-A",
+            "actual_runtime_resource_id": "host:nvidia:GPU-B",
+            "actual_runtime_gpu_uuid": "GPU-B",
+            "placement_match": False,
             "runtime_lane_id": "lane-a",
             "model_identity": "model-a",
             "reservation_reference": "reservation-a",
@@ -290,3 +293,7 @@ def test_multiple_physical_resources_remain_distinct_in_office_activity(tmp_path
     }
     assert {item["runtime_lane_id"] for item in snapshot["active"]} == {"lane-a", "lane-b"}
     assert {item["reservation_reference"] for item in snapshot["active"]} == {"reservation-a", "reservation-b"}
+    mismatch = next(item for item in snapshot["active"] if item["request_id"] == "dispatch-a")
+    assert mismatch["gpu_uuid"] == "GPU-A"
+    assert mismatch["actual_runtime_gpu_uuid"] == "GPU-B"
+    assert mismatch["placement_match"] is False
