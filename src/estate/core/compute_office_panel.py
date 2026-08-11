@@ -8,6 +8,7 @@ import json
 from estate.core.compute_resources import GPU_RESERVATIONS, GPU_SNAPSHOT, build_compute_projection, collect_nvidia_smi, write_compute_projection
 from estate.core.paths import ESTATE_ROOT
 from estate.core.gpu_runtime_lanes import LANE_EVIDENCE, load_registered_lanes
+from estate.core.gpu_runtime_lifecycle import inspect_gpu_runtime_lanes
 
 OPERATOR_SUMMARY = Path("runtime/compute_resources/operator_summary.json")
 
@@ -30,11 +31,18 @@ def _runtime_lane_projection(base: Path) -> list[dict[str, Any]]:
     except (OSError, ValueError, AttributeError):
         pass
     rows: list[dict[str, Any]] = []
+    try:
+        lifecycle = inspect_gpu_runtime_lanes(base)
+        lifecycle_by_id = {item["runtime_lane_id"]: item for item in lifecycle.get("lanes", [])}
+    except (OSError, RuntimeError, ValueError):
+        lifecycle_by_id = {}
     for lane in load_registered_lanes(base):
         row = lane.to_dict()
         evidence = evidence_by_id.get(lane.runtime_lane_id, {})
         row.update({key: evidence[key] for key in ("process_id", "process_identity", "started_at", "observed_at") if key in evidence})
         row["endpoint_identity"] = lane.runtime_lane_id
+        status = lifecycle_by_id.get(lane.runtime_lane_id, {})
+        row.update({"lifecycle_state": status.get("state", "UNKNOWN"), "ownership": status.get("ownership", "UNKNOWN"), "quiesce_allowed": status.get("quiesce_allowed", False), "stale_candidate": status.get("stale_candidate", False), "last_cleanup_result": status.get("last_cleanup_result")})
         rows.append(row)
     return rows
 

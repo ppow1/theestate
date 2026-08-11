@@ -157,3 +157,35 @@ def test_no_live_provider_or_acceptance_mutation(tmp_path, monkeypatch):
     payload = reconcile_result("dispatch-result-001", write_result(tmp_path, result()), tmp_path)
     assert payload["live_provider_called"] is False
     assert payload["institutional_acceptance_state"] == "not_granted"
+
+
+def test_reconciliation_projects_generic_physical_resource_context(tmp_path):
+    enqueue_dispatch_request(dispatch_payload(
+        compute_resource_requirements={
+            "requires_gpu": True,
+            "required_resource_id": "host:nvidia:GPU-A",
+            "required_gpu_uuid": "GPU-A",
+            "reservation_reference": "reservation-a",
+        },
+        provider_metadata={
+            "adapter_request_id": "adapter-result-001",
+            "validation_required": True,
+            "provider_extension": {
+                "runtime_lane_id": "lane-a",
+                "authorized_model_identity": "model-a",
+            },
+        },
+    ), tmp_path)
+
+    reconcile_result("dispatch-result-001", write_result(tmp_path, result(metadata={"live_provider_called": True, "actual_runtime_resource_id": "host:nvidia:GPU-B", "actual_runtime_gpu_uuid": "GPU-B", "placement_match": False})), tmp_path)
+    activity = json.loads((tmp_path / "runtime/execution_activity/current.json").read_text())
+    item = activity["active"][0]
+
+    assert item["compute_resource_id"] == "host:nvidia:GPU-A"
+    assert item["gpu_uuid"] == "GPU-A"
+    assert item["actual_runtime_resource_id"] == "host:nvidia:GPU-B"
+    assert item["actual_runtime_gpu_uuid"] == "GPU-B"
+    assert item["placement_match"] is False
+    assert item["runtime_lane_id"] == "lane-a"
+    assert item["model_identity"] == "model-a"
+    assert item["reservation_reference"] == "reservation-a"

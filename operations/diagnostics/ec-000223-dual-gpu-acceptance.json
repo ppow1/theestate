@@ -1,0 +1,95 @@
+{
+  "schema_version": "estate.ec-000223.dual-gpu-acceptance.v1",
+  "estate_change": "EC-000223",
+  "status": "Not accepted - Task B runtime selected RTX 4090 through Vulkan",
+  "provider_overlap": {
+    "task_a_start": "2026-08-11T18:10:13Z",
+    "task_a_finish": "2026-08-11T18:10:25Z",
+    "task_b_start": "2026-08-11T18:10:13Z",
+    "task_b_finish": "2026-08-11T18:10:21Z",
+    "overlap_seconds": 8.0,
+    "positive": true
+  },
+  "tasks": [
+    {
+      "task": "A",
+      "objective_id": "grace-obj-25a3b22e18f6",
+      "action_id": "grace-act-9a451083e6d7",
+      "ptm_readiness_resolution_id": "res_01KZS0912RM54BC12V6KR6GP6K",
+      "helen_determination_id": "heldet-defaa6f6d439",
+      "engineering_commission_id": "engcom-a8ec0d715c9e",
+      "engineering_authorization_id": "engauth-f2a3c584bf39",
+      "reservation_id": "gpu-reservation-grace-obj-25a3b22e18f6",
+      "dispatch_id": "dispatch-aa8acb1ff5f9",
+      "adapter_request_id": "adapter-dispatch-aa8acb1ff5f9",
+      "provider_receipt": "runtime/engineering_adapter_receipts/ec_000223_task_a_grace-obj-25a3b22e18f6.json",
+      "grace_receipt_id": "gracereceipt-369f85a0a9c6",
+      "model": "qwen3:8b",
+      "lane": "qwen.local.text.4090",
+      "resource_id": "DESKTOP-JA3RPNQ:nvidia:GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+      "gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+      "lane_process_id": 6840
+    },
+    {
+      "task": "B",
+      "objective_id": "grace-obj-33c55ec1c69f",
+      "action_id": "grace-act-dadae608b1e8",
+      "ptm_readiness_resolution_id": "res_01KZS092VCFQN9XAK8H5Z4H16H",
+      "helen_determination_id": "heldet-99b3e2d20b60",
+      "engineering_commission_id": "engcom-a168dfb1203e",
+      "engineering_authorization_id": "engauth-5476ead9f19e",
+      "reservation_id": "gpu-reservation-grace-obj-33c55ec1c69f",
+      "dispatch_id": "dispatch-f6a0aea1bdfb",
+      "adapter_request_id": "adapter-dispatch-f6a0aea1bdfb",
+      "provider_receipt": "runtime/engineering_adapter_receipts/ec_000223_task_b_grace-obj-33c55ec1c69f.json",
+      "grace_receipt_id": "gracereceipt-91b09258a6ab",
+      "model": "llama3.2:3b",
+      "lane": "qwen.local.text.p100-1",
+      "resource_id": "DESKTOP-JA3RPNQ:nvidia:GPU-6785b322-899d-8eec-e817-31d83279a414",
+      "gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+      "actual_runtime_gpu": "NVIDIA GeForce RTX 4090 (0000:07:00.0) via Vulkan0",
+      "lane_process_id": 25528
+    }
+  ],
+  "uuid_equality": {
+    "task_a": "required == authorized == reservation resource == Dispatch == adapter == allocation == lane == CUDA_VISIBLE_DEVICES == provider receipt runtime UUID",
+    "task_b": "required/authorized/reservation/Dispatch/adapter/allocation/lane/CUDA_VISIBLE_DEVICES/provider receipt claimed the P100 UUID, but the owned runtime log selected Vulkan0 NVIDIA GeForce RTX 4090 at 0000:07:00.0",
+    "cross_assignment": true,
+    "fallback": false
+  },
+  "runtime_placement_failure": {
+    "task": "B",
+    "required_gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "receipt_runtime_bound_gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "runtime_log_device": "Vulkan0 (NVIDIA GeForce RTX 4090) (0000:07:00.0)",
+    "runtime_log_offload": "offloaded 29/29 layers to GPU; Vulkan0 model buffer 1918.35 MiB; Vulkan0 KV buffer 896.00 MiB",
+    "corroborating_telemetry": "P100 remained at 9 MiB and 0 percent utilization through all six overlap samples",
+    "disposition": "fail closed; no retry"
+  },
+  "telemetry": [
+    {"timestamp": "2026-08-11T18:10:13Z", "p100": {"utilization_percent": 0, "memory_used_mib": 9, "temperature_c": 39, "power_w": 26.61}, "rtx_4090": {"utilization_percent": 3, "memory_used_mib": 2963, "temperature_c": 54, "power_w": 57.05}},
+    {"timestamp": "2026-08-11T18:10:17Z", "p100": {"utilization_percent": 0, "memory_used_mib": 9, "temperature_c": 39, "power_w": 32.38}, "rtx_4090": {"utilization_percent": 14, "memory_used_mib": 8001, "temperature_c": 54, "power_w": 59.78}},
+    {"timestamp": "2026-08-11T18:10:19Z", "p100": {"utilization_percent": 0, "memory_used_mib": 9, "temperature_c": 39, "power_w": 26.66}, "rtx_4090": {"utilization_percent": 30, "memory_used_mib": 10014, "temperature_c": 57, "power_w": 76.99}}
+  ],
+  "office_compute": {
+    "independent_assignment_count": 2,
+    "generic_n_resource_projection": true
+  },
+  "stream_deck": {
+    "compatible": true,
+    "fields": ["health_state", "memory_used_mib", "memory_total_mib", "utilization_percent"]
+  },
+  "postflight": {
+    "p100": {"uuid_unchanged": true, "pci_bus": "00000000:04:00.0", "nvml": "OK", "pnp": "OK", "memory_free_mib": 16280, "utilization_percent": 0},
+    "rtx_4090": {"uuid_unchanged": true, "pci_bus": "00000000:07:00.0", "nvml": "OK", "pnp": "OK", "memory_free_mib": 21175, "utilization_percent": 8},
+    "owned_processes_remaining": [],
+    "lane_ports_listening": []
+  },
+  "limitations": [
+    "heavy parallel workloads are not qualified",
+    "SDXL parallelism is not qualified",
+    "P100 32B parallelism is not qualified",
+    "unrestricted scheduler saturation is not qualified",
+    "Ollama Vulkan device selection is not constrained by CUDA_VISIBLE_DEVICES on this host"
+  ]
+}

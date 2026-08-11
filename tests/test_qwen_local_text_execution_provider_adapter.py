@@ -56,8 +56,10 @@ def _transport(response_text="Generated local Qwen text.", model="qwen3:8b", hea
     return call
 
 
-def _technical_request(tmp_path: Path, *, response_text: str, output_name: str, requested_capability: str = "text_generation") -> tuple[ExecutionProviderAdapterRequest, QwenLocalTextExecutionProviderAdapter]:
-    gpu_uuid = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+_DEFAULT_IDENTITY = object()
+
+
+def _technical_request(tmp_path: Path, *, response_text: str, output_name: str, requested_capability: str = "text_generation", gpu_uuid: str = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", actual_identity=_DEFAULT_IDENTITY, backend_environment: dict[str, str] | None = None) -> tuple[ExecutionProviderAdapterRequest, QwenLocalTextExecutionProviderAdapter]:
     resource_id = f"test-host:nvidia:{gpu_uuid}"
     lane = {
         "runtime_lane_id": "qwen.local.text.4090",
@@ -68,7 +70,7 @@ def _technical_request(tmp_path: Path, *, response_text: str, output_name: str, 
         "compute_resource_id": resource_id,
         "gpu_uuid": gpu_uuid,
         "model_identity": "qwen3:8b",
-        "environment_binding": {"CUDA_VISIBLE_DEVICES": gpu_uuid, "OLLAMA_HOST": "127.0.0.1:12409"},
+        "environment_binding": {"CUDA_VISIBLE_DEVICES": gpu_uuid, "OLLAMA_HOST": "127.0.0.1:12409", **(backend_environment or {})},
     }
     (tmp_path / "config/runtime").mkdir(parents=True)
     (tmp_path / "config/runtime/gpu_runtime_lanes.json").write_text(json.dumps({"lanes": [lane]}), encoding="utf-8")
@@ -94,7 +96,9 @@ def _technical_request(tmp_path: Path, *, response_text: str, output_name: str, 
     request.compute_resource_requirements = {"requires_gpu": True, "required_gpu_uuid": gpu_uuid, "required_resource_id": resource_id, "minimum_vram_mib": 8192, "reservation_reference": "reservation-test", "evidence_reference": "runtime/compute_resources/gpus.json", "freshness_seconds": 120, "excluded_resource_ids": [], "compatibility_tags": []}
     request.provider_extension = {"schema_version": "estate.qwen-local-text.execution-extension.v1", "provider_id": "qwen.local.text", "adapter_id": "qwen-local-ollama-text-adapter", "adapter_version": "1.0.0", "requested_capability": requested_capability, "evidence_observed_at": now.isoformat().replace("+00:00", "Z"), "evidence_expires_at": (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z"), "authorized_model_identity": "qwen3:8b", "provider_receipt_path": receipt, "artifact_path": artifact, "provider_health_evidence": ["runtime/provider_health/test.json"], "provider_health_evidence_digests": ["c" * 64], "runtime_lane_id": "qwen.local.text.4090"}
     request.metadata.update({"technical_execution": True, "provider_id": "qwen.local.text", "adapter_reference": request.adapter_reference, "prompt_source_digest": request.prompt_source_digest, "prompt_source_type": request.prompt_source_type, "grace_objective_id": request.grace_objective_id, "grace_action_id": request.grace_action_id, "helen_determination_id": request.helen_determination_id, "engineering_commission_id": request.engineering_commission_id, "engineering_authorization_id": request.engineering_authorization_id, "authorization_reference": request.authorization_reference, "operations_decision_id": "opdec-test", "capability_inquiry_reference": "capinq-test", "authorization_record_digest": "d" * 64, "prompt_text": "Write one short sentence.", "sandbox": "read-only"})
-    return request, QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(response_text))
+    identity = ({"evidence_source": "owned_ollama_runner_log+nvidia-smi", "backend_device": "CUDA0", "device_name": "NVIDIA GPU", "pci_bus_id": "00000000:07:00.0", "nvidia_uuid": gpu_uuid, "compute_resource_id": resource_id} if actual_identity is _DEFAULT_IDENTITY else actual_identity)
+    observer = lambda root, runtime_lane, offset: identity
+    return request, QwenLocalTextExecutionProviderAdapter(root=tmp_path, config_path=CONFIG_PATH, http_call=_transport(response_text), runtime_identity_observer=observer)
 
 
 def test_technical_content_failure_persists_uuid_bound_failure_receipt(tmp_path):
@@ -109,6 +113,7 @@ def test_technical_content_failure_persists_uuid_bound_failure_receipt(tmp_path)
     assert correlation["allocated_gpu_uuid"] == correlation["runtime_bound_gpu_uuid"] == request.compute_resource_requirements["required_gpu_uuid"]
     assert correlation["allocated_compute_resource_id"] == request.compute_resource_requirements["required_resource_id"]
     assert correlation["runtime_lane_id"] == "qwen.local.text.4090"
+    assert correlation["actual_runtime_gpu_identity"]["evidence_source"] == "owned_ollama_runner_log+nvidia-smi"
 
 
 def test_technical_text_generation_success_persists_capability_appropriate_receipt(tmp_path):
@@ -119,6 +124,58 @@ def test_technical_text_generation_success_persists_capability_appropriate_recei
     payload = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
     assert payload["transaction_state"] == "completed"
     assert payload["governed_correlation"]["runtime_bound_gpu_uuid"] == request.compute_resource_requirements["required_gpu_uuid"]
+    assert payload["governed_correlation"]["configured_required_gpu_uuid"] == request.compute_resource_requirements["required_gpu_uuid"]
+    assert payload["governed_correlation"]["configured_lane_gpu_uuid"] == request.compute_resource_requirements["required_gpu_uuid"]
+    assert payload["governed_correlation"]["placement_match"] is True
+
+
+def test_p100_runtime_identity_match_succeeds_and_is_observed_separately(tmp_path):
+    p100 = "GPU-6785b322-899d-8eec-e817-31d83279a414"
+    request, adapter = _technical_request(tmp_path, response_text="The P100 task completed.", output_name="p100-match", gpu_uuid=p100, backend_environment={"OLLAMA_LLM_LIBRARY": "cuda_v12", "OLLAMA_VULKAN": "0", "GGML_VK_VISIBLE_DEVICES": "-1"})
+    result = adapter.submit(request)
+    assert result.status == "completed"
+    assert result.metadata["configured_required_gpu_uuid"] == p100
+    assert result.metadata["actual_runtime_gpu_uuid"] == p100
+    receipt = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    assert receipt["governed_correlation"]["actual_runtime_gpu_uuid"] == p100
+
+
+def test_p100_runtime_4090_mismatch_fails_closed_without_success_artifact(tmp_path):
+    p100 = "GPU-6785b322-899d-8eec-e817-31d83279a414"
+    rtx = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+    actual = {"evidence_source": "owned_ollama_runner_log+nvidia-smi", "backend_device": "Vulkan0", "device_name": "NVIDIA GeForce RTX 4090", "pci_bus_id": "00000000:07:00.0", "nvidia_uuid": rtx, "compute_resource_id": f"test-host:nvidia:{rtx}"}
+    request, adapter = _technical_request(tmp_path, response_text="Wrong GPU output.", output_name="p100-mismatch", gpu_uuid=p100, actual_identity=actual)
+    result = adapter.submit(request)
+    assert result.status == "failed"
+    assert "does not match" in result.errors[0]
+    assert not (tmp_path / "docs/operations/examples/p100-mismatch.md").exists()
+    receipt = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    correlation = receipt["governed_correlation"]
+    assert correlation["configured_required_gpu_uuid"] == p100
+    assert correlation["actual_runtime_gpu_uuid"] == rtx
+    assert correlation["runtime_bound_gpu_uuid"] == rtx
+    assert correlation["placement_match"] is False
+
+
+def test_gpu_runtime_identity_unavailable_fails_and_is_not_derived_from_config(tmp_path):
+    request, adapter = _technical_request(tmp_path, response_text="Unknown placement.", output_name="identity-unavailable", actual_identity=None)
+    result = adapter.submit(request)
+    assert result.status == "failed"
+    receipt = json.loads((tmp_path / result.metadata["provider_receipt"]).read_text())
+    correlation = receipt["governed_correlation"]
+    assert correlation["configured_lane_gpu_uuid"] == request.compute_resource_requirements["required_gpu_uuid"]
+    assert correlation["actual_runtime_gpu_identity"] is None
+    assert correlation["actual_runtime_gpu_uuid"] is None
+    assert correlation["runtime_bound_gpu_uuid"] is None
+
+
+def test_gpu_required_execution_rejects_silent_cpu_fallback(tmp_path):
+    gpu = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+    actual = {"evidence_source": "owned_ollama_runner_log", "backend_device": "CPU", "device_name": "CPU", "pci_bus_id": None, "nvidia_uuid": gpu, "compute_resource_id": f"test-host:nvidia:{gpu}"}
+    request, adapter = _technical_request(tmp_path, response_text="CPU output.", output_name="cpu-fallback", actual_identity=actual)
+    result = adapter.submit(request)
+    assert result.status == "failed"
+    assert "non-GPU backend" in result.errors[0]
 
 
 def test_explicit_commission_bound_failure_injection_is_disabled_by_default_and_truthful(tmp_path, monkeypatch):

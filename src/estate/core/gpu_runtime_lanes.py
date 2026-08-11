@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import shutil
 import subprocess
@@ -18,8 +19,11 @@ from typing import Any, Iterable
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from estate.core.compute_resources import collect_nvidia_smi
+
 LANE_CONFIG = Path("config/runtime/gpu_runtime_lanes.json")
 LANE_EVIDENCE = Path("runtime/compute_resources/runtime_lanes.json")
+LANE_LOG_DIR = Path("runtime/compute_resources/lane_logs")
 
 
 def utc_now() -> str:
@@ -68,11 +72,20 @@ class RuntimeLane:
             raise ValueError("runtime lane requires a full NVIDIA UUID")
         if self.environment_binding.get("CUDA_VISIBLE_DEVICES") != self.gpu_uuid:
             raise ValueError("runtime lane CUDA binding must equal its full GPU UUID")
-        allowed = {"CUDA_VISIBLE_DEVICES", "OLLAMA_HOST"}
+        allowed = {"CUDA_VISIBLE_DEVICES", "OLLAMA_HOST", "OLLAMA_LLM_LIBRARY", "OLLAMA_VULKAN", "GGML_VK_VISIBLE_DEVICES"}
         if set(self.environment_binding) - allowed:
             raise ValueError("runtime lane environment contains an unapproved field")
         if self.environment_binding.get("OLLAMA_HOST") and not _ollama_host_matches(self.endpoint_address, self.environment_binding["OLLAMA_HOST"]):
             raise ValueError("runtime lane OLLAMA_HOST must equal its endpoint")
+        library = self.environment_binding.get("OLLAMA_LLM_LIBRARY")
+        if library is not None and not re.fullmatch(r"[A-Za-z0-9_.-]+", library):
+            raise ValueError("runtime lane OLLAMA_LLM_LIBRARY is invalid")
+        vulkan = self.environment_binding.get("OLLAMA_VULKAN")
+        if vulkan is not None and vulkan.lower() not in {"0", "1", "false", "true"}:
+            raise ValueError("runtime lane OLLAMA_VULKAN must be a boolean value")
+        vk_devices = self.environment_binding.get("GGML_VK_VISIBLE_DEVICES")
+        if vk_devices is not None and not re.fullmatch(r"-1|\d+(?:,\d+)*", vk_devices):
+            raise ValueError("runtime lane GGML_VK_VISIBLE_DEVICES is invalid")
         if self.freshness_seconds < 1:
             raise ValueError("runtime lane freshness_seconds must be positive")
         if not self.provider_config_path.startswith("config/providers/") or ".." in self.provider_config_path.replace("\\", "/").split("/"):
@@ -139,7 +152,10 @@ def require_allocation_matches_lane(*, allocated_gpu_uuid: str | None, allocated
 def lane_environment(lane: RuntimeLane) -> dict[str, str]:
     lane.validate()
     parsed = urlparse(lane.endpoint_address)
-    return {"CUDA_VISIBLE_DEVICES": lane.gpu_uuid, "OLLAMA_HOST": f"{parsed.hostname}:{parsed.port}"}
+    environment = dict(lane.environment_binding)
+    environment["CUDA_VISIBLE_DEVICES"] = lane.gpu_uuid
+    environment["OLLAMA_HOST"] = f"{parsed.hostname}:{parsed.port}"
+    return environment
 
 
 def process_binding_evidence(lane: RuntimeLane, *, pid: int, process_identity: str, started_at: str | None = None) -> dict[str, Any]:
@@ -166,8 +182,23 @@ def start_ollama_lane(root: str | Path, lane: RuntimeLane, *, executable: str | 
     env.update(lane_environment(lane))
     env["OLLAMA_KEEP_ALIVE"] = "0"
     flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) | getattr(subprocess, "DETACHED_PROCESS", 0)
-    process = subprocess.Popen([binary, "serve"], cwd=str(Path(root)), env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
+    log_dir = Path(root) / LANE_LOG_DIR
+    log_dir.mkdir(parents=True, exist_ok=True)
+    safe_lane_id = re.sub(r"[^A-Za-z0-9_.-]", "_", lane.runtime_lane_id)
+    stdout_path = log_dir / f"{safe_lane_id}.stdout.log"
+    stderr_path = log_dir / f"{safe_lane_id}.stderr.log"
+    stdout_stream = stdout_path.open("ab")
+    stderr_stream = stderr_path.open("ab")
+    try:
+        process = subprocess.Popen([binary, "serve"], cwd=str(Path(root)), env=env, stdin=subprocess.DEVNULL, stdout=stdout_stream, stderr=stderr_stream, creationflags=flags)
+    finally:
+        stdout_stream.close()
+        stderr_stream.close()
     evidence = process_binding_evidence(lane, pid=process.pid, process_identity=f"{Path(binary).name} serve", started_at=utc_now())
+    evidence["executable_path"] = str(Path(binary).resolve())
+    evidence["process_command_line"] = f'"{Path(binary).resolve()}" serve'
+    evidence["runtime_stdout_log"] = str(stdout_path.relative_to(Path(root))).replace("\\", "/")
+    evidence["runtime_stderr_log"] = str(stderr_path.relative_to(Path(root))).replace("\\", "/")
     path = Path(root) / LANE_EVIDENCE
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = {}
@@ -180,3 +211,64 @@ def start_ollama_lane(root: str | Path, lane: RuntimeLane, *, executable: str | 
     rows.append(evidence)
     path.write_text(json.dumps({"schema_version": "estate.gpu-runtime-lane-evidence.v1", "lanes": rows}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return evidence
+
+
+def runtime_log_position(root: str | Path, lane: RuntimeLane) -> int | None:
+    """Return the current owned runner-log offset, never a configured binding."""
+    evidence_path = Path(root) / LANE_EVIDENCE
+    try:
+        payload = json.loads(evidence_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    row = next((item for item in payload.get("lanes", []) if item.get("runtime_lane_id") == lane.runtime_lane_id), None)
+    relative = row.get("runtime_stderr_log") if isinstance(row, dict) else None
+    if not isinstance(relative, str) or not relative:
+        return None
+    path = (Path(root) / relative).resolve(strict=False)
+    permitted = (Path(root) / LANE_LOG_DIR).resolve(strict=False)
+    try:
+        path.relative_to(permitted)
+        return path.stat().st_size
+    except (ValueError, OSError):
+        return None
+
+
+def observe_ollama_runtime_gpu_identity(root: str | Path, lane: RuntimeLane, from_offset: int | None) -> dict[str, Any] | None:
+    """Resolve Ollama's observed model device through fresh NVIDIA inventory.
+
+    The configured lane UUID is deliberately not used as actual-runtime proof.
+    """
+    if from_offset is None:
+        return None
+    evidence_path = Path(root) / LANE_EVIDENCE
+    try:
+        payload = json.loads(evidence_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    row = next((item for item in payload.get("lanes", []) if item.get("runtime_lane_id") == lane.runtime_lane_id), None)
+    relative = row.get("runtime_stderr_log") if isinstance(row, dict) else None
+    if not isinstance(relative, str) or not relative:
+        return None
+    path = (Path(root) / relative).resolve(strict=False)
+    permitted = (Path(root) / LANE_LOG_DIR).resolve(strict=False)
+    try:
+        path.relative_to(permitted)
+        with path.open("rb") as stream:
+            stream.seek(max(0, int(from_offset)))
+            raw = stream.read(1_048_577)
+    except (ValueError, OSError):
+        return None
+    if len(raw) > 1_048_576:
+        return None
+    text = raw.decode("utf-8", errors="replace")
+    matches = list(re.finditer(r"using device\s+(?P<backend>[A-Za-z]+\d+)\s+\((?P<name>[^\r\n()]*(?:\([^\r\n()]*\)[^\r\n()]*)*)\)\s+\((?P<pci>[0-9A-Fa-f]{4}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}\.[0-7])\)", text))
+    if not matches:
+        return None
+    match = matches[-1]
+    observed_pci = match.group("pci").lower()
+    inventory = collect_nvidia_smi(host_id=lane.host_id)
+    candidates = [item for item in inventory if str(item.pci_bus_id or "").lower().endswith(observed_pci)]
+    if len(candidates) != 1:
+        return {"evidence_source": "owned_ollama_runner_log", "backend_device": match.group("backend"), "device_name": match.group("name").strip(), "pci_bus_id": observed_pci, "nvidia_uuid": None, "compute_resource_id": None, "observed_at": utc_now(), "runtime_log": relative}
+    device = candidates[0]
+    return {"evidence_source": "owned_ollama_runner_log+nvidia-smi", "backend_device": match.group("backend"), "device_name": match.group("name").strip(), "pci_bus_id": device.pci_bus_id, "nvidia_uuid": device.nvidia_uuid, "compute_resource_id": device.resource_id, "observed_at": utc_now(), "runtime_log": relative}

@@ -1,6 +1,7 @@
 import argparse
 import json
 import hashlib
+import sys
 from pathlib import Path
 from estate.core.ptm_pilot_projection import build_repository_pilot, normalized_json as normalized_ptm_json, reviewer_report as ptm_reviewer_report
 from estate.core.operational_events import utc_now_iso
@@ -71,6 +72,7 @@ from estate.core.work_package_validation import validate_work_package, format_va
 from estate.core.production_readiness_validation import generate_production_readiness_report, format_production_readiness_markdown
 from estate.core.codex_bridge import load_bridge_request, run_codex_bridge_request, format_codex_bridge_result
 from estate.core.execution_activity import generate_execution_activity_surface, format_execution_activity_report, format_execution_activity_summary
+from estate.core.gpu_runtime_lifecycle import inspect_gpu_runtime_lanes, quiesce_runtime_lane
 from estate.core.execution_provider_adapter_runtime import load_adapter_request as load_adapter_contract_request, run_dry_run_adapter, validate_adapter_request_file
 from estate.core.codex_bridge_execution_provider_adapter import run_codex_bridge_adapter_dry_run, CodexBridgeExecutionProviderAdapter
 from estate.core.execution_adapter_handoff_runtime import inspect_handoff, prepare_handoff, validate_handoff, dry_run_handoff
@@ -2664,6 +2666,31 @@ def cmd_execution_dispatch_report(args):
     print(format_execution_dispatch_report(payload))
 
 
+def cmd_gpu_runtime(args):
+    root = getattr(args, "root", None) or (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
+    if args.gpu_runtime_action == "status":
+        payload = inspect_gpu_runtime_lanes(root, lane_id=getattr(args, "lane", None))
+    elif args.gpu_runtime_action == "quiesce":
+        status = inspect_gpu_runtime_lanes(root, lane_id=args.lane)["lanes"][0]
+        plan = {"runtime_lane_id": args.lane, "ownership": status["ownership"], "root_pid": status["root_pid"], "child_pids": status["child_pids"], "port": status["port"], "quiesce_allowed": status["quiesce_allowed"], "gates": status["gates"]}
+        print("GPU runtime quiesce plan: " + json.dumps(plan, sort_keys=True), file=sys.stderr)
+        if not args.confirm:
+            if getattr(args, "json", False):
+                print(json.dumps({"status": "CONFIRMATION_REQUIRED", "plan": plan}, indent=2, sort_keys=True))
+            else:
+                print("Refused: repeat with --confirm after reviewing the exact owned process plan.")
+            return 2
+        payload = quiesce_runtime_lane(root, args.lane, actor=args.actor)
+    else:
+        raise SystemExit(f"Unknown gpu-runtime action: {args.gpu_runtime_action}")
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        rows = payload.get("lanes", []) if args.gpu_runtime_action == "status" else [payload]
+        for row in rows:
+            print(f"{row.get('runtime_lane_id')}: {row.get('state') or row.get('result')} ownership={row.get('ownership')} root_pid={row.get('root_pid')}")
+
+
 
 def cmd_ai_services(args):
     import json
@@ -3373,6 +3400,21 @@ def main(argv=None):
 
     p = sub.add_parser("execution-activity-report", help="Generate the shared local execution activity report")
     p.set_defaults(func=cmd_execution_activity_report)
+
+    p = sub.add_parser("gpu-runtime", help="Inspect or safely quiesce a registered GPU runtime lane")
+    gpu_runtime_sub = p.add_subparsers(dest="gpu_runtime_action", required=True)
+    q = gpu_runtime_sub.add_parser("status", help="Read-only ownership and lifecycle status")
+    q.add_argument("--lane", help="Optional registered runtime lane ID")
+    q.add_argument("--root")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_gpu_runtime)
+    q = gpu_runtime_sub.add_parser("quiesce", help="Quiesce one proven-owned inactive runtime lane")
+    q.add_argument("--lane", required=True, help="Registered runtime lane ID")
+    q.add_argument("--actor", required=True, choices=["operator", "engineering", "scheduler-runtime-cleanup"])
+    q.add_argument("--confirm", action="store_true", help="Confirm the exact ownership-gated process plan")
+    q.add_argument("--root")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_gpu_runtime)
 
     p = sub.add_parser("execution-dispatch", help="Manage the local provider-agnostic execution dispatch queue")
     dispatch_sub = p.add_subparsers(dest="execution_dispatch_action", required=True)

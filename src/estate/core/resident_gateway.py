@@ -318,10 +318,10 @@ def _engineering_assignment_content(workflow: dict[str, Any]) -> str:
 def _bounded_local_text_content(workflow: dict[str, Any]) -> str:
     if workflow.get("state") == "execution_completed":
         result_metadata = workflow.get("execution", {}).get("result", {}).get("metadata", {})
-        lane = result_metadata.get("runtime_lane_evidence", {})
         placement = workflow.get("placement", {}).get("selected")
-        authoritative_uuid = lane.get("gpu_uuid") or result_metadata.get("runtime_bound_gpu_uuid")
-        return json.dumps({"status": "completed", "provider": "qwen.local.text", "runtime_lane": workflow.get("lane", {}).get("runtime_lane_id"), "physical_resource": placement, "gpu_uuid": authoritative_uuid, "summary": workflow.get("execution", {}).get("result", {}).get("summary", "bounded local text task completed")}, sort_keys=True)
+        actual_resource = result_metadata.get("actual_runtime_resource_id")
+        actual_uuid = result_metadata.get("actual_runtime_gpu_uuid") or result_metadata.get("runtime_bound_gpu_uuid")
+        return json.dumps({"status": "completed", "provider": "qwen.local.text", "runtime_lane": workflow.get("lane", {}).get("runtime_lane_id"), "physical_resource": actual_resource, "gpu_uuid": actual_uuid, "intended_physical_resource": placement, "intended_gpu_uuid": result_metadata.get("configured_required_gpu_uuid"), "actual_runtime_resource": actual_resource, "actual_runtime_gpu_uuid": actual_uuid, "placement_match": result_metadata.get("placement_match"), "summary": workflow.get("execution", {}).get("result", {}).get("summary", "bounded local text task completed")}, sort_keys=True)
     return json.dumps({"status": workflow.get("state", "execution_blocked"), "reason": workflow.get("reason") or workflow.get("execution", {}).get("handoff", {}).get("errors") or "governed execution did not complete"}, sort_keys=True)
 
 

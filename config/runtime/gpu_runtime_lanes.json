@@ -28,7 +28,10 @@
       "model_identity": "llama3.2:3b",
       "environment_binding": {
         "CUDA_VISIBLE_DEVICES": "GPU-6785b322-899d-8eec-e817-31d83279a414",
-        "OLLAMA_HOST": "127.0.0.1:12100"
+        "OLLAMA_HOST": "127.0.0.1:12100",
+        "OLLAMA_LLM_LIBRARY": "cuda_v12",
+        "OLLAMA_VULKAN": "0",
+        "GGML_VK_VISIBLE_DEVICES": "-1"
       },
       "provider_config_path": "config/providers/qwen_local_text_p100.json",
       "minimum_vram_mib": 4096

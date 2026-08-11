@@ -249,3 +249,51 @@ def test_office_command_center_reads_generated_execution_activity_artifact(tmp_p
     assert payload["status_bar"]["execution_active_count"] == 2
     assert payload["status_bar"]["execution_blocked_count"] == 1
     assert any(event["source"] == "execution_activity" for event in payload["activity_console"]["events"])
+
+
+def test_multiple_physical_resources_remain_distinct_in_office_activity(tmp_path):
+    write_jsonl(tmp_path, "runtime/execution_activity/events.jsonl", [
+        {
+            "event_id": "evt-gpu-a",
+            "request_id": "dispatch-a",
+            "event_type": "execution_started",
+            "state": "Running",
+            "timestamp": "2026-08-11T18:10:13Z",
+            "provider": "qwen.local.text",
+            "compute_resource_id": "host:nvidia:GPU-A",
+            "gpu_uuid": "GPU-A",
+            "actual_runtime_resource_id": "host:nvidia:GPU-B",
+            "actual_runtime_gpu_uuid": "GPU-B",
+            "placement_match": False,
+            "runtime_lane_id": "lane-a",
+            "model_identity": "model-a",
+            "reservation_reference": "reservation-a",
+        },
+        {
+            "event_id": "evt-gpu-b",
+            "request_id": "dispatch-b",
+            "event_type": "execution_started",
+            "state": "Running",
+            "timestamp": "2026-08-11T18:10:13Z",
+            "provider": "qwen.local.text",
+            "compute_resource_id": "host:nvidia:GPU-B",
+            "gpu_uuid": "GPU-B",
+            "runtime_lane_id": "lane-b",
+            "model_identity": "model-b",
+            "reservation_reference": "reservation-b",
+        },
+    ])
+
+    snapshot = generate_execution_activity_surface(tmp_path)
+
+    assert snapshot["summary"]["active_count"] == 2
+    assert {item["compute_resource_id"] for item in snapshot["active"]} == {
+        "host:nvidia:GPU-A",
+        "host:nvidia:GPU-B",
+    }
+    assert {item["runtime_lane_id"] for item in snapshot["active"]} == {"lane-a", "lane-b"}
+    assert {item["reservation_reference"] for item in snapshot["active"]} == {"reservation-a", "reservation-b"}
+    mismatch = next(item for item in snapshot["active"] if item["request_id"] == "dispatch-a")
+    assert mismatch["gpu_uuid"] == "GPU-A"
+    assert mismatch["actual_runtime_gpu_uuid"] == "GPU-B"
+    assert mismatch["placement_match"] is False
