@@ -396,3 +396,57 @@ evidence remains unchanged. EC-000223 remains **Not Accepted**. Both GPUs are
 `SAFE_FOR_NEXT_ENGINEERING_STEP=yes`, but this verification does not authorize
 or perform another dual-GPU acceptance retry; the conservative P100 operating
 envelope must be evaluated first.
+
+## One conservative dual-GPU operating-envelope attempt
+
+Before the live attempt, publication `72b76446f53493952f5ea7253e80b95053d59eba`
+contained a generic bounded-runtime policy. It enforces one provider request per
+runtime lane with reject-when-busy admission and uses supported Ollama request
+options. The P100 profile was `llama3.2:3b`, `num_predict=64`, `num_ctx=2048`;
+the 4090 profile was `qwen3:8b`, `num_predict=128`, `num_ctx=4096`. No power,
+clock, driver, OS, or GPU controls were changed. Focused deterministic and
+regression tests passed (`128 passed`); PowerShell parser and diff checks passed.
+
+Exactly one new bounded attempt was launched at `2026-08-11T20:53:27Z` after
+read-only status and preflight passed. The 4090 provider interval was
+`20:53:36Z`–`20:53:41Z`; the P100 provider interval was
+`20:53:36Z`–`20:53:44Z`, giving 5.0 seconds of positive provider overlap.
+
+The P100 task completed through its governed chain: objective
+`grace-obj-f636f083cad6`, action `grace-act-d3d76ad8787c`, PTM
+`res_01KZS9M80CE1QT37AGYXNRPEF2`, Helen `heldet-ea1663be67ee`, commission
+`engcom-7add155582e4`, authorization `engauth-a9a64a9ce9c1`, reservation
+`gpu-reservation-grace-obj-f636f083cad6`, Dispatch `dispatch-46045e17928f`,
+adapter `adapter-dispatch-46045e17928f`, and provider receipt
+`runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-f636f083cad6.json`.
+Owned runner evidence proves CUDA0, Tesla P100-PCIE-16GB, PCI `04:00.0`, and
+UUID `GPU-6785b322-899d-8eec-e817-31d83279a414`; placement matched.
+
+The 4090 task created its independent governed records through Dispatch
+`dispatch-c3bd236b32a4` and adapter `adapter-dispatch-c3bd236b32a4`, but its
+provider result failed closed with `Qwen returned a malformed or incomplete
+response`. Its owned Ollama runner log independently shows CUDA0, NVIDIA
+GeForce RTX 4090, PCI `07:00.0`, and the required UUID, but the adapter did not
+accept this as a completed provider result. Therefore the attempt does not
+meet EC-000223 acceptance: both provider calls did not complete successfully,
+and no acceptance credit is taken for the 4090 task.
+
+The lightweight monitor observed no P100 NVML loss, but its in-flight sample
+stream was not durably emitted because the wrapper deadlocked buffering the
+large governed JSON result after provider completion. Exact in-flight telemetry
+peaks are therefore **not claimed**. Provider logs record model/KV buffers of
+1,918.35/224 MiB on P100 and 4,643.78/576 MiB on 4090; these are runtime-log
+allocations, not telemetry peaks and not a load qualification.
+
+Postflight preflight returned `PASS`, exit code `0`. P100 remained NVML/PnP
+healthy at 9 MiB used, 16,280 MiB free, 0%, 38 C, 26.29 W; 4090 remained
+healthy at 2,421 MiB used, 21,722 MiB free, 6%, 44 C, 21.64 W. Both ports were
+free and both full UUIDs/PCI identities were unchanged. Governed quiesce
+completed for both owned lanes with cleanup receipts
+`gpu-cleanup-cb90c34e02db486581b8987f087f203b` and
+`gpu-cleanup-1f41394c28a843eeab12fbf40a4668bf`; owned PIDs exited and no
+unrelated process was modified.
+
+EC-000223 remains **Not Accepted — conservative attempt had a 4090 provider
+failure**. No retry was performed. Heavy parallelism, saturation, SDXL,
+P100-32B, sustained throughput, and maximum-load operation remain unqualified.
