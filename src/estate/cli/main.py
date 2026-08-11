@@ -132,6 +132,7 @@ from estate.core.engineering_capacity_runtime import generate_engineering_capaci
 from estate.core.codex_status_cost_characterization import characterize_codex_status_cost, format_codex_status_cost_characterization
 from estate.core.codex_cli_capability_discovery import discover_codex_cli_capabilities, format_codex_cli_capability_discovery
 from estate.core.codex_seat_telemetry import collect_codex_seat_telemetry, format_codex_seat_telemetry
+from estate.core.codex_seat_configuration import codex_seat_configuration
 from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider, format_engineering_provider_routing
 from estate.core.engineering_provider_health_runtime import collect_provider_health, load_current_provider_health, format_provider_health_report
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime, format_assignment_board
@@ -895,6 +896,15 @@ def cmd_codex_seat_telemetry(args):
             print(format_codex_seat_telemetry(payload), end="")
     except Exception as exc:
         print(f"Codex seat telemetry failed: {exc}")
+        raise SystemExit(1)
+
+
+def cmd_codex_seat_config(args):
+    try:
+        payload = codex_seat_configuration(getattr(args, "seat", None))
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    except (OSError, ValueError) as exc:
+        print(f"Codex seat configuration failed: {exc}")
         raise SystemExit(1)
 
 
@@ -4149,6 +4159,10 @@ def main(argv=None):
     p.add_argument("--timeout-seconds", type=int, default=20)
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_codex_seat_telemetry)
+
+    p = sub.add_parser("codex-seat-config", help="Read the approved Codex seat-to-home mapping")
+    p.add_argument("--seat", choices=["C1", "C2", "C3"])
+    p.set_defaults(func=cmd_codex_seat_config)
 
     p = sub.add_parser("codex-status-cost-characterization", help="Characterize Codex CLI status polling cost evidence")
     p.add_argument("--json", action="store_true")
