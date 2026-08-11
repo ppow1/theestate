@@ -2,7 +2,9 @@
 param(
     [switch]$PlanOnly,
     [switch]$NoLaunch,
-    [switch]$NoMove
+    [switch]$NoMove,
+    [switch]$RestartChromium,
+    [switch]$StopChromium
 )
 
 $ErrorActionPreference = 'Stop'
@@ -369,6 +371,7 @@ public static class EstateCodexDeskChromiumV1 {
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool SetWindowText(IntPtr hwnd, string text);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hwnd, int command);
+    [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
     [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr hwnd);
     delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr state);
     public static WindowRecord[] Windows() {
@@ -383,7 +386,19 @@ public static class EstateCodexDeskChromiumV1 {
         }, IntPtr.Zero);
         return rows.ToArray();
     }
+    public static WindowRecord[] AllWindows() {
+        var rows = new List<WindowRecord>();
+        EnumWindows((hwnd, state) => {
+            uint pid; GetWindowThreadProcessId(hwnd, out pid);
+            var title = new StringBuilder(512); GetWindowText(hwnd, title, title.Capacity);
+            var cls = new StringBuilder(256); GetClassName(hwnd, cls, cls.Capacity);
+            if (cls.ToString().StartsWith("Chrome_WidgetWin_")) rows.Add(new WindowRecord { Hwnd=hwnd, Pid=pid, Title=title.ToString(), ClassName=cls.ToString() });
+            return true;
+        }, IntPtr.Zero);
+        return rows.ToArray();
+    }
 }
+
 '@
     }
     return [EstateCodexDeskChromiumV1]::Windows() | ForEach-Object {
@@ -397,6 +412,35 @@ function Move-ChromiumWindow($Window, $Cell) {
     if (-not [EstateCodexDeskChromiumV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)) {
         throw "Chromium window placement failed for HWND $($Window.hwnd)."
     }
+}
+
+function Get-AllChromiumWindows {
+    return [EstateCodexDeskChromiumV1]::AllWindows() | ForEach-Object {
+        [pscustomobject]@{ hwnd=[int64]$_.Hwnd; pid=$_.Pid; title=$_.Title; class_name=$_.ClassName }
+    }
+}
+
+function Get-ChromiumSeatProcesses([string]$ProfilePath) {
+    $needle = $ProfilePath.Replace('/', '\')
+    return @(Get-CimInstance Win32_Process -Filter "Name = 'chrome.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -and $_.CommandLine.IndexOf($needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 })
+}
+
+function Close-SeatChromium([string]$Seat) {
+    $record = $chromiumWindowMap[$Seat]
+    if (-not $record) { return }
+    $processes = Get-ChromiumSeatProcesses $record.profile_path
+    $pids = @($processes | ForEach-Object ProcessId)
+    foreach ($window in @(Get-AllChromiumWindows | Where-Object { $pids -contains $_.pid })) {
+        [EstateCodexDeskChromiumV1]::PostMessage([IntPtr]$window.hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+    }
+    for ($i=0; $i -lt 30; $i++) {
+        Start-Sleep -Milliseconds 500
+        $windowAlive = Get-ChromiumWindows | Where-Object { $_.hwnd -eq [int64]$record.hwnd }
+        $processes = Get-ChromiumSeatProcesses $record.profile_path
+        if (-not $windowAlive -and $processes.Count -eq 0) { return }
+    }
+    throw "Chromium $Seat did not complete graceful shutdown; no forced termination was attempted."
 }
 
 function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
@@ -413,6 +457,7 @@ function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
         $launchArguments = @(
             "--user-data-dir=`"$profilePath`""
             '--profile-directory="Default"'
+            '--disable-background-mode'
             '--app=about:blank'
         )
         Start-Process -FilePath $chromium -ArgumentList $launchArguments | Out-Null
@@ -431,13 +476,32 @@ function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
         profile_path_verified=$true
         persistent=$true
         app_mode=$true
-        launch_arguments=@("--user-data-dir=`"$profilePath`"", '--profile-directory="Default"', '--app=about:blank')
+        launch_arguments=@("--user-data-dir=`"$profilePath`"", '--profile-directory="Default"', '--disable-background-mode', '--app=about:blank')
     }
 }
 
 $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $reportPath -Encoding utf8
 
 if ($PlanOnly) { $report | ConvertTo-Json -Depth 12; exit 0 }
+
+if ($RestartChromium) {
+    Get-ChromiumWindows | Out-Null
+    foreach ($seat in @('C1','C2','C3')) {
+        Close-SeatChromium $seat
+        $chromiumWindowMap.Remove($seat)
+    }
+}
+
+if ($StopChromium) {
+    Get-ChromiumWindows | Out-Null
+    foreach ($seat in @('C1','C2','C3')) {
+        Close-SeatChromium $seat
+        $chromiumWindowMap.Remove($seat)
+    }
+    ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
+    Write-Host 'Chromium automation seats stopped cleanly.'
+    exit 0
+}
 
 foreach ($seat in @('C1','C2','C3')) {
     $window = Start-SeatCodex $seat
