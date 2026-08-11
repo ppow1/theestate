@@ -28,6 +28,21 @@ using System;
 using System.Runtime.InteropServices;
 public static class EstateCodexDeskDpiV1 {
     [DllImport("user32.dll")] public static extern bool SetProcessDpiAwarenessContext(IntPtr dpiContext);
+    [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr dpiContext);
+}
+'@
+}
+# Diagnostic/native context surface used before any workspace window placement.
+if (-not ('EstateCodexDeskDiagnosticsV1' -as [type])) {
+    Add-Type @'
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+public static class EstateCodexDeskDiagnosticsV1 {
+    [DllImport("shcore.dll")] public static extern int GetProcessDpiAwareness(IntPtr process, out int awareness);
+    [DllImport("user32.dll")] public static extern IntPtr GetThreadDpiAwarenessContext();
+    [DllImport("user32.dll")] public static extern int GetAwarenessFromDpiAwarenessContext(IntPtr context);
+    [DllImport("user32.dll")] public static extern int GetSystemMetrics(int index);
 }
 '@
 }
@@ -35,6 +50,7 @@ public static class EstateCodexDeskDpiV1 {
 # inherit a system-DPI context. Establish the workspace process context before
 # monitor identity/cell geometry is read.
 try { [EstateCodexDeskDpiV1]::SetProcessDpiAwarenessContext([IntPtr](-4)) | Out-Null } catch { }
+try { [EstateCodexDeskDpiV1]::SetThreadDpiAwarenessContext([IntPtr](-4)) | Out-Null } catch { }
 
 function Get-WindowByMarker([string]$Marker) {
     Get-Process -ErrorAction SilentlyContinue |
@@ -89,8 +105,13 @@ public static class EstateCodexDeskWindowV1 {
     $hwnd = $windowProcess.MainWindowHandle
     if ($hwnd -eq 0) { $hwnd = [EstateCodexDeskWindowV1]::FindWindow([uint32]$ProcessId) }
     if ($hwnd -eq 0) { Write-Warning "No independently movable console window found for process $ProcessId (Windows Terminal host); leaving its current geometry."; return $false }
-    [EstateCodexDeskWindowV1]::ShowWindow($hwnd, 9) | Out-Null
-    $ok = [EstateCodexDeskWindowV1]::SetWindowPos($hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)
+    $previousDpiContext = [EstateCodexDeskDpiV1]::SetThreadDpiAwarenessContext([IntPtr](-4))
+    try {
+        [EstateCodexDeskWindowV1]::ShowWindow($hwnd, 9) | Out-Null
+        $ok = [EstateCodexDeskWindowV1]::SetWindowPos($hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)
+    } finally {
+        if ($previousDpiContext -ne [IntPtr]::Zero) { [EstateCodexDeskDpiV1]::SetThreadDpiAwarenessContext($previousDpiContext) | Out-Null }
+    }
     if (-not $ok) { Write-Warning "Native window placement failed for process $ProcessId."; return $false }
     return $true
 }
@@ -118,74 +139,26 @@ function Get-ConsoleWindowProcessId([int]$ProcessId) {
     return $ProcessId
 }
 
-function Wait-SeatCodexReady([int]$ConsoleProcessId) {
-    $deadline = [DateTime]::UtcNow.AddSeconds(15)
-    while ([DateTime]::UtcNow -lt $deadline) {
-        $processes = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
-        $owned = [System.Collections.Generic.HashSet[int]]::new()
-        [void]$owned.Add($ConsoleProcessId)
-        $changed = $true
-        while ($changed) {
-            $changed = $false
-            foreach ($process in $processes) {
-                if ($owned.Contains([int]$process.ParentProcessId) -and $owned.Add([int]$process.ProcessId)) { $changed = $true }
-            }
-        }
-        $codex = $processes |
-            Where-Object { $_.Name -eq 'codex.exe' -and $owned.Contains([int]$_.ProcessId) } |
-            Select-Object -First 1
-        $console = Get-Process -Id $ConsoleProcessId -ErrorAction SilentlyContinue
-        if ($codex -and $console -and $console.MainWindowHandle -ne 0) {
-            # The codex process is the strongest local readiness signal
-            # available; allow its TUI one bounded render interval to settle.
-            Start-Sleep -Milliseconds 750
-            return $console
-        }
-        Start-Sleep -Milliseconds 250
-    }
-    throw "Codex TUI for process $ConsoleProcessId did not reach an input-ready process state."
-}
-
-function Send-NewSeatCodexStatus([string]$Seat, [int]$ConsoleProcessId) {
-    if (-not ('EstateCodexDeskInputV1' -as [type])) {
-        Add-Type @'
-using System;
-using System.Runtime.InteropServices;
-public static class EstateCodexDeskInputV1 {
-    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
-    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
-    [DllImport("user32.dll")] public static extern bool BringWindowToTop(IntPtr hWnd);
-}
-'@
-    }
-    Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
-    $console = Wait-SeatCodexReady $ConsoleProcessId
-    $target = [IntPtr]$console.MainWindowHandle
-    $previous = [EstateCodexDeskInputV1]::GetForegroundWindow()
-    [EstateCodexDeskInputV1]::BringWindowToTop($target) | Out-Null
-    [EstateCodexDeskInputV1]::SetForegroundWindow($target) | Out-Null
-    Start-Sleep -Milliseconds 150
-    if ([EstateCodexDeskInputV1]::GetForegroundWindow() -ne $target) {
-        throw "Could not focus the exact $Seat Codex console for /status input."
-    }
-    [System.Windows.Forms.SendKeys]::SendWait('/status{ENTER}')
-    Start-Sleep -Milliseconds 300
-    if ($previous -ne [IntPtr]::Zero) { [EstateCodexDeskInputV1]::SetForegroundWindow($previous) | Out-Null }
-    Write-Host "Codex /status sent once to new $Seat session (PID $ConsoleProcessId)." -ForegroundColor Cyan
-}
-
 function Start-SeatCodex($Seat) {
-    $script:CodexDeskSeatCreated = $false
     $marker = "$Seat-CODEX"
     $existing = Get-WindowByMarker $marker
     if (-not $existing) { $existing = Get-SeatLauncherProcess $Seat }
     if ($existing) { return $existing }
+    if ($codexWindowMap.Contains($Seat)) {
+        $saved = $codexWindowMap[$Seat]
+        $savedProcess = Get-Process -Id ([int]$saved.window_pid) -ErrorAction SilentlyContinue
+        $savedCommand = (Get-CimInstance Win32_Process -Filter "ProcessId = $([int]$saved.window_pid)" -ErrorAction SilentlyContinue).CommandLine
+        if ($savedProcess -and $savedCommand -and $savedCommand.Contains("Start-CodexInteractive.ps1' -Seat '$Seat'")) {
+            return $savedProcess
+        }
+        $codexWindowMap.Remove($Seat)
+    }
     if ($NoLaunch) { return $null }
     $interactive = Join-Path $PSScriptRoot 'Start-CodexInteractive.ps1'
-    $command = "`$host.UI.RawUI.WindowTitle = '$marker'; Set-Location -LiteralPath '$repoRoot'; & '$interactive' -Seat '$Seat'"
+    $statusHelper = Join-Path $PSScriptRoot 'Send-CodexStatus.ps1'
+    $command = "`$host.UI.RawUI.WindowTitle = '$marker'; Start-Process -FilePath 'pwsh.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-WindowStyle','Hidden','-File','$statusHelper','-Seat','$Seat','-ConsolePid',`$PID) -WindowStyle Hidden; Set-Location -LiteralPath '$repoRoot'; & '$interactive' -Seat '$Seat'"
     $conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
     $started = Start-Process -FilePath $conhost -Verb RunAs -ArgumentList @('pwsh.exe','-NoProfile','-ExecutionPolicy','Bypass','-NoExit','-Command',$command) -PassThru
-    $script:CodexDeskSeatCreated = $true
     Start-Sleep -Seconds 2
     return $started
 }
@@ -245,7 +218,29 @@ function Get-TargetMonitor {
     if ($jsonStart -lt 0) { throw 'Monitor identity helper did not return JSON.' }
     $jsonEnd = $raw.LastIndexOf('}')
     $layout = $raw.Substring($jsonStart, $jsonEnd - $jsonStart + 1) | ConvertFrom-Json
-    $topRow = @($layout.monitors | Sort-Object { ($_.bounds.top + $_.bounds.bottom) / 2 } | Select-Object -First 2)
+    $script:CodexDeskRawMonitorLayout = $layout
+    $canonicalMonitors = @($layout.monitors | ForEach-Object {
+        $scale = 96.0 / [double]$_.dpi.x
+        if ($scale -le 0) { $scale = 1.0 }
+        [pscustomobject]@{
+            index=$_.index; device=$_.device; primary=$_.primary
+            bounds=[pscustomobject]@{
+                left=[int][math]::Round($_.bounds.left * $scale); top=[int][math]::Round($_.bounds.top * $scale)
+                right=[int][math]::Round($_.bounds.right * $scale); bottom=[int][math]::Round($_.bounds.bottom * $scale)
+                width=[int][math]::Round($_.bounds.width * $scale); height=[int][math]::Round($_.bounds.height * $scale)
+            }
+            work_area=[pscustomobject]@{
+                left=[int][math]::Round($_.work_area.left * $scale); top=[int][math]::Round($_.work_area.top * $scale)
+                right=[int][math]::Round($_.work_area.right * $scale); bottom=[int][math]::Round($_.work_area.bottom * $scale)
+                width=[int][math]::Round($_.work_area.width * $scale); height=[int][math]::Round($_.work_area.height * $scale)
+            }
+            reserved_edges=$_.reserved_edges; dpi=[pscustomobject]@{ x=96; y=96; scale_percent=100.0 }; slot_prefix=$_.slot_prefix
+        }
+    })
+    $layout.monitors = $canonicalMonitors
+    $script:CodexDeskMonitorLayout = $layout
+    $topRow = @($canonicalMonitors | Sort-Object { ($_.bounds.top + $_.bounds.bottom) / 2 } | Select-Object -First 2)
+    $script:CodexDeskMonitorCandidates = @($topRow)
     return $topRow | Sort-Object { $_.bounds.left } -Descending | Select-Object -First 1
 }
 
@@ -298,9 +293,63 @@ $report = [ordered]@{
     chrome = [ordered]@{ configured_seats=@($seatBrowserMappings | ForEach-Object seat_id); status=if($seatBrowserMappings.Count -eq 3){'configured'}else{'unavailable/not configured'} }
 }
 $reportPath = Join-Path $PSScriptRoot 'runtime\codex-desk-workspace.json'
+$diagnosticPath = Join-Path $PSScriptRoot 'runtime\codex-desk-launch-diagnostics.json'
 $chromeMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-chrome-windows.json'
 $chromiumMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-chromium-windows.json'
+$codexMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-codex-windows.json'
+
+function Get-WorkspaceProcessChain {
+    $all = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
+    $chain = @()
+    $current = $all | Where-Object ProcessId -eq $PID | Select-Object -First 1
+    while ($current) {
+        $chain += [ordered]@{ pid=[int]$current.ProcessId; parent_pid=[int]$current.ParentProcessId; name=$current.Name; command_line=$current.CommandLine }
+        $current = $all | Where-Object ProcessId -eq $current.ParentProcessId | Select-Object -First 1
+    }
+    return $chain
+}
+
+function Write-WorkspaceLaunchDiagnostics($Monitor, $Cells) {
+    $process = Get-Process -Id $PID -ErrorAction SilentlyContinue
+    $processAwareness = -1
+    try { [void][EstateCodexDeskDiagnosticsV1]::GetProcessDpiAwareness($process.Handle, [ref]$processAwareness) } catch { }
+    $threadContext = [EstateCodexDeskDiagnosticsV1]::GetThreadDpiAwarenessContext()
+    $threadAwareness = -1
+    try { $threadAwareness = [EstateCodexDeskDiagnosticsV1]::GetAwarenessFromDpiAwarenessContext($threadContext) } catch { }
+    $sm = [ordered]@{
+        x=[EstateCodexDeskDiagnosticsV1]::GetSystemMetrics(76)
+        y=[EstateCodexDeskDiagnosticsV1]::GetSystemMetrics(77)
+        width=[EstateCodexDeskDiagnosticsV1]::GetSystemMetrics(78)
+        height=[EstateCodexDeskDiagnosticsV1]::GetSystemMetrics(79)
+    }
+    $diagnostic = [ordered]@{
+        observed_at=(Get-Date).ToUniversalTime().ToString('o')
+        launcher_pid=$PID
+        powershell_path=$process.Path
+        powershell_is_64_bit=[Environment]::Is64BitProcess
+        process_dpi_awareness=$processAwareness
+        thread_dpi_awareness_context=('0x{0:x}' -f $threadContext.ToInt64())
+        thread_dpi_awareness=$threadAwareness
+        virtual_screen=$sm
+        process_chain=(Get-WorkspaceProcessChain)
+        raw_monitor_map=$script:CodexDeskRawMonitorLayout.monitors
+        monitor_candidates=$script:CodexDeskMonitorCandidates
+        monitor_map=$script:CodexDeskMonitorLayout.monitors
+        selected_monitor=$Monitor
+        calculated_cells=$Cells
+    }
+    $diagnostic | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $diagnosticPath -Encoding utf8
+}
+
+Write-WorkspaceLaunchDiagnostics $monitor $cells
 $chromeExe = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+$codexWindowMap = [ordered]@{}
+if (Test-Path -LiteralPath $codexMapPath) {
+    try {
+        $savedCodexMap = (Get-Content -Raw -LiteralPath $codexMapPath | ConvertFrom-Json).seats
+        foreach ($property in $savedCodexMap.PSObject.Properties) { $codexWindowMap[$property.Name] = $property.Value }
+    } catch { $codexWindowMap = [ordered]@{} }
+}
 $chromeWindowMap = [ordered]@{}
 $chromiumWindowMap = [ordered]@{}
 if (Test-Path -LiteralPath $chromeMapPath) {
@@ -373,9 +422,8 @@ function Move-ChromeWindow($Window, $Cell) {
     $commandY = $targetY
     $commandWidth = $targetWidth
     $commandHeight = $targetHeight
-    # SetWindowPos otherwise virtualizes coordinates for this PowerShell host
-    # while a new Chrome app window is DPI 144. Use one explicit per-monitor
-    # context so target cells always mean physical desktop pixels.
+    # All rows use the canonical Estate 96-DPI desktop coordinate space. Keep
+    # SetWindowPos in the matching system-DPI context regardless of caller.
     $previousDpiContext = [EstateCodexDeskChromeV1]::SetThreadDpiAwarenessContext([IntPtr](-4))
     try {
         [EstateCodexDeskChromeV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
@@ -656,9 +704,14 @@ public static class EstateCodexDeskChromiumV1 {
 
 function Move-ChromiumWindow($Window, $Cell) {
     if ($NoMove) { return }
-    [EstateCodexDeskChromiumV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
-    if (-not [EstateCodexDeskChromiumV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)) {
-        throw "Chromium window placement failed for HWND $($Window.hwnd)."
+    $previousDpiContext = [EstateCodexDeskDpiV1]::SetThreadDpiAwarenessContext([IntPtr](-4))
+    try {
+        [EstateCodexDeskChromiumV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
+        if (-not [EstateCodexDeskChromiumV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)) {
+            throw "Chromium window placement failed for HWND $($Window.hwnd)."
+        }
+    } finally {
+        if ($previousDpiContext -ne [IntPtr]::Zero) { [EstateCodexDeskDpiV1]::SetThreadDpiAwarenessContext($previousDpiContext) | Out-Null }
     }
 }
 
@@ -811,9 +864,11 @@ if ($StopAll) {
     if ($remainingChromium.Count -gt 0) { throw 'Codex Desk Chromium processes remain after graceful StopAll.' }
     if ($remainingChrome.Count -gt 0) { throw "Codex Desk Chrome windows remain after StopAll: $($remainingChrome -join ', ')." }
     foreach ($seat in @('C1','C2','C3')) {
+        $codexWindowMap.Remove($seat)
         $chromiumWindowMap.Remove($seat)
         $chromeWindowMap.Remove($seat)
     }
+    ([ordered]@{ seats=$codexWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $codexMapPath -Encoding utf8
     ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
     ([ordered]@{ seats=$chromeWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromeMapPath -Encoding utf8
     Write-Host ("Codex Desk StopAll timings: Codex={0}ms Chromium={1}ms Chrome={2}ms Total={3}ms" -f $codexMs, $chromiumMs, $chromeMs, $totalMs)
@@ -832,12 +887,10 @@ if ($runTop) {
             $windowPid = Get-ConsoleWindowProcessId $window.Id
             Invoke-MovePid $windowPid $cells["$seat-CODEX"]
             Set-SeatWindowTitle $windowPid $seat-CODEX
-            if ($script:CodexDeskSeatCreated) {
-                Send-NewSeatCodexStatus $seat $windowPid
-                Set-SeatWindowTitle $windowPid $seat-CODEX
-            }
+            $codexWindowMap[$seat] = [ordered]@{ window_pid=[int]$windowPid; seat=$seat; title="$seat-CODEX" }
         }
     }
+    ([ordered]@{ seats=$codexWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $codexMapPath -Encoding utf8
 }
 
 if (-not $PlanOnly -and $runMiddle) {
