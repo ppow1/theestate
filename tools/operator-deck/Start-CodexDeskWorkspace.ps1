@@ -22,6 +22,20 @@ $ahkCandidates = @(
 )
 $ahk = $ahkCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 
+if (-not ('EstateCodexDeskDpiV1' -as [type])) {
+    Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class EstateCodexDeskDpiV1 {
+    [DllImport("user32.dll")] public static extern bool SetProcessDpiAwarenessContext(IntPtr dpiContext);
+}
+'@
+}
+# The Stream Deck child is launched through hidden cmd.exe and can otherwise
+# inherit a system-DPI context. Establish the workspace process context before
+# monitor identity/cell geometry is read.
+try { [EstateCodexDeskDpiV1]::SetProcessDpiAwarenessContext([IntPtr](-4)) | Out-Null } catch { }
+
 function Get-WindowByMarker([string]$Marker) {
     Get-Process -ErrorAction SilentlyContinue |
         Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -like "*$Marker*" } |
@@ -104,17 +118,74 @@ function Get-ConsoleWindowProcessId([int]$ProcessId) {
     return $ProcessId
 }
 
+function Wait-SeatCodexReady([int]$ConsoleProcessId) {
+    $deadline = [DateTime]::UtcNow.AddSeconds(15)
+    while ([DateTime]::UtcNow -lt $deadline) {
+        $processes = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
+        $owned = [System.Collections.Generic.HashSet[int]]::new()
+        [void]$owned.Add($ConsoleProcessId)
+        $changed = $true
+        while ($changed) {
+            $changed = $false
+            foreach ($process in $processes) {
+                if ($owned.Contains([int]$process.ParentProcessId) -and $owned.Add([int]$process.ProcessId)) { $changed = $true }
+            }
+        }
+        $codex = $processes |
+            Where-Object { $_.Name -eq 'codex.exe' -and $owned.Contains([int]$_.ProcessId) } |
+            Select-Object -First 1
+        $console = Get-Process -Id $ConsoleProcessId -ErrorAction SilentlyContinue
+        if ($codex -and $console -and $console.MainWindowHandle -ne 0) {
+            # The codex process is the strongest local readiness signal
+            # available; allow its TUI one bounded render interval to settle.
+            Start-Sleep -Milliseconds 750
+            return $console
+        }
+        Start-Sleep -Milliseconds 250
+    }
+    throw "Codex TUI for process $ConsoleProcessId did not reach an input-ready process state."
+}
+
+function Send-NewSeatCodexStatus([string]$Seat, [int]$ConsoleProcessId) {
+    if (-not ('EstateCodexDeskInputV1' -as [type])) {
+        Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class EstateCodexDeskInputV1 {
+    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] public static extern bool BringWindowToTop(IntPtr hWnd);
+}
+'@
+    }
+    Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+    $console = Wait-SeatCodexReady $ConsoleProcessId
+    $target = [IntPtr]$console.MainWindowHandle
+    $previous = [EstateCodexDeskInputV1]::GetForegroundWindow()
+    [EstateCodexDeskInputV1]::BringWindowToTop($target) | Out-Null
+    [EstateCodexDeskInputV1]::SetForegroundWindow($target) | Out-Null
+    Start-Sleep -Milliseconds 150
+    if ([EstateCodexDeskInputV1]::GetForegroundWindow() -ne $target) {
+        throw "Could not focus the exact $Seat Codex console for /status input."
+    }
+    [System.Windows.Forms.SendKeys]::SendWait('/status{ENTER}')
+    Start-Sleep -Milliseconds 300
+    if ($previous -ne [IntPtr]::Zero) { [EstateCodexDeskInputV1]::SetForegroundWindow($previous) | Out-Null }
+    Write-Host "Codex /status sent once to new $Seat session (PID $ConsoleProcessId)." -ForegroundColor Cyan
+}
+
 function Start-SeatCodex($Seat) {
+    $script:CodexDeskSeatCreated = $false
     $marker = "$Seat-CODEX"
     $existing = Get-WindowByMarker $marker
     if (-not $existing) { $existing = Get-SeatLauncherProcess $Seat }
     if ($existing) { return $existing }
     if ($NoLaunch) { return $null }
     $interactive = Join-Path $PSScriptRoot 'Start-CodexInteractive.ps1'
-    $startupStatus = "[$marker] seat=$Seat model=gpt-5.6-luna sandbox=danger-full-access approval=never"
-    $command = "`$host.UI.RawUI.WindowTitle = '$marker'; Write-Host '$startupStatus' -ForegroundColor Cyan; Set-Location -LiteralPath '$repoRoot'; & '$interactive' -Seat '$Seat'"
+    $command = "`$host.UI.RawUI.WindowTitle = '$marker'; Set-Location -LiteralPath '$repoRoot'; & '$interactive' -Seat '$Seat'"
     $conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
     $started = Start-Process -FilePath $conhost -Verb RunAs -ArgumentList @('pwsh.exe','-NoProfile','-ExecutionPolicy','Bypass','-NoExit','-Command',$command) -PassThru
+    $script:CodexDeskSeatCreated = $true
     Start-Sleep -Seconds 2
     return $started
 }
@@ -761,6 +832,10 @@ if ($runTop) {
             $windowPid = Get-ConsoleWindowProcessId $window.Id
             Invoke-MovePid $windowPid $cells["$seat-CODEX"]
             Set-SeatWindowTitle $windowPid $seat-CODEX
+            if ($script:CodexDeskSeatCreated) {
+                Send-NewSeatCodexStatus $seat $windowPid
+                Set-SeatWindowTitle $windowPid $seat-CODEX
+            }
         }
     }
 }
