@@ -23,6 +23,12 @@
     "max_output_tokens": 1200,
     "max_artifact_bytes": 200000
   },
+  "runtime_policy": {
+    "max_concurrent_requests": 1,
+    "request_queue": "reject_when_busy",
+    "max_output_tokens": 128,
+    "context_limit": 4096
+  },
   "network_policy": "loopback_only",
   "evidence_freshness_seconds": 3600
 }

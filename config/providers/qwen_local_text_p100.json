@@ -10,6 +10,7 @@
   "supported_capabilities": ["text_generation", "documentation_draft", "bounded_repository_read"],
   "health_check": {"method": "GET", "path": "/api/tags", "requires_model_present": true},
   "output_limits": {"max_output_tokens": 120, "max_artifact_bytes": 200000},
+  "runtime_policy": {"max_concurrent_requests": 1, "request_queue": "reject_when_busy", "max_output_tokens": 64, "context_limit": 2048},
   "network_policy": "loopback_only",
   "evidence_freshness_seconds": 120,
   "minimum_safe_vram_mib": 4096

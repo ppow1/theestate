@@ -322,17 +322,26 @@ def _read_queue_payload(root: Path) -> dict[str, Any]:
     if not path.exists():
         return {"version": 1, "updated_at": None, "items": []}
     last_error: json.JSONDecodeError | None = None
-    for attempt in range(3):
+    last_permission_error: PermissionError | None = None
+    for attempt in range(5):
         try:
             raw = json.loads(path.read_text(encoding="utf-8"))
             break
         except json.JSONDecodeError as exc:
             last_error = exc
-            if attempt < 2:
+            if attempt < 4:
                 time.sleep(0.01)
             else:
                 raise ValueError(f"execution dispatch queue is malformed JSON: {exc}") from exc
+        except PermissionError as exc:
+            last_permission_error = exc
+            if attempt < 4:
+                time.sleep(0.01)
+            else:
+                raise
     else:
+        if last_permission_error is not None:
+            raise last_permission_error
         raise ValueError(f"execution dispatch queue is malformed JSON: {last_error}")
     if isinstance(raw, list):
         return {"version": 1, "updated_at": None, "items": raw}
