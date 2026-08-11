@@ -200,3 +200,91 @@ activity, pending-task, and reconciliation agreement before quiescence. Any
 unknown gate refuses termination. Cleanup is lane/resource scoped, records a
 schema-governed receipt and operational event, and contains no GPU reset,
 device mutation, reboot, or global process-kill capability.
+
+## Governed cleanup and P100 qualification result
+
+The operator interfaces are read-only status:
+
+`python -m estate.cli.main gpu-runtime status --json`
+
+and confirmed, lane-scoped cleanup:
+
+`python -m estate.cli.main gpu-runtime quiesce --lane <lane-id> --actor operator --confirm --json`
+
+(`PYTHONPATH=src` is required when running directly from a source checkout.)
+The command prints its proposed PID/tree, port, ownership, and all inactivity
+gates before acting. Ordinary Grace conversation has no process-kill
+authority. The schema-governed receipt records lane/resource/UUID, root and
+children, reservation/Dispatch/provider/pending/reconciliation checks,
+shutdown requests, verified exits, port release, pre/post telemetry, warnings,
+errors, and result. Office receives the generic lane lifecycle states and the
+canonical operational-event stream receives stale-candidate, cleanup-success,
+or cleanup-failure events.
+
+The large allocations observed at `18:39Z` were not cleaned by this operation.
+The significant workers were `llama-server.exe` PIDs 9184 and 28892 under PID
+28456, with neither registered lane port nor a registered-root relationship.
+They were therefore `UNKNOWN`/external for cleanup authority and were refused;
+they disappeared independently before the next attribution. The evidence does
+not prove that the nearly full 4090 was abandoned Estate residue.
+
+After a `PASS` preflight at `19:32:00Z`, a single small P100 governed task ran
+from `19:33:48Z` to `19:33:54Z`. Its chain was objective
+`grace-obj-ddc0633d49eb`, action `grace-act-397474d8132c`, PTM
+`res_01KZS523XA0YSMHMDXAW0RZ1WM`, Helen `heldet-33f4f2a133d2`, commission
+`engcom-3c64fea3f645`, authorization `engauth-6e6295a29497`, reservation
+`gpu-reservation-grace-obj-ddc0633d49eb`, Dispatch `dispatch-570cdd3eac47`,
+adapter `adapter-dispatch-570cdd3eac47`, provider receipt
+`runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-ddc0633d49eb.json`,
+and Grace receipt `gracereceipt-ce4b9f2927b0`. The owned runner log plus
+`nvidia-smi` observed `CUDA0`, `Tesla P100-PCIE-16GB`, PCI
+`00000000:04:00.0`, UUID
+`GPU-6785b322-899d-8eec-e817-31d83279a414`, and placement match `true`.
+P100 memory rose from 9 MiB to 3,373 MiB with 95% utilization and then returned
+to 9 MiB. The 4090 retained its roughly 2.8 GiB desktop baseline and showed no
+model allocation attributable to the task. Single-P100 physical-runtime
+qualification therefore passed.
+
+Exactly one authorized dual-resource retry was then attempted. Task A used
+objective/action `grace-obj-e0aab6beb00b` / `grace-act-8289cb9e401d`, PTM
+`res_01KZS54TANPVWZ4FY2WJQ40ZF6`, Helen `heldet-25c268009a5f`, commission
+`engcom-b99ef5c4d2eb`, authorization `engauth-ca0c68e7ec19`, reservation
+`gpu-reservation-grace-obj-e0aab6beb00b`, and Dispatch
+`dispatch-490a9da42fd4`. It failed before adapter/provider invocation because a
+concurrent Dispatch queue reader observed the queue during a non-atomic write.
+The canonical Dispatch was recorded `Failed`; there is no Task A provider
+receipt. Task B used objective/action `grace-obj-1182358a50dc` /
+`grace-act-8e3f82c298df`, PTM `res_01KZS54TX600X0DWXWB9ZP4PAS`, Helen
+`heldet-d29e039e48e3`, commission `engcom-3125459e034c`, authorization
+`engauth-488a37b18803`, reservation
+`gpu-reservation-grace-obj-1182358a50dc`, Dispatch `dispatch-074a851ecb05`,
+adapter `adapter-dispatch-074a851ecb05`, provider receipt
+`runtime/engineering_adapter_receipts/ec_000223_retry_b_grace-obj-1182358a50dc.json`,
+and Grace receipt `gracereceipt-b73fc1057559`. It ran from `19:35:17Z` to
+`19:35:23Z` and again proved the P100 UUID/PCI/CUDA placement. Because Task A
+never invoked its provider, overlap was not established. Per the one-attempt
+constraint, no retry was performed.
+
+The subsequently launched lane roots were positively attributable and
+quiescible: 4090 PID 22992 and P100 PID 33384 matched registered PID,
+executable, command, creation time, port, lane, and resource identity, with all
+work gates empty. Cleanup receipt
+`gpu-cleanup-4ed91a214f804eada346d558281f6e33` verifies PID 22992 exited and
+port 12409 released. Receipt
+`gpu-cleanup-a228cd78ee974c4db9ed231dc24350c3` preserves a `FAILED` result even
+though PID 33384 exited and port 12100 released: Windows refused the graceful
+request and the then-current receipt logic retained that expected message as
+an error after verified fallback. The contract was corrected so a successful,
+identity-revalidated force fallback is a warning; real fallback, survivor, or
+port errors still fail. The historical failed receipt was not rewritten.
+
+Final canonical preflight at `2026-08-11T19:39:46.6123725Z` returned `PASS`,
+exit code 0. The 4090 was healthy/PnP OK at PCI `00000000:07:00.0`, 2,813 MiB
+used / 21,330 MiB free; the P100 was healthy/PnP OK at PCI
+`00000000:04:00.0`, 9 MiB used / 16,280 MiB free. Both ports were free, both
+UUIDs unchanged, and neither resource had conflicting or unknown compute.
+
+EC-000223 remains **Not Accepted**: the P100 backend is now singly qualified,
+but the sole concurrent retry produced no provider overlap because of the
+Dispatch queue concurrency defect. That defect is the recommended next
+milestone before any further dual-lane attempt.
