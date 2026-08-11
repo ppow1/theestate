@@ -12,6 +12,64 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# The Stream Deck process is intentionally not an interactive PowerShell
+# session. Log the process boundary and all bootstrap inputs before any
+# helper/configuration call can fail. This log is the durable cold-start
+# evidence; the transient console is not.
+$coldStartLog = Join-Path $PSScriptRoot 'runtime\codex-desk-cold-start.log'
+$resolvedPowerShell = Join-Path $PSHOME 'pwsh.exe'
+if (-not (Test-Path -LiteralPath $resolvedPowerShell)) { $resolvedPowerShell = (Get-Process -Id $PID -ErrorAction SilentlyContinue).Path }
+function Write-ColdStartLog([string]$Message) {
+    try {
+        $directory = Split-Path -Parent $coldStartLog
+        New-Item -ItemType Directory -Force -Path $directory -ErrorAction SilentlyContinue | Out-Null
+        $now = Get-Date
+        Add-Content -LiteralPath $coldStartLog -Value ("[local={0};utc={1}] {2}" -f $now.ToString('o'), $now.ToUniversalTime().ToString('o'), $Message) -Encoding utf8 -ErrorAction SilentlyContinue
+    } catch { }
+}
+function Get-ProcessChainForLog {
+    try {
+        $all = @(Get-CimInstance Win32_Process -ErrorAction Stop)
+        $current = $all | Where-Object ProcessId -eq $PID | Select-Object -First 1
+        $chain = @()
+        while ($current) {
+            $chain += ("pid={0};parent_pid={1};name={2};command_line={3}" -f $current.ProcessId, $current.ParentProcessId, $current.Name, $current.CommandLine)
+            $current = $all | Where-Object ProcessId -eq $current.ParentProcessId | Select-Object -First 1
+        }
+        return ($chain -join ' || ')
+    } catch { return "process_chain_error=$($_.Exception.Message)" }
+}
+function Resolve-ExistingPathForLog([string[]]$Candidates) {
+    foreach ($candidate in $Candidates) { if ($candidate -and (Test-Path -LiteralPath $candidate)) { return $candidate } }
+    return '<unresolved>'
+}
+try {
+    $self = Get-Process -Id $PID -ErrorAction SilentlyContinue
+    $selfCommand = (Get-CimInstance Win32_Process -Filter "ProcessId = $PID" -ErrorAction SilentlyContinue).CommandLine
+    $codexLogCandidates = @((Join-Path $env:APPDATA 'npm\codex.cmd'), (Join-Path $env:APPDATA 'npm\codex.ps1'))
+    $chromeLogCandidates = @(
+        (Join-Path $env:ProgramFiles 'Google\Chrome\Application\chrome.exe'),
+        (Join-Path ${env:ProgramFiles(x86)} 'Google\Chrome\Application\chrome.exe')
+    )
+    $chromiumLogCandidates = @(
+        (Join-Path $env:ProgramFiles 'Chromium\Application\chrome.exe'),
+        (Join-Path $env:ProgramFiles 'Chromium\chrome.exe'),
+        (Join-Path ${env:ProgramFiles(x86)} 'Chromium\Application\chrome.exe')
+    )
+    Write-ColdStartLog '[PS-BEGIN]'
+    Write-ColdStartLog ("pid={0};process={1};parent_chain={2}" -f $PID, $self.Path, (Get-ProcessChainForLog))
+    Write-ColdStartLog ("cwd={0};command_line={1};arguments={2}" -f (Get-Location).Path, $selfCommand, (($args | ForEach-Object { $_ }) -join ' '))
+    foreach ($name in @('PATH','PATHEXT','USERPROFILE','LOCALAPPDATA','APPDATA','ProgramFiles','ProgramFiles(x86)','CODEX_HOME')) {
+        Write-ColdStartLog ("env_{0}={1}" -f $name, [Environment]::GetEnvironmentVariable($name))
+    }
+    Write-ColdStartLog ("resolved_powershell={0};resolved_script={1};resolved_codex={2};resolved_chrome={3};resolved_chromium={4}" -f $self.Path, $PSCommandPath, (Resolve-ExistingPathForLog $codexLogCandidates), (Resolve-ExistingPathForLog $chromeLogCandidates), (Resolve-ExistingPathForLog $chromiumLogCandidates))
+    Write-ColdStartLog ("files_cmd={0};files_script={1};files_monitor_helper={2};files_status_helper={3};files_seat_helper={4}" -f (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-CodexDeskWorkspace.cmd')), (Test-Path -LiteralPath $PSCommandPath), (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'Get-OperatorDeckMonitorLayout.ps1')), (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'Send-CodexStatus.ps1')), (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'Get-CodexSeatConfiguration.ps1')))
+} catch { Write-ColdStartLog ("[PS-EARLY-DIAGNOSTIC-ERROR] {0}`n{1}" -f $_.Exception.Message, $_.ScriptStackTrace) }
+trap {
+    Write-ColdStartLog ("[PS-FAIL] exception={0}`nposition={1}`nstack={2}" -f $_.Exception.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace)
+    exit 1
+}
+
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $seatHelper = Join-Path $PSScriptRoot 'Get-CodexSeatConfiguration.ps1'
 $monitorHelper = Join-Path $PSScriptRoot 'Get-OperatorDeckMonitorLayout.ps1'
@@ -163,6 +221,20 @@ function Start-SeatCodex($Seat) {
     return $started
 }
 
+function Test-WorkspaceReadiness {
+    $checks = [ordered]@{
+        powershell = [bool]($resolvedPowerShell -and (Test-Path -LiteralPath $resolvedPowerShell))
+        codex_config = [bool]($config -and @($config.seats).Count -eq 3)
+        codex_executable = [bool]((Get-Command codex.cmd -ErrorAction SilentlyContinue) -or (Test-Path -LiteralPath (Join-Path $env:APPDATA 'npm\codex.cmd')))
+        elevation_host = [bool](Test-Path -LiteralPath (Join-Path $env:SystemRoot 'System32\conhost.exe'))
+    }
+    Write-ColdStartLog ("readiness={0}" -f (($checks.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ','))
+    if (-not $checks.powershell -or -not $checks.codex_config -or -not $checks.codex_executable -or -not $checks.elevation_host) {
+        throw ('CODEX DESK not ready: ' + (($checks.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ', '))
+    }
+    return $checks
+}
+
 function Close-SeatCodex([string]$Seat) {
     for ($attempt = 0; $attempt -lt 3; $attempt++) {
         $window = Get-Process -ErrorAction SilentlyContinue |
@@ -205,13 +277,13 @@ function Test-SeatCodexClosed([string]$Seat) {
 }
 
 function Get-SeatConfig {
-    $json = & pwsh -NoProfile -File $seatHelper
+    $json = & $resolvedPowerShell -NoLogo -NoProfile -ExecutionPolicy Bypass -File $seatHelper
     if ($LASTEXITCODE -ne 0) { throw 'Codex seat configuration helper failed.' }
     return ($json -join "`n" | ConvertFrom-Json)
 }
 
 function Get-TargetMonitor {
-    $json = & pwsh -NoProfile -File $monitorHelper -NoClipboard
+    $json = & $resolvedPowerShell -NoLogo -NoProfile -ExecutionPolicy Bypass -File $monitorHelper -NoClipboard
     if ($LASTEXITCODE -ne 0) { throw 'Operator Deck monitor identity helper failed.' }
     $raw = $json -join "`n"
     $jsonStart = $raw.IndexOf('{')
@@ -258,6 +330,7 @@ function New-WorkspaceCells($Monitor) {
 }
 
 $config = Get-SeatConfig
+Write-ColdStartLog ("seat_configuration=resolved;seat_count={0};homes={1}" -f @($config.seats).Count, ((@($config.seats) | ForEach-Object { "$($_.seat_id)=$($_.codex_home)" }) -join ','))
 $monitor = Get-TargetMonitor
 $cells = New-WorkspaceCells $monitor
 $chromium = @(
@@ -267,6 +340,7 @@ $chromium = @(
     'C:\Program Files\Chromium\chrome.exe'
     'C:\Program Files (x86)\Chromium\Application\chrome.exe'
 ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+Write-ColdStartLog ("runtime_resolved_chromium={0};runtime_resolved_chrome={1}" -f $chromium, (Resolve-ExistingPathForLog $chromeLogCandidates))
 $chromeUserData = Join-Path $env:LOCALAPPDATA 'Google\Chrome\User Data'
 $seatBrowserMappings = @($config.seats | Where-Object {
     $_.interactive_chrome_profile -and
@@ -287,9 +361,21 @@ $report = [ordered]@{
 }
 $reportPath = Join-Path $PSScriptRoot 'runtime\codex-desk-workspace.json'
 $diagnosticPath = Join-Path $PSScriptRoot 'runtime\codex-desk-launch-diagnostics.json'
+$batchPath = Join-Path $PSScriptRoot 'runtime\codex-desk-last-batch.json'
 $chromeMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-chrome-windows.json'
 $chromiumMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-chromium-windows.json'
 $codexMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-codex-windows.json'
+try {
+    $runtimeDirectory = Split-Path -Parent $reportPath
+    New-Item -ItemType Directory -Force -Path $runtimeDirectory | Out-Null
+    $writeProbe = Join-Path $runtimeDirectory ('.codex-desk-write-probe-{0}.tmp' -f $PID)
+    'probe' | Set-Content -LiteralPath $writeProbe -Encoding utf8
+    Remove-Item -LiteralPath $writeProbe -Force
+    Write-ColdStartLog ("runtime_directory={0};runtime_writable=True" -f $runtimeDirectory)
+} catch {
+    Write-ColdStartLog ("runtime_directory={0};runtime_writable=False;error={1}" -f (Split-Path -Parent $reportPath), $_.Exception.ToString())
+    throw
+}
 
 function Get-WorkspaceProcessChain {
     $all = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
@@ -336,27 +422,14 @@ function Write-WorkspaceLaunchDiagnostics($Monitor, $Cells) {
 
 Write-WorkspaceLaunchDiagnostics $monitor $cells
 $chromeExe = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+$readiness = Test-WorkspaceReadiness
+# Runtime HWND/PID files are evidence only. They are intentionally not loaded
+# as live state: after reboot PIDs and HWNDs may be recycled. Every invocation
+# discovers live windows/processes again and writes a fresh map after identity
+# validation.
 $codexWindowMap = [ordered]@{}
-if (Test-Path -LiteralPath $codexMapPath) {
-    try {
-        $savedCodexMap = (Get-Content -Raw -LiteralPath $codexMapPath | ConvertFrom-Json).seats
-        foreach ($property in $savedCodexMap.PSObject.Properties) { $codexWindowMap[$property.Name] = $property.Value }
-    } catch { $codexWindowMap = [ordered]@{} }
-}
 $chromeWindowMap = [ordered]@{}
 $chromiumWindowMap = [ordered]@{}
-if (Test-Path -LiteralPath $chromeMapPath) {
-    try {
-        $savedMap = (Get-Content -Raw -LiteralPath $chromeMapPath | ConvertFrom-Json).seats
-        foreach ($property in $savedMap.PSObject.Properties) { $chromeWindowMap[$property.Name] = $property.Value }
-    } catch { $chromeWindowMap = [ordered]@{} }
-}
-if (Test-Path -LiteralPath $chromiumMapPath) {
-    try {
-        $savedChromiumMap = (Get-Content -Raw -LiteralPath $chromiumMapPath | ConvertFrom-Json).seats
-        foreach ($property in $savedChromiumMap.PSObject.Properties) { $chromiumWindowMap[$property.Name] = $property.Value }
-    } catch { $chromiumWindowMap = [ordered]@{} }
-}
 
 function Get-ChromeWindows {
     if (-not ('EstateCodexDeskChromeV1' -as [type])) {
@@ -720,6 +793,12 @@ function Get-ChromiumSeatProcesses([string]$ProfilePath) {
         Where-Object { $_.CommandLine -and $_.CommandLine.IndexOf($needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 })
 }
 
+function Find-ChromiumWindowForProfile([string]$ProfilePath) {
+    $processes = @(Get-ChromiumSeatProcesses $ProfilePath | ForEach-Object ProcessId)
+    if ($processes.Count -eq 0) { return $null }
+    return Get-ChromiumWindows | Where-Object { $processes -contains $_.pid } | Select-Object -First 1
+}
+
 function Request-SeatChromiumClose([string]$Seat) {
     $record = $chromiumWindowMap[$Seat]
     if (-not $record) { return $null }
@@ -753,16 +832,46 @@ function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
     $profilePath = [string]$SeatRecord.automation_chromium_profile
     if (-not $profilePath) { throw "Chromium automation profile is unset for $Seat." }
     New-Item -ItemType Directory -Force -Path $profilePath | Out-Null
+
+    function Repair-IsolatedChromiumExitState([string]$Path) {
+        $preferences = Join-Path $Path 'Default\Preferences'
+        if (-not (Test-Path -LiteralPath $preferences)) { return 'not_present' }
+        try {
+            $json = Get-Content -Raw -LiteralPath $preferences | ConvertFrom-Json
+            $exitType = [string]$json.profile.exit_type
+            if ($exitType -and $exitType -ne 'Normal') {
+                $json.profile.exit_type = 'Normal'
+                $tmp = "$preferences.codex-desk.tmp"
+                $json | ConvertTo-Json -Depth 100 -Compress | Set-Content -LiteralPath $tmp -Encoding utf8
+                Move-Item -LiteralPath $tmp -Destination $preferences -Force
+                return "repaired_$exitType"
+            }
+            return "already_$exitType"
+        } catch {
+            throw "Could not inspect isolated Chromium exit state for $Seat`: $($_.Exception.Message)"
+        }
+    }
     $saved = $null
     if ($chromiumWindowMap.Contains($Seat) -and $chromiumWindowMap.$Seat.profile_path_verified -eq $true) {
         $saved = Get-ChromiumWindows | Where-Object { $_.hwnd -eq [int64]$chromiumWindowMap.$Seat.hwnd } | Select-Object -First 1
     }
     if (-not $saved) {
+        # Cold-start discovery is based on the live process command line, never
+        # on an HWND/PID saved before reboot.
+        $saved = Find-ChromiumWindowForProfile $profilePath
+    }
+    if (-not $saved) {
+        # Only touch the isolated Preferences file after proving that no live
+        # Chromium process owns this profile.
+        if ((Get-ChromiumSeatProcesses $profilePath).Count -eq 0) {
+            $exitState = Repair-IsolatedChromiumExitState $profilePath
+        }
         $before = @(Get-ChromiumWindows | ForEach-Object hwnd)
         $launchArguments = @(
             "--user-data-dir=`"$profilePath`""
             '--profile-directory="Default"'
             '--disable-background-mode'
+            '--disable-session-crashed-bubble'
             '--app=data:text/html,%3Ctitle%3ECodex%20Desk%20Chromium%3C%2Ftitle%3E'
         )
         Start-Process -FilePath $chromium -ArgumentList $launchArguments | Out-Null
@@ -784,6 +893,35 @@ function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
         launch_arguments=@("--user-data-dir=`"$profilePath`"", '--profile-directory="Default"', '--disable-background-mode', '--app=data:text/html,%3Ctitle%3ECodex%20Desk%20Chromium%3C%2Ftitle%3E')
     }
 }
+
+function Import-ValidatedRuntimeMaps {
+    foreach ($pathAndMap in @(
+        [pscustomobject]@{ path=$codexMapPath; map=$codexWindowMap; kind='codex' },
+        [pscustomobject]@{ path=$chromiumMapPath; map=$chromiumWindowMap; kind='chromium' },
+        [pscustomobject]@{ path=$chromeMapPath; map=$chromeWindowMap; kind='chrome' }
+    )) {
+        if (-not (Test-Path -LiteralPath $pathAndMap.path)) { continue }
+        try { $savedSeats = (Get-Content -Raw -LiteralPath $pathAndMap.path | ConvertFrom-Json).seats } catch { continue }
+        foreach ($property in $savedSeats.PSObject.Properties) {
+            $seat = $property.Name; $record = $property.Value
+            if ($pathAndMap.kind -eq 'codex') {
+                $process = Get-Process -Id ([int]$record.window_pid) -ErrorAction SilentlyContinue
+                $command = if ($process) { (Get-CimInstance Win32_Process -Filter "ProcessId = $([int]$record.window_pid)" -ErrorAction SilentlyContinue).CommandLine } else { '' }
+                if ($process -and $command -and $command.Contains("Start-CodexInteractive.ps1' -Seat '$seat'")) { $pathAndMap.map[$seat] = $record }
+            } elseif ($pathAndMap.kind -eq 'chromium') {
+                $live = Get-ChromiumWindows | Where-Object { $_.hwnd -eq [int64]$record.hwnd } | Select-Object -First 1
+                $command = if ($live) { (Get-CimInstance Win32_Process -Filter "ProcessId = $([int]$live.pid)" -ErrorAction SilentlyContinue).CommandLine } else { '' }
+                if ($live -and $command -and $command.IndexOf([string]$record.profile_path, [StringComparison]::OrdinalIgnoreCase) -ge 0) { $pathAndMap.map[$seat] = $record }
+            } else {
+                $live = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$record.hwnd } | Select-Object -First 1
+                $profilePath = Join-Path $chromeUserData ([string]$record.profile)
+                if (Test-ChromeWindowProfile $live $profilePath ([string]$record.profile) $record) { $pathAndMap.map[$seat] = $record }
+            }
+        }
+    }
+}
+
+Import-ValidatedRuntimeMaps
 
 $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $reportPath -Encoding utf8
 
@@ -872,33 +1010,52 @@ if ($StopAll) {
 $runTop = $Mode -in @('Top', 'All')
 $runMiddle = $Mode -in @('Middle', 'All')
 $runBottom = $Mode -in @('Bottom', 'All')
+$batchResults = [ordered]@{}
+
+function Invoke-SeatBatch([string]$Kind, [scriptblock]$Action) {
+    foreach ($seat in @('C1','C2','C3')) {
+        try {
+            & $Action $seat
+            $batchResults["$Kind-$seat"] = [ordered]@{ seat=$seat; kind=$Kind; status='success' }
+        } catch {
+            $batchResults["$Kind-$seat"] = [ordered]@{ seat=$seat; kind=$Kind; status='failure'; error=$_.Exception.Message }
+            Write-Warning "$Kind $seat failed; continuing remaining seats: $($_.Exception.Message)"
+        }
+    }
+}
 
 if ($runTop) {
-    foreach ($seat in @('C1','C2','C3')) {
+    Invoke-SeatBatch 'codex' {
+        param($seat)
         $window = Start-SeatCodex $seat
-        if ($window) {
-            $windowPid = Get-ConsoleWindowProcessId $window.Id
-            Invoke-MovePid $windowPid $cells["$seat-CODEX"]
-            Set-SeatWindowTitle $windowPid $seat-CODEX
-            $codexWindowMap[$seat] = [ordered]@{ window_pid=[int]$windowPid; seat=$seat; title="$seat-CODEX" }
-        }
+        if (-not $window) { throw "Codex launcher returned no process for $seat." }
+        $windowPid = Get-ConsoleWindowProcessId $window.Id
+        Invoke-MovePid $windowPid $cells["$seat-CODEX"]
+        Set-SeatWindowTitle $windowPid $seat-CODEX
+        $codexWindowMap[$seat] = [ordered]@{ window_pid=[int]$windowPid; seat=$seat; title="$seat-CODEX" }
     }
     ([ordered]@{ seats=$codexWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $codexMapPath -Encoding utf8
 }
 
 if (-not $PlanOnly -and $runMiddle) {
-    foreach ($seatRecord in @($config.seats)) {
-        Start-SeatChromium $seatRecord.seat_id $seatRecord $cells["$($seatRecord.seat_id)-CHROMIUM"]
+    Invoke-SeatBatch 'chromium' {
+        param($seat)
+        $seatRecord = @($config.seats) | Where-Object seat_id -eq $seat | Select-Object -First 1
+        Start-SeatChromium $seat $seatRecord $cells["$seat-CHROMIUM"]
     }
     ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
 }
 
 if (-not $PlanOnly -and $runBottom) {
-    foreach ($seatRecord in @($config.seats)) {
-        Start-SeatChrome $seatRecord.seat_id $seatRecord $cells["$($seatRecord.seat_id)-CHROME"]
+    Invoke-SeatBatch 'chrome' {
+        param($seat)
+        $seatRecord = @($config.seats) | Where-Object seat_id -eq $seat | Select-Object -First 1
+        Start-SeatChrome $seat $seatRecord $cells["$seat-CHROME"]
     }
     ([ordered]@{ seats=$chromeWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromeMapPath -Encoding utf8
 }
+
+([ordered]@{ schema_version='codex_desk_batch_v1'; observed_at=(Get-Date).ToUniversalTime().ToString('o'); mode=$Mode; readiness=$readiness; results=$batchResults } | ConvertTo-Json -Depth 12) | Set-Content -LiteralPath $batchPath -Encoding utf8
 
 Write-Host "Codex Desk target: $($monitor.device) / logical top-right ($($monitor.work_area.width)x$($monitor.work_area.height))"
 Write-Host "Workspace plan: $reportPath"
