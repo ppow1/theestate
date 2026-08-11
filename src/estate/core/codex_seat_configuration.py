@@ -7,6 +7,10 @@ from typing import Any
 
 from estate.core.codex_bridge import CODEX_SEAT_HOMES
 
+CODEX_AUTOMATION_CHROMIUM_ROOT = Path(
+    "A:/AI/Tools/EstateStreamDeckPlugin/runtime/codex-desk-chromium-profiles"
+)
+
 
 def codex_seat_configuration(seat_id: str | None = None) -> dict[str, Any]:
     """Return approved seat homes and non-secret browser identity mappings."""
@@ -25,7 +29,9 @@ def codex_seat_configuration(seat_id: str | None = None) -> dict[str, Any]:
                     "C2": "Profile 4",
                     "C3": "Profile 5",
                 }[logical_seat],
-                "automation_chromium_profile": None,
+                "automation_chromium_profile": str(
+                    CODEX_AUTOMATION_CHROMIUM_ROOT / logical_seat
+                ),
             }
         )
     if seat_id is not None and not seats:
