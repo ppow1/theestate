@@ -195,6 +195,8 @@ def start_ollama_lane(root: str | Path, lane: RuntimeLane, *, executable: str | 
         stdout_stream.close()
         stderr_stream.close()
     evidence = process_binding_evidence(lane, pid=process.pid, process_identity=f"{Path(binary).name} serve", started_at=utc_now())
+    evidence["executable_path"] = str(Path(binary).resolve())
+    evidence["process_command_line"] = f'"{Path(binary).resolve()}" serve'
     evidence["runtime_stdout_log"] = str(stdout_path.relative_to(Path(root))).replace("\\", "/")
     evidence["runtime_stderr_log"] = str(stderr_path.relative_to(Path(root))).replace("\\", "/")
     path = Path(root) / LANE_EVIDENCE

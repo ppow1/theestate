@@ -36,3 +36,33 @@ utilization. Stale or unknown telemetry is not rendered as zero.
 
 This increment does not implement multi-host orchestration, automatic recovery,
 P100 32B deployment, or heavy workload acceptance.
+
+## Governed runtime lifecycle
+
+The existing runtime-lane registry is also the root of cleanup authority. The
+Estate does not provide a global GPU-memory flush and never resets a device.
+`gpu-runtime status` correlates the registered root PID with its executable,
+exact command line, process creation time, child tree, endpoint port,
+reservations, Dispatch queue, provider activity, pending tasks, and
+reconciliation state. Missing evidence produces `UNKNOWN`, not ownership.
+
+A live root can be `IDLE`, `ACTIVE`, `STALE_CANDIDATE`, `QUIESCING`, or
+`UNKNOWN`; a missing registered root is `STOPPED`. Age is only a stale signal.
+Quiescence requires positive `ESTATE_OWNED` evidence and empty active,
+pending, and in-flight gates. Children are eligible only through the verified
+parent tree. Unrelated processes on the same GPU are never selected.
+
+Operator commands are:
+
+```text
+python -m estate.cli.main gpu-runtime status --json
+python -m estate.cli.main gpu-runtime quiesce --lane <registered-lane-id> --actor operator --confirm --json
+```
+
+The second command requests normal termination for the proven owned tree,
+forces only verified survivors if necessary, verifies the owned PIDs and lane
+port are gone, refreshes GPU telemetry, and writes
+`estate.gpu-runtime-cleanup-receipt.v1` evidence under
+`runtime/compute_resources/cleanup_receipts/`. Cleanup success or failure is
+also emitted through the existing transport-neutral operational-event log.
+Conversation-facing Grace has no direct quiesce or arbitrary PID authority.

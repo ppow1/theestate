@@ -173,3 +173,30 @@ and no-cross-assignment criterion failed. No retry was performed.
 
 Heavy parallel workloads, SDXL parallelism, P100 32B parallelism, and
 unrestricted scheduler saturation remain unqualified.
+
+## Governed runtime cleanup continuation
+
+The canonical preflight at `2026-08-11T18:39:17Z` found the RTX 4090 at
+23,449 MiB used / 694 MiB free and the P100 at 11,900 MiB used / 4,389 MiB
+free. Model workers included `llama-server.exe` PIDs 9184 and 28892 under PID
+28456. Neither registered lane port was listening. The recorded EC-000223 lane
+roots were PIDs 6840 and 25528, so the observed worker parent did not match a
+registered lane root. Executable names and the shared Ollama model path were
+not accepted as Estate ownership. Those workers therefore remained
+external/ambiguous and were not terminated.
+
+At the read-only lifecycle attribution on `2026-08-11T19:29:23Z`, the model
+workers and parent were already absent without an Estate cleanup action. The
+4090 had returned to 2,849 MiB used / 21,294 MiB free and the P100 to 9 MiB
+used / 16,280 MiB free. Ports 12409 and 12100 were free. The new canonical
+status command classified both historical registry roots as
+`ESTATE_OWNED_STOPPED`; there was no live owned tree to quiesce. Consequently
+the earlier allocation cannot be positively attributed to abandoned
+EC-000223 residue, and no retrospective cleanup claim is made.
+
+The runtime-lane lifecycle now requires PID, executable path, exact command
+line, creation time, child tree, lane port, reservation, Dispatch, provider
+activity, pending-task, and reconciliation agreement before quiescence. Any
+unknown gate refuses termination. Cleanup is lane/resource scoped, records a
+schema-governed receipt and operational event, and contains no GPU reset,
+device mutation, reboot, or global process-kill capability.

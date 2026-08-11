@@ -75,6 +75,37 @@
       ],
       "gpu_health_failure": false,
       "retry_performed": false
+    },
+    {
+      "observation_type": "canonical_preflight_before_runtime_cleanup_hardening",
+      "timestamp": "2026-08-11T18:39:17.1404668Z",
+      "status": "PRECHECK_BLOCKED",
+      "preflight_exit_code": 2,
+      "reasons": [
+        "free VRAM 694 MiB is below the accepted floor 8192 MiB",
+        "external model/CUDA worker is present; conservative preflight blocks the lane"
+      ],
+      "resources": [
+        {"gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "memory_used_mib": 23449, "memory_free_mib": 694, "lane_port_listening": false},
+        {"gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414", "memory_used_mib": 11900, "memory_free_mib": 4389, "lane_port_listening": false, "observed_model_worker_pids": [9184, 28892], "observed_parent_pid": 28456}
+      ],
+      "cleanup_performed": false
+    },
+    {
+      "observation_type": "read_only_runtime_lifecycle_attribution",
+      "timestamp": "2026-08-11T19:29:23Z",
+      "status": "NO_LIVE_OWNED_RUNTIME_TO_QUIESCE",
+      "registered_lane_roots": [
+        {"runtime_lane_id": "qwen.local.text.4090", "recorded_pid": 6840, "state": "STOPPED", "port": 12409, "port_listening": false},
+        {"runtime_lane_id": "qwen.local.text.p100-1", "recorded_pid": 25528, "state": "STOPPED", "port": 12100, "port_listening": false}
+      ],
+      "resources": [
+        {"gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "memory_used_mib": 2849, "memory_free_mib": 21294},
+        {"gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414", "memory_used_mib": 9, "memory_free_mib": 16280}
+      ],
+      "prior_model_workers_still_present": false,
+      "ownership_conclusion": "not positively attributable to EC-000223 or Estate runtime residue",
+      "cleanup_performed": false
     }
   ],
   "acceptance_gate": {

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate.gpu-runtime-cleanup-receipt.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version", "cleanup_id", "timestamp", "actor", "runtime_lane_id",
+    "resource_id", "gpu_uuid", "root_pid", "child_pids", "ownership",
+    "active_reservations_checked", "active_dispatches_checked",
+    "active_provider_invocations_checked", "pending_tasks_checked",
+    "in_flight_reconciliations_checked", "shutdown_requested",
+    "processes_exited", "port_released", "pre_cleanup_gpu",
+    "post_cleanup_gpu", "result", "errors"
+  ],
+  "properties": {
+    "schema_version": {"const": "estate.gpu-runtime-cleanup-receipt.v1"},
+    "cleanup_id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "actor": {"enum": ["operator", "engineering", "scheduler-runtime-cleanup"]},
+    "runtime_lane_id": {"type": "string", "minLength": 1},
+    "resource_id": {"type": "string", "minLength": 1},
+    "gpu_uuid": {"type": "string", "pattern": "^GPU-"},
+    "root_pid": {"type": ["integer", "null"]},
+    "child_pids": {"type": "array", "items": {"type": "integer"}, "uniqueItems": true},
+    "ownership": {"enum": ["ESTATE_OWNED", "ESTATE_OWNED_STOPPED", "UNKNOWN", "EXTERNAL"]},
+    "active_reservations_checked": {"type": "array"},
+    "active_dispatches_checked": {"type": "array"},
+    "active_provider_invocations_checked": {"type": "array"},
+    "pending_tasks_checked": {"type": "array"},
+    "in_flight_reconciliations_checked": {"type": "array"},
+    "unknown_checks": {"type": "array", "items": {"type": "string"}},
+    "shutdown_requested": {"type": "array", "items": {"type": "integer"}, "uniqueItems": true},
+    "forced_after_graceful_request": {"type": "array", "items": {"type": "integer"}, "uniqueItems": true},
+    "processes_exited": {"type": "boolean"},
+    "port_released": {"type": "boolean"},
+    "pre_cleanup_gpu": {"type": ["object", "null"]},
+    "post_cleanup_gpu": {"type": ["object", "null"]},
+    "result": {"enum": ["COMPLETED", "ALREADY_STOPPED", "BLOCKED", "FAILED"]},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  }
+}
