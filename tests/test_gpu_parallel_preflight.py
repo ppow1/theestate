@@ -20,8 +20,8 @@ def _smi(p100_free=12000, rtx_free=16000, p100_util=0, rtx_util=0, p100_power=34
 
 def _pnp(p100_status="OK", rtx_status="OK"):
     return [
-        {"name": "NVIDIA GeForce RTX 4090", "status": rtx_status, "problem_code": 0},
-        {"name": "Tesla P100-PCIE-16GB", "status": p100_status, "problem_code": 0},
+        {"FriendlyName": "NVIDIA GeForce RTX 4090", "Status": rtx_status, "InstanceId": "PCI\\RTX"},
+        {"FriendlyName": "Tesla P100-PCIE-16GB", "Status": p100_status, "InstanceId": "PCI\\P100"},
     ]
 
 
@@ -74,11 +74,23 @@ def test_capacity_floor_blocks_each_gpu(tmp_path):
     assert result["status"] == "PRECHECK_BLOCKED"
 
 
-def test_missing_wrong_uuid_and_wrong_pci_are_health_failures(tmp_path):
+def test_missing_and_wrong_uuid_are_health_failures(tmp_path):
     missing = _smi().splitlines()[0]
     assert _run(tmp_path, smi=missing)[1]["status"] == "GPU_HEALTH_FAILURE"
     assert _run(tmp_path, smi=_smi(rtx_uuid="GPU-wrong"))[1]["status"] == "GPU_HEALTH_FAILURE"
-    assert _run(tmp_path, smi=_smi(p100_pci="00000000:09:00.0"))[1]["status"] == "GPU_HEALTH_FAILURE"
+
+
+def test_stable_uuid_with_pci_reenumeration_passes_with_topology_warning(tmp_path):
+    code, result = _run(tmp_path, smi=_smi(rtx_pci="00000000:06:00.0", p100_pci="00000000:09:00.0"))
+    assert code == 0
+    assert result["status"] == "PASS"
+    assert result["policy"]["canonical_identity"] == "host_id + NVIDIA UUID"
+    for resource in result["resources"]:
+        assert resource["ready"] is True
+        assert resource["pci_topology_changed"] is True
+        assert resource["pci_bus"] != resource["prior_observed_pci_bus"]
+        assert "stable UUID" in resource["warnings"][0]
+    assert len(result["warnings"]) == 2
 
 
 def test_pnp_and_malformed_output_fail_safely(tmp_path):
@@ -88,6 +100,37 @@ def test_pnp_and_malformed_output_fail_safely(tmp_path):
     code, result = _run(tmp_path, smi="not,csv")
     assert code == 4
     assert result["status"] == "PREFLIGHT_TOOL_ERROR"
+
+
+def test_pnp_optional_problem_fields_absent_are_null_and_healthy(tmp_path):
+    code, result = _run(tmp_path, pnp=_pnp())
+    assert code == 0
+    assert result["status"] == "PASS"
+    for resource in result["resources"]:
+        assert resource["pnp_status"] == "OK"
+        assert resource["pnp_instance_id"].startswith("PCI\\")
+        assert resource["pnp_problem_code"] is None
+        assert resource["pnp_config_manager_error_code"] is None
+
+
+def test_pnp_explicit_problem_code_is_health_failure(tmp_path):
+    pnp = _pnp()
+    pnp[0]["ProblemCode"] = 43
+    code, result = _run(tmp_path, pnp=pnp)
+    assert code == 3
+    assert result["status"] == "GPU_HEALTH_FAILURE"
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    assert rtx["pnp_problem_code"] == 43
+    assert "explicit problem code" in rtx["reasons"][0]
+
+
+def test_pnp_missing_required_identity_field_fails_closed(tmp_path):
+    pnp = _pnp()
+    del pnp[0]["InstanceId"]
+    code, result = _run(tmp_path, pnp=pnp)
+    assert code == 3
+    assert result["status"] == "GPU_HEALTH_FAILURE"
+    assert any("missing required" in reason for reason in result["reasons"])
 
 
 def test_external_material_compute_blocks(tmp_path):
@@ -142,4 +185,4 @@ def test_json_contract_and_script_is_read_only():
         "pnputil", "devcon", "torch", "diffusers", "llama-server.*--prompt",
     ):
         assert forbidden not in source
-    assert all(token in source for token in ('status', 'resources', 'exit_code', 'uuid', 'pci_bus', 'lane_port'))
+    assert all(token in source for token in ('status', 'resources', 'exit_code', 'uuid', 'pci_bus', 'pci_topology_changed', 'warnings', 'lane_port'))
