@@ -1,10 +1,13 @@
 [CmdletBinding()]
 param(
+    [ValidateSet('Top', 'Middle', 'Bottom', 'All')]
+    [string]$Mode = 'All',
     [switch]$PlanOnly,
     [switch]$NoLaunch,
     [switch]$NoMove,
     [switch]$RestartChromium,
-    [switch]$StopChromium
+    [switch]$StopChromium,
+    [switch]$StopAll
 )
 
 $ErrorActionPreference = 'Stop'
@@ -108,6 +111,15 @@ function Start-SeatCodex($Seat) {
     $started = Start-Process -FilePath $conhost -Verb RunAs -ArgumentList @('pwsh.exe','-NoProfile','-ExecutionPolicy','Bypass','-NoExit','-Command',$command) -PassThru
     Start-Sleep -Seconds 2
     return $started
+}
+
+function Close-SeatCodex([string]$Seat) {
+    $window = Get-WindowByMarker "$Seat-CODEX"
+    if (-not $window) { $window = Get-SeatLauncherProcess $Seat }
+    if ($window) {
+        $window.CloseMainWindow() | Out-Null
+        $window.WaitForExit(5000) | Out-Null
+    }
 }
 
 function Get-SeatConfig {
@@ -248,6 +260,13 @@ function Close-ManagedChromeWindow($Window) {
         [EstateCodexDeskChromeV1]::PostMessage([IntPtr]$Window.hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
         Start-Sleep -Milliseconds 500
     }
+}
+
+function Close-SeatChrome([string]$Seat) {
+    if (-not $chromeWindowMap.Contains($Seat)) { return }
+    $window = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+    Close-ManagedChromeWindow $window
+    $chromeWindowMap.Remove($Seat)
 }
 
 function Get-ChromeProfilePathFromUi($Window) {
@@ -504,20 +523,43 @@ if ($StopChromium) {
     exit 0
 }
 
-foreach ($seat in @('C1','C2','C3')) {
-    $window = Start-SeatCodex $seat
-    if ($window) {
-        $windowPid = Get-ConsoleWindowProcessId $window.Id
-        Invoke-MovePid $windowPid $cells["$seat-CODEX"]
-        Set-SeatWindowTitle $windowPid $seat-CODEX
+if ($StopAll) {
+    Get-ChromiumWindows | Out-Null
+    foreach ($seat in @('C1','C2','C3')) {
+        Close-SeatChromium $seat
+        $chromiumWindowMap.Remove($seat)
+        Close-SeatCodex $seat
+        Close-SeatChrome $seat
+    }
+    ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
+    ([ordered]@{ seats=$chromeWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromeMapPath -Encoding utf8
+    Write-Host 'Codex Desk windows stopped cleanly.'
+    exit 0
+}
+
+$runTop = $Mode -in @('Top', 'All')
+$runMiddle = $Mode -in @('Middle', 'All')
+$runBottom = $Mode -in @('Bottom', 'All')
+
+if ($runTop) {
+    foreach ($seat in @('C1','C2','C3')) {
+        $window = Start-SeatCodex $seat
+        if ($window) {
+            $windowPid = Get-ConsoleWindowProcessId $window.Id
+            Invoke-MovePid $windowPid $cells["$seat-CODEX"]
+            Set-SeatWindowTitle $windowPid $seat-CODEX
+        }
     }
 }
 
-if (-not $PlanOnly) {
+if (-not $PlanOnly -and $runMiddle) {
     foreach ($seatRecord in @($config.seats)) {
         Start-SeatChromium $seatRecord.seat_id $seatRecord $cells["$($seatRecord.seat_id)-CHROMIUM"]
     }
     ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
+}
+
+if (-not $PlanOnly -and $runBottom) {
     foreach ($seatRecord in @($config.seats)) {
         Start-SeatChrome $seatRecord.seat_id $seatRecord $cells["$($seatRecord.seat_id)-CHROME"]
     }
