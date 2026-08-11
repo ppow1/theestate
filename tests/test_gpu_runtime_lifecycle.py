@@ -74,7 +74,7 @@ def test_windows_powershell_date_and_command_quoting_correlate(tmp_path):
     ("runtime/engineering_scheduler/compute_reservations.json", [{"reservation_id": "r1", "resource_id": "host:nvidia:GPU-A", "state": "reserved"}], "active_reservations"),
     ("runtime/execution_dispatch/queue.json", [{"dispatch_id": "d1", "state": "Running", "compute_resource_requirements": {"required_gpu_uuid": GPU_A}}], "active_dispatches"),
     ("runtime/execution_dispatch/queue.json", [{"dispatch_id": "d1", "state": "Ready", "provider_extension": {"runtime_lane_id": "lane-a"}}], "pending_tasks"),
-    ("runtime/execution_activity/current.json", {"active": [{"request_id": "d1", "runtime_lane_id": "lane-a"}]}, "active_provider_invocations"),
+    ("runtime/execution_activity/current.json", {"active": [{"request_id": "d1", "runtime_lane_id": "lane-a", "current_state": "Running"}]}, "active_provider_invocations"),
 ])
 def test_active_or_pending_governed_work_blocks_quiesce(tmp_path, artifact, payload, gate):
     _, process = _setup(tmp_path)
@@ -82,6 +82,26 @@ def test_active_or_pending_governed_work_blocks_quiesce(tmp_path, artifact, payl
     lane = inspect_gpu_runtime_lanes(tmp_path, process_inventory=lambda: [process], port_inventory=lambda: {12409: process.pid})["lanes"][0]
     assert lane["quiesce_allowed"] is False
     assert lane["gates"][gate]
+
+
+def test_completed_provider_execution_awaiting_validation_does_not_block_runtime_cleanup(tmp_path):
+    _, process = _setup(tmp_path)
+    activity = {
+        "active": [{
+            "request_id": "d1",
+            "runtime_lane_id": "lane-a",
+            "current_state": "Validation",
+            "provider_execution_state": "completed",
+        }]
+    }
+    (tmp_path / "runtime/execution_activity/current.json").write_text(json.dumps(activity), encoding="utf-8")
+    lane = inspect_gpu_runtime_lanes(
+        tmp_path,
+        process_inventory=lambda: [process],
+        port_inventory=lambda: {12409: process.pid},
+    )["lanes"][0]
+    assert lane["gates"]["active_provider_invocations"] == []
+    assert lane["quiesce_allowed"] is True
 
 
 def test_in_flight_reconciliation_blocks_quiesce(tmp_path):

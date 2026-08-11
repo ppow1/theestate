@@ -31,6 +31,7 @@ RECONCILIATIONS = Path("runtime/execution_adapters/reconciliation")
 ACTIVE_RESERVATION_STATES = {"active", "held", "pending", "reserved"}
 ACTIVE_DISPATCH_STATES = {"Running"}
 PENDING_DISPATCH_STATES = {"Awaiting Approval", "Queued", "Ready", "Waiting"}
+ACTIVE_PROVIDER_ACTIVITY_STATES = {"active", "in_progress", "running"}
 
 
 def utc_now() -> str:
@@ -215,7 +216,14 @@ def _gate_evidence(base: Path, lane: RuntimeLane) -> dict[str, Any]:
         unknown.append(error)
         active_provider: list[dict[str, Any]] = []
     else:
-        active_provider = [row for row in (activity.get("active", []) if isinstance(activity, dict) else []) if isinstance(row, dict) and _contains_identity(row, lane)]
+        active_provider = [
+            row
+            for row in (activity.get("active", []) if isinstance(activity, dict) else [])
+            if isinstance(row, dict)
+            and _contains_identity(row, lane)
+            and str(row.get("current_state") or row.get("state") or "").strip().lower()
+            in ACTIVE_PROVIDER_ACTIVITY_STATES
+        ]
 
     in_flight_reconciliation: list[str] = []
     recon_dir = base / RECONCILIATIONS
