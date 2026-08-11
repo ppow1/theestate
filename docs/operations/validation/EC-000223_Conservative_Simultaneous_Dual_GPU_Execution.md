@@ -359,3 +359,40 @@ operation, or cleanup action was performed after the loss; live evidence was
 preserved exactly.
 
 EC-000223 remains **Not Accepted — P100 device loss during final retry**.
+
+## Post-cold-restart recovery verification
+
+The host cold-restart recovery was verified at `2026-08-11T20:42:06.8442056Z`;
+Windows reports the last boot at `2026-08-11T16:23:08-04:00`. No Grace,
+Ollama, Qwen, or concurrent workload was launched after restart.
+
+The repository-owned canonical preflight
+(`powershell -ExecutionPolicy Bypass -File tools/gpu-parallel-preflight.ps1 -Json`)
+returned `PASS`, exit code `0`, with no warnings or reasons. Direct `nvidia-smi`
+and Windows PnP checks agreed with the canonical result. The complete recovery
+observation is appended to `operations/diagnostics/ec-000223-preflight-observation.json`.
+
+P100 recovery classification: **RECOVERED_HEALTHY**. NVML is visible; PnP is
+present and `OK`; the full UUID is
+`GPU-6785b322-899d-8eec-e817-31d83279a414`; current PCI is
+`00000000:04:00.0`; health is `OK`; and no device-loss symptom was observed.
+Idle telemetry was 9 MiB used / 16,280 MiB free, 0% utilization, 38 C, and
+26.27 W. Lane port 12100 was not listening and had no owner.
+
+RTX 4090 recovery classification: **RECOVERED_HEALTHY** independently. NVML is
+visible; PnP is present and `OK`; the authoritative full UUID is
+`GPU-46f3fd00-5454-4536-4196-5d8b727e14f2`; current PCI is
+`00000000:07:00.0`; health is `OK`; and WDDM/display residency is acceptable.
+Telemetry was 2,534 MiB used / 21,609 MiB free, 18% utilization, 51 C, and
+22.21 W. Lane port 12409 was not listening and had no owner; non-conflicting
+WDDM clients are expected and do not constitute compute ownership.
+
+The read-only GPU-runtime status found no live Estate-owned runtime, child PID,
+provider invocation, reservation, or listening lane port. It did retain stopped
+historical registry entries for both lanes and one pending P100 dispatch
+reference; these are stale registry metadata, not live runtime residue, and no
+cleanup or mutation was performed. The prior final-retry P100 device-loss
+evidence remains unchanged. EC-000223 remains **Not Accepted**. Both GPUs are
+`SAFE_FOR_NEXT_ENGINEERING_STEP=yes`, but this verification does not authorize
+or perform another dual-GPU acceptance retry; the conservative P100 operating
+envelope must be evaluated first.
