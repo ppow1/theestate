@@ -11,6 +11,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $seatHelper = Join-Path $PSScriptRoot 'Get-CodexSeatConfiguration.ps1'
 $monitorHelper = Join-Path $PSScriptRoot 'Get-OperatorDeckMonitorLayout.ps1'
@@ -114,11 +115,19 @@ function Start-SeatCodex($Seat) {
 }
 
 function Close-SeatCodex([string]$Seat) {
-    $window = Get-WindowByMarker "$Seat-CODEX"
-    if (-not $window) { $window = Get-SeatLauncherProcess $Seat }
-    if ($window) {
+    for ($attempt = 0; $attempt -lt 3; $attempt++) {
+        $window = Get-Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.MainWindowTitle -eq "$Seat-CODEX" } |
+            Select-Object -First 1
+        if (-not $window) { $window = Get-WindowByMarker "$Seat-CODEX" }
+        if (-not $window) { $window = Get-SeatLauncherProcess $Seat }
+        if (-not $window) { return }
         $window.CloseMainWindow() | Out-Null
         $window.WaitForExit(5000) | Out-Null
+        Start-Sleep -Milliseconds 250
+    }
+    if (Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq "$Seat-CODEX" }) {
+        throw "Codex Desk terminal $Seat did not close gracefully."
     }
 }
 
@@ -224,6 +233,7 @@ public static class EstateCodexDeskChromeV1 {
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool SetWindowText(IntPtr hwnd, string text);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hwnd, int command);
+    [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
     [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr hwnd);
     delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr state);
@@ -249,8 +259,17 @@ public static class EstateCodexDeskChromeV1 {
 
 function Move-ChromeWindow($Window, $Cell) {
     if ($NoMove) { return }
+    $targetDpi = [int]$monitor.dpi.x
+    if ($targetDpi -le 0) { $targetDpi = 96 }
+    $windowDpi = [int][EstateCodexDeskChromeV1]::GetDpiForWindow([IntPtr]$Window.hwnd)
+    if ($windowDpi -le 0) { $windowDpi = $targetDpi }
+    $scale = $windowDpi / $targetDpi
+    $x = [int][math]::Round($Cell.x * $scale)
+    $y = [int][math]::Round($Cell.y * $scale)
+    $width = [int][math]::Round($Cell.width * $scale)
+    $height = [int][math]::Round($Cell.height * $scale)
     [EstateCodexDeskChromeV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
-    if (-not [EstateCodexDeskChromeV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)) {
+    if (-not [EstateCodexDeskChromeV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $x, $y, $width, $height, 0x0014)) {
         throw "Chrome window placement failed for HWND $($Window.hwnd)."
     }
 }
@@ -264,8 +283,16 @@ function Close-ManagedChromeWindow($Window) {
 
 function Close-SeatChrome([string]$Seat) {
     if (-not $chromeWindowMap.Contains($Seat)) { return }
-    $window = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
-    Close-ManagedChromeWindow $window
+    $hwnd = [int64]$chromeWindowMap.$Seat.hwnd
+    for ($attempt = 0; $attempt -lt 10; $attempt++) {
+        $window = Get-ChromeWindows | Where-Object { $_.hwnd -eq $hwnd } | Select-Object -First 1
+        if (-not $window) { break }
+        Close-ManagedChromeWindow $window
+        Start-Sleep -Milliseconds 250
+    }
+    if (Get-ChromeWindows | Where-Object { $_.hwnd -eq $hwnd }) {
+        throw "Codex Desk Chrome window $Seat did not close gracefully."
+    }
     $chromeWindowMap.Remove($Seat)
 }
 
@@ -531,6 +558,14 @@ if ($StopAll) {
         Close-SeatCodex $seat
         Close-SeatChrome $seat
     }
+    $remainingChromium = @(
+        foreach ($seatRecord in @($config.seats)) {
+            if ($seatRecord.automation_chromium_profile) {
+                Get-ChromiumSeatProcesses $seatRecord.automation_chromium_profile
+            }
+        }
+    )
+    if ($remainingChromium.Count -gt 0) { throw 'Codex Desk Chromium processes remain after graceful StopAll.' }
     ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
     ([ordered]@{ seats=$chromeWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromeMapPath -Encoding utf8
     Write-Host 'Codex Desk windows stopped cleanly.'
