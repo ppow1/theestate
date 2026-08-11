@@ -261,6 +261,9 @@ public static class EstateCodexDeskChromeV1 {
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr hwnd, StringBuilder text, int count);
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool SetWindowText(IntPtr hwnd, string text);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
+    [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hwnd, out RECT rect);
+    [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr dpiContext);
+    public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hwnd, int command);
     [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
@@ -291,14 +294,58 @@ function Move-ChromeWindow($Window, $Cell) {
     # The existing placement process calls SetWindowPos with physical desktop
     # coordinates. Scaling again by GetDpiForWindow double-scales Chrome app
     # windows (for example 853x720 becomes 1280x1080 and spills monitors).
-    $x = [int]$Cell.x
-    $y = [int]$Cell.y
-    $width = [int]$Cell.width
-    $height = [int]$Cell.height
-    [EstateCodexDeskChromeV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
-    if (-not [EstateCodexDeskChromeV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $x, $y, $width, $height, 0x0014)) {
-        throw "Chrome window placement failed for HWND $($Window.hwnd)."
+    $targetX = [int]$Cell.x
+    $targetY = [int]$Cell.y
+    $targetWidth = [int]$Cell.width
+    $targetHeight = [int]$Cell.height
+    $commandX = $targetX
+    $commandY = $targetY
+    $commandWidth = $targetWidth
+    $commandHeight = $targetHeight
+    # SetWindowPos otherwise virtualizes coordinates for this PowerShell host
+    # while a new Chrome app window is DPI 144. Use one explicit per-monitor
+    # context so target cells always mean physical desktop pixels.
+    $previousDpiContext = [EstateCodexDeskChromeV1]::SetThreadDpiAwarenessContext([IntPtr](-4))
+    try {
+        [EstateCodexDeskChromeV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
+        for ($attempt = 0; $attempt -lt 2; $attempt++) {
+            if (-not [EstateCodexDeskChromeV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $commandX, $commandY, $commandWidth, $commandHeight, 0x0014)) {
+                throw "Chrome window placement failed for HWND $($Window.hwnd)."
+            }
+            # Chrome can apply its startup/app-window bounds after the first
+            # SetWindowPos. Read back the physical rectangle and correct once.
+            Start-Sleep -Milliseconds 350
+            $rect = New-Object EstateCodexDeskChromeV1+RECT
+            if (-not [EstateCodexDeskChromeV1]::GetWindowRect([IntPtr]$Window.hwnd, [ref]$rect)) {
+                throw "Chrome window rectangle could not be read for HWND $($Window.hwnd)."
+            }
+            if ($rect.Left -eq $targetX -and $rect.Top -eq $targetY -and
+                ($rect.Right - $rect.Left) -eq $targetWidth -and
+                ($rect.Bottom - $rect.Top) -eq $targetHeight) {
+                return
+            }
+            if ($attempt -eq 0) {
+                # Derive the next SetWindowPos arguments from the observed
+                # physical/API scale. This handles a newly created DPI-
+                # virtualized app window without hard-coded offsets.
+                $actualWidth = $rect.Right - $rect.Left
+                $actualHeight = $rect.Bottom - $rect.Top
+                if ($actualWidth -le 0 -or $actualHeight -le 0) { break }
+                $scaleX = $actualWidth / [double]$targetWidth
+                $scaleY = $actualHeight / [double]$targetHeight
+                if ($scaleX -le 0 -or $scaleY -le 0) { break }
+                $commandX = [int][math]::Round($targetX / $scaleX)
+                $commandY = [int][math]::Round($targetY / $scaleY)
+                $commandWidth = [int][math]::Round($targetWidth / $scaleX)
+                $commandHeight = [int][math]::Round($targetHeight / $scaleY)
+            }
+        }
+    } finally {
+        if ($previousDpiContext -ne [IntPtr]::Zero) {
+            [EstateCodexDeskChromeV1]::SetThreadDpiAwarenessContext($previousDpiContext) | Out-Null
+        }
     }
+    throw "Chrome window HWND $($Window.hwnd) did not stabilize at $targetX,$targetY ${targetWidth}x${targetHeight}."
 }
 
 function Close-ManagedChromeWindow($Window) {
