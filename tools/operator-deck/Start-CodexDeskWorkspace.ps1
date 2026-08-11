@@ -150,7 +150,14 @@ $config = Get-SeatConfig
 $monitor = Get-TargetMonitor
 $cells = New-WorkspaceCells $monitor
 $chromium = @('C:\Program Files\Chromium\Application\chrome.exe','C:\Program Files\Chromium\chrome.exe','C:\Program Files (x86)\Chromium\Application\chrome.exe') | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-$seatBrowserMappings = @($config.seats | Where-Object { $_.interactive_chrome_profile -and (Test-Path -LiteralPath $_.interactive_chrome_profile) })
+$chromeUserData = Join-Path $env:LOCALAPPDATA 'Google\Chrome\User Data'
+$seatBrowserMappings = @($config.seats | Where-Object {
+    $_.interactive_chrome_profile -and
+    (Test-Path -LiteralPath (Join-Path $chromeUserData $_.interactive_chrome_profile))
+})
+$seatChromiumMappings = @($config.seats | Where-Object {
+    $_.automation_chromium_profile -and (Test-Path -LiteralPath $_.automation_chromium_profile)
+})
 
 $report = [ordered]@{
     schema_version = 'codex_desk_workspace_v1'
@@ -158,10 +165,95 @@ $report = [ordered]@{
     target_monitor = $monitor
     cells = $cells
     codex_seats = @($config.seats | ForEach-Object { [ordered]@{ seat_id=$_.seat_id; codex_home=$_.codex_home; mode='interactive'; status='configured' } })
-    chromium = [ordered]@{ executable=$chromium; configured_seats=@($seatBrowserMappings | ForEach-Object seat_id); status=if($chromium -and $seatBrowserMappings.Count -eq 3){'configured'}else{'unavailable/not configured'} }
+    chromium = [ordered]@{ executable=$chromium; configured_seats=@($seatChromiumMappings | ForEach-Object seat_id); status='unavailable/not configured' }
     chrome = [ordered]@{ configured_seats=@($seatBrowserMappings | ForEach-Object seat_id); status=if($seatBrowserMappings.Count -eq 3){'configured'}else{'unavailable/not configured'} }
 }
 $reportPath = Join-Path $PSScriptRoot 'runtime\codex-desk-workspace.json'
+$chromeMapPath = Join-Path $PSScriptRoot 'runtime\codex-desk-chrome-windows.json'
+$chromeExe = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+$chromeWindowMap = [ordered]@{}
+if (Test-Path -LiteralPath $chromeMapPath) {
+    try {
+        $savedMap = (Get-Content -Raw -LiteralPath $chromeMapPath | ConvertFrom-Json).seats
+        foreach ($property in $savedMap.PSObject.Properties) { $chromeWindowMap[$property.Name] = $property.Value }
+    } catch { $chromeWindowMap = [ordered]@{} }
+}
+
+function Get-ChromeWindows {
+    if (-not ('EstateCodexDeskChromeV1' -as [type])) {
+        Add-Type @'
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Text;
+public static class EstateCodexDeskChromeV1 {
+    public class WindowRecord { public IntPtr Hwnd; public uint Pid; public string Title; public string ClassName; }
+    [DllImport("user32.dll")] static extern bool EnumWindows(EnumWindowsProc callback, IntPtr state);
+    [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
+    [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr hwnd);
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr hwnd, StringBuilder text, int count);
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr hwnd, StringBuilder text, int count);
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern bool SetWindowText(IntPtr hwnd, string text);
+    [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
+    [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hwnd, int command);
+    [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr hwnd);
+    delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr state);
+    public static WindowRecord[] Windows() {
+        var rows = new List<WindowRecord>();
+        EnumWindows((hwnd, state) => {
+            if (!IsWindowVisible(hwnd)) return true;
+            uint pid; GetWindowThreadProcessId(hwnd, out pid);
+            var title = new StringBuilder(512); GetWindowText(hwnd, title, title.Capacity);
+            var cls = new StringBuilder(256); GetClassName(hwnd, cls, cls.Capacity);
+            if (cls.ToString().StartsWith("Chrome_WidgetWin_")) rows.Add(new WindowRecord { Hwnd=hwnd, Pid=pid, Title=title.ToString(), ClassName=cls.ToString() });
+            return true;
+        }, IntPtr.Zero);
+        return rows.ToArray();
+    }
+}
+'@
+    }
+    return [EstateCodexDeskChromeV1]::Windows() | ForEach-Object {
+        [pscustomobject]@{ hwnd=[int64]$_.Hwnd; pid=$_.Pid; title=$_.Title; class_name=$_.ClassName }
+    }
+}
+
+function Move-ChromeWindow($Window, $Cell) {
+    if ($NoMove) { return }
+    [EstateCodexDeskChromeV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
+    if (-not [EstateCodexDeskChromeV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $Cell.x, $Cell.y, $Cell.width, $Cell.height, 0x0014)) {
+        throw "Chrome window placement failed for HWND $($Window.hwnd)."
+    }
+}
+
+function Set-ChromeWindowTitle($Window, [string]$Title) {
+    [EstateCodexDeskChromeV1]::SetWindowText([IntPtr]$Window.hwnd, $Title) | Out-Null
+}
+
+function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
+    $profileName = [string]$SeatRecord.interactive_chrome_profile
+    $profilePath = Join-Path $chromeUserData $profileName
+    if (-not (Test-Path -LiteralPath $profilePath)) { throw "Configured Chrome profile is missing for $Seat`: $profilePath" }
+    $marker = "$Seat-CHROME"
+    $saved = $null
+    if ($chromeWindowMap.Contains($Seat)) {
+        $saved = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+    }
+    if (-not $saved) {
+        $before = @(Get-ChromeWindows | ForEach-Object hwnd)
+        Start-Process -FilePath $chromeExe -ArgumentList @("--profile-directory=$profileName", '--new-window', 'https://chatgpt.com/') | Out-Null
+        for ($i=0; $i -lt 15; $i++) {
+            Start-Sleep -Milliseconds 500
+            $saved = Get-ChromeWindows | Where-Object { $before -notcontains $_.hwnd } | Select-Object -First 1
+            if ($saved) { break }
+        }
+        if (-not $saved) { throw "Chrome did not expose a new top-level window for $Seat." }
+    }
+    Set-ChromeWindowTitle $saved $marker
+    Move-ChromeWindow $saved $Cell
+    $chromeWindowMap[$Seat] = [ordered]@{ hwnd=$saved.hwnd; profile=$profileName; marker=$marker }
+}
+
 $report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $reportPath -Encoding utf8
 
 if ($PlanOnly) { $report | ConvertTo-Json -Depth 12; exit 0 }
@@ -173,6 +265,13 @@ foreach ($seat in @('C1','C2','C3')) {
         Invoke-MovePid $windowPid $cells["$seat-CODEX"]
         Set-SeatWindowTitle $windowPid $seat-CODEX
     }
+}
+
+if (-not $PlanOnly) {
+    foreach ($seatRecord in @($config.seats)) {
+        Start-SeatChrome $seatRecord.seat_id $seatRecord $cells["$($seatRecord.seat_id)-CHROME"]
+    }
+    ([ordered]@{ seats=$chromeWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromeMapPath -Encoding utf8
 }
 
 Write-Host "Codex Desk target: $($monitor.device) / logical top-right ($($monitor.work_area.width)x$($monitor.work_area.height))"

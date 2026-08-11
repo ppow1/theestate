@@ -19,8 +19,12 @@ def codex_seat_configuration(seat_id: str | None = None) -> dict[str, Any]:
                 "seat_id": logical_seat,
                 "codex_home": str(Path(home)),
                 "execution_surface": "codex-cli",
-                # No authenticated browser identities are currently proven by Estate records.
-                "interactive_chrome_profile": None,
+                # Proven Patricia interactive Chrome identities; names only, no auth state.
+                "interactive_chrome_profile": {
+                    "C1": "Profile 3",
+                    "C2": "Profile 4",
+                    "C3": "Profile 5",
+                }[logical_seat],
                 "automation_chromium_profile": None,
             }
         )

@@ -13,7 +13,9 @@ def test_seat_configuration_reuses_bridge_mapping_without_auth_state():
         r"A:\AI\CodexProfiles\C2",
         r"A:\AI\CodexProfiles\C3",
     ]
-    assert all(item["interactive_chrome_profile"] is None for item in payload["seats"])
+    assert [item["interactive_chrome_profile"] for item in payload["seats"]] == [
+        "Profile 3", "Profile 4", "Profile 5"
+    ]
     assert all(item["automation_chromium_profile"] is None for item in payload["seats"])
 
 
@@ -23,6 +25,6 @@ def test_seat_configuration_can_be_read_as_one_seat():
         "seat_id": "C2",
         "codex_home": r"A:\AI\CodexProfiles\C2",
         "execution_surface": "codex-cli",
-        "interactive_chrome_profile": None,
+        "interactive_chrome_profile": "Profile 4",
         "automation_chromium_profile": None,
     }]
