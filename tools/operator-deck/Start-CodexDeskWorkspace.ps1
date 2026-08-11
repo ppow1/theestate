@@ -458,7 +458,7 @@ function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
             "--user-data-dir=`"$profilePath`""
             '--profile-directory="Default"'
             '--disable-background-mode'
-            '--app=about:blank'
+            '--app=data:text/html,%3Ctitle%3ECodex%20Desk%20Chromium%3C%2Ftitle%3E'
         )
         Start-Process -FilePath $chromium -ArgumentList $launchArguments | Out-Null
         for ($i=0; $i -lt 20; $i++) {
@@ -476,7 +476,7 @@ function Start-SeatChromium([string]$Seat, $SeatRecord, $Cell) {
         profile_path_verified=$true
         persistent=$true
         app_mode=$true
-        launch_arguments=@("--user-data-dir=`"$profilePath`"", '--profile-directory="Default"', '--disable-background-mode', '--app=about:blank')
+        launch_arguments=@("--user-data-dir=`"$profilePath`"", '--profile-directory="Default"', '--disable-background-mode', '--app=data:text/html,%3Ctitle%3ECodex%20Desk%20Chromium%3C%2Ftitle%3E')
     }
 }
 
