@@ -321,3 +321,41 @@ coverage. The focused Dispatch, preflight, provider, reconciliation, and
 runtime-cleanup set has 134 passes. One unrelated pre-existing Windows path
 separator assertion remains excluded from the baseline; no queue test depends
 on it.
+
+## Final authorized retry hard-stop
+
+After publication, runtime status showed both registered roots stopped and both
+ports free. The exact canonical preflight at `2026-08-11T19:55:56.0444361Z`
+returned `PASS`, exit code `0`; the 4090 had 21,319 MiB free and the P100 had
+16,280 MiB free.
+
+Exactly one final synchronized attempt was launched. Task A used objective
+`grace-obj-4331fc0c79fa`, action `grace-act-a9f2cda43062`, PTM
+`res_01KZS6BXDJF99Q60GKHZ5ZCJ0T`, Helen `heldet-56771eda1e49`, commission
+`engcom-e94b58e880d0`, authorization `engauth-887b3d18b3d8`, reservation
+`gpu-reservation-grace-obj-4331fc0c79fa`, Dispatch `dispatch-fe19ae236e89`,
+adapter `adapter-dispatch-fe19ae236e89`, provider receipt
+`runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-4331fc0c79fa.json`,
+and Grace receipt `gracereceipt-a7fdb677350b`. It ran from `19:56:38Z` to
+`19:56:55Z` and proved CUDA0, NVIDIA GeForce RTX 4090, PCI `07:00.0`, and
+UUID `GPU-46f3fd00-5454-4536-4196-5d8b727e14f2`.
+
+Task B used objective `grace-obj-3eb4f8beb67c`, action
+`grace-act-f828e135ac00`, PTM `res_01KZS6BXDJF99Q60GKHZ5ZCJ0S`, Helen
+`heldet-27bb8f811ce2`, commission `engcom-fb7589afbfbe`, authorization
+`engauth-1b0bd8f5575d`, reservation
+`gpu-reservation-grace-obj-3eb4f8beb67c`, and Dispatch
+`dispatch-dceb0916e682`. Its adapter invocation failed at `19:56:54Z` with
+`HTTP Error 500: Internal Server Error`; the provider receipt has no actual
+runtime identity and `placement_match=false`.
+
+During the attempt, the P100 reached 100% utilization and 3,373 MiB while the
+4090 reached 93% utilization and approximately 14,249 MiB. Immediately after,
+`nvidia-smi` reported `GPU 0000:04:00.0 is lost. Reboot the system to recover
+this GPU`. Only the 4090 remained enumerated. This is a hard-stop device-loss
+condition. No provider overlap is accepted because Task B has no successful
+provider receipt or physical identity. No retry, reset, reboot, driver/device
+operation, or cleanup action was performed after the loss; live evidence was
+preserved exactly.
+
+EC-000223 remains **Not Accepted — P100 device loss during final retry**.

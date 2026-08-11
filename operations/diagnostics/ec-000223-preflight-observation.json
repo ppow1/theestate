@@ -188,6 +188,58 @@
         "queue_concurrency": "19 passed",
         "focused_regressions": "134 passed; 1 pre-existing Windows path-separator assertion excluded"
       }
+    },
+    {
+      "observation_type": "final_authorized_dual_gpu_retry_hard_stop",
+      "timestamp_start": "2026-08-11T19:56:38Z",
+      "timestamp_stop": "2026-08-11T19:57:09Z",
+      "status": "HARD_STOP_GPU_LOST",
+      "preflight_status": "PASS",
+      "preflight_exit_code": 0,
+      "task_a": {
+        "objective_id": "grace-obj-4331fc0c79fa",
+        "action_id": "grace-act-a9f2cda43062",
+        "ptm_id": "res_01KZS6BXDJF99Q60GKHZ5ZCJ0T",
+        "helen_id": "heldet-56771eda1e49",
+        "engineering_commission_id": "engcom-e94b58e880d0",
+        "authorization_id": "engauth-887b3d18b3d8",
+        "reservation_id": "gpu-reservation-grace-obj-4331fc0c79fa",
+        "dispatch_id": "dispatch-fe19ae236e89",
+        "adapter_id": "adapter-dispatch-fe19ae236e89",
+        "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-4331fc0c79fa.json",
+        "grace_receipt": "gracereceipt-a7fdb677350b",
+        "provider_started_at": "2026-08-11T19:56:38Z",
+        "provider_finished_at": "2026-08-11T19:56:55Z",
+        "actual_runtime_gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+        "actual_runtime_pci": "00000000:07:00.0",
+        "placement_match": true,
+        "state": "completed"
+      },
+      "task_b": {
+        "objective_id": "grace-obj-3eb4f8beb67c",
+        "action_id": "grace-act-f828e135ac00",
+        "ptm_id": "res_01KZS6BXDJF99Q60GKHZ5ZCJ0S",
+        "helen_id": "heldet-27bb8f811ce2",
+        "engineering_commission_id": "engcom-fb7589afbfbe",
+        "authorization_id": "engauth-1b0bd8f5575d",
+        "reservation_id": "gpu-reservation-grace-obj-3eb4f8beb67c",
+        "dispatch_id": "dispatch-dceb0916e682",
+        "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-3eb4f8beb67c.json",
+        "provider_started_at": "2026-08-11T19:56:38Z",
+        "provider_finished_at": "2026-08-11T19:56:54Z",
+        "error": "HTTP Error 500: Internal Server Error",
+        "actual_runtime_gpu_uuid": null,
+        "placement_match": false,
+        "state": "failed"
+      },
+      "telemetry": {
+        "4090_peak": {"utilization_percent": 93, "memory_used_mib": 14249, "power_w": 366.76, "pci_bus": "00000000:07:00.0"},
+        "p100_peak": {"utilization_percent": 100, "memory_used_mib": 3373, "power_w": 193.18, "pci_bus": "00000000:04:00.0"}
+      },
+      "overlap_seconds": null,
+      "device_loss": "P100 0000:04:00.0 disappeared from nvidia-smi; no recovery attempted",
+      "cleanup_after_loss": "not performed due hard-stop condition",
+      "retry_performed": false
     }
   ],
   "acceptance_gate": {
@@ -196,7 +248,7 @@
     "timestamp": "2026-08-11T19:39:46.6123725Z"
   },
   "single_p100_qualification": "PASS",
-  "dual_gpu_acceptance": "NOT_ACCEPTED_NO_PROVIDER_OVERLAP",
+  "dual_gpu_acceptance": "NOT_ACCEPTED_P100_DEVICE_LOSS",
   "dispatch_concurrency_tests": "19 passed",
   "deterministic_lifecycle_tests": "94 passed",
   "deterministic_preflight_tests": "24 passed",
