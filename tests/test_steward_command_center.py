@@ -47,6 +47,17 @@ def test_command_center_renders_all_initial_panels(tmp_path):
     assert (tmp_path / "runtime/steward/command_center.html").exists()
 
 
+def test_execution_control_renders_copyable_interactive_codex_seat_commands(tmp_path):
+    seed_inputs(tmp_path)
+    html = render_command_center_html(generate_command_center(tmp_path, write=False))
+
+    assert "id='codex-seat-launch-reference'" in html
+    for seat in ("C1", "C2", "C3"):
+        assert f"$env:CODEX_HOME = &#x27;A:\\AI\\CodexProfiles\\{seat}&#x27;" in html
+    assert html.count("codex --model gpt-5.6-luna --sandbox danger-full-access --ask-for-approval never") == 3
+    assert "Read-only reference. Copy the command block for the seat you want to use." in html
+
+
 def test_command_center_degrades_gracefully_when_artifacts_are_missing(tmp_path):
     payload = generate_command_center(tmp_path, write=False)
     html = render_command_center_html(payload)

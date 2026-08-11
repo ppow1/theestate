@@ -32,6 +32,7 @@ from estate.core.operator_activity_stream import generate_operator_activity_stre
 from estate.core.operations_notification_center import generate_operations_notification_center
 from estate.core.engineering_capacity_runtime import generate_engineering_capacity_dashboard
 from estate.core.codex_seat_telemetry import collect_codex_seat_telemetry
+from estate.core.codex_seat_configuration import codex_seat_configuration
 from estate.core.compute_resources import discover_grace_gpus, read_gpu_operational_view, write_compute_projection
 from estate.core.steward_annunciator import VISUAL_PROJECTION_VERSION
 from estate.core.office_operational_activity import load_office_operational_activity
@@ -1264,7 +1265,27 @@ def _execution_control_html(panel):
         last_html = "<h3>Last Office action result</h3><pre>" + html.escape(lines[-1] if lines else "No action result yet.") + "</pre>"
     else:
         last_html = "<h3>Last Office action result</h3><p class='placeholder'>No durable Office action result has been recorded yet.</p>"
-    return _panel("Execution Control Workspace", "<p class='source'>Use the controls above to invoke governed execution-session, attempt, and reconciliation runtimes. Enter IDs and authorization/result references in the labeled fields; confirmations must be explicit.</p><dl>" + rows + "</dl>" + last_html, "ready")
+    seat_blocks = []
+    for seat in codex_seat_configuration()["seats"]:
+        seat_id = str(seat["seat_id"])
+        command = "\n".join(
+            [
+                f"$env:CODEX_HOME = '{seat['codex_home']}'",
+                r"cd A:\theestate",
+                "codex --model gpt-5.6-luna --sandbox danger-full-access --ask-for-approval never",
+            ]
+        )
+        seat_blocks.append(
+            f"<article><h4>{html.escape(seat_id)}</h4><pre aria-label='{html.escape(seat_id, quote=True)} interactive Codex seat command'>{html.escape(command)}</pre></article>"
+        )
+    launch_reference = (
+        "<section id='codex-seat-launch-reference' aria-labelledby='codex-seat-launch-reference-title'>"
+        "<h3 id='codex-seat-launch-reference-title'>Interactive Codex seat launch reference</h3>"
+        "<p class='source'>Read-only reference. Copy the command block for the seat you want to use.</p>"
+        + "".join(seat_blocks)
+        + "</section>"
+    )
+    return _panel("Execution Control Workspace", "<p class='source'>Use the controls above to invoke governed execution-session, attempt, and reconciliation runtimes. Enter IDs and authorization/result references in the labeled fields; confirmations must be explicit.</p><dl>" + rows + "</dl>" + last_html + launch_reference, "ready")
 
 def _operations_center_layout_framework(panels, generated_at):
     regions = [
