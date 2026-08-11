@@ -36,6 +36,7 @@
     "pre_cleanup_gpu": {"type": ["object", "null"]},
     "post_cleanup_gpu": {"type": ["object", "null"]},
     "result": {"enum": ["COMPLETED", "ALREADY_STOPPED", "BLOCKED", "FAILED"]},
+    "warnings": {"type": "array", "items": {"type": "string"}},
     "errors": {"type": "array", "items": {"type": "string"}}
   }
 }

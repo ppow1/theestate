@@ -168,6 +168,35 @@ def test_cleanup_failure_is_recorded_truthfully(tmp_path):
     assert stored["errors"] == ["shutdown failed"]
 
 
+def test_verified_force_fallback_is_warning_not_cleanup_failure(tmp_path):
+    _, root = _setup(tmp_path)
+    current = {root.pid: root}
+    ports = {12409: root.pid}
+
+    def terminate(root_pid, children):
+        current.clear()
+        ports.clear()
+        return {
+            "shutdown_requested": [root_pid],
+            "forced_after_graceful_request": [root_pid],
+            "warnings": ["process required force fallback"],
+            "errors": [],
+        }
+
+    receipt = quiesce_runtime_lane(
+        tmp_path,
+        "lane-a",
+        actor="operator",
+        process_inventory=lambda: list(current.values()),
+        port_inventory=lambda: dict(ports),
+        terminate_owned_tree=terminate,
+        telemetry=lambda: _telemetry(),
+    )
+    assert receipt["result"] == "COMPLETED"
+    assert receipt["warnings"] == ["process required force fallback"]
+    assert receipt["errors"] == []
+
+
 def test_missing_required_gate_artifact_blocks_without_termination(tmp_path):
     _, root = _setup(tmp_path)
     (tmp_path / "runtime/execution_activity/current.json").unlink()

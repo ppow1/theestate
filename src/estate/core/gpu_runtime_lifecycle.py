@@ -94,12 +94,13 @@ def _default_terminate_owned_tree(root_pid: int, child_pids: list[int]) -> dict[
     """Ask each already-proven owned process to exit, then force only survivors."""
     before = {item.pid: item for item in _default_process_inventory() if item.pid in {root_pid, *child_pids}}
     requested: list[int] = []
+    warnings: list[str] = []
     errors: list[str] = []
     for pid in list(reversed(child_pids)) + [root_pid]:
         result = subprocess.run(["taskkill", "/PID", str(pid)], capture_output=True, text=True, timeout=10, check=False)
         requested.append(pid)
         if result.returncode != 0 and "not found" not in (result.stderr or "").lower():
-            errors.append(f"PID {pid}: {(result.stderr or result.stdout).strip()[:300]}")
+            warnings.append(f"PID {pid} did not accept graceful shutdown: {(result.stderr or result.stdout).strip()[:300]}")
     time.sleep(1.0)
     after = {item.pid: item for item in _default_process_inventory() if item.pid in set(requested)}
     survivors = {pid for pid, item in after.items() if before.get(pid) == item}
@@ -112,7 +113,12 @@ def _default_terminate_owned_tree(root_pid: int, child_pids: list[int]) -> dict[
         forced.append(pid)
         if result.returncode != 0 and "not found" not in (result.stderr or "").lower():
             errors.append(f"PID {pid} force: {(result.stderr or result.stdout).strip()[:300]}")
-    return {"shutdown_requested": requested, "forced_after_graceful_request": forced, "errors": errors}
+    return {
+        "shutdown_requested": requested,
+        "forced_after_graceful_request": forced,
+        "warnings": warnings,
+        "errors": errors,
+    }
 
 
 def _read_json(path: Path) -> tuple[Any, str | None]:
@@ -404,7 +410,7 @@ def quiesce_runtime_lane(root: str | Path, lane_id: str, *, actor: str,
         "pre_cleanup_gpu": _gpu_memory(lane.gpu_uuid, telemetry_source),
         "shutdown_requested": [], "forced_after_graceful_request": [],
         "processes_exited": False, "port_released": status["port_owner_pid"] is None,
-        "post_cleanup_gpu": None, "result": "BLOCKED", "errors": [],
+        "post_cleanup_gpu": None, "result": "BLOCKED", "warnings": [], "errors": [],
     }
     if status["ownership"] == "ESTATE_OWNED_STOPPED":
         receipt.update({"result": "ALREADY_STOPPED", "processes_exited": True, "post_cleanup_gpu": _gpu_memory(lane.gpu_uuid, telemetry_source)})
@@ -415,6 +421,7 @@ def quiesce_runtime_lane(root: str | Path, lane_id: str, *, actor: str,
         outcome = (terminate_owned_tree or _default_terminate_owned_tree)(int(status["root_pid"]), list(status["child_pids"]))
         receipt["shutdown_requested"] = outcome.get("shutdown_requested", [])
         receipt["forced_after_graceful_request"] = outcome.get("forced_after_graceful_request", [])
+        receipt["warnings"] = outcome.get("warnings", [])
         receipt["errors"] = outcome.get("errors", [])
         after = inspect_gpu_runtime_lanes(base, lane_id=lane_id, process_inventory=process_source, port_inventory=port_source)
         after_status = after["lanes"][0]
