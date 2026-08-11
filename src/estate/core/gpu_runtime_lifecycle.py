@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import platform
+import re
 import subprocess
 import time
 from dataclasses import asdict, dataclass
@@ -160,10 +161,17 @@ def _descendants(root_pid: int, by_pid: dict[int, ProcessRecord]) -> list[Proces
 def _parse_time(value: Any) -> datetime | None:
     if not isinstance(value, str) or not value:
         return None
+    windows_json_date = re.fullmatch(r"/Date\((\d+)(?:[+-]\d+)?\)/", value)
+    if windows_json_date:
+        return datetime.fromtimestamp(int(windows_json_date.group(1)) / 1000, tz=timezone.utc)
     try:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+
+
+def _normalized_command(value: Any) -> str:
+    return " ".join(str(value or "").replace('"', "").split()).lower()
 
 
 def _root_ownership(evidence: dict[str, Any], process: ProcessRecord | None) -> tuple[str, list[str]]:
@@ -177,7 +185,7 @@ def _root_ownership(evidence: dict[str, Any], process: ProcessRecord | None) -> 
         return "UNKNOWN", ["registry lacks production-grade executable, command, or process-start evidence"]
     if os.path.normcase(os.path.abspath(str(expected_path))) != os.path.normcase(os.path.abspath(str(process.executable_path or ""))):
         return "EXTERNAL", ["registered executable path does not match the live PID"]
-    if str(process.command_line or "").strip().lower() != str(expected_command).strip().lower():
+    if _normalized_command(process.command_line) != _normalized_command(expected_command):
         return "EXTERNAL", ["registered command line does not match the live PID"]
     if abs((observed_started - expected_started).total_seconds()) > 15:
         return "EXTERNAL", ["registered start time does not match the live PID creation time"]

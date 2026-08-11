@@ -61,6 +61,15 @@ def test_windows_process_inventory_shape_preserves_pid_zero():
     assert record.parent_pid == 0
 
 
+def test_windows_powershell_date_and_command_quoting_correlate(tmp_path):
+    _, process = _setup(tmp_path)
+    millis = int(datetime(2026, 8, 11, 18, 0, tzinfo=timezone.utc).timestamp() * 1000)
+    observed = ProcessRecord(**{**process.to_dict(), "command_line": process.command_line.replace('"', ''), "created_at": f"/Date({millis})/"})
+    lane = inspect_gpu_runtime_lanes(tmp_path, process_inventory=lambda: [observed], port_inventory=lambda: {12409: observed.pid})["lanes"][0]
+    assert lane["ownership"] == "ESTATE_OWNED"
+    assert lane["quiesce_allowed"] is True
+
+
 @pytest.mark.parametrize(("artifact", "payload", "gate"), [
     ("runtime/engineering_scheduler/compute_reservations.json", [{"reservation_id": "r1", "resource_id": "host:nvidia:GPU-A", "state": "reserved"}], "active_reservations"),
     ("runtime/execution_dispatch/queue.json", [{"dispatch_id": "d1", "state": "Running", "compute_resource_requirements": {"required_gpu_uuid": GPU_A}}], "active_dispatches"),
