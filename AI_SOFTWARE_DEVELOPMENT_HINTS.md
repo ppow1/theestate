@@ -262,6 +262,42 @@ The desired responsibility split is:
 - canonical cookbook: accepted operational knowledge;
 - Grace/other residents: consumers of that knowledge according to their authority.
 
-## 17. Final Engineering Principle
+## 17. Engineering Throughput and Steward Attention
+
+Fast code generation is not the same thing as high engineering throughput.
+
+A worker that produces a patch in minutes but requires many rounds of Steward inspection, regression discovery, re-explanation, and repair may be institutionally slower and more expensive than a worker that spends more reasoning effort up front and returns an acceptance-ready result on the first or second attempt.
+
+Treat Steward attention as a scarce engineering resource. The relevant quality measure is not merely tokens, wall-clock generation time, or number of patches produced. Prefer **successful accepted work per unit of human attention**.
+
+For software work:
+
+- reason through the complete contract before modifying code;
+- identify the real integration boundary and acceptance conditions before implementation;
+- do not declare `done` because syntax checks, unit tests, telemetry, or internally generated evidence passed when the operator-visible or physical boundary has not been exercised;
+- when numeric or automated evidence conflicts with direct physical/operator observation, treat the conflict as a failed acceptance condition and investigate the measurement boundary rather than repeatedly asserting the telemetry;
+- avoid a long chain of locally plausible patches that each repair one symptom while regressing another accepted behavior;
+- preserve already accepted behavior explicitly during each repair;
+- after a material failure, update the next work package or repair contract with the newly discovered acceptance condition instead of relying on memory;
+- distinguish legitimate technical discovery from preventable quality failures. Iteration is normal engineering; repeated unsupported completion claims are not;
+- prefer stronger first-pass reasoning when the change touches many interacting boundaries such as browsers, process ownership, persistent state, hardware controls, DPI/display topology, authentication, concurrency, or Live runtime state.
+
+A useful engineering question before reporting completion is:
+
+> If the Steward stops watching this worker for the next thirty minutes, is the evidence strong enough that the result is still likely to be correct, non-regressive, and recoverable?
+
+If the answer is no, the work is not yet ready for unattended trust.
+
+### Acceptance must include lifecycle states that matter operationally
+
+A warm-state success does not prove cold-start, restart, crash-recovery, or power-loss behavior. If a capability is expected to survive machine/service restart or reconstruct itself from persistent state, include that lifecycle boundary in acceptance before closing the work.
+
+Do not retroactively erase a valid warm-state acceptance when a later cold-start defect is discovered. Record the new defect as a new Estate Change, preserve the earlier evidence, and extend the acceptance contract so the failure is not repeated.
+
+### Provider/model routing implication
+
+When choosing among capable providers or models, do not optimize only for nominal price per call or raw generation speed. A more expensive reasoning pass can be cheaper overall if it materially reduces Steward intervention, regression cycles, and rework. Future routing and throttling systems should consider acceptance success and human-attention cost as part of effective throughput.
+
+## 18. Final Engineering Principle
 
 Build the smallest correct change inside the existing Estate architecture. Know exactly which revision and environment you changed. Leave evidence that another worker can verify. Teach Living Diagnostics what changed while you still understand it. Test through the boundary that actually matters. Promote deliberately when the Estate's candidate/acceptance path is available, document authorized exceptions when it is not, and preserve enough provenance to recover safely.
