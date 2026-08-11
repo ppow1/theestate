@@ -24,6 +24,12 @@ def _config(tmp_path):
     return P100LaneConfig(model=model, backend=backend)
 
 
+def _multimodal_config(tmp_path, **kwargs):
+    model = tmp_path / "model.gguf"; model.write_bytes(b"model")
+    backend = tmp_path / "llama-server.exe"; backend.write_bytes(b"backend")
+    return P100LaneConfig(model=model, backend=backend, multimodal_enabled=True, mmproj=tmp_path / "mmproj.gguf", **kwargs)
+
+
 def test_lane_resolves_p100_by_uuid_despite_reversed_ordinals(tmp_path):
     plan = build_launch_plan(_config(tmp_path), _rows())
     assert plan["resolved_target"]["physical_uuid"] == P100_UUID
@@ -56,3 +62,53 @@ def test_health_loss_disables_new_work():
     gate = health_gate_for_new_work(row)
     assert gate["accept_new_work"] is False
     assert gate["status"] == "DEGRADED/LOST"
+
+
+def test_multimodal_disabled_preserves_old_launch(tmp_path):
+    plan = build_launch_plan(_config(tmp_path), _rows())
+    assert "--mmproj" not in plan["argv"]
+
+
+def test_multimodal_missing_projector_fails_closed(tmp_path):
+    result = preflight_lane(_multimodal_config(tmp_path), _rows())
+    assert not result["ready"]
+    assert any("projector file is missing" in error for error in result["errors"])
+
+
+def test_multimodal_valid_projector_adds_expected_args(tmp_path, monkeypatch):
+    config = _multimodal_config(tmp_path)
+    config.mmproj.write_bytes(b"projector")
+    model_metadata = {
+        "general.architecture": "qwen3vl", "general.type": "model",
+        "general.name": "Qwen3 32B VL", "general.base_model.0.name": "Qwen3 VL 32B Instruct",
+        "qwen3vl.embedding_length": 5120,
+    }
+    projector_metadata = {
+        "general.architecture": "clip", "general.type": "mmproj",
+        "general.name": "Qwen3 VL 32B Projector", "general.base_model.0.name": "Qwen3 VL 32B Instruct",
+        "clip.projector_type": "qwen3vl_merger", "clip.vision.projection_dim": 5120,
+    }
+    monkeypatch.setattr("estate.core.p100_inference_lane._gguf_metadata", lambda path: model_metadata if path == config.model else projector_metadata)
+    plan = build_launch_plan(config, _rows())
+    assert plan["argv"][-3:] == ["--mmproj", str(config.mmproj), "--no-mmproj-offload"]
+
+
+def test_multimodal_incompatible_projector_fails_closed(tmp_path, monkeypatch):
+    config = _multimodal_config(tmp_path)
+    config.mmproj.write_bytes(b"projector")
+    monkeypatch.setattr("estate.core.p100_inference_lane._gguf_metadata", lambda path: {
+        "general.architecture": "qwen3vl", "general.type": "mmproj",
+        "general.name": "Qwen3 VL 8B", "clip.projector_type": "qwen3vl_merger",
+        "clip.vision.projection_dim": 4096, "qwen3vl.embedding_length": 5120,
+    })
+    result = preflight_lane(config, _rows())
+    assert not result["ready"]
+    assert any("projection dimension" in error for error in result["errors"])
+
+
+def test_multimodal_invalid_config_fails_clearly(tmp_path):
+    config = P100LaneConfig(model=tmp_path / "model.gguf", backend=tmp_path / "llama-server.exe", multimodal_enabled=True)
+    config.model.write_bytes(b"model"); config.backend.write_bytes(b"backend")
+    result = preflight_lane(config, _rows())
+    assert not result["ready"]
+    assert any("mmproj_path is missing" in error for error in result["errors"])

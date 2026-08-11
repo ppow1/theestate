@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import struct
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
@@ -28,6 +29,54 @@ DEFAULT_MODEL = Path(r"A:\AI\Models\GGUF\qwen3-32b-vl-instruct-polaris-hi16-here
 DEFAULT_BACKEND = Path(r"A:\AI\Tools\llama.cpp\cuda\llama-server.exe")
 
 
+def _gguf_metadata(path: Path) -> dict[str, Any]:
+    """Read GGUF metadata without requiring an optional third-party package."""
+    def read_string(handle: Any) -> str:
+        length = struct.unpack("<Q", handle.read(8))[0]
+        return handle.read(length).decode("utf-8", "replace")
+
+    scalar_sizes = {0: 1, 1: 1, 2: 2, 3: 2, 4: 4, 5: 4, 6: 4, 7: 1, 10: 8, 11: 8, 12: 8}
+
+    def skip_value(handle: Any, value_type: int) -> Any:
+        if value_type == 8:
+            return read_string(handle)
+        if value_type == 9:
+            element_type = struct.unpack("<I", handle.read(4))[0]
+            length = struct.unpack("<Q", handle.read(8))[0]
+            for _ in range(length):
+                skip_value(handle, element_type)
+            return None
+        if value_type not in scalar_sizes:
+            raise ValueError(f"unsupported GGUF metadata type: {value_type}")
+        raw = handle.read(scalar_sizes[value_type])
+        if value_type == 7:
+            return bool(raw[0])
+        formats = {0: "B", 1: "b", 2: "H", 3: "h", 4: "I", 5: "i", 6: "f", 10: "Q", 11: "q", 12: "d"}
+        return struct.unpack("<" + formats[value_type], raw)[0]
+
+    with path.open("rb") as handle:
+        if handle.read(4) != b"GGUF":
+            raise ValueError(f"not a GGUF file: {path}")
+        handle.read(4)  # GGUF version
+        handle.read(8)  # tensor count
+        metadata_count = struct.unpack("<Q", handle.read(8))[0]
+        metadata: dict[str, Any] = {}
+        wanted = {
+            "general.architecture", "general.type", "general.name", "general.basename",
+            "general.size_label", "general.base_model.0.name", "general.base_model.0.repo_url",
+            "clip.projector_type", "clip.vision.projection_dim", "clip.vision.block_count",
+            "clip.has_vision_encoder", "qwen3vl.embedding_length", "qwen3vl.block_count",
+            "qwen3vl.n_deepstack_layers",
+        }
+        for _ in range(metadata_count):
+            key = read_string(handle)
+            value_type = struct.unpack("<I", handle.read(4))[0]
+            value = skip_value(handle, value_type)
+            if key in wanted:
+                metadata[key] = value
+    return metadata
+
+
 @dataclass(frozen=True)
 class P100LaneConfig:
     model: Path = DEFAULT_MODEL
@@ -38,6 +87,9 @@ class P100LaneConfig:
     gpu_layers: int = 42
     extra_args: tuple[str, ...] = ()
     environment: dict[str, str] = field(default_factory=dict)
+    multimodal_enabled: bool = False
+    mmproj: Path | None = None
+    mmproj_offload: bool = False
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any]) -> "P100LaneConfig":
@@ -50,6 +102,9 @@ class P100LaneConfig:
             gpu_layers=int(raw.get("gpu_layers", 42)),
             extra_args=tuple(str(x) for x in raw.get("extra_args", []) or []),
             environment={str(k): str(v) for k, v in (raw.get("environment", {}) or {}).items()},
+            multimodal_enabled=bool((raw.get("multimodal", {}) or {}).get("enabled", False)),
+            mmproj=Path((raw.get("multimodal", {}) or {}).get("mmproj_path")) if (raw.get("multimodal", {}) or {}).get("mmproj_path") else None,
+            mmproj_offload=bool((raw.get("multimodal", {}) or {}).get("mmproj_offload", False)),
         )
 
 
@@ -96,6 +151,29 @@ def preflight_lane(config: P100LaneConfig, observations: Iterable[ComputeResourc
         errors.append(f"model file is missing: {config.model}")
     if not config.backend.is_file():
         errors.append(f"llama-server executable is missing: {config.backend}")
+    compatibility: dict[str, Any] = {"enabled": config.multimodal_enabled}
+    if config.multimodal_enabled:
+        if config.mmproj is None:
+            errors.append("multimodal is enabled but mmproj_path is missing")
+        elif not config.mmproj.is_file():
+            errors.append(f"multimodal projector file is missing: {config.mmproj}")
+        else:
+            try:
+                model_meta = _gguf_metadata(config.model)
+                projector_meta = _gguf_metadata(config.mmproj)
+                compatibility = {"enabled": True, "model": model_meta, "projector": projector_meta}
+                if model_meta.get("general.architecture") != "qwen3vl":
+                    errors.append("multimodal model architecture must be qwen3vl")
+                if projector_meta.get("general.type") != "mmproj":
+                    errors.append("projector GGUF general.type must be mmproj")
+                if projector_meta.get("clip.projector_type") != "qwen3vl_merger":
+                    errors.append("projector must use qwen3vl_merger")
+                if projector_meta.get("clip.vision.projection_dim") != model_meta.get("qwen3vl.embedding_length"):
+                    errors.append("projector projection dimension does not match model embedding length")
+                if "32b" not in str(projector_meta.get("general.name", "")).lower() and "32b" not in str(projector_meta.get("general.base_model.0.name", "")).lower():
+                    errors.append("projector metadata does not identify the Qwen3-VL 32B family")
+            except (OSError, ValueError, struct.error) as exc:
+                errors.append(f"multimodal GGUF metadata validation failed: {exc}")
     return {
         "ready": not errors,
         "errors": errors,
@@ -108,7 +186,8 @@ def preflight_lane(config: P100LaneConfig, observations: Iterable[ComputeResourc
             "runtime_ordinal": target.cuda_index if target else None,
             "dispatch_allowed": bool(target and target.dispatch_allowed),
         },
-        "configuration": {"gpu_layers": config.gpu_layers, "context": config.context, "host": config.host, "port": config.port},
+        "configuration": {"gpu_layers": config.gpu_layers, "context": config.context, "host": config.host, "port": config.port, "multimodal_enabled": config.multimodal_enabled, "mmproj": str(config.mmproj) if config.mmproj else None, "mmproj_offload": config.mmproj_offload},
+        "multimodal_compatibility": compatibility,
         "compute_preflight": build_grace_gpu_preflight(observations=rows),
         "no_fallback": True,
     }
@@ -130,6 +209,10 @@ def build_launch_plan(config: P100LaneConfig, observations: Iterable[ComputeReso
         "--gpu-layers", str(config.gpu_layers), "--device", "CUDA0",
         *config.extra_args,
     ]
+    if config.multimodal_enabled:
+        args.extend(["--mmproj", str(config.mmproj)])
+        if not config.mmproj_offload:
+            args.append("--no-mmproj-offload")
     return {"argv": args, "environment": env, "resolved_target": result["target"], "endpoint": f"http://{config.host}:{config.port}"}
 
 

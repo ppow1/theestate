@@ -27,6 +27,38 @@ service-control state and diagnostic packet should report `DEGRADED/LOST`.
 This lane is deliberately bounded and does not reproduce the heavy race or
 crash conditions captured in [PL-0042](../../collaboration/parking_lot/PL-0042-dual-gpu-parallelism-stability-and-p100-crash-forensics.md).
 
-Configuration is in `config/local_ai/p100_background_lane.json`. SillyTavern
-requires only a local OpenAI-compatible connection pointed at the endpoint;
-no SillyTavern UI modification is needed.
+Configuration is in `config/local_ai/p100_background_lane.json`. The optional
+`multimodal` block enables llama.cpp's `--mmproj` path. The projector is not
+selected by filename: preflight reads GGUF metadata and requires a Qwen3-VL
+model, a `mmproj` artifact using `qwen3vl_merger`, a matching projection
+dimension, and metadata identifying the same model family. Missing or
+incompatible projectors fail closed.
+
+The tested local projector is `A:\AI\Models\MMProj\mmproj-F16.gguf`, whose
+metadata identifies Qwen3-VL 32B Instruct and a 5120-dimensional projection.
+It is configured with projector GPU offload disabled because the resident text
+model already uses approximately 15.6 GiB of the P100's 16 GiB. The tested
+configuration remains 42 model GPU layers and context 4096; projector weights
+remain in host memory. If future changes require projector GPU offload or
+reduce headroom, lower model GPU layers conservatively and retest once.
+
+For the OpenAI-compatible endpoint, send an image as a `data:image/...;base64,`
+URL in a chat message content part alongside the text prompt. SillyTavern
+must use its OpenAI-compatible connection against `http://127.0.0.1:18080`,
+have image input enabled, and pass the image content through unchanged; no
+SillyTavern UI modification is required by this lane. Stop testing immediately
+if either GPU disappears from NVML/CUDA, the host becomes sluggish, or health
+changes to `DEGRADED/LOST`; do not retry, reset, or invoke the PL-0042 crash
+scenario.
+
+## Multimodal acceptance record (2026-08-11)
+
+- Model: `A:\AI\Models\GGUF\qwen3-32b-vl-instruct-polaris-hi16-heretic-uncensored-q5_k_m.gguf`
+- Projector: `A:\AI\Models\MMProj\mmproj-F16.gguf`
+- llama.cpp build: `9837 (b3fed31b9)`; interface: `--mmproj` and `--no-mmproj-offload`
+- Target: Tesla P100, UUID `GPU-6785b322-899d-8eec-e817-31d83279a414`, resolved CUDA ordinal 1
+- Tested settings: 42 GPU layers, context 4096, projector offload disabled
+- `/v1/models`: returned `multimodal`; one small local image request returned a coherent image-aware response in 66.9 seconds
+- Text regression before and after projector load: PASS
+- Post-test P100: 15,684 / 16,384 MiB, 48°C, 42.38W; RTX 4090: 2,912 / 24,564 MiB, 53°C, 16.50W
+- Both GPUs remained visible and healthy. No SDXL, benchmark, reset, driver/CUDA, or recovery action was performed.
