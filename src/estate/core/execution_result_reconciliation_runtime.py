@@ -119,6 +119,9 @@ def _target_state(item: Any, result: ExecutionProviderAdapterResult) -> str:
 
 
 def _activity_events(item: Any, result: ExecutionProviderAdapterResult, target_state: str, content_hash: str) -> list[dict[str, Any]]:
+    provider_metadata = item.provider_metadata or {}
+    requirements = item.compute_resource_requirements or {}
+    extension = provider_metadata.get("provider_extension") or {}
     base = {
         "request_id": item.dispatch_id,
         "work_package_id": item.work_package_id,
@@ -128,6 +131,11 @@ def _activity_events(item: Any, result: ExecutionProviderAdapterResult, target_s
         "profile_label": item.profile_label,
         "classification": item.classification,
         "validation_status": "prepared" if target_state == "Validation" else result.validation_status,
+        "compute_resource_id": requirements.get("required_resource_id"),
+        "gpu_uuid": requirements.get("required_gpu_uuid"),
+        "runtime_lane_id": extension.get("runtime_lane_id") or result.metadata.get("runtime_lane_id"),
+        "model_identity": extension.get("authorized_model_identity") or result.metadata.get("actual_model_identity"),
+        "reservation_reference": requirements.get("reservation_reference"),
         "metadata": {"adapter_request_id": result.adapter_request_id, "result_content_hash": content_hash, "institutional_acceptance_state": "not_granted"},
     }
     status_event = {
