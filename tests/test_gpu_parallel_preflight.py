@@ -205,6 +205,34 @@ def test_wddm_graphics_clients_with_low_load_are_non_conflicting(tmp_path):
     rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
     assert rtx["unknown_compute_ownership"] is False
     assert {item["ownership"] for item in rtx["compute_processes"]} == {"NON_CONFLICTING_WDDM"}
+    assert {item["pid_key"] for item in rtx["compute_processes"]} == {"77", "78"}
+    assert all(item["executable_path"] and item["command_line"] for item in rtx["compute_processes"])
+    assert {tuple(item["gpu_engine_types"]) for item in rtx["compute_processes"]} == {("3d", "copy"), ("3d", "videodecode")}
+
+
+def test_pid_normalization_correlates_string_fixture_integer_port_and_nvidia_pid(tmp_path):
+    apps = f"83, ui.exe, [N/A], {RTX}"
+    processes = [{"pid": " 83 ", "name": "ui.exe", "executable_path": "C:\\UI\\ui.exe", "command_line": "ui.exe", "parent_pid": 1, "gpu_engine_types": ["3d"]}]
+    code, result = _run(tmp_path, apps=apps, processes=processes)
+    assert code == 0
+    process = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)["compute_processes"][0]
+    assert process["pid"] == 83
+    assert process["pid_key"] == "83"
+    assert process["executable_path"] == "C:\\UI\\ui.exe"
+    assert process["gpu_engine_types"] == ["3d"]
+    assert process["process_lookup_state"] == "RESOLVED"
+
+
+def test_disappeared_nvidia_pid_is_recorded_as_transient_not_unknown(tmp_path):
+    apps = f"84, exited-ui.exe, [N/A], {RTX}"
+    processes = [{"pid": 84, "lookup_state": "exited"}]
+    code, result = _run(tmp_path, apps=apps, processes=processes)
+    assert code == 0
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    process = rtx["compute_processes"][0]
+    assert process["ownership"] == "TRANSIENT_EXITED"
+    assert process["process_lookup_state"] == "EXITED_AFTER_NVIDIA_SNAPSHOT"
+    assert rtx["unknown_compute_ownership"] is False
 
 
 def test_wddm_process_without_engine_context_uses_bounded_low_load_fallback(tmp_path):
@@ -268,12 +296,13 @@ def test_external_and_unknown_lane_ports_block(tmp_path):
 
 
 def test_expected_estate_lane_port_is_allowed(tmp_path):
-    processes = [{"pid": 99, "name": "python.exe", "executable_path": str(ROOT / "python.exe"), "command_line": f"python {ROOT} --lane qwen.local.text.4090", "parent_pid": 1}]
+    processes = [{"pid": "99", "name": "python.exe", "executable_path": str(ROOT / "python.exe"), "command_line": f"python {ROOT} --lane qwen.local.text.4090", "parent_pid": 1}]
     code, result = _run(tmp_path, ports=[{"port": 12409, "pid": 99}], processes=processes)
     assert code == 0
     assert result["status"] == "PASS"
     rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
     assert rtx["lane_port_owner"]["ownership"] == "ESTATE_OWNED"
+    assert rtx["lane_port_owner"]["pid_key"] == "99"
 
 
 def test_json_contract_and_script_is_read_only():

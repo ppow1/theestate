@@ -61,9 +61,22 @@ function Convert-ToNumber([object]$Value) {
 
 function Get-Field([object]$Object, [string]$Name) {
     if ($null -eq $Object) { return $null }
+    if ($Object -is [System.Collections.IDictionary]) {
+        foreach ($key in @($Object.Keys)) {
+            if ([string]$key -ieq $Name) { return $Object[$key] }
+        }
+        return $null
+    }
     $property = $Object.PSObject.Properties[$Name]
     if ($null -eq $property) { return $null }
     return $property.Value
+}
+
+function Normalize-PidKey([object]$Value) {
+    if ($null -eq $Value -or [string]::IsNullOrWhiteSpace([string]$Value)) { return $null }
+    $pidNumber = 0L
+    if (-not [long]::TryParse(([string]$Value).Trim(), [Globalization.NumberStyles]::Integer, [Globalization.CultureInfo]::InvariantCulture, [ref]$pidNumber) -or $pidNumber -le 0) { return $null }
+    return $pidNumber.ToString([Globalization.CultureInfo]::InvariantCulture)
 }
 
 function Read-JsonFixture([string]$Path) {
@@ -103,7 +116,8 @@ function Get-GpuEngineTypeMap {
         $sampleCount = @($sample.CounterSamples).Count
         foreach ($counter in @($sample.CounterSamples)) {
             if ([string]$counter.InstanceName -match '^pid_(?<pid>\d+)_.*engtype_(?<engine>.+)$') {
-                $pidKey = [string]$Matches.pid
+                $pidKey = Normalize-PidKey $Matches.pid
+                if ($null -eq $pidKey) { continue }
                 $map[$pidKey] = @(@($map[$pidKey]) + [string]$Matches.engine | Select-Object -Unique)
             }
         }
@@ -114,19 +128,27 @@ function Get-GpuEngineTypeMap {
 function Get-ProcessMap([object]$Fixture, [bool]$UseFixture) {
     $map = @{}
     if ($UseFixture) {
-        foreach ($item in @($Fixture)) { $pidValue = Get-Field $item 'pid'; if ($null -ne $pidValue) { $map[[string]$pidValue] = $item } }
+        foreach ($item in @($Fixture)) {
+            $pidKey = Normalize-PidKey (Get-Field $item 'pid')
+            if ($null -eq $pidKey) { continue }
+            $record = [ordered]@{}
+            foreach ($property in @($item.PSObject.Properties)) { $record[$property.Name] = $property.Value }
+            $map[$pidKey] = $record
+        }
         return [ordered]@{ processes = $map; gpu_engine_collection = [ordered]@{ available = $null; sample_count = $null; error = $null; source = 'fixture' } }
     }
     $gpuEngineCollection = Get-GpuEngineTypeMap
     $gpuEngineTypes = $gpuEngineCollection.map
     foreach ($process in @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)) {
-        $map[[string]$process.ProcessId] = [ordered]@{
+        $pidKey = Normalize-PidKey $process.ProcessId
+        if ($null -eq $pidKey) { continue }
+        $map[$pidKey] = [ordered]@{
             pid = [int]$process.ProcessId
             name = $process.Name
             executable_path = $process.ExecutablePath
             command_line = $process.CommandLine
             parent_pid = $process.ParentProcessId
-            gpu_engine_types = @($gpuEngineTypes[[string]$process.ProcessId])
+            gpu_engine_types = @($gpuEngineTypes[$pidKey])
         }
     }
     return [ordered]@{ processes = $map; gpu_engine_collection = [ordered]@{ available = $gpuEngineCollection.available; sample_count = $gpuEngineCollection.sample_count; error = $gpuEngineCollection.error; source = 'windows_gpu_engine_performance_counter' } }
@@ -164,10 +186,19 @@ function Test-EstateOwnership([object]$Process, [int]$Port, [string]$Root, [stri
     return 'UNKNOWN'
 }
 
-function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [string]$Root, [string]$LaneId, [string]$DriverModel, [object]$Utilization, [object]$Power, [object]$PortRecord) {
-    $pidValue = Convert-ToNumber (Get-Field $Row 'pid')
-    $process = if ($null -ne $pidValue) { $ProcessMap[[string][int]$pidValue] } else { $null }
-    $ownership = Test-EstateOwnership $process $Port $Root $LaneId
+function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [string]$Root, [string]$LaneId, [string]$DriverModel, [object]$Utilization, [object]$Power, [object]$PortRecord, [bool]$UseFixture) {
+    $pidKey = Normalize-PidKey (Get-Field $Row 'pid')
+    $process = if ($null -ne $pidKey) { $ProcessMap[$pidKey] } else { $null }
+    $fixtureLookupState = if ($null -ne $process) { [string](Get-Field $process 'lookup_state') } else { $null }
+    $processLookupState = if ($null -ne $process -and $fixtureLookupState -ne 'exited') { 'RESOLVED' } else { 'UNRESOLVED' }
+    $ownership = if ($fixtureLookupState -eq 'exited') { 'TRANSIENT_EXITED' } else { Test-EstateOwnership $process $Port $Root $LaneId }
+    if ($null -eq $process -and -not $UseFixture -and $null -ne $pidKey) {
+        $activeProcess = Get-Process -Id ([int64]$pidKey) -ErrorAction SilentlyContinue
+        if ($null -eq $activeProcess) { $processLookupState = 'EXITED_AFTER_NVIDIA_SNAPSHOT'; $ownership = 'TRANSIENT_EXITED' }
+        else { $processLookupState = 'ACTIVE_UNRESOLVED'; $ownership = 'UNKNOWN' }
+    } elseif ($fixtureLookupState -eq 'exited') {
+        $processLookupState = 'EXITED_AFTER_NVIDIA_SNAPSHOT'
+    }
     $usedMemory = Convert-ToNumber $Row.used_memory_mib
     $engineTypes = @()
     if ($null -ne $process) { $engineTypes = @((Get-Field $process 'gpu_engine_types') | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }) }
@@ -183,7 +214,8 @@ function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [st
         $nonConflictBasis = if ($positiveGraphicsContext) { 'wddm_non_compute_engine_context' } else { 'wddm_bounded_low_load_fallback' }
     }
     return [ordered]@{
-        pid = if ($null -ne $pidValue) { [int]$pidValue } else { $null }
+        pid = if ($null -ne $pidKey) { [int64]$pidKey } else { $null }
+        pid_key = $pidKey
         process_name = [string]$Row.process_name
         used_memory_mib = $usedMemory
         gpu_uuid = [string]$Row.gpu_uuid
@@ -193,6 +225,7 @@ function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [st
         driver_model = $DriverModel
         gpu_engine_types = $engineTypes
         non_conflict_basis = $nonConflictBasis
+        process_lookup_state = $processLookupState
         ownership = $ownership
     }
 }
@@ -200,15 +233,17 @@ function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [st
 function Get-PortRecord([hashtable]$PortMap, [hashtable]$ProcessMap, [int]$Port, [string]$Root, [string]$LaneId) {
     $row = $PortMap[[string]$Port]
     if ($null -eq $row) { return [ordered]@{ listening = $false; port = $Port; pid = $null; process_name = $null; ownership = $null } }
-    $process = $ProcessMap[[string][int](Get-Field $row 'pid')]
+    $pidKey = Normalize-PidKey (Get-Field $row 'pid')
+    $process = if ($null -ne $pidKey) { $ProcessMap[$pidKey] } else { $null }
     $ownership = Test-EstateOwnership $process $Port $Root $LaneId
     return [ordered]@{
         listening = $true
         port = $Port
-        pid = [int](Get-Field $row 'pid')
-        process_name = if ($null -ne $process) { $process.name } else { $null }
-        executable_path = if ($null -ne $process) { $process.executable_path } else { $null }
-        command_line = if ($null -ne $process) { $process.command_line } else { $null }
+        pid = if ($null -ne $pidKey) { [int64]$pidKey } else { $null }
+        pid_key = $pidKey
+        process_name = if ($null -ne $process) { Get-Field $process 'name' } else { $null }
+        executable_path = if ($null -ne $process) { Get-Field $process 'executable_path' } else { $null }
+        command_line = if ($null -ne $process) { Get-Field $process 'command_line' } else { $null }
         ownership = $ownership
     }
 }
@@ -319,7 +354,7 @@ function Invoke-Preflight {
             if ($null -ne $row -and ($null -eq $memoryFree -or $null -eq $memoryTotal -or $null -eq $util)) { $health = 'FAILURE'; $reasons += 'nvidia-smi returned incomplete device telemetry' }
             if ($null -ne $memoryFree -and $memoryFree -lt $expected.minimum_safe_free_mib) { $reasons += "free VRAM $memoryFree MiB is below the accepted floor $($expected.minimum_safe_free_mib) MiB" }
             $port = Get-PortRecord $ports $processes $expected.lane_port $RepoRoot $expected.lane_id
-            $gpuProcesses = @($computeRows | Where-Object { $_.gpu_uuid -eq $expected.gpu_uuid } | ForEach-Object { Get-ProcessRecord $_ $processes $expected.lane_port $RepoRoot $expected.lane_id ([string]$row.driver_model) $util $power $port })
+            $gpuProcesses = @($computeRows | Where-Object { $_.gpu_uuid -eq $expected.gpu_uuid } | ForEach-Object { Get-ProcessRecord $_ $processes $expected.lane_port $RepoRoot $expected.lane_id ([string]$row.driver_model) $util $power $port $UseProcessFixture })
             $material = $false
             $unknownComputeOwnership = $false
             $conflictingExternalCompute = $false
