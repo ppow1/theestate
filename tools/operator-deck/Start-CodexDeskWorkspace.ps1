@@ -32,7 +32,11 @@ function Get-SeatLauncherProcess([string]$Seat) {
     $needle = "Start-CodexInteractive.ps1' -Seat '$Seat'"
     $candidate = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
         Where-Object { $_.CommandLine -and $_.CommandLine.Contains($needle) } |
-        Sort-Object @{Expression={ if ($_.Name -eq 'conhost.exe') { 0 } else { 1 } }} |
+        Sort-Object @{Expression={
+            if ($_.Name -eq 'pwsh.exe' -and $_.ProcessId -and (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).MainWindowHandle -ne 0) { 0 }
+            elseif ($_.Name -eq 'pwsh.exe') { 1 }
+            else { 2 }
+        }} |
         Select-Object -First 1
     if ($candidate) { return Get-Process -Id $candidate.ProcessId -ErrorAction SilentlyContinue }
 }
@@ -107,7 +111,8 @@ function Start-SeatCodex($Seat) {
     if ($existing) { return $existing }
     if ($NoLaunch) { return $null }
     $interactive = Join-Path $PSScriptRoot 'Start-CodexInteractive.ps1'
-    $command = "`$host.UI.RawUI.WindowTitle = '$marker'; Set-Location -LiteralPath '$repoRoot'; & '$interactive' -Seat '$Seat'"
+    $startupStatus = "[$marker] seat=$Seat model=gpt-5.6-luna sandbox=danger-full-access approval=never"
+    $command = "`$host.UI.RawUI.WindowTitle = '$marker'; Write-Host '$startupStatus' -ForegroundColor Cyan; Set-Location -LiteralPath '$repoRoot'; & '$interactive' -Seat '$Seat'"
     $conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
     $started = Start-Process -FilePath $conhost -Verb RunAs -ArgumentList @('pwsh.exe','-NoProfile','-ExecutionPolicy','Bypass','-NoExit','-Command',$command) -PassThru
     Start-Sleep -Seconds 2
@@ -129,6 +134,30 @@ function Close-SeatCodex([string]$Seat) {
     if (Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq "$Seat-CODEX" }) {
         throw "Codex Desk terminal $Seat did not close gracefully."
     }
+}
+
+function Request-SeatCodexClose([string]$Seat) {
+    $windows = @(Get-Process -ErrorAction SilentlyContinue |
+        Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -eq "$Seat-CODEX" })
+    if ($windows.Count -eq 0) {
+        $windows = @(Get-Process -ErrorAction SilentlyContinue |
+            Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -like "*$Seat-CODEX*" })
+    }
+    if ($windows.Count -eq 0) {
+        $launcher = Get-SeatLauncherProcess $Seat
+        if ($launcher) { $windows = @($launcher) }
+    }
+    foreach ($window in $windows) {
+        try { $window.CloseMainWindow() | Out-Null } catch { }
+    }
+    return ($windows.Count -gt 0)
+}
+
+function Test-SeatCodexClosed([string]$Seat) {
+    $windows = @(Get-Process -ErrorAction SilentlyContinue |
+        Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -like "*$Seat-CODEX*" })
+    if ($windows.Count -gt 0) { return $false }
+    return (-not (Get-SeatLauncherProcess $Seat))
 }
 
 function Get-SeatConfig {
@@ -259,15 +288,13 @@ public static class EstateCodexDeskChromeV1 {
 
 function Move-ChromeWindow($Window, $Cell) {
     if ($NoMove) { return }
-    $targetDpi = [int]$monitor.dpi.x
-    if ($targetDpi -le 0) { $targetDpi = 96 }
-    $windowDpi = [int][EstateCodexDeskChromeV1]::GetDpiForWindow([IntPtr]$Window.hwnd)
-    if ($windowDpi -le 0) { $windowDpi = $targetDpi }
-    $scale = $windowDpi / $targetDpi
-    $x = [int][math]::Round($Cell.x * $scale)
-    $y = [int][math]::Round($Cell.y * $scale)
-    $width = [int][math]::Round($Cell.width * $scale)
-    $height = [int][math]::Round($Cell.height * $scale)
+    # The existing placement process calls SetWindowPos with physical desktop
+    # coordinates. Scaling again by GetDpiForWindow double-scales Chrome app
+    # windows (for example 853x720 becomes 1280x1080 and spills monitors).
+    $x = [int]$Cell.x
+    $y = [int]$Cell.y
+    $width = [int]$Cell.width
+    $height = [int]$Cell.height
     [EstateCodexDeskChromeV1]::ShowWindow([IntPtr]$Window.hwnd, 9) | Out-Null
     if (-not [EstateCodexDeskChromeV1]::SetWindowPos([IntPtr]$Window.hwnd, [IntPtr]::Zero, $x, $y, $width, $height, 0x0014)) {
         throw "Chrome window placement failed for HWND $($Window.hwnd)."
@@ -294,6 +321,23 @@ function Close-SeatChrome([string]$Seat) {
         throw "Codex Desk Chrome window $Seat did not close gracefully."
     }
     $chromeWindowMap.Remove($Seat)
+}
+
+function Request-SeatChromeClose([string]$Seat) {
+    if (-not $chromeWindowMap.Contains($Seat)) { return $false }
+    $hwnd = [int64]$chromeWindowMap.$Seat.hwnd
+    $window = Get-ChromeWindows | Where-Object { $_.hwnd -eq $hwnd } | Select-Object -First 1
+    if ($window) {
+        [EstateCodexDeskChromeV1]::PostMessage([IntPtr]$window.hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+        return $true
+    }
+    return $false
+}
+
+function Test-SeatChromeClosed([string]$Seat) {
+    if (-not $chromeWindowMap.Contains($Seat)) { return $true }
+    $hwnd = [int64]$chromeWindowMap.$Seat.hwnd
+    return (@(Get-ChromeWindows | Where-Object { $_.hwnd -eq $hwnd }).Count -eq 0)
 }
 
 function Get-ChromeProfilePathFromUi($Window) {
@@ -327,6 +371,42 @@ function Get-ChromeProfilePathFromUi($Window) {
     throw "Chrome did not expose a profile path for HWND $($Window.hwnd)."
 }
 
+function Get-ChromeWindowCommandLine($Window) {
+    $process = Get-CimInstance Win32_Process -Filter "ProcessId = $($Window.pid)" -ErrorAction SilentlyContinue
+    if ($process) { return [string]$process.CommandLine }
+    return ''
+}
+
+function Test-ChromeWindowProfile($Window, [string]$ProfilePath, [string]$ProfileName, $VerifiedRecord = $null) {
+    if (-not $Window) { return $false }
+    # Chrome app windows in an existing browser process do not retain the
+    # profile-launch switches on their owner process. A persisted record is
+    # accepted only when it was written after the chrome://version proof and
+    # the HWND is still the same visible ChatGPT app window. This prevents a
+    # stale HWND from being treated as a seat merely because it exists.
+    if ($VerifiedRecord -and
+        $VerifiedRecord.profile_path_verified -eq $true -and
+        $VerifiedRecord.app_mode -eq $true -and
+        [string]$VerifiedRecord.profile -eq $ProfileName -and
+        [string]$VerifiedRecord.user_data_dir -eq $chromeUserData -and
+        $Window.title -eq 'ChatGPT') {
+        return $true
+    }
+    $commandLine = Get-ChromeWindowCommandLine $Window
+    $rootNeedle = '--user-data-dir="?' + [regex]::Escape($chromeUserData) + '"?'
+    $profileNeedle = '--profile-directory="?' + [regex]::Escape($ProfileName) + '"?'
+    return $commandLine -match $rootNeedle -and
+        $commandLine -match $profileNeedle -and
+        $ProfilePath -eq (Join-Path $chromeUserData $ProfileName)
+}
+
+function Find-ChromeWindowForProfile([string]$ProfilePath, [string]$ProfileName) {
+    foreach ($window in @(Get-ChromeWindows)) {
+        if (Test-ChromeWindowProfile $window $ProfilePath $ProfileName) { return $window }
+    }
+    return $null
+}
+
 function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
     $profileName = [string]$SeatRecord.interactive_chrome_profile
     $profilePath = Join-Path $chromeUserData $profileName
@@ -341,12 +421,14 @@ function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
     }
     if ($chromeWindowMap.Contains($Seat)) {
         if ($chromeWindowMap.$Seat.profile_path_verified -eq $true) {
-            $saved = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+            $candidate = Get-ChromeWindows | Where-Object { $_.hwnd -eq [int64]$chromeWindowMap.$Seat.hwnd } | Select-Object -First 1
+            if (Test-ChromeWindowProfile $candidate $profilePath $profileName $chromeWindowMap.$Seat) { $saved = $candidate }
         }
         # The persisted record is written only after chrome://version proved the
         # exact profile path. Do not infer identity from a page title or profile
         # menu label on reuse; those are not stable window metadata.
     }
+    if (-not $saved) { $saved = Find-ChromeWindowForProfile $profilePath $profileName }
     $profilePathVerified = $false
     if (-not $saved) {
         # App windows do not expose a writable omnibox. Verify the exact
@@ -393,6 +475,7 @@ function Start-SeatChrome([string]$Seat, $SeatRecord, $Cell) {
     Move-ChromeWindow $saved $Cell
     $chromeWindowMap[$Seat] = [ordered]@{
         hwnd=$saved.hwnd
+        pid=$saved.pid
         profile=$profileName
         user_data_dir=$chromeUserData
         app_mode=$true
@@ -473,19 +556,30 @@ function Get-ChromiumSeatProcesses([string]$ProfilePath) {
         Where-Object { $_.CommandLine -and $_.CommandLine.IndexOf($needle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 })
 }
 
-function Close-SeatChromium([string]$Seat) {
+function Request-SeatChromiumClose([string]$Seat) {
     $record = $chromiumWindowMap[$Seat]
-    if (-not $record) { return }
+    if (-not $record) { return $null }
     $processes = Get-ChromiumSeatProcesses $record.profile_path
     $pids = @($processes | ForEach-Object ProcessId)
     foreach ($window in @(Get-AllChromiumWindows | Where-Object { $pids -contains $_.pid })) {
         [EstateCodexDeskChromiumV1]::PostMessage([IntPtr]$window.hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
     }
+    return [pscustomobject]@{ seat=$Seat; hwnd=[int64]$record.hwnd; profile_path=$record.profile_path }
+}
+
+function Test-SeatChromiumClosed($Request) {
+    if (-not $Request) { return $true }
+    $windowAlive = Get-ChromiumWindows | Where-Object { $_.hwnd -eq $Request.hwnd }
+    $processes = Get-ChromiumSeatProcesses $Request.profile_path
+    return (-not $windowAlive -and $processes.Count -eq 0)
+}
+
+function Close-SeatChromium([string]$Seat) {
+    $request = Request-SeatChromiumClose $Seat
+    if (-not $request) { return }
     for ($i=0; $i -lt 30; $i++) {
         Start-Sleep -Milliseconds 500
-        $windowAlive = Get-ChromiumWindows | Where-Object { $_.hwnd -eq [int64]$record.hwnd }
-        $processes = Get-ChromiumSeatProcesses $record.profile_path
-        if (-not $windowAlive -and $processes.Count -eq 0) { return }
+        if (Test-SeatChromiumClosed $request) { return }
     }
     throw "Chromium $Seat did not complete graceful shutdown; no forced termination was attempted."
 }
@@ -552,22 +646,59 @@ if ($StopChromium) {
 
 if ($StopAll) {
     Get-ChromiumWindows | Out-Null
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    $codexSeats = @()
+    $chromiumRequests = @()
+    $chromeSeats = @()
     foreach ($seat in @('C1','C2','C3')) {
-        Close-SeatChromium $seat
-        $chromiumWindowMap.Remove($seat)
-        Close-SeatCodex $seat
-        Close-SeatChrome $seat
+        if (Request-SeatCodexClose $seat) { $codexSeats += $seat }
+        $chromiumRequest = Request-SeatChromiumClose $seat
+        if ($chromiumRequest) { $chromiumRequests += $chromiumRequest }
+        if (Request-SeatChromeClose $seat) { $chromeSeats += $seat }
     }
+    $codexDone = ($codexSeats.Count -eq 0)
+    $chromiumDone = ($chromiumRequests.Count -eq 0)
+    $chromeDone = ($chromeSeats.Count -eq 0)
+    $codexMs = if ($codexDone) { 0 } else { $null }
+    $chromiumMs = if ($chromiumDone) { 0 } else { $null }
+    $chromeMs = if ($chromeDone) { 0 } else { $null }
+    for ($i = 0; $i -lt 60 -and -not ($codexDone -and $chromiumDone -and $chromeDone); $i++) {
+        if (-not $codexDone) {
+            $codexDone = (@($codexSeats | Where-Object { -not (Test-SeatCodexClosed $_) }).Count -eq 0)
+            if ($codexDone) { $codexMs = $stopwatch.ElapsedMilliseconds }
+        }
+        if (-not $chromiumDone) {
+            $chromiumDone = (@($chromiumRequests | Where-Object { -not (Test-SeatChromiumClosed $_) }).Count -eq 0)
+            if ($chromiumDone) { $chromiumMs = $stopwatch.ElapsedMilliseconds }
+        }
+        if (-not $chromeDone) {
+            $chromeDone = (@($chromeSeats | Where-Object { -not (Test-SeatChromeClosed $_) }).Count -eq 0)
+            if ($chromeDone) { $chromeMs = $stopwatch.ElapsedMilliseconds }
+        }
+        if (-not ($codexDone -and $chromiumDone -and $chromeDone)) {
+            Start-Sleep -Milliseconds 250
+        }
+    }
+    $totalMs = $stopwatch.ElapsedMilliseconds
     $remainingChromium = @(
         foreach ($seatRecord in @($config.seats)) {
             if ($seatRecord.automation_chromium_profile) {
-                Get-ChromiumSeatProcesses $seatRecord.automation_chromium_profile
+                @(Get-ChromiumSeatProcesses $seatRecord.automation_chromium_profile)
             }
         }
     )
+    $remainingCodex = @($codexSeats | Where-Object { -not (Test-SeatCodexClosed $_) })
+    $remainingChrome = @($chromeSeats | Where-Object { -not (Test-SeatChromeClosed $_) })
+    if ($remainingCodex.Count -gt 0) { throw "Codex Desk terminals remain after StopAll: $($remainingCodex -join ', ')." }
     if ($remainingChromium.Count -gt 0) { throw 'Codex Desk Chromium processes remain after graceful StopAll.' }
+    if ($remainingChrome.Count -gt 0) { throw "Codex Desk Chrome windows remain after StopAll: $($remainingChrome -join ', ')." }
+    foreach ($seat in @('C1','C2','C3')) {
+        $chromiumWindowMap.Remove($seat)
+        $chromeWindowMap.Remove($seat)
+    }
     ([ordered]@{ seats=$chromiumWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromiumMapPath -Encoding utf8
     ([ordered]@{ seats=$chromeWindowMap } | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $chromeMapPath -Encoding utf8
+    Write-Host ("Codex Desk StopAll timings: Codex={0}ms Chromium={1}ms Chrome={2}ms Total={3}ms" -f $codexMs, $chromiumMs, $chromeMs, $totalMs)
     Write-Host 'Codex Desk windows stopped cleanly.'
     exit 0
 }
