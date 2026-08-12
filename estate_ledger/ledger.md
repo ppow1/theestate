@@ -1109,3 +1109,13 @@ Classification: Estate Internal
 
 Summary:
 Extended the existing Playwright operator acceptance so LOGIN_REQUIRED emits one deduplicated, secret-free operator-attention event, launches the existing headed auth-bootstrap with the same dedicated persistent profile, waits for bounded authentication, correlates resolution/timeout/cancellation, and resumes the original acceptance after success. Extended the canonical operational-event types without creating a Notifier or delivery channel. Live headed authentication and automatic resume passed; before a Grace prompt could be submitted, the P100 disappeared from NVIDIA visibility, triggering the preserved PL-0042 stop boundary. Candidate services were shut down; no model or destructive recovery was performed.
+
+EC-000223 - Accepted conservative Grace dual-GPU parallelism
+
+Timestamp: 2026-08-12 00:00:00
+Location: A:\\theestate-grace-parallel-integration-real / PR #529
+Status: Accepted
+Classification: Estate Internal
+
+Summary:
+The final conservative Grace dual-GPU acceptance completed successfully. Independent governed RTX 4090 and Tesla P100 tasks executed on their required NVIDIA UUIDs with no cross-assignment and four seconds of provider-interval overlap. The accepted P100 profile was llama3.2:3b with context 1024, output cap 32, and concurrency 1; the bounded qwen3:8b 4090 profile also completed. The existing P100 utilization safety guard did not fire, both lanes were governed-cleaned, both GPUs remained healthy, and unrelated processes were untouched. The dedicated P100 stability-envelope/device-loss study remains parked under PL-0047 and is not part of EC-000223.

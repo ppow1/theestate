@@ -1,5 +1,10 @@
 # EC-000223 — Conservative Simultaneous Dual-GPU Execution
 
+**Current status: Accepted — final conservative Grace dual-GPU acceptance completed 2026-08-12.**
+
+Historical attempts and their failure outcomes below remain preserved as evidence;
+the final acceptance record is appended at the end of this document.
+
 ## Durable implementation
 
 The read-only preflight utility is `tools/gpu-parallel-preflight.ps1`, with
@@ -450,3 +455,46 @@ unrelated process was modified.
 EC-000223 remains **Not Accepted — conservative attempt had a 4090 provider
 failure**. No retry was performed. Heavy parallelism, saturation, SDXL,
 P100-32B, sustained throughput, and maximum-load operation remain unqualified.
+
+## Final conservative acceptance — 2026-08-12
+
+**Status: ACCEPTED.** This is the current authoritative EC-000223 result for
+PR #529. The earlier failed attempts in this document remain historical records
+and are not erased or rewritten.
+
+### Durable evidence
+
+- Runtime acceptance artifact:
+  `A:\EstateRuntime\host\estate-main\current\runtime\acceptance\ec-000223-pr529-final-attempt.json`
+- Acceptance artifact SHA-256:
+  `2A8CF89D818A700DD3369E787B593A1252CF16AF7BE12F25F5F51CC1CBACE68E`
+- RTX 4090 cleanup receipt:
+  `gpu-cleanup-ce0bedbef3ed4872a9ac15f5a833e431`
+  (SHA-256 `ADD3CD9A509522427A669731C06ECBBFEFA06AA31E09A449EAEB3F966D0C2B6`)
+- Tesla P100 cleanup receipt:
+  `gpu-cleanup-f6dcfd71889c4b278a571897330e87f2`
+  (SHA-256 `16CCE9C9849C9F32E280FD60FA9CAC051D34A481660253C18F1D0E4B0659A21C`)
+
+### Accepted governed executions
+
+| Task | Objective | Action | PTM | Helen | Commission | Authorization | Dispatch | Adapter | Provider interval | Actual GPU UUID |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RTX 4090 | `grace-obj-cda6af0bdc4c` | `grace-act-6910ae972cc0` | `res_01KZVB20TSH1XCSX5NJS408AFT` | `heldet-7789e265c8ee` | `engcom-d1768dda5a76` | `engauth-738e452c338a` | `dispatch-8b354c8d123c` | `adapter-dispatch-8b354c8d123c` | 15:57:05Z–15:57:10Z | `GPU-46f3fd00-5454-4536-4196-5d8b727e14f2` |
+| Tesla P100 | `grace-obj-5cec94c466bd` | `grace-act-72404a347726` | `res_01KZVB1Z8VB2EAZPRN7JZVX64Z` | `heldet-748897907631` | `engcom-c8185d75d1b6` | `engauth-62e4975c6c07` | `dispatch-d04f085e21b5` | `adapter-dispatch-d04f085e21b5` | 15:57:03Z–15:57:09Z | `GPU-6785b322-899d-8eec-e817-31d83279a414` |
+
+Provider intervals overlapped for **4 seconds**. Required, allocated, lane,
+configured, and actual physical identities matched for both tasks; no
+cross-assignment occurred. The existing P100 `>80%` for two consecutive
+samples guard did not fire. The accepted P100 profile was `llama3.2:3b`,
+context 1024, output cap 32, concurrency 1. The accepted 4090 profile was the
+bounded qualified `qwen3:8b` profile, concurrency 1.
+
+Both lanes were governed-cleaned, ports `12409` and `12100` were released,
+both GPUs remained healthy with UUID/PCI identities unchanged, no P100 device
+loss occurred, and no unrelated process was modified.
+
+This acceptance proves conservative simultaneous governed execution only. It
+does not qualify stress, benchmarking, SDXL, P100-32B, sustained throughput,
+or maximum-load operation. P100 stability-envelope and prior device-loss
+forensics remain owned by parking-lot item `PL-0047` and are explicitly outside
+EC-000223.
