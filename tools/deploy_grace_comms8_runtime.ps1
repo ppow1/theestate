@@ -24,7 +24,7 @@ $relativeFiles = @(
     'src\estate\core\execution_activity.py', 'src\estate\core\execution_dispatch.py',
     'src\estate\core\execution_provider_adapter.py', 'src\estate\core\execution_provider_adapter_runtime.py',
     'src\estate\core\execution_result_reconciliation_runtime.py', 'src\estate\core\governed_local_provider.py',
-    'src\estate\core\gpu_runtime_lanes.py', 'src\estate\core\grace_comfyui_execution.py',
+    'src\estate\core\gpu_runtime_lanes.py', 'src\estate\core\gpu_runtime_lifecycle.py', 'src\estate\core\grace_comfyui_execution.py',
     'src\estate\core\grace_helen_engineering_composition.py', 'src\estate\core\grace_momentum_service.py',
     'src\estate\core\grace_operations_runtime.py', 'src\estate\core\grace_runtime_bridge.py',
     'src\estate\core\office_personnel_directory.py', 'src\estate\core\openwebui_engineering_workflow.py',
