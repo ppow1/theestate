@@ -1,6 +1,6 @@
 """Local OpenAI-compatible gateway for Estate residents."""
 from __future__ import annotations
-import base64, hashlib, json, os, re, time
+import base64, hashlib, json, os, re, time, traceback
 from urllib.parse import unquote_to_bytes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -32,6 +32,34 @@ ACTIVE_RESIDENT_MODELS = {
     "estate/judy": "judy",
 }
 STATUS_PATH = Path("runtime/resident_gateway/status.json")
+BOUNDED_ERROR_PATH = Path("runtime/diagnostics/bounded_execution_errors.jsonl")
+
+
+def record_gateway_exception(exc: BaseException, *, payload: dict[str, Any] | None, root: Path | None) -> str | None:
+    """Persist internal exception provenance without changing the client error."""
+    try:
+        frames = traceback.extract_tb(exc.__traceback__)
+        origin = frames[-1] if frames else None
+        record = {
+            "schema_version": "estate.gateway-error-provenance.v1",
+            "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "exception_type": type(exc).__name__,
+            "exception_message": str(exc),
+            "missing_path": getattr(exc, "filename", None),
+            "origin": {"filename": origin.filename, "function": origin.name, "line": origin.lineno, "code": origin.line} if origin else None,
+            "traceback": traceback.format_exception(type(exc), exc, exc.__traceback__),
+            "request_id": (payload or {}).get("id"),
+            "session_id": ((payload or {}).get("metadata") or {}).get("session_id") or (payload or {}).get("session_id"),
+            "model": (payload or {}).get("model"),
+        }
+        base = Path(root) if root is not None else _root()
+        path = base / BOUNDED_ERROR_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, sort_keys=True) + "\n")
+        return str(path)
+    except Exception:
+        return None
 
 
 def models_payload(root=None) -> dict[str, Any]:
@@ -974,6 +1002,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 code, body=chat_completion(payload, root=self.root); self._send(code, body)
         except Exception as exc:
+            record_gateway_exception(exc, payload=locals().get("payload"), root=self.root)
             self._send(500,{"error":{"message":f"gateway error: {type(exc).__name__}","code":"gateway_error"}})
     def log_message(self, fmt, *args):
         return
