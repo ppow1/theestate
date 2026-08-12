@@ -11,7 +11,7 @@ from estate.core.multi_resident_room import create_room, invite_participant, acc
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat, detect_bounded_local_text_intent, execute_bounded_local_text_from_chat, execute_parallel_bounded_local_text_from_chat
+from estate.core.openwebui_engineering_workflow import _bounded_request_hash, bounded_trace_id, detect_engineering_assignment_command, initiate_engineering_assignment_from_chat, detect_bounded_local_text_intent, execute_bounded_local_text_from_chat, execute_parallel_bounded_local_text_from_chat, record_bounded_parallel_trace
 from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
 from estate.core.grace_runtime_bridge import GraceRuntimeBridge
 from estate.core.openwebui_grace_assignment import detect_grace_image_assignment, execute_grace_image_assignment
@@ -77,6 +77,10 @@ def models_payload(root=None) -> dict[str, Any]:
 
 
 def chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[str, Any]]:
+    if payload.get("model") in ACTIVE_RESIDENT_MODELS:
+        correlation_id = bounded_trace_id(payload)
+        metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+        record_bounded_parallel_trace(root, "gateway_request_entry", correlation_id=correlation_id, request_id=payload.get("id"), session_id=metadata.get("session_id") or payload.get("session_id"), model=payload.get("model"), request_body_hash=_bounded_request_hash(payload), caller="chat_completion")
     model = payload.get("model")
     if model == DEFAULT_ROOM_MODEL:
         return _room_chat_completion(payload, root=root)

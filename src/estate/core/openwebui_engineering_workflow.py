@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 from uuid import uuid4
 
 from estate.core.compute_resources import ComputeReservationLedger, ComputeResourceRequirements, collect_nvidia_smi, select_resource, write_compute_projection
@@ -58,10 +59,45 @@ P100_RESOURCE_PATTERNS = (
 )
 RAW_PLACEMENT_PATTERN = re.compile(r"\bGPU-[0-9a-f]{8,}(?:-[0-9a-f-]+)?\b|\bqwen\.local\.text\.[a-z0-9.-]+\b", re.I)
 UNRESOLVED_PLACEMENT_PATTERN = re.compile(r"\b(?:use|using|run\s+on|execute\s+on)\b.{0,80}\b(?:gpu|compute\s+(?:lane|resource)|tesla|rtx)\b", re.I)
+BOUNDED_TRACE_PATH = "runtime/diagnostics/bounded_parallel_invocations.jsonl"
 
 
 def _root(root: Path | None = None) -> Path:
     return root or (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
+
+
+def bounded_trace_id(payload: dict[str, Any]) -> str:
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    trace_id = payload.get("id") or metadata.get("bounded_trace_id") or metadata.get("session_id") or payload.get("session_id")
+    if not trace_id:
+        trace_id = f"bounded-{uuid4().hex}"
+    metadata["bounded_trace_id"] = str(trace_id)
+    payload["metadata"] = metadata
+    return str(trace_id)
+
+
+def _bounded_request_hash(payload: dict[str, Any]) -> str:
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    messages = []
+    for message in payload.get("messages") or []:
+        if isinstance(message, dict):
+            content = str(message.get("content") or "")
+            messages.append({"role": message.get("role"), "content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest()})
+    safe = {"model": payload.get("model"), "stream": payload.get("stream"), "id": payload.get("id"), "session_id": metadata.get("session_id") or payload.get("session_id"), "messages": messages}
+    return hashlib.sha256(json.dumps(safe, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def record_bounded_parallel_trace(root: Path | None, event: str, *, correlation_id: str, **fields: Any) -> None:
+    """Best-effort internal evidence; never changes governed execution semantics."""
+    try:
+        base = _root(root)
+        path = base / BOUNDED_TRACE_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        record = {"event": event, "correlation_id": correlation_id, "timestamp": utc_now(), "pid": os.getpid(), "thread_id": threading.get_ident(), **fields}
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, sort_keys=True) + "\n")
+    except Exception:
+        return
 
 
 def _provider_config(root: Path, relative: str) -> dict[str, Any] | None:
@@ -246,6 +282,10 @@ def _readiness_event(rootp: Path, objective: GraceObjective) -> dict[str, Any]:
 
 
 def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None, runtime_lane_id: str | None = None) -> dict[str, Any] | None:
+    correlation_id = bounded_trace_id(payload)
+    metadata_for_trace = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    executor_invocation_id = f"exec-{uuid4().hex}"
+    record_bounded_parallel_trace(root, "executor_invocation", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), runtime_lane_id=runtime_lane_id or metadata_for_trace.get("parallel_runtime_lane_id"), session_id=session_id, caller="execute_bounded_local_text_from_chat")
     intent = detect_bounded_local_text_intent(payload, user_message)
     if intent["state"] != "execution_requested":
         return intent if intent["state"] == "execution_blocked" else None
@@ -289,6 +329,7 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if lane_readiness.get("status") != "READY":
         return {"state": "execution_blocked", "reason": lane_readiness.get("reason", "selected runtime lane could not be made ready"), "lane_id": lane.runtime_lane_id, "lane_health": lane_health, "lane_readiness": lane_readiness, "provider_execution_performed": False}
     objective = GraceObjective.create(requested_by="Steward via Open WebUI", title="Bounded local text task", summary=user_message.strip(), work_package_id="WP-0649", owner="qwen-local-text", checkpoint="Grace records provider receipt and physical placement evidence; acceptance remains with Engineering and the Steward.", metadata={"summary_safe": True, "openwebui_bounded_local_text": True, "resource_intent": resource_intent, "compute_resource_requirements": requirements.to_dict()})
+    record_bounded_parallel_trace(rootp, "executor_objective_created", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid)
     artifact_path = f"docs/operations/examples/grace_bounded_local_text_{objective.objective_id}.md"
     receipt_path = f"runtime/engineering_adapter_receipts/grace_bounded_local_text_{objective.objective_id}.json"
     provider_config_path = lane.provider_config_path
@@ -305,7 +346,15 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     determination = comp.determine_capability(inquiry["capability_request_id"], disposition="qualified_and_available", worker_profile_id="qwen-local-text", qualification_evidence=[provider_config_path, str(health_path.relative_to(rootp)).replace("\\", "/")], availability_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], capacity_evidence=["runtime/compute_resources/gpus.json"], provider_health_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], evidence_observed_at=utc_now())
     event = _readiness_event(rootp, objective)
     reservation_id = f"gpu-reservation-{objective.objective_id}"
-    ComputeReservationLedger(rootp).reserve(reservation_id=reservation_id, resource_id=selected.resource_id, workload_id=objective.objective_id, minimum_vram_mib=requirements.minimum_vram_mib)
+    ledger = ComputeReservationLedger(rootp)
+    existing = [row for row in ledger.active() if row.get("resource_id") == selected.resource_id]
+    record_bounded_parallel_trace(rootp, "reservation_attempt_before", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid, reservation_id=reservation_id, existing_reservations=existing, caller="execute_bounded_local_text_from_chat")
+    try:
+        reservation = ledger.reserve(reservation_id=reservation_id, resource_id=selected.resource_id, workload_id=objective.objective_id, minimum_vram_mib=requirements.minimum_vram_mib)
+    except Exception as exc:
+        record_bounded_parallel_trace(rootp, "reservation_attempt_after", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid, reservation_id=reservation_id, success=False, exception_type=type(exc).__name__, exception_message=str(exc), existing_reservations=existing, caller="execute_bounded_local_text_from_chat")
+        raise
+    record_bounded_parallel_trace(rootp, "reservation_attempt_after", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid, reservation_id=reservation_id, success=True, reservation=reservation, caller="execute_bounded_local_text_from_chat")
     requirements = ComputeResourceRequirements(**{**requirements.__dict__, "required_gpu_uuid": selected.nvidia_uuid, "required_resource_id": selected.resource_id, "reservation_reference": reservation_id, "evidence_reference": "runtime/compute_resources/gpus.json"})
     try:
         governed = comp.governed_commission_and_dispatch(objective.objective_id, determination["determination_id"], grace_action_id=action.action_id, operations_decision_id=action_record["metadata"]["operations_decision_id"], bounded_objective=objective.summary, acceptance_criteria=["one bounded text artifact", "one provider receipt", "allocated UUID equals runtime lane UUID"], ptm_source_high_watermark=event["event_id"], ptm_task_or_package_id=f"task-{objective.objective_id}", enabling_project_id="project-local-text", provider_id="qwen.local.text", provider_type="execution", adapter_reference="qwen-local-ollama-text-adapter@1.0.0", execution_metadata=authority, compute_resource_requirements=requirements.to_dict(), idempotency_key=f"grace-bounded-text:{objective.objective_id}")
@@ -330,6 +379,7 @@ def execute_parallel_bounded_local_text_from_chat(payload: dict[str, Any], *, us
         task_payload = dict(payload)
         metadata = dict(payload.get("metadata") or {})
         metadata["parallel_task_id"] = spec["task_id"]
+        metadata["parallel_task_index"] = specs.index(spec)
         metadata["parallel_runtime_lane_id"] = spec["runtime_lane_id"]
         task_payload["metadata"] = metadata
         return execute_bounded_local_text_from_chat(
@@ -340,6 +390,8 @@ def execute_parallel_bounded_local_text_from_chat(payload: dict[str, Any], *, us
             runtime_lane_id=spec["runtime_lane_id"],
         ) or {"state": "execution_blocked", "reason": "parallel task returned no governed result", "provider_execution_performed": False}
 
+    correlation_id = bounded_trace_id(payload)
+    record_bounded_parallel_trace(root, "parallel_router_invocation", correlation_id=correlation_id, task_spec_count=len(specs), task_specs=[{"task_index": index, "task_id": spec["task_id"], "runtime_lane_id": spec["runtime_lane_id"]} for index, spec in enumerate(specs)], caller="execute_parallel_bounded_local_text_from_chat")
     with ThreadPoolExecutor(max_workers=2, thread_name_prefix="grace-parallel-text") as pool:
         results = list(pool.map(run, specs))
     completed = all(item.get("state") == "execution_completed" for item in results)

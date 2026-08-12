@@ -1,5 +1,7 @@
+import json
+
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane, _target_registered_lane, _parallel_bounded_text_task_specs, execute_parallel_bounded_local_text_from_chat
+from estate.core.openwebui_engineering_workflow import bounded_trace_id, record_bounded_parallel_trace, detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane, _target_registered_lane, _parallel_bounded_text_task_specs, execute_parallel_bounded_local_text_from_chat
 from estate.core.resident_gateway import _bounded_local_text_content, _grace_runtime_operation_response
 from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
@@ -85,6 +87,23 @@ def test_parallel_executor_uses_two_existing_single_task_paths(monkeypatch, tmp_
     assert result["state"] == "execution_completed"
     assert {item[0] for item in calls} == {"rtx4090", "p100"}
     assert {item[2] for item in calls} == {"qwen.local.text.4090", "qwen.local.text.p100-1"}
+
+
+def test_bounded_trace_records_gateway_safe_hash_and_two_task_router(tmp_path):
+    payload = {"model": "estate/grace", "stream": True, "metadata": {"session_id": "trace-session"}, "messages": [{"role": "user", "content": "secret prompt"}]}
+    correlation = bounded_trace_id(payload)
+    record_bounded_parallel_trace(tmp_path, "gateway_request_entry", correlation_id=correlation, request_body_hash="hash-only")
+    record_bounded_parallel_trace(tmp_path, "parallel_router_invocation", correlation_id=correlation, task_spec_count=2, task_specs=[{"task_index": 0}, {"task_index": 1}])
+    lines = (tmp_path / "runtime/diagnostics/bounded_parallel_invocations.jsonl").read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 2
+    assert all("secret prompt" not in line for line in lines)
+    assert all(json.loads(line)["correlation_id"] == "trace-session" for line in lines)
+    assert json.loads(lines[1])["task_spec_count"] == 2
+
+
+def test_bounded_trace_write_failure_is_best_effort(monkeypatch, tmp_path):
+    monkeypatch.setattr("pathlib.Path.open", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("diagnostic unavailable")))
+    record_bounded_parallel_trace(tmp_path, "reservation_attempt_before", correlation_id="trace-failure")
 
 
 def test_explicit_registered_lane_resolution_is_authoritative_and_validated(tmp_path):
