@@ -80,12 +80,31 @@ def chat_completion(payload: dict[str, Any], *, root=None) -> tuple[int, dict[st
     if payload.get("model") in ACTIVE_RESIDENT_MODELS:
         correlation_id = bounded_trace_id(payload)
         metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
-        record_bounded_parallel_trace(root, "gateway_request_entry", correlation_id=correlation_id, request_id=payload.get("id"), session_id=metadata.get("session_id") or payload.get("session_id"), model=payload.get("model"), request_body_hash=_bounded_request_hash(payload), caller="chat_completion")
+        task = metadata.get("task")
+        record_bounded_parallel_trace(root, "gateway_request_entry", correlation_id=correlation_id, request_id=payload.get("id"), session_id=metadata.get("session_id") or payload.get("session_id"), model=payload.get("model"), task=task, request_body_hash=_bounded_request_hash(payload), caller="chat_completion")
     model = payload.get("model")
     if model == DEFAULT_ROOM_MODEL:
         return _room_chat_completion(payload, root=root)
     if model not in ACTIVE_RESIDENT_MODELS:
         return 404, {"error":{"message":f"Unsupported Estate resident model: {model}","type":"invalid_request_error","code":"unsupported_model"}}
+    # Open WebUI performs post-response task calls (title/tags/follow-ups) using
+    # the selected model when no separate task model is configured. Those calls
+    # are metadata-marked and may contain the original operational prompt. They
+    # must remain non-executable so a single user turn cannot be replayed as a
+    # second governed Grace request.
+    if model == "estate/grace" and isinstance(metadata, dict) and metadata.get("task"):
+        user_message = _latest_user_message(payload.get("messages") or [])
+        title = (user_message.replace("\n", " ").strip()[:72] or "Grace response")
+        body = {
+            "id": f"chatcmpl-task-{uuid4().hex[:16]}",
+            "object": "chat.completion",
+            "created": int(time.time()),
+            "model": model,
+            "choices": [{"index": 0, "message": {"role": "assistant", "content": title}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+            "estate": {"resident_id": "grace", "task_request": True, "task": metadata.get("task"), "execution_performed": False},
+        }
+        return 200, body
     if payload.get("stream") is True:
         return _streaming_chat_completion(payload, root=root)
     return _non_streaming_chat_completion(payload, root=root)
