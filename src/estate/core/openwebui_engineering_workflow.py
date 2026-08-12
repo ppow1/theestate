@@ -120,6 +120,27 @@ def _target_symbolic_lane(root: Path, observations: list[Any], symbol: str) -> t
     return (lane, config, physical) if lane and config else None
 
 
+def _target_registered_lane(root: Path, observations: list[Any], runtime_lane_id: str) -> tuple[Any, dict[str, Any], Any] | None:
+    """Resolve an explicit lane only through the canonical registry and live resource evidence."""
+    if not isinstance(runtime_lane_id, str) or not runtime_lane_id.strip():
+        return None
+    lanes = load_registered_lanes(root)
+    lane = next((item for item in lanes if item.runtime_lane_id == runtime_lane_id.strip()), None)
+    if lane is None or lane.provider_id != "qwen.local.text":
+        return None
+    config = _provider_config(root, lane.provider_config_path)
+    selected = next(
+        (
+            row
+            for row in observations
+            if row.nvidia_uuid == lane.gpu_uuid
+            and row.resource_id == lane.compute_resource_id
+        ),
+        None,
+    )
+    return (lane, config, selected) if config and selected else None
+
+
 def detect_engineering_assignment_command(payload: dict[str, Any], user_message: str) -> dict[str, Any] | None:
     """Return command metadata when a chat turn explicitly requests assignment initiation."""
     metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
@@ -224,7 +245,7 @@ def _readiness_event(rootp: Path, objective: GraceObjective) -> dict[str, Any]:
     )
 
 
-def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None) -> dict[str, Any] | None:
+def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None, runtime_lane_id: str | None = None) -> dict[str, Any] | None:
     intent = detect_bounded_local_text_intent(payload, user_message)
     if intent["state"] != "execution_requested":
         return intent if intent["state"] == "execution_blocked" else None
@@ -237,10 +258,18 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if not observations:
         return {"state": "execution_blocked", "reason": "fresh physical compute evidence is unavailable", "provider_execution_performed": False}
     write_compute_projection(observations, rootp)
-    resource_intent = detect_bounded_compute_resource_intent(user_message)
-    if resource_intent["state"] == "blocked":
-        return {"state": "execution_blocked", "reason": resource_intent["reason"], "resource_intent": resource_intent, "provider_execution_performed": False}
-    target = _target_symbolic_lane(rootp, observations, resource_intent["symbol"]) if resource_intent["state"] == "required" else _target_lane(rootp, observations)
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    explicit_lane_id = runtime_lane_id or metadata.get("parallel_runtime_lane_id")
+    if explicit_lane_id is not None:
+        resource_intent = {"state": "required", "source": "validated_runtime_lane", "runtime_lane_id": explicit_lane_id}
+        target = _target_registered_lane(rootp, observations, explicit_lane_id)
+        if target is None:
+            return {"state": "execution_blocked", "reason": "explicit runtime lane is unknown, unavailable, or not registered for qwen.local.text", "resource_intent": resource_intent, "provider_execution_performed": False}
+    else:
+        resource_intent = detect_bounded_compute_resource_intent(user_message)
+        if resource_intent["state"] == "blocked":
+            return {"state": "execution_blocked", "reason": resource_intent["reason"], "resource_intent": resource_intent, "provider_execution_performed": False}
+        target = _target_symbolic_lane(rootp, observations, resource_intent["symbol"]) if resource_intent["state"] == "required" else _target_lane(rootp, observations)
     if not target:
         return {"state": "execution_blocked", "reason": "governed local-text target lane or its physical resource is unavailable", "resource_intent": resource_intent, "provider_execution_performed": False}
     lane, config, target_observation = target
@@ -308,6 +337,7 @@ def execute_parallel_bounded_local_text_from_chat(payload: dict[str, Any], *, us
             user_message=task_messages[spec["task_id"]],
             session_id=session_id,
             root=root,
+            runtime_lane_id=spec["runtime_lane_id"],
         ) or {"state": "execution_blocked", "reason": "parallel task returned no governed result", "provider_execution_performed": False}
 
     with ThreadPoolExecutor(max_workers=2, thread_name_prefix="grace-parallel-text") as pool:

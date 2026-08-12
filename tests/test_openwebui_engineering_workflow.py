@@ -1,5 +1,5 @@
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane, _parallel_bounded_text_task_specs, execute_parallel_bounded_local_text_from_chat
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane, _target_registered_lane, _parallel_bounded_text_task_specs, execute_parallel_bounded_local_text_from_chat
 from estate.core.resident_gateway import _bounded_local_text_content, _grace_runtime_operation_response
 from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
@@ -76,14 +76,34 @@ def test_parallel_intent_preserves_qualified_profiles_and_fails_closed_for_unsaf
 
 def test_parallel_executor_uses_two_existing_single_task_paths(monkeypatch, tmp_path):
     calls = []
-    def fake_single(payload, *, user_message, session_id, root):
-        calls.append((payload["metadata"]["parallel_task_id"], user_message))
+    def fake_single(payload, *, user_message, session_id, root, runtime_lane_id):
+        calls.append((payload["metadata"]["parallel_task_id"], user_message, runtime_lane_id))
         return {"state": "execution_completed", "provider_execution_performed": True, "objective": {"objective_id": calls[-1][0]}}
     monkeypatch.setattr("estate.core.openwebui_engineering_workflow.execute_bounded_local_text_from_chat", fake_single)
     prompt = "Run two independent governed local text tasks concurrently and return a short result from each."
     result = execute_parallel_bounded_local_text_from_chat({"model": "estate/grace"}, user_message=prompt, session_id="parallel-test", root=tmp_path)
     assert result["state"] == "execution_completed"
     assert {item[0] for item in calls} == {"rtx4090", "p100"}
+    assert {item[2] for item in calls} == {"qwen.local.text.4090", "qwen.local.text.p100-1"}
+
+
+def test_explicit_registered_lane_resolution_is_authoritative_and_validated(tmp_path):
+    uuid = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+    resource_id = f"DESKTOP-JA3RPNQ:nvidia:{uuid}"
+    observation = ComputeResourceObservation(resource_id=resource_id, host_id="DESKTOP-JA3RPNQ", nvidia_uuid=uuid, name="NVIDIA GeForce RTX 4090", health_state="healthy", capacity_state="available")
+    lane = RuntimeLane(runtime_lane_id="qwen.local.text.4090", provider_id="qwen.local.text", endpoint_type="ollama-http", endpoint_address="http://127.0.0.1:12409", host_id="DESKTOP-JA3RPNQ", compute_resource_id=resource_id, gpu_uuid=uuid, model_identity="qwen3:8b", environment_binding={"CUDA_VISIBLE_DEVICES": uuid, "OLLAMA_HOST": "127.0.0.1:12409"}, provider_config_path="config/providers/qwen_local_text.json", minimum_vram_mib=8192)
+    (tmp_path / "config/providers").mkdir(parents=True)
+    (tmp_path / "config/providers/qwen_local_text.json").write_text('{"minimum_safe_vram_mib": 8192}', encoding="utf-8")
+    import estate.core.openwebui_engineering_workflow as workflow
+    original = workflow.load_registered_lanes
+    workflow.load_registered_lanes = lambda root: [lane]
+    try:
+        selected = _target_registered_lane(tmp_path, [observation], "qwen.local.text.4090")
+        assert selected[0].runtime_lane_id == "qwen.local.text.4090"
+        assert selected[2].nvidia_uuid == uuid
+        assert _target_registered_lane(tmp_path, [observation], "qwen.local.text.unknown") is None
+    finally:
+        workflow.load_registered_lanes = original
 
 
 def test_bounded_prompt_with_runtime_keywords_bypasses_read_only_runtime_layer():
