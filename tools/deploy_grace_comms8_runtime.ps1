@@ -35,6 +35,30 @@ $relativeFiles = @(
     'src\estate\core\resident_authority.py', 'src\estate\core\resident_identity_composition.py',
     'src\estate\core\resident_interaction.py', 'src\estate\core\resident_voice_commissioning.py',
     'src\estate\core\steward_help.py',
+    'src\estate\ai_services\control.py', 'src\estate\ai_services\discovery.py',
+    'src\estate\ai_services\execution.py', 'src\estate\ai_services\manifest.py',
+    'src\estate\ai_services\paths.py', 'src\estate\ai_services\policy.py',
+    'src\estate\core\assignment_queue.py', 'src\estate\core\background_operations.py',
+    'src\estate\core\canonical_webui_gateway_runtime.py', 'src\estate\core\capability_dependency_visualization.py',
+    'src\estate\core\character_continuity.py', 'src\estate\core\codex_bridge.py',
+    'src\estate\core\codex_bridge_execution_provider_adapter.py', 'src\estate\core\collaboration_events.py',
+    'src\estate\core\collaboration_messages.py', 'src\estate\core\dependency_graph.py',
+    'src\estate\core\estate_capability_registry.py', 'src\estate\core\estate_skills.py',
+    'src\estate\core\execution_adapter_handoff_runtime.py', 'src\estate\core\execution_attempt_runtime.py',
+    'src\estate\core\grounded_fact_provider.py', 'src\estate\core\helen_workforce.py',
+    'src\estate\core\mailbox_index.py', 'src\estate\core\multi_resident_room.py',
+    'src\estate\core\open_webui_multi_resident_gateway.py', 'src\estate\core\openwebui_resident_package.py',
+    'src\estate\core\operational_status.py', 'src\estate\core\orchestrator_intake.py',
+    'src\estate\core\paths.py', 'src\estate\core\provider_capabilities.py',
+    'src\estate\core\provider_capacity.py', 'src\estate\core\provider_catalog.py',
+    'src\estate\core\provider_health.py', 'src\estate\core\ptm_ids.py',
+    'src\estate\core\qwen_local_text_execution_provider_adapter.py', 'src\estate\core\reflection_worker_request.py',
+    'src\estate\core\reflection_workflow.py', 'src\estate\core\relationship_graph.py',
+    'src\estate\core\resident_lifecycle.py', 'src\estate\core\resident_mail_bus.py',
+    'src\estate\core\resident_memory_runtime.py', 'src\estate\core\resident_registry_snapshot.py',
+    'src\estate\core\runtime_envelope.py', 'src\estate\core\traffic_controller.py',
+    'src\estate\core\worker_assignments.py', 'src\estate\model_control\assignments.py',
+    'src\estate\model_control\policy.py', 'src\estate\model_control\registry.py',
     'src\estate\core\openwebui_resident_surface.py', 'src\estate\core\resident_gateway.py',
     'tools\chatgpt_mailbox_worker_browser.cjs', 'tools\comms8_streamable_http_adapter.py',
     'tools\start_chatgpt_mailbox_worker_canonical.ps1', 'tools\start_grace_consultation_gateway.py',
@@ -90,6 +114,11 @@ $started = [DateTime]::UtcNow
 $deploymentId = 'grace-overlay-' + $started.ToString('yyyyMMddTHHmmssfffZ') + '-' + $sourceSha.Substring(0,12)
 $previous = @{}
 if (Test-Path -LiteralPath $oldReceipt) { try { $old = Get-Content -LiteralPath $oldReceipt -Raw | ConvertFrom-Json; foreach($f in $old.files){$previous[$f.path.Replace('/','\')] = [string]$f.sha256} } catch { } }
+$manifestFile = [IO.Path]::GetTempFileName(); $relativeFiles | Set-Content -LiteralPath $manifestFile -Encoding UTF8
+$closureScript = Join-Path $source 'tools\runtime_import_closure.py'
+$closureOutput = & python $closureScript --source-root (Join-Path $source 'src') --target-root (Join-Path $target 'src') --manifest $manifestFile 2>&1
+Remove-Item -LiteralPath $manifestFile -Force -ErrorAction SilentlyContinue
+try { $closure = ($closureOutput -join "`n") | ConvertFrom-Json } catch { throw "IMPORT_CLOSURE_BLOCKED: closure output was not valid JSON: $($_.Exception.Message)" }
 $manifest = @(); $unknown = @(); $unchanged = @(); $changed = @()
 foreach ($relative in $relativeFiles) {
     $sourcePath = Join-Path $source $relative; $targetPath = Join-Path $target $relative
@@ -101,8 +130,8 @@ foreach ($relative in $relativeFiles) {
     if ($class -eq 'INTEGRATION_EQUIVALENT') { $unchanged += $relative } else { $changed += $relative }
     $manifest += [ordered]@{relative_path=$relative;source_sha256=$sourceHash;pre_target_sha256=$preHash;post_target_sha256=$null;classification=$class;deployment_action=if($class -eq 'INTEGRATION_EQUIVALENT'){'UNCHANGED'}else{'REPLACE'};provenance=$provenance }
 }
-$result = if ($unknown.Count) { 'PREFLIGHT_BLOCKED' } else { 'PREFLIGHT_PASS' }
-$receipt = [ordered]@{schema='estate.grace_comms8_runtime_overlay.v2';deployment_id=$deploymentId;timestamp_started=$started.ToString('o');timestamp_completed=$null;actor=$env:USERNAME;source_root=$source;source_branch=$branch;source_sha=$sourceSha;target_root=$target;target_git_head=$targetHead;preflight_result=$result;runtime_drift_classification=$manifest;manifest=$manifest;backup_path=$null;files_changed=$changed;files_unchanged=$unchanged;pre_hashes=@{};source_hashes=@{};post_hashes=@{};rollback_available=$false;rollback_performed=$false;services_requiring_restart=@('resident-gateway','grace-consultation-gateway','chatgpt-mailbox-worker');result=$result;warnings=@();errors=@()}
+$result = if ($unknown.Count -or $closure.status -ne 'IMPORT_CLOSURE_PASS') { 'PREFLIGHT_BLOCKED' } else { 'PREFLIGHT_PASS' }
+$receipt = [ordered]@{schema='estate.grace_comms8_runtime_overlay.v2';deployment_id=$deploymentId;timestamp_started=$started.ToString('o');timestamp_completed=$null;actor=$env:USERNAME;source_root=$source;source_branch=$branch;source_sha=$sourceSha;target_root=$target;target_git_head=$targetHead;preflight_result=$result;import_closure=$closure;runtime_drift_classification=$manifest;manifest=$manifest;backup_path=$null;files_changed=$changed;files_unchanged=$unchanged;pre_hashes=@{};source_hashes=@{};post_hashes=@{};rollback_available=$false;rollback_performed=$false;services_requiring_restart=@('resident-gateway','grace-consultation-gateway','chatgpt-mailbox-worker');result=$result;warnings=@();errors=@()}
 foreach($m in $manifest){$receipt.pre_hashes[$m.relative_path]=$m.pre_target_sha256;$receipt.source_hashes[$m.relative_path]=$m.source_sha256}
 if ($PreflightOnly) { $receipt.timestamp_completed=[DateTime]::UtcNow.ToString('o'); $receipt | ConvertTo-Json -Depth 12; exit 0 }
 if ($unknown.Count) { throw "PREFLIGHT_BLOCKED: unknown runtime drift: $($unknown -join ', ')" }

@@ -14,7 +14,7 @@ def test_deployment_is_selective_and_contains_accepted_surface():
     text = SCRIPT.read_text(encoding="utf-8")
     manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
     manifest = re.findall(r"'([^']+)'", manifest_block)
-    assert len(manifest) == 54
+    assert len(manifest) == 102
     assert "src\\estate\\core\\openwebui_engineering_workflow.py" in manifest
     required = [
         "autonomous_chatgpt_mailbox_worker.py",
@@ -56,6 +56,7 @@ def test_deployment_safety_contract_is_fail_closed_and_transactional():
         "integration/grace-comms8-parallelism", "UNKNOWN_DRIFT", "EXPECTED_PREVIOUS_OVERLAY",
         "INTEGRATION_EQUIVALENT", "pre_target_sha256", "post_target_sha256", "backups",
         "PROVEN_TRACKED_PREDECESSOR", "Find-TrackedBlobProvenance", "CRLF_TO_LF_FOR_GIT_BLOB_ONLY",
+        "runtime_import_closure.py", "IMPORT_CLOSURE_BLOCKED", "import_closure",
         "metadata.json", "Target changed after preflight", "Temporary source hash failed",
         "Backup verification failed", "DEPLOYMENT_SUCCESS", "DEPLOYMENT_ROLLED_BACK",
         "ROLLBACK_INCOMPLETE", "rollback_available", "rollback_performed",
