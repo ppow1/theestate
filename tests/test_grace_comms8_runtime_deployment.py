@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -11,11 +12,18 @@ SCRIPT = ROOT / "tools" / "deploy_grace_comms8_runtime.ps1"
 
 def test_deployment_is_selective_and_contains_accepted_surface():
     text = SCRIPT.read_text(encoding="utf-8")
+    manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
+    manifest = re.findall(r"'([^']+)'", manifest_block)
+    assert len(manifest) == 54
+    assert "src\\estate\\core\\openwebui_engineering_workflow.py" in manifest
     required = [
         "autonomous_chatgpt_mailbox_worker.py",
         "grace_consultation_loop.py",
         "consultation_store.py",
         "openwebui_resident_surface.py",
+        "openwebui_engineering_workflow.py",
+        "execution_dispatch.py",
+        "gpu_runtime_lanes.py",
         "resident_gateway.py",
         "chatgpt_mailbox_worker_browser.cjs",
         "comms8_streamable_http_adapter.py",
