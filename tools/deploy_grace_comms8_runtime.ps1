@@ -60,9 +60,10 @@ function Get-NormalizedGitBlobId([string]$Path) {
 function Find-TrackedBlobProvenance([string]$Root, [string]$RelativePath, [string]$Path) {
     $blob = Get-NormalizedGitBlobId $Path
     if (-not $blob) { return $null }
-    $commits = @(Invoke-Git $Root @('log','--all','--format=%H','--',$RelativePath)) | Where-Object { $_ }
+    $gitPath = $RelativePath.Replace('\','/')
+    $commits = @(Invoke-Git $Root @('log','--all','--format=%H','--',$gitPath)) | Where-Object { $_ }
     foreach ($commit in $commits) {
-        $candidate = & git -C $Root rev-parse ("$commit`:$RelativePath") 2>$null
+        $candidate = & git -C $Root rev-parse ("$commit`:$gitPath") 2>$null
         if ($LASTEXITCODE -eq 0 -and (($candidate -join '').Trim() -eq $blob)) {
             return [ordered]@{ blob_id=$blob; commit=$commit; relative_path=$RelativePath; line_ending_normalization='CRLF_TO_LF_FOR_GIT_BLOB_ONLY' }
         }
