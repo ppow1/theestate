@@ -14,13 +14,21 @@ def test_deployment_is_selective_and_contains_accepted_surface():
     text = SCRIPT.read_text(encoding="utf-8")
     manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
     manifest = re.findall(r"'([^']+)'", manifest_block)
-    assert len(manifest) == 106
+    assert len(manifest) == 116
     assert "src\\estate\\core\\openwebui_engineering_workflow.py" in manifest
     assert {
         "config\\runtime\\gpu_runtime_lanes.json",
         "config\\providers\\qwen_local_text.json",
         "config\\providers\\qwen_local_text_p100.json",
         "schemas\\execution_provider_adapter_request_v1.schema.json",
+        "schemas\\engineering\\commission_execution_authority_v1.schema.json",
+        "schemas\\engineering\\commission_ptm_evidence_v1.schema.json",
+        "schemas\\engineering\\engineering_authorization_v1.schema.json",
+        "schemas\\dispatch\\execution_metadata_v1.schema.json",
+        "schemas\\compute_resource_requirements_v1.schema.json",
+        "schemas\\operations_control\\operations_decision_v1.schema.json",
+        "schemas\\providers\\qwen_local_text_execution_extension_v1.schema.json",
+        "schemas\\providers\\provider_receipt_v1.schema.json",
     }.issubset(set(manifest))
     required = [
         "autonomous_chatgpt_mailbox_worker.py",
@@ -50,12 +58,40 @@ def test_bounded_local_runtime_config_closure_is_finite_and_selective():
         "config\\providers\\qwen_local_text.json",
         "config\\providers\\qwen_local_text_p100.json",
         "schemas\\execution_provider_adapter_request_v1.schema.json",
+        "schemas\\engineering\\commission_execution_authority_v1.schema.json",
+        "schemas\\engineering\\commission_ptm_evidence_v1.schema.json",
+        "schemas\\engineering\\engineering_authorization_v1.schema.json",
+        "schemas\\dispatch\\execution_metadata_v1.schema.json",
+        "schemas\\compute_resource_requirements_v1.schema.json",
+        "schemas\\operations_control\\operations_decision_v1.schema.json",
+        "schemas\\providers\\qwen_local_text_execution_extension_v1.schema.json",
+        "schemas\\providers\\provider_receipt_v1.schema.json",
     }
     assert required <= manifest
     assert "config\\runtime\\openwebui.json" not in manifest
     assert "config\\providers\\unknown_provider.json" not in manifest
     for relative in required:
         assert (ROOT / relative).is_file()
+
+
+def test_authority_schema_registry_closure_is_explicit_and_finite():
+    source = (ROOT / "src/estate/core/authority_schema_runtime.py").read_text(encoding="utf-8")
+    expected = {
+        "engineering/commission_execution_authority_v1.schema.json",
+        "engineering/commission_ptm_evidence_v1.schema.json",
+        "engineering/engineering_authorization_v1.schema.json",
+        "dispatch/execution_metadata_v1.schema.json",
+        "execution_provider_adapter_request_v1.schema.json",
+        "compute_resource_requirements_v1.schema.json",
+        "operations_control/operations_decision_v1.schema.json",
+        "providers/qwen_local_text_execution_extension_v1.schema.json",
+        "providers/provider_receipt_v1.schema.json",
+    }
+    assert set(re.findall(r'"([^"]+\.schema\.json)"', source)) >= expected
+    manifest_block = (SCRIPT.read_text(encoding="utf-8").split("$relativeFiles = @(", 1)[1].split(")", 1)[0])
+    manifest = set(re.findall(r"'([^']+)'", manifest_block))
+    assert {"schemas\\" + path.replace("/", "\\") for path in expected} <= manifest
+    assert "schemas\\residents\\resident_capability_manifest_v1.schema.json" not in manifest
 
 
 def test_grace_catalog_contract_is_canonical():
