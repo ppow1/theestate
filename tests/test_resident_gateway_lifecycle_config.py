@@ -13,8 +13,8 @@ def test_global_paths_remain_unchanged_and_gateway_has_narrow_override():
     assert 'PythonPath = "A:\\theestate\\src"' in text
     assert 'ResidentGatewayRuntimeRoot = "A:\\EstateRuntime\\host\\estate-main\\current"' in text
     assert 'ResidentGatewayPythonPath = "A:\\EstateRuntime\\host\\estate-main\\current\\src"' in text
-    assert 'WorkingDirectory = $script:EstateCoreServiceConfig.ResidentGatewayRuntimeRoot' in text
-    assert 'PYTHONPATH = $script:EstateCoreServiceConfig.ResidentGatewayPythonPath' in text
+    assert 'WorkingDirectory = $residentGatewayRuntimeRoot' in text
+    assert 'PYTHONPATH = $residentGatewayPythonPath' in text
 
 
 def test_other_services_continue_using_shared_paths():

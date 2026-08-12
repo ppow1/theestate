@@ -1,8 +1,11 @@
+$residentGatewayRuntimeRoot = "A:\EstateRuntime\host\estate-main\current"
+$residentGatewayPythonPath = "A:\EstateRuntime\host\estate-main\current\src"
+
 $script:EstateCoreServiceConfig = @{
     EstateRoot = "A:\theestate"
     PythonPath = "A:\theestate\src"
-    ResidentGatewayRuntimeRoot = "A:\EstateRuntime\host\estate-main\current"
-    ResidentGatewayPythonPath = "A:\EstateRuntime\host\estate-main\current\src"
+    ResidentGatewayRuntimeRoot = $residentGatewayRuntimeRoot
+    ResidentGatewayPythonPath = $residentGatewayPythonPath
     PythonExe = "C:\Python314\python.exe"
     OpenWebUiExe = "A:\AI\OpenWebUI\.venv\Scripts\open-webui.exe"
     OpenWebUiWorkDir = "A:\AI\OpenWebUI"
@@ -50,9 +53,9 @@ $script:EstateCoreServiceConfig = @{
                 "--port",
                 "11435"
             )
-            WorkingDirectory = $script:EstateCoreServiceConfig.ResidentGatewayRuntimeRoot
+            WorkingDirectory = $residentGatewayRuntimeRoot
             Environment = @{
-                PYTHONPATH = $script:EstateCoreServiceConfig.ResidentGatewayPythonPath
+                PYTHONPATH = $residentGatewayPythonPath
             }
             RequiredPaths = @(
                 "src",
