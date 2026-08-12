@@ -112,7 +112,11 @@ def main() -> int:
     args = parser.parse_args()
     source_root = args.source_root.resolve()
     target_root = args.target_root.resolve()
-    manifest = {line.replace("\\", "/").removeprefix("src/") for line in args.manifest.read_text(encoding="utf-8").splitlines() if line.strip()}
+    manifest = {
+        line.lstrip("\ufeff").replace("\\", "/").removeprefix("src/")
+        for line in args.manifest.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
     records, unresolved = static_closure(source_root, args.entry)
     dynamic, dynamic_error = dynamic_modules(source_root, args.entry)
     static_names = {r["module"] for r in records}

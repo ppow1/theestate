@@ -115,7 +115,7 @@ $receiptFull = [IO.Path]::GetFullPath($ReceiptPath)
 $started = [DateTime]::UtcNow
 $deploymentId = 'grace-overlay-' + $started.ToString('yyyyMMddTHHmmssfffZ') + '-' + $sourceSha.Substring(0,12)
 $previous = @{}
-if (Test-Path -LiteralPath $oldReceipt) { try { $old = Get-Content -LiteralPath $oldReceipt -Raw | ConvertFrom-Json; foreach($f in $old.files){$previous[$f.path.Replace('/','\')] = [string]$f.sha256} } catch { } }
+if (Test-Path -LiteralPath $oldReceipt) { try { $old = Get-Content -LiteralPath $oldReceipt -Raw | ConvertFrom-Json; $priorFiles = if ($old.files) { @($old.files) } else { @($old.manifest) }; foreach($f in $priorFiles){$path = if ($f.path) { $f.path } else { $f.relative_path }; $hash = if ($f.sha256) { $f.sha256 } else { $f.post_target_sha256 }; if ($path -and $hash) { $previous[$path.Replace('/','\')] = [string]$hash } } } catch { } }
 $manifestFile = [IO.Path]::GetTempFileName(); $relativeFiles | Set-Content -LiteralPath $manifestFile -Encoding UTF8
 $closureScript = Join-Path $source 'tools\runtime_import_closure.py'
 $closureOutput = & python $closureScript --source-root (Join-Path $source 'src') --target-root (Join-Path $target 'src') --manifest $manifestFile 2>&1

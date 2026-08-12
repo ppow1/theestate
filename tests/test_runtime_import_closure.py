@@ -63,3 +63,13 @@ def test_manifest_membership_and_target_presence(tmp_path):
     write(tmp_path, "estate/a.py", "")
     records, unresolved = MODULE.static_closure(tmp_path, "estate.a")
     assert not unresolved and records[0]["path"] == "estate/a.py"
+
+
+def test_manifest_bom_does_not_omit_first_runtime_module(tmp_path):
+    write(tmp_path, "estate/__init__.py", "")
+    write(tmp_path, "estate/a.py", "")
+    manifest = tmp_path / "manifest.txt"
+    manifest.write_text("\ufeffsrc\\estate\\a.py\n", encoding="utf-8")
+    records, unresolved = MODULE.static_closure(tmp_path, "estate.a")
+    assert not unresolved
+    assert {r["path"] for r in records} == {"estate/a.py"}
