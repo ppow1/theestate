@@ -54,7 +54,7 @@ function Get-NormalizedGitBlobId([string]$Path) {
         $normalized[$count] = $bytes[$i]; $count++
     }
     $tmp = [IO.Path]::GetTempFileName()
-    try { [IO.File]::WriteAllBytes($tmp, $normalized[0..($count - 1)]); return (Invoke-Git $target @('hash-object', $tmp)) }
+    try { $final = New-Object byte[] $count; [Array]::Copy($normalized, $final, $count); [IO.File]::WriteAllBytes($tmp, $final); return (Invoke-Git $target @('hash-object', $tmp)) }
     finally { Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue }
 }
 function Find-TrackedBlobProvenance([string]$Root, [string]$RelativePath, [string]$Path) {
