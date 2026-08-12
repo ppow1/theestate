@@ -4,12 +4,14 @@ from pathlib import Path
 MVP_ROOT = Path(r"A:\AI\Tools\EstateStreamDeckMVP")
 CORE = MVP_ROOT / "Core"
 PLUGIN = Path(r"A:\AI\Tools\EstateStreamDeckPlugin") / "src"
+CANONICAL_PLUGIN = Path("tools/streamdeck/estate-status-bridge")
+CANONICAL_RUNTIME = Path("tools/streamdeck/estate-service-runtime")
 
 
 def test_streamdeck_launcher_is_transient_and_not_cmd_k_start():
     source = (PLUGIN / "plugin.js").read_text(encoding="utf-8")
     assert 'command: "cmd.exe"' in source
-    assert 'args: ["/d", "/s", "/c"' in source
+    assert 'args: ["/d", "/s", "/c", commandPath]' in source
     assert '"start", "", commandPath' not in source
 
 
@@ -45,3 +47,14 @@ def test_all_mvp_start_wrappers_do_not_request_persistent_cmd_shells():
     for path in CORE.glob("Start-*.cmd"):
         text = path.read_text(encoding="utf-8").lower()
         assert "/k" not in text
+
+
+def test_streamdeck_runtime_is_reproducible_from_repository_sources():
+    assert (CANONICAL_PLUGIN / "src" / "status.js").is_file()
+    assert (CANONICAL_PLUGIN / "src" / "plugin.js").is_file()
+    assert (CANONICAL_PLUGIN / "scripts" / "build.ps1").is_file()
+    assert (CANONICAL_RUNTIME / "Core" / "Estate-Service-Lib.ps1").is_file()
+    assert (CANONICAL_RUNTIME / "Core" / "Get-EstateServiceStatus.ps1").is_file()
+    source = (CANONICAL_PLUGIN / "src" / "status.js").read_text(encoding="utf-8")
+    assert "DIAGNOSTIC_MAX_BYTES" in source
+    assert "resources.find((resource) => resource.resource_id === action.resourceId)" in source

@@ -1,0 +1,600 @@
+{
+  "UUID": "com.estate.statusbridge",
+  "Name": "Estate Status Bridge",
+  "Description": "Live local Estate status and control keys.",
+  "Author": "Estate",
+  "Version": "0.3.0",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.5"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "CodePath": "bin/EstateStatusBridge.cmd",
+  "CodePathWin": "bin/EstateStatusBridge.cmd",
+  "Category": "Estate Status Bridge",
+  "CategoryIcon": "images/category",
+  "Icon": "images/plugin",
+  "Actions": [
+    {
+      "UUID": "com.estate.statusbridge.estate",
+      "Name": "Estate Repository Status",
+      "Tooltip": "Estate Repository Status",
+      "Icon": "images/estate",
+      "States": [
+        {
+          "Image": "images/estate",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.estate.sync",
+      "Name": "Estate Safe Sync",
+      "Tooltip": "Estate Safe Sync",
+      "Icon": "images/estate",
+      "States": [
+        {
+          "Image": "images/estate",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.cuemastery",
+      "Name": "CueMastery Repository Status",
+      "Tooltip": "CueMastery Repository Status",
+      "Icon": "images/cuemastery",
+      "States": [
+        {
+          "Image": "images/cuemastery",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.cuemastery.sync",
+      "Name": "CueMastery Safe Sync",
+      "Tooltip": "CueMastery Safe Sync",
+      "Icon": "images/cuemastery",
+      "States": [
+        {
+          "Image": "images/cuemastery",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.workpackages",
+      "Name": "Work Packages Pending",
+      "Tooltip": "Work Packages Pending",
+      "Icon": "images/workpackages",
+      "States": [
+        {
+          "Image": "images/workpackages",
+          "TitleAlignment": "middle",
+          "FontSize": "18"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.validation",
+      "Name": "Validation Status",
+      "Tooltip": "Validation Status",
+      "Icon": "images/validation",
+      "States": [
+        {
+          "Image": "images/validation",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.readiness",
+      "Name": "Operational Readiness Status",
+      "Tooltip": "Operational Readiness Status",
+      "Icon": "images/readiness",
+      "States": [
+        {
+          "Image": "images/readiness",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.runtime",
+      "Name": "Estate Runtime Status",
+      "Tooltip": "Estate Runtime Status",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.surfaces.start",
+      "Name": "Start Estate Surfaces",
+      "Tooltip": "Start Estate Surfaces",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.resident_gateway.start",
+      "Name": "Start Resident Gateway",
+      "Tooltip": "Start Resident Gateway",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.office.start",
+      "Name": "Start Office of Steward",
+      "Tooltip": "Start Office of Steward",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.open_webui.start",
+      "Name": "Start Open WebUI",
+      "Tooltip": "Start Open WebUI",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.sillytavern.start",
+      "Name": "Start SillyTavern",
+      "Tooltip": "Start SillyTavern",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.textgen.start",
+      "Name": "Start TextGen",
+      "Tooltip": "Start TextGen",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.surfaces.stop",
+      "Name": "Stop Estate Surfaces",
+      "Tooltip": "Stop Estate Surfaces",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.surfaces.restart",
+      "Name": "Restart Estate Surfaces",
+      "Tooltip": "Restart Estate Surfaces",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.health",
+      "Name": "Estate Service Health",
+      "Tooltip": "Estate Service Health",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "18"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.comfyui.start",
+      "Name": "Start ComfyUI",
+      "Tooltip": "Tap to start ComfyUI. Hold to stop ComfyUI.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.dictation",
+      "Name": "Operator Deck Voice Typing",
+      "Tooltip": "Tap to toggle Windows Voice Typing. Status shows ON or OFF.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m1_top_left",
+      "Name": "Operator Deck M1 Top Left",
+      "Tooltip": "Select the window in M1_TOP_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m1_top_right",
+      "Name": "Operator Deck M1 Top Right",
+      "Tooltip": "Select the window in M1_TOP_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m1_bottom_left",
+      "Name": "Operator Deck M1 Bottom Left",
+      "Tooltip": "Select the window in M1_BOTTOM_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m1_bottom_right",
+      "Name": "Operator Deck M1 Bottom Right",
+      "Tooltip": "Select the window in M1_BOTTOM_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m2_top_left",
+      "Name": "Operator Deck M2 Top Left",
+      "Tooltip": "Select the window in M2_TOP_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m2_top_right",
+      "Name": "Operator Deck M2 Top Right",
+      "Tooltip": "Select the window in M2_TOP_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m2_bottom_left",
+      "Name": "Operator Deck M2 Bottom Left",
+      "Tooltip": "Select the window in M2_BOTTOM_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m2_bottom_right",
+      "Name": "Operator Deck M2 Bottom Right",
+      "Tooltip": "Select the window in M2_BOTTOM_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m3_top_left",
+      "Name": "Operator Deck M3 Top Left",
+      "Tooltip": "Select the window in M3_TOP_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m3_top_right",
+      "Name": "Operator Deck M3 Top Right",
+      "Tooltip": "Select the window in M3_TOP_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m3_bottom_left",
+      "Name": "Operator Deck M3 Bottom Left",
+      "Tooltip": "Select the window in M3_BOTTOM_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m3_bottom_right",
+      "Name": "Operator Deck M3 Bottom Right",
+      "Tooltip": "Select the window in M3_BOTTOM_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m4_top_left",
+      "Name": "Operator Deck M4 Top Left",
+      "Tooltip": "Select the window in M4_TOP_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m4_top_right",
+      "Name": "Operator Deck M4 Top Right",
+      "Tooltip": "Select the window in M4_TOP_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m4_bottom_left",
+      "Name": "Operator Deck M4 Bottom Left",
+      "Tooltip": "Select the window in M4_BOTTOM_LEFT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.slot.m4_bottom_right",
+      "Name": "Operator Deck M4 Bottom Right",
+      "Tooltip": "Select the window in M4_BOTTOM_RIGHT, or place the armed selection there.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "13"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.gpu.gpu1",
+      "Name": "GPU1 Compute and VRAM Status",
+      "Tooltip": "GPU1 compute and VRAM status; press to open Office GPU1 detail.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "12"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.gpu.gpu2",
+      "Name": "GPU2 Compute and VRAM Status",
+      "Tooltip": "GPU2 compute and VRAM status; press to open Office GPU2 detail.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "12"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.codex_desk",
+      "Name": "Operator Deck Codex Desk",
+      "Tooltip": "Materialize or focus the three-seat Codex Desk workspace.",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.undo",
+      "Name": "Operator Deck Undo",
+      "Tooltip": "Operator Deck Undo",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.clear_selection",
+      "Name": "Operator Deck Clear Selection",
+      "Tooltip": "Operator Deck Clear Selection",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.estate.statusbridge.operator_deck.select_active",
+      "Name": "Operator Deck Select Active",
+      "Tooltip": "Operator Deck Select Active",
+      "Icon": "images/health",
+      "States": [
+        {
+          "Image": "images/health",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": false
+    }
+  ]
+}
+
+
