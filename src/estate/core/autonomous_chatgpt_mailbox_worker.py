@@ -292,13 +292,22 @@ class AutonomousChatGPTMailboxWorker:
 
         return asyncio.run(read())
 
-    def run_once(self) -> WorkerResult:
+    def run_once(self, *, request_id: str | None = None) -> WorkerResult:
         self._write_state("CHECKING_QUEUE")
         reserved_logical_id = os.environ.get("ESTATE_RESERVED_CONTINUATION_ID")
+        scoped_request_id = request_id or os.environ.get("ESTATE_SCOPED_REQUEST_ID")
+        if scoped_request_id is not None and not str(scoped_request_id).startswith("ec8-"):
+            self._write_state("ERROR", reason="invalid_scoped_request_id")
+            return WorkerResult("ERROR", ec8_request_id=str(scoped_request_id), reason="invalid_scoped_request_id")
         candidates = self.store.search(status="awaiting_reasoning")
         if reserved_logical_id:
             candidates = [item for item in candidates if item.logical_consultation_id == reserved_logical_id]
+        if scoped_request_id:
+            candidates = [item for item in candidates if item.ec8_request_id == scoped_request_id]
         if not candidates:
+            if scoped_request_id:
+                self._write_state("ERROR", reason="scoped_request_not_found", ec8_request_id=scoped_request_id)
+                return WorkerResult("ERROR", ec8_request_id=scoped_request_id, reason="scoped_request_not_found")
             self._write_state("IDLE", result="EMPTY_QUEUE")
             return WorkerResult("EMPTY_QUEUE", reason="no_awaiting_reasoning_consultation")
 
@@ -427,6 +436,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Estate Comms8 autonomous ChatGPT mailbox worker")
     parser.add_argument("--once", action="store_true", help="perform one bounded activation")
+    parser.add_argument("--request-id", help="process only this exact queued Comms8 request; never falls back")
     parser.add_argument("--watch", action="store_true", help="boundedly watch for awaiting consultations")
     parser.add_argument("--interval-seconds", type=float, default=2.0)
     parser.add_argument("--max-seconds", type=float, default=300.0)
@@ -446,5 +456,5 @@ if __name__ == "__main__":
         decision_handler = build_live_decision_handler(store)
         format_repair_handler = lambda logical_id, reason: GraceConsultationLoop(store=store).create_execution_format_repair_continuation(logical_id, reason)
     worker = AutonomousChatGPTMailboxWorker(store, decision_handler=decision_handler, format_repair_handler=format_repair_handler)
-    result = worker.run_once() if args.once else worker.watch(interval_seconds=args.interval_seconds, max_seconds=args.max_seconds)
+    result = worker.run_once(request_id=args.request_id) if args.once else worker.watch(interval_seconds=args.interval_seconds, max_seconds=args.max_seconds)
     print(json.dumps(result.__dict__, sort_keys=True))

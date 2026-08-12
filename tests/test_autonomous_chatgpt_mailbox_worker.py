@@ -183,6 +183,65 @@ def test_multiple_consultations_process_only_oldest_one_per_activation(tmp_path)
     assert store.get(second.logical_consultation_id).status == "awaiting_reasoning"
 
 
+def test_scoped_worker_processes_exact_request_only(tmp_path):
+    store = ConsultationStore(tmp_path / "consultations.db")
+    target = _store_with_consultation(tmp_path, ec8="ec8-target")
+    unrelated = store.allocate_root(status="awaiting_reasoning", objective="unrelated")
+    unrelated = store.attach_ec8(unrelated.logical_consultation_id, "ec8-unrelated")
+    processed = []
+    worker = AutonomousChatGPTMailboxWorker(
+        store, state_path=tmp_path / "state.json",
+        browser_runner=lambda *_: {"marker": "WORKER_COMPLETE"},
+        read_request=lambda rid: processed.append(rid) or {"state": "resolved", "response": {"content": rid}},
+    )
+    result = worker.run_once(request_id="ec8-target")
+    assert result.status == "WORKER_COMPLETE"
+    assert processed == ["ec8-target"]
+    assert store.get(target.logical_consultation_id).status == "resolved"
+    assert store.get(unrelated.logical_consultation_id).status == "awaiting_reasoning"
+
+
+def test_scoped_worker_rejects_invalid_request_id_without_fallback(tmp_path):
+    store = ConsultationStore(tmp_path / "consultations.db")
+    _store_with_consultation(tmp_path)
+    calls = []
+    worker = AutonomousChatGPTMailboxWorker(store, state_path=tmp_path / "state.json", browser_runner=lambda *_: calls.append(True))
+    result = worker.run_once(request_id="not-an-ec8-request")
+    assert result.status == "ERROR"
+    assert result.reason == "invalid_scoped_request_id"
+    assert calls == []
+
+
+def test_scoped_worker_missing_or_terminal_target_does_not_fallback(tmp_path):
+    store = ConsultationStore(tmp_path / "consultations.db")
+    target = store.allocate_root(status="resolved", objective="terminal")
+    store.attach_ec8(target.logical_consultation_id, "ec8-terminal")
+    other = store.allocate_root(status="awaiting_reasoning", objective="other")
+    store.attach_ec8(other.logical_consultation_id, "ec8-other")
+    calls = []
+    worker = AutonomousChatGPTMailboxWorker(store, state_path=tmp_path / "state.json", browser_runner=lambda *_: calls.append(True))
+    result = worker.run_once(request_id="ec8-terminal")
+    assert result.status == "ERROR"
+    assert result.reason == "scoped_request_not_found"
+    assert calls == []
+    assert store.get(other.logical_consultation_id).status == "awaiting_reasoning"
+
+
+def test_scoped_worker_exits_after_target_completion(tmp_path):
+    store = ConsultationStore(tmp_path / "consultations.db")
+    target = _store_with_consultation(tmp_path, ec8="ec8-only")
+    other = store.allocate_root(status="awaiting_reasoning", objective="other")
+    store.attach_ec8(other.logical_consultation_id, "ec8-other")
+    worker = AutonomousChatGPTMailboxWorker(
+        store, state_path=tmp_path / "state.json",
+        browser_runner=lambda *_: {"marker": "WORKER_COMPLETE"},
+        read_request=lambda rid: {"state": "resolved", "response": {"content": "done"}},
+    )
+    assert worker.run_once(request_id="ec8-only").ec8_request_id == "ec8-only"
+    assert store.get(target.logical_consultation_id).status == "resolved"
+    assert store.get(other.logical_consultation_id).status == "awaiting_reasoning"
+
+
 def test_browser_disconnect_fails_without_claiming_or_fabricating(tmp_path):
     store = ConsultationStore(tmp_path / "consultations.db")
     consultation = _store_with_consultation(tmp_path)
