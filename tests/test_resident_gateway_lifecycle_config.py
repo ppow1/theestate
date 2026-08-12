@@ -11,8 +11,8 @@ def test_global_paths_remain_unchanged_and_gateway_has_narrow_override():
     text = CONFIG.read_text(encoding="utf-8")
     assert 'EstateRoot = "A:\\theestate"' in text
     assert 'PythonPath = "A:\\theestate\\src"' in text
-    assert 'ResidentGatewayRuntimeRoot = "A:\\EstateRuntime\\host\\estate-main\\current"' in text
-    assert 'ResidentGatewayPythonPath = "A:\\EstateRuntime\\host\\estate-main\\current\\src"' in text
+    assert '$residentGatewayRuntimeRoot = "A:\\EstateRuntime\\host\\estate-main\\current"' in text
+    assert '$residentGatewayPythonPath = "A:\\EstateRuntime\\host\\estate-main\\current\\src"' in text
     assert 'WorkingDirectory = $residentGatewayRuntimeRoot' in text
     assert 'PYTHONPATH = $residentGatewayPythonPath' in text
 
