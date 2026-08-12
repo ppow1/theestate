@@ -19,7 +19,7 @@ from typing import Any, Callable, Iterable
 from uuid import uuid4
 
 from estate.core.compute_resources import collect_nvidia_smi
-from estate.core.gpu_runtime_lanes import LANE_EVIDENCE, RuntimeLane, load_registered_lanes
+from estate.core.gpu_runtime_lanes import LANE_EVIDENCE, RuntimeLane, endpoint_health, load_registered_lanes, persist_lane_evidence, start_ollama_lane
 from estate.core.operational_events import OperationalEvent, append_event_artifact
 
 CLEANUP_RECEIPTS = Path("runtime/compute_resources/cleanup_receipts")
@@ -376,6 +376,66 @@ def emit_stale_runtime_blocked_event(root: str | Path, lane_id: str, *,
         metadata={"runtime_lane_id": lane_id, "resource_id": status["resource_id"], "gpu_uuid": status["gpu_uuid"]},
     )
     return str(append_event_artifact(event, base, allow_extension_event_types=True).relative_to(base)).replace("\\", "/")
+
+
+def ensure_runtime_lane_ready(root: str | Path, lane: RuntimeLane, *,
+                              process_inventory: Callable[[], list[ProcessRecord]] | None = None,
+                              port_inventory: Callable[[], dict[int, int]] | None = None,
+                              health_check: Callable[[RuntimeLane], dict[str, Any]] | None = None,
+                              starter: Callable[[str | Path, RuntimeLane], dict[str, Any]] | None = None,
+                              timeout_seconds: float = 10.0,
+                              poll_interval_seconds: float = 0.25) -> dict[str, Any]:
+    """Reuse or start one registered lane, proving ownership before readiness.
+
+    This is the only admission-time startup hook.  It never kills or adopts a
+    process and refuses any foreign/ambiguous port or process identity.
+    """
+    lane.validate()
+    base = Path(root)
+    process_source = process_inventory or _default_process_inventory
+    port_source = port_inventory or _default_port_inventory
+    health_source = health_check or endpoint_health
+    start_source = starter or start_ollama_lane
+    port = _lane_port(lane)
+
+    def snapshot() -> tuple[dict[str, Any] | None, dict[str, Any]]:
+        status = inspect_gpu_runtime_lanes(base, lane_id=lane.runtime_lane_id, process_inventory=process_source, port_inventory=port_source)
+        return (status.get("lanes") or [None])[0], status
+
+    row, status = snapshot()
+    if not row or status.get("errors"):
+        return {"status": "BLOCKED", "started": False, "reused": False, "reason": "lane lifecycle inventory is unavailable", "errors": status.get("errors", [])}
+    port_owner = row.get("port_owner_pid")
+    root_pid = row.get("root_pid")
+    if port_owner is not None and not (row.get("ownership") == "ESTATE_OWNED" and port_owner == root_pid):
+        return {"status": "BLOCKED", "started": False, "reused": False, "reason": f"lane port {port} is not positively owned by the registered Estate lane", "port_owner_pid": port_owner, "lifecycle": row}
+    health = health_source(lane)
+    if row.get("ownership") == "ESTATE_OWNED" and port_owner == root_pid and health.get("healthy"):
+        _write_lane_state(base, lane, "READY", result="REUSED")
+        return {"status": "READY", "started": False, "reused": True, "lane": lane.to_dict(), "health": health, "lifecycle": row}
+    if port_owner is not None:
+        return {"status": "BLOCKED", "started": False, "reused": False, "reason": "lane port is occupied but provider is not a healthy positively-owned Estate process", "port_owner_pid": port_owner, "health": health, "lifecycle": row}
+
+    try:
+        evidence = start_source(base, lane)
+        persist_lane_evidence(base, evidence)
+    except Exception as exc:
+        return {"status": "BLOCKED", "started": False, "reused": False, "reason": "governed lane startup failed", "errors": [str(exc)[:500]]}
+
+    deadline = time.monotonic() + max(0.0, timeout_seconds)
+    last_row = row
+    last_health = health
+    while True:
+        last_row, _ = snapshot()
+        last_health = health_source(lane)
+        if last_row and last_row.get("ownership") == "ESTATE_OWNED" and last_row.get("port_owner_pid") == last_row.get("root_pid") and last_health.get("healthy"):
+            _write_lane_state(base, lane, "READY", result="STARTED")
+            return {"status": "READY", "started": True, "reused": False, "lane": lane.to_dict(), "health": last_health, "lifecycle": last_row}
+        if last_row and last_row.get("port_owner_pid") is not None and last_row.get("port_owner_pid") != last_row.get("root_pid"):
+            return {"status": "BLOCKED", "started": True, "reused": False, "reason": "foreign process acquired the lane port during startup", "health": last_health, "lifecycle": last_row}
+        if time.monotonic() >= deadline:
+            return {"status": "BLOCKED", "started": True, "reused": False, "reason": "governed lane startup did not establish owned healthy readiness before timeout", "health": last_health, "lifecycle": last_row}
+        time.sleep(max(0.0, poll_interval_seconds))
 
 
 def quiesce_runtime_lane(root: str | Path, lane_id: str, *, actor: str,

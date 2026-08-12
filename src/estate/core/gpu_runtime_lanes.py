@@ -163,6 +163,20 @@ def process_binding_evidence(lane: RuntimeLane, *, pid: int, process_identity: s
     return {"schema_version": "estate.gpu-runtime-lane-evidence.v1", "runtime_lane_id": lane.runtime_lane_id, "provider_id": lane.provider_id, "endpoint_address": lane.endpoint_address, "host_id": lane.host_id, "compute_resource_id": lane.compute_resource_id, "gpu_uuid": lane.gpu_uuid, "model_identity": lane.model_identity, "environment_binding": lane_environment(lane), "process_id": int(pid), "process_identity": process_identity, "started_at": started_at or utc_now(), "observed_at": utc_now(), "hostname": socket.gethostname()}
 
 
+def persist_lane_evidence(root: str | Path, evidence: dict[str, Any]) -> None:
+    """Persist evidence returned by a governed lane starter."""
+    path = Path(root) / LANE_EVIDENCE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        existing = {}
+    rows = existing.get("lanes", []) if isinstance(existing, dict) else []
+    rows = [row for row in rows if row.get("runtime_lane_id") != evidence.get("runtime_lane_id")]
+    rows.append(evidence)
+    path.write_text(json.dumps({"schema_version": "estate.gpu-runtime-lane-evidence.v1", "lanes": rows}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def endpoint_health(lane: RuntimeLane, *, timeout_seconds: float = 2.0) -> dict[str, Any]:
     lane.validate()
     url = lane.endpoint_address.rstrip("/") + "/api/tags"
@@ -199,17 +213,7 @@ def start_ollama_lane(root: str | Path, lane: RuntimeLane, *, executable: str | 
     evidence["process_command_line"] = f'"{Path(binary).resolve()}" serve'
     evidence["runtime_stdout_log"] = str(stdout_path.relative_to(Path(root))).replace("\\", "/")
     evidence["runtime_stderr_log"] = str(stderr_path.relative_to(Path(root))).replace("\\", "/")
-    path = Path(root) / LANE_EVIDENCE
-    path.parent.mkdir(parents=True, exist_ok=True)
-    existing = {}
-    try:
-        existing = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        pass
-    rows = existing.get("lanes", []) if isinstance(existing, dict) else []
-    rows = [row for row in rows if row.get("runtime_lane_id") != lane.runtime_lane_id]
-    rows.append(evidence)
-    path.write_text(json.dumps({"schema_version": "estate.gpu-runtime-lane-evidence.v1", "lanes": rows}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    persist_lane_evidence(root, evidence)
     return evidence
 
 

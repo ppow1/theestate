@@ -21,6 +21,7 @@ from estate.core.grace_operations_runtime import GraceObjective, GraceOperations
 from estate.core.helen_workforce import HelenWorkforceStore, WorkforceAssessment, WorkforceRequest
 from estate.core.grace_helen_engineering_composition import GraceHelenEngineeringComposition
 from estate.core.gpu_runtime_lanes import endpoint_health, load_registered_lanes, select_runtime_lane
+from estate.core.gpu_runtime_lifecycle import ensure_runtime_lane_ready
 from estate.core.ptm_production_readiness import append_ptm_event
 from estate.core.execution_provider_adapter import utc_now
 from estate.core.paths import ESTATE_ROOT
@@ -183,9 +184,10 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     lane_selection = select_runtime_lane([lane], provider_id="qwen.local.text", model_identity=lane.model_identity, required_gpu_uuid=selected.nvidia_uuid, required_resource_id=selected.resource_id)
     if not lane_selection.get("eligible"):
         return {"state": "execution_blocked", "reason": "no registered runtime lane matches the selected physical GPU", "placement": placement, "lane_selection": lane_selection, "provider_execution_performed": False}
-    lane_health = endpoint_health(lane)
-    if not lane_health.get("healthy"):
-        return {"state": "execution_blocked", "reason": "selected runtime lane is not healthy", "lane_id": lane.runtime_lane_id, "lane_health": lane_health, "provider_execution_performed": False}
+    lane_readiness = ensure_runtime_lane_ready(rootp, lane)
+    lane_health = lane_readiness.get("health", {})
+    if lane_readiness.get("status") != "READY":
+        return {"state": "execution_blocked", "reason": lane_readiness.get("reason", "selected runtime lane could not be made ready"), "lane_id": lane.runtime_lane_id, "lane_health": lane_health, "lane_readiness": lane_readiness, "provider_execution_performed": False}
     objective = GraceObjective.create(requested_by="Steward via Open WebUI", title="Bounded local text task", summary=user_message.strip(), work_package_id="WP-0649", owner="qwen-local-text", checkpoint="Grace records provider receipt and physical placement evidence; acceptance remains with Engineering and the Steward.", metadata={"summary_safe": True, "openwebui_bounded_local_text": True, "resource_intent": resource_intent, "compute_resource_requirements": requirements.to_dict()})
     artifact_path = f"docs/operations/examples/grace_bounded_local_text_{objective.objective_id}.md"
     receipt_path = f"runtime/engineering_adapter_receipts/grace_bounded_local_text_{objective.objective_id}.json"

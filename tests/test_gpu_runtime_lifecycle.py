@@ -9,7 +9,8 @@ from jsonschema import Draft202012Validator
 
 from estate.core.compute_office_panel import build_compute_panel
 from estate.core.compute_resources import ComputeResourceObservation
-from estate.core.gpu_runtime_lifecycle import ProcessRecord, emit_stale_runtime_blocked_event, inspect_gpu_runtime_lanes, quiesce_runtime_lane
+from estate.core.gpu_runtime_lifecycle import ProcessRecord, emit_stale_runtime_blocked_event, ensure_runtime_lane_ready, inspect_gpu_runtime_lanes, quiesce_runtime_lane
+from estate.core.gpu_runtime_lanes import RuntimeLane, process_binding_evidence
 
 
 GPU_A = "GPU-A"
@@ -250,6 +251,84 @@ def test_lifecycle_is_generic_for_multiple_resources(tmp_path):
     status = inspect_gpu_runtime_lanes(tmp_path, process_inventory=lambda: [process_a], port_inventory=lambda: {12409: process_a.pid})
     assert {row["runtime_lane_id"] for row in status["lanes"]} == {"lane-a", "lane-b"}
     assert next(row for row in status["lanes"] if row["runtime_lane_id"] == "lane-b")["state"] == "STOPPED"
+
+
+def _startup_fixture(tmp_path):
+    lane, _ = _setup(tmp_path, pid=4100)
+    current = {}
+    ports = {}
+    next_pid = 5100
+
+    def process_inventory():
+        return list(current.values())
+
+    def port_inventory():
+        return dict(ports)
+
+    def starter(root, runtime_lane):
+        nonlocal next_pid
+        executable = str((tmp_path / "bin/ollama.exe").resolve())
+        started = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        evidence = process_binding_evidence(runtime_lane, pid=next_pid, process_identity="ollama.exe serve", started_at=started)
+        evidence.update({"executable_path": executable, "process_command_line": f'"{executable}" serve'})
+        current[next_pid] = ProcessRecord(pid=next_pid, parent_pid=1, name="ollama.exe", executable_path=executable, command_line=f'"{executable}" serve', created_at=started)
+        ports[12409] = next_pid
+        return evidence
+
+    return lane, current, ports, process_inventory, port_inventory, starter
+
+
+def test_stopped_governed_lane_is_started_and_becomes_ready(tmp_path):
+    lane, current, ports, processes, ports_for_lane, starter = _startup_fixture(tmp_path)
+    result = ensure_runtime_lane_ready(tmp_path, RuntimeLane(**lane), process_inventory=processes, port_inventory=ports_for_lane, health_check=lambda _: {"healthy": True}, starter=starter, timeout_seconds=0.2, poll_interval_seconds=0)
+    assert result["status"] == "READY"
+    assert result["started"] is True
+    assert result["lifecycle"]["port_owner_pid"] == result["lifecycle"]["root_pid"]
+
+
+def test_already_running_correct_lane_is_reused(tmp_path):
+    lane, process = _setup(tmp_path)
+    result = ensure_runtime_lane_ready(tmp_path, RuntimeLane(**lane), process_inventory=lambda: [process], port_inventory=lambda: {12409: process.pid}, health_check=lambda _: {"healthy": True}, starter=lambda *_: pytest.fail("starter must not run"))
+    assert result["status"] == "READY"
+    assert result["reused"] is True
+
+
+def test_foreign_port_owner_blocks_without_start(tmp_path):
+    lane, _, _, processes, _, starter = _startup_fixture(tmp_path)
+    result = ensure_runtime_lane_ready(tmp_path, RuntimeLane(**lane), process_inventory=processes, port_inventory=lambda: {12409: 9999}, health_check=lambda _: {"healthy": False}, starter=starter)
+    assert result["status"] == "BLOCKED"
+    assert "not positively owned" in result["reason"]
+
+
+def test_identity_mismatch_blocks_without_start(tmp_path):
+    lane, process = _setup(tmp_path)
+    mismatched = ProcessRecord(**{**process.to_dict(), "command_line": "ollama.exe unrelated"})
+    result = ensure_runtime_lane_ready(tmp_path, RuntimeLane(**lane), process_inventory=lambda: [mismatched], port_inventory=lambda: {12409: process.pid}, health_check=lambda _: {"healthy": True}, starter=lambda *_: pytest.fail("starter must not run"))
+    assert result["status"] == "BLOCKED"
+
+
+def test_startup_failure_blocks_provider_readiness(tmp_path):
+    lane, _, _, processes, ports_for_lane, _ = _startup_fixture(tmp_path)
+    def failed(*_):
+        raise RuntimeError("launcher unavailable")
+    result = ensure_runtime_lane_ready(tmp_path, RuntimeLane(**lane), process_inventory=processes, port_inventory=ports_for_lane, health_check=lambda _: {"healthy": False}, starter=failed)
+    assert result["status"] == "BLOCKED"
+    assert "startup failed" in result["reason"]
+
+
+def test_health_timeout_blocks_after_owned_start(tmp_path):
+    lane, _, _, processes, ports_for_lane, starter = _startup_fixture(tmp_path)
+    result = ensure_runtime_lane_ready(tmp_path, RuntimeLane(**lane), process_inventory=processes, port_inventory=ports_for_lane, health_check=lambda _: {"healthy": False, "reason": "timeout"}, starter=starter, timeout_seconds=0, poll_interval_seconds=0)
+    assert result["status"] == "BLOCKED"
+    assert "did not establish" in result["reason"]
+
+
+def test_p100_and_4090_lanes_remain_independently_selectable():
+    from estate.core.gpu_runtime_lanes import load_registered_lanes, select_runtime_lane
+    lanes = load_registered_lanes(Path("."))
+    assert {lane.runtime_lane_id for lane in lanes} >= {"qwen.local.text.4090", "qwen.local.text.p100-1"}
+    assert select_runtime_lane(lanes, provider_id="qwen.local.text", model_identity="qwen3:8b", required_gpu_uuid="GPU-46f3fd00-5454-4536-4196-5d8b727e14f2")["selected"] == "qwen.local.text.4090"
+    assert select_runtime_lane(lanes, provider_id="qwen.local.text", model_identity="llama3.2:3b", required_gpu_uuid="GPU-6785b322-899d-8eec-e817-31d83279a414")["selected"] == "qwen.local.text.p100-1"
 
 
 def test_cleanup_source_contains_no_gpu_reset_or_device_mutation():
