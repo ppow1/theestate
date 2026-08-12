@@ -14,12 +14,13 @@ def test_deployment_is_selective_and_contains_accepted_surface():
     text = SCRIPT.read_text(encoding="utf-8")
     manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
     manifest = re.findall(r"'([^']+)'", manifest_block)
-    assert len(manifest) == 122
+    assert len(manifest) == 123
     assert "src\\estate\\core\\openwebui_engineering_workflow.py" in manifest
     assert {
         "config\\runtime\\gpu_runtime_lanes.json",
         "config\\providers\\qwen_local_text.json",
         "config\\providers\\qwen_local_text_p100.json",
+        "config\\providers\\catalog.json",
         "schemas\\execution_provider_adapter_request_v1.schema.json",
         "schemas\\engineering\\commission_execution_authority_v1.schema.json",
         "schemas\\engineering\\commission_ptm_evidence_v1.schema.json",
@@ -63,6 +64,7 @@ def test_bounded_local_runtime_config_closure_is_finite_and_selective():
         "config\\runtime\\gpu_runtime_lanes.json",
         "config\\providers\\qwen_local_text.json",
         "config\\providers\\qwen_local_text_p100.json",
+        "config\\providers\\catalog.json",
         "schemas\\execution_provider_adapter_request_v1.schema.json",
         "schemas\\engineering\\commission_execution_authority_v1.schema.json",
         "schemas\\engineering\\commission_ptm_evidence_v1.schema.json",

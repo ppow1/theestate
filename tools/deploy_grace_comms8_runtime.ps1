@@ -33,7 +33,7 @@ $relativeFiles = @(
     'src\estate\core\ptm_policy.py', 'src\estate\core\ptm_production_readiness.py',
     'src\estate\core\ptm_readiness_integration.py', 'src\estate\core\ptm_waiver_authority.py',
     'config\runtime\gpu_runtime_lanes.json', 'config\providers\qwen_local_text.json',
-    'config\providers\qwen_local_text_p100.json', 'schemas\execution_provider_adapter_request_v1.schema.json',
+    'config\providers\qwen_local_text_p100.json', 'config\providers\catalog.json', 'schemas\execution_provider_adapter_request_v1.schema.json',
     'schemas\engineering\commission_execution_authority_v1.schema.json',
     'schemas\engineering\commission_ptm_evidence_v1.schema.json',
     'schemas\engineering\engineering_authorization_v1.schema.json',
