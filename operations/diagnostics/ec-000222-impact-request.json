@@ -1,0 +1,115 @@
+{
+  "change_id": "EC-000222",
+  "title": "Qualify P100 as second governed compute lane",
+  "status": "accepted_single_p100_governed_lane",
+  "predecessor": "EC-000221@6842df3dafa949e392f888af28559d1888b419ef",
+  "lane": {
+    "runtime_lane_id": "qwen.local.text.p100-1",
+    "provider_id": "qwen.local.text",
+    "model_identity": "llama3.2:3b",
+    "endpoint": "http://127.0.0.1:12100",
+    "gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "cuda_visible_devices": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "minimum_safe_vram_mib": 4096,
+    "provider_config_path": "config/providers/qwen_local_text_p100.json"
+  },
+  "direct_governed_acceptance": {
+    "status": "accepted",
+    "objective_id": "grace-obj-1260f92f8cd2",
+    "action_id": "grace-act-0f614b4745ed",
+    "ptm_resolution_id": "res_01KZMP84SEJJB292SJQME5TA2P",
+    "helen_determination_id": "heldet-0471ae0cf0af",
+    "engineering_commission_id": "engcom-ce8329ace9ce",
+    "engineering_authorization_id": "engauth-968bbcfe34ae",
+    "reservation_id": "gpu-reservation-grace-obj-1260f92f8cd2",
+    "dispatch_id": "dispatch-c5c6ae6b273b",
+    "adapter_request_id": "adapter-dispatch-c5c6ae6b273b",
+    "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-1260f92f8cd2.json",
+    "uuid_equality": "required_gpu_uuid = allocated_gpu_uuid = runtime_bound_gpu_uuid = GPU-6785b322-899d-8eec-e817-31d83279a414"
+  },
+  "grace_acceptance": {
+    "submitted": true,
+    "status": "blocked",
+    "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810023945567-d63bcc32",
+    "visible_result": "completed governed response, but wrong physical GPU: qwen.local.text.4090",
+    "historical_prior_attempt": {
+      "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810020425856-9ae00508",
+      "visible_result": "RUNTIME_UNAVAILABLE",
+      "root_cause": "candidate resident Gateway inherited active Grace runtime URL 127.0.0.1:8766 instead of green 127.0.0.1:8767"
+    },
+    "historical_keyword_interception_attempt": {
+      "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810022309077-c275cc98",
+      "visible_result": "AUTHORITATIVE_RESULT (runtime availability; no active objective)",
+      "root_cause": "read-only Grace runtime keyword inference intercepted explicit bounded intent containing checkpoint and provider"
+    },
+    "root_cause": "P100 lane selection was not propagated as a required compute-resource requirement from the browser-created Grace request; governed execution defaulted to qwen.local.text.4090 despite ESTATE_GOVERNED_LOCAL_TEXT_LANE=qwen.local.text.p100-1",
+    "correction": "explicit execution_requested bounded intent now takes precedence over read-only runtime keyword inference; green slot URL injection remains enforced; resource propagation remains blocked for follow-up work",
+    "governed_artifacts_created": true,
+    "placement_status": "blocked_wrong_gpu",
+    "observed_chain": {
+      "objective_id": "grace-obj-f2c203f51875",
+      "action_id": "grace-act-61af5a3ec052",
+      "ptm_resolution_id": "res_01KZMRN3HQ7Z2WQ3DBXJJ8HM5M",
+      "helen_determination_id": "heldet-83d49d79352a",
+      "engineering_commission_id": "engcom-b7826bbe5976",
+      "engineering_authorization_id": "engauth-2ec4f9a56672",
+      "reservation_id": "gpu-reservation-grace-obj-f2c203f51875",
+      "dispatch_id": "dispatch-3820d01a140c",
+      "adapter_request_id": "adapter-dispatch-3820d01a140c",
+      "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-f2c203f51875.json",
+      "grace_receipt_id": "gracereceipt-a037c8e7034d",
+      "selected_lane": "qwen.local.text.4090",
+      "selected_gpu_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+    },
+    "required_p100_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "retry_submitted": false
+  },
+  "health": {
+    "p100_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "p100_pci": "00000000:04:00.0",
+    "rtx4090_uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2",
+    "rtx4090_pci": "00000000:07:00.0",
+    "pnp_status": "OK",
+    "postflight": "both present; PnP OK; P100 0% utilization; no device-loss symptom"
+  },
+  "safety": ["no concurrency", "no P100 32B", "no SDXL", "no stress", "no reset", "no reboot", "no driver operation"],
+  "current_attempt": {
+    "submitted": true,
+    "status": "placement_completed_clean_ownership_postflight_confirmed",
+    "evidence": "runtime/evidence/openwebui-operator/openwebui-operator-20260810031139491-b1a4ab9e",
+    "objective_id": "grace-obj-de80132692f3",
+    "action_id": "grace-act-7c4d2dc4a75a",
+    "ptm_resolution_id": "res_01KZMTFGB9D3KMJTQZ7BJZNVF8",
+    "helen_determination_id": "heldet-16fff90f8a9d",
+    "engineering_commission_id": "engcom-aec2224c2293",
+    "engineering_authorization_id": "engauth-876a0e1a7fc0",
+    "authorization_required_resource_persisted": true,
+    "authorization_required_gpu_uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "authorization_required_resource_id": "DESKTOP-JA3RPNQ:nvidia:GPU-6785b322-899d-8eec-e817-31d83279a414",
+    "reservation_id": "gpu-reservation-grace-obj-de80132692f3",
+    "dispatch_id": "dispatch-cff6674588aa",
+    "adapter_request_id": "adapter-dispatch-cff6674588aa",
+    "provider_receipt": "runtime/engineering_adapter_receipts/grace_bounded_local_text_grace-obj-de80132692f3.json",
+    "grace_receipt_id": "gracereceipt-a0fd2f478e1e",
+    "selected_lane": "qwen.local.text.p100-1",
+    "selected_model": "llama3.2:3b",
+    "placement_status": "p100_uuid_and_resource_equality_proven",
+    "historical_immediate_postflight": {
+      "p100": {"uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414", "pci": "00000000:04:00.0", "pnp": "OK", "free_mib": 7572, "utilization_percent": 89, "power_w": 101.29, "attributed_process": "unrelated Ollama llama-server.exe PID 15868"},
+      "rtx4090": {"uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "pci": "00000000:07:00.0", "free_mib": 298, "attributed_process": "unrelated Ollama llama-server.exe PID 22468"},
+      "status": "historical_external_residency_observed",
+      "action": "no_process_killed_or_altered"
+    },
+    "postflight": {
+      "status": "clean_ownership_postflight_confirmed",
+      "acceptance_ports_listening": false,
+      "estate_candidate_or_lane_processes_remaining": false,
+      "p100": {"uuid": "GPU-6785b322-899d-8eec-e817-31d83279a414", "pci": "00000000:04:00.0", "pnp": "OK", "free_mib": 7572, "utilization_percent": 0, "temperature_c": 46, "power_w": 34.0, "nvml_visible": true},
+      "rtx4090": {"uuid": "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2", "pci": "00000000:07:00.0", "pnp": "OK", "free_mib": 283, "utilization_percent": 23, "temperature_c": 44, "power_w": 22.8, "nvml_visible": true},
+      "remaining_gpu_process_classification": "unrelated_external_or_desktop_ui",
+      "action": "read_only_observation_only"
+    },
+    "retry_submitted": false
+  },
+  "remaining_unproven": ["simultaneous dual-GPU work"]
+}

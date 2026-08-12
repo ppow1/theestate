@@ -17,6 +17,8 @@ ALLOWED_EVENT_TYPES = {
     "Validation Passed", "Validation Failed", "Commit Created", "Result Returned",
     "Execution Complete", "Planning Complete", "Worker Blocked", "Worker Failed",
     "Worker Cancelled",
+    "Operator Attention Required", "Operator Attention Resolved",
+    "Operator Attention Timed Out", "Operator Attention Cancelled",
 }
 RUNTIME_EVENTS_RELATIVE_DIR = Path("runtime/operations/events")
 

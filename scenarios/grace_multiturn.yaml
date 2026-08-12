@@ -1,0 +1,9 @@
+name: GRACE_OPENWEBUI_MULTITURN
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, remember this harmless acceptance label: OPENWEBUI_CONTINUITY_CHECK."
+  - send: "What label did I just give you?"
+    expect:
+      contains_all: ["OPENWEBUI_CONTINUITY_CHECK"]
+  - send: "Confirm that this is the same conversation and answer briefly."

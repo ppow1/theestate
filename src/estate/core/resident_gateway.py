@@ -11,7 +11,7 @@ from estate.core.multi_resident_room import create_room, invite_participant, acc
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat, detect_bounded_local_text_intent, execute_bounded_local_text_from_chat
 from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
 from estate.core.grace_runtime_bridge import GraceRuntimeBridge
 from estate.core.openwebui_grace_assignment import detect_grace_image_assignment, execute_grace_image_assignment
@@ -98,6 +98,13 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     # must never intercept an assignment command merely because it mentions
     # operational terms such as "dispatch" or "objective".
     if detect_engineering_assignment_command(payload, text):
+        return None
+    # Explicit bounded execution is governed by the workflow below. It must
+    # take precedence over this read-only compatibility layer even when the
+    # request mentions ordinary operational words such as "checkpoint" or
+    # "provider".
+    bounded_intent = detect_bounded_local_text_intent(payload, text)
+    if bounded_intent.get("state") == "execution_requested":
         return None
     explicit_runtime_operations = (
         "list_grace_runtime_operations",
@@ -602,6 +609,14 @@ def _grace_consultation_chat_completion(payload: dict[str, Any], *, user_message
         },
     }
     return body
+def _bounded_local_text_content(workflow: dict[str, Any]) -> str:
+    if workflow.get("state") == "execution_completed":
+        result_metadata = workflow.get("execution", {}).get("result", {}).get("metadata", {})
+        placement = workflow.get("placement", {}).get("selected")
+        actual_resource = result_metadata.get("actual_runtime_resource_id")
+        actual_uuid = result_metadata.get("actual_runtime_gpu_uuid") or result_metadata.get("runtime_bound_gpu_uuid")
+        return json.dumps({"status": "completed", "provider": "qwen.local.text", "runtime_lane": workflow.get("lane", {}).get("runtime_lane_id"), "physical_resource": actual_resource, "gpu_uuid": actual_uuid, "intended_physical_resource": placement, "intended_gpu_uuid": result_metadata.get("configured_required_gpu_uuid"), "actual_runtime_resource": actual_resource, "actual_runtime_gpu_uuid": actual_uuid, "placement_match": result_metadata.get("placement_match"), "summary": workflow.get("execution", {}).get("result", {}).get("summary", "bounded local text task completed")}, sort_keys=True)
+    return json.dumps({"status": workflow.get("state", "execution_blocked"), "reason": workflow.get("reason") or workflow.get("execution", {}).get("handoff", {}).get("errors") or "governed execution did not complete"}, sort_keys=True)
 
 
 def _engineering_assignment_estate_envelope(model: str, session_id: str | None, workflow: dict[str, Any]) -> dict[str, Any]:
@@ -661,6 +676,22 @@ def _engineering_assignment_chat_completion(
     }
 
 
+def _bounded_local_text_chat_completion(payload: dict[str, Any], *, user_message: str, session_id: str | None, root=None, stream: bool = False) -> dict[str, Any] | None:
+    intent = detect_bounded_local_text_intent(payload, user_message)
+    if intent["state"] == "conversation_only":
+        return None
+    workflow = execute_bounded_local_text_from_chat(payload, user_message=user_message, session_id=session_id, root=root)
+    if workflow is None:
+        return None
+    content = _bounded_local_text_content(workflow)
+    envelope = {"resident_id": "grace", "session_id": session_id, "bounded_local_text": workflow, "provider_execution_performed": bool(workflow.get("provider_execution_performed")), "privileged_action_executed": False, "second_execution_system_created": False}
+    body = {"id": f"chatcmpl-grace-bounded-{workflow.get('objective', {}).get('objective_id', int(time.time()))}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "estate": envelope}
+    if stream:
+        body["object"] = "chat.completion.chunk"
+        body["choices"][0] = {"index": 0, "delta": {"role": "assistant", "content": content}, "finish_reason": "stop"}
+    return body
+
+
 def _grace_image_assignment_chat_completion(payload: dict[str, Any], *, user_message: str, session_id: str | None, stream: bool = False) -> dict[str, Any] | None:
     if not detect_grace_image_assignment(payload.get("model"), user_message):
         return None
@@ -693,6 +724,9 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
     consultation_body = _grace_consultation_chat_completion(payload, user_message=user_message, session_id=session_id)
     if consultation_body is not None:
         return 200, consultation_body
+    bounded_text = _bounded_local_text_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
+    if bounded_text is not None:
+        return 200, bounded_text
     workflow_body = _engineering_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
     if workflow_body is not None:
         return 200, workflow_body
@@ -733,6 +767,9 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
     consultation_body = _grace_consultation_chat_completion(payload, user_message=user_message, session_id=session_id, stream=True)
     if consultation_body is not None:
         return 200, consultation_body
+    bounded_text = _bounded_local_text_chat_completion(payload, user_message=user_message, session_id=session_id, root=root, stream=True)
+    if bounded_text is not None:
+        return 200, bounded_text
     workflow_body = _engineering_assignment_chat_completion(
         payload, user_message=user_message, session_id=session_id, root=root, stream=True
     )

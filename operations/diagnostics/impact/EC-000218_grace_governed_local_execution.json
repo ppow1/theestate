@@ -1,0 +1,56 @@
+{
+  "schema_version": "estate.diagnostic_impact.v1",
+  "change_id": "EC-000218",
+  "title": "Connect Grace chat to governed local execution",
+  "status": "implemented_live_acceptance_blocked",
+  "predecessor": "EC-000217",
+  "changed_artifacts": [
+    "src/estate/core/openwebui_engineering_workflow.py",
+    "src/estate/core/resident_gateway.py",
+    "src/estate/core/grace_helen_engineering_composition.py",
+    "tests/test_openwebui_engineering_workflow.py",
+    "docs/operations/validation/EC-000218_Grace_Governed_Local_Execution.md"
+  ],
+  "invariants": [
+    "Only explicit bounded local-text intent can request execution",
+    "Ordinary and ambiguous conversation never invokes a provider",
+    "PTM, Helen, Engineering authorization, Dispatch, and adapter validation remain mandatory",
+    "Compute selection and reservation use canonical UUID-based evidence",
+    "Runtime lane UUID must equal allocated physical GPU UUID",
+    "Grace receives provider evidence and cannot directly call Ollama, CUDA, or shell commands",
+    "No CPU, other GPU, provider, model, or shared-Ollama fallback is implicit"
+  ],
+  "probes": [
+    "Focused Grace workflow, composition, Dispatch, and Qwen adapter tests",
+    "Open WebUI Playwright harness deterministic tests",
+    "Read-only NVIDIA identity and capacity observation",
+    "Approved blue/green candidate controller readiness and cleanup"
+  ],
+  "failure_seams": [
+    "Candidate Grace readiness disables governed local execution",
+    "Fresh physical GPU evidence unavailable or insufficient",
+    "No healthy UUID-matching runtime lane",
+    "PTM/Helen/Engineering/Dispatch/adapter gate rejection",
+    "Provider receipt or allocation/lane equality missing",
+    "Open WebUI candidate surface not semantically ready"
+  ],
+  "runtime_reload_boundaries": [
+    "Candidate Grace, gateway, and Open WebUI must be started by the approved blue/green controller",
+    "Runtime configuration source root must identify the candidate checkout",
+    "GPU lane health and compute projection must be refreshed immediately before admission"
+  ],
+  "safety_stop_conditions": [
+    "GPU disappearance or UUID identity change",
+    "Windows instability or CUDA device-loss evidence",
+    "Insufficient safe VRAM",
+    "Candidate process cleanup failure",
+    "Behavior approaching PL-0042 heavy-SDXL crash path"
+  ],
+  "evidence_result": "Deterministic governed seam and fail-closed states are implemented. Candidate runtime readiness was blocked before model invocation; no browser or live provider execution was performed.",
+  "remaining_unproven_boundaries": [
+    "Real Open WebUI conversation through EC-000218 source root",
+    "Live Grace-to-provider result and receipt correlation",
+    "Physical placement proof for a real model task",
+    "Post-run Office correlation"
+  ]
+}

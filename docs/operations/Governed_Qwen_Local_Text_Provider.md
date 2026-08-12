@@ -67,6 +67,16 @@ references, source commit, boundary, prompt digest, artifact SHA-256 values,
 timestamps, timeout and cancellation state, local endpoint determination, and
 validation result. It never records the complete prompt or secrets.
 
+Artifact-content validation is capability-aware. `documentation_draft` retains
+its documentation marker requirement; `text_generation` validates the requested
+bounded text, size limits, and prohibited residue without requiring unrelated
+capability or governance recital phrases; `bounded_repository_read` has its own
+bounded-read marker contract. Shell, merge, institutional-acceptance, model,
+write-scope, allocation, and runtime-lane authority remain request/receipt
+evidence rather than model prose. A model sentence claiming a GPU is never
+placement evidence; allocation, the registered lane, CUDA binding, and the
+provider receipt are authoritative.
+
 If pre-invocation receipt authority is absent or invalid, the request is
 blocked without provider invocation or repository mutation. Every live
 document and receipt is first written completely inside an invocation-owned

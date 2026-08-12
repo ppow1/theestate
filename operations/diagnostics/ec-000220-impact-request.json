@@ -1,0 +1,29 @@
+{
+  "change_id": "EC-000220",
+  "title": "Add Open WebUI auth bootstrap and operator attention event",
+  "status": "implemented_live_acceptance_blocked_gpu_loss",
+  "changed_artifacts": [
+    "tools/openwebui_operator_acceptance.cjs",
+    "tools/openwebui-operator/operator-attention.cjs",
+    "src/estate/core/operational_events.py",
+    "tests/test_openwebui_operator_acceptance.cjs",
+    "tests/test_operational_events.py"
+  ],
+  "owners": ["Open WebUI Playwright acceptance", "Operational Events"],
+  "dependencies": ["persistent Estate Playwright profile", "headed Chromium", "candidate Open WebUI", "existing auth-bootstrap privacy boundary"],
+  "invariants": [
+    "LOGIN_REQUIRED emits at most one required event per run",
+    "auth-bootstrap and acceptance reuse the same profile",
+    "credential entry has no acceptance evidence capture",
+    "successful authentication resumes the original acceptance",
+    "timeout or cancellation submits no prompt",
+    "operator attention is an event producer, not a Notifier transport"
+  ],
+  "failure_seams": ["login timeout", "operator cancellation", "origin-specific authentication", "profile lock", "candidate Open WebUI unavailable"],
+  "probes_and_tests": ["operator-attention deduplication test", "operational-event contract test", "Playwright harness privacy/profile tests", "headed auth-bootstrap readiness"],
+  "reload_boundaries": ["close unauthenticated context before bootstrap", "reopen the same persistent profile after authentication"],
+  "stop_conditions": ["unexpected credential capture", "browser instability", "candidate service failure", "GPU disappearance during later acceptance"],
+  "remaining_unproven": ["post-login Grace conversation", "live GPU placement and receipt correlation"],
+  "live_stop_evidence": "runtime/evidence/ec000220/gpu-loss-after-stop.txt; P100 NVML/CUDA device-loss observation",
+  "future_notifier_boundary": "Notifier channels consume the operational attention event; no delivery transport is implemented here."
+}

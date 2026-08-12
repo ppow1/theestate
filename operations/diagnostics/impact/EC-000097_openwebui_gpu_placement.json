@@ -1,0 +1,51 @@
+{
+  "schema_version": "estate.diagnostic_impact.v1",
+  "change_id": "EC-000097",
+  "title": "Grace Open WebUI GPU placement acceptance boundary",
+  "status": "blocked",
+  "predecessor": "EC-000096",
+  "changed_artifacts": [
+    "tools/openwebui_operator_acceptance.cjs",
+    "tools/openwebui-operator/",
+    "tests/test_openwebui_operator_acceptance.cjs",
+    "docs/operations/testing/ESTATE_OpenWebUI_Operator_Acceptance_Harness.md",
+    "docs/operations/validation/EC-000097_Grace_OpenWebUI_GPU_Placement.md"
+  ],
+  "invariants": [
+    "Playwright is the browser acceptance boundary",
+    "Grace does not directly mutate GPU or driver state",
+    "physical NVIDIA UUID, not runtime ordinal, identifies a GPU",
+    "required placement must fail closed",
+    "PTM, Helen, Engineering authorization, Dispatch, and adapter validation remain required"
+  ],
+  "probes": [
+    "node --test tests/test_openwebui_operator_acceptance.cjs",
+    "node tools/openwebui_operator_acceptance.cjs --help",
+    "read-only nvidia-smi identity and telemetry query",
+    "read-only Ollama /api/tags query"
+  ],
+  "failure_seams": [
+    "Open WebUI canonical port unavailable",
+    "canonical runtime configuration points to a different dirty worktree",
+    "resident engineering workflow does not perform provider execution",
+    "fresh governed capacity/reservation evidence is absent",
+    "RTX 4090 free VRAM is approximately 1.8 GiB for configured qwen3:8b"
+  ],
+  "runtime_reload_boundaries": [
+    "Open WebUI, gateway, and Grace runtime must be started by the canonical runtime owner",
+    "runtime source root must match the integration checkout before acceptance"
+  ],
+  "safety_stop_conditions": [
+    "GPU disappearance or UUID mismatch",
+    "Windows instability or device-loss evidence",
+    "worker cleanup failure",
+    "behavior resembling PL-0042"
+  ],
+  "evidence_result": "No real workload or browser conversation was executed; acceptance remains blocked.",
+  "remaining_unproven_boundaries": [
+    "Grace resident chat to governed technical Dispatch",
+    "Open WebUI session to Dispatch correlation",
+    "real provider result to physical UUID correlation",
+    "Office post-run allocation visibility"
+  ]
+}

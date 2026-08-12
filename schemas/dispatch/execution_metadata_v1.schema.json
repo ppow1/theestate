@@ -28,7 +28,8 @@
     "ptm_revalidated_at": {"type": "string", "format": "date-time"},
     "ptm_revalidation_result": {"const": "passed"},
     "execution_authority": {"$ref": "estate.engineering.commission-execution-authority.v1"},
-    "provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "object", "additionalProperties": false}, {"type": "null"}]}
+    "provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "object", "additionalProperties": false}, {"type": "null"}]},
+    "compute_resource_requirements": {"type": "object", "additionalProperties": false, "properties": {"requires_gpu": {"type": "boolean"}, "minimum_vram_mib": {"type": ["number", "null"], "minimum": 0}, "required_compute_capability": {"type": ["string", "null"]}, "required_resource_id": {"type": ["string", "null"]}, "preferred_resource_id": {"type": ["string", "null"]}, "required_gpu_uuid": {"type": ["string", "null"]}, "preferred_gpu_uuid": {"type": ["string", "null"]}, "excluded_resource_ids": {"type": "array", "items": {"type": "string"}}, "compatibility_tags": {"type": "array", "items": {"type": "string"}}, "reservation_reference": {"type": ["string", "null"]}, "evidence_reference": {"type": ["string", "null"]}, "freshness_seconds": {"type": ["integer", "null"], "minimum": 1}}}
     ,"adapter_result_reference": {"type": "string", "minLength": 1}
     ,"adapter_result_content_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
     ,"provider_execution_state": {"enum": ["accepted", "dry_run_completed", "blocked", "failed", "completed"]}

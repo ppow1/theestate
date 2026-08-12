@@ -105,6 +105,7 @@ class ExecutionProviderAdapterRequest:
     adapter_reference: str | None = None
     ptm_readiness: dict[str, Any] = field(default_factory=dict)
     provider_extension: dict[str, Any] = field(default_factory=dict)
+    compute_resource_requirements: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=utc_now)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -123,6 +124,8 @@ class ExecutionProviderAdapterRequest:
         for key in ("read_scope_paths", "write_scope_paths", "blocked_scope_paths", "expected_outputs"):
             values[key] = _coerce_list(values.get(key))
         values["metadata"] = values.get("metadata") if isinstance(values.get("metadata"), dict) else {}
+        requirements = values.get("compute_resource_requirements")
+        values["compute_resource_requirements"] = requirements if isinstance(requirements, dict) else {}
         req = cls(**values)
         req.validate()
         return req
@@ -160,6 +163,7 @@ class ExecutionProviderAdapterRequest:
             adapter_reference=(data.get("metadata") or {}).get("adapter_reference"),
             ptm_readiness=(data.get("metadata") or {}).get("ptm_readiness") or {},
             provider_extension=(data.get("metadata") or {}).get("provider_extension") or data.get("provider_extension") or {},
+            compute_resource_requirements=data.get("compute_resource_requirements") or (data.get("metadata") or {}).get("compute_resource_requirements") or {},
             metadata={**(data.get("metadata") or {}), **(metadata or {})},
         )
 
@@ -173,6 +177,11 @@ class ExecutionProviderAdapterRequest:
                 errors.append(str(exc))
         if self.classification not in ALLOWED_CLASSIFICATIONS:
             errors.append(f"classification must be one of {sorted(ALLOWED_CLASSIFICATIONS)}")
+        try:
+            from estate.core.compute_resources import ComputeResourceRequirements
+            ComputeResourceRequirements.from_dict(self.compute_resource_requirements).validate()
+        except ValueError as exc:
+            errors.append(f"compute resource requirements are invalid: {exc}")
         for write_path in self.write_scope_paths:
             for blocked_path in self.blocked_scope_paths:
                 if _paths_overlap(write_path, blocked_path):

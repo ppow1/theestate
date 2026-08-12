@@ -32,6 +32,7 @@
     "engineering_commission_id": {"type": "string", "minLength": 1},
     "engineering_authorization_id": {"type": "string", "minLength": 1},
     "ptm_readiness": {"type": "object", "minProperties": 1},
+    "compute_resource_requirements": {"$ref": "estate.compute-resource-requirements.v1"},
     "metadata": {"type": "object"},
     "provider_extension": {"anyOf": [{"$ref": "estate.qwen-local-text.execution-extension.v1"}, {"type": "object", "maxProperties": 0}]}
   }

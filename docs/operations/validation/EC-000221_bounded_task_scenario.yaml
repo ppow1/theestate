@@ -1,0 +1,7 @@
+name: EC-000221_GRACE_GOVERNED_GPU_PLACEMENT
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, run a small bounded local text task: write one short sentence confirming that this governed task used the UUID-bound RTX 4090 lane; include no secrets and perform no hardware actions."
+    expect:
+      contains_any: [execution_completed, qwen.local.text, provider]
