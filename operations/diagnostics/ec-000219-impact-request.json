@@ -1,0 +1,14 @@
+{
+  "change_id": "EC-000219",
+  "title": "Enable candidate Grace governed execution acceptance",
+  "status": "implemented_live_browser_blocked",
+  "changed_artifacts": ["config/providers/qwen_local_text.json", "src/estate/core/openwebui_engineering_workflow.py", "scripts/enable_grace_candidate_governed_execution.py", "docs/operations/validation/EC-000219_Grace_Governed_Execution_Acceptance.md"],
+  "architecture": "Candidate-only provider admission enables the existing Grace/PTM/Helen/Engineering/Dispatch/Qwen UUID-bound chain; no alternate execution path is created.",
+  "invariants": ["GraceMomentumService owns governed readiness", "production shadow mode remains unchanged", "qwen3:8b uses a model-specific safe VRAM floor", "P100 is not substituted without qualification", "GPU UUID remains physical identity", "browser acceptance uses visible Open WebUI interaction"],
+  "failure_seams": ["missing candidate admission", "stale telemetry", "insufficient VRAM", "lane health or UUID mismatch", "Open WebUI authentication"],
+  "probes_and_tests": ["candidate readiness", "nvidia-smi read-only telemetry", "4090 lane health and environment evidence", "focused pytest", "Playwright harness readiness"],
+  "reload_boundary": "candidate Grace runtime restart after admission; no host reboot",
+  "stop_conditions": ["GPU disappearance", "UUID mismatch", "CUDA device loss", "Windows instability", "cleanup failure", "PL-0042-like behavior"],
+  "remaining_unproven": ["human-authenticated Playwright Grace conversation", "live qwen3:8b completion through chat", "end-to-end receipt correlation"],
+  "predecessor_evidence": "EC-000218"
+}

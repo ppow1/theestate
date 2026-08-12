@@ -7,8 +7,12 @@ not schedule work intelligently or invoke live providers.
 from __future__ import annotations
 
 import json
+import os
 import re
+import tempfile
+import time
 import uuid
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +23,7 @@ from estate.core.paths import ESTATE_ROOT
 RUNTIME_DIR = Path("runtime/execution_dispatch")
 QUEUE_OUTPUT = RUNTIME_DIR / "queue.json"
 EVENTS_OUTPUT = RUNTIME_DIR / "events.jsonl"
+QUEUE_LOCK = RUNTIME_DIR / ".queue.lock"
 CURRENT_OUTPUT = RUNTIME_DIR / "current.json"
 REPORT_OUTPUT = RUNTIME_DIR / "report.md"
 HANDOFF_DIR = RUNTIME_DIR / "handoffs"
@@ -162,6 +167,7 @@ class DispatchRequest:
     attention_required: bool = False
     attention_reason: str | None = None
     provider_metadata: dict[str, Any] = field(default_factory=dict)
+    compute_resource_requirements: dict[str, Any] = field(default_factory=dict)
     created_at: str | None = None
     updated_at: str | None = None
 
@@ -199,6 +205,8 @@ def dispatch_request_from_dict(data: dict[str, Any]) -> DispatchRequest:
         values[key] = _coerce_list(values.get(key))
     metadata = values.get("provider_metadata")
     values["provider_metadata"] = metadata if isinstance(metadata, dict) else {}
+    requirements = values.get("compute_resource_requirements")
+    values["compute_resource_requirements"] = requirements if isinstance(requirements, dict) else {}
     values["state"] = _clean_state(values.get("state"))
     return DispatchRequest(**values)
 
@@ -226,6 +234,12 @@ def _validate_request(request: DispatchRequest, root: Path | None = None) -> Non
         errors.append("provider is not in allowed_providers")
     if request.provider and request.provider in request.forbidden_providers:
         errors.append("provider is forbidden")
+    try:
+        from estate.core.compute_resources import ComputeResourceRequirements
+        requirements = ComputeResourceRequirements.from_dict(request.compute_resource_requirements)
+        requirements.validate()
+    except ValueError as exc:
+        errors.append(f"compute resource requirements are invalid: {exc}")
     # Technical work is admitted to Dispatch only after Engineering has made a
     # durable authorization.  This deliberately does not affect ordinary
     # operational Dispatch items.
@@ -259,6 +273,46 @@ def _queue_path(root: Path) -> Path:
     return root / QUEUE_OUTPUT
 
 
+@contextmanager
+def _queue_mutation_lock(root: Path, *, timeout_seconds: float = 10.0):
+    """Cross-process lock for the queue read/modify/atomic-replace section."""
+    path = root / QUEUE_LOCK
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = path.open("a+b")
+    handle.seek(0)
+    if handle.tell() == 0:
+        handle.write(b"0")
+        handle.flush()
+    acquired = False
+    started = time.monotonic()
+    try:
+        while not acquired:
+            try:
+                if os.name == "nt":
+                    import msvcrt
+                    handle.seek(0)
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                acquired = True
+            except (OSError, BlockingIOError):
+                if time.monotonic() - started >= timeout_seconds:
+                    raise TimeoutError(f"timed out acquiring Dispatch queue lock: {path}")
+                time.sleep(0.01)
+        yield
+    finally:
+        if acquired:
+            if os.name == "nt":
+                import msvcrt
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        handle.close()
+
+
 def _events_path(root: Path) -> Path:
     return root / EVENTS_OUTPUT
 
@@ -267,10 +321,28 @@ def _read_queue_payload(root: Path) -> dict[str, Any]:
     path = _queue_path(root)
     if not path.exists():
         return {"version": 1, "updated_at": None, "items": []}
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"execution dispatch queue is malformed JSON: {exc}") from exc
+    last_error: json.JSONDecodeError | None = None
+    last_permission_error: PermissionError | None = None
+    for attempt in range(5):
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            break
+        except json.JSONDecodeError as exc:
+            last_error = exc
+            if attempt < 4:
+                time.sleep(0.01)
+            else:
+                raise ValueError(f"execution dispatch queue is malformed JSON: {exc}") from exc
+        except PermissionError as exc:
+            last_permission_error = exc
+            if attempt < 4:
+                time.sleep(0.01)
+            else:
+                raise
+    else:
+        if last_permission_error is not None:
+            raise last_permission_error
+        raise ValueError(f"execution dispatch queue is malformed JSON: {last_error}")
     if isinstance(raw, list):
         return {"version": 1, "updated_at": None, "items": raw}
     if not isinstance(raw, dict):
@@ -288,7 +360,35 @@ def _write_queue(root: Path, items: list[DispatchQueueItem]) -> dict[str, Any]:
     }
     path = _queue_path(root)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    temporary_path: str | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent,
+            prefix=f"{path.name}.", suffix=".tmp", delete=False,
+        ) as handle:
+            temporary_path = handle.name
+            handle.write(serialized)
+            handle.flush()
+            os.fsync(handle.fileno())
+        replacement_error: OSError | None = None
+        for attempt in range(5):
+            try:
+                os.replace(temporary_path, path)
+                replacement_error = None
+                break
+            except PermissionError as exc:
+                replacement_error = exc
+                if attempt < 4:
+                    time.sleep(0.01)
+        if replacement_error is not None:
+            raise replacement_error
+    finally:
+        if temporary_path:
+            try:
+                os.unlink(temporary_path)
+            except FileNotFoundError:
+                pass
     return payload
 
 
@@ -388,12 +488,13 @@ def enqueue_dispatch_request(request: DispatchRequest | dict[str, Any], root: st
     req.created_at = req.created_at or now
     req.updated_at = req.updated_at or req.created_at
     _validate_request(req, base)
-    items = load_dispatch_queue(base)
-    if any(item.dispatch_id == req.dispatch_id for item in items):
-        raise ValueError(f"dispatch item already exists: {req.dispatch_id}")
-    item = DispatchQueueItem(**req.to_dict())
-    items.append(item)
-    _write_queue(base, items)
+    with _queue_mutation_lock(base):
+        items = load_dispatch_queue(base)
+        if any(item.dispatch_id == req.dispatch_id for item in items):
+            raise ValueError(f"dispatch item already exists: {req.dispatch_id}")
+        item = DispatchQueueItem(**req.to_dict())
+        items.append(item)
+        _write_queue(base, items)
     _emit_event(base, item, "dispatch_enqueued", f"Dispatch item {item.dispatch_id} queued.")
     generate_current_dispatch_snapshot(base, write=True)
     return item
@@ -423,19 +524,20 @@ def update_dispatch_state(
     new_state = _clean_state(state)
     if new_state not in DISPATCH_STATES:
         raise ValueError(f"state must be one of {sorted(DISPATCH_STATES)}")
-    items = load_dispatch_queue(base)
-    item = _find_item(items, dispatch_id)
-    item.state = new_state
-    item.updated_at = _now()
-    if attention_required is None:
-        if new_state in ATTENTION_STATES:
-            item.attention_required = True
-        elif new_state in TERMINAL_STATES | {"Running", "Ready"}:
-            item.attention_required = False
-    else:
-        item.attention_required = bool(attention_required)
-    items = _replace_item(items, item)
-    _write_queue(base, items)
+    with _queue_mutation_lock(base):
+        items = load_dispatch_queue(base)
+        item = _find_item(items, dispatch_id)
+        item.state = new_state
+        item.updated_at = _now()
+        if attention_required is None:
+            if new_state in ATTENTION_STATES:
+                item.attention_required = True
+            elif new_state in TERMINAL_STATES | {"Running", "Ready"}:
+                item.attention_required = False
+        else:
+            item.attention_required = bool(attention_required)
+        items = _replace_item(items, item)
+        _write_queue(base, items)
     event_type = _event_type_for_state(new_state)
     _emit_event(base, item, event_type, summary or f"Dispatch item {dispatch_id} state updated to {new_state}.")
     generate_current_dispatch_snapshot(base, write=True)
@@ -444,15 +546,16 @@ def update_dispatch_state(
 
 def block_dispatch_item(dispatch_id: str, reason: str, root: str | Path | None = None) -> DispatchQueueItem:
     base = _root(root)
-    items = load_dispatch_queue(base)
-    item = _find_item(items, dispatch_id)
-    item.state = "Blocked"
-    item.block_reason = reason
-    item.attention_required = True
-    item.attention_reason = reason
-    item.updated_at = _now()
-    items = _replace_item(items, item)
-    _write_queue(base, items)
+    with _queue_mutation_lock(base):
+        items = load_dispatch_queue(base)
+        item = _find_item(items, dispatch_id)
+        item.state = "Blocked"
+        item.block_reason = reason
+        item.attention_required = True
+        item.attention_reason = reason
+        item.updated_at = _now()
+        items = _replace_item(items, item)
+        _write_queue(base, items)
     _emit_event(base, item, "dispatch_blocked", f"Dispatch item {dispatch_id} blocked: {reason}")
     generate_current_dispatch_snapshot(base, write=True)
     return item
@@ -466,13 +569,14 @@ def mark_dispatch_attention(
     reason: str | None = None,
 ) -> DispatchQueueItem:
     base = _root(root)
-    items = load_dispatch_queue(base)
-    item = _find_item(items, dispatch_id)
-    item.attention_required = bool(attention_required)
-    item.attention_reason = reason if attention_required else None
-    item.updated_at = _now()
-    items = _replace_item(items, item)
-    _write_queue(base, items)
+    with _queue_mutation_lock(base):
+        items = load_dispatch_queue(base)
+        item = _find_item(items, dispatch_id)
+        item.attention_required = bool(attention_required)
+        item.attention_reason = reason if attention_required else None
+        item.updated_at = _now()
+        items = _replace_item(items, item)
+        _write_queue(base, items)
     event_type = "dispatch_awaiting_approval" if attention_required else "dispatch_state_updated"
     summary = reason or ("Dispatch item requires Steward attention." if attention_required else "Dispatch item attention flag cleared.")
     _emit_event(base, item, event_type, summary)
@@ -487,14 +591,15 @@ def cancel_dispatch_item(dispatch_id: str, root: str | Path | None = None, *, re
 
 def complete_dispatch_item(dispatch_id: str, root: str | Path | None = None, *, result_reference: str | None = None) -> DispatchQueueItem:
     base = _root(root)
-    items = load_dispatch_queue(base)
-    item = _find_item(items, dispatch_id)
-    item.state = "Completed"
-    item.result_reference = result_reference
-    item.attention_required = False
-    item.updated_at = _now()
-    items = _replace_item(items, item)
-    _write_queue(base, items)
+    with _queue_mutation_lock(base):
+        items = load_dispatch_queue(base)
+        item = _find_item(items, dispatch_id)
+        item.state = "Completed"
+        item.result_reference = result_reference
+        item.attention_required = False
+        item.updated_at = _now()
+        items = _replace_item(items, item)
+        _write_queue(base, items)
     summary = f"Dispatch item {dispatch_id} completed" + (f"; result: {result_reference}" if result_reference else ".")
     _emit_event(base, item, "dispatch_completed", summary)
     generate_current_dispatch_snapshot(base, write=True)
@@ -559,9 +664,12 @@ def prepare_codex_bridge_handoff(
         path = base / HANDOFF_DIR / f"{_safe_id(item.dispatch_id)}_codex_bridge_request.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(_jsonable(request), indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        item.handoff_reference = _rel(path, base)
-        item.updated_at = _now()
-        _write_queue(base, _replace_item(items, item))
+        with _queue_mutation_lock(base):
+            latest_item = _find_item(load_dispatch_queue(base), dispatch_id)
+            latest_item.handoff_reference = _rel(path, base)
+            latest_item.updated_at = _now()
+            _write_queue(base, _replace_item(load_dispatch_queue(base), latest_item))
+            item = latest_item
     _emit_event(base, item, "dispatch_handoff_prepared", f"Codex Bridge dry-run handoff prepared for {dispatch_id}.")
     generate_current_dispatch_snapshot(base, write=True)
     if write:
@@ -691,7 +799,9 @@ def generate_current_dispatch_snapshot(
     if write:
         (base / RUNTIME_DIR).mkdir(parents=True, exist_ok=True)
         if not (base / QUEUE_OUTPUT).exists():
-            _write_queue(base, items)
+            with _queue_mutation_lock(base):
+                if not (base / QUEUE_OUTPUT).exists():
+                    _write_queue(base, items)
         if not (base / EVENTS_OUTPUT).exists():
             (base / EVENTS_OUTPUT).write_text("", encoding="utf-8")
         (base / CURRENT_OUTPUT).write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8")

@@ -1,0 +1,175 @@
+{
+  "affected_checkpoints": [
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "boundaries": [
+    "reload Dispatch and adapter request before new handoff",
+    "scheduler reservation remains separate from Dispatch release",
+    "no destructive GPU recovery",
+    "no heavy simultaneous SDXL"
+  ],
+  "changed_artifacts": [
+    {
+      "git_blob": "76cbb2e6cf3e640c5b93933ea68e48efc4ec54bd",
+      "head_git_blob": null,
+      "path": "src/estate/core/compute_resources.py",
+      "sha256": "8dc240bf0839a8d5a0c2ade0756749851503daf29454a1fb44cddbfd755f90d1",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "0fc5ad41a79441e4661be5b7efd043bf521acad3",
+      "head_git_blob": null,
+      "path": "src/estate/core/compute_office_panel.py",
+      "sha256": "29f0e4f9b9b994fe6732c55f5cd00a9673ca7fbced39c9eb104dff414fc50e3b",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "2ece2d944b739bdb63cf283e899de091569d562c",
+      "head_git_blob": "6c86923827da54bd2b8658e467b9bdcffa8573b6",
+      "path": "src/estate/core/execution_dispatch.py",
+      "sha256": "294bc3e211542ee3ee86e6b02090a405e43774bab61b746f2993b1c9e4fefa26",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "77fb408cc653e74e6aa20331699aa6aed899b9bc",
+      "head_git_blob": "39fbfec66bd53ef845719eaddc762207facf25c1",
+      "path": "src/estate/core/execution_provider_adapter.py",
+      "sha256": "b4fc829a30d6c039d13982468db9565e70df95ca68d995061e9e4b45d939d75d",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "fd53bd1020ab4e0a32f9e8fa2c5cc32579e39abd",
+      "head_git_blob": "0c47e6d5c98149650f0b1bd9d21ff88bc3dc1c93",
+      "path": "src/estate/core/governed_provider_scheduler.py",
+      "sha256": "0facfc0ca45c317f7e0f3a5d882a7f86df3bd1b9d4222907d793e2e3b45360c4",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "85ef6726b2ec1ba71a67ac88ba36a9ee2dbe4826",
+      "head_git_blob": "7469c32b3971140d8aeda995d0955ffbf5018fa9",
+      "path": "src/estate/core/office_command_surface.py",
+      "sha256": "9acf1f7e18efa3298952135cf474477782af12de4d50e421d9e9bf7289c5c774",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "89eb5d23bfe5922cadb1e93bf6f1bc9142dda81b",
+      "head_git_blob": "298bf122cc78942fe4b73727e745ba9067942f4b",
+      "path": "src/estate/core/steward_command_center.py",
+      "sha256": "70d669c062a4d1ccfe5a849e4485cedfc9d7bb03b7fe879ad18e9f6958bbe584",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "2d35cacd02a0b33fd63e9bba50a8e52e3005d01a",
+      "head_git_blob": "06a829f1f270f294c086d1ed05d7fe9ff02ac544",
+      "path": "src/estate/core/operations_center_settings.py",
+      "sha256": "705471be18c8668ef6c6558d2f4958564b37ba26698936d67b5be8ebc6d45fce",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "648ede30f846958dc21f537ad769ffbc32e62620",
+      "head_git_blob": "4926f13cf6853d8ede3911d7092bfc79e8ff0099",
+      "path": "src/estate/core/authority_schema_runtime.py",
+      "sha256": "a5870515e45532925acf9494433d17a9b4c3b70527b5827800e5438078241493",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "e969c355709184cfbdba233a774d6082a65e0194",
+      "head_git_blob": null,
+      "path": "schemas/compute_resource_requirements_v1.schema.json",
+      "sha256": "06d10ace7fabdeeb886d1635c65c3aa6fddad0c37df1574ed36b331ee3771a32",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "459cb0224ed0938f4122772c1697e6eeb3fcd729",
+      "head_git_blob": "1ec9050ab7da67402947d4320d41ed3f3ba3436e",
+      "path": "schemas/execution_provider_adapter_request_v1.schema.json",
+      "sha256": "3d8f563a468f15ed868751fcc93b9807a2ee43b72d947bd50e9627264e103470",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "4221b79ee5b2eaa71b1165895129a9c75a11eed7",
+      "head_git_blob": null,
+      "path": "tests/test_compute_resources.py",
+      "sha256": "c47171ce5f25a4fd13a848128565311d1be76f51830fd0269fdaeac696d5135a",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "1d0bbfc442e8b322e4a37c424ba7fda0a93db051",
+      "head_git_blob": "f00392e15b8587db2c1244479264e63ce7c0658b",
+      "path": "tests/test_steward_command_center.py",
+      "sha256": "ef885908f029184b1fef515244531a62e317ba3a16a7b9627bef42f514bd894a",
+      "worktree_state": "dirty"
+    },
+    {
+      "git_blob": "f791c4ab522db3a2ac3c7e32414ee36e7e0189e3",
+      "head_git_blob": null,
+      "path": "docs/architecture/compute_resource_foundation.md",
+      "sha256": "6c0d6004e7bc569709ab36c104660a3632eec482481ab6da974fe53b6e0304e9",
+      "worktree_state": "untracked"
+    },
+    {
+      "git_blob": "a56851fb7f1cf62174dc74582ed01a271119d84e",
+      "head_git_blob": "361607948d33db51f592573602a3a9040f74415b",
+      "path": "estate_ledger/ledger.md",
+      "sha256": "ea0ddd052735e46e293de704eb6a9753e37c6b8fc9643a171712636817ffeb53",
+      "worktree_state": "dirty"
+    }
+  ],
+  "component": "compute-resource-foundation",
+  "confidence": "HIGH",
+  "dependencies": [
+    "current Execution Dispatch technical gates",
+    "current provider adapter JSON schema",
+    "governed provider scheduler",
+    "Office command surface",
+    "NVIDIA read-only nvidia-smi evidence"
+  ],
+  "evidence": [
+    "source commit 001eb915df3915db9a62fd0cb5da5f11f06a9e96 as historical donor",
+    "collaboration/parking_lot/PL-0042 from source history",
+    "focused test reports",
+    "runtime/compute_resources/gpus.json when live observation is performed"
+  ],
+  "failure_seams": [
+    "malformed telemetry",
+    "NVML disappearance",
+    "PnP problem state",
+    "stale evidence",
+    "UUID mismatch",
+    "insufficient VRAM",
+    "reservation overbooking",
+    "schema or Dispatch gate regression"
+  ],
+  "implementation_revision": {
+    "git_revision": "16ce8f42ae612b1a164bb98750b5a09cd5faa6d8",
+    "worktree_dirty": true
+  },
+  "intended_behavior": "Integrate N-device physical GPU identity, telemetry, deterministic health/capacity evidence, resource-aware Dispatch/provider contracts, governed reservation hooks, and Office visibility into current main without weakening Grace/PTM/Engineering authority gates.",
+  "invariants": [
+    "host plus NVIDIA UUID is canonical identity",
+    "runtime ordinal is observational only",
+    "health and capacity remain separate",
+    "required physical GPU fails closed",
+    "Office and Grace cannot mutate hardware",
+    "existing authority gates remain required"
+  ],
+  "packet_id": "EC-000096",
+  "probes": [
+    "pytest -q tests/test_compute_resources.py",
+    "pytest -q tests/test_execution_dispatch.py tests/test_execution_provider_adapter.py tests/test_governed_provider_scheduler.py",
+    "python -m py_compile changed Python modules",
+    "read-only nvidia-smi/PnP/PyTorch enumeration only"
+  ],
+  "proposed_knowledge": [
+    {
+      "state": "CANDIDATE",
+      "text": "When a required GPU UUID is absent, stale, identity-mismatched, or reserved, stop admission and require fresh governed placement evidence; never fall back by ordinal, CPU, model, runtime, or provider."
+    }
+  ],
+  "schema_version": "1.0",
+  "source": {
+    "actor": "Codex",
+    "created_at": "2026-08-09T20:37:32+00:00",
+    "kind": "human"
+  }
+}

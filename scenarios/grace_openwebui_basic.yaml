@@ -1,0 +1,12 @@
+name: GRACE_OPENWEBUI_BASIC
+resident: Grace
+fresh_conversation: true
+turns:
+  - send: "Grace, please acknowledge this harmless Open WebUI acceptance check in one concise sentence."
+    expect:
+      not_contains: ["I executed", "I changed the repository"]
+timeouts:
+  timeout: 60000
+evidence_requirements:
+  screenshots: true
+  trace_on_failure: true

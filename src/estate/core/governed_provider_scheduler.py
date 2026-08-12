@@ -12,6 +12,7 @@ from estate.core.provider_health import utc_now_iso, _write_json
 from estate.core.worker_assignment_runtime import WorkerAssignmentRuntime
 from estate.core.engineering_provider_health_runtime import load_current_provider_health
 from estate.core.engineering_provider_routing_runtime import recommend_engineering_provider
+from estate.core.compute_resources import ComputeReservationLedger, ComputeResourceRequirements, select_resource
 
 SCHED_ROOT = Path("runtime/engineering_scheduler")
 QUEUE = SCHED_ROOT / "queue.json"
@@ -96,7 +97,7 @@ class GovernedProviderScheduler:
                 self._event("enqueue_idempotent", existing, actor, "Assignment already queued; enqueue is idempotent.")
                 self._save_queue(q); return existing
             assignment = WorkerAssignmentRuntime(self.root).load_assignment(assignment_id).to_dict()
-            item = {"queue_item_id": f"qi-{uuid4().hex}", "assignment_id": assignment_id, "state": "queued", "created_at": utc_now_iso(), "updated_at": utc_now_iso(), "priority": assignment.get("priority", "normal"), "classification": assignment.get("classification"), "work_package_id": assignment.get("work_package_id"), "provider_id": manual_provider or assignment.get("provider_id"), "manual_pin": bool(manual_provider), "attempt_count": 0, "defer_until": None, "reservation": None, "release": None, "failures": [], "overrides": [], "evidence_refs": [f"runtime/workers/assignments/records/{assignment_id}.json"]}
+            item = {"queue_item_id": f"qi-{uuid4().hex}", "assignment_id": assignment_id, "state": "queued", "created_at": utc_now_iso(), "updated_at": utc_now_iso(), "priority": assignment.get("priority", "normal"), "classification": assignment.get("classification"), "work_package_id": assignment.get("work_package_id"), "provider_id": manual_provider or assignment.get("provider_id"), "manual_pin": bool(manual_provider), "attempt_count": 0, "defer_until": None, "reservation": None, "release": None, "failures": [], "overrides": [], "evidence_refs": [f"runtime/workers/assignments/records/{assignment_id}.json"], "compute_resource_requirements": (assignment.get("metadata") or {}).get("compute_resource_requirements") or {}}
             q["items"].append(item)
             self._event("enqueue", item, actor, "Approved assignment entered governed scheduling queue.", {"assignment": assignment})
             self._save_queue(q); return item
@@ -110,6 +111,9 @@ class GovernedProviderScheduler:
                 exp=_parse_ts(res.get("expires_at"))
                 if item.get("state") == "reserved" and exp and exp <= now:
                     item["state"]="queued"; item["reservation"]["expired_at"]=utc_now_iso(); recovered.append(item["assignment_id"])
+                    reservation_id = (item.get("reservation") or {}).get("reservation_id")
+                    if reservation_id:
+                        ComputeReservationLedger(self.root).release(reservation_id)
                     self._event("recover_expired_reservation", item, actor, "Expired reservation returned to queue.", {"reservation": res})
             self._save_queue(q)
         return {"recovered_assignment_ids": recovered, "recovered_count": len(recovered)}
@@ -137,13 +141,29 @@ class GovernedProviderScheduler:
                 route = recommend_engineering_provider({"routing_request_id": item["queue_item_id"], "mission_summary": assignment.get("summary") or assignment.get("mission"), "work_type": assignment.get("mission") or "assignment", "requires_repo_write": True, "validation_required": assignment.get("validation_required", True)}, root=self.root, write=False)
                 provider = route.get("recommended_provider"); item["provider_id"] = provider; item["routing_snapshot"] = route
             ph = health_by.get(provider, {})
+            requirements = ComputeResourceRequirements.from_dict(item.get("compute_resource_requirements"))
+            if requirements.requires_gpu:
+                snapshot_path = self.root / "runtime/compute_resources/gpus.json"
+                snapshot = _read_json(snapshot_path, {})
+                resources = snapshot.get("resources") if isinstance(snapshot, dict) else []
+                observations = []
+                for raw in resources or []:
+                    try:
+                        from estate.core.compute_resources import ComputeResourceObservation
+                        observations.append(ComputeResourceObservation(**raw))
+                    except (TypeError, ValueError):
+                        continue
+                placement = select_resource(observations, requirements)
+                if not placement.get("eligible"):
+                    eligible = False; reasons.append(placement.get("reason") or "compute placement unavailable")
+                item["compute_placement_snapshot"] = placement
             if provider in q.get("provider_exclusions", {}): eligible=False; reasons.append("provider is manually excluded")
             if ph and ph.get("health_state") in {"offline", "maintenance"}: eligible=False; reasons.append("provider health excludes scheduling")
             if ph and ph.get("is_stale"): eligible=False; reasons.append("provider evidence is stale")
             max_jobs = ph.get("max_jobs") or ph.get("metadata", {}).get("max_jobs") or 1
             if active_by_provider.get(provider, 0) >= int(max_jobs or 1): eligible=False; reasons.append("provider reservation capacity is full")
             rank = (PRIORITY.get(item.get("priority", "normal"), 2), item.get("created_at"), item.get("assignment_id"))
-            decisions.append({"queue_item_id": item["queue_item_id"], "assignment_id": item["assignment_id"], "provider_id": provider, "eligible": eligible, "rank": rank, "reasons": reasons or ["eligible under current governed scheduling evidence"], "constraints": {"dispatch_required": True, "recommendation_only_routing": True}})
+            decisions.append({"queue_item_id": item["queue_item_id"], "assignment_id": item["assignment_id"], "provider_id": provider, "eligible": eligible, "rank": rank, "reasons": reasons or ["eligible under current governed scheduling evidence"], "compute_placement": item.get("compute_placement_snapshot"), "constraints": {"dispatch_required": True, "recommendation_only_routing": True}})
         decisions.sort(key=lambda d: (not d["eligible"], d["rank"]))
         return {"generated_at": utc_now_iso(), "paused": q.get("paused", False), "decisions": decisions, "constraints": {"does_not_dispatch": True, "existing_dispatch_only_release_path": True}, "source_artifacts": [str(QUEUE), "runtime/provider_health/current.json", "runtime/workers/assignments/status/board.json"]}
 
@@ -158,6 +178,17 @@ class GovernedProviderScheduler:
             item = next(i for i in q["items"] if i["queue_item_id"] == chosen["queue_item_id"] and i.get("state") in {"queued", "deferred"})
             item["state"] = "reserved"; item["provider_id"] = chosen["provider_id"]
             item["reservation"] = {"reservation_id": f"rs-{uuid4().hex}", "reserved_by": actor, "reserved_at": utc_now_iso(), "expires_at": (datetime.now(timezone.utc)+timedelta(minutes=ttl_minutes)).replace(microsecond=0).isoformat().replace("+00:00","Z"), "dispatch_required": True}
+            requirements = ComputeResourceRequirements.from_dict(item.get("compute_resource_requirements"))
+            if requirements.requires_gpu:
+                resource_id = (chosen.get("compute_placement") or {}).get("selected") or (item.get("compute_placement_snapshot") or {}).get("selected")
+                if not resource_id:
+                    item["state"] = "queued"
+                    return {"reserved": False, "reason": "compute resource selection disappeared before reservation", "recommendation": rec}
+                try:
+                    ComputeReservationLedger(self.root).reserve(reservation_id=item["reservation"]["reservation_id"], resource_id=resource_id, workload_id=item["assignment_id"], minimum_vram_mib=requirements.minimum_vram_mib)
+                except ValueError as exc:
+                    item["state"] = "queued"
+                    return {"reserved": False, "reason": str(exc), "recommendation": rec}
             self._event("reserve", item, actor, "Capacity reservation prepared; Dispatch authorization remains required.", chosen)
             self._save_queue(q); return {"reserved": True, "item": item}
 
@@ -166,6 +197,9 @@ class GovernedProviderScheduler:
             q=self._queue(); item=next((i for i in q["items"] if i["assignment_id"]==assignment_id), None)
             if not item: raise ValueError(f"queue item not found for assignment: {assignment_id}")
             item["state"]="released_to_dispatch"; item["release"]={"released_at": utc_now_iso(), "released_by": actor, "rationale": rationale, "dispatch_required": True}
+            reservation_id = (item.get("reservation") or {}).get("reservation_id")
+            if reservation_id:
+                ComputeReservationLedger(self.root).release(reservation_id)
             self._event("release", item, actor, rationale, {"dispatch_boundary": "existing execution_dispatch remains sole execution release path"})
             self._save_queue(q); return item
 

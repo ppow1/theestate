@@ -104,6 +104,14 @@ class ExecutionActivityEvent:
     summary: str | None = None
     current_assignment: str | None = None
     estimated_completion: str | None = None
+    compute_resource_id: str | None = None
+    gpu_uuid: str | None = None
+    actual_runtime_resource_id: str | None = None
+    actual_runtime_gpu_uuid: str | None = None
+    placement_match: bool | None = None
+    runtime_lane_id: str | None = None
+    model_identity: str | None = None
+    reservation_reference: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -131,6 +139,14 @@ class ActivityItem:
     attention_required: bool
     summary: str | None
     updated_at: str | None
+    compute_resource_id: str | None = None
+    gpu_uuid: str | None = None
+    actual_runtime_resource_id: str | None = None
+    actual_runtime_gpu_uuid: str | None = None
+    placement_match: bool | None = None
+    runtime_lane_id: str | None = None
+    model_identity: str | None = None
+    reservation_reference: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -236,6 +252,10 @@ def normalize_activity_event(data: dict[str, Any], *, source: str = "execution_a
         "attention_required",
         "budget_source",
         "classification",
+        "compute_resource_id",
+        "actual_runtime_resource_id",
+        "actual_runtime_gpu_uuid",
+        "placement_match",
         "current_assignment",
         "current_state",
         "elapsed_seconds",
@@ -243,11 +263,15 @@ def normalize_activity_event(data: dict[str, Any], *, source: str = "execution_a
         "event_id",
         "event_type",
         "human_attention_required",
+        "gpu_uuid",
         "kind",
         "last_event",
+        "model_identity",
         "profile_label",
         "provider",
         "request_id",
+        "reservation_reference",
+        "runtime_lane_id",
         "security_classification",
         "source",
         "state",
@@ -283,6 +307,14 @@ def normalize_activity_event(data: dict[str, Any], *, source: str = "execution_a
         summary=_string_or_none(_first(data, "summary") or last_event.get("summary")),
         current_assignment=_string_or_none(_first(data, "current_assignment")),
         estimated_completion=_string_or_none(_first(data, "estimated_completion")),
+        compute_resource_id=_string_or_none(_first(data, "compute_resource_id")),
+        gpu_uuid=_string_or_none(_first(data, "gpu_uuid")),
+        actual_runtime_resource_id=_string_or_none(_first(data, "actual_runtime_resource_id")),
+        actual_runtime_gpu_uuid=_string_or_none(_first(data, "actual_runtime_gpu_uuid")),
+        placement_match=_coerce_bool(_first(data, "placement_match"), default=False) if _first(data, "placement_match") is not None else None,
+        runtime_lane_id=_string_or_none(_first(data, "runtime_lane_id")),
+        model_identity=_string_or_none(_first(data, "model_identity")),
+        reservation_reference=_string_or_none(_first(data, "reservation_reference")),
         metadata=_metadata(data, mapped_keys),
     )
 
@@ -418,6 +450,14 @@ def _item_from_events(request_id: str | None, events: list[ExecutionActivityEven
         attention_required=latest.attention_required,
         summary=latest.summary,
         updated_at=latest.timestamp,
+        compute_resource_id=latest.compute_resource_id,
+        gpu_uuid=latest.gpu_uuid,
+        actual_runtime_resource_id=latest.actual_runtime_resource_id,
+        actual_runtime_gpu_uuid=latest.actual_runtime_gpu_uuid,
+        placement_match=latest.placement_match,
+        runtime_lane_id=latest.runtime_lane_id,
+        model_identity=latest.model_identity,
+        reservation_reference=latest.reservation_reference,
     )
 
 
@@ -589,6 +629,9 @@ def format_execution_activity_report(snapshot: dict[str, Any]) -> str:
                 f"{item.get('worker_label') or 'unknown worker'} | "
                 f"{item.get('provider') or 'unknown provider'} | "
                 f"{item.get('profile_label') or 'no profile'} | "
+                f"{item.get('runtime_lane_id') or 'no runtime lane'} | "
+                f"{item.get('model_identity') or 'no model'} | "
+                f"{item.get('compute_resource_id') or 'no physical resource'} | "
                 f"{item.get('current_state') or 'unknown'} | "
                 f"{last.get('event_type') or 'unknown'} | "
                 f"{item.get('summary') or 'No summary.'}"

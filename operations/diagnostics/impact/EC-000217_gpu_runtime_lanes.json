@@ -1,0 +1,64 @@
+{
+  "schema_version": "estate.diagnostic_impact.v1",
+  "change_id": "EC-000217",
+  "title": "Governed GPU-pinned runtime lanes",
+  "status": "implemented_with_live_model_acceptance_blocked",
+  "predecessor": "EC-000097",
+  "changed_artifacts": [
+    "src/estate/core/gpu_runtime_lanes.py",
+    "scripts/start_gpu_runtime_lane.py",
+    "config/runtime/gpu_runtime_lanes.json",
+    "schemas/dispatch/execution_metadata_v1.schema.json",
+    "schemas/providers/qwen_local_text_execution_extension_v1.schema.json",
+    "src/estate/core/qwen_local_text_execution_provider_adapter.py",
+    "src/estate/core/grace_helen_engineering_composition.py",
+    "src/estate/core/compute_office_panel.py",
+    "A:/AI/Tools/EstateStreamDeckPlugin/src/actions.js",
+    "A:/AI/Tools/EstateStreamDeckPlugin/src/status.js",
+    "A:/AI/Tools/EstateStreamDeckPlugin/src/icon.js"
+  ],
+  "invariants": [
+    "Full NVIDIA UUID is physical identity; ordinal is observational only",
+    "Allocated resource UUID and runtime lane UUID must match",
+    "Required placement fails closed without shared-Ollama or CPU fallback",
+    "PTM, Helen, Engineering authorization, Dispatch, and adapter validation remain required",
+    "Office and Stream Deck consume Estate-owned projection evidence",
+    "No automatic GPU recovery or destructive hardware action is permitted"
+  ],
+  "probes": [
+    "Focused Python lane, Dispatch, composition, adapter, and projection tests",
+    "External Stream Deck npm test",
+    "Candidate Ollama lane launch with allow-listed CUDA_VISIBLE_DEVICES binding",
+    "Delayed loopback endpoint health observation",
+    "Read-only nvidia-smi identity and telemetry"
+  ],
+  "failure_seams": [
+    "Shared Ollama cannot prove per-request physical placement",
+    "Lane endpoint or process binding disappears",
+    "Allocation/lane UUID mismatch",
+    "Stale or insufficient GPU evidence",
+    "Canonical runtime ownership differs from candidate checkout",
+    "Open WebUI/Grace governed execution path remains operationally unbound"
+  ],
+  "runtime_reload_boundaries": [
+    "Candidate lane process must be started by the lane launcher and health-checked",
+    "Office/operator projection must be refreshed after telemetry changes",
+    "Stream Deck bridge polls the Estate operator summary artifact",
+    "Core services remain owned by the approved Core startup mechanism"
+  ],
+  "safety_stop_conditions": [
+    "GPU disappearance or UUID mismatch",
+    "Windows instability or CUDA device-loss evidence",
+    "Worker cleanup failure",
+    "Behavior resembling PL-0042 heavy-SDXL failure path",
+    "Insufficient safe VRAM for a model invocation"
+  ],
+  "evidence_result": "Pinned candidate lane launch and delayed endpoint readiness were proven without loading or invoking a model; physical model placement and browser acceptance remain unproven.",
+  "remaining_unproven_boundaries": [
+    "Grace resident text to governed provider execution",
+    "Live model receipt correlated to a pinned process and UUID",
+    "Open WebUI Playwright placement acceptance",
+    "Post-run Office and Stream Deck live workload correlation",
+    "P100 lane launch and qualification"
+  ]
+}

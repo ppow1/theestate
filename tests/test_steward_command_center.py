@@ -213,6 +213,7 @@ def test_command_center_office_navigation_and_tabs_cover_initial_areas(tmp_path)
         "Helen",
         "Resident Conversations",
         "AI Services / Models",
+        "Compute",
         "Daily Board",
         "Operational Activity",
         "Execution Control",
@@ -333,7 +334,7 @@ def test_wp0214_office_tabs_preserved_and_left_navigation_collapsed_by_default(t
 
     expected_tabs = [
         "Home", "Mission Control", "Engineering Dashboard", "Alfred", "Helen", "Resident Conversations",
-        "AI Services / Models", "Daily Board", "Operational Activity", "Execution Control", "Projects", "Roadmap", "Parking Lot",
+        "AI Services / Models", "Compute", "Daily Board", "Operational Activity", "Execution Control", "Projects", "Roadmap", "Parking Lot",
         "Work Packages", "Mailboxes", "Recalls", "Notifications", "Validation",
         "Search", "Settings", "Help", "About",
     ]

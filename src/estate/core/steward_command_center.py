@@ -43,6 +43,7 @@ from estate.core.operations_center_settings import load_operations_center_settin
 from estate.core.resident_interaction import resident_surface, process_chat, load_history, forget_conversation, retry_failed_response, alfred_llm_diagnostic
 from estate.ai_services.steward_model_selector import build_steward_ai_services_panel
 from estate.core.office_command_surface import controls_for_tab, execute_office_action
+from estate.core.compute_office_panel import build_compute_panel
 from estate.core.office_personnel_directory import build_office_personnel_directory
 from estate.core.engineering_campaign_dashboard import dashboard_operation, load_engineering_campaign_dashboard
 from estate.core.steward_awareness import generate_steward_awareness_runtime
@@ -58,6 +59,7 @@ OFFICE_NAVIGATION = [
     {"id": "helen", "label": "Helen", "panel": "helen_resident_card", "tab": "helen"},
     {"id": "resident-conversations", "label": "Resident Conversations", "panel": "resident_conversations_workspace", "tab": "resident-conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models", "panel": "ai_services_models", "tab": "ai-services-models"},
+    {"id": "compute", "label": "Compute", "panel": "compute_resources", "tab": "compute"},
     {"id": "daily-board", "label": "Daily Board", "panel": "morning_briefing", "tab": "daily-board"},
     {"id": "operational-activity", "label": "Operational Activity", "panel": "operational_activity", "tab": "operational-activity"},
     {"id": "execution-control", "label": "Execution Control", "panel": "execution_control", "tab": "execution-control"},
@@ -83,6 +85,7 @@ OFFICE_TABS = [
     {"id": "helen", "label": "Helen"},
     {"id": "resident-conversations", "label": "Resident Conversations"},
     {"id": "ai-services-models", "label": "AI Services / Models"},
+    {"id": "compute", "label": "Compute"},
     {"id": "daily-board", "label": "Daily Board"},
     {"id": "operational-activity", "label": "Operational Activity"},
     {"id": "execution-control", "label": "Execution Control"},
@@ -1088,6 +1091,7 @@ def generate_command_center(root=None, write=True):
         "about": _about_panel(root),
         "alfred_chat": _alfred_chat_panel(root),
         "grace_momentum": {"available": True, "path": "GraceMomentumClient", "kind": "grace_momentum_client_v1", "data": build_grace_momentum_surface(str(root))},
+        "compute_resources": {"available": True, "path": "runtime/compute_resources/gpus.json", "kind": "steward_compute_resources", "data": build_compute_panel(root)},
     }
     panels["office_operational_command_dashboard"] = _office_operational_command_dashboard(root, panels)
     if isinstance(panels.get("mission_control_workspace"), dict) and isinstance(panels["mission_control_workspace"].get("data"), dict):
@@ -1145,6 +1149,22 @@ def _execution_control_panel(root):
         "sessions": sessions,
         "attempts": attempts,
     }
+
+def _compute_resources_html(panel):
+    data = panel.get("data") or panel
+    rows = data.get("resources") or []
+    if not rows:
+        return _panel("Compute Resources", "<p class='placeholder'>No physical compute-resource evidence is currently available.</p>", "placeholder")
+    cards = []
+    for row in rows:
+        cards.append("<article class='compute-resource-card'><h4>" + html.escape(str(row.get("name") or "Unknown GPU")) + "</h4>" +
+                     "<p><strong>Resource:</strong> " + html.escape(str(row.get("resource_id"))) + "<br><strong>UUID:</strong> " + html.escape(str(row.get("nvidia_uuid", ""))[:18]) +
+                     "<br><strong>Health:</strong> " + html.escape(str(row.get("health_state"))) + "<br><strong>Capacity:</strong> " + html.escape(str(row.get("capacity_state"))) +
+                     "<br><strong>VRAM:</strong> " + html.escape(f"{row.get('memory_used_mib')} / {row.get('memory_free_mib')} / {row.get('memory_total_mib')} MiB") +
+                     "<br><strong>Utilization:</strong> " + html.escape(str(row.get("utilization_percent"))) + "%<br><strong>Temperature:</strong> " + html.escape(str(row.get("temperature_c"))) +
+                     "<br><strong>Freshness:</strong> " + html.escape(str(row.get("observation_timestamp"))) +
+                     "</p><pre>" + html.escape(json.dumps({"health_reasons": row.get("health_reasons"), "capacity_reasons": row.get("capacity_reasons"), "allocations": row.get("allocation_references")}, sort_keys=True, indent=2)) + "</pre></article>")
+    return _panel("Compute Resources", "<p><strong>Read-only projection.</strong> Physical identity is host plus NVIDIA UUID; runtime ordinal is observational only.</p><div class='compute-resource-grid'>" + "".join(cards) + "</div><h4>Reservations</h4><pre>" + html.escape(json.dumps(data.get("reservations") or [], indent=2, sort_keys=True)) + "</pre>", "ready")
 
 def _execution_control_html(panel):
     fields = ["selected_dispatch_id","selected_session_id","selected_attempt_id","selected_adapter_request_id","authorization_record_path","current_session_state","current_stage","provider","workspace_commit","lease_state","cancellation_state","result_state","reconciliation_state","validation_reference","attention_required","blocking_failure_reason"]
@@ -2692,6 +2712,7 @@ def render_command_center_html(payload):
         ("helen", "Helen Resident Card", _resident_html(p.get("helen_resident_card", {}))),
         ("resident-conversations", "Resident Conversations Workspace", _office_action_controls_html(payload, "resident-task-board") + _resident_task_board_html(p.get("resident_task_board", {})) + _resident_conversations_html(p.get("resident_conversations_workspace", {}))),
         ("ai-services-models", "AI Services / Models", _office_action_controls_html(payload, "ai-services-models") + _ai_services_models_html(p.get("ai_services_models", {}))),
+        ("compute", "Compute", _office_action_controls_html(payload, "compute") + _compute_resources_html(p.get("compute_resources", {}))),
         ("daily-board", "Daily Board / Parking Lot Workspace", _office_action_controls_html(payload, "daily-board") + _panel("Morning Briefing", _artifact_html(p.get("morning_briefing", {})), "ready" if p.get("morning_briefing", {}).get("available") else "placeholder") + _daily_board_workspace_html(p.get("daily_board_workspace", {}))),
         ("operational-dashboard", "Office Operational Command Dashboard", _office_action_controls_html(payload, "operational-dashboard") + _office_operational_command_dashboard_html(p.get("office_operational_command_dashboard", {}))),
         ("operational-activity", "Operational Activity", _office_action_controls_html(payload, "operational-activity") + _grace_momentum_html(p.get("grace_momentum", {})) + _operations_control_surface_html(p.get("operations_control_surface", {})) + _traffic_controller_html(p.get("traffic_controller_panel", {})) + _operational_activity_html(p.get("operational_activity", {}))),

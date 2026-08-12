@@ -1,0 +1,16 @@
+(async()=>{ const fs = require('node:fs');
+const target = (await fetch('http://127.0.0.1:9224/json/list').then(r=>r.json())).find(x=>x.type==='page'&&x.url==='http://127.0.0.1:8080/');
+if (!target) throw new Error('Open WebUI page not found');
+const ws = new WebSocket(target.webSocketDebuggerUrl); let id=0; const pending=new Map();
+ws.onmessage=e=>{const m=JSON.parse(e.data),p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result)}};
+await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject});
+const call=(method,params)=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}))});
+const evaluate=async expression=>(await call('Runtime.evaluate',{returnByValue:true,awaitPromise:true,expression})).result?.value;
+const payload=(text)=>({model:'estate/grace-grounded-test',messages:[{role:'user',content:text}],stream:false,tool_ids:['server:mcp:estate-comms8-live'],params:{function_calling:'native'}});
+const read=await evaluate(`fetch('/api/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(${JSON.stringify(payload('Use Estate Comms8 Live and call estate_comms8_list_requests with claim_next=false. Return only the authoritative tool result.'))})}).then(async r=>({status:r.status,body:await r.json()}))`);
+const create=await evaluate(`fetch('/api/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(${JSON.stringify(payload('Use Estate Comms8 Live and call estate_comms8_create_reasoning_request now with workflow_id="grace-mcp-investigation", objective="Return one bounded observation", input_data={}, idempotency_key="grace-mcp-investigation-1". Do not simulate the result.'))})}).then(async r=>({status:r.status,body:await r.json()}))`);
+const out={recorded_at:new Date().toISOString(),read:{status:read?.status,body:read?.body},create:{status:create?.status,body:create?.body}};
+fs.mkdirSync('A:/theestate-data/grace-comms8-mutation-investigation',{recursive:true});
+fs.writeFileSync('A:/theestate-data/grace-comms8-mutation-investigation/openwebui-grace-call-results.json',JSON.stringify(out,null,2)+'\n');
+console.log(JSON.stringify({read_status:read?.status,create_status:create?.status,read_tool_calls:read?.body?.choices?.[0]?.message?.tool_calls?.length||0,create_tool_calls:create?.body?.choices?.[0]?.message?.tool_calls?.length||0,read_content:read?.body?.choices?.[0]?.message?.content||'',create_content:create?.body?.choices?.[0]?.message?.content||''}));
+ws.close(); })().catch(e=>{console.error(e.message);process.exitCode=1});

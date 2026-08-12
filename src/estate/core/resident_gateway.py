@@ -1,7 +1,6 @@
 """Local OpenAI-compatible gateway for Estate residents."""
 from __future__ import annotations
-import base64, hashlib, json, os, time
-import re
+import base64, hashlib, json, os, re, time, traceback
 from urllib.parse import unquote_to_bytes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -12,7 +11,7 @@ from estate.core.multi_resident_room import create_room, invite_participant, acc
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat, detect_bounded_local_text_intent, execute_bounded_local_text_from_chat
 from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
 from estate.core.grace_runtime_bridge import GraceRuntimeBridge
 from estate.core.openwebui_grace_assignment import detect_grace_image_assignment, execute_grace_image_assignment
@@ -33,6 +32,34 @@ ACTIVE_RESIDENT_MODELS = {
     "estate/judy": "judy",
 }
 STATUS_PATH = Path("runtime/resident_gateway/status.json")
+BOUNDED_ERROR_PATH = Path("runtime/diagnostics/bounded_execution_errors.jsonl")
+
+
+def record_gateway_exception(exc: BaseException, *, payload: dict[str, Any] | None, root: Path | None) -> str | None:
+    """Persist internal exception provenance without changing the client error."""
+    try:
+        frames = traceback.extract_tb(exc.__traceback__)
+        origin = frames[-1] if frames else None
+        record = {
+            "schema_version": "estate.gateway-error-provenance.v1",
+            "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "exception_type": type(exc).__name__,
+            "exception_message": str(exc),
+            "missing_path": getattr(exc, "filename", None),
+            "origin": {"filename": origin.filename, "function": origin.name, "line": origin.lineno, "code": origin.line} if origin else None,
+            "traceback": traceback.format_exception(type(exc), exc, exc.__traceback__),
+            "request_id": (payload or {}).get("id"),
+            "session_id": ((payload or {}).get("metadata") or {}).get("session_id") or (payload or {}).get("session_id"),
+            "model": (payload or {}).get("model"),
+        }
+        base = Path(root) if root is not None else _root()
+        path = base / BOUNDED_ERROR_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, sort_keys=True) + "\n")
+        return str(path)
+    except Exception:
+        return None
 
 
 def models_payload(root=None) -> dict[str, Any]:
@@ -99,6 +126,13 @@ def _grace_runtime_operation_response(payload: dict[str, Any], *, root=None) -> 
     # must never intercept an assignment command merely because it mentions
     # operational terms such as "dispatch" or "objective".
     if detect_engineering_assignment_command(payload, text):
+        return None
+    # Explicit bounded execution is governed by the workflow below. It must
+    # take precedence over this read-only compatibility layer even when the
+    # request mentions ordinary operational words such as "checkpoint" or
+    # "provider".
+    bounded_intent = detect_bounded_local_text_intent(payload, text)
+    if bounded_intent.get("state") == "execution_requested":
         return None
     explicit_runtime_operations = (
         "list_grace_runtime_operations",
@@ -299,6 +333,147 @@ def _chat_result(payload: dict[str, Any], *, root=None) -> tuple[int, str | None
     return 200, model, result
 
 
+def _grace_operational_memory_completion(payload: dict[str, Any], *, user_message: str, root=None) -> dict[str, Any] | None:
+    if payload.get("model") != "estate/grace":
+        return None
+    from estate.core.grace_operational_memory import (
+        build_composite_operational_evidence, classify_operational_request,
+        composite_response_complete, enforce_terminal_provenance_status,
+        read_operational_snapshot, render_operational_snapshot,
+        render_provenance_composite,
+    )
+    mode = classify_operational_request(user_message)
+    if not mode["requires_operational_read"]:
+        return None
+    snapshot = read_operational_snapshot()
+    if mode["mode"] == "grounded_composite_reasoning":
+        evidence = build_composite_operational_evidence(snapshot, user_message)
+        from estate.core.resident_interaction import process_chat
+        result = process_chat("grace", user_message, participant_role="Steward", action="conversation",
+                              root=root, reasoning_evidence=evidence, persist=False)
+        content = str((result.get("turn") or {}).get("resident_response") or "")
+        repair_attempted = False
+        if not composite_response_complete(content, user_message):
+            repair_attempted = True
+            repair_prompt = (user_message + "\n\nBounded response repair: answer every original numbered obligation, "
+                             "use the supplied authoritative evidence, distinguish executed/recommended/requested/pending, "
+                             "and end with exactly one requested terminal classification. Do not claim an action without evidence.")
+            repaired = process_chat("grace", repair_prompt, participant_role="Steward", action="conversation",
+                                    root=root, reasoning_evidence=evidence, persist=False)
+            content = str((repaired.get("turn") or {}).get("resident_response") or "")
+        if not composite_response_complete(content, user_message):
+            content = render_provenance_composite(snapshot) if "provenance" in user_message.lower() or "did you" in user_message.lower() else (content + "\n\nINCOMPLETE_RESPONSE_UNAVAILABLE")
+        content = enforce_terminal_provenance_status(content, user_message, evidence)
+        return {
+            "id": f"chatcmpl-operational-composite-{hashlib.sha256(user_message.encode('utf-8')).hexdigest()[:16]}",
+            "object": "chat.completion",
+            "created": int(time.time()), "model": payload.get("model"),
+            "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+            "estate": {"resident_id": "grace", "privileged_action_executed": False,
+                        "claim_provenance": "authoritative_read",
+                        "operational_memory": {**snapshot, "runtime_bridge_invoked": True, "native_tool_call": False},
+                        "composite_reasoning": {"mode": mode["mode"], "original_request_preserved": True,
+                                                "model_reasoning_attempted": True, "completeness_repair_attempted": repair_attempted,
+                                                "evidence": evidence, "final_response_complete": composite_response_complete(content, user_message)}},
+        }
+    return {
+        "id": f"chatcmpl-operational-memory-{hashlib.sha256(user_message.encode('utf-8')).hexdigest()[:16]}",
+        "object": "chat.completion",
+        "created": int(time.time()),
+        "model": payload.get("model"),
+        "choices": [{"index": 0, "message": {"role": "assistant", "content": render_operational_snapshot(snapshot)}, "finish_reason": "stop"}],
+        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        "estate": {"resident_id": "grace", "privileged_action_executed": False,
+                    "claim_provenance": "authoritative_read",
+                    "operational_memory": {**snapshot, "runtime_bridge_invoked": True, "native_tool_call": False}},
+    }
+
+
+def _mcp_function_specs(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Return only Comms8 functions explicitly supplied by Open WebUI."""
+    specs: dict[str, dict[str, Any]] = {}
+    for item in payload.get("tools") or []:
+        if not isinstance(item, dict):
+            continue
+        function = item.get("function") if isinstance(item.get("function"), dict) else item
+        name = function.get("name") if isinstance(function, dict) else None
+        if isinstance(name, str) and "estate_comms8_" in name:
+            specs[name] = function
+    return specs
+
+
+def _mcp_arguments(tool_name: str, text: str) -> dict[str, Any] | None:
+    """Parse only explicit MCP arguments; never invent a request identity."""
+    def quoted(key: str) -> str | None:
+        match = re.search(rf"(?:[\"']?{key}[\"']?)\s*[:=]\s*[\"']([^\"']+)[\"']", text, re.I)
+        return match.group(1) if match else None
+
+    if tool_name.endswith("estate_comms8_list_requests"):
+        match = re.search(r"claim_next\s*[:=]\s*(true|false)", text, re.I)
+        return {"claim_next": match.group(1).lower() == "true"} if match else {"claim_next": False}
+    if tool_name.endswith("estate_comms8_read_request"):
+        request_id = quoted("request_id")
+        if request_id is None:
+            match = re.search(r"\bec8-[0-9a-f]{8,}\b", text, re.I)
+            request_id = match.group(0) if match else None
+        return {"request_id": request_id} if request_id else None
+    if tool_name.endswith("estate_comms8_create_reasoning_request"):
+        workflow_id = quoted("workflow_id")
+        objective = quoted("objective")
+        idempotency_key = quoted("idempotency_key")
+        if not all((workflow_id, objective, idempotency_key)):
+            return None
+        input_data = {}
+        input_match = re.search(r"input_data\s*[:=]\s*(\{.*?\})", text, re.I | re.S)
+        if input_match:
+            try:
+                parsed = json.loads(input_match.group(1).replace("'", '"'))
+                if isinstance(parsed, dict):
+                    input_data = parsed
+            except (TypeError, ValueError):
+                return None
+        return {"workflow_id": workflow_id, "objective": objective, "input_data": input_data, "idempotency_key": idempotency_key}
+    return None
+
+
+def _mcp_tool_request_response(payload: dict[str, Any]) -> dict[str, Any] | None:
+    """Emit a native tool call for an explicit Comms8 request, never its result."""
+    if payload.get("model") not in {"estate/grace", "estate/grace-grounded-test"}:
+        return None
+    text = _latest_user_message(payload.get("messages") or [])
+    specs = _mcp_function_specs(payload)
+    requested_name = next((name for name in specs if name in text), None)
+    if requested_name is None:
+        lower = text.lower()
+        if "estate" in lower and "comms8" in lower:
+            if re.search(r"\b(read|retrieve|look\s+up|show)\b", lower):
+                requested_name = next((name for name in specs if name.endswith("estate_comms8_read_request")), None)
+            elif re.search(r"\b(list|queue|queued)\b", lower):
+                requested_name = next((name for name in specs if name.endswith("estate_comms8_list_requests")), None)
+    if requested_name is None:
+        if "comms8" in text.lower() and re.search(r"\b(claim|claimed|acknowledge|acknowledged|respond|responded|resolve|resolved|created|submitted|completed|located)\b", text, re.I):
+            return {"id": f"chatcmpl-grace-mcp-unavailable-{int(time.time()*1000)}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": "I cannot report a Comms8 lifecycle change because no enabled Comms8 function call was emitted."}, "finish_reason": "stop"}], "estate": {"resident_id": "grace", "mcp_invocation": "not_attempted", "reason": "native_tool_call_required"}}
+        return None
+    arguments = _mcp_arguments(requested_name, text)
+    if arguments is None:
+        return {"id": f"chatcmpl-grace-mcp-missing-{int(time.time()*1000)}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": f"I cannot invoke {requested_name}: explicit required arguments were not supplied."}, "finish_reason": "stop"}], "estate": {"resident_id": "grace", "mcp_invocation": "not_attempted", "reason": "explicit_arguments_required"}}
+    return {"id": f"chatcmpl-grace-mcp-call-{int(time.time()*1000)}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": None, "tool_calls": [{"id": f"call-{uuid4().hex[:16]}", "type": "function", "function": {"name": requested_name, "arguments": json.dumps(arguments, separators=(",", ":"))}}]}, "finish_reason": "tool_calls"}], "estate": {"resident_id": "grace", "mcp_invocation": "delegated_to_openwebui"}}
+
+
+def _mcp_tool_result_response(payload: dict[str, Any]) -> dict[str, Any] | None:
+    """Return the latest MCP tool result verbatim; do not synthesize its contents."""
+    messages = payload.get("messages") or []
+    last_user = max((index for index, message in enumerate(messages) if isinstance(message, dict) and message.get("role") == "user"), default=-1)
+    results = [message for message in messages[last_user + 1:] if isinstance(message, dict) and message.get("role") == "tool"]
+    if not results:
+        return None
+    content = results[-1].get("content", "")
+    if not isinstance(content, str):
+        content = json.dumps(content, sort_keys=True)
+    return {"id": f"chatcmpl-grace-mcp-result-{int(time.time()*1000)}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}], "estate": {"resident_id": "grace", "mcp_result": "authoritative_tool_result"}}
+
+
 def _engineering_assignment_content(workflow: dict[str, Any]) -> str:
     return (
         "Engineering Department assignment initiated through the existing Helen workforce, "
@@ -306,6 +481,170 @@ def _engineering_assignment_content(workflow: dict[str, Any]) -> str:
         "No second execution system was created.\n\n"
         + workflow["summary"]
     )
+
+
+def _bounded_conversation_context(payload: dict[str, Any], *, latest_user: str) -> str:
+    parts = []
+    messages = payload.get("messages") or []
+    # Keep only the bounded referent immediately preceding the delegation.
+    # The final assistant turn is Grace's recommendation; the preceding user
+    # turn is the question it answers.  System/developer material is excluded.
+    prior = [message for message in messages if isinstance(message, dict) and message.get("role") in {"user", "assistant"}]
+    if prior and prior[-1].get("role") == "user" and _message_text(prior[-1].get("content")).strip() == latest_user:
+        prior = prior[:-1]
+    prior = prior[-4:]
+    for message in prior:
+        role = str(message.get("role") or "")
+        content = _message_text(message.get("content"))
+        if not content:
+            continue
+        parts.append(f"{role}: {content[:1200]}")
+    return "\n".join(parts)[-3600:]
+
+
+def _second_opinion_context(payload: dict[str, Any], *, latest_user: str, session_id: str | None) -> dict[str, Any] | None:
+    """Resolve the bounded conversational referent before consultation allocation."""
+    if "second opinion on this" not in " ".join(str(latest_user).lower().split()):
+        return None
+    messages = [message for message in payload.get("messages") or []
+                if isinstance(message, dict) and message.get("role") in {"user", "assistant"}]
+    if messages and messages[-1].get("role") == "user" and _message_text(messages[-1].get("content")).strip() == latest_user:
+        messages = messages[:-1]
+    if not messages or messages[-1].get("role") != "assistant":
+        return None
+    recommendation = _message_text(messages[-1].get("content")).strip()
+    preceding_user = next((_message_text(item.get("content")).strip() for item in reversed(messages[:-1])
+                           if item.get("role") == "user"), "")
+    if not recommendation or not preceding_user:
+        return None
+    bounded = _bounded_conversation_context(payload, latest_user=latest_user)
+    return {
+        "purpose": "independent_second_opinion",
+        "proposition": preceding_user[:1200],
+        "current_recommendation": recommendation[:1200],
+        "constraints": [],
+        "requested_analysis": [
+            "evaluate Grace's recommendation independently",
+            "identify agreement, disagreement, missed risks, and new insight",
+        ],
+        "bounded_context": bounded,
+        "source_interaction": {"session_id": session_id, "message_count": len(messages)},
+    }
+
+
+def _grace_consultation_chat_completion(payload: dict[str, Any], *, user_message: str,
+                                        session_id: str | None, stream: bool = False) -> dict[str, Any] | None:
+    """Handle external reasoning only through the authoritative consultation loop."""
+    if payload.get("model") != "estate/grace":
+        return None
+    from estate.core.grace_consultation_loop import (
+        GraceConsultationLoop,
+        external_reasoning_claim_present,
+        external_reasoning_provenance,
+        is_explicit_delegation_request,
+    )
+    if not is_explicit_delegation_request(user_message):
+        return None
+    loop = GraceConsultationLoop()
+    prior_context = _bounded_conversation_context(payload, latest_user=user_message)
+    second_opinion_context = _second_opinion_context(payload, latest_user=user_message, session_id=session_id)
+    delegation_text = (
+        f"{user_message}\n\nBounded prior conversation context:\n{prior_context}"
+        if prior_context else user_message
+    )
+    parent_logical_id = None
+    if prior_context:
+        existing = [
+            item for status in ("open", "awaiting_reasoning", "claimed", "reasoning", "continuation_required")
+            for item in loop.store.search(status=status)
+            if item.objective == user_message.strip()
+        ]
+        parent_logical_id = max(existing, key=lambda item: item.updated_at, default=None)
+        parent_logical_id = parent_logical_id.logical_consultation_id if parent_logical_id else None
+    try:
+        result = loop.delegate(
+            delegation_text,
+            session_id=session_id,
+            parent_logical_id=parent_logical_id,
+            tags=("grace", "reasoning"),
+            second_opinion_context=second_opinion_context,
+        )
+        provenance = external_reasoning_provenance(result, user_message)
+        if not provenance["external_reasoning_performed"]:
+            content = (
+                "External reasoning: Performed: No\n"
+                "Attempted: Yes\n"
+                "Failure: authoritative reasoning response unavailable."
+            )
+        else:
+            content = str(result.get("response") or "")
+    except Exception as exc:
+        # Preserve the authoritative allocation identity on failed transport
+        # or provider attempts.  A failure may prove that a consultation was
+        # allocated, but never proves that a provider conclusion exists.
+        candidates = [
+            item for status in ("open", "awaiting_reasoning", "claimed", "reasoning", "continuation_required")
+            for item in loop.store.search(status=status)
+            if item.objective in (user_message.strip(), delegation_text)
+        ]
+        attempted = max(candidates, key=lambda item: item.updated_at, default=None)
+        provenance = {
+            "external_reasoning_performed": False,
+            "attempted": True,
+            "request_fingerprint": hashlib.sha256(user_message.strip().encode("utf-8")).hexdigest(),
+            "consultation_root": attempted.root_logical_id if attempted else None,
+            "consultation_turn": attempted.logical_consultation_id if attempted else None,
+            "consultation_status": attempted.status if attempted else "unavailable",
+            "comms8_request_id": attempted.ec8_request_id if attempted else None,
+            "provider": None,
+            "response_id": None,
+            "completion_status": "failed",
+            "failure": str(exc).split(":", 1)[0][:120],
+            "contribution": None,
+        }
+        content = (
+            "External reasoning: Performed: No\n"
+            "Attempted: Yes\n"
+            f"Failure: {provenance['failure']}. No provider conclusion is available."
+        )
+    if not provenance["external_reasoning_performed"] and external_reasoning_claim_present(content):
+        content = (
+            "External reasoning: Performed: No\n"
+            "No authoritative consultation/provider evidence is available; no external conclusion is asserted."
+        )
+    body = {
+        "id": f"chatcmpl-external-reasoning-{provenance.get('consultation_turn') or 'unavailable'}",
+        "object": "chat.completion.chunk" if stream else "chat.completion",
+        "created": int(time.time()),
+        "model": payload.get("model"),
+        "choices": [{
+            "index": 0,
+            ("delta" if stream else "message"): {"role": "assistant", "content": content},
+            "finish_reason": None if stream else "stop",
+        }],
+        "estate": {
+            "external_reasoning": provenance,
+            "consultation": {
+                "logical_consultation_id": provenance.get("consultation_turn"),
+                "root_logical_id": provenance.get("consultation_root"),
+                "ec8_request_id": provenance.get("comms8_request_id"),
+                "response_id": provenance.get("response_id"),
+                "worker": provenance.get("provider"),
+                "status": provenance.get("consultation_status"),
+                "authoritative": provenance.get("external_reasoning_performed", False),
+            },
+            "privileged_action_executed": False,
+        },
+    }
+    return body
+def _bounded_local_text_content(workflow: dict[str, Any]) -> str:
+    if workflow.get("state") == "execution_completed":
+        result_metadata = workflow.get("execution", {}).get("result", {}).get("metadata", {})
+        placement = workflow.get("placement", {}).get("selected")
+        actual_resource = result_metadata.get("actual_runtime_resource_id")
+        actual_uuid = result_metadata.get("actual_runtime_gpu_uuid") or result_metadata.get("runtime_bound_gpu_uuid")
+        return json.dumps({"status": "completed", "provider": "qwen.local.text", "runtime_lane": workflow.get("lane", {}).get("runtime_lane_id"), "physical_resource": actual_resource, "gpu_uuid": actual_uuid, "intended_physical_resource": placement, "intended_gpu_uuid": result_metadata.get("configured_required_gpu_uuid"), "actual_runtime_resource": actual_resource, "actual_runtime_gpu_uuid": actual_uuid, "placement_match": result_metadata.get("placement_match"), "summary": workflow.get("execution", {}).get("result", {}).get("summary", "bounded local text task completed")}, sort_keys=True)
+    return json.dumps({"status": workflow.get("state", "execution_blocked"), "reason": workflow.get("reason") or workflow.get("execution", {}).get("handoff", {}).get("errors") or "governed execution did not complete"}, sort_keys=True)
 
 
 def _engineering_assignment_estate_envelope(model: str, session_id: str | None, workflow: dict[str, Any]) -> dict[str, Any]:
@@ -317,6 +656,18 @@ def _engineering_assignment_estate_envelope(model: str, session_id: str | None, 
         "second_execution_system_created": False,
         "engineering_assignment": workflow,
     }
+
+
+def _guard_unproven_external_claim(content: str) -> str:
+    """Prevent ordinary resident prose from fabricating provider review."""
+    from estate.core.grace_consultation_loop import external_reasoning_claim_present
+    if external_reasoning_claim_present(content):
+        return (
+            "External reasoning: Performed: No\n"
+            "No authoritative consultation/provider evidence is available; "
+            "no external conclusion is asserted."
+        )
+    return content
 
 
 def _engineering_assignment_chat_completion(
@@ -353,6 +704,22 @@ def _engineering_assignment_chat_completion(
     }
 
 
+def _bounded_local_text_chat_completion(payload: dict[str, Any], *, user_message: str, session_id: str | None, root=None, stream: bool = False) -> dict[str, Any] | None:
+    intent = detect_bounded_local_text_intent(payload, user_message)
+    if intent["state"] == "conversation_only":
+        return None
+    workflow = execute_bounded_local_text_from_chat(payload, user_message=user_message, session_id=session_id, root=root)
+    if workflow is None:
+        return None
+    content = _bounded_local_text_content(workflow)
+    envelope = {"resident_id": "grace", "session_id": session_id, "bounded_local_text": workflow, "provider_execution_performed": bool(workflow.get("provider_execution_performed")), "privileged_action_executed": False, "second_execution_system_created": False}
+    body = {"id": f"chatcmpl-grace-bounded-{workflow.get('objective', {}).get('objective_id', int(time.time()))}", "object": "chat.completion", "created": int(time.time()), "model": payload.get("model"), "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "estate": envelope}
+    if stream:
+        body["object"] = "chat.completion.chunk"
+        body["choices"][0] = {"index": 0, "delta": {"role": "assistant", "content": content}, "finish_reason": "stop"}
+    return body
+
+
 def _grace_image_assignment_chat_completion(payload: dict[str, Any], *, user_message: str, session_id: str | None, stream: bool = False) -> dict[str, Any] | None:
     if not detect_grace_image_assignment(payload.get("model"), user_message):
         return None
@@ -379,6 +746,15 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
     image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id)
     if image_assignment is not None:
         return 200, image_assignment
+    operational_body = _grace_operational_memory_completion(payload, user_message=user_message, root=root)
+    if operational_body is not None:
+        return 200, operational_body
+    consultation_body = _grace_consultation_chat_completion(payload, user_message=user_message, session_id=session_id)
+    if consultation_body is not None:
+        return 200, consultation_body
+    bounded_text = _bounded_local_text_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
+    if bounded_text is not None:
+        return 200, bounded_text
     workflow_body = _engineering_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, root=root)
     if workflow_body is not None:
         return 200, workflow_body
@@ -392,7 +768,8 @@ def _non_streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tup
     if audio["requested"]:
         from estate.core.resident_voice_commissioning import synthesize_resident_sample
         audio = synthesize_resident_sample(turn["resident_id"], turn["resident_response"], root=root, sample_name=f"{turn['turn_id']}", turn_id=turn["turn_id"])
-    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":turn["resident_response"]},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"privileged_actions_enabled":False,"identity_hash":package["identity_source_hash"],"identity_schema_version":package["identity_schema_version"],"identity_failed_closed":package["identity_failed_closed"],"identity_sources":package["identity_sources"],"resident_package":package,"voice":{"state":"unavailable" if package["voice_state"] == "uncommissioned" else package["voice_state"],"commissioning_state":package["voice_state"],"engine":package["voice_engine"],"voice_id":package["voice_id"],"speed":package["voice_speed"],"approval_state":package["voice_approval_state"],"tts_available":package["tts_available"]},"visual":{"state":package["visual_state"],"avatar_uri":package["avatar_uri"],"provenance":package["visual_provenance"]},"audio":audio}}
+    content = _guard_unproven_external_claim(turn["resident_response"])
+    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion","created":created,"model":model,"choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0},"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":package["identity_source_hash"],"identity_schema_version":package["identity_schema_version"],"identity_failed_closed":package["identity_failed_closed"],"identity_sources":package["identity_sources"],"resident_package":package,"voice":{"state":package["voice_state"],"engine":package["voice_engine"],"voice_id":package["voice_id"],"speed":package["voice_speed"],"approval_state":package["voice_approval_state"],"tts_available":package["tts_available"]},"visual":{"state":package["visual_state"],"avatar_uri":package["avatar_uri"],"provenance":package["visual_provenance"]},"audio":audio}}
     _attach_optional_gateway_diagnostics(body, result)
     return 200, body
 
@@ -410,6 +787,17 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
     image_assignment = _grace_image_assignment_chat_completion(payload, user_message=user_message, session_id=session_id, stream=True)
     if image_assignment is not None:
         return 200, image_assignment
+    operational_body = _grace_operational_memory_completion(payload, user_message=user_message, root=root)
+    if operational_body is not None:
+        operational_body["object"] = "chat.completion.chunk"
+        operational_body["choices"][0]["delta"] = operational_body["choices"][0].pop("message")
+        return 200, operational_body
+    consultation_body = _grace_consultation_chat_completion(payload, user_message=user_message, session_id=session_id, stream=True)
+    if consultation_body is not None:
+        return 200, consultation_body
+    bounded_text = _bounded_local_text_chat_completion(payload, user_message=user_message, session_id=session_id, root=root, stream=True)
+    if bounded_text is not None:
+        return 200, bounded_text
     workflow_body = _engineering_assignment_chat_completion(
         payload, user_message=user_message, session_id=session_id, root=root, stream=True
     )
@@ -420,7 +808,8 @@ def _streaming_chat_completion(payload: dict[str, Any], *, root=None) -> tuple[i
         return code, result
     turn = result["turn"]
     created = int(time.time())
-    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":turn["resident_response"]},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":(turn.get("identity_composition") or {}).get("identity_version_or_source_hash"),"identity_schema_version":(turn.get("identity_composition") or {}).get("schema_version"),"identity_failed_closed":(turn.get("identity_composition") or {}).get("failed_closed")}}
+    content = _guard_unproven_external_claim(turn["resident_response"])
+    body = {"id":f"chatcmpl-{turn['turn_id']}","object":"chat.completion.chunk","created":created,"model":model,"choices":[{"index":0,"delta":{"role":"assistant","content":content},"finish_reason":None}],"estate":{"resident_id":turn["resident_id"],"session_id":result["session_id"],"turn_id":turn["turn_id"],"fallback_used":turn["llm"].get("fallback_used"),"provider":turn["llm"].get("provider"),"model":turn["llm"].get("model"),"privileged_action_executed":False,"identity_hash":(turn.get("identity_composition") or {}).get("identity_version_or_source_hash"),"identity_schema_version":(turn.get("identity_composition") or {}).get("schema_version"),"identity_failed_closed":(turn.get("identity_composition") or {}).get("failed_closed")}}
     _attach_optional_gateway_diagnostics(body, result)
     return 200, body
 
@@ -613,6 +1002,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 code, body=chat_completion(payload, root=self.root); self._send(code, body)
         except Exception as exc:
+            record_gateway_exception(exc, payload=locals().get("payload"), root=self.root)
             self._send(500,{"error":{"message":f"gateway error: {type(exc).__name__}","code":"gateway_error"}})
     def log_message(self, fmt, *args):
         return
