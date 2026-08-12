@@ -1,78 +1,78 @@
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(DefaultParameterSetName='Preflight', SupportsShouldProcess)]
 param(
-    [string]$RepositoryRoot = 'A:\theestate',
-    [string]$RuntimeRoot = 'A:\EstateRuntime\host\estate-main\current'
+    [Parameter(Mandatory=$true)][string]$SourceRoot,
+    [Parameter(Mandatory=$true)][string]$TargetRoot,
+    [Parameter(Mandatory=$false)][string]$ExpectedSourceSha,
+    [Parameter(Mandatory=$false)][string]$ReceiptPath,
+    [Parameter(ParameterSetName='Preflight', Mandatory=$true)][switch]$PreflightOnly,
+    [Parameter(ParameterSetName='Deploy', Mandatory=$true)][switch]$Deploy
 )
 
 $ErrorActionPreference = 'Stop'
-
-# This is a selective runtime overlay. It intentionally does not synchronize
-# the repository wholesale and therefore cannot import unrelated feature work.
+# Selective overlay only; never synchronize the repository wholesale.
 $relativeFiles = @(
-    'src\estate\core\autonomous_chatgpt_mailbox_worker.py',
-    'src\estate\core\autonomous_reason_execute_loop.py',
-    'src\estate\core\chatgpt_execution_runtime.py',
-    'src\estate\core\chatgpt_reasoning_resident.py',
-    'src\estate\core\chatgpt_worker_runtime.py',
-    'src\estate\core\compute_resources.py',
-    'src\estate\core\conference_room_lifecycle.py',
-    'src\estate\core\consultation_escalation.py',
-    'src\estate\core\consultation_execution.py',
-    'src\estate\core\consultation_projection.py',
-    'src\estate\core\consultation_store.py',
-    'src\estate\core\evidence_acquisition.py',
-    'src\estate\core\grace_consultation_loop.py',
-    'src\estate\core\grace_live_mcp_cli.py',
-    'src\estate\core\grace_operational_memory.py',
-    'src\estate\core\grace_parallel_portfolio.py',
-    'src\estate\core\openwebui_resident_surface.py',
-    'src\estate\core\resident_gateway.py',
-    'tools\chatgpt_mailbox_worker_browser.cjs',
-    'tools\comms8_streamable_http_adapter.py',
-    'tools\start_chatgpt_mailbox_worker_canonical.ps1',
-    'tools\start_grace_consultation_gateway.py',
+    'src\estate\core\autonomous_chatgpt_mailbox_worker.py', 'src\estate\core\autonomous_reason_execute_loop.py',
+    'src\estate\core\chatgpt_execution_runtime.py', 'src\estate\core\chatgpt_reasoning_resident.py',
+    'src\estate\core\chatgpt_worker_runtime.py', 'src\estate\core\compute_resources.py',
+    'src\estate\core\conference_room_lifecycle.py', 'src\estate\core\consultation_escalation.py',
+    'src\estate\core\consultation_execution.py', 'src\estate\core\consultation_projection.py',
+    'src\estate\core\consultation_store.py', 'src\estate\core\evidence_acquisition.py',
+    'src\estate\core\grace_consultation_loop.py', 'src\estate\core\grace_live_mcp_cli.py',
+    'src\estate\core\grace_operational_memory.py', 'src\estate\core\grace_parallel_portfolio.py',
+    'src\estate\core\openwebui_resident_surface.py', 'src\estate\core\resident_gateway.py',
+    'tools\chatgpt_mailbox_worker_browser.cjs', 'tools\comms8_streamable_http_adapter.py',
+    'tools\start_chatgpt_mailbox_worker_canonical.ps1', 'tools\start_grace_consultation_gateway.py',
     'tools\start_openwebui_canonical.ps1'
 )
 
-$repo = [IO.Path]::GetFullPath($RepositoryRoot)
-$runtime = [IO.Path]::GetFullPath($RuntimeRoot)
-if (-not (Test-Path -LiteralPath (Join-Path $repo '.git') -PathType Container)) {
-    throw "Repository root is not a checkout: $repo"
-}
-if (-not (Test-Path -LiteralPath $runtime -PathType Container)) {
-    throw "Runtime root is missing: $runtime"
-}
+function Hash-File([string]$Path) { if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }; return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
+function Invoke-Git([string]$Root, [string[]]$GitArgs) { $out = & git -C $Root @GitArgs 2>&1; if ($LASTEXITCODE -ne 0) { throw "git failed: $($out -join ' ')" }; return ($out -join "`n").Trim() }
+function Safe-Id([string]$Value) { return (($Value -replace '[^A-Za-z0-9_.-]', '_').Trim('_')) }
 
-$receipt = [ordered]@{
-    schema = 'estate.grace_comms8_runtime_overlay.v1'
-    generated_at = [DateTime]::UtcNow.ToString('o')
-    repository_root = $repo
-    runtime_root = $runtime
-    source_revision = (& git -C $repo rev-parse HEAD).Trim()
-    files = @()
-}
-
+$source = [IO.Path]::GetFullPath($SourceRoot)
+$target = [IO.Path]::GetFullPath($TargetRoot)
+if (-not (Test-Path -LiteralPath $source -PathType Container)) { throw "SourceRoot missing: $source" }
+if (-not (Test-Path -LiteralPath $target -PathType Container)) { throw "TargetRoot missing: $target" }
+$top = Invoke-Git $source @('rev-parse','--show-toplevel')
+if ([IO.Path]::GetFullPath($top) -ne $source) { throw "SourceRoot is not the git worktree root: $source" }
+$branch = Invoke-Git $source @('branch','--show-current')
+if ($branch -ne 'integration/grace-comms8-parallelism') { throw "Wrong source branch: $branch" }
+$sourceSha = Invoke-Git $source @('rev-parse','HEAD')
+if ($ExpectedSourceSha -and $sourceSha -ne $ExpectedSourceSha) { throw "Source SHA mismatch: expected $ExpectedSourceSha, got $sourceSha" }
+$targetHead = Invoke-Git $target @('rev-parse','HEAD')
+$oldReceipt = Join-Path $target 'runtime\deployments\grace_comms8_runtime_overlay.json'
+if (-not $ReceiptPath) { $ReceiptPath = $oldReceipt }
+$receiptFull = [IO.Path]::GetFullPath($ReceiptPath)
+$started = [DateTime]::UtcNow
+$deploymentId = 'grace-overlay-' + $started.ToString('yyyyMMddTHHmmssfffZ') + '-' + $sourceSha.Substring(0,12)
+$previous = @{}
+if (Test-Path -LiteralPath $oldReceipt) { try { $old = Get-Content -LiteralPath $oldReceipt -Raw | ConvertFrom-Json; foreach($f in $old.files){$previous[$f.path.Replace('/','\')] = [string]$f.sha256} } catch { } }
+$manifest = @(); $unknown = @(); $unchanged = @(); $changed = @()
 foreach ($relative in $relativeFiles) {
-    $source = Join-Path $repo $relative
-    $target = Join-Path $runtime $relative
-    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "Manifest source is missing: $source" }
-    $targetDir = Split-Path -Parent $target
-    if (-not (Test-Path -LiteralPath $targetDir -PathType Container)) {
-        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-    }
-    if ($PSCmdlet.ShouldProcess($target, 'Deploy selective Grace/Comms8 runtime file')) {
-        Copy-Item -LiteralPath $source -Destination $target -Force
-    }
-    $hash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
-    $receipt.files += [ordered]@{ path = $relative; sha256 = $hash }
+    $sourcePath = Join-Path $source $relative; $targetPath = Join-Path $target $relative
+    if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) { throw "Manifest source is missing: $sourcePath" }
+    $sourceHash = Hash-File $sourcePath; $preHash = Hash-File $targetPath
+    $class = if ($preHash -and $preHash -eq $sourceHash) { 'INTEGRATION_EQUIVALENT' } elseif ($preHash -and $previous.ContainsKey($relative) -and $preHash -eq $previous[$relative].ToUpperInvariant()) { 'EXPECTED_PREVIOUS_OVERLAY' } elseif (-not $preHash) { 'MISSING_TARGET' } else { 'UNKNOWN_DRIFT' }
+    if ($class -eq 'UNKNOWN_DRIFT') { $unknown += $relative }
+    if ($class -eq 'INTEGRATION_EQUIVALENT') { $unchanged += $relative } else { $changed += $relative }
+    $manifest += [ordered]@{relative_path=$relative;source_sha256=$sourceHash;pre_target_sha256=$preHash;post_target_sha256=$null;classification=$class;deployment_action=if($class -eq 'INTEGRATION_EQUIVALENT'){'UNCHANGED'}else{'REPLACE'} }
 }
-
-$receiptPath = Join-Path $runtime 'runtime\deployments\grace_comms8_runtime_overlay.json'
-$receiptDir = Split-Path -Parent $receiptPath
-if (-not (Test-Path -LiteralPath $receiptDir -PathType Container)) {
-    New-Item -ItemType Directory -Path $receiptDir -Force | Out-Null
+$result = if ($unknown.Count) { 'PREFLIGHT_BLOCKED' } else { 'PREFLIGHT_PASS' }
+$receipt = [ordered]@{schema='estate.grace_comms8_runtime_overlay.v2';deployment_id=$deploymentId;timestamp_started=$started.ToString('o');timestamp_completed=$null;actor=$env:USERNAME;source_root=$source;source_branch=$branch;source_sha=$sourceSha;target_root=$target;target_git_head=$targetHead;preflight_result=$result;runtime_drift_classification=$manifest;manifest=$manifest;backup_path=$null;files_changed=$changed;files_unchanged=$unchanged;pre_hashes=@{};source_hashes=@{};post_hashes=@{};rollback_available=$false;rollback_performed=$false;services_requiring_restart=@('resident-gateway','grace-consultation-gateway','chatgpt-mailbox-worker');result=$result;warnings=@();errors=@()}
+foreach($m in $manifest){$receipt.pre_hashes[$m.relative_path]=$m.pre_target_sha256;$receipt.source_hashes[$m.relative_path]=$m.source_sha256}
+if ($PreflightOnly) { $receipt.timestamp_completed=[DateTime]::UtcNow.ToString('o'); $receipt | ConvertTo-Json -Depth 12; exit 0 }
+if ($unknown.Count) { throw "PREFLIGHT_BLOCKED: unknown runtime drift: $($unknown -join ', ')" }
+$backup = Join-Path $target ('runtime\deployments\backups\' + $deploymentId); if (Test-Path -LiteralPath $backup) { throw "Backup already exists: $backup" }
+New-Item -ItemType Directory -Path $backup -Force | Out-Null
+try {
+    foreach($m in $manifest){ if($m.pre_target_sha256){$dst=Join-Path $target $m.relative_path;if((Hash-File $dst) -ne $m.pre_target_sha256){throw "Target changed after preflight: $($m.relative_path)"}; $bd=Join-Path $backup $m.relative_path;New-Item -ItemType Directory -Path (Split-Path $bd) -Force | Out-Null;Copy-Item -LiteralPath $dst -Destination $bd; if((Hash-File $bd) -ne $m.pre_target_sha256){throw "Backup verification failed: $($m.relative_path)"} } }
+    $meta=[ordered]@{deployment_id=$deploymentId;source_root=$source;source_branch=$branch;source_sha=$sourceSha;target_git_head=$targetHead;manifest=$manifest;rollback_instructions='Copy backup files back to target paths after stopping governed services.'}; $meta | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $backup 'metadata.json') -Encoding UTF8
+    $receipt.backup_path=$backup;$receipt.rollback_available=$true
+    foreach($m in $manifest){ if($m.classification -eq 'INTEGRATION_EQUIVALENT'){continue};$sp=Join-Path $source $m.relative_path;$dp=Join-Path $target $m.relative_path;New-Item -ItemType Directory -Path (Split-Path $dp) -Force | Out-Null;$tmp=$dp+'.estate-tmp-'+$deploymentId;Copy-Item -LiteralPath $sp -Destination $tmp -Force;if((Hash-File $tmp) -ne $m.source_sha256){throw "Temporary source hash failed: $($m.relative_path)"};Move-Item -LiteralPath $tmp -Destination $dp -Force;if((Hash-File $dp) -ne $m.source_sha256){throw "Post-write hash failed: $($m.relative_path)"};$receipt.post_hashes[$m.relative_path]=Hash-File $dp }
+    $receipt.result='DEPLOYMENT_SUCCESS'
+} catch {
+    $receipt.errors += $_.Exception.Message
+    $ok=$true; foreach($m in $manifest){$bd=Join-Path $backup $m.relative_path;$dp=Join-Path $target $m.relative_path;if(Test-Path -LiteralPath $bd){try{Copy-Item -LiteralPath $bd -Destination $dp -Force;if((Hash-File $dp) -ne $m.pre_target_sha256){$ok=$false}}catch{$ok=$false}}};$receipt.rollback_performed=$true;$receipt.result=if($ok){'DEPLOYMENT_ROLLED_BACK'}else{'ROLLBACK_INCOMPLETE'};if(-not $ok){$receipt.errors += 'Rollback verification failed'}
 }
-if ($PSCmdlet.ShouldProcess($receiptPath, 'Write deployment receipt')) {
-    $receipt | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $receiptPath -Encoding UTF8
-}
-Write-Output ($receipt | ConvertTo-Json -Depth 8)
+$receipt.timestamp_completed=[DateTime]::UtcNow.ToString('o');$receiptDir=Split-Path $receiptFull -Parent;New-Item -ItemType Directory -Path $receiptDir -Force | Out-Null;$receipt | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $receiptFull -Encoding UTF8;$receipt | ConvertTo-Json -Depth 12
+if($receipt.result -ne 'DEPLOYMENT_SUCCESS'){exit 2}
