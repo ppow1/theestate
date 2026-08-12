@@ -38,6 +38,12 @@ BOUNDED_TEXT_PREFIXES = (
     "run a bounded local text task",
     "execute a bounded local text task",
 )
+BOUNDED_TEXT_ACTION_PATTERN = re.compile(r"\b(?:run|execute|use)\b", re.I)
+BOUNDED_TEXT_SIZE_PATTERN = re.compile(r"\b(?:small|tiny|bounded)\b", re.I)
+BOUNDED_TEXT_LOCAL_PATTERN = re.compile(r"\blocal(?:ly)?\b", re.I)
+BOUNDED_TEXT_TASK_PATTERN = re.compile(r"\b(?:text(?:[- ]generation)?|generation)\s*task\b|\btext execution\b", re.I)
+BOUNDED_TEXT_GOVERNED_PATTERN = re.compile(r"\bgoverned\b", re.I)
+UNSAFE_LOCAL_ACTION_PATTERN = re.compile(r"\b(?:benchmark|stress|delete|remove|powershell|shell)\b", re.I)
 P100_RESOURCE_PATTERNS = (
     re.compile(r"\bgoverned\s+p100\s+compute\s+(?:lane|resource)\b", re.I),
     re.compile(r"\btesla\s+p100\b", re.I),
@@ -131,9 +137,22 @@ def detect_bounded_local_text_intent(payload: dict[str, Any], user_message: str)
         lowered = lowered.split(":", 1)[1] if lowered.startswith("grace:") else lowered.split(",", 1)[1].lstrip()
     if model not in {"estate/grace", "estate/grace-grounded-test"}:
         return {"state": "conversation_only", "reason": "resident is not Grace"}
+    if UNSAFE_LOCAL_ACTION_PATTERN.search(lowered):
+        return {"state": "execution_blocked", "reason": "unsafe local action is outside bounded text-task execution"}
     if any(lowered.startswith(prefix) for prefix in BOUNDED_TEXT_PREFIXES):
         return {"state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"}
-    if "execute" in lowered or "run " in lowered:
+    semantic_bounded_text = all(
+        pattern.search(lowered)
+        for pattern in (
+            BOUNDED_TEXT_ACTION_PATTERN,
+            BOUNDED_TEXT_SIZE_PATTERN,
+            BOUNDED_TEXT_LOCAL_PATTERN,
+            BOUNDED_TEXT_TASK_PATTERN,
+        )
+    ) and (BOUNDED_TEXT_GOVERNED_PATTERN.search(lowered) or re.search(r"\btext[- ]generation\b", lowered))
+    if semantic_bounded_text and not UNSAFE_LOCAL_ACTION_PATTERN.search(lowered):
+        return {"state": "execution_requested", "intent": "bounded_local_text", "source": "semantic_chat_intent"}
+    if BOUNDED_TEXT_ACTION_PATTERN.search(lowered):
         return {"state": "execution_blocked", "reason": "execution wording is ambiguous; use an explicit bounded local text task request"}
     return {"state": "conversation_only", "reason": "no executable intent detected"}
 

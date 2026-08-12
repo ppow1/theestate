@@ -26,6 +26,31 @@ def test_bounded_text_intent_is_explicit_and_ordinary_chat_is_not_executable():
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run something locally.")["state"] == "execution_blocked"
 
 
+def test_natural_bounded_local_text_variants_are_executable():
+    prompts = [
+        "Run one small governed local text task and return one short sentence confirming successful local execution. Use the normal governed execution path and do not perform hardware actions.",
+        "Grace, execute a bounded local text-generation task and give me one short sentence.",
+        "Use the governed local text execution path for a tiny response.",
+        "Run a small local governed text task; no hardware actions.",
+    ]
+    for prompt in prompts:
+        result = detect_bounded_local_text_intent({"model": "estate/grace"}, prompt)
+        assert result == {"state": "execution_requested", "intent": "bounded_local_text", "source": "semantic_chat_intent"}
+
+
+def test_ambiguous_or_unsafe_local_requests_remain_fail_closed():
+    prompts = [
+        "Run this locally.",
+        "Use my GPU.",
+        "Execute something on this computer.",
+        "Run a benchmark.",
+        "Delete this file locally.",
+        "Launch PowerShell locally.",
+    ]
+    for prompt in prompts:
+        assert detect_bounded_local_text_intent({"model": "estate/grace"}, prompt)["state"] == "execution_blocked"
+
+
 def test_bounded_prompt_with_runtime_keywords_bypasses_read_only_runtime_layer():
     prompt = "Grace, run a small bounded local text task on the governed P100 compute lane: write one short sentence about a safe operational checkpoint; include no secrets and perform no hardware actions."
     payload = {"model": "estate/grace", "messages": [{"role": "user", "content": prompt}]}
