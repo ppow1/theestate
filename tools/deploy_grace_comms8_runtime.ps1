@@ -32,6 +32,8 @@ $relativeFiles = @(
     'src\estate\core\operations_control_runtime.py', 'src\estate\core\operations_manager.py',
     'src\estate\core\ptm_policy.py', 'src\estate\core\ptm_production_readiness.py',
     'src\estate\core\ptm_readiness_integration.py', 'src\estate\core\ptm_waiver_authority.py',
+    'config\runtime\gpu_runtime_lanes.json', 'config\providers\qwen_local_text.json',
+    'config\providers\qwen_local_text_p100.json', 'schemas\execution_provider_adapter_request_v1.schema.json',
     'src\estate\core\resident_authority.py', 'src\estate\core\resident_identity_composition.py',
     'src\estate\core\resident_interaction.py', 'src\estate\core\resident_voice_commissioning.py',
     'src\estate\core\steward_help.py',

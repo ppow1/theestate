@@ -14,8 +14,14 @@ def test_deployment_is_selective_and_contains_accepted_surface():
     text = SCRIPT.read_text(encoding="utf-8")
     manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
     manifest = re.findall(r"'([^']+)'", manifest_block)
-    assert len(manifest) == 102
+    assert len(manifest) == 106
     assert "src\\estate\\core\\openwebui_engineering_workflow.py" in manifest
+    assert {
+        "config\\runtime\\gpu_runtime_lanes.json",
+        "config\\providers\\qwen_local_text.json",
+        "config\\providers\\qwen_local_text_p100.json",
+        "schemas\\execution_provider_adapter_request_v1.schema.json",
+    }.issubset(set(manifest))
     required = [
         "autonomous_chatgpt_mailbox_worker.py",
         "grace_consultation_loop.py",
@@ -33,6 +39,23 @@ def test_deployment_is_selective_and_contains_accepted_surface():
     assert "Copy-Item" in text
     assert "SourceRoot" in text and "TargetRoot" in text and "PreflightOnly" in text and "Deploy" in text
     assert "ExpectedSourceSha" in text and "PREFLIGHT_BLOCKED" in text
+
+
+def test_bounded_local_runtime_config_closure_is_finite_and_selective():
+    text = SCRIPT.read_text(encoding="utf-8")
+    manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
+    manifest = set(re.findall(r"'([^']+)'", manifest_block))
+    required = {
+        "config\\runtime\\gpu_runtime_lanes.json",
+        "config\\providers\\qwen_local_text.json",
+        "config\\providers\\qwen_local_text_p100.json",
+        "schemas\\execution_provider_adapter_request_v1.schema.json",
+    }
+    assert required <= manifest
+    assert "config\\runtime\\openwebui.json" not in manifest
+    assert "config\\providers\\unknown_provider.json" not in manifest
+    for relative in required:
+        assert (ROOT / relative).is_file()
 
 
 def test_grace_catalog_contract_is_canonical():

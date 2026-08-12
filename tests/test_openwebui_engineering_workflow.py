@@ -88,6 +88,23 @@ def test_qwen_model_specific_vram_floor_fails_closed_when_missing(tmp_path):
     assert _qwen_minimum_safe_vram_mib(tmp_path) is None
 
 
+def test_missing_lane_registry_fails_closed_before_bounded_execution(tmp_path, monkeypatch):
+    import estate.core.openwebui_engineering_workflow as workflow
+    monkeypatch.setattr(workflow, "collect_nvidia_smi", lambda: [ComputeResourceObservation(
+        resource_id="host:nvidia:GPU-test", host_id="host", nvidia_uuid="GPU-test",
+        name="NVIDIA GeForce RTX 4090", health_state="healthy", capacity_state="available",
+    )])
+    result = workflow.execute_bounded_local_text_from_chat(
+        {"model": "estate/grace"},
+        user_message="Grace, run a small bounded local text task.",
+        session_id="missing-lane-registry",
+        root=tmp_path,
+    )
+    assert result["state"] == "execution_blocked"
+    assert result["provider_execution_performed"] is False
+    assert "target lane" in result["reason"]
+
+
 def test_bounded_visible_placement_uses_authoritative_receipt_metadata():
     content = _bounded_local_text_content({
         "state": "execution_completed",
