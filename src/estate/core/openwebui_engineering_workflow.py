@@ -22,6 +22,7 @@ from estate.core.helen_workforce import HelenWorkforceStore, WorkforceAssessment
 from estate.core.grace_helen_engineering_composition import GraceHelenEngineeringComposition
 from estate.core.gpu_runtime_lanes import endpoint_health, load_registered_lanes, select_runtime_lane
 from estate.core.gpu_runtime_lifecycle import ensure_runtime_lane_ready
+from estate.core.governed_execution_runtime_state import ensure_governed_execution_runtime_state
 from estate.core.ptm_production_readiness import append_ptm_event
 from estate.core.execution_provider_adapter import utc_now
 from estate.core.paths import ESTATE_ROOT
@@ -162,6 +163,10 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if intent["state"] != "execution_requested":
         return intent if intent["state"] == "execution_blocked" else None
     rootp = _root(root)
+    try:
+        ensure_governed_execution_runtime_state(rootp)
+    except (OSError, RuntimeError, ValueError) as exc:
+        return {"state": "execution_blocked", "reason": f"governed execution runtime state is unavailable: {exc}", "provider_execution_performed": False}
     observations = collect_nvidia_smi()
     if not observations:
         return {"state": "execution_blocked", "reason": "fresh physical compute evidence is unavailable", "provider_execution_performed": False}
