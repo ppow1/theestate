@@ -11,7 +11,7 @@ from estate.core.multi_resident_room import create_room, invite_participant, acc
 from estate.core.open_webui_multi_resident_gateway import DEFAULT_ROOM_MODEL, attributed_response_envelope, normalize_open_webui_request
 from estate.core.resident_identity_composition import compose_resident_identity
 from estate.core.openwebui_resident_package import resident_package
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat, detect_bounded_local_text_intent, execute_bounded_local_text_from_chat
+from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, initiate_engineering_assignment_from_chat, detect_bounded_local_text_intent, execute_bounded_local_text_from_chat, execute_parallel_bounded_local_text_from_chat
 from estate.core.grace_momentum_service import LoopbackGraceMomentumClient
 from estate.core.grace_runtime_bridge import GraceRuntimeBridge
 from estate.core.openwebui_grace_assignment import detect_grace_image_assignment, execute_grace_image_assignment
@@ -638,6 +638,19 @@ def _grace_consultation_chat_completion(payload: dict[str, Any], *, user_message
     }
     return body
 def _bounded_local_text_content(workflow: dict[str, Any]) -> str:
+    if workflow.get("parallel"):
+        tasks = []
+        for task in workflow.get("tasks", []):
+            metadata = task.get("execution", {}).get("result", {}).get("metadata", {})
+            tasks.append({
+                "task_id": task.get("intent", {}).get("task_id") or task.get("objective", {}).get("objective_id"),
+                "status": task.get("state"),
+                "runtime_lane": task.get("lane", {}).get("runtime_lane_id"),
+                "gpu_uuid": metadata.get("actual_runtime_gpu_uuid") or metadata.get("runtime_bound_gpu_uuid"),
+                "placement_match": metadata.get("placement_match"),
+                "summary": task.get("execution", {}).get("result", {}).get("summary"),
+            })
+        return json.dumps({"status": workflow.get("state"), "parallel": True, "tasks": tasks}, sort_keys=True)
     if workflow.get("state") == "execution_completed":
         result_metadata = workflow.get("execution", {}).get("result", {}).get("metadata", {})
         placement = workflow.get("placement", {}).get("selected")
@@ -708,7 +721,8 @@ def _bounded_local_text_chat_completion(payload: dict[str, Any], *, user_message
     intent = detect_bounded_local_text_intent(payload, user_message)
     if intent["state"] == "conversation_only":
         return None
-    workflow = execute_bounded_local_text_from_chat(payload, user_message=user_message, session_id=session_id, root=root)
+    executor = execute_parallel_bounded_local_text_from_chat if intent.get("intent") == "parallel_bounded_local_text" else execute_bounded_local_text_from_chat
+    workflow = executor(payload, user_message=user_message, session_id=session_id, root=root)
     if workflow is None:
         return None
     content = _bounded_local_text_content(workflow)

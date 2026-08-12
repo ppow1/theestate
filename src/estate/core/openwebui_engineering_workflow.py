@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -44,6 +45,12 @@ BOUNDED_TEXT_LOCAL_PATTERN = re.compile(r"\blocal(?:ly)?\b", re.I)
 BOUNDED_TEXT_TASK_PATTERN = re.compile(r"\b(?:text(?:[- ]generation)?|generation)\s*task\b|\btext execution\b", re.I)
 BOUNDED_TEXT_GOVERNED_PATTERN = re.compile(r"\bgoverned\b", re.I)
 UNSAFE_LOCAL_ACTION_PATTERN = re.compile(r"\b(?:benchmark|stress|delete|remove|powershell|shell)\b", re.I)
+PARALLEL_COUNT_PATTERN = re.compile(r"\b(?:two|2|pair\s+of)\b", re.I)
+PARALLEL_CONCURRENCY_PATTERN = re.compile(r"\b(?:concurrent(?:ly)?|parallel|at\s+the\s+same\s+time|simultaneous(?:ly)?)\b", re.I)
+PARALLEL_TASK_PATTERN = re.compile(r"\b(?:local\s+)?text(?:[- ]generation)?\s+tasks?\b|\btext execution\b", re.I)
+PARALLEL_GOVERNED_PATTERN = re.compile(r"\bgoverned\b|\bqualified\s+(?:gpu\s+)?lanes?\b", re.I)
+PARALLEL_QUALIFIED_LANE_PATTERN = re.compile(r"\b(?:4090|p100)\b", re.I)
+PARALLEL_UNKNOWN_LANE_PATTERN = re.compile(r"\b(?:a100|v100|t4|3090|p40|other\s+gpu|both\s+gpus)\b", re.I)
 P100_RESOURCE_PATTERNS = (
     re.compile(r"\bgoverned\s+p100\s+compute\s+(?:lane|resource)\b", re.I),
     re.compile(r"\btesla\s+p100\b", re.I),
@@ -139,6 +146,22 @@ def detect_bounded_local_text_intent(payload: dict[str, Any], user_message: str)
         return {"state": "conversation_only", "reason": "resident is not Grace"}
     if UNSAFE_LOCAL_ACTION_PATTERN.search(lowered):
         return {"state": "execution_blocked", "reason": "unsafe local action is outside bounded text-task execution"}
+    parallel_bounded_text = (
+        PARALLEL_COUNT_PATTERN.search(lowered)
+        and PARALLEL_CONCURRENCY_PATTERN.search(lowered)
+        and PARALLEL_TASK_PATTERN.search(lowered)
+        and PARALLEL_GOVERNED_PATTERN.search(lowered)
+        and (BOUNDED_TEXT_LOCAL_PATTERN.search(lowered) or PARALLEL_QUALIFIED_LANE_PATTERN.search(lowered))
+    )
+    if parallel_bounded_text:
+        if PARALLEL_UNKNOWN_LANE_PATTERN.search(lowered):
+            return {"state": "execution_blocked", "reason": "parallel request names an unsupported or ambiguous runtime lane"}
+        return {
+            "state": "execution_requested",
+            "intent": "parallel_bounded_local_text",
+            "source": "semantic_parallel_chat_intent",
+            "task_specs": _parallel_bounded_text_task_specs(),
+        }
     if any(lowered.startswith(prefix) for prefix in BOUNDED_TEXT_PREFIXES):
         return {"state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"}
     semantic_bounded_text = all(
@@ -155,6 +178,30 @@ def detect_bounded_local_text_intent(payload: dict[str, Any], user_message: str)
     if BOUNDED_TEXT_ACTION_PATTERN.search(lowered):
         return {"state": "execution_blocked", "reason": "execution wording is ambiguous; use an explicit bounded local text task request"}
     return {"state": "conversation_only", "reason": "no executable intent detected"}
+
+
+def _parallel_bounded_text_task_specs() -> list[dict[str, Any]]:
+    """Return the fixed, already-qualified two-lane UI parallel contract."""
+    return [
+        {
+            "task_id": "rtx4090",
+            "runtime_lane_id": "qwen.local.text.4090",
+            "gpu_symbol": "rtx4090",
+            "model": "qwen3:8b",
+            "context_limit": None,
+            "output_cap": None,
+            "concurrency": 1,
+        },
+        {
+            "task_id": "p100",
+            "runtime_lane_id": "qwen.local.text.p100-1",
+            "gpu_symbol": "p100",
+            "model": "llama3.2:3b",
+            "context_limit": 1024,
+            "output_cap": 32,
+            "concurrency": 1,
+        },
+    ]
 
 
 def _readiness_event(rootp: Path, objective: GraceObjective) -> dict[str, Any]:
@@ -237,6 +284,44 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     finally:
         ComputeReservationLedger(rootp).release(reservation_id)
     return {"state": "execution_completed" if execution.get("status") == "completed" else "execution_failed", "intent": intent, "objective": objective.to_dict(), "grace_action": action.to_dict(), "placement": placement, "lane": lane.to_dict(), "governed": governed, "execution": execution, "provider_execution_performed": execution.get("status") == "completed", "session_id": session_id}
+
+
+def execute_parallel_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None) -> dict[str, Any] | None:
+    """Run exactly the two qualified local-text lanes through the existing governed executor."""
+    intent = detect_bounded_local_text_intent(payload, user_message)
+    if intent.get("state") != "execution_requested" or intent.get("intent") != "parallel_bounded_local_text":
+        return intent if intent.get("state") == "execution_blocked" else None
+    specs = intent["task_specs"]
+    task_messages = {
+        "rtx4090": "Run a small governed local text task and return one short result.",
+        "p100": "Run a small governed local text task using the governed P100 compute lane and return one short result.",
+    }
+
+    def run(spec: dict[str, Any]) -> dict[str, Any]:
+        task_payload = dict(payload)
+        metadata = dict(payload.get("metadata") or {})
+        metadata["parallel_task_id"] = spec["task_id"]
+        metadata["parallel_runtime_lane_id"] = spec["runtime_lane_id"]
+        task_payload["metadata"] = metadata
+        return execute_bounded_local_text_from_chat(
+            task_payload,
+            user_message=task_messages[spec["task_id"]],
+            session_id=session_id,
+            root=root,
+        ) or {"state": "execution_blocked", "reason": "parallel task returned no governed result", "provider_execution_performed": False}
+
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="grace-parallel-text") as pool:
+        results = list(pool.map(run, specs))
+    completed = all(item.get("state") == "execution_completed" for item in results)
+    return {
+        "state": "execution_completed" if completed else "execution_failed",
+        "intent": intent,
+        "parallel": True,
+        "task_specs": specs,
+        "tasks": results,
+        "provider_execution_performed": completed,
+        "session_id": session_id,
+    }
 
 
 def initiate_engineering_assignment_from_chat(
