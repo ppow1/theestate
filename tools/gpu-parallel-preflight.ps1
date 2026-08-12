@@ -182,8 +182,16 @@ function Test-EstateOwnership([object]$Process, [int]$Port, [string]$Root, [stri
             }
         } catch { }
     }
-    if ($evidence -match '(?i)ollama|llama-server|python(?:\.exe)?|cuda|model|inference|vllm|text-generation|stable-diffusion') { return 'EXTERNAL_COMPUTE' }
     return 'UNKNOWN'
+}
+
+function Test-ActiveExternalCompute([object]$Process, [object]$Row, [object[]]$EngineTypes, [object]$PortRecord) {
+    $evidence = @([string](Get-Field $Process 'executable_path'), [string](Get-Field $Process 'command_line'), [string](Get-Field $Row 'process_name')) -join ' '
+    $usedMemory = Convert-ToNumber (Get-Field $Row 'used_memory_mib')
+    $hasComputeEngine = @($EngineTypes | Where-Object { [string]$_ -match '(?i)compute|cuda' }).Count -gt 0
+    $foreignLanePort = $null -ne $PortRecord -and [bool]$PortRecord.listening -and [string]$PortRecord.ownership -ne 'ESTATE_OWNED'
+    $modelWorkerSignature = $evidence -match '(?i)llama-server|vllm|text-generation|stable-diffusion|(?:^|\s)--model(?:[=\s])|\.gguf(?:\s|$)'
+    return $foreignLanePort -or $hasComputeEngine -or $modelWorkerSignature
 }
 
 function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [string]$Root, [string]$LaneId, [string]$DriverModel, [object]$Utilization, [object]$Power, [object]$PortRecord, [bool]$UseFixture) {
@@ -208,6 +216,8 @@ function Get-ProcessRecord([object]$Row, [hashtable]$ProcessMap, [int]$Port, [st
     $lanePortSafe = $null -ne $PortRecord -and (-not [bool]$PortRecord.listening -or [string]$PortRecord.ownership -eq 'ESTATE_OWNED')
     $positiveGraphicsContext = @($engineTypes).Count -gt 0 -and -not $hasComputeEngine
     $boundedWddmFallback = @($engineTypes).Count -eq 0 -and $lowAggregateLoad
+    $activeExternalCompute = Test-ActiveExternalCompute $process $Row $engineTypes $PortRecord
+    if ($ownership -eq 'UNKNOWN' -and $activeExternalCompute) { $ownership = 'EXTERNAL_COMPUTE' }
     $nonConflictBasis = $null
     if ($ownership -eq 'UNKNOWN' -and $DriverModel -eq 'WDDM' -and $null -eq $usedMemory -and $hasCompleteProcessMetadata -and $lanePortSafe -and -not $hasComputeEngine -and ($positiveGraphicsContext -or $boundedWddmFallback)) {
         $ownership = 'NON_CONFLICTING_WDDM'

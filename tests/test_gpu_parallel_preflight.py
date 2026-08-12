@@ -181,6 +181,31 @@ def test_external_model_worker_blocks_even_when_current_load_is_low(tmp_path):
     assert result["status"] == "PRECHECK_BLOCKED"
 
 
+def test_idle_ollama_control_and_serve_processes_do_not_block(tmp_path):
+    apps = "\n".join([
+        f"29652, ollama app.exe, [N/A], {RTX}",
+        f"26220, ollama.exe, [N/A], {RTX}",
+    ])
+    processes = [
+        {"pid": 29652, "name": "ollama app.exe", "executable_path": "C:\\Ollama\\ollama app.exe", "command_line": "ollama app.exe", "parent_pid": 1, "gpu_engine_types": []},
+        {"pid": 26220, "name": "ollama.exe", "executable_path": "C:\\Ollama\\ollama.exe", "command_line": "ollama.exe serve", "parent_pid": 1, "gpu_engine_types": []},
+    ]
+    code, result = _run(tmp_path, apps=apps, processes=processes)
+    assert code == 0, result
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    assert {item["ownership"] for item in rtx["compute_processes"]} == {"NON_CONFLICTING_WDDM"}
+    assert rtx["conflicting_external_compute"] is False
+
+
+def test_ollama_control_process_with_no_gpu_allocation_and_no_lane_port_is_non_conflicting(tmp_path):
+    apps = f"26220, ollama.exe, [N/A], {RTX}"
+    processes = [{"pid": 26220, "name": "ollama.exe", "executable_path": "C:\\Ollama\\ollama.exe", "command_line": "ollama.exe serve", "parent_pid": 1, "gpu_engine_types": []}]
+    code, result = _run(tmp_path, apps=apps, processes=processes)
+    assert code == 0, result
+    rtx = next(item for item in result["resources"] if item["gpu_uuid"] == RTX)
+    assert rtx["compute_processes"][0]["ownership"] == "NON_CONFLICTING_WDDM"
+
+
 def test_unknown_wddm_executable_with_model_signature_blocks(tmp_path):
     apps = f"76, mystery.exe, [N/A], {RTX}"
     processes = [{"pid": 76, "name": "mystery.exe", "executable_path": "C:\\Unknown\\mystery.exe", "command_line": "mystery.exe --model local.gguf", "parent_pid": 1, "gpu_engine_types": []}]
