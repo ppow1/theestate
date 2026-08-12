@@ -16,6 +16,7 @@ from estate.core.autonomous_reason_execute_loop import classify_reasoning_respon
 from estate.core.chatgpt_worker_runtime import validate_worker_runtime
 from estate.core.evidence_acquisition import acquisition_count, MAX_ACQUISITIONS
 from estate.core.consultation_escalation import instrument_escalation
+from estate.core.grace_parallel_portfolio import list_activations, mark_activation_active, release_activation
 
 
 WORKER_ID = "chatgpt"
@@ -70,6 +71,25 @@ def generic_worker_prompt() -> str:
         "evidence_requirements, and consultation_correlation. Do not encode "
         "a missing-evidence need only in prose. At the end return exactly "
         "WORKER_COMPLETE after successful resolution."
+    )
+
+
+def reserved_worker_prompt(logical_consultation_id: str, ec8_request_id: str) -> str:
+    """Bind one CME reservation to the existing browser worker turn."""
+    return (
+        f"Use Estate Comms8 Live and process ONLY the CME-reserved consultation "
+        f"logical_consultation_id={logical_consultation_id}, request_id={ec8_request_id}. "
+        f"Call estate_comms8_claim_request with request_id={ec8_request_id}, worker_id=chatgpt, "
+        "lease_seconds=900 exactly, then read, "
+        "acknowledge, reason, respond, and resolve only that request with worker_id=chatgpt. "
+        "Do not call claim_next, do not process any other request, and do not create another request. "
+        "If context is insufficient, return CONTEXT_REQUIRED rather than guessing. Return one complete "
+        "JSON response with reasoning and a decision classified as INFORMATION_ONLY, "
+        "EXECUTION_RECOMMENDED, STEWARD_DECISION_REQUIRED, or MORE_REASONING_REQUIRED. "
+        "For EXECUTION_RECOMMENDED include objective, required_capability, allowed_scope, "
+        "prohibited_scope, evidence_requirements, validation_criteria, consultation_correlation, "
+        "and write_scope. For MORE_REASONING_REQUIRED include an explicit evidence_request when needed. "
+        "Return exactly WORKER_COMPLETE after successful resolution."
     )
 
 
@@ -274,12 +294,29 @@ class AutonomousChatGPTMailboxWorker:
 
     def run_once(self) -> WorkerResult:
         self._write_state("CHECKING_QUEUE")
+        reserved_logical_id = os.environ.get("ESTATE_RESERVED_CONTINUATION_ID")
         candidates = self.store.search(status="awaiting_reasoning")
+        if reserved_logical_id:
+            candidates = [item for item in candidates if item.logical_consultation_id == reserved_logical_id]
         if not candidates:
             self._write_state("IDLE", result="EMPTY_QUEUE")
             return WorkerResult("EMPTY_QUEUE", reason="no_awaiting_reasoning_consultation")
 
-        consultation = candidates[0]
+        reservations = {
+            item.continuation_logical_id: item
+            for item in list_activations(self.store, states={"RESERVED", "LAUNCHING", "ACTIVE"})
+        }
+        reserved_candidates = [item for item in candidates if item.logical_consultation_id in reservations]
+        # A direct legacy worker tick may have no portfolio reservation; keep
+        # the historical fallback, while a reserved live lane is authoritative
+        # and prevents the worker from claiming another root's request.
+        consultation = (reserved_candidates or candidates)[0]
+        if reserved_logical_id and consultation.logical_consultation_id != reserved_logical_id:
+            self._write_state("ERROR", reason="reserved_lane_not_found", logical_consultation_id=reserved_logical_id)
+            return WorkerResult("ERROR", reserved_logical_id, reason="reserved_lane_not_found")
+        activation = reservations.get(consultation.logical_consultation_id)
+        if activation and activation.state == "RESERVED":
+            mark_activation_active(self.store, activation.activation_id, worker_pid=os.getpid())
         if not consultation.ec8_request_id:
             self._write_state("ERROR", reason="consultation_missing_ec8_request_id", logical_consultation_id=consultation.logical_consultation_id)
             return WorkerResult("ERROR", consultation.logical_consultation_id, reason="consultation_missing_ec8_request_id")
@@ -304,8 +341,11 @@ class AutonomousChatGPTMailboxWorker:
                     if attempt.request_id == consultation.ec8_request_id:
                         self.store.mark_transport_attempt(consultation.logical_consultation_id, attempt.attempt_number, status="resolved", worker_id="chatgpt")
                 self._write_state("STOPPED", result="WORKER_COMPLETE", logical_consultation_id=consultation.logical_consultation_id, ec8_request_id=consultation.ec8_request_id, recovery=True)
+                if activation:
+                    release_activation(self.store, activation.activation_id, reason="worker_complete")
                 return WorkerResult("WORKER_COMPLETE", consultation.logical_consultation_id, consultation.ec8_request_id)
-            browser_result = self.browser_runner(self.browser_script, generic_worker_prompt())
+            prompt = reserved_worker_prompt(consultation.logical_consultation_id, consultation.ec8_request_id) if reserved_logical_id else generic_worker_prompt()
+            browser_result = self.browser_runner(self.browser_script, prompt)
             marker = browser_result.get("marker")
             if marker == "READINESS_FAILED":
                 reason = str(browser_result.get("reason") or "chatgpt_readiness_failed")
@@ -349,10 +389,18 @@ class AutonomousChatGPTMailboxWorker:
                 if attempt.request_id == consultation.ec8_request_id:
                     self.store.mark_transport_attempt(consultation.logical_consultation_id, attempt.attempt_number, status="resolved", worker_id="chatgpt")
             self._write_state("STOPPED", result="WORKER_COMPLETE", logical_consultation_id=consultation.logical_consultation_id, ec8_request_id=consultation.ec8_request_id)
+            if activation:
+                release_activation(self.store, activation.activation_id, reason="worker_complete")
             return WorkerResult("WORKER_COMPLETE", consultation.logical_consultation_id, consultation.ec8_request_id)
         except Exception as exc:
             self._write_state("ERROR", reason=type(exc).__name__ + ":" + str(exc), logical_consultation_id=consultation.logical_consultation_id)
             return WorkerResult("ERROR", consultation.logical_consultation_id, consultation.ec8_request_id, str(exc))
+        finally:
+            # A physical worker owns the activation only for the duration of
+            # this bounded turn.  Handoffs, validation errors, and failures
+            # must all release the reservation so unrelated lanes can move.
+            if activation:
+                release_activation(self.store, activation.activation_id, reason="worker_exit")
 
     def watch(self, *, interval_seconds: float = 2.0, max_seconds: float = 300.0) -> WorkerResult:
         """Boundedly activate on consultation-store changes.

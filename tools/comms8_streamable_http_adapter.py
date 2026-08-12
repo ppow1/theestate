@@ -84,7 +84,35 @@ class AdapterHandler(BaseHTTPRequestHandler):
         if self.path == "/health":
             self._send(200, _json_bytes({"status": "ok", "service": "estate-comms8-streamable-http-adapter"}))
             return
-        self._error(404, "not_found")
+        _purge()
+        if not _authorized(self.headers.get("Authorization", "")):
+            self._error(401, "unauthorized")
+            return
+        session = self.headers.get("Mcp-Session-Id", "")
+        if not session or session not in SESSIONS:
+            self._error(400, "invalid_session")
+            return
+        SESSIONS[session] = time.monotonic()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("Mcp-Session-Id", session)
+        self.send_header("Mcp-Protocol-Version", PROTOCOL)
+        self.end_headers()
+        try:
+            self.wfile.write(b": estate-comms8 keep-alive\n\n")
+            self.wfile.flush()
+            deadline = time.monotonic() + SESSION_TTL
+            while time.monotonic() < deadline and session in SESSIONS:
+                time.sleep(15)
+                if session not in SESSIONS:
+                    break
+                SESSIONS[session] = time.monotonic()
+                self.wfile.write(b": keep-alive\n\n")
+                self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            return
 
     def do_DELETE(self) -> None:
         _purge()

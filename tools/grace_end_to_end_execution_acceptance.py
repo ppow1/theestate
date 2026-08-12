@@ -121,6 +121,7 @@ def run(evidence: Path) -> int:
     loop = GraceConsultationLoop(store=store)
     session_id = "grace-e2e-execution-" + uuid4().hex[:12]
     prompt = (
+        f"This is a fresh bounded acceptance run {session_id}. "
         "Grace, verify whether the controlled acceptance fixture at "
         "Temp/cme-execution-fixtures/full-loop-20260807/fixture.json satisfies "
         "its documented invariant. If needed, ask for higher-level reasoning "

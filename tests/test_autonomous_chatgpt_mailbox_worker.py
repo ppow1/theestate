@@ -3,6 +3,7 @@ import json
 from estate.core.autonomous_chatgpt_mailbox_worker import (
     AutonomousChatGPTMailboxWorker,
     generic_worker_prompt,
+    reserved_worker_prompt,
 )
 from estate.core.consultation_store import ConsultationStore
 
@@ -27,6 +28,14 @@ def test_generic_prompt_contains_no_request_id_and_requires_one_claim_next():
         assert field in prompt
     assert "write_scope" in prompt
     assert "software_engineering_test" in prompt
+
+
+def test_reserved_prompt_binds_exact_internal_lane_without_claim_next():
+    prompt = reserved_worker_prompt("52.00", "ec8-reserved-52")
+    assert "request_id=ec8-reserved-52" in prompt
+    assert "worker_id=chatgpt" in prompt
+    assert "lease_seconds=900" in prompt
+    assert "do not call claim_next" in prompt.lower()
 
 
 def test_worker_can_read_bounded_local_context_without_github(tmp_path):

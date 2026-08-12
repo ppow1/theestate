@@ -76,6 +76,8 @@ def test_generated_prompt_is_governed_and_readable(tmp_path):
     bridge = bridge_request_from_adapter_request(adapter_request, root=tmp_path)
     assert bridge.prompt_source.startswith("docs/prompts/generated-")
     assert not bridge.prompt_source.startswith("runtime/")
+    assert "docs/prompts" in bridge.allowed_read_paths
+    assert "Temp/fixture" in bridge.allowed_read_paths
 
 
 def test_authorization_decision_reference_required(tmp_path):
