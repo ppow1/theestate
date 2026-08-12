@@ -30,6 +30,21 @@ The worker is a bounded child launch, not a replacement Open WebUI service.
 Its lifetime is independent after launch; it does not require an Open WebUI
 restart to obtain the canonical database or secret source.
 
+## Governed Estate startup contract
+
+The Estate CORE and WEBUI launch wrappers use the same canonical persistence
+contract before starting Open WebUI:
+
+- `DATA_DIR`: `A:\AI\OpenWebUI\EstateCanonicalData`
+- database: `A:\AI\OpenWebUI\EstateCanonicalData\webui.db`
+- working directory: `A:\AI\OpenWebUI`
+
+Startup fails closed when the canonical data directory or database is missing
+or unreadable. The package-default data directory is not authoritative, and
+startup does not restore, create, or fall back to another database. Existing
+healthy service ownership remains idempotent; an unrecognized owner of port
+8080 is not killed automatically.
+
 ## Fail-closed checks
 
 `estate.core.chatgpt_worker_runtime.validate_worker_runtime` verifies:
@@ -104,4 +119,3 @@ The following are CONDITIONAL: a fresh ChatGPT conversation/reconnect if the
 existing target is unauthenticated or its Live app attachment is stale;
 consultation-worker relaunch; execution-router/provider relaunch; and Codex
 adapter relaunch when an execution-recommended decision is actually routed.
-
