@@ -14,7 +14,7 @@ def test_deployment_is_selective_and_contains_accepted_surface():
     text = SCRIPT.read_text(encoding="utf-8")
     manifest_block = text.split("$relativeFiles = @(", 1)[1].split(")", 1)[0]
     manifest = re.findall(r"'([^']+)'", manifest_block)
-    assert len(manifest) == 116
+    assert len(manifest) == 122
     assert "src\\estate\\core\\openwebui_engineering_workflow.py" in manifest
     assert {
         "config\\runtime\\gpu_runtime_lanes.json",
@@ -29,6 +29,12 @@ def test_deployment_is_selective_and_contains_accepted_surface():
         "schemas\\operations_control\\operations_decision_v1.schema.json",
         "schemas\\providers\\qwen_local_text_execution_extension_v1.schema.json",
         "schemas\\providers\\provider_receipt_v1.schema.json",
+        "config\\ptm\\readiness_freshness_policy.json",
+        "config\\ptm\\waiver_authorities.json",
+        "schemas\\ptm\\readiness_freshness_policy_v1.schema.json",
+        "schemas\\ptm\\waiver_authorities_v1.schema.json",
+        "schemas\\ptm\\readiness_resolution_v1.schema.json",
+        "schemas\\ptm\\event_v1.schema.json",
     }.issubset(set(manifest))
     required = [
         "autonomous_chatgpt_mailbox_worker.py",
@@ -66,6 +72,12 @@ def test_bounded_local_runtime_config_closure_is_finite_and_selective():
         "schemas\\operations_control\\operations_decision_v1.schema.json",
         "schemas\\providers\\qwen_local_text_execution_extension_v1.schema.json",
         "schemas\\providers\\provider_receipt_v1.schema.json",
+        "config\\ptm\\readiness_freshness_policy.json",
+        "config\\ptm\\waiver_authorities.json",
+        "schemas\\ptm\\readiness_freshness_policy_v1.schema.json",
+        "schemas\\ptm\\waiver_authorities_v1.schema.json",
+        "schemas\\ptm\\readiness_resolution_v1.schema.json",
+        "schemas\\ptm\\event_v1.schema.json",
     }
     assert required <= manifest
     assert "config\\runtime\\openwebui.json" not in manifest
