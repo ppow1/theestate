@@ -44,6 +44,31 @@ $relativeFiles = @(
 function Hash-File([string]$Path) { if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }; return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
 function Invoke-Git([string]$Root, [string[]]$GitArgs) { $out = & git -C $Root @GitArgs 2>&1; if ($LASTEXITCODE -ne 0) { throw "git failed: $($out -join ' ')" }; return ($out -join "`n").Trim() }
 function Safe-Id([string]$Value) { return (($Value -replace '[^A-Za-z0-9_.-]', '_').Trim('_')) }
+function Get-NormalizedGitBlobId([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    $normalized = New-Object byte[] $bytes.Length
+    $count = 0
+    for ($i = 0; $i -lt $bytes.Length; $i++) {
+        if ($bytes[$i] -eq 13 -and ($i + 1) -lt $bytes.Length -and $bytes[$i + 1] -eq 10) { continue }
+        $normalized[$count] = $bytes[$i]; $count++
+    }
+    $tmp = [IO.Path]::GetTempFileName()
+    try { [IO.File]::WriteAllBytes($tmp, $normalized[0..($count - 1)]); return (Invoke-Git $target @('hash-object', $tmp)) }
+    finally { Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue }
+}
+function Find-TrackedBlobProvenance([string]$Root, [string]$RelativePath, [string]$Path) {
+    $blob = Get-NormalizedGitBlobId $Path
+    if (-not $blob) { return $null }
+    $commits = @(Invoke-Git $Root @('log','--all','--format=%H','--',$RelativePath)) | Where-Object { $_ }
+    foreach ($commit in $commits) {
+        $candidate = & git -C $Root rev-parse ("$commit`:$RelativePath") 2>$null
+        if ($LASTEXITCODE -eq 0 -and (($candidate -join '').Trim() -eq $blob)) {
+            return [ordered]@{ blob_id=$blob; commit=$commit; relative_path=$RelativePath; line_ending_normalization='CRLF_TO_LF_FOR_GIT_BLOB_ONLY' }
+        }
+    }
+    return $null
+}
 
 $source = [IO.Path]::GetFullPath($SourceRoot)
 $target = [IO.Path]::GetFullPath($TargetRoot)
@@ -68,10 +93,11 @@ foreach ($relative in $relativeFiles) {
     $sourcePath = Join-Path $source $relative; $targetPath = Join-Path $target $relative
     if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) { throw "Manifest source is missing: $sourcePath" }
     $sourceHash = Hash-File $sourcePath; $preHash = Hash-File $targetPath
-    $class = if ($preHash -and $preHash -eq $sourceHash) { 'INTEGRATION_EQUIVALENT' } elseif ($preHash -and $previous.ContainsKey($relative) -and $preHash -eq $previous[$relative].ToUpperInvariant()) { 'EXPECTED_PREVIOUS_OVERLAY' } elseif (-not $preHash) { 'MISSING_TARGET' } else { 'UNKNOWN_DRIFT' }
+    $provenance = $null
+    $class = if ($preHash -and $preHash -eq $sourceHash) { 'INTEGRATION_EQUIVALENT' } elseif ($preHash -and $previous.ContainsKey($relative) -and $preHash -eq $previous[$relative].ToUpperInvariant()) { 'EXPECTED_PREVIOUS_OVERLAY' } elseif (-not $preHash) { 'MISSING_TARGET' } else { $provenance = Find-TrackedBlobProvenance $target $relative $targetPath; if ($provenance) { 'PROVEN_TRACKED_PREDECESSOR' } else { 'UNKNOWN_DRIFT' } }
     if ($class -eq 'UNKNOWN_DRIFT') { $unknown += $relative }
     if ($class -eq 'INTEGRATION_EQUIVALENT') { $unchanged += $relative } else { $changed += $relative }
-    $manifest += [ordered]@{relative_path=$relative;source_sha256=$sourceHash;pre_target_sha256=$preHash;post_target_sha256=$null;classification=$class;deployment_action=if($class -eq 'INTEGRATION_EQUIVALENT'){'UNCHANGED'}else{'REPLACE'} }
+    $manifest += [ordered]@{relative_path=$relative;source_sha256=$sourceHash;pre_target_sha256=$preHash;post_target_sha256=$null;classification=$class;deployment_action=if($class -eq 'INTEGRATION_EQUIVALENT'){'UNCHANGED'}else{'REPLACE'};provenance=$provenance }
 }
 $result = if ($unknown.Count) { 'PREFLIGHT_BLOCKED' } else { 'PREFLIGHT_PASS' }
 $receipt = [ordered]@{schema='estate.grace_comms8_runtime_overlay.v2';deployment_id=$deploymentId;timestamp_started=$started.ToString('o');timestamp_completed=$null;actor=$env:USERNAME;source_root=$source;source_branch=$branch;source_sha=$sourceSha;target_root=$target;target_git_head=$targetHead;preflight_result=$result;runtime_drift_classification=$manifest;manifest=$manifest;backup_path=$null;files_changed=$changed;files_unchanged=$unchanged;pre_hashes=@{};source_hashes=@{};post_hashes=@{};rollback_available=$false;rollback_performed=$false;services_requiring_restart=@('resident-gateway','grace-consultation-gateway','chatgpt-mailbox-worker');result=$result;warnings=@();errors=@()}

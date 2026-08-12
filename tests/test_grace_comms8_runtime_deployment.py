@@ -55,6 +55,7 @@ def test_deployment_safety_contract_is_fail_closed_and_transactional():
     for marker in (
         "integration/grace-comms8-parallelism", "UNKNOWN_DRIFT", "EXPECTED_PREVIOUS_OVERLAY",
         "INTEGRATION_EQUIVALENT", "pre_target_sha256", "post_target_sha256", "backups",
+        "PROVEN_TRACKED_PREDECESSOR", "Find-TrackedBlobProvenance", "CRLF_TO_LF_FOR_GIT_BLOB_ONLY",
         "metadata.json", "Target changed after preflight", "Temporary source hash failed",
         "Backup verification failed", "DEPLOYMENT_SUCCESS", "DEPLOYMENT_ROLLED_BACK",
         "ROLLBACK_INCOMPLETE", "rollback_available", "rollback_performed",
